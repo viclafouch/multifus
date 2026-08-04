@@ -6,10 +6,11 @@
 //! and the journal. Every command and the window scan go through the same mutex.
 //!
 //! One rule keeps that mutex safe: **never hold this lock while touching the
-//! notification watcher**. The watcher's `stop` joins its own thread, and that
-//! thread is the one running the sink, which takes this lock. Holding both in the
-//! wrong order is the only deadlock this module can produce, and not holding them
-//! at once is enough to make it impossible.
+//! notification watcher or the global shortcut plugin**. The watcher's `stop`
+//! joins its own thread, and that thread is the one running the sink, which
+//! takes this lock. The plugin hops to the main thread and waits for it, and the
+//! main thread is where every command takes this lock. Both are the same shape
+//! of deadlock, and not holding the two at once is enough to make it impossible.
 
 use std::collections::HashMap;
 use std::sync::Mutex;
@@ -22,12 +23,14 @@ use tauri::Manager;
 use crate::app::journal::Journal;
 use crate::app::journal::JournalEvent;
 use crate::app::journal::Outcome;
+use crate::app::journal::ShortcutOutcome;
 use crate::app::view::AuthorizationView;
 use crate::app::view::AutoFocusView;
 use crate::app::view::CharacterView;
 use crate::app::view::ConfigProblem;
 use crate::app::view::ConfigView;
 use crate::app::view::ShortcutAction;
+use crate::app::view::ShortcutStatus;
 use crate::app::view::ShortcutView;
 use crate::app::view::Snapshot;
 use crate::config::ConfigError;
@@ -61,6 +64,10 @@ pub struct Multifus {
     /// The live configuration. Its roster carries the veille and the connected
     /// state, which never reach the file, see ADR 0004.
     settings: Settings,
+    /// What the system answered for each of the four combinations. Filled in one
+    /// piece by [`crate::app::shortcuts::apply`], so an action missing from it
+    /// is one nobody has tried to lay down yet.
+    shortcut_statuses: HashMap<ShortcutAction, ShortcutStatus>,
     /// Where each connected character's window is. Refilled by every scan, since
     /// a [`WindowId`] means nothing once its window is gone.
     windows: HashMap<String, WindowId>,
@@ -112,6 +119,7 @@ impl Multifus {
             store,
             version: version.into(),
             settings,
+            shortcut_statuses: HashMap::new(),
             windows: HashMap::new(),
             granted: None,
             listening: false,
@@ -141,9 +149,12 @@ impl Multifus {
                 .into_iter()
                 .map(|action| ShortcutView {
                     action,
-                    accelerator: self
-                        .shortcut(action)
-                        .map(|shortcut| shortcut.as_str().to_owned()),
+                    accelerator: self.accelerator(action),
+                    status: self
+                        .shortcut_statuses
+                        .get(&action)
+                        .cloned()
+                        .unwrap_or(ShortcutStatus::Pending),
                 })
                 .collect(),
             auto_focus: NotificationKind::ALL
@@ -273,11 +284,23 @@ impl Multifus {
         }
     }
 
+    /// The combination bound to an action, as the plugin reads it.
+    #[must_use]
+    pub fn accelerator(&self, action: ShortcutAction) -> Option<String> {
+        self.shortcut(action)
+            .map(|shortcut| shortcut.as_str().to_owned())
+    }
+
+    /// Takes in what the system answered for the four combinations.
+    pub fn set_shortcut_statuses(&mut self, statuses: HashMap<ShortcutAction, ShortcutStatus>) {
+        self.shortcut_statuses = statuses;
+    }
+
     /// Binds a combination to an action, or clears it.
     ///
     /// The text is stored as it comes and never interpreted here. Whether the
-    /// system accepts it is the plugin's answer, at step 7, and it has to reach
-    /// the screen then.
+    /// system accepts it is the plugin's answer, and
+    /// [`crate::app::shortcuts::apply`] is what asks for it right after this.
     pub fn set_shortcut(&mut self, action: ShortcutAction, accelerator: Option<String>) {
         let shortcut = accelerator.and_then(Shortcut::new);
 
@@ -464,6 +487,75 @@ impl Multifus {
             None => Decision::Ignored(Outcome::NoWindow),
         }
     }
+
+    // -- The shortcuts firing ---------------------------------------------
+
+    /// What a shortcut should do, decided without touching the system.
+    ///
+    /// `current` is the character whose window is in the foreground, which the
+    /// caller has already established: outside the game the four combinations
+    /// never get this far. The split is the same as [`Multifus::decide`]'s and
+    /// exists for the same reason, no system call under this lock.
+    ///
+    /// The veille the two toggling actions move is not written to the file, the
+    /// file has no room for it, see ADR 0004.
+    pub fn decide_shortcut(&mut self, action: ShortcutAction, current: &str) -> ShortcutEffect {
+        match action {
+            ShortcutAction::Next => {
+                let target = nickname_of(self.settings.roster.next_in_cycle(current));
+
+                self.aim_at(target)
+            }
+            ShortcutAction::Previous => {
+                let target = nickname_of(self.settings.roster.previous_in_cycle(current));
+
+                self.aim_at(target)
+            }
+            ShortcutAction::ToggleAsleep => self.toggle_foreground(current),
+            ShortcutAction::Swap => match self.settings.roster.swap() {
+                Some(awake) => ShortcutEffect::Settled(ShortcutOutcome::Swapped { awake }),
+                None => ShortcutEffect::Settled(ShortcutOutcome::NoGender),
+            },
+        }
+    }
+
+    /// Turns the character the cycle chose into the window to bring forward.
+    fn aim_at(&self, target: Option<String>) -> ShortcutEffect {
+        let Some(nickname) = target else {
+            return ShortcutEffect::Settled(ShortcutOutcome::NobodyInCycle);
+        };
+
+        match self.windows.get(&nickname) {
+            Some(window) => ShortcutEffect::Focus {
+                nickname,
+                window: *window,
+            },
+            None => ShortcutEffect::Settled(ShortcutOutcome::NoWindow { nickname }),
+        }
+    }
+
+    /// Puts the character in front to sleep, or wakes it up.
+    ///
+    /// A refusal here means the roster does not hold that nickname yet, since a
+    /// window is in the foreground and the character is therefore online. That
+    /// is a client opened less than one scan ago, and it is worth saying so
+    /// rather than reporting that nothing had to be done.
+    fn toggle_foreground(&mut self, current: &str) -> ShortcutEffect {
+        let nickname = current.to_owned();
+
+        let outcome = match self.settings.roster.toggle_asleep(current) {
+            Some(true) => ShortcutOutcome::Slept { nickname },
+            Some(false) => ShortcutOutcome::Woke { nickname },
+            None => ShortcutOutcome::NotInRoster { nickname },
+        };
+
+        ShortcutEffect::Settled(outcome)
+    }
+}
+
+/// The nickname of the character the cycle chose, if it chose one.
+fn nickname_of(character: Option<&Character>) -> Option<String> {
+    character.map(|character| character.nickname.clone())
 }
 
 /// What [`Multifus::decide`] concluded about a game notification.
@@ -473,6 +565,15 @@ pub enum Decision {
     Focus(WindowId),
     /// Do nothing, and this is why.
     Ignored(Outcome),
+}
+
+/// What [`Multifus::decide_shortcut`] concluded about a shortcut that fired.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ShortcutEffect {
+    /// Bring this window to the front. The only outcome left to the system.
+    Focus { nickname: String, window: WindowId },
+    /// Everything is done, and this is what happened.
+    Settled(ShortcutOutcome),
 }
 
 /// Takes the lock, and takes it even when a previous holder panicked.
@@ -486,4 +587,142 @@ pub fn lock(app: &AppHandle) -> MutexGuard<'_, Multifus> {
         .inner()
         .lock()
         .unwrap_or_else(PoisonError::into_inner)
+}
+
+#[cfg(test)]
+mod tests {
+    use tempfile::TempDir;
+
+    use super::*;
+
+    /// A multifus with nothing on disk, writing into a directory that dies with
+    /// the test rather than into a path written in the source.
+    fn multifus(directory: &TempDir) -> Multifus {
+        Multifus::new(
+            ConfigStore::in_directory(directory.path()),
+            "0.0.0",
+            Loaded {
+                settings: Settings::default(),
+                failure: None,
+                quarantined: None,
+            },
+        )
+    }
+
+    /// A window with the title a real client carries, which is the only door
+    /// into [`GameWindow`].
+    fn window(pid: u64, nickname: &str) -> GameWindow {
+        let title = format!("{nickname} - Dofus Retro v1.48.21");
+
+        GameWindow::from_title(WindowId::from_raw(pid), &title).expect("a game window")
+    }
+
+    #[test]
+    fn the_cycle_shortcuts_hand_back_the_window_of_the_next_character() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha"), window(2, "Bravo")]);
+
+        assert_eq!(
+            state.decide_shortcut(ShortcutAction::Next, "Alpha"),
+            ShortcutEffect::Focus {
+                nickname: "Bravo".to_owned(),
+                window: WindowId::from_raw(2),
+            }
+        );
+        assert_eq!(
+            state.decide_shortcut(ShortcutAction::Previous, "Alpha"),
+            ShortcutEffect::Focus {
+                nickname: "Bravo".to_owned(),
+                window: WindowId::from_raw(2),
+            }
+        );
+    }
+
+    #[test]
+    fn the_veille_shortcut_acts_on_the_character_in_front() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha"), window(2, "Bravo")]);
+
+        assert_eq!(
+            state.decide_shortcut(ShortcutAction::ToggleAsleep, "Alpha"),
+            ShortcutEffect::Settled(ShortcutOutcome::Slept {
+                nickname: "Alpha".to_owned()
+            })
+        );
+
+        // And the cycle now walks past it.
+        assert_eq!(
+            state.decide_shortcut(ShortcutAction::Next, "Bravo"),
+            ShortcutEffect::Focus {
+                nickname: "Bravo".to_owned(),
+                window: WindowId::from_raw(2),
+            }
+        );
+
+        assert_eq!(
+            state.decide_shortcut(ShortcutAction::ToggleAsleep, "Alpha"),
+            ShortcutEffect::Settled(ShortcutOutcome::Woke {
+                nickname: "Alpha".to_owned()
+            })
+        );
+    }
+
+    #[test]
+    fn a_shortcut_fired_from_a_client_opened_a_moment_ago_says_so() {
+        // The scan runs every few seconds, so a window can be in front before
+        // its character has entered the roster. Reporting that nothing had to be
+        // done would send the user looking in the wrong place.
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        assert_eq!(
+            state.decide_shortcut(ShortcutAction::ToggleAsleep, "Echo"),
+            ShortcutEffect::Settled(ShortcutOutcome::NotInRoster {
+                nickname: "Echo".to_owned()
+            })
+        );
+    }
+
+    #[test]
+    fn the_swap_shortcut_alternates_and_does_nothing_without_a_gender() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha"), window(2, "Bravo")]);
+
+        assert_eq!(
+            state.decide_shortcut(ShortcutAction::Swap, "Alpha"),
+            ShortcutEffect::Settled(ShortcutOutcome::NoGender)
+        );
+
+        state.set_gender("Alpha", Some(Gender::Male));
+        state.set_gender("Bravo", Some(Gender::Female));
+
+        assert_eq!(
+            state.decide_shortcut(ShortcutAction::Swap, "Alpha"),
+            ShortcutEffect::Settled(ShortcutOutcome::Swapped {
+                awake: Gender::Female
+            })
+        );
+        assert_eq!(
+            state.decide_shortcut(ShortcutAction::Swap, "Alpha"),
+            ShortcutEffect::Settled(ShortcutOutcome::Swapped {
+                awake: Gender::Male
+            })
+        );
+    }
+
+    #[test]
+    fn a_cycle_shortcut_with_everyone_asleep_settles_on_nothing() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha")]);
+        state.toggle_asleep("Alpha");
+
+        assert_eq!(
+            state.decide_shortcut(ShortcutAction::Next, "Alpha"),
+            ShortcutEffect::Settled(ShortcutOutcome::NobodyInCycle)
+        );
+    }
 }

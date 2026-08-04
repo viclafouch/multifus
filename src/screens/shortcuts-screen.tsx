@@ -3,7 +3,12 @@ import { FieldRow, Note, Panel, Screen } from '@/components/screen'
 import { Button } from '@/components/ui/button'
 import type { CaptureRejection } from '@/lib/accelerator'
 import { acceleratorParts, capture, heldModifiers } from '@/lib/accelerator'
-import type { ShortcutAction, ShortcutBinding, Snapshot } from '@/lib/multifus'
+import type {
+  ShortcutAction,
+  ShortcutBinding,
+  ShortcutStatus,
+  Snapshot
+} from '@/lib/multifus'
 import { setShortcut } from '@/lib/multifus'
 import { keyLabel, strings } from '@/lib/strings'
 
@@ -15,11 +20,11 @@ type ShortcutsScreenProps = Readonly<{
 /**
  * The four combinations of perimetre.md.
  *
- * This screen captures and stores, and stops there. Whether the system accepts a
- * combination is the plugin's answer at the next step, and the trap to avoid
- * then is Dracoon's: it unregisters everything and re-registers it inside a
- * swallowed try, so one bad combination leaves the user with no shortcuts at all
- * and no message.
+ * This screen captures, and then reports. What each combination is worth is not
+ * guessed here: the Rust side lays it on the system and sends back what the
+ * system answered, action by action. That is the trap of Dracoon shut, which
+ * drops every shortcut and puts them back inside a swallowed try, leaving one
+ * bad combination to cost the user all four and tell them nothing.
  */
 export const ShortcutsScreen = ({ shortcuts, run }: ShortcutsScreenProps) => {
   const [editing, setEditing] = React.useState<ShortcutAction | null>(null)
@@ -42,7 +47,6 @@ export const ShortcutsScreen = ({ shortcuts, run }: ShortcutsScreenProps) => {
             >
               <ShortcutField
                 shortcut={shortcut}
-                isConflicting={isConflicting(shortcuts, shortcut)}
                 editing={{
                   isActive: editing === shortcut.action,
                   handleOpen: () => {
@@ -61,14 +65,13 @@ export const ShortcutsScreen = ({ shortcuts, run }: ShortcutsScreenProps) => {
           )
         })}
       </Panel>
-      <Note>{strings.shortcuts.notWired}</Note>
+      <Note>{strings.shortcuts.silent}</Note>
     </Screen>
   )
 }
 
 type ShortcutFieldProps = Readonly<{
   shortcut: ShortcutBinding
-  isConflicting: boolean
   editing: Readonly<{
     isActive: boolean
     handleOpen: () => void
@@ -85,11 +88,7 @@ type ShortcutFieldProps = Readonly<{
  * that is only modifiers is shown as it is held rather than rejected: it is
  * somebody halfway through a combination, not a mistake.
  */
-const ShortcutField = ({
-  shortcut,
-  isConflicting: hasConflict,
-  editing
-}: ShortcutFieldProps) => {
+const ShortcutField = ({ shortcut, editing }: ShortcutFieldProps) => {
   const [held, setHeld] = React.useState<readonly string[]>([])
   const [rejected, setRejected] = React.useState<CaptureRejection | null>(null)
 
@@ -136,7 +135,7 @@ const ShortcutField = ({
 
   const hint = fieldHint({
     isEditing: editing.isActive,
-    hasConflict,
+    status: shortcut.status,
     rejected
   })
 
@@ -148,11 +147,11 @@ const ShortcutField = ({
           strings.shortcuts.actions[shortcut.action].label
         )}
         data-editing={editing.isActive ? '' : undefined}
-        data-conflict={hasConflict ? '' : undefined}
+        data-error={hint.tone === 'bad' ? '' : undefined}
         onClick={editing.handleOpen}
         onKeyDown={editing.isActive ? handleKeyDown : undefined}
         onBlur={editing.isActive ? stop : undefined}
-        className="h-8 min-w-field justify-center gap-1 px-2 data-conflict:border-destructive/45 data-editing:border-primary/60 data-editing:bg-primary/8 data-editing:ring-2 data-editing:ring-ring"
+        className="h-8 min-w-field justify-center gap-1 px-2 data-editing:border-primary/60 data-editing:bg-primary/8 data-editing:ring-2 data-editing:ring-ring data-error:border-destructive/45"
       >
         {parts.length === 0 ? (
           <span className="text-log font-normal text-muted-foreground">
@@ -166,14 +165,13 @@ const ShortcutField = ({
           })
         )}
       </Button>
-      {hint === null ? null : (
-        <p
-          data-tone={hint.tone}
-          className="max-w-60 text-right text-mini text-muted-foreground/75 data-[tone=bad]:text-destructive"
-        >
-          {hint.text}
-        </p>
-      )}
+      <p
+        data-tone={hint.tone}
+        role={hint.tone === 'bad' ? 'alert' : undefined}
+        className="max-w-60 text-right text-mini text-muted-foreground/75 data-[tone=bad]:text-destructive"
+      >
+        {hint.text}
+      </p>
     </div>
   )
 }
@@ -192,12 +190,27 @@ const KeyCap = ({ token }: KeyCapProps) => {
 
 type FieldHintParams = {
   readonly isEditing: boolean
-  readonly hasConflict: boolean
+  readonly status: ShortcutStatus
   readonly rejected: CaptureRejection | null
 }
 
-/** What the line under the field says, or nothing when it has nothing to say. */
-const fieldHint = ({ isEditing, hasConflict, rejected }: FieldHintParams) => {
+type FieldHint = {
+  readonly tone: 'bad' | 'calm'
+  readonly text: string
+}
+
+/**
+ * What the line under the field says.
+ *
+ * It always says something. A combination that works is the state the user came
+ * here to confirm, and a field that stays silent about it is a field one has to
+ * go and test in the game to trust.
+ */
+const fieldHint = ({
+  isEditing,
+  status,
+  rejected
+}: FieldHintParams): FieldHint => {
   if (rejected !== null) {
     return { tone: 'bad', text: strings.shortcuts.rejected[rejected] }
   }
@@ -206,29 +219,36 @@ const fieldHint = ({ isEditing, hasConflict, rejected }: FieldHintParams) => {
     return { tone: 'calm', text: strings.shortcuts.captureHint }
   }
 
-  if (hasConflict) {
-    return { tone: 'bad', text: strings.shortcuts.duplicate }
-  }
-
-  return null
+  return statusHint(status)
 }
 
-/** Whether another action already answers to the same combination. */
-const isConflicting = (
-  shortcuts: readonly ShortcutBinding[],
-  shortcut: ShortcutBinding
-) => {
-  if (shortcut.accelerator === null) {
-    return false
+/** What the system answered about this combination, in French. */
+const statusHint = (status: ShortcutStatus): FieldHint => {
+  const answers = strings.shortcuts.status
+
+  switch (status.kind) {
+    case 'registered': {
+      return { tone: 'calm', text: answers.registered }
+    }
+    case 'unbound': {
+      return { tone: 'calm', text: answers.unbound }
+    }
+    case 'pending': {
+      return { tone: 'calm', text: answers.pending }
+    }
+    case 'invalid': {
+      return { tone: 'bad', text: answers.invalid }
+    }
+    case 'refused': {
+      return { tone: 'bad', text: answers.refused }
+    }
+    case 'duplicate': {
+      const { label } = strings.shortcuts.actions[status.action]
+
+      return { tone: 'bad', text: answers.duplicate(label) }
+    }
+    default: {
+      return { tone: 'calm', text: answers.pending }
+    }
   }
-
-  const same = acceleratorParts(shortcut.accelerator).join('+')
-
-  return shortcuts.some((other) => {
-    return (
-      other.action !== shortcut.action &&
-      other.accelerator !== null &&
-      acceleratorParts(other.accelerator).join('+') === same
-    )
-  })
 }

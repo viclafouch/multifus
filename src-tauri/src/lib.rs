@@ -16,6 +16,11 @@ pub mod platform;
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
+        // No shortcut is declared here and no handler either: which combinations
+        // to lay down is read from the configuration, and each one carries its
+        // own handler so that a key press already knows which action it is. See
+        // `app::shortcuts`.
+        .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .setup(|tauri_app| {
             // The one failure that stops multifus here: no configuration
             // directory at all means there is nowhere to ever write. Everything

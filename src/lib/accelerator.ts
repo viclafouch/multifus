@@ -1,12 +1,12 @@
 /**
  * Reading a key combination off the keyboard, in the exact vocabulary the global
- * shortcut plugin of step 7 will have to parse.
+ * shortcut plugin parses.
  *
  * Nothing here is a user-facing word. The plugin reads `Control+Shift+Right`, so
  * that is what is captured and that is what reaches the configuration file; how
  * it is drawn on screen is decided once, in the strings of the interface.
  *
- * Two rules keep this capture from producing something the plugin will refuse.
+ * Two rules keep this capture from producing something the plugin refuses.
  * The key must be one of the names the parser accepts, which are the W3C
  * `KeyboardEvent.code` values it knows; anything else is turned down at capture
  * time rather than at registration time, when it is too late to say so nicely.

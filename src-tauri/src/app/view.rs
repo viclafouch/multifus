@@ -72,9 +72,52 @@ impl ShortcutAction {
 #[serde(rename_all = "camelCase")]
 pub struct ShortcutView {
     pub action: ShortcutAction,
-    /// The combination as the plugin of step 7 reads it, `null` for an action
-    /// the user has cleared. Nothing here interprets it.
+    /// The combination as the global shortcut plugin reads it, `null` for an
+    /// action the user has cleared. Nothing here interprets it.
     pub accelerator: Option<String>,
+    /// What the system answered when multifus laid this combination down.
+    pub status: ShortcutStatus,
+}
+
+/// What became of one combination when it was handed to the system.
+///
+/// This type exists to keep the trap of the plan shut. Dracoon drops all of its
+/// shortcuts and puts them back inside a `try` whose exception is swallowed, so
+/// one impossible combination leaves the user with nothing bound and nothing
+/// said. Here every action carries its own answer: one failure costs that
+/// action and no other, and the screen reads the answer instead of assuming one.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(
+    tag = "kind",
+    rename_all = "camelCase",
+    rename_all_fields = "camelCase"
+)]
+pub enum ShortcutStatus {
+    /// multifus has not tried yet. Only ever visible in the instant between the
+    /// window opening and the first registration.
+    Pending,
+
+    /// No combination is bound to this action.
+    Unbound,
+
+    /// The system took it.
+    ///
+    /// It is not a promise that the combination will ever fire. A shortcut the
+    /// desktop already owns registers cleanly on macOS and is simply never
+    /// delivered, see the note on [`crate::app::shortcuts`], so the wording on
+    /// screen says what was accepted and not what will work.
+    Registered,
+
+    /// The stored text is not a combination this system can express.
+    Invalid { detail: String },
+
+    /// Another action of multifus already answers to it. The system keys a
+    /// shortcut by the combination alone, so it cannot hold the two.
+    Duplicate { action: ShortcutAction },
+
+    /// The system turned it down. On Windows that is what another application
+    /// holding the combination looks like.
+    Refused { detail: String },
 }
 
 /// One row of the AutoFocus screen.

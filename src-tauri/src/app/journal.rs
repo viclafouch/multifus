@@ -16,6 +16,8 @@ use std::time::UNIX_EPOCH;
 
 use serde::Serialize;
 
+use crate::app::view::ShortcutAction;
+use crate::domain::Gender;
 use crate::domain::NotificationKind;
 
 /// How many entries are kept. Past this the oldest goes, which is the right end
@@ -72,6 +74,25 @@ pub enum JournalEvent {
         outcome: Outcome,
     },
 
+    /// A combination could not be laid on the system. The one failure of the
+    /// shortcuts that must never be swallowed.
+    ShortcutRefused {
+        action: ShortcutAction,
+        /// The combination as it is stored, so the journal names what to change.
+        accelerator: String,
+        detail: String,
+    },
+
+    /// The shortcuts as a whole are in trouble: the thread that runs them could
+    /// not start, or the previous ones could not be taken down.
+    ShortcutsFailed { detail: String },
+
+    /// A shortcut fired, and this is what multifus did with it.
+    Shortcut {
+        action: ShortcutAction,
+        outcome: ShortcutOutcome,
+    },
+
     /// Enumerating the game windows failed for a reason of the system's own.
     ScanFailed { detail: String },
 
@@ -109,6 +130,51 @@ pub enum Outcome {
     FocusFailed { detail: String },
 }
 
+/// What became of a shortcut that fired.
+///
+/// The question this answers is the one asked out loud the day a combination
+/// seems dead: multifus heard the keys, and then what. « Nothing happened »
+/// has five different reasons here, and telling them apart is the whole point.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(tag = "outcome", rename_all = "camelCase")]
+pub enum ShortcutOutcome {
+    /// The window of this character was asked to come to the front.
+    Focused { nickname: String },
+
+    /// This character left the cycle.
+    Slept { nickname: String },
+
+    /// This character came back into the cycle.
+    Woke { nickname: String },
+
+    /// One gender went to sleep and the other woke up.
+    Swapped { awake: Gender },
+
+    /// The foreground window is not a game one, so the shortcut stayed inert.
+    /// The guard of perimetre.md, and by far the most common outcome.
+    OutsideGame,
+
+    /// A game window is in front and its character is not in the roster yet.
+    /// A client opened less than one scan ago looks like this.
+    NotInRoster { nickname: String },
+
+    /// The cycle had nowhere to go: everyone is asleep, or nobody is connected.
+    NobodyInCycle,
+
+    /// The swap had nothing to swap: no connected character has a gender.
+    NoGender,
+
+    /// The character to go to has no window multifus can see any more.
+    NoWindow { nickname: String },
+
+    /// The focus was asked for and the system refused it.
+    FocusFailed { nickname: String, detail: String },
+
+    /// The system would not say what is in the foreground, so the guard could
+    /// not be checked and nothing was done.
+    ForegroundUnknown { detail: String },
+}
+
 /// The last [`CAPACITY`] events, oldest first.
 #[derive(Debug, Default)]
 pub struct Journal {
@@ -143,7 +209,12 @@ impl Journal {
     /// hold: a revoked authorization, a system call that keeps refusing. Written
     /// every time, one such failure would push everything that led to it out of
     /// the journal within a couple of minutes, which is the one thing this
-    /// journal must not do.
+    /// journal must not do. A shortcut mashed outside the game says the same
+    /// thing about the same key press, and costs the same.
+    ///
+    /// It says nothing about whether anything else changed, and no caller should
+    /// read it that way: two identical events in a row are two identical events,
+    /// not a roster that stood still between them.
     pub fn push_unless_repeated(&mut self, event: JournalEvent) {
         if self.entries.back().map(|entry| &entry.event) == Some(&event) {
             return;

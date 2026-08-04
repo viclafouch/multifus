@@ -8,8 +8,8 @@
 //! The scan polls, and that is a deliberate cost. Neither system pushes an event
 //! when a client opens or closes a window, so the choice is between asking every
 //! few seconds and not knowing. [`SCAN_INTERVAL`] is the price of the lamps being
-//! right, and of the shortcuts of step 7 having a fresh window to aim at whether
-//! or not the interface is open.
+//! right, and of the shortcuts having a fresh window to aim at whether or not
+//! the interface is open.
 //!
 //! The AutoFocus path below is written, and on macOS it has never run against a
 //! real client, see step 4 of the plan. Nothing here assumes it works: what it

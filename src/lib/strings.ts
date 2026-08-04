@@ -16,7 +16,9 @@ import type {
   Gender,
   JournalEvent,
   NotificationKind,
-  NotificationOutcome
+  NotificationOutcome,
+  ShortcutAction,
+  ShortcutOutcome
 } from '@/lib/multifus'
 
 export const strings = {
@@ -110,15 +112,29 @@ export const strings = {
     title: 'Raccourcis',
     subtitle:
       'Ces combinaisons restent inertes tant qu’une fenêtre Dofus n’est pas au premier plan.',
-    notWired:
-      'Elles sont enregistrées dans la configuration, mais pas encore posées sur le système : c’est l’étape suivante du projet.',
+    // A combination the system accepts is not a combination that fires: macOS
+    // takes one another application already owns and then never delivers it.
+    // This note is the only place the interface can warn about that, and the
+    // journal is where it is confirmed.
+    silent:
+      'Le système accepte parfois une combinaison qu’une autre application intercepte déjà : elle est alors posée, mais n’arrive jamais jusqu’ici. En cas de doute, appuyez dessus depuis le jeu et regardez le journal.',
     capture: 'Appuyez sur une combinaison',
     captureHint: 'Échap pour annuler, Retour arrière pour effacer.',
     empty: 'Aucune',
     edit: (label: string) => {
       return `Modifier le raccourci ${label}`
     },
-    duplicate: 'Cette combinaison est déjà prise par une autre action.',
+    status: {
+      pending: 'Pas encore posé sur le système.',
+      unbound: 'Aucune combinaison, cette action ne répond à rien.',
+      registered: 'Posé sur le système.',
+      invalid: 'Le système ne sait pas lire cette combinaison.',
+      refused:
+        'Le système a refusé cette combinaison, sans doute déjà prise ailleurs.',
+      duplicate: (label: string) => {
+        return `Déjà prise par « ${label} », le système ne peut pas tenir les deux.`
+      }
+    },
     rejected: {
       noModifier:
         'Il faut au moins un modificateur, sans quoi la touche serait avalée dans toutes les applications.',
@@ -318,7 +334,7 @@ export type JournalTone = 'good' | 'neutral' | 'warning'
 /** The events whose tone is decided by their kind alone. */
 type PlainEventKind = Exclude<
   JournalEvent['kind'],
-  'authorization' | 'notification'
+  'authorization' | 'notification' | 'shortcut'
 >
 
 const TONES = {
@@ -330,13 +346,39 @@ const TONES = {
   scanFailed: 'warning',
   saveFailed: 'warning',
   openFailed: 'warning',
+  shortcutRefused: 'warning',
+  shortcutsFailed: 'warning',
   reset: 'neutral'
 } as const satisfies Record<PlainEventKind, JournalTone>
 
 /**
+ * The tone of each outcome a shortcut can have, a table for the same reason as
+ * {@link TONES}: a new outcome on the Rust side has to fail to compile here
+ * rather than quietly take the neutral colour.
+ *
+ * Ochre is spent on the four that did what the key was pressed for. The ones
+ * that did nothing on purpose stay grey, since being outside the game is the
+ * ordinary state of these four combinations and not a fault.
+ */
+const SHORTCUT_TONES = {
+  focused: 'good',
+  slept: 'good',
+  woke: 'good',
+  swapped: 'good',
+  outsideGame: 'neutral',
+  notInRoster: 'neutral',
+  nobodyInCycle: 'neutral',
+  noGender: 'neutral',
+  noWindow: 'neutral',
+  focusFailed: 'warning',
+  foregroundUnknown: 'warning'
+} as const satisfies Record<ShortcutOutcome['outcome'], JournalTone>
+
+/**
  * A table rather than a switch, so a new event on the Rust side fails to compile
- * here instead of quietly taking the neutral colour. Only the two events whose
- * tone depends on their payload are read by hand.
+ * here instead of quietly taking the neutral colour. Only the three events whose
+ * tone depends on their payload are read by hand, and two of them read a table
+ * of their own.
  */
 export const journalTone = (event: JournalEvent): JournalTone => {
   if (event.kind === 'authorization') {
@@ -345,6 +387,10 @@ export const journalTone = (event: JournalEvent): JournalTone => {
 
   if (event.kind === 'notification') {
     return event.outcome.outcome === 'focused' ? 'good' : 'neutral'
+  }
+
+  if (event.kind === 'shortcut') {
+    return SHORTCUT_TONES[event.outcome.outcome]
   }
 
   return TONES[event.kind]
@@ -376,6 +422,17 @@ export const journalLine = (event: JournalEvent) => {
     case 'notification': {
       return notificationLine(event)
     }
+    case 'shortcut': {
+      return shortcutLine(event)
+    }
+    case 'shortcutRefused': {
+      const { label } = strings.shortcuts.actions[event.action]
+
+      return `Raccourci ${label} refusé (${event.accelerator}) : ${event.detail}`
+    }
+    case 'shortcutsFailed': {
+      return `Les raccourcis ne sont pas fiables : ${event.detail}`
+    }
     case 'scanFailed': {
       return `Lecture des fenêtres impossible : ${event.detail}`
     }
@@ -390,6 +447,62 @@ export const journalLine = (event: JournalEvent) => {
     }
     default: {
       return ''
+    }
+  }
+}
+
+type ShortcutLineParams = {
+  readonly action: ShortcutAction
+  readonly outcome: ShortcutOutcome
+}
+
+/**
+ * A shortcut that fired, put into words.
+ *
+ * Every line names the action first, because the question being asked of this
+ * journal is always about one combination: it was pressed, and then what.
+ */
+const shortcutLine = ({ action, outcome }: ShortcutLineParams) => {
+  const { label } = strings.shortcuts.actions[action]
+
+  switch (outcome.outcome) {
+    case 'focused': {
+      return `${label} : ${outcome.nickname} au premier plan.`
+    }
+    case 'slept': {
+      return `${label} : ${outcome.nickname} mis en veille.`
+    }
+    case 'woke': {
+      return `${label} : ${outcome.nickname} remis dans le défilement.`
+    }
+    case 'swapped': {
+      return outcome.awake === 'male'
+        ? `${label} : les hommes sont réveillés, les femmes en veille.`
+        : `${label} : les femmes sont réveillées, les hommes en veille.`
+    }
+    case 'outsideGame': {
+      return `${label} : ignoré, aucune fenêtre Dofus au premier plan.`
+    }
+    case 'notInRoster': {
+      return `${label} : ${outcome.nickname} n’est pas encore dans le roster.`
+    }
+    case 'nobodyInCycle': {
+      return `${label} : personne dans le défilement.`
+    }
+    case 'noGender': {
+      return `${label} : aucun personnage connecté n’a de sexe assigné.`
+    }
+    case 'noWindow': {
+      return `${label} : la fenêtre de ${outcome.nickname} a disparu.`
+    }
+    case 'focusFailed': {
+      return `${label} : le système a refusé de ramener ${outcome.nickname} au premier plan (${outcome.detail}).`
+    }
+    case 'foregroundUnknown': {
+      return `${label} : impossible de savoir quelle fenêtre est au premier plan (${outcome.detail}).`
+    }
+    default: {
+      return label
     }
   }
 }

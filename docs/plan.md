@@ -85,6 +85,8 @@ Crates pressenties : `objc2`, `objc2-app-kit`, `objc2-application-services`.
 
 Écrite, dans `platform::macos`, mais **pas vérifiée** : elle compile, elle est lintée et testée, et elle n'a jamais tourné face à un vrai client Dofus. L'AutoFocus macOS n'est donc pas prouvé. Ne rien construire qui suppose qu'il fonctionne tant que la vérification ci-dessus n'a pas été faite pour de bon.
 
+Trois hypothèses de cette étape ont tout de même été confrontées à un vrai client Retro pendant l'étape 7, hors de l'application, en lecture seule, avec un harnais jetable qui n'est pas dans le dépôt. Le bundle est bien `com.dofus.d1elauncher`. Le titre de la fenêtre principale est bien de la forme `Pseudo - Dofus Retro v1.48.21`, que la regex reconnaît. Et lire `AXMainWindow` puis `AXTitle` sur ce client coûte 0,05 ms en médiane. Restent non vérifiés, et ce sont les deux qui comptent : l'observateur de bannières et l'activation du processus.
+
 Ce qui a été décidé en l'écrivant. Le focus a deux portes : `activateWithOptions(ActivateAllWindows)` d'abord, sans le `ActivateIgnoringOtherApps` que macOS a déprécié, puis `AXFrontmost` si l'activation coopérative refuse, ce qu'elle a le droit de faire pour une application qui n'est pas au premier plan, et multifus ne l'est jamais. Même processus, même intention, seconde porte.
 
 L'observateur vit sur un thread nommé qui possède tout ce que l'API Accessibility lui rend, rien n'en sort, ce qui donne un watcher `Send + Sync` sans une seule promesse `unsafe` sur des objets Core Foundation. `start` attend par un canal le compte rendu de mise en route, donc une autorisation refusée ou un centre de notifications introuvable revient à l'appelant au lieu de mourir en silence dans un thread ; `stop` joint le thread, donc quand il rend la main le sink ne sera plus appelé. La marche dans la bannière est bornée à huit niveaux et quatre textes, pour ne pas parcourir tout le centre de notifications sur ce thread. Les constantes `AXTitle`, `AXFrontmost` et les autres ne sont pas exposées par `objc2-application-services` et sont réécrites comme dans les en-têtes du framework.
@@ -157,13 +159,37 @@ Ce qui a été décidé en l'écrivant.
 
 ---
 
-## Étape 7 — Raccourcis globaux
+## Étape 7 — Raccourcis globaux ✅ écrite, non vérifiée
 
 **Objectif.** Les quatre raccourcis de [perimetre.md](./perimetre.md) fonctionnent depuis le jeu.
 
 Utiliser `tauri-plugin-global-shortcut`. Chaque raccourci reste inerte tant qu'une fenêtre Dofus n'est pas au premier plan.
 
 **Piège à ne pas reproduire.** Dracoon retire tous ses raccourcis puis les réenregistre à chaque modification, dans un `try` dont l'exception est avalée. Une combinaison invalide laisse donc l'utilisateur sans aucun raccourci et sans aucun message. Il faut valider avant d'appliquer, et remonter l'échec à l'écran.
+
+Écrite, dans `src-tauri/src/app/shortcuts.rs`, cinquième fichier de la couche de branchement. `apply` pose les combinaisons, une fois au démarrage et une fois à chaque modification ; le travail, quand l'une d'elles est frappée, se fait ailleurs.
+
+**Pas vérifiée**, au même titre que l'étape 4 et pour la même raison. Aucune des quatre combinaisons n'a jamais été frappée depuis un client Dofus. « Suivant » et « Précédent » finissent dans `PlatformWindowManager::focus`, l'activation de processus que l'étape 4 liste toujours comme non prouvée ; si elle ne marche pas, ces deux raccourcis ne marchent pas non plus. La vérification à faire : deux clients ouverts, les quatre combinaisons frappées depuis le jeu, et le journal qui dit ce qui s'est passé à chaque fois.
+
+Ce qui a été décidé en l'écrivant.
+
+**Chaque échec coûte une action et une seule.** Les quatre sont bien retirées puis reposées, mais chaque pose est tentée séparément et sa réponse voyage dans le snapshot. `ShortcutStatus` dit posé, illisible, déjà pris par une autre action, ou refusé par le système. L'écran affiche cette réponse sous chaque champ, la phrase `notWired` a disparu, et le journal garde le texte brut du système à côté. Une combinaison impossible ne peut donc plus emporter les trois autres en silence, ce qui est tout le piège ci-dessus.
+
+**Ce que le système accepte n'est pas ce qui se déclenchera.** Vérifié dans le code de `global-hotkey` plutôt que supposé : sur macOS, Carbon ne refuse qu'un doublon du même processus, donc une combinaison qu'une autre application ou le bureau tient déjà s'enregistre proprement et n'est jamais délivrée. Windows est le franc des deux, `RegisterHotKey` échoue avec `ERROR_HOTKEY_ALREADY_REGISTERED`. `Registered` veut donc dire « le système l'a prise » et jamais « elle marchera » ; l'écran le dit en toutes lettres et renvoie au journal, où un événement est écrit à chaque appui.
+
+**Deux actions sur la même combinaison, le système ne sait pas le tenir.** Il indexe un raccourci sur les touches seules, donc la seconde pose remplacerait la première dans la table du plugin. La détection est passée côté Rust, seul endroit qui sache ce qui a réellement été posé, et l'ancienne détection côté React a été retirée pour ne pas laisser deux sources se contredire.
+
+**Rien ne se passe sur le fil qui appelle.** Le plugin délivre ses événements en ligne, sur le fil de la boucle Carbon, c'est-à-dire le fil principal, celui de la fenêtre. Le rappel se contente donc de poser l'action sur une file, et un fil nommé `multifus-shortcuts` la dépile. Un fil et pas un par frappe, pour que deux appuis soient traités dans l'ordre où ils ont été faits.
+
+**La garde « inerte hors du jeu » ne coûte rien, sauf quand elle coûte tout.** Mesurée contre un vrai client Dofus Retro, hors de l'application et en lecture seule : trois cents lectures de `AXMainWindow` puis `AXTitle` sur le processus du client, médiane 0,05 ms, maximum 0,16 ms. Le harnais était jetable et n'est pas dans le dépôt, la mesure se refait en quelques lignes contre un client ouvert. Le problème n'est donc pas la moyenne mais la queue, un client qui ne répond plus bloquant l'appel jusqu'au délai de messagerie de l'Accessibilité. Payer ça sur le fil principal gèlerait la fenêtre, et le fil de travail rend la question sans objet. C'est aussi la raison pour laquelle `foreground_game_window` rend la fenêtre : un seul appel décide de la garde et nomme le personnage.
+
+**L'appui et le relâchement passent par le même rappel.** Sans le filtre sur `Pressed`, chaque action serait jouée deux fois.
+
+**Un ordre, une seule source.** `Shortcuts::all()` a été retiré de l'étape 5 : il encodait l'ordre des quatre actions une deuxième fois à côté de `ShortcutAction::ALL`, et le premier appelant qui en avait besoin est justement celui à qui il faut l'action et pas seulement la combinaison.
+
+**Le vocabulaire du parseur, vérifié touche par touche.** Toutes les touches acceptées à la capture sont bien celles que `global-hotkey` sait lire, alias courts compris. Mais `Pause`, `ScrollLock` et `F21` à `F24` n'ont pas de code de touche sur macOS : elles passent le parseur et échouent à la pose. C'est exactement ce que `ShortcutStatus::Refused` existe pour montrer, elles restent donc offertes à la capture.
+
+**Ce qui n'a pas été ajouté.** La veille et la bascule ne touchent pas au premier plan. perimetre.md décrit leur effet et n'en demande pas plus, donc après une bascule on reste sur un personnage endormi et c'est « Suivant » qui en sort. À rouvrir si l'usage dit le contraire, pas avant.
 
 ---
 
@@ -202,6 +228,8 @@ Un workflow GitHub Actions basé sur `tauri-action`, déclenché sur tag, qui co
 **shadcn 4.16 repose sur Base UI, pas sur Radix.** Les API de composants diffèrent de la plupart des tutoriels shadcn en circulation.
 
 **L'AutoFocus macOS dépend de l'affichage des bannières.** Si l'utilisateur les désactive pour Dofus dans les réglages système, l'écoute cesse de fonctionner. Le README de Dracoon recommande justement de les désactiver sur Windows, où l'écoute passe par l'API et non par l'affichage. Cette asymétrie doit être expliquée dans l'interface.
+
+**Sur macOS, une combinaison déjà prise s'enregistre sans erreur et ne se déclenche jamais.** Carbon ne refuse qu'un doublon du même processus, donc ni le bureau ni une autre application ne provoquent d'échec à la pose. Aucune API ne permet de le savoir à l'avance. Ne pas chercher à faire dire au plugin ce qu'il ne sait pas : la seule preuve est un appui depuis le jeu et la ligne que le journal écrit.
 
 **Un client Dofus sur l'écran de connexion existe déjà en tant que processus** avec des fenêtres, mais sans titre exploitable. Toujours filtrer sur le titre.
 

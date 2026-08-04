@@ -3,7 +3,7 @@
 //!
 //! Every type here is plain data with a `Default`. Nothing reads a file, nothing
 //! registers a shortcut, nothing starts at login: this module describes the
-//! shape, steps 7 and 8 give it an effect.
+//! shape, [`crate::app::shortcuts`] and step 8 give it an effect.
 
 use std::fmt;
 
@@ -43,8 +43,8 @@ pub struct Settings {
 /// The four shortcuts of perimetre.md.
 ///
 /// `None` is a shortcut the user has cleared, and it means the action has no key
-/// combination at all. It is a normal state, not a missing value: step 7
-/// registers what is here and leaves the rest alone.
+/// combination at all. It is a normal state, not a missing value:
+/// [`crate::app::shortcuts`] registers what is here and leaves the rest alone.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Shortcuts {
@@ -63,7 +63,7 @@ pub struct Shortcuts {
 /// `Control+Shift+arrow` rather than `Control+arrow`: macOS binds the latter to
 /// Mission Control and to moving between Spaces, so the four would be taken
 /// before multifus ever saw them. They stay a proposal, the user changes them at
-/// step 6, and step 7 is the one that finds out whether the system accepts them.
+/// step 6, and the registration is what finds out whether the system takes them.
 const DEFAULT_NEXT: &str = "Control+Shift+Right";
 const DEFAULT_PREVIOUS: &str = "Control+Shift+Left";
 const DEFAULT_TOGGLE_ASLEEP: &str = "Control+Shift+Down";
@@ -80,29 +80,15 @@ impl Default for Shortcuts {
     }
 }
 
-impl Shortcuts {
-    /// The four of them, in the order of the table of perimetre.md. Handy for a
-    /// caller that has the same thing to do with each, registering them for
-    /// instance.
-    #[must_use]
-    pub fn all(&self) -> [Option<&Shortcut>; 4] {
-        [
-            self.next.as_ref(),
-            self.previous.as_ref(),
-            self.toggle_asleep.as_ref(),
-            self.swap.as_ref(),
-        ]
-    }
-}
-
-/// A key combination, written the way the global shortcut plugin of step 7
-/// reads it, `Control+Shift+Right` and the like.
+/// A key combination, written the way the global shortcut plugin reads it,
+/// `Control+Shift+Right` and the like.
 ///
 /// It is stored as text and never interpreted here. Deciding whether a
 /// combination exists on this system is the plugin's job, at the moment it is
-/// registered, and the failure has to reach the screen then, see the trap noted
-/// at step 7 of the plan. The only thing this type refuses is a blank string,
-/// which is not a shortcut but an absence, and an absence is spelled `None`.
+/// registered, and the failure has to reach the screen then, which is what
+/// [`crate::app::view::ShortcutStatus`] carries. The only thing this type refuses
+/// is a blank string, which is not a shortcut but an absence, and an absence is
+/// spelled `None`.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(try_from = "String", into = "String")]
 pub struct Shortcut(String);
@@ -264,13 +250,20 @@ mod tests {
 
     #[test]
     fn the_four_shortcuts_are_bound_by_default_and_all_differ() {
+        // Two actions on the same combination is a state the system cannot hold:
+        // it keys a shortcut by the keys alone, so the second registration is
+        // turned down. A first launch must not walk into that.
         let shortcuts = Shortcuts::default();
-        let bound = shortcuts
-            .all()
-            .into_iter()
-            .flatten()
-            .map(Shortcut::as_str)
-            .collect::<Vec<_>>();
+        let bound = [
+            shortcuts.next.as_ref(),
+            shortcuts.previous.as_ref(),
+            shortcuts.toggle_asleep.as_ref(),
+            shortcuts.swap.as_ref(),
+        ]
+        .into_iter()
+        .flatten()
+        .map(Shortcut::as_str)
+        .collect::<Vec<_>>();
 
         assert_eq!(bound.len(), 4);
 
@@ -313,8 +306,8 @@ mod tests {
 
     #[test]
     fn a_blank_shortcut_in_the_file_is_rejected_rather_than_kept() {
-        // It would otherwise reach the plugin at step 7, which has nothing to
-        // register and no way to say so.
+        // It would otherwise reach the plugin, which has nothing to register
+        // and no way to say so.
         let error = serde_json::from_str::<Shortcuts>(r#"{"next":""}"#)
             .expect_err("a blank combination is not a shortcut");
 

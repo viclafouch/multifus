@@ -19,6 +19,7 @@
 pub mod commands;
 pub mod journal;
 pub mod runtime;
+pub mod shortcuts;
 pub mod state;
 pub mod view;
 
@@ -52,6 +53,11 @@ pub fn setup(app: &AppHandle) -> Result<(), ConfigError> {
     app.manage::<AppState>(Mutex::new(Multifus::new(store, version, loaded)));
     app.manage(PlatformWindowManager::new());
     app.manage::<WatcherState>(Mutex::new(PlatformNotificationWatcher::new()));
+
+    // The queue exists before any combination is laid down, so that a shortcut
+    // fired in the same breath as the registration has somewhere to go.
+    shortcuts::start(app);
+    shortcuts::apply(app);
 
     runtime::start(app.clone());
 

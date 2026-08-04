@@ -38,10 +38,26 @@ export type Character = {
   readonly online: boolean
 }
 
+/**
+ * What the system answered when multifus laid a combination down.
+ *
+ * `registered` says the system took it, never that it will fire: on macOS a
+ * combination the desktop already owns registers cleanly and is then simply
+ * never delivered. The journal is where a silent shortcut is diagnosed.
+ */
+export type ShortcutStatus =
+  | { readonly kind: 'duplicate'; readonly action: ShortcutAction }
+  | { readonly kind: 'invalid'; readonly detail: string }
+  | { readonly kind: 'pending' }
+  | { readonly kind: 'refused'; readonly detail: string }
+  | { readonly kind: 'registered' }
+  | { readonly kind: 'unbound' }
+
 export type ShortcutBinding = {
   readonly action: ShortcutAction
-  /** As the plugin of step 7 reads it, `null` for an action with no combination. */
+  /** As the plugin reads it, `null` for an action with no combination. */
   readonly accelerator: string | null
+  readonly status: ShortcutStatus
 }
 
 export type AutoFocusSwitch = {
@@ -79,6 +95,24 @@ export type NotificationOutcome =
   | { readonly outcome: 'kindUnknown' }
   | { readonly outcome: 'noWindow' }
 
+/** What became of a shortcut that fired. */
+export type ShortcutOutcome =
+  | {
+      readonly outcome: 'focusFailed'
+      readonly nickname: string
+      readonly detail: string
+    }
+  | { readonly outcome: 'focused'; readonly nickname: string }
+  | { readonly outcome: 'foregroundUnknown'; readonly detail: string }
+  | { readonly outcome: 'noGender' }
+  | { readonly outcome: 'nobodyInCycle' }
+  | { readonly outcome: 'notInRoster'; readonly nickname: string }
+  | { readonly outcome: 'noWindow'; readonly nickname: string }
+  | { readonly outcome: 'outsideGame' }
+  | { readonly outcome: 'slept'; readonly nickname: string }
+  | { readonly outcome: 'swapped'; readonly awake: Gender }
+  | { readonly outcome: 'woke'; readonly nickname: string }
+
 /** One thing worth knowing about when nothing comes to the front. */
 export type JournalEvent =
   | { readonly kind: 'authorization'; readonly granted: boolean }
@@ -90,7 +124,19 @@ export type JournalEvent =
   | { readonly kind: 'reset' }
   | { readonly kind: 'saveFailed'; readonly detail: string }
   | { readonly kind: 'scanFailed'; readonly detail: string }
+  | { readonly kind: 'shortcutsFailed'; readonly detail: string }
   | { readonly kind: 'started' }
+  | {
+      readonly kind: 'shortcut'
+      readonly action: ShortcutAction
+      readonly outcome: ShortcutOutcome
+    }
+  | {
+      readonly kind: 'shortcutRefused'
+      readonly action: ShortcutAction
+      readonly accelerator: string
+      readonly detail: string
+    }
   | {
       readonly kind: 'notification'
       readonly nickname: string

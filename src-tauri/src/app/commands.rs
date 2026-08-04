@@ -16,6 +16,7 @@ use tauri_plugin_opener::OpenerExt;
 
 use crate::app::journal::JournalEvent;
 use crate::app::runtime;
+use crate::app::shortcuts;
 use crate::app::state::lock;
 use crate::app::view::ShortcutAction;
 use crate::app::view::Snapshot;
@@ -124,19 +125,21 @@ pub fn remove_character(app: AppHandle, nickname: String) -> Snapshot {
 
 /// Binds a combination to an action, or clears it with `null`.
 ///
-/// Nothing here decides whether the system will accept it. The plugin of step 7
-/// is what finds out, at the moment it registers, and the refusal has to reach
-/// this screen then rather than leave the user with no shortcut and no message.
+/// The four are laid on the system again right after, and the snapshot that
+/// comes back carries what the system answered for each of them. A combination
+/// it turns down therefore reaches this screen on the spot, instead of leaving
+/// the user with a shortcut that is written down and does nothing.
 #[tauri::command]
 pub fn set_shortcut(
     app: AppHandle,
     action: ShortcutAction,
     accelerator: Option<String>,
 ) -> Snapshot {
-    let mut state = lock(&app);
-    state.set_shortcut(action, accelerator);
+    lock(&app).set_shortcut(action, accelerator);
 
-    state.snapshot()
+    shortcuts::apply(&app);
+
+    lock(&app).snapshot()
 }
 
 /// Flips one of the seven switches. Global, never per character, perimetre.md.
@@ -154,6 +157,10 @@ pub fn set_auto_focus(app: AppHandle, kind: NotificationKind, enabled: bool) -> 
 #[tauri::command]
 pub fn reset(app: AppHandle) -> Snapshot {
     lock(&app).reset();
+
+    // The four default combinations are not the ones that were on the system a
+    // moment ago, so they have to be laid down again.
+    shortcuts::apply(&app);
 
     // The connected characters come straight back, without their genders.
     runtime::refresh(&app);
