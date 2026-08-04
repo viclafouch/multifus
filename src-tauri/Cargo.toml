@@ -1,8 +1,10 @@
 [package]
 name = "multifus"
 version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
+description = "Gestionnaire de fenêtres Dofus Retro en multicompte, macOS et Windows."
+authors = ["Victor de la Fouchardiere <victor.delafouchardiere@gmail.com>"]
+license = "MIT"
+repository = "https://github.com/viclafouch/multifus"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

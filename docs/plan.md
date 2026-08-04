@@ -16,13 +16,15 @@ Vérification : `npm run build` passe.
 
 ---
 
-## Étape 1 — Outillage
+## Étape 1 — Outillage ✅
 
 **Objectif.** Le projet respecte les conventions du mainteneur et peut produire des releases.
 
 Brancher **`@viclafouch/oxc-config`** pour oxlint et oxfmt, avec les scripts `lint`, `lint:fix`, `format`, `format:check` calqués sur les autres dépôts viclafouch. Ajouter un `.nvmrc` sur Node 24. Poser la licence **MIT** et remplir les champs `author`, `license`, `repository`, `bugs` du `package.json`. Installer **`standard-version`** pour le changelog, puisque l'historique est déjà en conventional commits.
 
 **Vérification.** `npm run lint` et `npm run format:check` sortent en zéro.
+
+Faite. Le lint est type-aware, `typeAware` et `typeCheck` activés, donc `npm run lint` couvre aussi les erreurs du compilateur. Les fichiers générés par shadcn, `src/components/ui/**` et `src/lib/utils.ts`, portent un override : le `ClassValue` de clsx est récursivement mutable et ne peut pas satisfaire `prefer-readonly-parameter-types`. `standard-version` bumpe `src-tauri/tauri.conf.json` en même temps que le `package.json`, sans quoi la version du bundle décrocherait du changelog.
 
 ---
 
@@ -92,6 +94,8 @@ Un fichier JSON dans le dossier de configuration standard du système, via `app_
 Quatre écrans. **Personnages** : la liste, avec l'état connecté ou non, la bascule de veille, l'assignation du sexe, le drag and drop du défilement, les deux boutons d'action groupée, et la suppression au survol pour les personnages non connectés. **Raccourcis** : capture des quatre combinaisons. **AutoFocus** : les sept interrupteurs globaux. **À propos** : version, mentions légales Ankama, réinitialisation.
 
 Un journal repliable, masqué par défaut, indispensable le jour où l'AutoFocus ne se déclenche pas.
+
+C'est aussi ici que `src-tauri/tauri.conf.json` doit être repris : il est resté aux valeurs du scaffolder. Titre de la fenêtre, dimensions, taille minimale, comportement à la fermeture.
 
 Les chaînes d'interface sont en français et centralisées dans un seul fichier, le code et les commentaires sont en anglais.
 

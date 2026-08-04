@@ -22,12 +22,12 @@ Ce principe arbitre tous les compromis. Une fonctionnalité qui exige d'ouvrir l
 
 ## Raccourcis
 
-| Raccourci | Effet |
-|---|---|
-| Suivant | Passe au personnage suivant, hors veille |
-| Précédent | Passe au personnage précédent, hors veille |
-| Veille | Endort ou réveille le personnage au premier plan |
-| Bascule | Endort un sexe et réveille l'autre |
+| Raccourci | Effet                                            |
+| --------- | ------------------------------------------------ |
+| Suivant   | Passe au personnage suivant, hors veille         |
+| Précédent | Passe au personnage précédent, hors veille       |
+| Veille    | Endort ou réveille le personnage au premier plan |
+| Bascule   | Endort un sexe et réveille l'autre               |
 
 Tous restent inertes tant qu'une fenêtre Dofus n'est pas au premier plan. Sans cette garde, un raccourci du type `ctrl+flèche` casserait la navigation par mot dans tous les éditeurs de texte.
 
@@ -45,12 +45,12 @@ Tous restent inertes tant qu'une fenêtre Dofus n'est pas au premier plan. Sans 
 
 ## Écarts entre les deux systèmes
 
-| | Windows | macOS |
-|---|---|---|
-| Source des notifications | `UserNotificationListener` (WinRT) | Bannière lue par Accessibility |
-| Autorisation requise | Accès aux notifications | Accessibilité |
-| Suppression des notifications au focus | oui | impossible, pas d'API |
-| Dépendance à l'affichage des bannières | non | oui |
+|                                        | Windows                            | macOS                          |
+| -------------------------------------- | ---------------------------------- | ------------------------------ |
+| Source des notifications               | `UserNotificationListener` (WinRT) | Bannière lue par Accessibility |
+| Autorisation requise                   | Accès aux notifications            | Accessibilité                  |
+| Suppression des notifications au focus | oui                                | impossible, pas d'API          |
+| Dépendance à l'affichage des bannières | non                                | oui                            |
 
 Le détail et les mesures sont dans [ADR 0002](./adr/0002-notifications-macos-via-accessibility.md).
 

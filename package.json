@@ -1,13 +1,29 @@
 {
   "name": "multifus",
-  "private": true,
   "version": "0.1.0",
+  "private": true,
+  "description": "Gestionnaire de fenêtres Dofus Retro en multicompte, macOS et Windows.",
+  "homepage": "https://github.com/viclafouch/multifus#readme",
+  "bugs": {
+    "url": "https://github.com/viclafouch/multifus/issues"
+  },
+  "license": "MIT",
+  "author": "Victor de la Fouchardiere <victor.delafouchardiere@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/viclafouch/multifus.git"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix && oxfmt",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
+    "release": "standard-version"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",
@@ -28,8 +44,13 @@
     "@types/node": "^26.1.2",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
+    "@viclafouch/oxc-config": "^1.0.0-alpha.24",
     "@vitejs/plugin-react": "^6.0.5",
+    "oxfmt": "^0.62.0",
+    "oxlint": "^1.77.0",
+    "oxlint-tsgolint": "^7.0.2001",
     "shadcn": "^4.16.1",
+    "standard-version": "^9.5.0",
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2",
     "vite": "^8.2.0"

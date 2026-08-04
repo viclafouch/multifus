@@ -1,13 +1,15 @@
-import tailwindcss from '@tailwindcss/vite'
-import react from '@vitejs/plugin-react'
 import path from 'node:path'
 import process from 'node:process'
 import { defineConfig } from 'vite'
+import tailwindcss from '@tailwindcss/vite'
+import react from '@vitejs/plugin-react'
 
-const host = process.env.TAURI_DEV_HOST
+// Set by `tauri dev` when serving to a physical device on the local network
+const host = process.env.TAURI_DEV_HOST ?? ''
+const isRemoteHost = host !== ''
 
 // https://vite.dev/config/
-export default defineConfig(async () => ({
+export default defineConfig({
   plugins: [react(), tailwindcss()],
 
   resolve: {
@@ -24,8 +26,8 @@ export default defineConfig(async () => ({
   server: {
     port: 1420,
     strictPort: true,
-    host: host || false,
-    hmr: host
+    host: isRemoteHost ? host : false,
+    hmr: isRemoteHost
       ? {
           protocol: 'ws',
           host,
@@ -37,4 +39,4 @@ export default defineConfig(async () => ({
       ignored: ['**/src-tauri/**']
     }
   }
-}))
+})

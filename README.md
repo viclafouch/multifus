@@ -34,16 +34,21 @@ Prérequis : [Rust](https://www.rust-lang.org/tools/install), Node 24, et les [p
 npm install
 npm run tauri dev     # lance l'application
 npm run build         # vérifie les types et construit le front
+npm run lint          # oxlint, avec les règles type-aware
+npm run lint:fix      # corrige et formate
+npm run format:check  # oxfmt en vérification seule
 ```
+
+Les versions sont posées par `npm run release`, qui lit les conventional commits, écrit le `CHANGELOG.md` et bascule `package.json` comme `src-tauri/tauri.conf.json`.
 
 ## Documentation
 
-| Fichier | Contenu |
-|---|---|
-| [CONTEXT.md](./CONTEXT.md) | Le vocabulaire du domaine, français vers anglais du code |
-| [docs/perimetre.md](./docs/perimetre.md) | Ce qui entre, ce qui sort, les écarts entre systèmes |
-| [docs/plan.md](./docs/plan.md) | La feuille de route et les pièges connus |
-| [docs/adr](./docs/adr) | Les décisions structurantes et leurs raisons |
+| Fichier                                  | Contenu                                                  |
+| ---------------------------------------- | -------------------------------------------------------- |
+| [CONTEXT.md](./CONTEXT.md)               | Le vocabulaire du domaine, français vers anglais du code |
+| [docs/perimetre.md](./docs/perimetre.md) | Ce qui entre, ce qui sort, les écarts entre systèmes     |
+| [docs/plan.md](./docs/plan.md)           | La feuille de route et les pièges connus                 |
+| [docs/adr](./docs/adr)                   | Les décisions structurantes et leurs raisons             |
 
 ## Licence
 

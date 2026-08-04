@@ -8,12 +8,12 @@ La route évidente était la base SQLite du centre de notifications, `~/Library/
 
 Chaque route a été testée sur macOS 26.3 en postant une notification et en mesurant le délai de détection.
 
-| Route | Latence | Contenu lisible |
-|---|---|---|
-| Base SQLite `usernoted` | 5115 ms | oui |
-| Création d'une fenêtre de bannière (CoreGraphics) | jamais | non |
-| Journal unifié `log stream` | 110 ms | non, masqué en `<private>` |
-| **Bannière via Accessibility** | **235 ms** | **oui** |
+| Route                                             | Latence    | Contenu lisible            |
+| ------------------------------------------------- | ---------- | -------------------------- |
+| Base SQLite `usernoted`                           | 5115 ms    | oui                        |
+| Création d'une fenêtre de bannière (CoreGraphics) | jamais     | non                        |
+| Journal unifié `log stream`                       | 110 ms     | non, masqué en `<private>` |
+| **Bannière via Accessibility**                    | **235 ms** | **oui**                    |
 
 Les 235 ms incluent la surcouche AppleScript du prototype et le polling. Un `AXObserver` natif en push élimine cette marge.
 
