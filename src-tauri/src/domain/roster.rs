@@ -100,6 +100,42 @@ impl Roster {
         }
     }
 
+    /// Rewrites the cycle order, which is what the drag and drop of the
+    /// interface produces.
+    ///
+    /// `order` is a list of nicknames. The characters it names take that order,
+    /// and everyone it does not name keeps their relative order at the end. So a
+    /// stale list, one built before a scan discovered a new character, moves what
+    /// the user dragged and loses nobody. A nickname that is not in the roster is
+    /// ignored, and a nickname listed twice only counts once.
+    pub fn reorder(&mut self, order: &[String]) {
+        let mut ordered = Vec::with_capacity(self.characters.len());
+
+        for nickname in order {
+            let already_taken = ordered
+                .iter()
+                .any(|character: &Character| character.nickname == *nickname);
+
+            if already_taken {
+                continue;
+            }
+
+            if let Some(index) = self.position(nickname) {
+                ordered.push(self.characters[index].clone());
+            }
+        }
+
+        let untouched = self
+            .characters
+            .iter()
+            .filter(|character| !order.contains(&character.nickname))
+            .cloned();
+
+        ordered.extend(untouched);
+
+        self.characters = ordered;
+    }
+
     /// The characters the cycle stops on, in order.
     pub fn in_cycle(&self) -> impl DoubleEndedIterator<Item = &Character> {
         self.characters
@@ -462,6 +498,59 @@ mod tests {
 
         assert_eq!(roster.swap(), None);
         assert_eq!(nicknames(&roster), vec!["Alpha"]);
+    }
+
+    #[test]
+    fn reordering_rewrites_the_cycle_order() {
+        let mut roster = roster(vec![
+            Character::new("Alpha"),
+            Character::new("Bravo"),
+            Character::new("Charlie"),
+        ]);
+
+        roster.reorder(&["Charlie".to_owned(), "Alpha".to_owned(), "Bravo".to_owned()]);
+
+        assert_eq!(nicknames(&roster), vec!["Charlie", "Alpha", "Bravo"]);
+        assert_eq!(roster.next_in_cycle("Charlie").unwrap().nickname, "Alpha");
+    }
+
+    #[test]
+    fn reordering_keeps_everyone_the_order_forgot() {
+        // What a list built just before a scan discovered someone looks like.
+        // The drag is honoured and nobody falls out of the roster.
+        let mut roster = roster(vec![
+            Character::new("Alpha").with_gender(Gender::Male).asleep(),
+            Character::new("Bravo"),
+            Character::new("Charlie"),
+        ]);
+
+        roster.reorder(&["Bravo".to_owned(), "Alpha".to_owned()]);
+
+        let order = roster
+            .characters()
+            .iter()
+            .map(|character| character.nickname.as_str())
+            .collect::<Vec<_>>();
+
+        assert_eq!(order, vec!["Bravo", "Alpha", "Charlie"]);
+        // The characters are moved, not rebuilt: what they carry survives.
+        assert!(roster.get("Alpha").unwrap().asleep);
+        assert_eq!(roster.get("Alpha").unwrap().gender, Some(Gender::Male));
+    }
+
+    #[test]
+    fn reordering_ignores_what_the_roster_does_not_hold() {
+        let mut roster = roster(vec![Character::new("Alpha"), Character::new("Bravo")]);
+
+        roster.reorder(&[
+            "Echo".to_owned(),
+            "Bravo".to_owned(),
+            "Bravo".to_owned(),
+            "Alpha".to_owned(),
+        ]);
+
+        assert_eq!(nicknames(&roster), vec!["Bravo", "Alpha"]);
+        assert_eq!(roster.len(), 2);
     }
 
     #[test]
