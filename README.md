@@ -10,14 +10,14 @@ Quand une notification de jeu arrive, multifus ramène au premier plan la fenêt
 - Raccourcis clavier pour circuler entre les fenêtres, dans un ordre qu'on range soi-même
 - Mise en veille d'un personnage pour le sortir du défilement, sans le sortir du roster
 - Un sexe assigné par personnage, et deux actions groupées pour endormir ou réveiller tout un sexe d'un coup
-- Un journal, pour comprendre le jour où rien ne se passe
+- Un journal, pour comprendre le jour où rien ne se passe, et qui se copie d'un clic
 
 ## Compatibilité
 
-| Système | État                                                           |
-| ------- | -------------------------------------------------------------- |
-| macOS   | Écrit et en cours de vérification, demande l'**Accessibilité** |
-| Windows | Prévu                                                          |
+| Système | État                                 |
+| ------- | ------------------------------------ |
+| macOS   | Vérifié, demande l'**Accessibilité** |
+| Windows | Prévu                                |
 
 Les notifications en arrière-plan doivent être activées dans le jeu, via Options puis Général. Sur macOS, les bannières de Dofus doivent rester visibles dans les réglages du système, faute de quoi multifus n'a rien à lire.
 

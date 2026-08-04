@@ -10,43 +10,31 @@ Le vocabulaire est dans [CONTEXT.md](../CONTEXT.md), ce que le projet refuse de 
 
 Les étapes 0 à 7 sont écrites. Leurs numéros restent des étiquettes, le code y renvoie.
 
-| #   | Étape                     | Où                                 | État                                           |
-| --- | ------------------------- | ---------------------------------- | ---------------------------------------------- |
-| 0-1 | Bootstrap et outillage    | `package.json`, `oxlint.config.ts` | fait                                           |
-| 2   | Cœur métier pur           | `src-tauri/src/domain`             | fait, testé                                    |
-| 3   | Frontière avec le système | `src-tauri/src/platform`           | fait                                           |
-| 4   | Implémentation macOS      | `platform::macos`                  | **écrite, jamais confrontée à un vrai client** |
-| 5   | Persistance               | `src-tauri/src/config`             | fait, testé                                    |
-| 6   | Interface React           | `src`, `src-tauri/src/app`         | faite, AutoFocus branché mais non prouvé       |
-| 7   | Raccourcis globaux        | `app::shortcuts`                   | **écrits, jamais frappés depuis le jeu**       |
+| #   | Étape                     | Où                                 | État                          |
+| --- | ------------------------- | ---------------------------------- | ----------------------------- |
+| 0-1 | Bootstrap et outillage    | `package.json`, `oxlint.config.ts` | fait                          |
+| 2   | Cœur métier pur           | `src-tauri/src/domain`             | fait, testé                   |
+| 3   | Frontière avec le système | `src-tauri/src/platform`           | fait                          |
+| 4   | Implémentation macOS      | `platform::macos`                  | **vérifiée sur deux clients** |
+| 5   | Persistance               | `src-tauri/src/config`             | fait, testé                   |
+| 6   | Interface React           | `src`, `src-tauri/src/app`         | faite, AutoFocus prouvé       |
+| 7   | Raccourcis globaux        | `app::shortcuts`                   | **vérifiés depuis le jeu**    |
 
 Les versions font foi dans `package.json` et `Cargo.toml`, nulle part ailleurs.
 
-**Trois choses ne sont pas prouvées, et elles tiennent au même fil :** l'activation de processus de l'étape 4. Si elle ne fonctionne pas, l'AutoFocus et les deux raccourcis de défilement tombent ensemble, et le correctif est dans `platform::macos`, pas dans les couches au-dessus. C'est ce que l'étape suivante tranche.
+**L'activation de processus fonctionne.** C'était le fil auquel tenaient l'AutoFocus et les deux raccourcis de défilement, et il tient. Sur l'application empaquetée, avec deux clients Retro connectés, le journal a écrit : Suivant alternant dix-huit fois entre les deux personnages, Précédent remontant, la Veille agissant sur celui de devant, et l'AutoFocus ramenant la bonne fenêtre sur trois types de notification distincts, échange, défi et combat. La garde tient aussi, un Suivant frappé sans fenêtre Dofus devant écrit « ignoré » et ne fait rien.
 
-Ce qui a tout de même été confronté à un vrai client Retro, hors de l'application et en lecture seule : le bundle est bien `com.dofus.d1elauncher`, le titre de la fenêtre principale est bien `Pseudo - Dofus Retro v1.48.21` et la regex le reconnaît, et lire `AXMainWindow` puis `AXTitle` coûte 0,05 ms en médiane. Restent en l'air l'observateur de bannières et l'activation.
+Ce qui avait été confronté à un vrai client Retro avant cela, hors de l'application et en lecture seule : le bundle est bien `com.dofus.d1elauncher`, le titre de la fenêtre principale est bien `Pseudo - Dofus Retro v1.48.21` et la regex le reconnaît, et lire `AXMainWindow` puis `AXTitle` coûte 0,05 ms en médiane.
+
+Plus rien de macOS n'est en l'air.
+
+Le journal se copie depuis son en-tête, puisque c'est ce qu'on en fait : on le relit ailleurs. Il part en texte brut, une ligne par entrée, l'heure devant. L'écriture passe par `tauri-plugin-clipboard-manager` et non par `navigator.clipboard`, la fenêtre étant servie par un protocole propre à Tauri. Ce plugin n'accorde rien par défaut, sa permission `default` est vide par conception : la capacité déclare `clipboard-manager:allow-write-text` et rien d'autre, multifus ne lisant jamais le presse-papiers.
 
 ---
 
 ## La suite, dans l'ordre
 
 L'ordre ci-dessous n'est pas celui des numéros : la distribution passe avant Windows, pour la raison donnée à sa section.
-
-### Vérification macOS
-
-**Objectif.** Remplacer les « non vérifié » du tableau par des faits. C'est la seule étape qui peut invalider du code déjà écrit, donc elle passe en premier : empiler la barre système par-dessus une base non prouvée ne ferait qu'agrandir la pile.
-
-Sur l'application empaquetée, `npm run tauri build`, et non sur `tauri dev` : l'autorisation d'Accessibilité se donne à un binaire, et chaque compilation remplace celui de développement. Laisser la fenêtre ouverte, la fermer quitte l'application jusqu'à l'étape 8. Déplier le journal, il est masqué par défaut et c'est l'outil construit pour cette séance.
-
-À prouver, dans cet ordre, chacun laissant sa ligne au journal :
-
-1. Deux clients ouverts remplissent le roster tout seuls, lampes allumées.
-2. « Suivant » frappé depuis le jeu bascule la fenêtre. Le test le plus rentable de tous : il prouve la garde et l'activation de processus d'un seul coup.
-3. « Suivant » frappé depuis un éditeur de texte ne fait rien du tout.
-4. Veille et Bascule bougent l'interface en direct.
-5. Une notification de combat sur le second client le ramène au premier plan en moins de 300 ms.
-
-Trois échecs à savoir lire. « Ignoré, aucune fenêtre Dofus au premier plan » alors qu'on y est : la garde ou le bundle. « Le système a refusé de ramener X au premier plan » : l'activation de processus, donc l'étape 4. Rien du tout au journal : la combinaison n'est jamais délivrée, il faut en changer, et c'est le cas que macOS ne sait pas signaler.
 
 ### Étape 8 — Barre système, logo et démarrage automatique
 
@@ -82,7 +70,7 @@ Ce qui attend déjà de ce côté : `platform::windows` compile en renvoyant `No
 
 ## Ce qui mord
 
-**L'autorisation d'Accessibilité se donne à un binaire, pas à un projet.** Le `target/debug/multifus` de `tauri dev` et l'application empaquetée sont deux entrées distinctes dans Réglages Système, et un `cargo build` qui remplace le binaire peut faire perdre la confiance accordée à la version de développement. Vérifier sur l'application empaquetée, ou réaccorder quand l'autorisation disparaît sans raison apparente.
+**L'autorisation d'Accessibilité se donne à un binaire, pas à un projet.** Le `target/debug/multifus` de `tauri dev` et l'application empaquetée sont deux entrées distinctes dans Réglages Système, et un `cargo build` qui remplace le binaire peut faire perdre la confiance accordée à la version de développement. Vérifier sur l'application empaquetée. Aucune identité de signature n'est configurée, donc chaque compilation change la signature ad hoc du binaire : l'entrée peut rester cochée à l'écran sans plus s'appliquer. Quand l'autorisation disparaît sans raison apparente, `tccutil reset Accessibility com.viclafouch.multifus` puis réaccorder.
 
 **Sur macOS, une combinaison déjà prise s'enregistre sans erreur et ne se déclenche jamais.** Carbon ne refuse qu'un doublon du même processus, donc ni le bureau ni une autre application ne provoquent d'échec à la pose, et aucune API ne permet de le savoir à l'avance. Ne pas chercher à faire dire au plugin ce qu'il ne sait pas : la seule preuve est un appui depuis le jeu et la ligne que le journal écrit. Windows, lui, refuse franchement.
 
