@@ -23,9 +23,10 @@ Toujours démarrer le skill `/frontend-design` sans exception avant de démarrer
 
 - Code et commentaires en anglais, interface en français, chaînes centralisées.
 - Conventional commits, changelog par `standard-version`.
-- Lint et format par oxlint et oxfmt, via `@viclafouch/oxc-config`.
 - Étape terminée quand `npm run lint:fix`, `npm run lint` et `npm run build`
   sortent en zéro, plus `cargo fmt`, `clippy` et `test` si le Rust bouge.
+- Ne jamais lancer `npm run tauri dev`, c'est le mainteneur qui le fait ; les
+  autres commandes de vérification restent libres.
 - Aucune donnée personnelle en dur : ni pseudo, ni nombre de comptes supposé,
   ni chemin de machine. Projet perso, codé comme s'il était public.
 
