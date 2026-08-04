@@ -52,7 +52,7 @@ tokens chacun. Le MCP context7 couvre aussi Tauri pour une question ponctuelle.
 ## Référence
 
 multifus reprend les idées de [Dracoon](https://github.com/Slyss42/Dracoon)
-sans en être un fork, et n'en partage aucun code. Deux éléments valent d'en être
-repris tels quels, vérifiés valides sur les deux systèmes : la regex d'extraction
-du pseudo `^(.+?)\s*-\s*Dofus`, et la table `NOTIF_TYPES` des patterns de
-notification en français, anglais et espagnol. À porter à l'étape 2.
+sans en être un fork, et n'en partage aucun code. Deux éléments en ont été repris
+tels quels, dans `src-tauri/src/domain` : la regex d'extraction du pseudo
+`^(.+?)\s*-\s*Dofus`, et la table `NOTIF_TYPES` des patterns de notification en
+français, anglais et espagnol. Ne pas les réécrire, ils sont testés.

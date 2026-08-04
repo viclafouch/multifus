@@ -14,10 +14,10 @@ Quand une notification de jeu arrive, multifus ramène au premier plan la fenêt
 
 ## Compatibilité
 
-| Système | État                                                    |
-| ------- | ------------------------------------------------------- |
-| macOS   | Fonctionnel, demande l'autorisation d'**Accessibilité** |
-| Windows | Prévu                                                   |
+| Système | État                                                           |
+| ------- | -------------------------------------------------------------- |
+| macOS   | Écrit et en cours de vérification, demande l'**Accessibilité** |
+| Windows | Prévu                                                          |
 
 Les notifications en arrière-plan doivent être activées dans le jeu, via Options puis Général. Sur macOS, les bannières de Dofus doivent rester visibles dans les réglages du système, faute de quoi multifus n'a rien à lire.
 
