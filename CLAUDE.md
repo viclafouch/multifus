@@ -15,6 +15,10 @@ Tauri v2, interface React et TypeScript, couche système en Rust.
 On lance multifus et on l'oublie. Une fonctionnalité qui oblige à ouvrir la
 fenêtre pour être utile doit avoir un raccourci clavier, ou ne pas exister.
 
+# Design / UX / UI
+
+Toujours démarrer le skill `/frontend-design` sans exception avant de démarrer une session de design. Les choix d'intégration et de style viennent de lui.
+
 ## Conventions
 
 - Code et commentaires en anglais, interface en français, chaînes centralisées.
