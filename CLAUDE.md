@@ -27,6 +27,9 @@ Toujours démarrer le skill `/frontend-design` sans exception avant de démarrer
   sortent en zéro, plus `cargo fmt`, `clippy` et `test` si le Rust bouge.
 - Ne jamais lancer `npm run tauri dev`, c'est le mainteneur qui le fait ; les
   autres commandes de vérification restent libres.
+- Après chaque modification de code, passer en revue tous les markdown du dépôt,
+  `git ls-files '*.md'`, README compris, et remettre d'accord ceux que le
+  changement a démentis. C'est là que la doc décroche sans que personne le voie.
 - Aucune donnée personnelle en dur : ni pseudo, ni nombre de comptes supposé,
   ni chemin de machine. Projet perso, codé comme s'il était public.
 
