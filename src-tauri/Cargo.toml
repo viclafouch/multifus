@@ -26,6 +26,11 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 regex = "1"
 
+[dev-dependencies]
+# Only the configuration tests, which need a directory that disappears with them
+# rather than a path written into the source.
+tempfile = "3"
+
 # The macOS side of the boundary, and nothing else in the crate, talks to these.
 # Feature sets are cut to what `platform::macos` calls, so that the Windows
 # build never sees them and the macOS build stays small.
