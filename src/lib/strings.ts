@@ -14,6 +14,7 @@
 import { IS_APPLE } from '@/lib/accelerator'
 import type {
   Gender,
+  JournalEntry,
   JournalEvent,
   NotificationKind,
   NotificationOutcome,
@@ -241,6 +242,8 @@ export const strings = {
     empty: 'Rien à signaler pour l’instant.',
     show: 'Afficher le journal',
     hide: 'Masquer le journal',
+    copy: 'Copier le journal',
+    copied: 'Journal copié',
     entries: (count: number) => {
       return count === 1 ? '1 entrée' : `${count} entrées`
     }
@@ -449,6 +452,21 @@ export const journalLine = (event: JournalEvent) => {
       return ''
     }
   }
+}
+
+/**
+ * The whole journal as plain text, one entry per line, oldest first.
+ *
+ * What leaves the window when the reader copies it. The time is kept in front of
+ * every line: the journal is read to find out what happened just before nothing
+ * came to the front, and an order without moments answers half the question.
+ */
+export const journalTranscript = (entries: readonly JournalEntry[]) => {
+  return entries
+    .map((entry) => {
+      return `${journalTime(entry.at)}  ${journalLine(entry.event)}`
+    })
+    .join('\n')
 }
 
 type ShortcutLineParams = {

@@ -1,8 +1,15 @@
 import React from 'react'
 import { ChevronDown, ChevronUp } from 'lucide-react'
+import { CopyButton } from '@/components/copy-button'
 import { Button } from '@/components/ui/button'
 import type { JournalEntry } from '@/lib/multifus'
-import { journalLine, journalTime, journalTone, strings } from '@/lib/strings'
+import {
+  journalLine,
+  journalTime,
+  journalTone,
+  journalTranscript,
+  strings
+} from '@/lib/strings'
 
 /**
  * How far from the foot of the journal still counts as being at the foot, in
@@ -61,25 +68,34 @@ export const JournalPanel = ({ entries }: JournalPanelProps) => {
 
   return (
     <section className="shrink-0 border-t border-border bg-sidebar/80">
-      <h2>
-        <Button
-          variant="ghost"
-          aria-expanded={isOpen}
-          onClick={handleToggle}
-          title={isOpen ? strings.journal.hide : strings.journal.show}
-          className="h-9 w-full justify-start gap-2 rounded-none px-4 text-mini tracking-micro text-muted-foreground uppercase"
-        >
-          {isOpen ? (
-            <ChevronDown strokeWidth={2} />
-          ) : (
-            <ChevronUp strokeWidth={2} />
-          )}
-          {strings.journal.title}
-          <span className="ml-auto font-mono text-micro tracking-normal normal-case">
-            {strings.journal.entries(entries.length)}
-          </span>
-        </Button>
-      </h2>
+      <div className="flex items-center pr-2.5">
+        <h2 className="min-w-0 flex-1">
+          <Button
+            variant="ghost"
+            aria-expanded={isOpen}
+            onClick={handleToggle}
+            title={isOpen ? strings.journal.hide : strings.journal.show}
+            className="h-9 w-full justify-start gap-2 rounded-none px-4 text-mini tracking-micro text-muted-foreground uppercase"
+          >
+            {isOpen ? (
+              <ChevronDown strokeWidth={2} />
+            ) : (
+              <ChevronUp strokeWidth={2} />
+            )}
+            {strings.journal.title}
+            <span className="ml-auto font-mono text-micro tracking-normal normal-case">
+              {strings.journal.entries(entries.length)}
+            </span>
+          </Button>
+        </h2>
+        {entries.length === 0 ? null : (
+          <CopyButton
+            text={journalTranscript(entries)}
+            label={strings.journal.copy}
+            copiedLabel={strings.journal.copied}
+          />
+        )}
+      </div>
       {isOpen ? (
         <ol
           ref={list}
