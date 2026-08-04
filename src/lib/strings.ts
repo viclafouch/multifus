@@ -1,0 +1,433 @@
+/**
+ * Every word multifus shows, in one file.
+ *
+ * The interface is in French, the code and the comments are in English, and this
+ * is where the two meet. Nothing else in `src` holds a sentence for the user, and
+ * nothing on the Rust side holds one at all: the journal crosses the bridge as
+ * structured events and is put into words here, by {@link journalLine}.
+ *
+ * No nickname, no supposed number of accounts, no path to anybody's machine
+ * appears here. multifus is a personal project written as though it were public,
+ * and the empty states have to read right for somebody who has never opened it.
+ */
+
+import { IS_APPLE } from '@/lib/accelerator'
+import type {
+  Gender,
+  JournalEvent,
+  NotificationKind,
+  NotificationOutcome
+} from '@/lib/multifus'
+
+export const strings = {
+  app: {
+    name: 'multifus'
+  },
+
+  nav: {
+    characters: 'Personnages',
+    shortcuts: 'Raccourcis',
+    autoFocus: 'AutoFocus',
+    about: 'À propos'
+  },
+
+  status: {
+    connected: (count: number) => {
+      return count === 1
+        ? '1 personnage connecté'
+        : `${count} personnages connectés`
+    },
+    listening: 'À l’écoute des notifications',
+    notListening: 'Écoute interrompue',
+    denied: 'Autorisation manquante'
+  },
+
+  characters: {
+    title: 'Personnages',
+    subtitle:
+      'L’ordre de cette liste est l’ordre du défilement. Faites glisser une ligne pour le changer.',
+    inCycle: 'Dans le défilement',
+    asleep: 'En veille',
+    offline: 'Hors ligne',
+    rankNone: '·',
+    handle: (nickname: string) => {
+      return `Déplacer ${nickname} dans le défilement`
+    },
+    // The switch is on when the character is in the cycle, so the label names
+    // the cycle and not the veille. Calling it « Veille de X » while it reads
+    // checked for someone who is awake said the opposite of the truth.
+    cycleToggle: (nickname: string) => {
+      return `Défilement de ${nickname}`
+    },
+    genderLabel: (nickname: string, gender: Gender) => {
+      return gender === 'male'
+        ? `Marquer ${nickname} comme homme`
+        : `Marquer ${nickname} comme femme`
+    },
+    remove: (nickname: string) => {
+      return `Retirer ${nickname} du roster`
+    },
+    groupedActions: 'Actions groupées',
+    groupLabel: {
+      male: 'Hommes',
+      female: 'Femmes'
+    },
+    sleepGroup: 'Endormir',
+    wakeGroup: 'Réveiller',
+    sleepGroupLabel: {
+      male: 'Endormir tous les hommes',
+      female: 'Endormir toutes les femmes'
+    },
+    wakeGroupLabel: {
+      male: 'Réveiller tous les hommes',
+      female: 'Réveiller toutes les femmes'
+    },
+    noGenderYet:
+      'Assignez un sexe à vos personnages pour activer les actions groupées.',
+    emptyTitle: 'Le roster est vide',
+    emptyBody:
+      'Ouvrez un client Dofus. Le personnage apparaît ici dès que sa fenêtre porte son pseudo, et il y reste même une fois le client fermé.',
+    emptyHint:
+      'Un client resté sur l’écran de connexion n’a pas encore de pseudo : il ne peut donc pas être reconnu.',
+    refresh: 'Chercher maintenant'
+  },
+
+  authorization: {
+    title: 'Autorisation requise',
+    body: IS_APPLE
+      ? 'multifus a besoin de l’accès à l’Accessibilité pour lire le titre des fenêtres Dofus, les amener au premier plan et entendre les notifications du jeu.'
+      : 'multifus a besoin de l’accès aux notifications pour entendre les événements du jeu et amener la bonne fenêtre au premier plan.',
+    patience: IS_APPLE
+      ? 'macOS n’accorde jamais cette autorisation dans la seconde. Cochez multifus dans Réglages Système, puis revenez : cet écran disparaîtra tout seul.'
+      : 'Autorisez multifus dans les réglages du système, puis revenez : cet écran disparaîtra tout seul.',
+    request: 'Demander l’autorisation',
+    openSettings: IS_APPLE
+      ? 'Ouvrir Réglages Système'
+      : 'Ouvrir les réglages du système'
+  },
+
+  shortcuts: {
+    title: 'Raccourcis',
+    subtitle:
+      'Ces combinaisons restent inertes tant qu’une fenêtre Dofus n’est pas au premier plan.',
+    notWired:
+      'Elles sont enregistrées dans la configuration, mais pas encore posées sur le système : c’est l’étape suivante du projet.',
+    capture: 'Appuyez sur une combinaison',
+    captureHint: 'Échap pour annuler, Retour arrière pour effacer.',
+    empty: 'Aucune',
+    edit: (label: string) => {
+      return `Modifier le raccourci ${label}`
+    },
+    duplicate: 'Cette combinaison est déjà prise par une autre action.',
+    rejected: {
+      noModifier:
+        'Il faut au moins un modificateur, sans quoi la touche serait avalée dans toutes les applications.',
+      unsupportedKey: 'Cette touche ne peut pas servir de raccourci.'
+    },
+    actions: {
+      next: {
+        label: 'Suivant',
+        description: 'Passe au personnage suivant, en sautant ceux en veille.'
+      },
+      previous: {
+        label: 'Précédent',
+        description: 'Passe au personnage précédent, en sautant ceux en veille.'
+      },
+      toggleAsleep: {
+        label: 'Veille',
+        description: 'Endort ou réveille le personnage au premier plan.'
+      },
+      swap: {
+        label: 'Bascule',
+        description: 'Endort un sexe et réveille l’autre, d’un seul coup.'
+      }
+    }
+  },
+
+  autoFocus: {
+    title: 'AutoFocus',
+    subtitle:
+      'Une notification de jeu ramène la fenêtre du personnage concerné au premier plan. Ces réglages sont globaux : ils valent pour tout le roster.',
+    stillApplies:
+      'L’AutoFocus s’applique aussi aux personnages en veille, pour qu’un échange proposé à une mule la fasse remonter.',
+    bannerWarning: IS_APPLE
+      ? 'Sur macOS, multifus lit la bannière que le système affiche. Si vous désactivez les bannières de Dofus dans les réglages de notifications, l’AutoFocus cesse de fonctionner. Sur Windows, c’est l’inverse : l’écoute passe par une API et les bannières peuvent rester coupées.'
+      : 'Sur Windows, l’écoute passe par une API du système : les bannières de Dofus peuvent rester coupées sans rien casser. Sur macOS, elles sont au contraire indispensables.',
+    kinds: {
+      combat: {
+        label: 'Combat',
+        description: 'C’est au tour de ce personnage de jouer.'
+      },
+      trade: {
+        label: 'Échange',
+        description: 'Quelqu’un propose un échange.'
+      },
+      group: {
+        label: 'Groupe',
+        description: 'Invitation à rejoindre un groupe ou une guilde.'
+      },
+      private_message: {
+        label: 'Message privé',
+        description: 'Un message privé arrive.'
+      },
+      challenge: {
+        label: 'Défi',
+        description: 'Quelqu’un lance un défi en duel.'
+      },
+      craft: {
+        label: 'Craft',
+        description:
+          'Appel à un artisan, invitation à un atelier, objets prêts.'
+      },
+      perceptor: {
+        label: 'Percepteur',
+        description: 'Un percepteur est attaqué.'
+      }
+    }
+  },
+
+  about: {
+    title: 'À propos',
+    version: 'Version',
+    configPath: 'Configuration',
+    legalTitle: 'Mentions légales',
+    legalBody:
+      'multifus est un projet personnel indépendant, sans aucun lien avec Ankama. Dofus et Dofus Retro sont des marques déposées d’Ankama.',
+    legalScope:
+      'multifus ne lit pas la mémoire du client, ne simule aucune action de jeu et ne modifie aucun fichier. Il ne fait que gérer des fenêtres et lire des notifications du système.',
+    resetTitle: 'Réinitialisation',
+    resetBody:
+      'Remet la configuration à son état d’origine : roster vidé, sexes oubliés, raccourcis et AutoFocus par défaut.',
+    reset: 'Tout réinitialiser',
+    resetConfirmTitle: 'Tout réinitialiser ?',
+    resetConfirmBody:
+      'Le roster sera vidé et les sexes assignés seront perdus. Les personnages actuellement connectés réapparaîtront dans la seconde, mais sans leur sexe et dans l’ordre où le système les rend.',
+    resetConfirm: 'Réinitialiser',
+    cancel: 'Annuler'
+  },
+
+  config: {
+    unreadableTitle: 'Configuration illisible',
+    unreadableBody:
+      'Le fichier de configuration existe mais n’a pas pu être lu. multifus tourne sur ses réglages par défaut et n’a rien écrasé.',
+    malformedTitle: 'Configuration mise de côté',
+    malformedBody:
+      'Le fichier de configuration n’était pas exploitable. Il a été renommé plutôt qu’écrasé, et multifus est reparti sur ses réglages par défaut.',
+    notSavedTitle: 'Configuration non enregistrée',
+    notSavedBody:
+      'La dernière écriture a échoué. Ce qui est à l’écran est correct, ce qui est sur le disque ne l’est pas encore.',
+    reveal: 'Montrer le fichier',
+    dismiss: 'J’ai compris'
+  },
+
+  journal: {
+    title: 'Journal',
+    empty: 'Rien à signaler pour l’instant.',
+    show: 'Afficher le journal',
+    hide: 'Masquer le journal',
+    entries: (count: number) => {
+      return count === 1 ? '1 entrée' : `${count} entrées`
+    }
+  }
+} as const
+
+/**
+ * How each key token is drawn on this keyboard. Rebuilt on every call would be
+ * waste, so it lives at module scope, next to the only function that reads it.
+ */
+const KEY_LABELS = new Map<string, string>([
+  ['Alt', IS_APPLE ? '⌥' : 'Alt'],
+  ['ArrowDown', '↓'],
+  ['ArrowLeft', '←'],
+  ['ArrowRight', '→'],
+  ['ArrowUp', '↑'],
+  ['Backquote', '`'],
+  ['Backslash', '\\'],
+  ['Backspace', '⌫'],
+  ['BracketLeft', '['],
+  ['BracketRight', ']'],
+  ['CapsLock', 'Verr. maj'],
+  ['Comma', ','],
+  ['Control', IS_APPLE ? '⌃' : 'Ctrl'],
+  ['Delete', 'Suppr'],
+  ['End', 'Fin'],
+  ['Enter', '↵'],
+  ['Equal', '='],
+  ['Escape', 'Échap'],
+  ['Home', 'Origine'],
+  ['Insert', 'Inser'],
+  ['Minus', '-'],
+  ['NumLock', 'Verr. num'],
+  ['NumpadAdd', 'Pavé +'],
+  ['NumpadDecimal', 'Pavé ,'],
+  ['NumpadDivide', 'Pavé /'],
+  ['NumpadEnter', 'Pavé ↵'],
+  ['NumpadEqual', 'Pavé ='],
+  ['NumpadMultiply', 'Pavé ×'],
+  ['NumpadSubtract', 'Pavé -'],
+  ['PageDown', 'Page ↓'],
+  ['PageUp', 'Page ↑'],
+  ['Pause', 'Pause'],
+  ['Period', '.'],
+  ['PrintScreen', 'Impr. écran'],
+  ['Quote', '’'],
+  ['ScrollLock', 'Arrêt défil.'],
+  ['Semicolon', ';'],
+  ['Shift', IS_APPLE ? '⇧' : 'Maj'],
+  ['Slash', '/'],
+  ['Space', 'Espace'],
+  ['Super', IS_APPLE ? '⌘' : 'Win'],
+  ['Tab', '⇥']
+])
+
+/** The label a key token gets on this keyboard. */
+export const keyLabel = (token: string) => {
+  const known = KEY_LABELS.get(token)
+
+  if (known !== undefined) {
+    return known
+  }
+
+  if (token.startsWith('Key')) {
+    return token.slice(3)
+  }
+
+  if (token.startsWith('Digit')) {
+    return token.slice(5)
+  }
+
+  if (token.startsWith('Numpad')) {
+    return `Pavé ${token.slice(6)}`
+  }
+
+  return token
+}
+
+/** How a moment of the day is written in the journal. */
+export const journalTime = (milliseconds: number) => {
+  return new Date(milliseconds).toLocaleTimeString('fr-FR', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  })
+}
+
+/** How serious a journal entry is, which is what colours its dot. */
+export type JournalTone = 'good' | 'neutral' | 'warning'
+
+/** The events whose tone is decided by their kind alone. */
+type PlainEventKind = Exclude<
+  JournalEvent['kind'],
+  'authorization' | 'notification'
+>
+
+const TONES = {
+  started: 'neutral',
+  listening: 'good',
+  listeningFailed: 'warning',
+  characterOnline: 'neutral',
+  characterOffline: 'neutral',
+  scanFailed: 'warning',
+  saveFailed: 'warning',
+  openFailed: 'warning',
+  reset: 'neutral'
+} as const satisfies Record<PlainEventKind, JournalTone>
+
+/**
+ * A table rather than a switch, so a new event on the Rust side fails to compile
+ * here instead of quietly taking the neutral colour. Only the two events whose
+ * tone depends on their payload are read by hand.
+ */
+export const journalTone = (event: JournalEvent): JournalTone => {
+  if (event.kind === 'authorization') {
+    return event.granted ? 'good' : 'warning'
+  }
+
+  if (event.kind === 'notification') {
+    return event.outcome.outcome === 'focused' ? 'good' : 'neutral'
+  }
+
+  return TONES[event.kind]
+}
+
+/** A journal event, put into words. */
+export const journalLine = (event: JournalEvent) => {
+  switch (event.kind) {
+    case 'started': {
+      return 'multifus a démarré.'
+    }
+    case 'authorization': {
+      return event.granted
+        ? 'Autorisation accordée : les fenêtres sont lisibles.'
+        : 'Autorisation refusée : les fenêtres ne peuvent pas être lues.'
+    }
+    case 'listening': {
+      return 'Écoute des notifications démarrée.'
+    }
+    case 'listeningFailed': {
+      return `Écoute des notifications impossible : ${event.detail}`
+    }
+    case 'characterOnline': {
+      return `${event.nickname} est connecté.`
+    }
+    case 'characterOffline': {
+      return `${event.nickname} n’est plus connecté.`
+    }
+    case 'notification': {
+      return notificationLine(event)
+    }
+    case 'scanFailed': {
+      return `Lecture des fenêtres impossible : ${event.detail}`
+    }
+    case 'saveFailed': {
+      return `Configuration non enregistrée : ${event.detail}`
+    }
+    case 'openFailed': {
+      return `Le système n’a pas pu ouvrir cet élément : ${event.detail}`
+    }
+    case 'reset': {
+      return 'Configuration remise à zéro.'
+    }
+    default: {
+      return ''
+    }
+  }
+}
+
+type NotificationLineParams = {
+  readonly nickname: string
+  readonly notificationKind: NotificationKind | null
+  readonly outcome: NotificationOutcome
+}
+
+const notificationLine = ({
+  nickname,
+  notificationKind,
+  outcome
+}: NotificationLineParams) => {
+  const subject =
+    notificationKind === null
+      ? `Notification pour ${nickname}`
+      : `${strings.autoFocus.kinds[notificationKind].label} pour ${nickname}`
+
+  switch (outcome.outcome) {
+    case 'focused': {
+      return `${subject} : fenêtre ramenée au premier plan.`
+    }
+    case 'kindDisabled': {
+      return `${subject} : ce type est désactivé, rien n’a été fait.`
+    }
+    case 'kindUnknown': {
+      return `${subject} : type non reconnu, rien n’a été fait.`
+    }
+    case 'noWindow': {
+      return `${subject} : aucune fenêtre à ramener.`
+    }
+    case 'focusFailed': {
+      return `${subject} : le système a refusé le passage au premier plan (${outcome.detail}).`
+    }
+    default: {
+      return subject
+    }
+  }
+}

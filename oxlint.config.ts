@@ -28,7 +28,19 @@ export default defineConfig({
       files: ['src/components/ui/**', 'src/lib/utils.ts'],
       rules: {
         'typescript/prefer-readonly-parameter-types': 'off',
-        'react/function-component-definition': 'off'
+        'react/function-component-definition': 'off',
+        'eslint/no-restricted-imports': 'off'
+      }
+    },
+    {
+      files: [
+        'src/app.tsx',
+        'src/components/**',
+        'src/hooks/**',
+        'src/screens/**'
+      ],
+      rules: {
+        'typescript/prefer-readonly-parameter-types': 'off'
       }
     }
   ]
