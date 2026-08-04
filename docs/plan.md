@@ -113,7 +113,7 @@ Cette étape stocke et ne branche pas : `run()` dans `lib.rs` est intact, donc r
 
 ---
 
-## Étape 6 — Interface React
+## Étape 6 — Interface React ✅
 
 **Objectif.** Un tableau de bord que l'on consulte, pas un panneau de réglages que l'on visite.
 
@@ -124,6 +124,36 @@ Un journal repliable, masqué par défaut, indispensable le jour où l'AutoFocus
 C'est aussi ici que `src-tauri/tauri.conf.json` doit être repris : il est resté aux valeurs du scaffolder. Titre de la fenêtre, dimensions, taille minimale, comportement à la fermeture.
 
 Les chaînes d'interface sont en français et centralisées dans un seul fichier, le code et les commentaires sont en anglais.
+
+Faite. Le branchement vit dans `src-tauri/src/app`, quatrième module à côté de `domain`, `platform` et `config` : c'est le seul qui connaisse Tauri et l'interface, et il ne porte aucune logique métier. `setup` charge la configuration, la met dans l'état Tauri avec le `WindowManager` et le `NotificationWatcher`, et démarre le balayage.
+
+Ce qui a été décidé en l'écrivant.
+
+**Une seule forme traverse le pont.** Chaque commande renvoie le `Snapshot` entier, et le balayage pousse le même sur un unique événement. Le tableau de bord fait une poignée de personnages et onze réglages : tout renvoyer ne coûte rien et supprime la classe de bugs où deux panneaux ne sont pas d'accord sur ce qui est écrit sur le disque. Presque aucune commande ne renvoie de `Result` : une écriture qui échoue, un système qui refuse, ça part au journal et dans le snapshot, pas dans un second canal parallèle en anglais. La version du bundle y voyage aussi, plutôt que par `getVersion` du plugin : une constante que l'écran À propos imprime ne vaut pas un second canal et un second état de chargement côté interface.
+
+**Le journal transporte des événements structurés, jamais des phrases.** Écrire du français dans un module dont la langue est l'anglais aurait éparpillé les chaînes d'interface sur deux langues et deux dépôts. `JournalEvent` porte les faits, `src/lib/strings.ts` porte les mots, et c'est le seul fichier du projet qui en contient.
+
+**Le balayage interroge toutes les 3 secondes.** Aucun des deux systèmes n'émet d'événement quand un client ouvre ou ferme une fenêtre, donc le choix est entre demander régulièrement et ne pas savoir. C'est le prix des lampes justes, et de l'étape 7 qui aura une fenêtre fraîche à viser que la fenêtre soit ouverte ou non.
+
+**Une règle protège le mutex.** Ne jamais tenir le verrou de l'état en touchant au watcher : son `stop` joint le thread qui exécute le sink, et le sink prend ce verrou. C'est le seul interblocage que cette application sache construire, et ne pas tenir les deux à la fois suffit à le rendre impossible. Pour la même raison le sink n'appelle pas `dismiss`, qui ne fait rien sur macOS de toute façon ; l'étape 9 le branchera là où c'est sûr.
+
+**Les actions groupées portent leurs deux verbes en permanence.** Un bouton par sexe dont le verbe bascule avec l'état du groupe lit l'agrégat, ce que l'ADR 0004 interdit, et casse sur le cas qu'elle décrit : quatre hommes endormis, on en réveille un depuis sa ligne, le bouton repasse à « Endormir » et plus aucun clic ne réveille les trois autres. La bande au-dessus du roster offre donc « Endormir » et « Réveiller » pour chaque sexe, avec des libellés qui ne bougent jamais.
+
+**L'interrupteur de chaque ligne coche le défilement, pas la veille.** Coché veut dire dans le défilement, ce qui va avec la lampe ocre et avec le libellé visible en dessous. Son étiquette accessible nomme donc le défilement ; l'appeler « Veille de X » disait le contraire de ce qu'il affichait.
+
+**La veille survit à une reconnexion.** L'ADR 0004 la remet à zéro à chaque lancement et ne dit rien d'une fenêtre qui revient. Une première version réveillait les personnages qui repassaient connectés ; c'était un ajout silencieux, et avec un balayage toutes les 3 secondes un seul passage qui rate une fenêtre suffisait à remettre dans le défilement une mule mise de côté exprès. La ligne affiche « En veille » en toutes lettres, donc rien n'est caché de toute façon.
+
+**L'autorisation est un tri-état côté Rust,** `Option<bool>`, pour que la première réponse atteigne le journal même quand c'est celle sur laquelle le champ serait parti. Un refus au lancement est justement l'état qu'il faut expliquer.
+
+**Fermer la fenêtre quitte l'application, pour l'instant.** perimetre.md veut le contraire, mais l'icône de barre système qui permet de la rouvrir n'arrive qu'à l'étape 8. Une fenêtre cachée sans moyen de revenir est une application perdue. Le `tauri.conf.json` reste donc sur le comportement par défaut, et l'étape 8 le bascule au moment même où elle pose l'icône. Le reste est repris : 880×660, minimum 720×520, centrée, `backgroundColor` sombre pour éviter le flash blanc au lancement.
+
+**L'écran d'autorisation ne remplace que les Personnages.** Les raccourcis, les interrupteurs et l'À propos fonctionnent sans autorisation, et rien ne justifie d'enfermer quelqu'un pendant que macOS réfléchit. Cet écran tient dans la durée, il ne clignote pas, et il disparaît tout seul au balayage qui trouve l'autorisation accordée. Un bouton ouvre directement le volet de Réglages Système, puisque le dialogue du système ne le propose qu'une fois.
+
+**La capture de raccourci produit des `KeyboardEvent.code`,** que le parseur de `global-hotkey` accepte tels quels, et exige au moins un modificateur : enregistrer une touche nue l'avalerait dans toutes les applications du bureau. Une touche que le parseur ne connaît pas est refusée à la capture, pas à l'enregistrement, où il serait trop tard pour le dire gentiment. Les valeurs par défaut de l'étape 5 utilisent les alias courts (`Right`), l'affichage résout les deux graphies.
+
+**Deux ajouts hors interface.** `Roster::reorder` est entré dans `domain` avec ses tests : l'ordre du défilement est de la logique métier, et le mettre dans la couche Tauri aurait contredit l'architecture du projet. Et `oxlint.config.ts` désactive `prefer-readonly-parameter-types` sur la couche React seulement : `ReactNode`, un événement synthétique et une `Promise` ne sont pas readonly, et aucun `Readonly<>` n'y change rien. La règle reste active sur `src/lib`, qui est de la donnée pure et l'honore.
+
+**L'AutoFocus est branché de bout en bout et toujours pas prouvé.** Une notification de jeu est classée, confrontée aux sept interrupteurs, rapprochée du roster, et la fenêtre est demandée au premier plan, chaque étape passant au journal. Le `focus` est appelé depuis le thread du watcher, comme le contrat de l'étape 3 l'autorise. Si la vérification montre que l'activation AppKit exige le thread principal, c'est l'étape 4 qu'il faudra corriger, pas la contourner ici.
 
 ---
 
@@ -174,5 +204,7 @@ Un workflow GitHub Actions basé sur `tauri-action`, déclenché sur tag, qui co
 **L'AutoFocus macOS dépend de l'affichage des bannières.** Si l'utilisateur les désactive pour Dofus dans les réglages système, l'écoute cesse de fonctionner. Le README de Dracoon recommande justement de les désactiver sur Windows, où l'écoute passe par l'API et non par l'affichage. Cette asymétrie doit être expliquée dans l'interface.
 
 **Un client Dofus sur l'écran de connexion existe déjà en tant que processus** avec des fenêtres, mais sans titre exploitable. Toujours filtrer sur le titre.
+
+**L'autorisation d'Accessibilité se donne à un binaire, pas à un projet.** Le `target/debug/multifus` de `tauri dev` et l'application empaquetée sont deux entrées distinctes dans Réglages Système, et un `cargo build` qui remplace le binaire peut faire perdre la confiance accordée à la version de développement. Vérifier l'étape 4 sur l'application empaquetée, ou réaccorder l'autorisation quand elle disparaît sans raison apparente.
 
 **`cargo check --target x86_64-pc-windows-msvc` échoue depuis macOS**, avant même de compiler une ligne du projet : le build script de Tauri réclame `llvm-rc`, absent de la machine de développement. C'est antérieur au projet, constaté sur un dépôt neuf, ne pas partir chasser ça dans le code. La compilation Windows est le sujet de l'étape 10, par GitHub Actions et sans chaîne de build sur le PC de jeu.
