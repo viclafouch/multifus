@@ -430,8 +430,44 @@ export const journalTone = (event: JournalEvent): JournalTone => {
   return TONES[event.kind]
 }
 
+/**
+ * The events whose whole line is a stock phrase and the reason the system gave.
+ *
+ * `shortcutRefused` carries a detail too and is not one of them: it has to name
+ * the action and the combination first, so it stays a sentence of its own.
+ */
+type DetailedEventKind = Exclude<
+  Extract<JournalEvent, { readonly detail: string }>['kind'],
+  'shortcutRefused'
+>
+
+/**
+ * What each of them says before the colon. A table for the same reason as
+ * {@link TONES}: a new failure event on the Rust side fails to compile here
+ * rather than reaching the journal as an empty line.
+ */
+const DETAILED_LINES = {
+  listeningFailed: 'Écoute des notifications impossible',
+  shortcutsFailed: 'Les raccourcis ne sont pas fiables',
+  trayFailed: 'La barre système n’est pas fiable',
+  startAtLoginFailed: 'Démarrage avec la session impossible',
+  scanFailed: 'Lecture des fenêtres impossible',
+  saveFailed: 'Configuration non enregistrée',
+  openFailed: 'Le système n’a pas pu ouvrir cet élément'
+} as const satisfies Record<DetailedEventKind, string>
+
+const isDetailed = (
+  event: JournalEvent
+): event is Extract<JournalEvent, { readonly kind: DetailedEventKind }> => {
+  return event.kind in DETAILED_LINES
+}
+
 /** A journal event, put into words. */
 export const journalLine = (event: JournalEvent) => {
+  if (isDetailed(event)) {
+    return `${DETAILED_LINES[event.kind]} : ${event.detail}`
+  }
+
   switch (event.kind) {
     case 'started': {
       return 'multifus a démarré.'
@@ -443,9 +479,6 @@ export const journalLine = (event: JournalEvent) => {
     }
     case 'listening': {
       return 'Écoute des notifications démarrée.'
-    }
-    case 'listeningFailed': {
-      return `Écoute des notifications impossible : ${event.detail}`
     }
     case 'characterOnline': {
       return `${event.nickname} est connecté.`
@@ -464,26 +497,8 @@ export const journalLine = (event: JournalEvent) => {
 
       return `Raccourci ${label} refusé (${event.accelerator}) : ${event.detail}`
     }
-    case 'shortcutsFailed': {
-      return `Les raccourcis ne sont pas fiables : ${event.detail}`
-    }
     case 'trayFocus': {
       return trayLine(event)
-    }
-    case 'trayFailed': {
-      return `La barre système n’est pas fiable : ${event.detail}`
-    }
-    case 'startAtLoginFailed': {
-      return `Démarrage avec la session impossible : ${event.detail}`
-    }
-    case 'scanFailed': {
-      return `Lecture des fenêtres impossible : ${event.detail}`
-    }
-    case 'saveFailed': {
-      return `Configuration non enregistrée : ${event.detail}`
-    }
-    case 'openFailed': {
-      return `Le système n’a pas pu ouvrir cet élément : ${event.detail}`
     }
     case 'reset': {
       return 'Configuration remise à zéro.'
