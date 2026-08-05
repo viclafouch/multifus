@@ -78,7 +78,7 @@ Ce qui attend déjà de ce côté : `platform::windows` compile en renvoyant `No
 
 **Ne jamais tenir le verrou de `Multifus` en touchant au watcher de notifications ou au plugin de raccourcis.** Le premier joint le thread qui exécute le sink, le second attend le fil principal où les commandes prennent ce verrou. C'est le seul interblocage que cette application sache construire, et la règle est écrite en tête de `app::state`.
 
-**L'AutoFocus macOS dépend de l'affichage des bannières.** Si l'utilisateur les désactive pour Dofus dans les réglages système, l'écoute cesse de fonctionner. Sur Windows c'est l'inverse, l'écoute passe par une API et les bannières peuvent rester coupées. L'interface explique déjà cette asymétrie.
+**L'AutoFocus macOS dépend de l'affichage des bannières, et la livraison sans affichage a été essayée.** Décocher « Bureau » en gardant « Centre de notifications » ne donne rien du tout : macOS ne construit aucun élément tant que le panneau reste fermé, donc l'observateur n'a rien à lire. Mesuré sur un combat, un défi et un échange, journal vide et aucune fenêtre ramenée. Ne pas rouvrir cette piste, elle est dans ADR 0002. Le réglage le moins gênant qui marche est bannière sur le Bureau, style temporaire, son coupé, aperçus par défaut. Sur Windows c'est l'inverse, l'écoute passe par une API et les bannières peuvent rester coupées.
 
 **Un client Dofus sur l'écran de connexion existe déjà en tant que processus** avec des fenêtres, mais sans titre exploitable. Toujours filtrer sur le titre, jamais sur la taille.
 

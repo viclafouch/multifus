@@ -168,7 +168,7 @@ export const strings = {
     stillApplies:
       'L’AutoFocus s’applique aussi aux personnages en veille, pour qu’un échange proposé à une mule la fasse remonter.',
     bannerWarning: IS_APPLE
-      ? 'Sur macOS, multifus lit la bannière que le système affiche. Si vous désactivez les bannières de Dofus dans les réglages de notifications, l’AutoFocus cesse de fonctionner. Sur Windows, c’est l’inverse : l’écoute passe par une API et les bannières peuvent rester coupées.'
+      ? 'Sur macOS, multifus lit la bannière que le système affiche : sans elle il n’a rien à lire et l’AutoFocus s’arrête. Dans les réglages de notifications de Dofus, gardez « Bureau » coché et les aperçus sur « Par défaut ». Le reste est libre : coupez le son et laissez le style sur « Temporaire », la bannière s’efface alors toute seule.'
       : 'Sur Windows, l’écoute passe par une API du système : les bannières de Dofus peuvent rester coupées sans rien casser. Sur macOS, elles sont au contraire indispensables.',
     kinds: {
       combat: {
