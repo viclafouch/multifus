@@ -2,7 +2,15 @@
   "bumpFiles": [
     { "filename": "package.json", "type": "json" },
     { "filename": "package-lock.json", "type": "json" },
-    { "filename": "src-tauri/tauri.conf.json", "type": "json" }
+    { "filename": "src-tauri/tauri.conf.json", "type": "json" },
+    {
+      "filename": "src-tauri/Cargo.toml",
+      "updater": "scripts/cargo-version.cjs"
+    },
+    {
+      "filename": "src-tauri/Cargo.lock",
+      "updater": "scripts/cargo-version.cjs"
+    }
   ],
   "types": [
     { "type": "feat", "section": "Fonctionnalités" },

@@ -13,7 +13,12 @@ export default defineConfig({
     '**/node_modules/**',
     'dist/**',
     // Rust side, linted by clippy and formatted by rustfmt
-    'src-tauri/**'
+    'src-tauri/**',
+    // Release tooling, loaded by `standard-version` through `require`, so it
+    // has to be CommonJS while the rest of the repository is ESM. That puts it
+    // outside the TypeScript project, and the type-aware rules have nothing to
+    // say about a file the project does not contain.
+    'scripts/*.cjs'
   ],
   options: {
     typeAware: true,
