@@ -35,8 +35,12 @@ L'incarnation d'un personnage à l'écran. Un processus client par personnage, s
 _Avoid_: Client, instance, écran
 
 **Focus** (`focus`):
-L'action de faire passer une fenêtre au premier plan.
+L'action de faire passer une fenêtre au premier plan. Une fenêtre réduite en ressort.
 _Avoid_: Activer, basculer, afficher
+
+**Réduite** (`minimized`):
+Se dit d'une fenêtre que l'utilisateur a rangée dans le Dock ou la barre des tâches. Le personnage reste connecté : sa fenêtre existe toujours, elle n'est plus à l'écran.
+_Avoid_: Minimisée, masquée, iconifiée, cachée
 
 ### Veille et défilement
 
@@ -81,3 +85,7 @@ _Avoid_: Catégorie, événement, déclencheur
 **AutoFocus** (`AutoFocus`):
 Le mécanisme qui focus la fenêtre d'un personnage lorsqu'une notification de jeu le concernant arrive. Activable par type de notification, globalement.
 _Avoid_: Switch automatique, auto-switch, suivi
+
+**Réveil des réduites** (`wakes_minimized`):
+Le réglage qui dit si l'AutoFocus sort une fenêtre réduite. Coché par défaut. Décoché, réduire une fenêtre la met hors d'atteinte de l'AutoFocus, ce qui laisse travailler ailleurs sans être ramené dans le jeu. Ne concerne que l'AutoFocus : un raccourci et un clic dans la barre système sortent toujours la fenêtre, puisque l'utilisateur les a demandés.
+_Avoid_: Mode concentration, ne pas déranger, restaurer

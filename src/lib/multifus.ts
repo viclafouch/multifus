@@ -109,6 +109,7 @@ export type NotificationOutcome =
   | { readonly outcome: 'focused' }
   | { readonly outcome: 'kindDisabled' }
   | { readonly outcome: 'kindUnknown' }
+  | { readonly outcome: 'leftMinimized' }
   | { readonly outcome: 'noWindow' }
 
 /** What became of a character clicked in the system tray. */
@@ -194,6 +195,9 @@ export type Snapshot = {
   /** The AutoFocus is running at all. Off, the seven above still say what they
    * will come back to. */
   readonly autoFocusEnabled: boolean
+  /** A notification takes a window out of the Dock. Off, minimizing a client
+   * puts it out of the AutoFocus's reach, and only the AutoFocus's. */
+  readonly wakesMinimized: boolean
   /** What the user asked for, not what the system currently holds. */
   readonly startAtLogin: boolean
   readonly authorization: Authorization
@@ -298,6 +302,16 @@ export const setAutoFocus = async (
 /** Suspends the AutoFocus as a whole, or brings it back. */
 export const setAutoFocusEnabled = async (enabled: boolean) => {
   return invoke<Snapshot>('set_auto_focus_enabled', { enabled })
+}
+
+/**
+ * Says whether a notification takes a window out of the Dock.
+ *
+ * The AutoFocus alone reads it. A shortcut and a click in the system tray were
+ * asked for, so they bring the window back whatever this says.
+ */
+export const setWakesMinimized = async (wakes: boolean) => {
+  return invoke<Snapshot>('set_wakes_minimized', { wakes })
 }
 
 /**

@@ -116,7 +116,27 @@ pub trait WindowManager: Send + Sync {
     /// two calls would leave room for the foreground to change in between.
     fn foreground_game_window(&self) -> Result<Option<GameWindow>>;
 
-    /// Brings a window to the front.
+    /// Whether the user has put this window away in the Dock or the taskbar.
+    ///
+    /// Asked by the one caller that may decide not to act, the AutoFocus with
+    /// its réveil des réduites switched off. The other two ways to a window, a
+    /// shortcut and a click in the system tray, never ask: the user requested
+    /// those, so they go through whatever the window's state.
+    ///
+    /// A window that has just been closed answers
+    /// [`PlatformError::WindowGone`], exactly as [`WindowManager::focus`] does,
+    /// so a caller that asks both handles one failure and not two.
+    ///
+    /// [`PlatformError::WindowGone`]: crate::platform::PlatformError::WindowGone
+    fn is_minimized(&self, window: WindowId) -> Result<bool>;
+
+    /// Brings a window to the front, out of the Dock or the taskbar if that is
+    /// where it was.
+    ///
+    /// Restoring is part of focusing and not an option of it: a window left in
+    /// the Dock has not been brought to the front, whatever the system reports.
+    /// What is optional is *asking for* the focus at all, and that is
+    /// [`WindowManager::is_minimized`]'s question.
     ///
     /// Returns [`PlatformError::WindowGone`] when the client has been closed
     /// since the window was enumerated.

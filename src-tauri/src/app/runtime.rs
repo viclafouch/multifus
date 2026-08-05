@@ -41,6 +41,7 @@ use crate::platform::NotificationWatcher;
 use crate::platform::PlatformError;
 use crate::platform::PlatformNotificationWatcher;
 use crate::platform::PlatformWindowManager;
+use crate::platform::WindowId;
 use crate::platform::WindowManager;
 
 /// How often the game windows are looked at.
@@ -204,13 +205,8 @@ fn on_notification(app: &AppHandle, notification: GameNotification) {
 
     let outcome = match decision {
         Decision::Ignored(outcome) => outcome,
-        Decision::Focus(window) => match app.state::<PlatformWindowManager>().focus(window) {
-            Ok(()) => Outcome::Focused,
-            Err(PlatformError::WindowGone) => Outcome::NoWindow,
-            Err(error) => Outcome::FocusFailed {
-                detail: error.to_string(),
-            },
-        },
+        Decision::Focus(window) => focus(app, window),
+        Decision::FocusUnlessMinimized(window) => focus_unless_minimized(app, window),
     };
 
     lock(app).log(JournalEvent::Notification {
@@ -220,6 +216,39 @@ fn on_notification(app: &AppHandle, notification: GameNotification) {
     });
 
     emit_snapshot(app);
+}
+
+/// Brings the window forward and says what came of it.
+fn focus(app: &AppHandle, window: WindowId) -> Outcome {
+    match app.state::<PlatformWindowManager>().focus(window) {
+        Ok(()) => Outcome::Focused,
+        Err(error) => refused(&error),
+    }
+}
+
+/// The same, for a user who asked that a window put in the Dock stay there.
+///
+/// One extra call to the system, paid only by those who switched the réveil des
+/// réduites off. Everyone else never asks the question.
+fn focus_unless_minimized(app: &AppHandle, window: WindowId) -> Outcome {
+    match app.state::<PlatformWindowManager>().is_minimized(window) {
+        Ok(true) => Outcome::LeftMinimized,
+        Ok(false) => focus(app, window),
+        Err(error) => refused(&error),
+    }
+}
+
+/// What the journal says when the system would not do it.
+///
+/// A client closed between the scan and the notification is the ordinary case
+/// and is not a failure, which is why it does not read as one.
+fn refused(error: &PlatformError) -> Outcome {
+    match error {
+        PlatformError::WindowGone => Outcome::NoWindow,
+        other => Outcome::FocusFailed {
+            detail: other.to_string(),
+        },
+    }
 }
 
 /// Asks the system for the authorization, which opens its dialog.

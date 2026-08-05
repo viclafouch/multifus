@@ -154,6 +154,11 @@ pub enum Outcome {
     /// window multifus cannot see. A notification can outlive its window.
     NoWindow,
 
+    /// The window is in the Dock and the réveil des réduites is off, so it was
+    /// left there. What the user asked for, said out loud rather than looking
+    /// like an AutoFocus that missed.
+    LeftMinimized,
+
     /// The focus was asked for and the system refused it.
     FocusFailed { detail: String },
 }

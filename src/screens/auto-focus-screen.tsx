@@ -5,18 +5,23 @@ import {
   Flag,
   Hammer,
   MessageSquare,
+  PictureInPicture2,
   Radar,
   Swords,
   Users
 } from 'lucide-react'
-import { FieldRow, Note, Panel, Screen } from '@/components/screen'
+import { FieldRow, Panel, Screen } from '@/components/screen'
 import { Switch } from '@/components/ui/switch'
 import type {
   AutoFocusSwitch,
   NotificationKind,
   Snapshot
 } from '@/lib/multifus'
-import { setAutoFocus, setAutoFocusEnabled } from '@/lib/multifus'
+import {
+  setAutoFocus,
+  setAutoFocusEnabled,
+  setWakesMinimized
+} from '@/lib/multifus'
 import { strings } from '@/lib/strings'
 
 /** One glyph per recognised event, so the seven rows can be told apart at speed. */
@@ -33,6 +38,7 @@ const ICONS = {
 type AutoFocusScreenProps = Readonly<{
   switches: readonly AutoFocusSwitch[]
   isEnabled: boolean
+  wakesMinimized: boolean
   run: (action: Promise<Snapshot>) => void
 }>
 
@@ -44,18 +50,23 @@ type AutoFocusScreenProps = Readonly<{
  * six accounts plus the global-to-local synchronisation that comes with it;
  * perimetre.md drops the whole idea, and this screen is what replaces it.
  *
- * The master sits in its own panel rather than as an eighth row, because it does
- * not answer the same question: the seven say which events count, it says
- * whether any of them do. It is also the one setting reachable from the system
- * tray, so it has to be findable here without being mistaken for a kind.
+ * Two panels and not three. The first holds what is not a kind: whether the
+ * AutoFocus runs at all, and whether it reaches into the Dock. The second holds
+ * the seven kinds. Mixing the two would make « Fenêtres réduites » read like an
+ * eighth event, which it is not.
  *
  * Suspended, the seven dim but stay live. Greying them out would be a lie, since
  * they are still what the AutoFocus comes back to, and the project's rule is to
  * explain a constraint rather than to block a click.
+ *
+ * No paragraph under the panels. Every caveat that used to sit there is a hint
+ * on the row it belongs to: a note nobody reads is a note that does not exist,
+ * and the reader who wonders about a row looks at that row.
  */
 export const AutoFocusScreen = ({
   switches,
   isEnabled,
+  wakesMinimized,
   run
 }: AutoFocusScreenProps) => {
   return (
@@ -74,6 +85,25 @@ export const AutoFocusScreen = ({
             aria-label={strings.autoFocus.masterLabel}
             onCheckedChange={(enabled) => {
               run(setAutoFocusEnabled(enabled))
+            }}
+          />
+        </FieldRow>
+        <FieldRow
+          label={strings.autoFocus.minimizedLabel}
+          description={strings.autoFocus.minimizedDescription}
+          icon={
+            <PictureInPicture2
+              className="size-glyph"
+              strokeWidth={1.75}
+              aria-hidden
+            />
+          }
+        >
+          <Switch
+            checked={wakesMinimized}
+            aria-label={strings.autoFocus.minimizedLabel}
+            onCheckedChange={(wakes) => {
+              run(setWakesMinimized(wakes))
             }}
           />
         </FieldRow>
@@ -106,9 +136,6 @@ export const AutoFocusScreen = ({
           )
         })}
       </Panel>
-      {isEnabled ? null : <Note>{strings.autoFocus.suspended}</Note>}
-      <Note>{strings.autoFocus.stillApplies}</Note>
-      <Note>{strings.autoFocus.bannerWarning}</Note>
     </Screen>
   )
 }

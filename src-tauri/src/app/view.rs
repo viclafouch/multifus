@@ -38,6 +38,9 @@ pub struct Snapshot {
     /// The AutoFocus is running at all. Off, the seven above still say what
     /// they will come back to.
     pub auto_focus_enabled: bool,
+    /// A notification takes a window out of the Dock. Off, minimizing a client
+    /// puts it out of the AutoFocus's reach, and only the AutoFocus's.
+    pub wakes_minimized: bool,
     /// multifus is asked to start with the session. What the user wants, not
     /// what the system currently holds, see [`crate::app::autostart`].
     pub start_at_login: bool,

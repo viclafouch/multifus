@@ -169,6 +169,7 @@ impl Multifus {
                 })
                 .collect(),
             auto_focus_enabled: self.settings.auto_focus.enabled,
+            wakes_minimized: self.settings.auto_focus.wakes_minimized,
             authorization: AuthorizationView {
                 granted: self.is_granted(),
                 listening: self.listening,
@@ -375,6 +376,12 @@ impl Multifus {
         self.settings.auto_focus.enabled
     }
 
+    /// Says whether a notification takes a window out of the Dock.
+    pub fn set_wakes_minimized(&mut self, wakes: bool) {
+        self.settings.auto_focus.wakes_minimized = wakes;
+        self.save();
+    }
+
     /// Suspends the AutoFocus if it was running, brings it back if it was not.
     ///
     /// What the system tray asks for, since a tick carries no state of its own:
@@ -382,6 +389,18 @@ impl Multifus {
     /// a command could slip between the question and the answer.
     pub fn toggle_auto_focus(&mut self) {
         self.set_auto_focus_enabled(!self.settings.auto_focus.enabled);
+    }
+
+    /// Whether a notification takes a window out of the Dock.
+    #[must_use]
+    pub fn wakes_minimized(&self) -> bool {
+        self.settings.auto_focus.wakes_minimized
+    }
+
+    /// Wakes the minimized windows if it was not doing so, stops if it was. The
+    /// system tray's other switch, and the same reason for one hold.
+    pub fn toggle_wakes_minimized(&mut self) {
+        self.set_wakes_minimized(!self.settings.auto_focus.wakes_minimized);
     }
 
     /// Everything back to what someone who has never opened multifus gets,
@@ -580,7 +599,8 @@ impl Multifus {
         // of the cycle, not out of AutoFocus: a trade offered to a mule has to
         // bring it up. See CONTEXT.md.
         match self.windows.get(nickname) {
-            Some(window) => Decision::Focus(*window),
+            Some(window) if self.settings.auto_focus.wakes_minimized => Decision::Focus(*window),
+            Some(window) => Decision::FocusUnlessMinimized(*window),
             None => Decision::Ignored(Outcome::NoWindow),
         }
     }
@@ -670,6 +690,13 @@ fn view_of(character: &Character) -> CharacterView {
 pub enum Decision {
     /// Bring this window to the front.
     Focus(WindowId),
+    /// Bring this window to the front, unless the user has put it in the Dock.
+    ///
+    /// Two variants rather than a flag on one, because the question costs a call
+    /// to the system and the ordinary answer is not to ask it. Whether a window
+    /// is minimized cannot be decided here anyway: this is the pure side, and
+    /// only the boundary knows.
+    FocusUnlessMinimized(WindowId),
     /// Do nothing, and this is why.
     Ignored(Outcome),
 }
@@ -722,6 +749,46 @@ mod tests {
         let title = format!("{nickname} - Dofus Retro v1.48.21");
 
         GameWindow::from_title(WindowId::from_raw(pid), &title).expect("a game window")
+    }
+
+    #[test]
+    fn a_window_in_the_dock_is_only_spared_once_the_switch_is_off() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha")]);
+
+        // By default nothing is spared: whether the window is in the Dock is a
+        // question the boundary is never even asked.
+        assert_eq!(
+            state.decide("Alpha", Some(NotificationKind::Combat)),
+            Decision::Focus(WindowId::from_raw(1))
+        );
+
+        state.set_wakes_minimized(false);
+
+        assert_eq!(
+            state.decide("Alpha", Some(NotificationKind::Combat)),
+            Decision::FocusUnlessMinimized(WindowId::from_raw(1))
+        );
+    }
+
+    #[test]
+    fn sparing_the_minimized_says_nothing_about_the_kinds() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha")]);
+        state.set_wakes_minimized(false);
+
+        state.set_auto_focus(NotificationKind::Combat, false);
+
+        assert_eq!(
+            state.decide("Alpha", Some(NotificationKind::Combat)),
+            Decision::Ignored(Outcome::KindDisabled)
+        );
+        assert_eq!(
+            state.decide("Alpha", Some(NotificationKind::Trade)),
+            Decision::FocusUnlessMinimized(WindowId::from_raw(1))
+        );
     }
 
     #[test]

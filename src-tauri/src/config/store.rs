@@ -312,6 +312,7 @@ mod tests {
         let mut auto_focus = AutoFocus::all(true);
         auto_focus.set(NotificationKind::PrivateMessage, false);
         auto_focus.set(NotificationKind::Craft, false);
+        auto_focus.wakes_minimized = false;
 
         Settings {
             roster: Roster::from_characters(vec![

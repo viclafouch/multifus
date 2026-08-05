@@ -159,6 +159,16 @@ pub struct AutoFocus {
     /// them back on would hand back all seven. Suspending is not the same as
     /// clearing, and the file has to remember the difference.
     pub enabled: bool,
+    /// Whether a notification takes a window out of the Dock.
+    ///
+    /// Not a kind, and that is why it is not one of the seven: it says what to
+    /// do with a window the user has put away, whatever brought it up. Switched
+    /// off, minimizing a client puts it out of AutoFocus's reach, which is how
+    /// one works elsewhere without being dragged back into the game.
+    ///
+    /// Only the AutoFocus reads it. A shortcut and a click in the system tray
+    /// were asked for, so they always bring the window back.
+    pub wakes_minimized: bool,
     /// It is this character's turn to play.
     pub combat: bool,
     /// Somebody offers a trade.
@@ -182,11 +192,12 @@ impl Default for AutoFocus {
 }
 
 impl AutoFocus {
-    /// The same state for the master and the seven of them.
+    /// The same state for every switch of this screen.
     #[must_use]
     pub const fn all(enabled: bool) -> Self {
         Self {
             enabled,
+            wakes_minimized: enabled,
             combat: enabled,
             trade: enabled,
             group: enabled,
@@ -285,6 +296,38 @@ mod tests {
 
         assert!(auto_focus.is_enabled(NotificationKind::Combat));
         assert!(!auto_focus.is_enabled(NotificationKind::Craft));
+    }
+
+    #[test]
+    fn the_minimized_are_woken_by_default() {
+        // multifus is for bringing the right window forward, and a first launch
+        // has to do that whatever the user has put away in the Dock.
+        assert!(AutoFocus::default().wakes_minimized);
+    }
+
+    #[test]
+    fn a_file_written_before_this_setting_existed_wakes_the_minimized() {
+        // The switch is new. Every configuration already on disk is missing it,
+        // and reading `false` there would silently change what those multifus
+        // do on a notification.
+        let auto_focus =
+            serde_json::from_str::<AutoFocus>("{}").expect("an AutoFocus with nothing in it");
+
+        assert!(auto_focus.wakes_minimized);
+    }
+
+    #[test]
+    fn leaving_the_minimized_alone_changes_nothing_for_a_window_on_screen() {
+        // The switch answers one question and not two: it says what happens to a
+        // window in the Dock, never which kinds count.
+        let auto_focus = AutoFocus {
+            wakes_minimized: false,
+            ..AutoFocus::default()
+        };
+
+        for kind in NotificationKind::ALL {
+            assert!(auto_focus.is_enabled(kind), "{kind:?} should still be on");
+        }
     }
 
     #[test]

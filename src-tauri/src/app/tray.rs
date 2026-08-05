@@ -72,6 +72,11 @@ const MENU_ASLEEP: &str = " (en veille)";
 // only be an action, and the verb it starts with says which way it will go.
 const MENU_AUTO_FOCUS_ON: &str = "Activer l'AutoFocus";
 const MENU_AUTO_FOCUS_OFF: &str = "Désactiver l'AutoFocus";
+// The one setting worth a line here that is not about kinds: it is switched
+// while playing, or rather while not playing, which is exactly what this menu is
+// for. « Ignorer » is what the click will do, as the rule of this menu asks.
+const MENU_WAKE_MINIMIZED: &str = "Réveiller les fenêtres réduites";
+const MENU_LEAVE_MINIMIZED: &str = "Ignorer les fenêtres réduites";
 const MENU_DENIED: &str = "Autorisation manquante";
 
 /// The line that names the version that is out. Only ever there when a check
@@ -103,6 +108,9 @@ const NOBODY_ID: &str = "multifus://nobody";
 
 /// The tick that suspends the AutoFocus without forgetting the seven kinds.
 const AUTO_FOCUS_ID: &str = "multifus://auto-focus";
+
+/// The one that says whether the AutoFocus reaches into the Dock.
+const WAKE_MINIMIZED_ID: &str = "multifus://wake-minimized";
 
 /// The item that replaces multifus with the version that is out and restarts it.
 const UPDATE_ID: &str = "multifus://update";
@@ -136,6 +144,7 @@ type ShownMenu = Mutex<Option<Contents>>;
 struct Contents {
     entries: Vec<Entry>,
     auto_focus: bool,
+    wakes_minimized: bool,
     granted: bool,
     /// The version a check found, `None` when there is nothing to offer.
     update: Option<String>,
@@ -167,6 +176,7 @@ fn contents(app: &AppHandle) -> Contents {
     Contents {
         entries: entries(&state.connected()),
         auto_focus: state.is_auto_focus_enabled(),
+        wakes_minimized: state.wakes_minimized(),
         granted: state.is_granted(),
         update: state.available_update(),
     }
@@ -333,6 +343,22 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
         None::<&str>,
     )?)?;
 
+    // Under the master and not next to the screens: it is a setting of the
+    // AutoFocus, not a fifth place to go. Left live while the AutoFocus is off,
+    // exactly as the seven kinds are on the screen, since it says what will
+    // happen when it comes back rather than what is happening now.
+    menu.append(&MenuItem::with_id(
+        app,
+        WAKE_MINIMIZED_ID,
+        switch_label(
+            contents.wakes_minimized,
+            MENU_LEAVE_MINIMIZED,
+            MENU_WAKE_MINIMIZED,
+        ),
+        true,
+        None::<&str>,
+    )?)?;
+
     // Four lines rather than one « Ouvrir », because opening the window is never
     // the thing one wants: going to one of its screens is. The rail is three
     // clicks away otherwise, and this icon exists to save exactly those.
@@ -423,6 +449,14 @@ fn on_menu_event(app: &AppHandle, event: MenuEvent) {
         // flips, and what the menu shows next comes back through the snapshot,
         // like every other surface.
         lock(app).toggle_auto_focus();
+
+        runtime::emit_snapshot(app);
+
+        return;
+    }
+
+    if id == WAKE_MINIMIZED_ID {
+        lock(app).toggle_wakes_minimized();
 
         runtime::emit_snapshot(app);
 

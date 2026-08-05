@@ -38,9 +38,11 @@ use objc2_application_services::AXIsProcessTrusted;
 use objc2_application_services::AXIsProcessTrustedWithOptions;
 use objc2_application_services::AXObserver;
 use objc2_application_services::AXUIElement;
+use objc2_core_foundation::kCFBooleanFalse;
 use objc2_core_foundation::kCFBooleanTrue;
 use objc2_core_foundation::kCFRunLoopDefaultMode;
 use objc2_core_foundation::CFArray;
+use objc2_core_foundation::CFBoolean;
 use objc2_core_foundation::CFDictionary;
 use objc2_core_foundation::CFRetained;
 use objc2_core_foundation::CFRunLoop;
@@ -72,6 +74,7 @@ const NOTIFICATION_CENTRE_BUNDLE_ID: &str = "com.apple.notificationcenterui";
 // the framework headers spell them.
 const AX_TITLE: &str = "AXTitle";
 const AX_MAIN_WINDOW: &str = "AXMainWindow";
+const AX_MINIMIZED: &str = "AXMinimized";
 const AX_WINDOWS: &str = "AXWindows";
 const AX_CHILDREN: &str = "AXChildren";
 const AX_ROLE: &str = "AXRole";
@@ -186,6 +189,13 @@ fn string_attribute(element: &AXUIElement, name: &str) -> Result<Option<String>>
         .map(|text| text.to_string()))
 }
 
+/// Reads an attribute that holds a boolean.
+fn bool_attribute(element: &AXUIElement, name: &str) -> Result<Option<bool>> {
+    Ok(attribute(element, name)?
+        .and_then(|value| value.downcast::<CFBoolean>().ok())
+        .map(|flag| flag.value()))
+}
+
 /// Reads an attribute that holds a single accessibility object.
 fn element_attribute(element: &AXUIElement, name: &str) -> Result<Option<CFRetained<AXUIElement>>> {
     Ok(attribute(element, name)?.and_then(|value| value.downcast::<AXUIElement>().ok()))
@@ -226,25 +236,54 @@ fn dofus_applications() -> Vec<Retained<NSRunningApplication>> {
     NSRunningApplication::runningApplicationsWithBundleIdentifier(&bundle).to_vec()
 }
 
-/// The titles of a client's windows, its main window first.
+/// A client's windows, its main window first.
 ///
-/// The main window is the one the plan asks for. The other windows follow as a
-/// safety net for a client that has not designated a main one yet; since a title
-/// only becomes a [`GameWindow`] through [`GameWindow::from_title`], the extra
-/// titles can add a window that would have been missed but can never let a wrong
-/// one through.
+/// The main window is the one the plan asks for. The others follow as a safety
+/// net for a client that has not designated a main one yet, and for one whose
+/// window is minimized: macOS drops `AXMainWindow` while a window sits in the
+/// Dock, and the window is still in `AXWindows`. Since a window only becomes a
+/// [`GameWindow`] through its title, the extra entries can add one that would
+/// have been missed but can never let a wrong one through.
+fn windows_of(application: &AXUIElement) -> Result<Vec<CFRetained<AXUIElement>>> {
+    let mut windows = Vec::new();
+
+    if let Some(main_window) = element_attribute(application, AX_MAIN_WINDOW)? {
+        windows.push(main_window);
+    }
+
+    windows.extend(element_array_attribute(application, AX_WINDOWS)?);
+
+    Ok(windows)
+}
+
+/// The titles of those windows, in the same order.
 fn window_titles(application: &AXUIElement) -> Result<Vec<String>> {
     let mut titles = Vec::new();
 
-    if let Some(main_window) = element_attribute(application, AX_MAIN_WINDOW)? {
-        titles.extend(string_attribute(&main_window, AX_TITLE)?);
-    }
-
-    for window in element_array_attribute(application, AX_WINDOWS)? {
+    for window in windows_of(application)? {
         titles.extend(string_attribute(&window, AX_TITLE)?);
     }
 
     Ok(titles)
+}
+
+/// The window of a client that carries a nickname, `None` for a client sitting
+/// on the login screen.
+///
+/// The one place that needs the window itself rather than its title: a window is
+/// what carries `AXMinimized`, an application does not.
+fn game_window_element(application: &AXUIElement) -> Result<Option<CFRetained<AXUIElement>>> {
+    for window in windows_of(application)? {
+        let Some(title) = string_attribute(&window, AX_TITLE)? else {
+            continue;
+        };
+
+        if extract_nickname(&title).is_some() {
+            return Ok(Some(window));
+        }
+    }
+
+    Ok(None)
 }
 
 /// The game window of one client process, `None` when no title carries a
@@ -294,6 +333,62 @@ fn set_frontmost(application: &AXUIElement) -> Result<()> {
     match status {
         AXError::InvalidUIElement | AXError::CannotComplete => Err(PlatformError::WindowGone),
         other => ax_result(other, "focusing a client"),
+    }
+}
+
+/// The live client a window token designates, and its accessibility object.
+///
+/// [`PlatformError::WindowGone`] covers the three ways a token can designate
+/// nothing any more: a raw value that is not a pid, an application the system no
+/// longer knows, and one that has quit since the scan saw it.
+fn live_application(
+    window: WindowId,
+) -> Result<(Retained<NSRunningApplication>, CFRetained<AXUIElement>)> {
+    let pid = pid_t::try_from(window.raw()).map_err(|_| PlatformError::WindowGone)?;
+
+    let Some(application) = NSRunningApplication::runningApplicationWithProcessIdentifier(pid)
+    else {
+        return Err(PlatformError::WindowGone);
+    };
+
+    if application.isTerminated() {
+        return Err(PlatformError::WindowGone);
+    }
+
+    // SAFETY: the pid belongs to an application the system just reported as
+    // running.
+    let element = unsafe { AXUIElement::new_application(pid) };
+
+    Ok((application, element))
+}
+
+/// Takes a window out of the Dock, and only one that is in it.
+///
+/// Read before write on purpose. Writing `AXMinimized` on a window that is not
+/// minimized is a call with nothing to do, and a refusal there would turn an
+/// ordinary focus into a failure for no gain. Reading one attribute is the
+/// 0,05 ms the plan measured.
+fn restore(window: &AXUIElement) -> Result<()> {
+    if bool_attribute(window, AX_MINIMIZED)? != Some(true) {
+        return Ok(());
+    }
+
+    let name = CFString::from_str(AX_MINIMIZED);
+
+    // SAFETY: a constant of the framework, alive for the whole process.
+    let Some(no) = (unsafe { kCFBooleanFalse }) else {
+        return Err(PlatformError::system(
+            "restoring a window",
+            "kCFBooleanFalse is missing",
+        ));
+    };
+
+    // SAFETY: `AXMinimized` takes a boolean, which is what is passed.
+    let status = unsafe { window.set_attribute_value(&name, no) };
+
+    match status {
+        AXError::InvalidUIElement | AXError::CannotComplete => Err(PlatformError::WindowGone),
+        other => ax_result(other, "restoring a window"),
     }
 }
 
@@ -352,16 +447,28 @@ impl WindowManager for AccessibilityWindowManager {
         Ok(None)
     }
 
-    fn focus(&self, window: WindowId) -> Result<()> {
-        let pid = pid_t::try_from(window.raw()).map_err(|_| PlatformError::WindowGone)?;
+    fn is_minimized(&self, window: WindowId) -> Result<bool> {
+        let (_, element) = live_application(window)?;
 
-        let Some(application) = NSRunningApplication::runningApplicationWithProcessIdentifier(pid)
-        else {
+        // No game window on a live client is the login screen, and a client that
+        // has left the game is one this token no longer designates.
+        let Some(game_window) = game_window_element(&element)? else {
             return Err(PlatformError::WindowGone);
         };
 
-        if application.isTerminated() {
-            return Err(PlatformError::WindowGone);
+        // A window the system says nothing about is a window on screen. Only
+        // `AXMinimized` reading true puts it in the Dock.
+        Ok(bool_attribute(&game_window, AX_MINIMIZED)? == Some(true))
+    }
+
+    fn focus(&self, window: WindowId) -> Result<()> {
+        let (application, element) = live_application(window)?;
+
+        // Out of the Dock before anything else. Activating a client whose window
+        // is minimized brings its menu bar to the front and leaves the window
+        // exactly where it was, which is the whole trap this answers.
+        if let Some(game_window) = game_window_element(&element)? {
+            restore(&game_window)?;
         }
 
         // `ActivateAllWindows` without `ActivateIgnoringOtherApps`, which macOS
@@ -375,11 +482,6 @@ impl WindowManager for AccessibilityWindowManager {
         // an application that is not in front, which multifus never is. Setting
         // `AXFrontmost` asks for the same thing through the authorization
         // multifus already holds. Same process, same intent, second door.
-        //
-        // SAFETY: the pid belongs to an application the system just reported as
-        // running.
-        let element = unsafe { AXUIElement::new_application(pid) };
-
         set_frontmost(&element)
     }
 }

@@ -63,6 +63,10 @@ type FieldRowProps = Readonly<{
  * The shortcuts and the seven AutoFocus switches are both lists of settings, so
  * they are both this row. Only the AutoFocus rows carry an icon, which is why it
  * is optional rather than a second component.
+ *
+ * The description says what the setting gives the user when it is on, in one
+ * line. Not how multifus goes about it, which is nobody's business, and not what
+ * happens when it is off, which is the same sentence backwards.
  */
 export const FieldRow = ({
   label,

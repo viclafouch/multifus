@@ -65,7 +65,16 @@ impl WindowManager for Win32WindowManager {
         ))
     }
 
+    fn is_minimized(&self, _window: WindowId) -> Result<bool> {
+        // `IsIconic`, one call and no authorization.
+        Err(PlatformError::not_implemented(
+            "Win32WindowManager::is_minimized",
+        ))
+    }
+
     fn focus(&self, _window: WindowId) -> Result<()> {
+        // `ShowWindow` with `SW_RESTORE` before the `AttachThreadInput` dance,
+        // since a window left iconic is a window nobody sees.
         Err(PlatformError::not_implemented("Win32WindowManager::focus"))
     }
 }

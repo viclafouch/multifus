@@ -81,6 +81,7 @@ const CurrentScreen = ({ screen, snapshot, run }: CurrentScreenProps) => {
       <AutoFocusScreen
         switches={snapshot.autoFocus}
         isEnabled={snapshot.autoFocusEnabled}
+        wakesMinimized={snapshot.wakesMinimized}
         run={run}
       />
     )

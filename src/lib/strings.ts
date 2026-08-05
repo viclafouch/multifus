@@ -169,18 +169,13 @@ export const strings = {
 
   autoFocus: {
     title: 'AutoFocus',
-    subtitle:
-      'Une notification de jeu ramène la fenêtre du personnage concerné au premier plan. Ces réglages sont globaux : ils valent pour tout le roster.',
+    subtitle: 'Réglages valables pour tout le roster.',
     masterLabel: 'AutoFocus',
-    masterDescription:
-      'Coupe tout d’un coup, sans oublier les types réglés ci-dessous. Le même interrupteur vit dans le menu de la barre système.',
-    suspended:
-      'L’AutoFocus est coupé : aucune notification ne ramène de fenêtre. Les réglages ci-dessous restent modifiables et reprendront tels quels.',
-    stillApplies:
-      'L’AutoFocus s’applique aussi aux personnages en veille, pour qu’un échange proposé à une mule la fasse remonter.',
-    bannerWarning: IS_APPLE
-      ? 'Sur macOS, multifus lit la bannière que le système affiche : sans elle il n’a rien à lire et l’AutoFocus s’arrête. Dans les réglages de notifications de Dofus, gardez « Bureau » coché et les aperçus sur « Par défaut ». Le reste est libre : coupez le son et laissez le style sur « Temporaire », la bannière s’efface alors toute seule.'
-      : 'Sur Windows, l’écoute passe par une API du système : les bannières de Dofus peuvent rester coupées sans rien casser. Sur macOS, elles sont au contraire indispensables.',
+    masterDescription: 'Ramène la fenêtre qui reçoit une notification.',
+    minimizedLabel: 'Fenêtres réduites',
+    minimizedDescription: IS_APPLE
+      ? 'Rouvre de force celles rangées dans le Dock.'
+      : 'Rouvre de force celles rangées dans la barre des tâches.',
     kinds: {
       combat: {
         label: 'Combat',
@@ -690,6 +685,9 @@ const notificationLine = ({
     }
     case 'noWindow': {
       return `${subject} : aucune fenêtre à ramener.`
+    }
+    case 'leftMinimized': {
+      return `${subject} : fenêtre réduite, laissée où elle est.`
     }
     case 'focusFailed': {
       return `${subject} : le système a refusé le passage au premier plan (${outcome.detail}).`

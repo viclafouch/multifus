@@ -144,6 +144,17 @@ pub fn set_auto_focus_enabled(app: AppHandle, enabled: bool) -> Snapshot {
     runtime::emit_snapshot(&app)
 }
 
+/// Says whether a notification takes a window out of the Dock.
+///
+/// Only the AutoFocus reads this. A shortcut and a click in the system tray were
+/// asked for by the user, so they bring the window back either way.
+#[tauri::command]
+pub fn set_wakes_minimized(app: AppHandle, wakes: bool) -> Snapshot {
+    lock(&app).set_wakes_minimized(wakes);
+
+    runtime::emit_snapshot(&app)
+}
+
 /// Asks multifus to start with the session, or to stop doing so.
 ///
 /// The configuration is written first and the system is made to follow, never
