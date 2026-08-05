@@ -2,13 +2,13 @@
 
 Ce document dit où en est multifus et ce qui vient ensuite. Rien d'autre.
 
-Le vocabulaire est dans [CONTEXT.md](../CONTEXT.md), ce que le projet refuse de faire dans [perimetre.md](./perimetre.md), les décisions structurantes dans [adr](./adr). Le pourquoi des choix d'implémentation vit dans les commentaires de module du code, au contact de ce qu'il explique et là où il se périme le moins vite. Ce document ne le recopie pas.
+Le vocabulaire est dans [CONTEXT.md](../CONTEXT.md), ce que le projet refuse de faire dans [perimetre.md](./perimetre.md), les décisions structurantes dans [adr](./adr), les règles d'écriture du code dans [.claude/rules](../.claude/rules).
 
 ---
 
 ## Où on en est
 
-Les étapes 0 à 8 et l'étape 10 sont écrites, les sept premières sont vérifiées. Leurs numéros restent des étiquettes, le code y renvoie.
+Les étapes 0 à 8 et l'étape 10 sont écrites, les sept premières sont vérifiées. De l'étape 11, les fondations sont posées et le reste attend. Leurs numéros restent des étiquettes, le code y renvoie.
 
 | #   | Étape                       | Où                                           | État                                 |
 | --- | --------------------------- | -------------------------------------------- | ------------------------------------ |
@@ -21,6 +21,8 @@ Les étapes 0 à 8 et l'étape 10 sont écrites, les sept premières sont vérif
 | 7   | Raccourcis globaux          | `app::shortcuts`                             | **vérifiés depuis le jeu**           |
 | 8   | Barre système et session    | `app::tray`, `app::autostart`                | **revient à l'ouverture de session** |
 | 10  | Distribution et mise à jour | `.github/workflows`, `app::update`           | écrite, à vérifier                   |
+| 11a | Fondations du relais        | `app::relay::secret`, `platform::display`    | écrites, testées                     |
+| 11b | Relais Telegram             | `app::relay`, écran, barre système           | cadré et mesuré, rien d'écrit        |
 
 Les versions font foi dans `package.json`, `tauri.conf.json` et `Cargo.toml`, nulle part ailleurs. `standard-version` les déplace ensemble, et le workflow de release refuse un tag qui ne dirait pas la même chose qu'elles.
 
@@ -46,7 +48,7 @@ L'écriture dans le presse-papiers passe par `tauri-plugin-clipboard-manager` et
 
 ## La suite, dans l'ordre
 
-L'ordre ci-dessous n'est pas celui des numéros : la distribution est passée avant Windows, pour que macOS soit fini d'un bloc et que la session Windows trouve la chaîne de compilation déjà posée, à laquelle il ne restera qu'à ajouter un runner.
+L'ordre ci-dessous n'est pas celui des numéros : la distribution est passée avant Windows, pour que macOS soit fini d'un bloc et que la session Windows trouve la chaîne de compilation déjà posée, à laquelle il ne restera qu'à ajouter un runner. Le relais s'insère par la même logique, avant Windows : il se vérifie entièrement sur macOS, et sa seule moitié propre à Windows est l'écran tenu éveillé, qui suivra le motif `NotImplemented` déjà en place dans `platform::windows`.
 
 ### Étape 8 — Barre système et démarrage automatique
 
@@ -122,6 +124,161 @@ Perdue avant la première release, elle se régénère sans conséquence. Perdue
 
 **Vérification.** Un tag sur une version d'essai, le brouillon relu, le DMG téléchargé depuis un autre compte pour que la quarantaine s'applique vraiment, puis une seconde version pour voir si l'autorisation d'Accessibilité tient et si la fenêtre propose la mise à jour.
 
+### Étape 11 — Relais Telegram
+
+**Les fondations sont écrites, le reste attend.** Le besoin : jouer en passif, ne guetter que les messages privés, et pouvoir aller faire autre chose dans la maison sans perdre ces messages.
+
+#### 11a — Posé
+
+`app::relay::secret` pour le trousseau, `platform::display` et sa moitié macOS, `relayed` sur le personnage avec les accesseurs de `Roster` qui vont avec, `config::Relay`, les trois dépendances et le fournisseur `rustls` dans `app::setup`. Ni interface, ni réseau, ni barre système.
+
+#### 11b — Ce qui reste
+
+Cinq décisions sont tranchées et n'ont pas à être rejouées. Le service, [ADR 0007](./adr/0007-telegram-plutot-que-whatsapp-ou-ntfy.md), qui écarte WhatsApp, ntfy, Gotify, Bark et Pushover avec les motifs de chacun. Le corps du message, [ADR 0008](./adr/0008-corps-relaye-sur-consentement.md), qui explique pourquoi l'interdit de l'ADR 0006 ne s'applique pas ici et pourquoi le réglage est décoché par défaut. Le jeton, [ADR 0009](./adr/0009-jeton-dans-le-trousseau.md), qui le range dans le trousseau du système. Les avis, [ADR 0010](./adr/0010-le-relais-parle-de-lui-meme.md), qui disent quand le relais a cessé d'entendre. Le relais par personnage, [ADR 0011](./adr/0011-relais-par-personnage.md), qui revient sur un refus du périmètre.
+
+**Ce qui décide de tout, et qu'aucun document ne disait : le quart d'heure.** Dofus déconnecte un client resté inactif, et le titre de sa fenêtre perd le pseudo. Le périmètre interdit d'y remédier, ce serait simuler une action de jeu. Le relais a donc une durée de vie utile d'environ quinze minutes par personnage, et rien ne la rallongera. Ça ne le condamne pas, ça le recadre : l'avis de déconnexion n'est pas un confort, c'est l'événement principal.
+
+**Le message privé seul parmi les sept types, codé en dur.** Pas de jeu d'interrupteurs par type. Le périmètre écrit le refus et dit à quelle condition le rouvrir. Les avis de l'ADR 0010 ne sont pas des types de notification et n'ouvrent pas cette porte.
+
+**Les personnages relayés se choisissent, et ça se garde.** L'attribut et ses accesseurs sont posés en 11a. Reste ce qui s'appuie dessus : l'écran Relais en dessine la liste, et le relais refuse de s'activer quand `has_relayed` est faux, ce qui est le seul garde-fou contre l'exclusion oubliée de l'ADR 0004. Voir ADR 0011.
+
+**L'interrupteur est dans la barre système et nulle part ailleurs.** Un article avec un verbe, comme la règle de l'étape 8 l'exige pour tout ce qui bascule dans ce menu. Pas de cinquième raccourci global : les quatre flèches de `Control+Shift` sont prises, et on active le relais en se levant, un geste qui supporte d'aller à la barre des menus.
+
+Trois états et non deux verbes, parce que l'état « aucun jeton rangé » existe et qu'un « Activer le relais » qui échoue est exactement ce que cette étape cherche à éviter :
+
+| État                          | Ce que l'article dit                              |
+| ----------------------------- | ------------------------------------------------- |
+| Aucun jeton dans le trousseau | `Configurer le relais…`, et le clic ouvre l'écran |
+| Jeton présent, relais coupé   | `Activer le relais`                               |
+| Relais actif                  | `Désactiver le relais`                            |
+
+**L'écran Relais est le cinquième du rail et du menu.** `Screen::ALL`, `tray::build_menu` et le rail passent de quatre à cinq. C'est la première fonctionnalité qui oblige à ouvrir la fenêtre pour être installée, et l'arbitrage est en bas de cette étape.
+
+**L'état actif ne survit pas au processus.** Même raisonnement que l'[ADR 0004](./adr/0004-veille-ephemere-sexe-persiste.md) pour la veille : un multifus qui revient d'un plantage en tenant l'écran éveillé et en poussant des messages privés vers un téléphone, sans que personne ne l'ait demandé, est un comportement que ce projet refuse déjà ailleurs. Le jeton et l'identifiant de salon persistent, l'état actif non.
+
+**Un des quatre raccourcis frappé coupe le relais.** Si un raccourci se déclenche, c'est qu'une fenêtre Dofus est devant et qu'une main est au clavier, donc que l'utilisateur est revenu. Le journal écrit la ligne. Aucun minuteur : « le relais se coupe au bout de deux heures » recréerait exactement la panne que toute l'étape cherche à éviter, un relais auquel on fait confiance et qui s'est arrêté pendant l'absence.
+
+**L'écran est tenu éveillé tant qu'il y a quelque chose à écouter.** C'est la condition de survie de la fonctionnalité sur macOS, et elle découle de l'[ADR 0002](./adr/0002-notifications-macos-via-accessibility.md) : multifus ne lit pas des notifications, il lit des bannières. Écran éteint et session verrouillée, il n'y a plus de bannière et plus d'arbre d'accessibilité à parcourir, donc plus de relais, et un téléphone silencieux se lit comme « personne ne m'a écrit ». La frontière et l'implantation macOS sont posées en 11a ; reste à brancher `has_relayed_online` dessus, au tour de balayage.
+
+**Elle suit les personnages relayés connectés, et pas l'interrupteur.** C'est le quart d'heure qui l'impose : sans ça, une déconnexion à quinze minutes laisse la machine allumée une heure pour écouter le vide, et sur batterie ça se voit. Plus aucun personnage relayé connecté, l'assertion tombe. L'un d'eux revient, elle est reposée. **Le relais, lui, ne bouge pas** : seul un raccourci l'arrête, un relais qui s'arrêterait tout seul étant le minuteur que cette étape refuse plus haut. CONTEXT.md porte la définition.
+
+**L'économiseur d'écran est un trou, et il n'est pas mesuré.** `PreventUserIdleDisplaySleep` empêche l'écran de s'éteindre. Rien ne documente qu'il empêche l'économiseur de démarrer, et un économiseur qui démarre verrouille la session, ce qui rend le relais muet exactement comme une extinction. La machine de développement a `idleTime` à zéro, donc aucun économiseur, et l'essai n'y prouverait rien. La lecture est écrite en 11a et rend `Never` sur cette machine-là ; reste à la poser à l'activation et à la dire sur l'écran Relais quand elle rend autre chose, plutôt que de promettre ce qui n'a pas été vérifié.
+
+**Le mot « veille » est interdit dans tout ce code.** Il désigne un personnage retiré du défilement. L'état de la machine s'appelle `display_awake`, et CONTEXT.md porte l'interdit.
+
+**L'envoi part sur un autre fil.** `platform::notification` l'écrit noir sur blanc : le sink tourne sur le fil du watcher et ne doit pas bloquer, tout ce qui est plus long qu'un focus appartient à un autre fil. Un POST HTTPS est exactement ce que cette phrase interdit là. Et la règle en tête de `app::state` continue de s'appliquer, le verrou de `Multifus` ne se tient pas pendant l'appel.
+
+**Le journal, et ce qu'il ne porte pas.** `RelayEnabled` avec la surface d'où le clic est venu, `RelayDisabled`, `RelaySent` avec le type, `RelayNoticeSent` avec le cas, `RelayFailed` avec sa raison, `DisplayAwake` avec l'état posé ou relâché. Aucun corps, sous aucune forme, et un test qui compare la liste exacte des champs, comme celui qui garde déjà l'événement de notification. Trois échecs à ne pas confondre, parce qu'ils se réparent dans trois endroits différents : le trousseau qui refuse de rendre le jeton, Telegram qui refuse la requête, et le réseau qui n'est pas là.
+
+**L'appariement.** L'utilisateur crée le robot chez BotFather, colle le jeton dans l'écran Relais, écrit un message au robot depuis son téléphone, puis clique Connecter. multifus appelle `getUpdates` une seule fois, prend l'identifiant de salon du premier message, l'écrit dans la configuration, range le jeton dans le trousseau et envoie un message d'essai. Aucune boucle de scrutation : multifus n'a aucune boucle réseau vivante aujourd'hui et cette étape ne lui en donne pas.
+
+#### Ce qui a été mesuré
+
+| Question                                         | Réponse                                                                                                            |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
+| `AXValue` tronque-t-il le corps ?                | **Non.** Entier jusqu'à 400 caractères, sans points de suspension. Six longueurs postées, six longueurs rendues    |
+| L'assertion d'énergie se pose-t-elle ?           | **Oui.** Elle s'inscrit sous le pid de multifus avec son nom dans `pmset -g assertions`, et se relâche             |
+| `keyring` ouvre-t-il une invite en `tauri dev` ? | **Oui.** Un binaire recompilé bloque sur une boîte de dialogue. Voir le tableau de l'ADR 0009                      |
+| Que rend `getUpdates` sur un jeton invalide ?    | HTTP **401**, `{"ok":false,"error_code":401,"description":"Unauthorized"}`. Un jeton sans deux-points rend **404** |
+| Combien de crates coûte l'étape ?                | **Trois**, sur macOS comme sur Windows                                                                             |
+
+La question du double déclenchement de l'observateur est traitée dans « Ce qui mord », parce que la mesure a rendu autre chose que ce qu'on lui demandait et qu'elle est douteuse.
+
+Deux de ces lignes sont maintenant tenues par le code de 11a et non plus par un prototype. Les trois crates sont ce que `Cargo.lock` a réellement gagné, `keyring`, `keyring-core` et `apple-native-keyring-store`, et rien d'autre. L'assertion se pose et se relâche dans `cargo test`, et elle apparaît bien dans `pmset -g assertions` sous le nom `multifus relay`.
+
+#### Ce qui reste à mesurer, et qui demande la vraie machine
+
+**Le titre exact de la fenêtre après une déconnexion pour inactivité.** S'il devient `Dofus Retro`, la regex n'y voit pas de pseudo et tout va bien. S'il devenait `Connexion - Dofus Retro`, elle y lirait `Connexion` et **inventerait un personnage** dans le roster. Une capture du titre suffit.
+
+**Ce que rend `getUpdates` sur un vrai robot à qui personne n'a écrit.** L'écran doit distinguer « écris à ton robot puis réessaie » d'un jeton invalide, sinon les deux se lisent comme un échec de connexion. La commande, avant d'avoir écrit au robot :
+
+```bash
+curl -s "https://api.telegram.org/bot<JETON>/getUpdates"
+```
+
+Sans `offset`, cet appel ne consomme rien et Telegram garde les messages 24 heures. Cliquer Connecter deux fois marche donc, écrire au robot la veille non.
+
+**Le verrouillage de session, et le protocole d'origine ne pouvait pas le détecter.** La machine a `displaysleep` à 120 minutes, `idleTime` à zéro et un verrouillage 300 secondes après extinction : elle ne se verrouille qu'au bout de deux heures et cinq minutes, donc les « vingt minutes » de la vérification passaient que l'assertion marche ou non. Pour que l'essai veuille dire quelque chose :
+
+```bash
+sudo pmset -a displaysleep 2
+sysadminctl -screenLock immediate
+```
+
+Puis, sans multifus, trois minutes sans rien toucher, l'écran doit s'éteindre et verrouiller. Puis, relais actif, cinq minutes sans rien toucher, l'écran doit rester allumé et `pmset -g assertions` doit montrer la ligne de multifus. Enfin `sudo pmset -a displaysleep 120` et `sysadminctl -screenLock 300`.
+
+#### Le client Telegram, tranché
+
+`reqwest` en dépendance directe. Mesuré avec `cargo tree` sur `aarch64-apple-darwin`, en comparant à l'arbre existant :
+
+| Ce qu'on ajoute                          | Crates en plus                                              |
+| ---------------------------------------- | ----------------------------------------------------------- |
+| `reqwest`, `json` + `rustls-no-provider` | **0**                                                       |
+| `reqwest` avec ses réglages par défaut   | 7, dont `aws-lc-rs` et `aws-lc-sys`                         |
+| `frankenstein` + `client-reqwest`        | 14, dont `aws-lc-sys`, `bon`, `prettyplease`, `async-trait` |
+| `frankenstein` + `client-ureq`           | 20, dont `ureq`, `ureq-proto`, `webpki-roots`, `rand`       |
+
+`teloxide` reste écarté sans mesure : deux appels ne justifient pas un cadriciel de dialogue.
+
+**L'argument contre `frankenstein` était faux, et le vrai est plus fort.** Une version antérieure de ce document disait que son client bloquant ferait entrer une seconde pile TLS. C'est inexact : `ureq` 3 roule sur le `rustls 0.23.43` déjà dans le verrou. Le vrai coût est quatorze crates pour deux URL, et surtout `aws-lc-sys`, une bibliothèque C que `client-reqwest` fait entrer en activant le TLS par défaut de `reqwest`.
+
+Les trois déclarations, à zéro crate près pour les deux premières :
+
+```toml
+reqwest = { version = "0.13", default-features = false, features = ["json", "rustls-no-provider"] }
+rustls  = { version = "0.23", default-features = false, features = ["ring"] }
+keyring = "4"
+```
+
+Le trait de `reqwest` s'appelle `rustls-no-provider` et pas `rustls-tls`. C'est celui que `tauri-plugin-updater` demande déjà, d'où le zéro.
+
+**Et il manque une ligne que personne n'attend.** `rustls-no-provider` veut dire que personne n'installe le fournisseur cryptographique. Aujourd'hui c'est l'updater qui le fait, **dans sa boucle de vérification** et pas à l'initialisation du greffon :
+
+```rust
+// tauri-plugin-updater-2.10.1/src/updater.rs:446
+if rustls::crypto::CryptoProvider::get_default().is_none() {
+    let _ = rustls::crypto::ring::default_provider().install_default();
+}
+```
+
+Un `sendMessage` parti avant la première vérification de mise à jour trouverait donc un `rustls` sans fournisseur et échouerait avec une erreur illisible. multifus pose le sien au démarrage, ce qui rend le garde de l'updater sans objet.
+
+**Le greffon HTTP officiel n'est pas la réponse.** Sur les trente greffons du catalogue, un seul touche au sujet, et son intérêt est d'exposer un client HTTP **au webview**. Côté Rust il n'est rien d'autre que `reqwest`. Le prendre ajouterait une surface de permission là où l'ADR 0009 tient précisément à ne pas en avoir. Rien d'officiel ne couvre le trousseau, à part `stronghold` que l'ADR 0009 écarte, ni l'écran tenu éveillé.
+
+#### Pièges connus d'avance
+
+**Aucun `parse_mode` demandé à Telegram.** Un corps de jeu qui contient une astérisque ou un souligné casse l'analyse Markdown, et Telegram rejette le message entier plutôt que de l'envoyer en clair. Texte brut, toujours.
+
+**Telegram limite l'envoi vers un même salon**, de l'ordre d'un message par seconde en régime établi, et répond 429 avec un `retry_after`. Une soirée de messages privés nourris peut l'atteindre. Ne pas réessayer en boucle : écrire la ligne au journal et laisser tomber ce message. Un relais qui se met à retenir des messages pour les envoyer plus tard mentirait sur l'heure à laquelle on a été appelé.
+
+**Le trousseau ne suit pas la configuration.** La question « le relais est-il configuré » se répond en interrogeant le trousseau, jamais en lisant un booléen du fichier, qui pourrait dire oui sur un jeton absent. Même famille d'erreur que le `is_enabled()` de `tauri-plugin-autostart`, qui ne vérifie que l'existence d'un fichier.
+
+**Mais la question se pose à l'activation et pas au lancement**, et c'est la mesure de l'ADR 0009 qui l'impose : au lancement, chaque `tauri dev` ouvrirait une boîte de trousseau, y compris pour travailler sur les raccourcis. À l'activation, l'invite tombe quand l'utilisateur est devant sa machine. Un trousseau qui refuse empêche alors le relais de s'activer, plutôt que de laisser partir quelqu'un qui le croit en marche.
+
+**Le relais ne passe pas par `Decision`.** Ce type est taillé pour l'AutoFocus, qui a besoin d'une fenêtre où sauter, et il rend `Ignored(NoWindow)` pour un pseudo qu'il ne voit plus. Le relais n'a besoin d'aucune fenêtre : le message est arrivé, c'est tout ce qui compte, et le cas où le client vient de tomber est justement celui où relayer sert le plus. Deux chemins depuis `on_notification`, et le plus naturel à écrire est celui qui avale ces messages.
+
+**Le jeton ne ressort jamais vers React.** Il n'existe pas de commande qui le rende, et depuis 11a il ne peut pas y en avoir : une lecture rend un `BotToken`, qui n'est pas `Serialize`. L'écran affiche un état, relié ou pas relié, et un bouton pour délier qui efface l'entrée du trousseau.
+
+**Le relais est indépendant de l'AutoFocus.** L'interrupteur maître coupé, le relais continue de relayer : l'un dit ce qui a le droit de ramener une fenêtre devant les yeux, l'autre ce qui a le droit de déranger quelqu'un qui n'est pas là. Ils ne partagent aucun réglage.
+
+**Un personnage en veille est relayé comme les autres.** La veille retire du défilement, elle ne rend pas un personnage muet, l'AutoFocus s'applique déjà aux personnages endormis. C'est `relayed` qui dit qui est relayé, et rien d'autre : lier les deux ferait taire une mule qu'on a seulement sortie du défilement pour jouer plus confortablement. Voir ADR 0011.
+
+#### Ce que ça arbitre contre le principe directeur
+
+Le relais est la première fonctionnalité qui oblige à ouvrir la fenêtre pour être installée, puisqu'il faut y coller un jeton. L'arbitrage est le même que pour le démarrage avec la session : un réglage d'une seule fois, et un usage quotidien qui tient dans un clic de la barre système. Le principe visait les réglages qu'on visite, pas ceux qu'on pose une fois.
+
+#### Vérification
+
+De 11a, ce qui se vérifie sans le robot est fait : `cargo test` passe, `cargo tree` ne montre que les trois crates, un fichier de configuration écrit avant cette étape se relit avec tout le monde relayé, l'assertion se pose et se relâche, et la lecture de l'économiseur rend ce que `defaults -currentHost read com.apple.screensaver idleTime` rend. Ce qui suit demande le robot et la vraie machine.
+
+Le robot créé, le jeton collé, un message d'essai reçu sur le téléphone. Puis un vrai message privé envoyé par quelqu'un d'autre, reçu sur le téléphone.
+
+**Puis le quart d'heure, qui est l'essai qui compte.** Un seul personnage coché, la machine laissée seule vingt minutes. Il doit arriver un message privé, puis un avis de déconnexion vers la quinzième minute, puis plus rien. `pmset -g assertions` doit montrer la ligne de multifus avant l'avis et ne plus la montrer après. Le retour au clavier avec un raccourci de défilement doit couper le relais.
+
+Le protocole de l'assertion est plus haut, avec les deux commandes qui rendent l'essai détectable ; l'exécuter séparément, sur une machine où l'écran s'éteint en deux minutes.
+
+Enfin, deux personnages, un seul coché, un message privé sur chacun : un seul doit arriver sur le téléphone. Puis l'envoi du corps coché et décoché, pour voir les deux formes du message. Et le journal relu pour vérifier qu'aucune des formes n'y a laissé une trace du texte.
+
 ### Étape 9 — Implémentation Windows
 
 **Objectif.** La parité, sur la machine où l'application sert vraiment.
@@ -164,7 +321,15 @@ Ce qui attend déjà de ce côté : `platform::windows` compile en renvoyant `No
 
 **L'AutoFocus macOS dépend de l'affichage des bannières, et la livraison sans affichage a été essayée.** Décocher « Bureau » en gardant « Centre de notifications » ne donne rien du tout : macOS ne construit aucun élément tant que le panneau reste fermé, donc l'observateur n'a rien à lire. Mesuré sur un combat, un défi et un échange, journal vide et aucune fenêtre ramenée. Ne pas rouvrir cette piste, elle est dans ADR 0002. Le réglage le moins gênant qui marche est bannière sur le Bureau, style temporaire, son coupé, aperçus par défaut. Sur Windows c'est l'inverse, l'écoute passe par une API et les bannières peuvent rester coupées.
 
-**Un client Dofus sur l'écran de connexion existe déjà en tant que processus** avec des fenêtres, mais sans titre exploitable. Toujours filtrer sur le titre, jamais sur la taille.
+**Un client Dofus sur l'écran de connexion existe déjà en tant que processus** avec des fenêtres, mais sans titre exploitable. Toujours filtrer sur le titre, jamais sur la taille. Un client **déconnecté pour inactivité** ressemble à ça : la fenêtre reste, le pseudo quitte le titre, et le personnage passe hors ligne tout seul au tour de balayage suivant. C'est ce qui rend l'avis de déconnexion gratuit à détecter.
+
+**Une mesure douteuse sur l'observateur de bannières, gardée ici et pas agie.** En postant des notifications avec `osascript`, `AXCreated` ne s'est déclenché que pour la première d'une série : tant qu'une bannière du même émetteur restait à l'écran, macOS **réemployait son élément** et seul `AXLayoutChanged` tirait, deux à trois fois, à moins de 11 ms d'écart. Le seuil observé était entre 4,1 et 5,1 secondes, ce qui est la durée de vie d'une bannière temporaire. Pris au pied de la lettre, ça voudrait dire que deux messages privés à trois secondes d'écart n'en produisent qu'un seul focus.
+
+**Ne pas agir dessus en l'état.** `display notification` ne pose aucun identifiant de notification, donc macOS a très bien pu traiter ces envois comme des mises à jour d'une même notification et non comme des notifications distinctes. Un client Dofus en pose sûrement un différent à chaque fois, et l'usage réel n'a jamais montré d'AutoFocus manquant. L'essai qui tranche ne demande aucun outil : deux vrais clients, deux messages privés à trois secondes d'écart, puis le journal. Deux lignes `Message privé`, la mesure était un artefact. Une seule, il faut écouter `AXLayoutChanged` en plus d'`AXCreated` et dédoublonner sur une fenêtre courte, en comparant à la notification précédente et jamais à un ensemble, sans quoi le même message reçu deux fois dans la soirée n'en ferait qu'un.
+
+**`Character` n'a pas de `#[serde(default)]` de structure, et `Settings` en a un.** Un champ ajouté au personnage sans défaut à lui fait échouer la lecture de tout fichier existant : la configuration part en quarantaine, les défauts se chargent, et les sexes assignés partent avec. Poser `#[serde(default)]` sur la structure pour s'en tirer ferait pire, un personnage tronqué revenant sans pseudo.
+
+**Les traits de `keyring` 4 ne s'appellent pas comme on croit.** `apple-native` et `windows-native` n'existent pas, et nommer les vrais, `apple-native-keyring-store` seul, ne compile pas : le trait de `keyring` n'active pas le sous-trait `keychain` du magasin. La bonne déclaration est `keyring = "4"` sans rien, dont le trait par défaut `v1` fait déjà le bon choix par cible. Détail dans l'ADR 0009.
 
 **`cargo check --target x86_64-pc-windows-msvc` échoue depuis macOS**, avant même de compiler une ligne du projet : le build script de Tauri réclame `llvm-rc`, absent de la machine. C'est antérieur au projet, constaté sur un dépôt neuf, ne pas partir chasser ça dans le code.
 

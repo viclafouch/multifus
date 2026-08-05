@@ -323,6 +323,7 @@ mod tests {
 
     use super::*;
     use crate::config::settings::AutoFocus;
+    use crate::config::settings::Relay;
     use crate::config::settings::Shortcut;
     use crate::config::settings::Shortcuts;
     use crate::domain::Character;
@@ -349,7 +350,9 @@ mod tests {
         Settings {
             roster: Roster::from_characters(vec![
                 Character::new("Alpha").with_gender(Gender::Male),
-                Character::new("Bravo").with_gender(Gender::Female),
+                Character::new("Bravo")
+                    .with_gender(Gender::Female)
+                    .not_relayed(),
                 Character::new("Charlie"),
             ]),
             shortcuts: Shortcuts {
@@ -359,6 +362,10 @@ mod tests {
                 swap: Shortcut::new("Alt+Space"),
             },
             auto_focus,
+            relay: Relay {
+                chat_id: Some(-1_001_234_567_890),
+                send_body: true,
+            },
             start_at_login: true,
         }
     }
@@ -471,6 +478,43 @@ mod tests {
         assert_eq!(roster.get("Alpha").unwrap().gender, Some(Gender::Male));
         assert_eq!(roster.get("Bravo").unwrap().gender, Some(Gender::Female));
         assert_eq!(roster.get("Charlie").unwrap().gender, None);
+    }
+
+    #[test]
+    fn a_file_written_before_the_relay_existed_comes_back_with_everybody_relayed() {
+        // Written as bytes on purpose: built from `Settings` it would carry
+        // today's fields and prove nothing about yesterday's file.
+        let (_directory, store) = store();
+        let written = r#"{
+          "roster": {
+            "characters": [
+              { "nickname": "Alpha", "gender": "male" },
+              { "nickname": "Bravo", "gender": null }
+            ]
+          },
+          "shortcuts": { "next": "Alt+Right", "previous": null,
+                         "toggle_asleep": null, "swap": null },
+          "auto_focus": { "enabled": true, "combat": false },
+          "start_at_login": true
+        }"#;
+        fs::write(store.path(), written).expect("the earlier configuration is written");
+
+        let loaded = store.load();
+
+        assert_eq!(loaded.failure, None, "an earlier file is not a corrupt one");
+        assert_eq!(loaded.quarantined, None);
+
+        let roster = loaded.settings.roster;
+
+        assert_eq!(roster.len(), 2);
+        assert!(roster.get("Alpha").unwrap().relayed);
+        assert!(roster.get("Bravo").unwrap().relayed);
+        assert!(roster.has_relayed());
+
+        assert_eq!(roster.get("Alpha").unwrap().gender, Some(Gender::Male));
+        assert!(loaded.settings.start_at_login);
+        assert!(!loaded.settings.auto_focus.combat);
+        assert_eq!(loaded.settings.relay, Relay::default());
     }
 
     #[test]

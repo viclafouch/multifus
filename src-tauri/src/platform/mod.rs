@@ -1,8 +1,7 @@
 //! The boundary between the business core and the operating system.
 //!
-//! Two interfaces, [`WindowManager`] and [`NotificationWatcher`], and one
-//! implementation of each per system under `macos` and `windows`, selected by
-//! `cfg`. Every system call multifus makes goes through here.
+//! Three interfaces, [`WindowManager`], [`NotificationWatcher`] and
+//! [`DisplayKeeper`], one implementation of each per system, selected by `cfg`.
 //!
 //! The dependency runs one way only. This module uses the types of
 //! [`crate::domain`], `domain` knows nothing of this module and calls nothing of
@@ -13,6 +12,7 @@
 //! identity of a window is discussed on [`WindowId`], the shape of the listening
 //! on [`NotificationSink`].
 
+pub mod display;
 pub mod error;
 pub mod notification;
 pub mod window;
@@ -22,6 +22,8 @@ pub mod macos;
 #[cfg(target_os = "windows")]
 pub mod windows;
 
+pub use display::DisplayKeeper;
+pub use display::ScreenSaverDelay;
 pub use error::PlatformError;
 pub use error::Result;
 pub use notification::NotificationReport;
@@ -63,3 +65,10 @@ pub type PlatformNotificationWatcher = macos::BannerNotificationWatcher;
 /// The notification watcher of the system multifus is running on.
 #[cfg(target_os = "windows")]
 pub type PlatformNotificationWatcher = windows::UserNotificationWatcher;
+
+/// The display keeper of the system multifus is running on.
+#[cfg(target_os = "macos")]
+pub type PlatformDisplayKeeper = macos::PowerAssertionDisplayKeeper;
+/// The display keeper of the system multifus is running on.
+#[cfg(target_os = "windows")]
+pub type PlatformDisplayKeeper = windows::ExecutionStateDisplayKeeper;

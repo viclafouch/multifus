@@ -34,6 +34,11 @@ tauri-plugin-updater = "2"
 tauri-plugin-log = "2"
 tauri-plugin-os = "2"
 log = "0.4"
+# The three crates of step 11, and they cost three. `rustls-no-provider` is the
+# feature the updater already asks for; `keyring` takes no feature list, ADR 0009.
+reqwest = { version = "0.13", default-features = false, features = ["json", "rustls-no-provider"] }
+rustls = { version = "0.23", default-features = false, features = ["ring"] }
+keyring = "4"
 
 [dev-dependencies]
 # Only the configuration tests, which need a directory that disappears with them
@@ -63,6 +68,8 @@ objc2-core-foundation = { version = "0.3", default-features = false, features = 
   "CFArray",
   "CFDictionary",
   "CFNumber",
+  # The screen saver delay, which the display assertion does not cover.
+  "CFPreferences",
   "CFRunLoop",
   "CFString",
 ] }

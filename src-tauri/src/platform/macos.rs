@@ -7,7 +7,7 @@
 //! `com.apple.notificationcenterui`, whose banner text carries the title and the
 //! body, see ADR 0002. Both need the same and only authorization, Accessibility,
 //! which is why [`accessibility_authorization`] is shared by the two
-//! implementations.
+//! implementations. The third one, [`PowerAssertionDisplayKeeper`], needs none.
 //!
 //! The SQLite database of the notification centre is not an option and is not to
 //! be brought back to the table: it is written 5.1 seconds after the banner is
@@ -27,6 +27,7 @@ use std::sync::mpsc;
 use std::sync::Arc;
 use std::thread;
 use std::thread::JoinHandle;
+use std::time::Duration;
 
 use libc::pid_t;
 use objc2::rc::Retained;
@@ -40,10 +41,14 @@ use objc2_application_services::AXObserver;
 use objc2_application_services::AXUIElement;
 use objc2_core_foundation::kCFBooleanFalse;
 use objc2_core_foundation::kCFBooleanTrue;
+use objc2_core_foundation::kCFPreferencesCurrentHost;
+use objc2_core_foundation::kCFPreferencesCurrentUser;
 use objc2_core_foundation::kCFRunLoopDefaultMode;
 use objc2_core_foundation::CFArray;
 use objc2_core_foundation::CFBoolean;
 use objc2_core_foundation::CFDictionary;
+use objc2_core_foundation::CFNumber;
+use objc2_core_foundation::CFPreferencesCopyValue;
 use objc2_core_foundation::CFRetained;
 use objc2_core_foundation::CFRunLoop;
 use objc2_core_foundation::CFString;
@@ -52,6 +57,8 @@ use objc2_foundation::NSString;
 
 use crate::domain::extract_nickname;
 use crate::domain::GameNotification;
+use crate::platform::display::DisplayKeeper;
+use crate::platform::display::ScreenSaverDelay;
 use crate::platform::error::PlatformError;
 use crate::platform::error::Result;
 use crate::platform::notification::NotificationReport;
@@ -872,6 +879,145 @@ fn collect_static_texts(element: &AXUIElement, depth: usize, walk: &mut Walk) {
     }
 }
 
+// The IOKit spellings. `kIOReturnSuccess` is zero, and the framework writes an
+// assertion level on as 255 rather than 1.
+type IOReturn = i32;
+type IOPMAssertionID = u32;
+type IOPMAssertionLevel = u32;
+
+const IO_RETURN_SUCCESS: IOReturn = 0;
+const IO_PM_ASSERTION_LEVEL_ON: IOPMAssertionLevel = 255;
+
+/// The assertion multifus takes. Not `PreventUserIdleSystemSleep`, which lets the
+/// display go dark and the banners with it.
+const PREVENT_USER_IDLE_DISPLAY_SLEEP: &str = "PreventUserIdleDisplaySleep";
+
+/// What `pmset -g assertions` shows next to the pid of multifus.
+const ASSERTION_NAME: &str = "multifus relay";
+
+// The screen saver delay, filed per host, which is what `defaults -currentHost`
+// reaches and what `CFPreferencesCopyAppValue` would miss.
+const SCREEN_SAVER_DOMAIN: &str = "com.apple.screensaver";
+const SCREEN_SAVER_IDLE_TIME: &str = "idleTime";
+
+// Declared here rather than brought in with a crate: the step is measured at
+// three crates, and a fourth for two functions would not be one of them.
+#[link(name = "IOKit", kind = "framework")]
+extern "C" {
+    fn IOPMAssertionCreateWithName(
+        assertion_type: &CFString,
+        assertion_level: IOPMAssertionLevel,
+        assertion_name: &CFString,
+        assertion_id: *mut IOPMAssertionID,
+    ) -> IOReturn;
+
+    fn IOPMAssertionRelease(assertion_id: IOPMAssertionID) -> IOReturn;
+}
+
+/// Keeps the display awake through an IOKit energy assertion.
+#[derive(Debug, Default)]
+pub struct PowerAssertionDisplayKeeper {
+    /// The assertion currently held, `None` when the machine may sleep.
+    held: Option<IOPMAssertionID>,
+}
+
+impl PowerAssertionDisplayKeeper {
+    #[must_use]
+    pub fn new() -> Self {
+        Self::default()
+    }
+}
+
+impl DisplayKeeper for PowerAssertionDisplayKeeper {
+    fn keep_awake(&mut self) -> Result<()> {
+        if self.held.is_some() {
+            return Ok(());
+        }
+
+        let kind = CFString::from_str(PREVENT_USER_IDLE_DISPLAY_SLEEP);
+        let name = CFString::from_str(ASSERTION_NAME);
+        let mut id: IOPMAssertionID = 0;
+
+        // SAFETY: both strings are alive for the call, and `id` is a live pointer.
+        let status =
+            unsafe { IOPMAssertionCreateWithName(&kind, IO_PM_ASSERTION_LEVEL_ON, &name, &mut id) };
+
+        if status != IO_RETURN_SUCCESS {
+            return Err(PlatformError::system(
+                "holding the display awake",
+                format!("IOReturn {status}"),
+            ));
+        }
+
+        self.held = Some(id);
+
+        Ok(())
+    }
+
+    fn release(&mut self) -> Result<()> {
+        let Some(id) = self.held.take() else {
+            return Ok(());
+        };
+
+        // SAFETY: the token comes from a call that reported success, and taking
+        // it out of the field is what stops it being released twice.
+        let status = unsafe { IOPMAssertionRelease(id) };
+
+        if status != IO_RETURN_SUCCESS {
+            return Err(PlatformError::system(
+                "letting the display sleep again",
+                format!("IOReturn {status}"),
+            ));
+        }
+
+        Ok(())
+    }
+
+    fn is_awake(&self) -> bool {
+        self.held.is_some()
+    }
+
+    fn screen_saver_delay(&self) -> Result<ScreenSaverDelay> {
+        Ok(screen_saver_delay())
+    }
+}
+
+impl Drop for PowerAssertionDisplayKeeper {
+    fn drop(&mut self) {
+        // No hold survives the keeper, and a failure here reaches nobody: the
+        // assertion dies with the process whatever the system answered.
+        drop(self.release());
+    }
+}
+
+/// Reads the screen saver delay of this machine. Every way the answer can be
+/// missing is [`ScreenSaverDelay::Unknown`], and zero is the screen saver off.
+fn screen_saver_delay() -> ScreenSaverDelay {
+    let key = CFString::from_str(SCREEN_SAVER_IDLE_TIME);
+    let domain = CFString::from_str(SCREEN_SAVER_DOMAIN);
+
+    // SAFETY: both are constants of the framework, alive for the whole process.
+    let user = unsafe { kCFPreferencesCurrentUser };
+    let host = unsafe { kCFPreferencesCurrentHost };
+
+    let Some(value) = CFPreferencesCopyValue(&key, &domain, user, host) else {
+        return ScreenSaverDelay::Unknown;
+    };
+
+    let Ok(number) = value.downcast::<CFNumber>() else {
+        return ScreenSaverDelay::Unknown;
+    };
+
+    match number.as_i64() {
+        Some(0) => ScreenSaverDelay::Never,
+        Some(seconds) => match u64::try_from(seconds) {
+            Ok(seconds) => ScreenSaverDelay::After(Duration::from_secs(seconds)),
+            Err(_) => ScreenSaverDelay::Unknown,
+        },
+        None => ScreenSaverDelay::Unknown,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -900,6 +1046,40 @@ mod tests {
         let watcher = BannerNotificationWatcher::new();
 
         assert_eq!(manager.authorization(), watcher.authorization());
+    }
+
+    #[test]
+    fn the_display_is_held_and_let_go_again() {
+        let mut keeper = PowerAssertionDisplayKeeper::new();
+
+        assert!(!keeper.is_awake());
+
+        assert_eq!(keeper.keep_awake(), Ok(()));
+        assert!(keeper.is_awake());
+
+        assert_eq!(keeper.release(), Ok(()));
+        assert!(!keeper.is_awake());
+    }
+
+    #[test]
+    fn holding_twice_and_letting_go_twice_are_both_harmless() {
+        // The caller asks after every scan and keeps no boolean of its own.
+        let mut keeper = PowerAssertionDisplayKeeper::new();
+
+        assert_eq!(keeper.keep_awake(), Ok(()));
+        assert_eq!(keeper.keep_awake(), Ok(()));
+        assert!(keeper.is_awake());
+
+        assert_eq!(keeper.release(), Ok(()));
+        assert_eq!(keeper.release(), Ok(()));
+        assert!(!keeper.is_awake());
+    }
+
+    #[test]
+    fn the_screen_saver_setting_is_read_rather_than_assumed() {
+        let keeper = PowerAssertionDisplayKeeper::new();
+
+        assert!(keeper.screen_saver_delay().is_ok());
     }
 
     #[test]

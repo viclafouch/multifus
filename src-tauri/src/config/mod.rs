@@ -24,6 +24,7 @@ pub mod store;
 pub use error::ConfigError;
 pub use error::Result;
 pub use settings::AutoFocus;
+pub use settings::Relay;
 pub use settings::Settings;
 pub use settings::Shortcut;
 pub use settings::Shortcuts;

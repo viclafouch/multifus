@@ -36,6 +36,9 @@ pub struct Settings {
     pub shortcuts: Shortcuts,
     /// The seven AutoFocus switches.
     pub auto_focus: AutoFocus,
+    /// Where the relay writes, and how much of a private message it carries.
+    /// Never the bot token, see ADR 0009.
+    pub relay: Relay,
     /// Whether multifus starts with the session. Unchecked by default,
     /// perimetre.md is explicit about it.
     ///
@@ -252,6 +255,19 @@ impl AutoFocus {
     }
 }
 
+/// What the file holds about the relay, which is everything except the token:
+/// that one is in the keychain, see ADR 0009 and [`crate::app::relay::secret`].
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct Relay {
+    /// The Telegram conversation the relay writes into. `None` until the pairing
+    /// has run, and signed because Telegram numbers a group negatively.
+    pub chat_id: Option<i64>,
+    /// Whether the text of a private message goes out with the nickname and the
+    /// kind. Unchecked by default, ADR 0008.
+    pub send_body: bool,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -412,6 +428,30 @@ mod tests {
     }
 
     #[test]
+    fn the_body_of_a_private_message_stays_on_the_machine_until_it_is_asked_for() {
+        let relay = Relay::default();
+
+        assert!(!relay.send_body);
+        assert_eq!(relay.chat_id, None);
+    }
+
+    #[test]
+    fn a_relay_never_carries_the_token_to_the_file() {
+        let relay = Relay {
+            chat_id: Some(-1_001_234_567_890),
+            send_body: true,
+        };
+
+        let json = serde_json::to_string(&relay).expect("a relay serialises");
+
+        assert_eq!(json, r#"{"chat_id":-1001234567890,"send_body":true}"#);
+        assert_eq!(
+            serde_json::from_str::<Relay>(&json).expect("a relay reads back"),
+            relay
+        );
+    }
+
+    #[test]
     fn a_missing_field_takes_its_default_and_an_unknown_one_is_ignored() {
         let settings: Settings =
             serde_json::from_str(r#"{"start_at_login":true,"from_a_later_version":42}"#)
@@ -420,6 +460,7 @@ mod tests {
         assert!(settings.start_at_login);
         assert_eq!(settings.shortcuts, Shortcuts::default());
         assert_eq!(settings.auto_focus, AutoFocus::default());
+        assert_eq!(settings.relay, Relay::default());
         assert!(settings.roster.is_empty());
     }
 }

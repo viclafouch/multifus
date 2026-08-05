@@ -24,6 +24,7 @@ pub mod commands;
 pub mod journal;
 pub mod journal_file;
 pub mod main_window;
+pub mod relay;
 pub mod runtime;
 pub mod shortcuts;
 pub mod state;
@@ -55,6 +56,8 @@ pub use view::Snapshot;
 /// system having no configuration directory at all stops multifus here, since
 /// there would then be nowhere to ever write.
 pub fn setup(app: &AppHandle) -> Result<(), ConfigError> {
+    install_crypto_provider();
+
     let store = ConfigStore::for_app(app)?;
     let loaded = store.load();
 
@@ -93,6 +96,12 @@ pub fn setup(app: &AppHandle) -> Result<(), ConfigError> {
     main_window::show_on_launch(app);
 
     Ok(())
+}
+
+/// Lays down the cryptographic provider every HTTPS call stands on. Nobody else
+/// does before the updater's first check, and a relay sent before that fails.
+fn install_crypto_provider() {
+    drop(rustls::crypto::ring::default_provider().install_default());
 }
 
 /// The system multifus is running on, for the head of the journal.

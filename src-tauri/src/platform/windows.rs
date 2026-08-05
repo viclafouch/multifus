@@ -13,6 +13,8 @@
 //! `UserNotificationListener`, which also lets a toast be removed once its window
 //! has been focused.
 
+use crate::platform::display::DisplayKeeper;
+use crate::platform::display::ScreenSaverDelay;
 use crate::platform::error::PlatformError;
 use crate::platform::error::Result;
 use crate::platform::notification::NotificationSink;
@@ -124,6 +126,49 @@ impl NotificationWatcher for UserNotificationWatcher {
         // a character once its window is in front.
         Err(PlatformError::not_implemented(
             "UserNotificationWatcher::dismiss",
+        ))
+    }
+}
+
+/// Keeps the display awake through `SetThreadExecutionState`. Empty until step 9,
+/// and what a sleeping machine costs here is the clients, not the banners.
+#[derive(Debug, Default)]
+pub struct ExecutionStateDisplayKeeper;
+
+impl ExecutionStateDisplayKeeper {
+    #[must_use]
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+impl DisplayKeeper for ExecutionStateDisplayKeeper {
+    fn keep_awake(&mut self) -> Result<()> {
+        // `ES_CONTINUOUS | ES_DISPLAY_REQUIRED | ES_SYSTEM_REQUIRED`, on the
+        // calling thread, so the hold and its release share one.
+        Err(PlatformError::not_implemented(
+            "ExecutionStateDisplayKeeper::keep_awake",
+        ))
+    }
+
+    fn release(&mut self) -> Result<()> {
+        // `ES_CONTINUOUS` on its own, which is how the flags above are dropped.
+        Err(PlatformError::not_implemented(
+            "ExecutionStateDisplayKeeper::release",
+        ))
+    }
+
+    fn is_awake(&self) -> bool {
+        // No token to keep, unlike the macOS assertion: the state belongs to the
+        // thread, so step 9 stores a plain boolean.
+        false
+    }
+
+    fn screen_saver_delay(&self) -> Result<ScreenSaverDelay> {
+        // `SystemParametersInfo`, `SPI_GETSCREENSAVEACTIVE` then
+        // `SPI_GETSCREENSAVETIMEOUT`, the first telling `Never` from a delay.
+        Err(PlatformError::not_implemented(
+            "ExecutionStateDisplayKeeper::screen_saver_delay",
         ))
     }
 }

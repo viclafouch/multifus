@@ -263,6 +263,38 @@ impl Roster {
             .iter()
             .any(|character| character.gender == Some(gender) && character.is_in_cycle())
     }
+
+    /// Puts a character in or out of the relay. Returns `false` when the nickname
+    /// is unknown. No online guard, unlike `toggle_asleep`: this choice is kept.
+    pub fn set_relayed(&mut self, nickname: &str, relayed: bool) -> bool {
+        match self.get_mut(nickname) {
+            Some(character) => {
+                character.relayed = relayed;
+
+                true
+            }
+            None => false,
+        }
+    }
+
+    /// The characters the relay carries, in roster order.
+    pub fn relayed(&self) -> impl DoubleEndedIterator<Item = &Character> {
+        self.characters.iter().filter(|character| character.relayed)
+    }
+
+    /// Whether anybody at all is ticked. The relay refuses to switch on when this
+    /// is false, which is the one guard against the trap of ADR 0011.
+    #[must_use]
+    pub fn has_relayed(&self) -> bool {
+        self.relayed().next().is_some()
+    }
+
+    /// Whether the relay still has something to hear right now. What the display
+    /// awake follows, rather than the switch.
+    #[must_use]
+    pub fn has_relayed_online(&self) -> bool {
+        self.characters.iter().any(Character::is_relayed_online)
+    }
 }
 
 /// Which way [`Roster::scan_from`] walks the roster.
@@ -283,6 +315,13 @@ mod tests {
     fn nicknames(roster: &Roster) -> Vec<&str> {
         roster
             .in_cycle()
+            .map(|character| character.nickname.as_str())
+            .collect()
+    }
+
+    fn relayed(roster: &Roster) -> Vec<&str> {
+        roster
+            .relayed()
             .map(|character| character.nickname.as_str())
             .collect()
     }
@@ -551,6 +590,73 @@ mod tests {
 
         assert_eq!(nicknames(&roster), vec!["Bravo", "Alpha"]);
         assert_eq!(roster.len(), 2);
+    }
+
+    #[test]
+    fn everybody_is_relayed_until_somebody_is_unticked() {
+        let mut roster = roster(vec![Character::new("Alpha"), Character::new("Bravo")]);
+
+        assert!(roster.has_relayed());
+        assert_eq!(relayed(&roster), vec!["Alpha", "Bravo"]);
+
+        assert!(roster.set_relayed("Bravo", false));
+        assert_eq!(relayed(&roster), vec!["Alpha"]);
+
+        assert!(roster.set_relayed("Bravo", true));
+        assert_eq!(relayed(&roster), vec!["Alpha", "Bravo"]);
+
+        assert!(!roster.set_relayed("Echo", false));
+    }
+
+    #[test]
+    fn a_roster_where_nobody_is_ticked_has_nothing_to_carry() {
+        let mut roster = roster(vec![Character::new("Alpha"), Character::new("Bravo")]);
+
+        roster.set_relayed("Alpha", false);
+        roster.set_relayed("Bravo", false);
+
+        assert!(!roster.has_relayed());
+        assert!(!roster.has_relayed_online());
+        assert!(!Roster::new().has_relayed());
+    }
+
+    #[test]
+    fn an_offline_character_can_still_be_ticked_and_unticked() {
+        // Unlike `toggle_asleep`, which refuses an offline character.
+        let mut roster = roster(vec![Character::new("Alpha").offline()]);
+
+        assert!(roster.set_relayed("Alpha", false));
+        assert!(!roster.get("Alpha").unwrap().relayed);
+    }
+
+    #[test]
+    fn the_relay_stops_having_anything_to_hear_when_the_last_one_disconnects() {
+        // The quarter of an hour, seen from the roster.
+        let mut roster = roster(vec![
+            Character::new("Alpha"),
+            Character::new("Bravo").not_relayed(),
+        ]);
+
+        assert!(roster.has_relayed_online());
+
+        roster.set_online("Alpha", false);
+
+        assert!(!roster.has_relayed_online());
+        assert!(roster.has_relayed(), "Alpha is still ticked, only offline");
+
+        roster.set_online("Alpha", true);
+
+        assert!(roster.has_relayed_online(), "and it comes back");
+    }
+
+    #[test]
+    fn an_asleep_character_is_relayed_like_the_others() {
+        let mut roster = roster(vec![Character::new("Alpha")]);
+
+        roster.toggle_asleep("Alpha");
+
+        assert!(roster.has_relayed_online());
+        assert_eq!(nicknames(&roster), Vec::<&str>::new());
     }
 
     #[test]
