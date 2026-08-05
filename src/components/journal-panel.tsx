@@ -1,8 +1,9 @@
 import React from 'react'
-import { ChevronDown, ChevronUp } from 'lucide-react'
+import { ChevronDown, ChevronUp, FolderOpen } from 'lucide-react'
 import { CopyButton } from '@/components/copy-button'
 import { Button } from '@/components/ui/button'
-import type { JournalEntry } from '@/lib/multifus'
+import type { JournalEntry, Snapshot } from '@/lib/multifus'
+import { revealJournal } from '@/lib/multifus'
 import {
   journalLine,
   journalTime,
@@ -19,7 +20,7 @@ import {
 const FOLLOW_MARGIN = 28
 
 type JournalPanelProps = Readonly<{
-  entries: readonly JournalEntry[]
+  snapshot: Snapshot
 }>
 
 /**
@@ -28,8 +29,18 @@ type JournalPanelProps = Readonly<{
  * It exists for one day: the one where a notification arrives and nothing comes
  * to the front. Every step multifus goes through is written here, so the answer
  * is a scroll away instead of a rebuild with a print statement in it.
+ *
+ * It draws what the Rust side holds in memory and not the whole journal, which
+ * lives in a file and goes weeks further back. Two buttons for that reason: the
+ * clipboard hands over these lines with everything needed to read them, and the
+ * other one opens the file.
+ *
+ * It takes the whole snapshot rather than the entries alone, because the copy is
+ * only worth something with the version, the system, the authorization and the
+ * four combinations in front of it.
  */
-export const JournalPanel = ({ entries }: JournalPanelProps) => {
+export const JournalPanel = ({ snapshot }: JournalPanelProps) => {
+  const entries = snapshot.journal
   const [isOpen, setIsOpen] = React.useState(false)
   const list = React.useRef<HTMLOListElement>(null)
   // Whether the reader is still at the foot of the journal. Kept in a ref
@@ -66,6 +77,10 @@ export const JournalPanel = ({ entries }: JournalPanelProps) => {
     })
   }
 
+  const handleReveal = () => {
+    revealJournal().catch(ignoreRevealFailure)
+  }
+
   return (
     <section className="shrink-0 border-t border-border bg-sidebar/80">
       <div className="flex items-center pr-2.5">
@@ -90,11 +105,21 @@ export const JournalPanel = ({ entries }: JournalPanelProps) => {
         </h2>
         {entries.length === 0 ? null : (
           <CopyButton
-            text={journalTranscript(entries)}
+            text={journalTranscript(snapshot)}
             label={strings.journal.copy}
             copiedLabel={strings.journal.copied}
           />
         )}
+        <Button
+          variant="ghost"
+          size="icon-xs"
+          onClick={handleReveal}
+          title={strings.journal.reveal}
+          aria-label={strings.journal.reveal}
+          className="text-muted-foreground/55 hover:text-foreground"
+        >
+          <FolderOpen aria-hidden strokeWidth={2} />
+        </Button>
       </div>
       {isOpen ? (
         <ol
@@ -120,6 +145,9 @@ export const JournalPanel = ({ entries }: JournalPanelProps) => {
 type JournalLineProps = Readonly<{
   entry: JournalEntry
 }>
+
+/** The Rust side journals what the system refused to open. Nothing to add. */
+const ignoreRevealFailure = () => {}
 
 const JournalLine = ({ entry }: JournalLineProps) => {
   return (

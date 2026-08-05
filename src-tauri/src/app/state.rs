@@ -22,8 +22,12 @@ use tauri::Manager;
 
 use crate::app::journal::Journal;
 use crate::app::journal::JournalEvent;
+use crate::app::journal::Launch;
 use crate::app::journal::Outcome;
+use crate::app::journal::RosterChange;
+use crate::app::journal::SettingChange;
 use crate::app::journal::ShortcutOutcome;
+use crate::app::journal::Surface;
 use crate::app::view::AuthorizationView;
 use crate::app::view::AutoFocusView;
 use crate::app::view::CharacterView;
@@ -62,6 +66,9 @@ pub struct Multifus {
     /// because a constant the about screen prints is not worth a second channel
     /// and a second loading state on the interface side.
     version: String,
+    /// The system, kept for the head of a copied journal. See
+    /// [`crate::app::view::Snapshot::system`].
+    system: String,
     /// The live configuration. Its roster carries the veille and the connected
     /// state, which never reach the file, see ADR 0004.
     settings: Settings,
@@ -90,6 +97,26 @@ pub struct Multifus {
     journal: Journal,
 }
 
+/// Everything a [`Multifus`] starts from.
+///
+/// Three of these five are here for the journal alone. A transcript is read
+/// against a release, on an operating system whose version is what ADR 0002
+/// stands on, started in one of two ways that do not show the same thing. Asking
+/// the user for any of the three is asking them to tell a story, which is exactly
+/// what the journal is meant to replace.
+#[derive(Debug)]
+pub struct MultifusParams {
+    pub store: ConfigStore,
+    pub loaded: Loaded,
+    /// The version of the bundle, read from the package information.
+    pub version: String,
+    /// The system, its version and its architecture. No hostname and no locale:
+    /// the file this ends up in is meant to be shareable.
+    pub system: String,
+    /// Whether the session started multifus or somebody opened it.
+    pub launch: Launch,
+}
+
 impl Multifus {
     /// Starts from what the store just read.
     ///
@@ -97,32 +124,48 @@ impl Multifus {
     /// the reason the stored one was not used. That reason is kept here rather
     /// than dropped, so that the interface can say the file was unreadable
     /// instead of leaving the user with an empty roster and no explanation.
+    ///
+    /// **It also reaches the journal, and that is not the same channel.** The
+    /// snapshot carries the problem until the user dismisses it, and
+    /// [`Multifus::dismiss_problem`] then erases the only trace there was that a
+    /// roster went missing. The journal keeps it.
     #[must_use]
-    pub fn new(store: ConfigStore, version: impl Into<String>, loaded: Loaded) -> Self {
+    pub fn new(params: MultifusParams) -> Self {
+        let MultifusParams {
+            store,
+            loaded,
+            version,
+            system,
+            launch,
+        } = params;
+
         let Loaded {
             settings,
             failure,
             quarantined,
+            quarantine_failure,
         } = loaded;
 
-        let problem = failure.map(|failure| {
-            let detail = failure.to_string();
+        let mut journal = Journal::new();
 
-            match failure {
-                ConfigError::Malformed { .. } => ConfigProblem::Malformed {
-                    detail,
-                    quarantined: quarantined.map(|path| path.display().to_string()),
-                },
-                _ => ConfigProblem::Unreadable { detail },
-            }
+        // First line of every run, and the head of every transcript.
+        journal.push(JournalEvent::Started {
+            version: version.clone(),
+            system: system.clone(),
+            launch,
         });
 
-        let mut journal = Journal::new();
-        journal.push(JournalEvent::Started);
+        let problem = triage_config(
+            &mut journal,
+            failure,
+            quarantined.map(|path| path.display().to_string()),
+            quarantine_failure,
+        );
 
         Self {
             store,
-            version: version.into(),
+            version,
+            system,
             settings,
             shortcut_statuses: HashMap::new(),
             windows: HashMap::new(),
@@ -139,6 +182,7 @@ impl Multifus {
     pub fn snapshot(&self) -> Snapshot {
         Snapshot {
             version: self.version.clone(),
+            system: self.system.clone(),
             characters: self
                 .settings
                 .roster
@@ -204,8 +248,13 @@ impl Multifus {
         self.journal.push(event);
     }
 
-    pub fn log_unless_repeated(&mut self, event: JournalEvent) {
-        self.journal.push_unless_repeated(event);
+    /// Writes an event unless it repeats the last one, and says whether it wrote.
+    ///
+    /// The answer is only for a caller whose one reason to emit a snapshot was
+    /// this line. Everything else ignores it, and nothing may read it as « the
+    /// state did not change ».
+    pub fn log_unless_repeated(&mut self, event: JournalEvent) -> bool {
+        self.journal.push_unless_repeated(event)
     }
 
     // -- The file ---------------------------------------------------------
@@ -255,29 +304,85 @@ impl Multifus {
 
     /// Assigns a gender, or takes it away.
     pub fn set_gender(&mut self, nickname: &str, gender: Option<Gender>) {
-        if let Some(character) = self.settings.roster.get_mut(nickname) {
-            character.gender = gender;
-            self.save();
-        }
+        let Some(character) = self.settings.roster.get_mut(nickname) else {
+            return;
+        };
+
+        character.gender = gender;
+
+        self.log(JournalEvent::Roster {
+            change: RosterChange::GenderAssigned {
+                nickname: nickname.to_owned(),
+                gender,
+            },
+        });
+        self.save();
     }
 
     /// Puts an awake character to sleep, or wakes an asleep one up. Does nothing
     /// for an offline character, which is not sleepable.
     ///
-    /// Nothing is saved: the veille never reaches the file, see ADR 0004.
+    /// Nothing is saved: the veille never reaches the file, see ADR 0004. It is
+    /// written to the journal, which is a different question: the file is what
+    /// multifus starts from tomorrow, the journal is what explains today. A
+    /// défilement that reports « personne dans le défilement » is only ever
+    /// explained by the rows somebody put to sleep a minute earlier.
     pub fn toggle_asleep(&mut self, nickname: &str) {
-        self.settings.roster.toggle_asleep(nickname);
+        let change = match self.settings.roster.toggle_asleep(nickname) {
+            Some(true) => RosterChange::Slept {
+                nickname: nickname.to_owned(),
+            },
+            Some(false) => RosterChange::Woke {
+                nickname: nickname.to_owned(),
+            },
+            // Not a character multifus knows, so nothing moved and there is
+            // nothing to report.
+            None => return,
+        };
+
+        self.log(JournalEvent::Roster { change });
     }
 
     /// One of the two grouped actions: pushes the same veille on every online
     /// character of a gender, exactly as if each line had been clicked.
+    ///
+    /// Nothing is written when nobody moved, the same way
+    /// [`Multifus::toggle_asleep`] writes nothing for a nickname it does not hold:
+    /// a button pressed on a gender nobody connected carries is not a roster
+    /// change, and a journal that says it is would send the reader looking for
+    /// one.
     pub fn set_gender_asleep(&mut self, gender: Gender, asleep: bool) {
-        self.settings.roster.set_asleep_for_gender(gender, asleep);
+        let moved = self.settings.roster.set_asleep_for_gender(gender, asleep);
+
+        if moved == 0 {
+            return;
+        }
+
+        self.log(JournalEvent::Roster {
+            change: RosterChange::GenderAsleep { gender, asleep },
+        });
     }
 
     /// Rewrites the cycle order, which is what the drag and drop produces.
+    ///
+    /// Written only when the order actually came out different. A drag that ends
+    /// where it started reaches this method like any other, and the file is
+    /// rewritten either way, but the journal has nothing to report.
     pub fn reorder(&mut self, order: &[String]) {
+        let before = self.nicknames();
+
         self.settings.roster.reorder(order);
+
+        // The order that came out, not the one that was asked for: a stale list
+        // moves what was dragged and loses nobody, so the two can differ.
+        let after = self.nicknames();
+
+        if after != before {
+            self.log(JournalEvent::Roster {
+                change: RosterChange::Reordered { order: after },
+            });
+        }
+
         self.save();
     }
 
@@ -289,8 +394,25 @@ impl Multifus {
     pub fn remove(&mut self, nickname: &str) {
         if self.settings.roster.remove(nickname).is_some() {
             self.windows.remove(nickname);
+
+            self.log(JournalEvent::Roster {
+                change: RosterChange::Removed {
+                    nickname: nickname.to_owned(),
+                },
+            });
             self.save();
         }
+    }
+
+    /// The roster in cycle order, by pseudo.
+    #[must_use]
+    fn nicknames(&self) -> Vec<String> {
+        self.settings
+            .roster
+            .characters()
+            .iter()
+            .map(|character| character.nickname.clone())
+            .collect()
     }
 
     // -- The settings -----------------------------------------------------
@@ -355,8 +477,18 @@ impl Multifus {
     }
 
     /// Flips one of the seven switches. Global, never per character.
+    ///
+    /// The window only, so no surface travels with it: the menu has no room for
+    /// seven lines, and perimetre.md refuses them per character.
     pub fn set_auto_focus(&mut self, kind: NotificationKind, enabled: bool) {
         self.settings.auto_focus.set(kind, enabled);
+
+        self.log(JournalEvent::Setting {
+            change: SettingChange::AutoFocusKind {
+                notification_kind: kind,
+                enabled,
+            },
+        });
         self.save();
     }
 
@@ -365,8 +497,16 @@ impl Multifus {
     /// The seven are left exactly where they were: this is the switch the system
     /// tray offers, and it has to be undoable without the user having to
     /// remember which kinds they had turned off.
-    pub fn set_auto_focus_enabled(&mut self, enabled: bool) {
+    ///
+    /// `from` reaches the journal because it is part of the fact. This switch has
+    /// two doors, and which one was used says whether the window had to be
+    /// opened, which is the measure of the whole principle of the project.
+    pub fn set_auto_focus_enabled(&mut self, enabled: bool, from: Surface) {
         self.settings.auto_focus.enabled = enabled;
+
+        self.log(JournalEvent::Setting {
+            change: SettingChange::AutoFocusEnabled { enabled, from },
+        });
         self.save();
     }
 
@@ -377,8 +517,12 @@ impl Multifus {
     }
 
     /// Says whether a notification takes a window out of the Dock.
-    pub fn set_wakes_minimized(&mut self, wakes: bool) {
+    pub fn set_wakes_minimized(&mut self, wakes: bool, from: Surface) {
         self.settings.auto_focus.wakes_minimized = wakes;
+
+        self.log(JournalEvent::Setting {
+            change: SettingChange::WakesMinimized { wakes, from },
+        });
         self.save();
     }
 
@@ -388,7 +532,7 @@ impl Multifus {
     /// reading and writing in one hold, rather than two, leaves no moment where
     /// a command could slip between the question and the answer.
     pub fn toggle_auto_focus(&mut self) {
-        self.set_auto_focus_enabled(!self.settings.auto_focus.enabled);
+        self.set_auto_focus_enabled(!self.settings.auto_focus.enabled, Surface::Tray);
     }
 
     /// Whether a notification takes a window out of the Dock.
@@ -400,7 +544,7 @@ impl Multifus {
     /// Wakes the minimized windows if it was not doing so, stops if it was. The
     /// system tray's other switch, and the same reason for one hold.
     pub fn toggle_wakes_minimized(&mut self) {
-        self.set_wakes_minimized(!self.settings.auto_focus.wakes_minimized);
+        self.set_wakes_minimized(!self.settings.auto_focus.wakes_minimized, Surface::Tray);
     }
 
     /// Everything back to what someone who has never opened multifus gets,
@@ -515,6 +659,11 @@ impl Multifus {
     ///
     /// Everyone goes offline: multifus has no idea who is connected, and saying
     /// nobody is closer to the truth than leaving stale lamps lit.
+    ///
+    /// Each departure is written down, exactly as [`Multifus::apply_windows`]
+    /// writes it. The authorization line above says why they all left at once,
+    /// and it used to be the only line: a roster emptying itself with no
+    /// `CharacterOffline` anywhere read as a scan that had stopped running.
     pub fn apply_denied(&mut self) -> bool {
         let mut changed = self.set_granted(false);
 
@@ -531,6 +680,8 @@ impl Multifus {
 
         for nickname in still_online {
             self.settings.roster.set_online(&nickname, false);
+            self.log(JournalEvent::CharacterOffline { nickname });
+
             changed = true;
         }
 
@@ -670,6 +821,51 @@ impl Multifus {
     }
 }
 
+/// What a load cost, written to the journal and turned into what the band shows.
+///
+/// Two channels out of one set of facts, and they do not have the same lifetime:
+/// the band is dismissed by [`Multifus::dismiss_problem`] and gone for good, the
+/// journal keeps it. A roster that opens empty with nothing to explain it is the
+/// worst failure this application has.
+fn triage_config(
+    journal: &mut Journal,
+    failure: Option<ConfigError>,
+    quarantined: Option<String>,
+    quarantine_failure: Option<ConfigError>,
+) -> Option<ConfigProblem> {
+    let problem = failure.map(|failure| {
+        let detail = failure.to_string();
+
+        journal.push(JournalEvent::ConfigLoadFailed {
+            detail: detail.clone(),
+            quarantined: quarantined.clone(),
+        });
+
+        match failure {
+            ConfigError::Malformed { .. } => ConfigProblem::Malformed {
+                detail,
+                quarantined,
+            },
+            _ => ConfigProblem::Unreadable { detail },
+        }
+    });
+
+    // A file that could not be read and could not be moved is the one state where
+    // the next save writes over somebody's roster. It outranks the reason the file
+    // was unreadable, which is why it takes the band.
+    let Some(failure) = quarantine_failure else {
+        return problem;
+    };
+
+    let detail = failure.to_string();
+
+    journal.push(JournalEvent::ConfigNotSetAside {
+        detail: detail.clone(),
+    });
+
+    Some(ConfigProblem::NotSetAside { detail })
+}
+
 /// The nickname of the character the cycle chose, if it chose one.
 fn nickname_of(character: Option<&Character>) -> Option<String> {
     character.map(|character| character.nickname.clone())
@@ -732,15 +928,30 @@ mod tests {
     /// A multifus with nothing on disk, writing into a directory that dies with
     /// the test rather than into a path written in the source.
     fn multifus(directory: &TempDir) -> Multifus {
-        Multifus::new(
-            ConfigStore::in_directory(directory.path()),
-            "0.0.0",
-            Loaded {
+        Multifus::new(MultifusParams {
+            store: ConfigStore::in_directory(directory.path()),
+            loaded: Loaded {
                 settings: Settings::default(),
                 failure: None,
                 quarantined: None,
+                quarantine_failure: None,
             },
-        )
+            version: "0.0.0".to_owned(),
+            system: "test".to_owned(),
+            launch: Launch::ByHand,
+        })
+    }
+
+    /// The events the journal holds, newest last, without the [`Launch`] line
+    /// every run opens on.
+    fn journalled(state: &Multifus) -> Vec<JournalEvent> {
+        state
+            .journal
+            .entries()
+            .into_iter()
+            .map(|entry| entry.event)
+            .filter(|event| !matches!(event, JournalEvent::Started { .. }))
+            .collect()
     }
 
     /// A window with the title a real client carries, which is the only door
@@ -764,7 +975,7 @@ mod tests {
             Decision::Focus(WindowId::from_raw(1))
         );
 
-        state.set_wakes_minimized(false);
+        state.set_wakes_minimized(false, Surface::Window);
 
         assert_eq!(
             state.decide("Alpha", Some(NotificationKind::Combat)),
@@ -777,7 +988,7 @@ mod tests {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
         state.apply_windows(&[window(1, "Alpha")]);
-        state.set_wakes_minimized(false);
+        state.set_wakes_minimized(false, Surface::Window);
 
         state.set_auto_focus(NotificationKind::Combat, false);
 
@@ -884,6 +1095,181 @@ mod tests {
             ShortcutEffect::Settled(ShortcutOutcome::Swapped {
                 awake: Gender::Male
             })
+        );
+    }
+
+    #[test]
+    fn a_veille_moved_from_a_row_is_written_down() {
+        // The gap this closes: a shortcut that reports « personne dans le
+        // défilement » is only ever explained by the rows somebody clicked a
+        // minute earlier, and those clicks used to leave no trace at all.
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha")]);
+
+        state.toggle_asleep("Alpha");
+        state.toggle_asleep("Alpha");
+
+        let written = journalled(&state);
+
+        assert!(
+            written.contains(&JournalEvent::Roster {
+                change: RosterChange::Slept {
+                    nickname: "Alpha".to_owned()
+                }
+            }),
+            "{written:?}"
+        );
+        assert!(
+            written.contains(&JournalEvent::Roster {
+                change: RosterChange::Woke {
+                    nickname: "Alpha".to_owned()
+                }
+            }),
+            "{written:?}"
+        );
+    }
+
+    #[test]
+    fn a_veille_on_a_character_nobody_knows_writes_nothing() {
+        // Nothing moved, so there is nothing to report. A line here would put a
+        // roster change in the journal that never happened.
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        state.toggle_asleep("Nobody");
+
+        assert_eq!(journalled(&state), Vec::new());
+    }
+
+    #[test]
+    fn a_grouped_action_on_nobody_writes_nothing() {
+        // The button is never disabled, by the rule of the interface, so it is
+        // pressed on a gender nobody connected carries. That is not a roster
+        // change, and a line saying it is would send the reader looking for one.
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha")]);
+
+        state.set_gender_asleep(Gender::Female, true);
+
+        let roster_changes = journalled(&state)
+            .into_iter()
+            .filter(|event| matches!(event, JournalEvent::Roster { .. }))
+            .count();
+
+        assert_eq!(roster_changes, 0);
+    }
+
+    #[test]
+    fn a_drag_that_changes_nothing_writes_nothing() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha"), window(2, "Bravo")]);
+
+        state.reorder(&["Alpha".to_owned(), "Bravo".to_owned()]);
+
+        let reordered = journalled(&state)
+            .into_iter()
+            .filter(|event| {
+                matches!(
+                    event,
+                    JournalEvent::Roster {
+                        change: RosterChange::Reordered { .. }
+                    }
+                )
+            })
+            .count();
+
+        assert_eq!(reordered, 0);
+
+        // And it does write when the order really moves.
+        state.reorder(&["Bravo".to_owned(), "Alpha".to_owned()]);
+
+        assert!(journalled(&state).contains(&JournalEvent::Roster {
+            change: RosterChange::Reordered {
+                order: vec!["Bravo".to_owned(), "Alpha".to_owned()]
+            }
+        }));
+    }
+
+    #[test]
+    fn a_setting_says_which_surface_it_came_from() {
+        // The two settings the menu carries are the two that get switched while
+        // playing. Which door was used says whether the window had to be opened,
+        // which is the measure of the whole principle of the project.
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        state.toggle_auto_focus();
+        state.set_wakes_minimized(false, Surface::Window);
+
+        let written = journalled(&state);
+
+        assert!(
+            written.contains(&JournalEvent::Setting {
+                change: SettingChange::AutoFocusEnabled {
+                    enabled: false,
+                    from: Surface::Tray
+                }
+            }),
+            "{written:?}"
+        );
+        assert!(
+            written.contains(&JournalEvent::Setting {
+                change: SettingChange::WakesMinimized {
+                    wakes: false,
+                    from: Surface::Window
+                }
+            }),
+            "{written:?}"
+        );
+    }
+
+    #[test]
+    fn a_revoked_authorization_says_who_went_offline() {
+        // It used to say only that the authorization was gone, and a roster
+        // emptying itself with no `CharacterOffline` anywhere read as a scan that
+        // had stopped running.
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha"), window(2, "Bravo")]);
+
+        state.apply_denied();
+
+        let written = journalled(&state);
+
+        for nickname in ["Alpha", "Bravo"] {
+            assert!(
+                written.contains(&JournalEvent::CharacterOffline {
+                    nickname: nickname.to_owned()
+                }),
+                "{nickname} left without a line: {written:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn the_first_line_carries_what_a_transcript_is_read_against() {
+        // Version, system and launch. Asking the user for any of the three is
+        // asking them to tell a story, which is what this journal replaces.
+        let directory = TempDir::new().expect("a temporary directory");
+        let state = multifus(&directory);
+
+        let first = state
+            .journal
+            .entries()
+            .into_iter()
+            .next()
+            .expect("a run opens on a line");
+
+        assert_eq!(
+            first.event,
+            JournalEvent::Started {
+                version: "0.0.0".to_owned(),
+                system: "test".to_owned(),
+                launch: Launch::ByHand,
+            }
         );
     }
 

@@ -32,6 +32,15 @@ use crate::app::main_window;
 /// the Dock icon being clicked, see [`main_window::show_on_dock_click`].
 pub fn run() {
     tauri::Builder::default()
+        // First, so that everything the setup below writes is already on disk.
+        // Nothing of it is exposed to the webview: the capability grants no
+        // `log:` permission, because the journal is multifus's own account of
+        // what it did and not a channel React can write into. See
+        // `app::journal_file`.
+        .plugin(app::journal_file::plugin())
+        // Read from Rust only, for the one line of the journal that says which
+        // operating system this was. No permission granted either.
+        .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_opener::init())
         // No shortcut is declared here and no handler either: which combinations
@@ -81,6 +90,7 @@ pub fn run() {
             app::commands::check_update,
             app::commands::install_update,
             app::commands::dismiss_config_problem,
+            app::commands::reveal_journal,
             app::commands::reveal_quarantined_config,
         ])
         .build(tauri::generate_context!())

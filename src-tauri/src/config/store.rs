@@ -109,11 +109,20 @@ impl ConfigStore {
 
         match serde_json::from_slice::<Settings>(&bytes) {
             Ok(settings) => Loaded::read(settings),
-            Err(error) => Loaded {
-                settings: Settings::default(),
-                failure: Some(ConfigError::malformed(&self.path, error.to_string())),
-                quarantined: self.quarantine().ok(),
-            },
+            Err(error) => {
+                let failure = ConfigError::malformed(&self.path, error.to_string());
+                let (quarantined, quarantine_failure) = match self.quarantine() {
+                    Ok(target) => (Some(target), None),
+                    Err(error) => (None, Some(error)),
+                };
+
+                Loaded {
+                    settings: Settings::default(),
+                    failure: Some(failure),
+                    quarantined,
+                    quarantine_failure,
+                }
+            }
         }
     }
 
@@ -168,11 +177,20 @@ impl ConfigStore {
     /// Moves an unreadable configuration aside and returns where it went.
     ///
     /// Renaming rather than copying, so that the file is gone from the path the
-    /// next save writes to, and so that nothing is read twice. A failure here is
-    /// not reported on its own: the caller already has the reason the file could
-    /// not be read, which is the one worth showing.
+    /// next save writes to, and so that nothing is read twice.
+    ///
+    /// **A failure here is reported on its own**, in [`Loaded::quarantine_failure`],
+    /// and it used to be swallowed by an `.ok()`. Two different facts hide behind
+    /// one `None`: nothing needed moving, and the move was refused. The second one
+    /// leaves the unreadable file exactly where the next save writes, which is the
+    /// one thing this whole mechanism exists to prevent, and it costs a roster
+    /// somebody typed by hand.
     fn quarantine(&self) -> Result<PathBuf> {
-        let target = self.quarantine_path();
+        let target = self.quarantine_path().ok_or_else(|| ConfigError::Encoding {
+            detail: format!(
+                "no free name for the configuration to be set aside to, after {QUARANTINE_ATTEMPTS} attempts"
+            ),
+        })?;
 
         fs::rename(&self.path, &target)
             .map_err(|error| ConfigError::io("setting the configuration aside", &target, &error))?;
@@ -183,7 +201,12 @@ impl ConfigStore {
     /// A free name next to the configuration, `config.invalid-1754300000.json`
     /// and so on. Never one that exists, so a quarantine never erases an older
     /// one.
-    fn quarantine_path(&self) -> PathBuf {
+    ///
+    /// `None` when every candidate is taken, which the caller turns into a
+    /// failure. It used to fall back to the first candidate instead, which exists
+    /// by definition at that point: the rename then overwrote an older
+    /// quarantine, doing exactly what this method's own promise forbids.
+    fn quarantine_path(&self) -> Option<PathBuf> {
         let stem = self
             .path
             .file_stem()
@@ -201,7 +224,7 @@ impl ConfigStore {
             .with_file_name(format!("{stem}.invalid-{seconds}.json"));
 
         if !first.exists() {
-            return first;
+            return Some(first);
         }
 
         (1..QUARANTINE_ATTEMPTS)
@@ -210,7 +233,6 @@ impl ConfigStore {
                     .with_file_name(format!("{stem}.invalid-{seconds}-{attempt}.json"))
             })
             .find(|candidate| !candidate.exists())
-            .unwrap_or(first)
     }
 
     /// The neighbouring file a save writes to before renaming it into place. In
@@ -248,6 +270,13 @@ pub struct Loaded {
     /// Where an unreadable file was set aside, so the interface can point at it
     /// instead of leaving the user to wonder what became of their roster.
     pub quarantined: Option<PathBuf>,
+    /// Why it could not be set aside, when that is what happened.
+    ///
+    /// A field of its own rather than an absent `quarantined`, because the two
+    /// mean opposite things to the user: nothing was moved because nothing had to
+    /// be, or the unreadable file is still sitting where the next save will write
+    /// over it. Only the second one is worth interrupting somebody for.
+    pub quarantine_failure: Option<ConfigError>,
 }
 
 impl Loaded {
@@ -257,6 +286,7 @@ impl Loaded {
             settings: Settings::default(),
             failure: None,
             quarantined: None,
+            quarantine_failure: None,
         }
     }
 
@@ -266,6 +296,7 @@ impl Loaded {
             settings,
             failure: None,
             quarantined: None,
+            quarantine_failure: None,
         }
     }
 
@@ -275,6 +306,7 @@ impl Loaded {
             settings: Settings::default(),
             failure: Some(failure),
             quarantined: None,
+            quarantine_failure: None,
         }
     }
 
@@ -510,6 +542,51 @@ mod tests {
             Some(ConfigError::Malformed { .. })
         ));
         assert!(loaded.quarantined.is_some());
+    }
+
+    /// Unix only: `set_readonly` on a directory is what stops a rename inside it
+    /// there, and does nothing of the sort on Windows. The behaviour under test
+    /// is the store's and is the same on both, only the way to provoke it is not.
+    #[cfg(unix)]
+    #[test]
+    fn a_file_that_cannot_be_set_aside_says_so_instead_of_looking_untouched() {
+        use std::os::unix::fs::PermissionsExt;
+
+        // The failure that used to hide behind an `.ok()`. What a read-only
+        // volume, a synced folder or a tightened permission looks like: the file
+        // is readable, unreadable as a configuration, and cannot be moved out of
+        // the way of the next save.
+        let (directory, store) = store();
+        let garbage = "{ this is not json";
+        fs::write(store.path(), garbage).expect("the corrupt file is written");
+
+        // The modes are spelled out rather than set through `set_readonly`, which
+        // hands out world write access on the way back.
+        let readable_only = fs::Permissions::from_mode(0o500);
+        let writable_again = fs::Permissions::from_mode(0o700);
+
+        fs::set_permissions(directory.path(), readable_only).expect("the directory is locked");
+
+        let loaded = store.load();
+
+        // Put it back before asserting, so that a failure here still leaves a
+        // directory the temporary one can delete.
+        fs::set_permissions(directory.path(), writable_again).expect("the directory is unlocked");
+
+        assert!(matches!(
+            loaded.failure,
+            Some(ConfigError::Malformed { .. })
+        ));
+        assert_eq!(loaded.quarantined, None);
+        assert!(
+            loaded.quarantine_failure.is_some(),
+            "a refused rename must not read as a file nothing had to be done to"
+        );
+        assert_eq!(
+            fs::read_to_string(store.path()).expect("the file is still there"),
+            garbage,
+            "the file the save is about to overwrite has to still be reported"
+        );
     }
 
     #[test]

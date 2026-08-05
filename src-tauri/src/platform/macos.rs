@@ -54,6 +54,7 @@ use crate::domain::extract_nickname;
 use crate::domain::GameNotification;
 use crate::platform::error::PlatformError;
 use crate::platform::error::Result;
+use crate::platform::notification::NotificationReport;
 use crate::platform::notification::NotificationSink;
 use crate::platform::notification::NotificationWatcher;
 use crate::platform::window::GameWindow;
@@ -183,6 +184,13 @@ fn attribute(element: &AXUIElement, name: &str) -> Result<Option<CFRetained<CFTy
 }
 
 /// Reads an attribute that holds a string.
+///
+/// A value of another type reads as an absence, like every other ordinary absence
+/// [`attribute`] folds into `Ok(None)`. That is the honest answer rather than a
+/// swallowed failure: multifus wants a title, and an attribute that is not a
+/// string is not a title. Only the walk of a banner cares about the difference,
+/// and what it needs to report is a system that refused, which arrives as an
+/// error above.
 fn string_attribute(element: &AXUIElement, name: &str) -> Result<Option<String>> {
     Ok(attribute(element, name)?
         .and_then(|value| value.downcast::<CFString>().ok())
@@ -561,6 +569,9 @@ impl NotificationWatcher for BannerNotificationWatcher {
                 Ok(())
             }
             Err(error) => {
+                // The thread's own report is what `error` already carries, so the
+                // join has nothing left to add: it is waited on to make sure the
+                // observer is gone, not to be asked how it went.
                 drop(thread.join());
 
                 Err(error)
@@ -592,7 +603,9 @@ impl NotificationWatcher for BannerNotificationWatcher {
 
 impl Drop for BannerNotificationWatcher {
     fn drop(&mut self) {
-        // No observer survives the application.
+        // No observer survives the application. A failure here reaches nobody and
+        // that is not a swallowed one: this runs as the process is ending, so
+        // there is no journal left to read and no reader left to read it.
         drop(self.stop());
     }
 }
@@ -725,15 +738,49 @@ unsafe extern "C-unwind" fn on_banner_created(
     let element: &AXUIElement = unsafe { element.as_ref() };
 
     // A panic must not cross back into the C callback, and the sink is code
-    // multifus does not own.
+    // multifus does not own. Reading and reporting are caught separately so that
+    // a panic in the reading still reaches the journal: swallowed together, a
+    // notification would be lost without a line, which is the one thing the two
+    // variants of `NotificationReport` exist to prevent.
+    let read = catch_unwind(AssertUnwindSafe(|| read_banner(element)));
+
+    let report = match read {
+        Ok(report) => report,
+        Err(_) => Some(NotificationReport::Unreadable {
+            detail: "reading the banner panicked".to_owned(),
+        }),
+    };
+
+    // Nothing is left to say if this one panics: saying it would go through the
+    // very sink that just failed.
     drop(catch_unwind(AssertUnwindSafe(|| {
-        if let Some(notification) = read_banner(element) {
-            sink(notification);
+        if let Some(report) = report {
+            sink(report);
         }
     })));
 }
 
-/// Reads a banner, if that element is one.
+/// What one walk of a notification element came back with.
+#[derive(Debug, Default)]
+struct Walk {
+    /// The texts the element shows, in the order they were met.
+    texts: Vec<String>,
+    /// What the system refused during the walk, if it refused anything.
+    ///
+    /// The first refusal and not the last: it is the one closest to what was
+    /// being read, and the ones after it are usually the same refusal again.
+    refusal: Option<String>,
+}
+
+impl Walk {
+    fn note(&mut self, error: &PlatformError) {
+        if self.refusal.is_none() {
+            self.refusal = Some(error.to_string());
+        }
+    }
+}
+
+/// Reads a banner, if that element is one, and says so when it cannot.
 ///
 /// The tree the prototype recorded, where the first text is the title and the
 /// second the body:
@@ -749,45 +796,79 @@ unsafe extern "C-unwind" fn on_banner_created(
 /// the first text outright, so that a macOS which one day slips an application
 /// name above it does not break the reading. A text that carries no nickname is
 /// no risk: no banner from anything but Dofus can produce one.
-fn read_banner(element: &AXUIElement) -> Option<GameNotification> {
-    let mut texts = Vec::new();
+///
+/// **`None` means nothing worth saying, never « nothing happened ».** The
+/// observer fires for every element the notification centre builds, and almost
+/// none of them are game notifications: those die here in silence, as they must,
+/// or the journal would be unreadable. A walk the system *refused* is the
+/// opposite case and comes back as [`NotificationReport::Unreadable`], because a
+/// banner drawn and not read used to produce no line at all, and an empty journal
+/// already meant that no banner had been drawn.
+fn read_banner(element: &AXUIElement) -> Option<NotificationReport> {
+    let mut walk = Walk::default();
 
-    collect_static_texts(element, 0, &mut texts);
+    collect_static_texts(element, 0, &mut walk);
 
-    let title = texts
+    let found = walk
+        .texts
         .iter()
-        .position(|text| extract_nickname(text).is_some())?;
+        .position(|text| extract_nickname(text).is_some());
 
-    let body = texts.get(title + 1).cloned().unwrap_or_default();
+    let Some(title) = found else {
+        return walk
+            .refusal
+            .map(|detail| NotificationReport::Unreadable { detail });
+    };
 
-    Some(GameNotification::new(texts.swap_remove(title), body))
+    let body = walk.texts.get(title + 1).cloned().unwrap_or_default();
+
+    Some(NotificationReport::Heard(GameNotification::new(
+        walk.texts.swap_remove(title),
+        body,
+    )))
 }
 
 /// Walks a banner and collects the text it shows.
 ///
 /// Bounded in depth and in count because it runs on the observer's thread, where
 /// nothing is allowed to take long.
-fn collect_static_texts(element: &AXUIElement, depth: usize, texts: &mut Vec<String>) {
-    if depth > MAX_BANNER_DEPTH || texts.len() >= MAX_BANNER_TEXTS {
+///
+/// Every refusal is kept rather than dropped. What reaches here as an error is
+/// already narrow: [`attribute`] answers `Ok(None)` for every ordinary absence,
+/// an attribute this element does not have, a client that does not implement the
+/// API, an element that has gone. So a refusal here is a revoked authorization or
+/// a genuine system failure, and both are worth exactly one line.
+fn collect_static_texts(element: &AXUIElement, depth: usize, walk: &mut Walk) {
+    if depth > MAX_BANNER_DEPTH || walk.texts.len() >= MAX_BANNER_TEXTS {
         return;
     }
 
-    if let Ok(Some(role)) = string_attribute(element, AX_ROLE) {
-        if role == AX_STATIC_TEXT_ROLE {
-            if let Ok(Some(text)) = string_attribute(element, AX_VALUE) {
-                texts.push(text);
+    match string_attribute(element, AX_ROLE) {
+        Ok(Some(role)) if role == AX_STATIC_TEXT_ROLE => {
+            match string_attribute(element, AX_VALUE) {
+                Ok(Some(text)) => walk.texts.push(text),
+                // A text element showing nothing. Ordinary, and not a refusal.
+                Ok(None) => {}
+                Err(error) => walk.note(&error),
             }
+
+            return;
+        }
+        Ok(_) => {}
+        Err(error) => {
+            walk.note(&error);
 
             return;
         }
     }
 
-    let Ok(children) = element_array_attribute(element, AX_CHILDREN) else {
-        return;
-    };
-
-    for child in children {
-        collect_static_texts(&child, depth + 1, texts);
+    match element_array_attribute(element, AX_CHILDREN) {
+        Ok(children) => {
+            for child in children {
+                collect_static_texts(&child, depth + 1, walk);
+            }
+        }
+        Err(error) => walk.note(&error),
     }
 }
 

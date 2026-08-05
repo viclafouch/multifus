@@ -30,7 +30,17 @@ Ce qui avait été confronté à un vrai client Retro avant cela, hors de l'appl
 
 Plus rien de macOS n'est en l'air, sauf ce que les étapes 8 et 10 viennent d'ajouter et qui n'a pas encore tourné. De l'étape 8, une seule chose a été confrontée à la vraie machine : l'application empaquetée dans `/Applications` revient bien d'elle-même après une ouverture de session.
 
-Le journal se copie depuis son en-tête, puisque c'est ce qu'on en fait : on le relit ailleurs. Il part en texte brut, une ligne par entrée, l'heure devant. L'écriture passe par `tauri-plugin-clipboard-manager` et non par `navigator.clipboard`, la fenêtre étant servie par un protocole propre à Tauri. Ce plugin n'accorde rien par défaut, sa permission `default` est vide par conception : la capacité déclare `clipboard-manager:allow-write-text` et rien d'autre, multifus ne lisant jamais le presse-papiers.
+### Le journal
+
+**Il vit sur le disque, et c'est [ADR 0006](./adr/0006-journal-sur-disque.md).** Il était en mémoire, plafonné à 200 entrées, et mourait avec le processus, ce qui fait quelques minutes de jeu actif. `tauri-plugin-log` écrit chaque entrée en JSON dans le dossier de logs du système, un plafond de 1 Mo par fichier et huit fichiers gardés. Les 200 entrées en mémoire restent : elles sont ce que le tiroir dessine et ce que chaque snapshot transporte.
+
+**Aucun corps de notification n'y entre, sous aucune forme.** Seul le type déduit voyage. La règle est tenue par un test qui compare la liste exacte des champs de l'événement, pas par la mémoire de qui relit le code. Le raisonnement et ce que ça coûte sont dans l'ADR.
+
+**Deux exports, à deux distances de la panne.** Le bouton copier emporte ce qui est en mémoire avec un en-tête qui le rend lisible seul : version, système, autorisation, raccourcis posés avec leur état, chemin de la configuration, période couverte. « Montrer le journal » ouvre le fichier, depuis la fenêtre et depuis la barre système. Il est dans le menu parce que la règle du projet le demande : la fenêtre qui ne revient pas est l'une des pannes que ce journal sait écrire, donc un journal accessible par la seule fenêtre est un journal des bons jours.
+
+L'écriture dans le presse-papiers passe par `tauri-plugin-clipboard-manager` et non par `navigator.clipboard`, la fenêtre étant servie par un protocole propre à Tauri. Ce plugin n'accorde rien par défaut, sa permission `default` est vide par conception : la capacité déclare `clipboard-manager:allow-write-text` et rien d'autre, multifus ne lisant jamais le presse-papiers. Ni `log:` ni `os:` ne sont accordés : les deux nouveaux plugins ne servent que depuis Rust, et le journal n'est pas un canal où React écrit.
+
+**Ce qui échouait en silence et qui écrit maintenant une ligne.** Les trois fils qui pouvaient mourir sans un mot, balayage, raccourcis et barre système, survivent à un panic et le disent. Les mutations du roster et les réglages, qui n'écrivaient rien, écrivent leur ligne avec la surface d'où le clic est venu pour les deux que le menu porte. Une bannière que le système refuse de laisser lire écrit `NotificationUnreadable`, là où elle ne produisait rien du tout et où un journal vide voulait dire deux choses opposées. Et une configuration illisible qui n'a pas pu être déplacée n'est plus confondue avec une configuration que personne n'avait à déplacer.
 
 ---
 
@@ -161,3 +171,9 @@ Ce qui attend déjà de ce côté : `platform::windows` compile en renvoyant `No
 **TypeScript 7 a supprimé `baseUrl`.** Les `paths` du `tsconfig.json` se résolvent relativement au fichier lui-même. Ne pas le réintroduire, le build casse.
 
 **shadcn 4.16 repose sur Base UI, pas sur Radix.** Les API de composants diffèrent de la plupart des tutoriels shadcn en circulation.
+
+**Ce que la règle du verrou interdit, c'est de le tenir, pas de le prendre.** `shortcuts::fire` et le clic sur un personnage dans la barre système avalent l'échec de leur `send` parce qu'il n'y a plus rien à écrire : le worker n'a jamais démarré, ce que `start` a noté, ou il est mort, ce qu'un `catch_unwind` autour de chaque réponse empêche désormais. Ce n'est pas une question d'interblocage, et une version de ce texte l'a prétendu à tort : `tray::on_menu_event` prend ce verrou sur ce même fil principal pour trois de ses articles. L'interdit porte sur le fait de le tenir pendant un appel qui attend le fil principal.
+
+**`tauri-plugin-log` écrit du `[INFO]` sur chaque ligne, et c'est voulu.** Le journal n'a pas de niveaux, il a des événements, et la gravité est une lecture que fait l'interface. Ne pas ajouter une table de gravité côté Rust pour rendre le fichier plus joli : ce serait une seconde source de vérité. Ne pas non plus passer par `.format()`, qui est écrasé par `.timezone_strategy()` appelé après lui.
+
+**oxfmt réécrit `tableau[tableau.length - 1]` en `tableau.at(-1)`**, que la `lib` TypeScript du projet n'a pas, donc le code ne compile plus après un `lint:fix`. Passer l'index par une variable. Constaté dans `journalPeriod`.

@@ -22,7 +22,35 @@ use crate::platform::Authorization;
 ///
 /// The sink runs on the watcher's thread, whichever that is, so it must not
 /// block. `focus` is a short call, and anything longer belongs on another thread.
-pub type NotificationSink = Box<dyn Fn(GameNotification) + Send + 'static>;
+pub type NotificationSink = Box<dyn Fn(NotificationReport) + Send + 'static>;
+
+/// What a watcher has to say when something was notified.
+///
+/// Two variants and not one, and the second is the whole reason this type exists
+/// rather than a bare [`GameNotification`]. macOS reads its notifications by
+/// walking the element the system drew, see ADR 0002, and that walk can be
+/// refused halfway: an authorization taken away in the second the banner
+/// appeared, an element that goes before it is read. A refusal used to produce
+/// nothing at all, so the journal stayed empty, and an empty journal already
+/// meant something else entirely, that no banner had been drawn. Those are
+/// opposite diagnoses and they looked identical.
+///
+/// Windows never sends the second: `UserNotificationListener` hands over a
+/// structured toast, which is either there or not.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum NotificationReport {
+    /// A game notification, for the core to decide about.
+    Heard(GameNotification),
+
+    /// Something was notified and the system would not let multifus read it.
+    ///
+    /// Only ever sent when a read was actually refused. The ordinary case, an
+    /// element that is simply not a game notification, is dropped by the
+    /// implementation and never reaches here: on macOS the observer fires for
+    /// everything the notification centre builds, and reporting all of it would
+    /// bury the journal it is meant to fill.
+    Unreadable { detail: String },
+}
 
 /// Starts listening to the system notifications and reports the game ones.
 ///
@@ -39,11 +67,13 @@ pub trait NotificationWatcher: Send + Sync {
     fn request_authorization(&self) -> Result<Authorization>;
 
     /// Starts the listening. Every notification whose title carries a nickname
-    /// goes to `sink` as a [`GameNotification`]; everything else is dropped by
-    /// the implementation and never reaches the core.
+    /// goes to `sink` as a [`NotificationReport::Heard`]; everything else is
+    /// dropped by the implementation and never reaches the core, except a read
+    /// the system refused, which goes as [`NotificationReport::Unreadable`].
     ///
     /// The body is passed through untouched. Reading a kind out of it is the
-    /// core's job, [`classify`] does it.
+    /// core's job, [`classify`] does it, and nothing keeps it afterwards: see the
+    /// note on privacy at the top of [`crate::app::journal`].
     ///
     /// [`classify`]: crate::domain::classify
     fn start(&mut self, sink: NotificationSink) -> Result<()>;

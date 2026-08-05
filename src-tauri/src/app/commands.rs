@@ -22,6 +22,8 @@ use tauri_plugin_opener::OpenerExt;
 
 use crate::app::autostart;
 use crate::app::journal::JournalEvent;
+use crate::app::journal::Surface;
+use crate::app::journal_file;
 use crate::app::runtime;
 use crate::app::shortcuts;
 use crate::app::state::lock;
@@ -139,7 +141,7 @@ pub fn set_auto_focus(app: AppHandle, kind: NotificationKind, enabled: bool) -> 
 /// lit and do nothing.
 #[tauri::command]
 pub fn set_auto_focus_enabled(app: AppHandle, enabled: bool) -> Snapshot {
-    lock(&app).set_auto_focus_enabled(enabled);
+    lock(&app).set_auto_focus_enabled(enabled, Surface::Window);
 
     runtime::emit_snapshot(&app)
 }
@@ -150,7 +152,7 @@ pub fn set_auto_focus_enabled(app: AppHandle, enabled: bool) -> Snapshot {
 /// asked for by the user, so they bring the window back either way.
 #[tauri::command]
 pub fn set_wakes_minimized(app: AppHandle, wakes: bool) -> Snapshot {
-    lock(&app).set_wakes_minimized(wakes);
+    lock(&app).set_wakes_minimized(wakes, Surface::Window);
 
     runtime::emit_snapshot(&app)
 }
@@ -216,6 +218,18 @@ pub fn dismiss_config_problem(app: AppHandle) -> Snapshot {
     lock(&app).dismiss_problem();
 
     runtime::emit_snapshot(&app)
+}
+
+/// Shows the journal file in the system's own file browser.
+///
+/// The other half of the export, next to the copy button that was already there.
+/// The clipboard carries the entries the window holds, this carries the weeks: see
+/// [`crate::app::journal_file`]. The same item sits in the menu of the system
+/// tray, since a journal reachable only through the window is a journal reachable
+/// only on the days nothing is wrong with the window.
+#[tauri::command]
+pub fn reveal_journal(app: AppHandle) {
+    journal_file::reveal(&app);
 }
 
 /// Shows the file that was set aside, in the system's own file browser.

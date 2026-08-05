@@ -16,6 +16,8 @@
 //! journal every step it goes through, so that the day it does not fire, the
 //! interface can say where it stopped.
 
+use std::panic::catch_unwind;
+use std::panic::AssertUnwindSafe;
 use std::sync::MutexGuard;
 use std::sync::PoisonError;
 use std::thread;
@@ -28,6 +30,7 @@ use tauri_plugin_opener::OpenerExt;
 
 use crate::app::journal::JournalEvent;
 use crate::app::journal::Outcome;
+use crate::app::journal::Work;
 use crate::app::state::lock;
 use crate::app::state::Decision;
 use crate::app::state::WatcherState;
@@ -35,7 +38,7 @@ use crate::app::tray;
 use crate::app::view::Screen;
 use crate::app::view::Snapshot;
 use crate::domain::GameNotification;
-use crate::platform::Authorization;
+use crate::platform::NotificationReport;
 use crate::platform::NotificationSink;
 use crate::platform::NotificationWatcher;
 use crate::platform::PlatformError;
@@ -72,6 +75,13 @@ pub const SNAPSHOT_EVENT: &str = "multifus://snapshot";
 pub const NAVIGATE_EVENT: &str = "multifus://navigate";
 
 /// Starts the scan, on its own thread, for the life of the process.
+///
+/// **It survives its own failures.** A panic inside one turn used to end the
+/// thread, and nothing else: no character ever came online again, no lamp ever
+/// went out, the listening was never started, and not one line said so. Every
+/// Accessibility call of `platform::macos` is inside that turn, so this is not a
+/// theoretical shape. The turn is therefore caught, written down and tried again
+/// three seconds later.
 pub fn start(app: AppHandle) {
     let spawned = thread::Builder::new()
         .name("multifus-window-scan".to_owned())
@@ -79,7 +89,10 @@ pub fn start(app: AppHandle) {
             let app = app.clone();
 
             move || loop {
-                tick(&app);
+                if catch_unwind(AssertUnwindSafe(|| tick(&app))).is_err() {
+                    lock(&app).log_unless_repeated(JournalEvent::Panicked { work: Work::Scan });
+                }
+
                 thread::sleep(SCAN_INTERVAL);
             }
         });
@@ -153,8 +166,7 @@ fn follow_authorization(app: &AppHandle) -> bool {
 fn start_listening(app: &AppHandle) -> bool {
     let outcome = {
         let sink_app = app.clone();
-        let sink: NotificationSink =
-            Box::new(move |notification| on_notification(&sink_app, notification));
+        let sink: NotificationSink = Box::new(move |report| on_report(&sink_app, report));
 
         watcher(app).start(sink)
     };
@@ -189,6 +201,14 @@ fn stop_listening(app: &AppHandle) -> bool {
     state.set_listening(false)
 }
 
+/// The watcher has something to say, on its own thread.
+fn on_report(app: &AppHandle, report: NotificationReport) {
+    match report {
+        NotificationReport::Heard(notification) => on_notification(app, notification),
+        NotificationReport::Unreadable { detail } => on_unreadable(app, detail),
+    }
+}
+
 /// A game notification just arrived, on the watcher's own thread.
 ///
 /// Everything that can be decided without the system is decided under the lock,
@@ -204,6 +224,13 @@ fn on_notification(app: &AppHandle, notification: GameNotification) {
     let decision = lock(app).decide(&nickname, kind);
 
     let outcome = match decision {
+        // A body multifus never read reaches `decide` looking exactly like one
+        // whose wording it does not know, and only this side can tell them apart.
+        // They are two different failures repaired in two different files, see
+        // [`Outcome::BodyUnread`].
+        Decision::Ignored(Outcome::KindUnknown) if notification.matches_blank_body() => {
+            Outcome::BodyUnread
+        }
         Decision::Ignored(outcome) => outcome,
         Decision::Focus(window) => focus(app, window),
         Decision::FocusUnlessMinimized(window) => focus_unless_minimized(app, window),
@@ -216,6 +243,20 @@ fn on_notification(app: &AppHandle, notification: GameNotification) {
     });
 
     emit_snapshot(app);
+}
+
+/// Something was notified and the system would not let multifus read it.
+///
+/// An authorization taken away refuses every element the notification centre
+/// builds, until the scan takes the listening down a turn or two later, so the
+/// same refusal would otherwise be written a dozen times and flush the journal of
+/// what led to it. The snapshot only goes out when a line was actually written.
+fn on_unreadable(app: &AppHandle, detail: String) {
+    let written = lock(app).log_unless_repeated(JournalEvent::NotificationUnreadable { detail });
+
+    if written {
+        emit_snapshot(app);
+    }
 }
 
 /// Brings the window forward and says what came of it.
@@ -257,17 +298,36 @@ fn refused(error: &PlatformError) -> Outcome {
 /// always still a refusal. The scan is what notices the grant, whenever it comes,
 /// which is why the screen behind this button has to hold rather than blink.
 pub fn request_authorization(app: &AppHandle) {
-    let granted = app
-        .state::<PlatformWindowManager>()
-        .request_authorization()
-        .is_ok_and(Authorization::is_granted);
+    let asked = app.state::<PlatformWindowManager>().request_authorization();
 
-    lock(app).set_granted(granted);
+    let (granted, failure) = match asked {
+        Ok(authorization) => (authorization.is_granted(), None),
+        // Collapsed into a plain refusal, this looked exactly like the system
+        // saying no, and the button wrote nothing at all when the answer had not
+        // changed. Windows answers this way until step 9, and macOS does when a
+        // framework constant is missing.
+        Err(error) => (false, Some(error.to_string())),
+    };
+
+    {
+        let mut state = lock(app);
+
+        // Written every time, refusal included: macOS grants nothing in the
+        // second that follows the dialog, so the fact worth keeping is that the
+        // button was pressed at all. `set_granted` only writes a change.
+        state.log(JournalEvent::AuthorizationRequested { granted, failure });
+        state.set_granted(granted);
+    }
 
     follow_authorization(app);
 }
 
 /// Asks the window to show one screen, without saying anything about the rest.
+///
+/// Nothing is written when this does not arrive, and that is deliberate: the
+/// window is brought forward in the same breath, so the user is looking at the
+/// screen it landed on. A request that went missing costs one click on the rail
+/// and is visible on the spot, which a journal line would not make any clearer.
 pub fn navigate(app: &AppHandle, screen: Screen) {
     drop(app.emit(NAVIGATE_EVENT, screen));
 }
@@ -315,10 +375,18 @@ pub fn refresh(app: &AppHandle) {
 /// The lock is taken and given back before [`tray::refresh`] runs, and that is
 /// not incidental: the menu setters block on the main thread, which is where
 /// every command takes this lock. See the note on [`crate::app::tray`].
+/// The failure of this emission is the one thing the window can never show, since
+/// the journal travels inside the very payload that did not arrive: the board
+/// stays frozen on an older roster and looks like a multifus that has stopped.
+/// It is in the file, and that is the plainest argument for the file.
 pub fn emit_snapshot(app: &AppHandle) -> Snapshot {
     let snapshot = lock(app).snapshot();
 
-    drop(app.emit(SNAPSHOT_EVENT, snapshot.clone()));
+    if let Err(error) = app.emit(SNAPSHOT_EVENT, snapshot.clone()) {
+        lock(app).log_unless_repeated(JournalEvent::SnapshotFailed {
+            detail: error.to_string(),
+        });
+    }
 
     tray::refresh(app);
 

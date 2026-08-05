@@ -60,5 +60,10 @@ export const useMultifus = () => {
  * through, a system that refused, they all come back inside the snapshot. A
  * rejection here means the bridge itself failed, and the window scan puts the
  * interface back in step within a few seconds.
+ *
+ * The other half of that failure is written down where this side cannot see it.
+ * A snapshot the Rust side could not hand over is a `snapshotFailed` line in the
+ * journal file, which is the one place it can be read: a journal that travels
+ * inside the payload cannot report the payload not arriving.
  */
 const ignore = () => {}

@@ -39,6 +39,7 @@ use tauri::WindowEvent;
 use tauri::Wry;
 
 use crate::app::journal::JournalEvent;
+use crate::app::journal::Launch;
 use crate::app::state::lock;
 use crate::app::tray;
 
@@ -64,11 +65,28 @@ pub const FROM_SESSION_ARG: &str = "--from-session";
 /// opens the window like a launch by hand: being in the way is the worse of two
 /// behaviours and by far the better of two failures.
 pub fn show_on_launch(app: &AppHandle) {
-    if matches_session_launch(std::env::args()) && tray::is_present(app) {
+    if launch() == Launch::Session && tray::is_present(app) {
         return;
     }
 
     show(app);
+}
+
+/// How multifus was started, for the head of the journal.
+///
+/// Read from the arguments and not from whether the window is up, because the two
+/// come apart: a session start with no system tray icon opens the window anyway,
+/// and it is still a session start. `docs/plan.md` records that macOS reopens
+/// applications by itself at login, without the argument and with the window,
+/// which fakes the whole test; this is what makes the difference readable in the
+/// journal instead of in `ps`.
+#[must_use]
+pub fn launch() -> Launch {
+    if matches_session_launch(std::env::args()) {
+        Launch::Session
+    } else {
+        Launch::ByHand
+    }
 }
 
 /// Brings the window back when the Dock icon is clicked.
@@ -88,6 +106,10 @@ pub fn show_on_dock_click(_app: &AppHandle, _event: RunEvent) {}
 
 /// Brings the window back, whether it was hidden or merely behind something.
 pub fn show(app: &AppHandle) {
+    // Nothing is written when there is no window under this label, and that is
+    // not a swallowed failure: the window is declared in `tauri.conf.json` and
+    // never destroyed, only hidden, so this branch is unreachable rather than
+    // unlikely. A journal line here would describe a state that cannot exist.
     let Some(window) = app.get_webview_window(LABEL) else {
         return;
     };
@@ -116,13 +138,23 @@ pub fn hide_rather_than_quit(window: &Window<Wry>, event: &WindowEvent) {
         return;
     };
 
-    if !tray::is_present(window.app_handle()) {
+    let app = window.app_handle();
+
+    if !tray::is_present(app) {
         return;
     }
 
     api.prevent_close();
 
-    drop(window.hide());
+    // The close was refused and the hiding did not happen, so the window stays on
+    // screen and will not go away however many times it is asked: the shape of a
+    // frozen application. [`show`] has always written its own failure down and
+    // this one was silent, which was an asymmetry and nothing more.
+    if let Err(error) = window.hide() {
+        lock(app).log_unless_repeated(JournalEvent::WindowFailed {
+            detail: error.to_string(),
+        });
+    }
 }
 
 fn matches_session_launch(arguments: impl IntoIterator<Item = String>) -> bool {

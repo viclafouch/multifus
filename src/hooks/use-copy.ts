@@ -15,6 +15,12 @@ const FEEDBACK_DURATION = 2000
  * A refusal leaves `hasCopied` false and shows nothing. There is no wording for
  * a clipboard that will not take text, and inventing one would be a sentence the
  * reader can do nothing with; the button simply does not confirm.
+ *
+ * It reaches no journal either, and cannot: the journal is written on the Rust
+ * side and deliberately has no door open to the webview, see ADR 0006. That is
+ * affordable here because the clipboard is not the only way out. The button next
+ * to this one opens the journal file, which is the same information and more of
+ * it, through a completely different path.
  */
 export const useCopy = () => {
   const [hasCopied, setHasCopied] = React.useState(false)

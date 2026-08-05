@@ -22,10 +22,16 @@ import type {
   JournalEvent,
   NotificationKind,
   NotificationOutcome,
+  RosterChange,
+  SettingChange,
   ShortcutAction,
+  ShortcutBinding,
   ShortcutOutcome,
+  Snapshot,
+  Surface,
   TrayOutcome,
-  UpdateStatus
+  UpdateStatus,
+  Work
 } from '@/lib/multifus'
 
 export const strings = {
@@ -262,6 +268,10 @@ export const strings = {
     notSavedTitle: 'Configuration non enregistrée',
     notSavedBody:
       'La dernière écriture a échoué. Ce qui est à l’écran est correct, ce qui est sur le disque ne l’est pas encore.',
+    // The one problem of the four where doing nothing loses something.
+    notSetAsideTitle: 'Configuration illisible et toujours en place',
+    notSetAsideBody:
+      'Le fichier de configuration n’était pas exploitable, et multifus n’a pas réussi à le déplacer. Le prochain enregistrement l’écrasera. Copiez-le ailleurs si son contenu compte.',
     reveal: 'Montrer le fichier',
     dismiss: 'J’ai compris'
   },
@@ -273,6 +283,9 @@ export const strings = {
     hide: 'Masquer le journal',
     copy: 'Copier le journal',
     copied: 'Journal copié',
+    // The drawer shows what is in memory. The file holds weeks, and saying so is
+    // what stops somebody from scrolling up looking for last Tuesday.
+    reveal: 'Montrer le fichier du journal',
     entries: (count: number) => {
       return count === 1 ? '1 entrée' : `${count} entrées`
     }
@@ -360,32 +373,60 @@ export const journalTime = (milliseconds: number) => {
   })
 }
 
+/**
+ * The same moment with its date, for the head of a transcript.
+ *
+ * The lines below carry the time alone, which is right in a drawer somebody is
+ * looking at. A transcript pasted elsewhere has to say which day it was.
+ */
+const journalMoment = (milliseconds: number) => {
+  return new Date(milliseconds).toLocaleString('fr-FR', {
+    dateStyle: 'short',
+    timeStyle: 'medium'
+  })
+}
+
 /** How serious a journal entry is, which is what colours its dot. */
 export type JournalTone = 'good' | 'neutral' | 'warning'
 
 /** The events whose tone is decided by their kind alone. */
 type PlainEventKind = Exclude<
   JournalEvent['kind'],
-  'authorization' | 'notification' | 'shortcut' | 'trayFocus'
+  | 'authorization'
+  | 'authorizationRequested'
+  | 'notification'
+  | 'shortcut'
+  | 'shortcutsBound'
+  | 'trayFocus'
 >
 
 const TONES = {
   started: 'neutral',
   listening: 'good',
   listeningFailed: 'warning',
+  notificationUnreadable: 'warning',
+  panicked: 'warning',
   characterOnline: 'neutral',
   characterOffline: 'neutral',
+  // What the user asked for, never a fault, whatever it does to the défilement.
+  roster: 'neutral',
+  setting: 'neutral',
   scanFailed: 'warning',
   saveFailed: 'warning',
   openFailed: 'warning',
-  shortcutRefused: 'warning',
+  configLoadFailed: 'warning',
+  configNotSetAside: 'warning',
   shortcutsFailed: 'warning',
+  snapshotFailed: 'warning',
   trayFailed: 'warning',
   windowFailed: 'warning',
+  startAtLoginReconciled: 'neutral',
   startAtLoginFailed: 'warning',
   updateAvailable: 'good',
+  updateUpToDate: 'neutral',
   updateFailed: 'warning',
-  reset: 'neutral'
+  reset: 'neutral',
+  quit: 'neutral'
 } as const satisfies Record<PlainEventKind, JournalTone>
 
 /**
@@ -411,6 +452,18 @@ const SHORTCUT_TONES = {
   foregroundUnknown: 'warning'
 } as const satisfies Record<ShortcutOutcome['outcome'], JournalTone>
 
+/**
+ * The statuses that mean a combination is not on the desktop.
+ *
+ * A duplicate belongs here even though the system never turned it down: multifus
+ * turned it down itself, and the action answers to nothing either way.
+ */
+const DEAD_SHORTCUT_STATUSES = new Set<ShortcutBinding['status']['kind']>([
+  'duplicate',
+  'invalid',
+  'refused'
+])
+
 /** The tone of each outcome a click in the system tray can have. */
 const TRAY_TONES = {
   focused: 'good',
@@ -429,12 +482,31 @@ export const journalTone = (event: JournalEvent): JournalTone => {
     return event.granted ? 'good' : 'warning'
   }
 
+  // Being refused a second after asking is what macOS always answers, so it is
+  // the ordinary state and not a fault. Only a system that would not answer at
+  // all is one.
+  if (event.kind === 'authorizationRequested') {
+    if (event.failure !== null) {
+      return 'warning'
+    }
+
+    return event.granted ? 'good' : 'neutral'
+  }
+
   if (event.kind === 'notification') {
     return event.outcome.outcome === 'focused' ? 'good' : 'neutral'
   }
 
   if (event.kind === 'shortcut') {
     return SHORTCUT_TONES[event.outcome.outcome]
+  }
+
+  if (event.kind === 'shortcutsBound') {
+    const isDead = event.bindings.some((binding) => {
+      return DEAD_SHORTCUT_STATUSES.has(binding.status.kind)
+    })
+
+    return isDead ? 'warning' : 'neutral'
   }
 
   if (event.kind === 'trayFocus') {
@@ -447,12 +519,12 @@ export const journalTone = (event: JournalEvent): JournalTone => {
 /**
  * The events whose whole line is a stock phrase and the reason the system gave.
  *
- * `shortcutRefused` carries a detail too and is not one of them: it has to name
- * the action and the combination first, so it stays a sentence of its own.
+ * `configLoadFailed` carries a detail too and is not one of them: it has to name
+ * where the file went, so it stays a sentence of its own.
  */
 type DetailedEventKind = Exclude<
   Extract<JournalEvent, { readonly detail: string }>['kind'],
-  'shortcutRefused'
+  'configLoadFailed'
 >
 
 /**
@@ -462,12 +534,16 @@ type DetailedEventKind = Exclude<
  */
 const DETAILED_LINES = {
   listeningFailed: 'Écoute des notifications impossible',
+  notificationUnreadable: 'Notification impossible à lire',
   shortcutsFailed: 'Les raccourcis ne sont pas fiables',
   trayFailed: 'La barre système n’est pas fiable',
-  windowFailed: 'La fenêtre de multifus n’est pas revenue',
+  windowFailed: 'La fenêtre de multifus n’a pas suivi',
+  snapshotFailed: 'La fenêtre n’a pas reçu le tableau de bord',
   startAtLoginFailed: 'Démarrage avec la session impossible',
   scanFailed: 'Lecture des fenêtres impossible',
   saveFailed: 'Configuration non enregistrée',
+  configNotSetAside:
+    'Configuration illisible et impossible à déplacer, le prochain enregistrement l’écrasera',
   openFailed: 'Le système n’a pas pu ouvrir cet élément',
   updateFailed: 'Mise à jour impossible'
 } as const satisfies Record<DetailedEventKind, string>
@@ -478,23 +554,60 @@ const isDetailed = (
   return event.kind in DETAILED_LINES
 }
 
+/**
+ * The kinds of an event union that carry nothing but their own name.
+ *
+ * Derived rather than listed, so that a payload-free event added on the Rust side
+ * has to appear in {@link PLAIN_LINES} instead of falling through to an empty
+ * line.
+ */
+type WithoutPayload<Event> = Event extends { readonly kind: string }
+  ? keyof Event extends 'kind'
+    ? Event['kind']
+    : never
+  : never
+
+/** Each of them is one fact with nothing to add about it. */
+const PLAIN_LINES = {
+  listening: 'Écoute des notifications démarrée.',
+  updateUpToDate: 'Aucune version plus récente.',
+  reset: 'Configuration remise à zéro.',
+  quit: 'multifus a été quitté depuis la barre système.'
+} as const satisfies Record<WithoutPayload<JournalEvent>, string>
+
+const isPlain = (
+  event: JournalEvent
+): event is Extract<
+  JournalEvent,
+  { readonly kind: WithoutPayload<JournalEvent> }
+> => {
+  return event.kind in PLAIN_LINES
+}
+
 /** A journal event, put into words. */
 export const journalLine = (event: JournalEvent) => {
   if (isDetailed(event)) {
     return `${DETAILED_LINES[event.kind]} : ${event.detail}`
   }
 
+  if (isPlain(event)) {
+    return PLAIN_LINES[event.kind]
+  }
+
   switch (event.kind) {
     case 'started': {
-      return 'multifus a démarré.'
+      return startedLine(event)
+    }
+    case 'configLoadFailed': {
+      return configLoadFailedLine(event)
     }
     case 'authorization': {
       return event.granted
         ? 'Autorisation accordée : les fenêtres sont lisibles.'
         : 'Autorisation refusée : les fenêtres ne peuvent pas être lues.'
     }
-    case 'listening': {
-      return 'Écoute des notifications démarrée.'
+    case 'authorizationRequested': {
+      return authorizationRequestedLine(event)
     }
     case 'characterOnline': {
       return `${event.nickname} est connecté.`
@@ -505,27 +618,237 @@ export const journalLine = (event: JournalEvent) => {
     case 'notification': {
       return notificationLine(event)
     }
+    case 'roster': {
+      return rosterLine(event.change)
+    }
+    case 'setting': {
+      return settingLine(event.change)
+    }
     case 'shortcut': {
       return shortcutLine(event)
     }
-    case 'shortcutRefused': {
-      const { label } = strings.shortcuts.actions[event.action]
-
-      return `Raccourci ${label} refusé (${event.accelerator}) : ${event.detail}`
+    case 'shortcutsBound': {
+      return shortcutsBoundLine(event.bindings)
     }
     case 'trayFocus': {
       return trayLine(event)
     }
+    case 'startAtLoginReconciled': {
+      return event.enabled
+        ? 'Démarrage avec la session actif, enregistrement réécrit.'
+        : 'Démarrage avec la session inactif, aucun enregistrement.'
+    }
     case 'updateAvailable': {
       return `La version ${event.version} est disponible.`
     }
-    case 'reset': {
-      return 'Configuration remise à zéro.'
+    case 'panicked': {
+      return `${WORK_LABELS[event.work]} a échoué brutalement, et a repris.`
     }
     default: {
       return ''
     }
   }
+}
+
+/**
+ * The first line of every run, and the one that makes the rest readable.
+ *
+ * Version, system and launch in one sentence, because a transcript is read
+ * against a release, on an operating system whose version decides how the
+ * notifications are read, started in one of two ways that do not show the same
+ * thing.
+ */
+const startedLine = (event: Extract<JournalEvent, { kind: 'started' }>) => {
+  const how =
+    event.launch === 'session'
+      ? 'au démarrage de la session'
+      : 'lancé à la main'
+
+  return `multifus ${event.version} a démarré sur ${event.system}, ${how}.`
+}
+
+const configLoadFailedLine = (
+  event: Extract<JournalEvent, { kind: 'configLoadFailed' }>
+) => {
+  const whereItWent =
+    event.quarantined === null
+      ? 'Rien n’a été déplacé.'
+      : `Fichier mis de côté : ${event.quarantined}`
+
+  return `Configuration non chargée, multifus est reparti sur ses réglages par défaut (${event.detail}). ${whereItWent}`
+}
+
+const authorizationRequestedLine = (
+  event: Extract<JournalEvent, { kind: 'authorizationRequested' }>
+) => {
+  if (event.failure !== null) {
+    return `Autorisation demandée : le système n’a pas pu répondre (${event.failure}).`
+  }
+
+  return event.granted
+    ? 'Autorisation demandée : accordée.'
+    : 'Autorisation demandée : pas encore accordée, ce qui est normal dans la seconde qui suit.'
+}
+
+/**
+ * What each thread of multifus is called when it has to be named.
+ *
+ * A table because the Rust side sends an enum and not a sentence: there is
+ * nothing to quote from the system when a panic is caught, so the event names the
+ * work and the words live here, like every other word of this window.
+ */
+const WORK_LABELS = {
+  scan: 'La lecture des fenêtres',
+  shortcuts: 'La réponse à un raccourci',
+  tray: 'La réponse à un clic dans la barre système'
+} as const satisfies Record<Work, string>
+
+/** Where the user acted, for the two settings that have two doors. */
+const surfaceLabel = (surface: Surface) => {
+  return surface === 'tray' ? 'la barre système' : 'la fenêtre'
+}
+
+/** How a sex is named when a whole one of them is meant. */
+const genderPluralLabel = (gender: Gender) => {
+  return gender === 'male' ? 'les hommes' : 'les femmes'
+}
+
+/**
+ * What the user did to the roster, put into words.
+ *
+ * These lines exist so that the journal reads on its own. A `Suivant` reporting
+ * « personne dans le défilement » is only ever explained by the rows somebody put
+ * to sleep a minute earlier.
+ */
+const rosterLine = (change: RosterChange) => {
+  switch (change.kind) {
+    case 'slept': {
+      return `${change.nickname} mis en veille.`
+    }
+    case 'woke': {
+      return `${change.nickname} remis dans le défilement.`
+    }
+    case 'genderAsleep': {
+      const what = change.asleep ? 'en veille' : 'réveillés'
+
+      return `Tous ${genderPluralLabel(change.gender)} connectés sont ${what}.`
+    }
+    case 'genderAssigned': {
+      if (change.gender === null) {
+        return `Sexe retiré à ${change.nickname}.`
+      }
+
+      const sex = change.gender === 'male' ? 'homme' : 'femme'
+
+      return `${change.nickname} est assigné comme ${sex}.`
+    }
+    case 'reordered': {
+      return change.order.length === 0
+        ? 'Ordre du défilement modifié, roster vide.'
+        : `Ordre du défilement : ${change.order.join(', ')}.`
+    }
+    case 'removed': {
+      return `${change.nickname} retiré du roster.`
+    }
+    default: {
+      return ''
+    }
+  }
+}
+
+/** A setting the user moved, put into words. */
+const settingLine = (change: SettingChange) => {
+  switch (change.kind) {
+    case 'autoFocusEnabled': {
+      const what = change.enabled ? 'activé' : 'désactivé'
+
+      return `AutoFocus ${what} depuis ${surfaceLabel(change.from)}.`
+    }
+    case 'autoFocusKind': {
+      const { label } = strings.autoFocus.kinds[change.notificationKind]
+      const what = change.enabled ? 'activé' : 'désactivé'
+
+      return `AutoFocus, type ${label} ${what}.`
+    }
+    case 'wakesMinimized': {
+      const what = change.wakes ? 'activé' : 'désactivé'
+
+      return `Réveil des fenêtres réduites ${what} depuis ${surfaceLabel(change.from)}.`
+    }
+    default: {
+      return ''
+    }
+  }
+}
+
+/**
+ * The four combinations as the system left them, on one line.
+ *
+ * The accelerator is written as it is stored and not as the keyboard draws it: a
+ * transcript ends up in a bug report next to a configuration file, and
+ * `Control+Shift+Right` is what both of them hold.
+ */
+const shortcutsBoundLine = (bindings: readonly ShortcutBinding[]) => {
+  const parts = bindings.map((binding) => {
+    const { label } = strings.shortcuts.actions[binding.action]
+
+    return `${label} ${shortcutBindingLabel(binding)}`
+  })
+
+  return `Raccourcis : ${parts.join(' · ')}.`
+}
+
+const shortcutBindingLabel = ({ accelerator, status }: ShortcutBinding) => {
+  // `null` is a combination the user cleared, which the status reports as
+  // `unbound`. Naming it here as well keeps every branch readable on its own
+  // rather than resting on the two agreeing.
+  const combination = accelerator ?? 'aucune combinaison'
+
+  switch (status.kind) {
+    case 'registered': {
+      return combination
+    }
+    case 'unbound': {
+      return 'non attribué'
+    }
+    case 'pending': {
+      return 'pas encore posé'
+    }
+    case 'invalid': {
+      return `${combination} illisible (${status.detail})`
+    }
+    case 'duplicate': {
+      const { label } = strings.shortcuts.actions[status.action]
+
+      return `${combination} en doublon avec ${label}, donc inerte`
+    }
+    case 'refused': {
+      return `${combination} refusé (${status.detail})`
+    }
+    default: {
+      return combination
+    }
+  }
+}
+
+/**
+ * The stretch of time the entries in memory cover.
+ *
+ * With the date, unlike the lines: a transcript read elsewhere has to say which
+ * day it was, and how far back these lines reach before the file has to be
+ * opened.
+ */
+const journalPeriod = (entries: readonly JournalEntry[]) => {
+  if (entries.length === 0) {
+    return 'aucune entrée'
+  }
+
+  // The index goes through a variable on purpose: the formatter rewrites
+  // `entries[entries.length - 1]` into `entries.at(-1)`, which the `lib` of this
+  // project does not have.
+  const lastIndex = entries.length - 1
+
+  return `${journalMoment(entries[0].at)} → ${journalMoment(entries[lastIndex].at)}`
 }
 
 /**
@@ -559,18 +882,40 @@ export const updateLine = (update: UpdateStatus) => {
 }
 
 /**
- * The whole journal as plain text, one entry per line, oldest first.
+ * The journal as plain text, a header and then one entry per line, oldest first.
  *
  * What leaves the window when the reader copies it. The time is kept in front of
  * every line: the journal is read to find out what happened just before nothing
  * came to the front, and an order without moments answers half the question.
+ *
+ * **The header is not decoration.** Everything in it is already in the snapshot
+ * and used to reach nobody: a transcript went out with no version, no system, no
+ * state of the authorization and no combinations, so reading it started with a
+ * round of questions. The `started` event carries most of the same facts, and it
+ * is the first line to be pushed out of a journal that has been running a while,
+ * which is exactly when somebody copies it.
  */
-export const journalTranscript = (entries: readonly JournalEntry[]) => {
-  return entries
-    .map((entry) => {
-      return `${journalTime(entry.at)}  ${journalLine(entry.event)}`
-    })
-    .join('\n')
+export const journalTranscript = (snapshot: Snapshot) => {
+  const { journal } = snapshot
+
+  const lines = journal.map((entry) => {
+    return `${journalTime(entry.at)}  ${journalLine(entry.event)}`
+  })
+
+  return [
+    `multifus ${snapshot.version} sur ${snapshot.system}`,
+    `Autorisation : ${snapshot.authorization.granted ? 'accordée' : 'refusée'}, écoute ${snapshot.authorization.listening ? 'active' : 'arrêtée'}`,
+    `AutoFocus : ${snapshot.autoFocusEnabled ? 'actif' : 'suspendu'}, réveil des réduites ${snapshot.wakesMinimized ? 'actif' : 'inactif'}`,
+    shortcutsBoundLine(snapshot.shortcuts),
+    `Configuration : ${snapshot.config.path}`,
+    `Mise à jour : ${updateLine(snapshot.update)}`,
+    `Entrées en mémoire : ${journal.length}, ${journalPeriod(journal)}`,
+    // The drawer holds a window, the file holds the weeks. Without this line
+    // somebody hands over ten minutes and believes they handed over the month.
+    'Le fichier du journal sur le disque va plus loin en arrière que ces lignes.',
+    '',
+    ...lines
+  ].join('\n')
 }
 
 type ShortcutLineParams = {
@@ -688,6 +1033,11 @@ const notificationLine = ({
     }
     case 'leftMinimized': {
       return `${subject} : fenêtre réduite, laissée où elle est.`
+    }
+    // Told apart from `kindUnknown` on purpose: an unknown wording is repaired by
+    // adding a pattern, a body nobody read is repaired in the reading itself.
+    case 'bodyUnread': {
+      return `${subject} : corps de la notification illisible, rien n’a été fait.`
     }
     case 'focusFailed': {
       return `${subject} : le système a refusé le passage au premier plan (${outcome.detail}).`

@@ -28,6 +28,15 @@ use crate::domain::NotificationKind;
 pub struct Snapshot {
     /// The version of the bundle, the one the changelog talks about.
     pub version: String,
+    /// The system, its version and its architecture.
+    ///
+    /// It crosses for one reader only, the head of a copied journal. The spec of
+    /// this journal names it next to the version: a transcript is read against a
+    /// release *and* against an operating system, the macOS banner tree of ADR
+    /// 0002 belonging to a version of it. The `Started` event carries the same
+    /// string and is the first line to be pushed out of a full journal, which is
+    /// exactly when somebody copies one.
+    pub system: String,
     /// The roster, in cycle order.
     pub characters: Vec<CharacterView>,
     /// The four combinations, in the order of the table of perimetre.md.
@@ -239,6 +248,15 @@ pub enum ConfigProblem {
         detail: String,
         quarantined: Option<String>,
     },
+
+    /// The bytes were read, are not a configuration, and the file could not even
+    /// be moved out of the way.
+    ///
+    /// The one state of this list where doing nothing loses something: the file
+    /// is still at the path the next save writes to. It outranks
+    /// [`ConfigProblem::Malformed`] on the band for that reason, and `detail` is
+    /// what the system said about the move rather than about the reading.
+    NotSetAside { detail: String },
 
     /// The last save did not go through. What is on screen is right, what is on
     /// disk is behind.

@@ -59,7 +59,7 @@ export const App = () => {
             </div>
           </main>
         </div>
-        <JournalPanel entries={snapshot.journal} />
+        <JournalPanel snapshot={snapshot} />
       </div>
     </>
   )

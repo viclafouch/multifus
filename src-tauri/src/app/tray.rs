@@ -28,6 +28,8 @@
 //! character click is queued and answered on the worker below, exactly as a
 //! shortcut is.
 
+use std::panic::catch_unwind;
+use std::panic::AssertUnwindSafe;
 use std::sync::mpsc;
 use std::sync::mpsc::Sender;
 use std::sync::Mutex;
@@ -45,6 +47,8 @@ use tauri::Wry;
 
 use crate::app::journal::JournalEvent;
 use crate::app::journal::TrayOutcome;
+use crate::app::journal::Work;
+use crate::app::journal_file;
 use crate::app::main_window;
 use crate::app::runtime;
 use crate::app::state::lock;
@@ -78,6 +82,12 @@ const MENU_AUTO_FOCUS_OFF: &str = "Désactiver l'AutoFocus";
 const MENU_WAKE_MINIMIZED: &str = "Réveiller les fenêtres réduites";
 const MENU_LEAVE_MINIMIZED: &str = "Ignorer les fenêtres réduites";
 const MENU_DENIED: &str = "Autorisation manquante";
+// The journal is reachable from here and not from the window alone, and that is
+// the rule of the project rather than a convenience: what is only useful with the
+// window open needs a way in that does not need the window. « La fenêtre de
+// multifus n'est pas revenue » is one of the lines this journal can hold, and a
+// journal reachable only through the window is a journal for the good days.
+const MENU_JOURNAL: &str = "Montrer le journal";
 
 /// The line that names the version that is out. Only ever there when a check
 /// has found one, since a menu item that says « nothing new » is an item that
@@ -114,6 +124,9 @@ const WAKE_MINIMIZED_ID: &str = "multifus://wake-minimized";
 
 /// The item that replaces multifus with the version that is out and restarts it.
 const UPDATE_ID: &str = "multifus://update";
+
+/// The item that shows the journal file in the file browser of the system.
+const JOURNAL_ID: &str = "multifus://journal";
 
 /// The line that says multifus is not allowed to work, and the one that leads
 /// to the pane where that is fixed.
@@ -374,6 +387,18 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
         )?)?;
     }
 
+    // With the four screens, because it is the same gesture: going to look at
+    // something. It is here rather than in the window alone because the day it is
+    // wanted is a day something is wrong, and the window is one of the things
+    // that can be wrong.
+    menu.append(&MenuItem::with_id(
+        app,
+        JOURNAL_ID,
+        MENU_JOURNAL,
+        true,
+        None::<&str>,
+    )?)?;
+
     menu.append(&PredefinedMenuItem::separator(app)?)?;
 
     // Next to the way out rather than at the top, and for the same reason it is
@@ -409,9 +434,20 @@ fn on_menu_event(app: &AppHandle, event: MenuEvent) {
     let id = event.id().as_ref();
 
     if id == QUIT_ID {
+        // Written before the process ends, and the last line of a run that ended
+        // on purpose. Its absence at the end of a run is a fact of its own, which
+        // only a journal that outlives the process can hold.
+        lock(app).log(JournalEvent::Quit);
+
         // The only way out. `exit` carries a code, which is how the run loop
         // tells this apart from a window the user merely closed.
         app.exit(0);
+
+        return;
+    }
+
+    if id == JOURNAL_ID {
+        journal_file::reveal(app);
 
         return;
     }
@@ -464,9 +500,11 @@ fn on_menu_event(app: &AppHandle, event: MenuEvent) {
     }
 
     if let Some(nickname) = id.strip_prefix(CHARACTER_PREFIX) {
-        // A send that fails means the worker never came up, which
-        // [`start_worker`] has already written down. Saying it again on every
-        // click would only bury it.
+        // Nothing is written on a send that fails, because there is nothing left
+        // to write: the worker never came up, which `start_worker` wrote down, or
+        // it died, which it no longer does since each click is caught. Same note
+        // as on `crate::app::shortcuts::fire`, including why the state lock is not
+        // the obstacle here: this very function takes it three items above.
         drop(app.state::<TrayQueue>().send(nickname.to_owned()));
     }
 }
@@ -510,6 +548,10 @@ fn screen_label(screen: Screen) -> &'static str {
 
 /// Starts the thread that answers a clicked character, for the life of the
 /// process.
+///
+/// One click cannot cost the menu. Focusing goes into a game client through
+/// Accessibility, and a panic there used to end this thread for good: the menu
+/// kept opening, kept listing everybody, and no item did anything ever again.
 fn start_worker(app: &AppHandle) {
     let (queue, nicknames) = mpsc::channel::<String>();
 
@@ -520,7 +562,9 @@ fn start_worker(app: &AppHandle) {
 
             move || {
                 for nickname in nicknames {
-                    focus(&app, &nickname);
+                    if catch_unwind(AssertUnwindSafe(|| focus(&app, &nickname))).is_err() {
+                        lock(&app).log_unless_repeated(JournalEvent::Panicked { work: Work::Tray });
+                    }
                 }
             }
         });

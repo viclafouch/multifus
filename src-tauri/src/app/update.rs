@@ -69,17 +69,19 @@ pub fn check(app: &AppHandle) {
                 state.set_update(UpdateView::Available {
                     version: version.clone(),
                 });
-                state.log(JournalEvent::UpdateAvailable { version });
+                // Once per version and not once per question. The about screen
+                // asks again by hand, and three presses used to write three
+                // identical lines, which the documentation of this event said it
+                // did not do.
+                state.log_unless_repeated(JournalEvent::UpdateAvailable { version });
             }
-            Ok(None) => lock(&app).set_update(UpdateView::UpToDate),
+            Ok(None) => up_to_date(&app),
             // An endpoint that answers without naming a release is the ordinary
             // state of a repository whose only release is still a draft, and of
             // one that has never published at all. There is nothing newer, which
             // is what being up to date means. A network that fails does not land
             // here: it comes back as another variant, and that one is a failure.
-            Err(tauri_plugin_updater::Error::ReleaseNotFound) => {
-                lock(&app).set_update(UpdateView::UpToDate);
-            }
+            Err(tauri_plugin_updater::Error::ReleaseNotFound) => up_to_date(&app),
             Err(error) => fail(&app, &error.to_string()),
         }
 
@@ -101,6 +103,12 @@ async fn look(app: &AppHandle) -> tauri_plugin_updater::Result<Option<Update>> {
 ///
 /// Does nothing when no check has found anything, which is what a click on a
 /// menu built a moment before an « up to date » answer looks like.
+///
+/// Nothing is written in that case. It takes a click inside the fraction of a
+/// second between a menu being drawn with the line and the check answering that
+/// there is nothing to install, and the menu loses the line on the spot through
+/// the snapshot. A journal line for it would describe the timing of a redraw
+/// rather than anything about multifus.
 pub fn install(app: &AppHandle) {
     let Some(update) = pending(app).take() else {
         return;
@@ -125,6 +133,21 @@ pub fn install(app: &AppHandle) {
 
         app.restart();
     });
+}
+
+/// This version is the published one.
+///
+/// Written down as well as shown, which it was not: a check that has never once
+/// reached the endpoint looked exactly like a multifus that is up to date, and
+/// over weeks that is the difference between « no release yet » and « this
+/// machine has not been able to ask since March ». Collapsed into one line per
+/// run by `log_unless_repeated`, since the answer does not change between two
+/// presses of the same button.
+fn up_to_date(app: &AppHandle) {
+    let mut state = lock(app);
+
+    state.set_update(UpdateView::UpToDate);
+    state.log_unless_repeated(JournalEvent::UpdateUpToDate);
 }
 
 /// Says what went wrong, on screen and in the journal.

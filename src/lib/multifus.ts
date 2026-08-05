@@ -75,7 +75,13 @@ export type Authorization = {
   readonly listening: boolean
 }
 
-/** Why the configuration on screen is not the one on disk. */
+/**
+ * Why the configuration on screen is not the one on disk.
+ *
+ * `notSetAside` is the only one where doing nothing loses something: the file
+ * could not be read and could not be moved, so it is still sitting where the
+ * next save writes.
+ */
 export type ConfigProblem =
   | {
       readonly kind: 'malformed'
@@ -83,6 +89,7 @@ export type ConfigProblem =
       readonly quarantined: string | null
     }
   | { readonly kind: 'notSaved'; readonly detail: string }
+  | { readonly kind: 'notSetAside'; readonly detail: string }
   | { readonly kind: 'unreadable'; readonly detail: string }
 
 export type ConfigStatus = {
@@ -103,8 +110,15 @@ export type UpdateStatus =
   | { readonly kind: 'installing' }
   | { readonly kind: 'upToDate' }
 
-/** What became of a game notification. */
+/**
+ * What became of a game notification.
+ *
+ * `kindUnknown` is a wording no pattern covers, `bodyUnread` is a body multifus
+ * never got to read. Two different repairs, in two different files, which is why
+ * they are two outcomes and not one.
+ */
 export type NotificationOutcome =
+  | { readonly outcome: 'bodyUnread' }
   | { readonly outcome: 'focusFailed'; readonly detail: string }
   | { readonly outcome: 'focused' }
   | { readonly outcome: 'kindDisabled' }
@@ -136,24 +150,115 @@ export type ShortcutOutcome =
   | { readonly outcome: 'swapped'; readonly awake: Gender }
   | { readonly outcome: 'woke'; readonly nickname: string }
 
-/** One thing worth knowing about when nothing comes to the front. */
+/** How multifus was started. A session start does not show the window. */
+export type Launch = 'byHand' | 'session'
+
+/** Which of the two surfaces the user acted on. */
+export type Surface = 'tray' | 'window'
+
+/**
+ * One of the three things multifus does on a thread of its own.
+ *
+ * What `panicked` names. Each of them going quiet used to look exactly like a
+ * user who had stopped touching anything.
+ */
+export type Work = 'scan' | 'shortcuts' | 'tray'
+
+/** What the user did to the roster from the window. */
+export type RosterChange =
+  | {
+      readonly kind: 'genderAsleep'
+      readonly gender: Gender
+      readonly asleep: boolean
+    }
+  | {
+      readonly kind: 'genderAssigned'
+      readonly nickname: string
+      readonly gender: Gender | null
+    }
+  | { readonly kind: 'removed'; readonly nickname: string }
+  | { readonly kind: 'reordered'; readonly order: readonly string[] }
+  | { readonly kind: 'slept'; readonly nickname: string }
+  | { readonly kind: 'woke'; readonly nickname: string }
+
+/**
+ * What the user changed, and from where when there are two doors.
+ *
+ * `from` says whether the window had to be opened, which is the measure of the
+ * whole principle of the project.
+ */
+export type SettingChange =
+  | {
+      readonly kind: 'autoFocusEnabled'
+      readonly enabled: boolean
+      readonly from: Surface
+    }
+  | {
+      readonly kind: 'autoFocusKind'
+      readonly notificationKind: NotificationKind
+      readonly enabled: boolean
+    }
+  | {
+      readonly kind: 'wakesMinimized'
+      readonly wakes: boolean
+      readonly from: Surface
+    }
+
+/**
+ * One thing worth knowing about when nothing comes to the front.
+ *
+ * No event carries a word of what a notification said. The seven kinds are read
+ * from the body on the Rust side and only the kind travels; a private message is
+ * somebody writing to the user, and this journal is a file that lives for weeks.
+ * See the note at the top of `app::journal`.
+ */
 export type JournalEvent =
   | { readonly kind: 'authorization'; readonly granted: boolean }
   | { readonly kind: 'characterOffline'; readonly nickname: string }
   | { readonly kind: 'characterOnline'; readonly nickname: string }
+  | { readonly kind: 'configNotSetAside'; readonly detail: string }
   | { readonly kind: 'listening' }
   | { readonly kind: 'listeningFailed'; readonly detail: string }
+  | { readonly kind: 'notificationUnreadable'; readonly detail: string }
   | { readonly kind: 'openFailed'; readonly detail: string }
+  | { readonly kind: 'panicked'; readonly work: Work }
+  | { readonly kind: 'quit' }
   | { readonly kind: 'reset' }
+  | { readonly kind: 'roster'; readonly change: RosterChange }
   | { readonly kind: 'saveFailed'; readonly detail: string }
   | { readonly kind: 'scanFailed'; readonly detail: string }
+  | { readonly kind: 'setting'; readonly change: SettingChange }
+  | {
+      readonly kind: 'shortcutsBound'
+      readonly bindings: readonly ShortcutBinding[]
+    }
   | { readonly kind: 'shortcutsFailed'; readonly detail: string }
+  | { readonly kind: 'snapshotFailed'; readonly detail: string }
   | { readonly kind: 'startAtLoginFailed'; readonly detail: string }
-  | { readonly kind: 'started' }
+  | { readonly kind: 'startAtLoginReconciled'; readonly enabled: boolean }
   | { readonly kind: 'trayFailed'; readonly detail: string }
   | { readonly kind: 'updateAvailable'; readonly version: string }
   | { readonly kind: 'updateFailed'; readonly detail: string }
+  | { readonly kind: 'updateUpToDate' }
   | { readonly kind: 'windowFailed'; readonly detail: string }
+  | {
+      readonly kind: 'authorizationRequested'
+      readonly granted: boolean
+      /** What the system said when it would not even answer the question. */
+      readonly failure: string | null
+    }
+  | {
+      readonly kind: 'configLoadFailed'
+      readonly detail: string
+      /** Where the file went, `null` when nothing was moved. */
+      readonly quarantined: string | null
+    }
+  | {
+      readonly kind: 'started'
+      readonly version: string
+      readonly system: string
+      readonly launch: Launch
+    }
   | {
       readonly kind: 'trayFocus'
       readonly nickname: string
@@ -163,12 +268,6 @@ export type JournalEvent =
       readonly kind: 'shortcut'
       readonly action: ShortcutAction
       readonly outcome: ShortcutOutcome
-    }
-  | {
-      readonly kind: 'shortcutRefused'
-      readonly action: ShortcutAction
-      readonly accelerator: string
-      readonly detail: string
     }
   | {
       readonly kind: 'notification'
@@ -188,6 +287,14 @@ export type JournalEntry = {
 export type Snapshot = {
   /** The version of the bundle, the one the changelog talks about. */
   readonly version: string
+  /**
+   * The system, its version and its architecture.
+   *
+   * Read by the head of a copied journal and nothing else. A transcript is read
+   * against a release and against an operating system, and the `started` line
+   * that also carries it is the first to leave a journal that has been running.
+   */
+  readonly system: string
   /** The roster, in cycle order. */
   readonly characters: readonly Character[]
   readonly shortcuts: readonly ShortcutBinding[]
@@ -204,6 +311,13 @@ export type Snapshot = {
   readonly config: ConfigStatus
   /** Where multifus is with the version that is published. */
   readonly update: UpdateStatus
+  /**
+   * The entries the Rust side still holds in memory, oldest first.
+   *
+   * Not the whole journal: every entry also goes to a file that keeps weeks of
+   * them, which is what `revealJournal` opens. This is the window the drawer
+   * draws.
+   */
   readonly journal: readonly JournalEntry[]
 }
 
@@ -347,6 +461,17 @@ export const installUpdate = async () => {
 
 export const dismissConfigProblem = async () => {
   return invoke<Snapshot>('dismiss_config_problem')
+}
+
+/**
+ * Shows the journal file in the system's own file browser.
+ *
+ * The other half of the export. The copy button carries the entries above, this
+ * carries the weeks the file holds, and the same item sits in the menu of the
+ * system tray for the day the window is the thing that is wrong.
+ */
+export const revealJournal = async () => {
+  return invoke<null>('reveal_journal')
 }
 
 /** Shows the file that was set aside, in the system's own file browser. */

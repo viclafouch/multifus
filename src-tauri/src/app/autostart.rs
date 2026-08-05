@@ -52,9 +52,21 @@ pub fn reconcile(app: &AppHandle) {
         manager.disable()
     };
 
-    if let Err(error) = outcome {
-        lock(app).log(JournalEvent::StartAtLoginFailed {
-            detail: error.to_string(),
-        });
+    let mut state = lock(app);
+
+    // The success is written too, and it is the only proof there is. The plugin's
+    // `is_enabled` checks that a file exists and never reads the path inside it,
+    // so nothing else in this application can say that the registration matches
+    // the binary that is running. One line at every launch, collapsed by
+    // `log_unless_repeated` into one line per change of intent.
+    match outcome {
+        Ok(()) => {
+            state.log_unless_repeated(JournalEvent::StartAtLoginReconciled { enabled: wanted });
+        }
+        Err(error) => {
+            state.log(JournalEvent::StartAtLoginFailed {
+                detail: error.to_string(),
+            });
+        }
     }
 }

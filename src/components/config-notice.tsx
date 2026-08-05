@@ -17,6 +17,10 @@ const WORDING = {
     title: strings.config.notSavedTitle,
     body: strings.config.notSavedBody
   },
+  notSetAside: {
+    title: strings.config.notSetAsideTitle,
+    body: strings.config.notSetAsideBody
+  },
   unreadable: {
     title: strings.config.unreadableTitle,
     body: strings.config.unreadableBody

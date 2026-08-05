@@ -22,6 +22,7 @@
 pub mod autostart;
 pub mod commands;
 pub mod journal;
+pub mod journal_file;
 pub mod main_window;
 pub mod runtime;
 pub mod shortcuts;
@@ -42,6 +43,7 @@ use crate::platform::PlatformWindowManager;
 
 pub use state::AppState;
 pub use state::Multifus;
+pub use state::MultifusParams;
 pub use state::WatcherState;
 pub use view::Snapshot;
 
@@ -55,9 +57,16 @@ pub use view::Snapshot;
 pub fn setup(app: &AppHandle) -> Result<(), ConfigError> {
     let store = ConfigStore::for_app(app)?;
     let loaded = store.load();
-    let version = app.package_info().version.to_string();
 
-    app.manage::<AppState>(Mutex::new(Multifus::new(store, version, loaded)));
+    // The first line of the journal is written by this constructor, so everything
+    // that line has to carry is gathered before anything else runs.
+    app.manage::<AppState>(Mutex::new(Multifus::new(MultifusParams {
+        store,
+        loaded,
+        version: app.package_info().version.to_string(),
+        system: system(),
+        launch: main_window::launch(),
+    })));
     app.manage(PlatformWindowManager::new());
     app.manage::<WatcherState>(Mutex::new(PlatformNotificationWatcher::new()));
 
@@ -84,4 +93,23 @@ pub fn setup(app: &AppHandle) -> Result<(), ConfigError> {
     main_window::show_on_launch(app);
 
     Ok(())
+}
+
+/// The system multifus is running on, for the head of the journal.
+///
+/// The version matters more than the name here: the macOS banner tree ADR 0002
+/// stands on belongs to an operating system version, so « the AutoFocus stopped
+/// after an update » is a sentence this string either supports or does not. The
+/// architecture comes along because the release is Apple Silicon only for now.
+///
+/// Neither the hostname nor the locale, which `tauri-plugin-os` would also give:
+/// this ends up in a file meant to be handed over, and neither of them helps read
+/// it.
+fn system() -> String {
+    format!(
+        "{} {} {}",
+        tauri_plugin_os::platform(),
+        tauri_plugin_os::version(),
+        tauri_plugin_os::arch()
+    )
 }

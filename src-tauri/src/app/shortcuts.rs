@@ -9,10 +9,16 @@
 //! system will not take leaves the user with nothing bound and no message. Here
 //! a combination that cannot be parsed, that another action already claims, or
 //! that the system turns down costs that action alone: the other three go up,
-//! and the reason reaches the screen inside the snapshot. The two failures that
-//! carry words from the system, the parse and the refusal, also reach the
-//! journal; a duplicate is the screen's to explain, since the screen is where
-//! both combinations are on show.
+//! and the reason reaches the screen inside the snapshot.
+//!
+//! **The four answers reach the journal together, in one line.** They used to
+//! reach it one at a time and only when they failed with words from the system,
+//! which left two holes. A duplicate wrote nothing, on the grounds that the
+//! screen shows both combinations; but a duplicate is never registered, so it
+//! never fires either, and the journal was then silent from end to end about a
+//! dead shortcut. And a combination that worked wrote nothing at all, so a
+//! transcript never said which keys were bound when it was recorded. One line for
+//! the set answers both, and it is short enough to write at every launch.
 //!
 //! **What the system accepts is not what will fire.** On macOS a combination
 //! another application or the desktop itself already owns registers cleanly and
@@ -34,6 +40,8 @@
 //! that two presses are answered in the order they were made.
 
 use std::collections::HashMap;
+use std::panic::catch_unwind;
+use std::panic::AssertUnwindSafe;
 use std::sync::mpsc;
 use std::sync::mpsc::Sender;
 use std::thread;
@@ -46,11 +54,13 @@ use tauri_plugin_global_shortcut::ShortcutState;
 
 use crate::app::journal::JournalEvent;
 use crate::app::journal::ShortcutOutcome;
+use crate::app::journal::Work;
 use crate::app::runtime;
 use crate::app::state::lock;
 use crate::app::state::ShortcutEffect;
 use crate::app::view::ShortcutAction;
 use crate::app::view::ShortcutStatus;
+use crate::app::view::ShortcutView;
 use crate::platform::PlatformError;
 use crate::platform::PlatformWindowManager;
 use crate::platform::WindowManager;
@@ -60,9 +70,13 @@ pub type ShortcutQueue = Sender<ShortcutAction>;
 
 /// Starts the thread that answers the shortcuts, for the life of the process.
 ///
-/// The queue is put in the Tauri state whether or not the thread came up. A
-/// send on a queue nobody is reading fails quietly, which is the right shape:
-/// the failure is said once here, not once per key press.
+/// The queue is put in the Tauri state whether or not the thread came up.
+///
+/// **One key press cannot cost the other three combinations.** Answering a
+/// shortcut goes into a game client through Accessibility, and a panic there used
+/// to end this thread for good: every combination stayed registered, kept being
+/// delivered, and did nothing, with the journal saying only what
+/// [`fire`] could not say. Each answer is caught on its own now.
 pub fn start(app: &AppHandle) {
     let (queue, actions) = mpsc::channel::<ShortcutAction>();
 
@@ -73,7 +87,11 @@ pub fn start(app: &AppHandle) {
 
             move || {
                 for action in actions {
-                    answer(&app, action);
+                    if catch_unwind(AssertUnwindSafe(|| answer(&app, action))).is_err() {
+                        lock(&app).log_unless_repeated(JournalEvent::Panicked {
+                            work: Work::Shortcuts,
+                        });
+                    }
                 }
             }
         });
@@ -111,41 +129,27 @@ pub fn apply(app: &AppHandle) {
 
     let mut claimed = HashMap::new();
     let mut statuses = HashMap::new();
-    let mut refusals = Vec::new();
+    let mut bindings = Vec::new();
 
     for (action, accelerator) in wanted {
         let status = bind(app, action, accelerator.as_deref(), &mut claimed);
 
-        // Both refusals carry what the system said, and both mean the same thing
-        // to the user: this combination is not on the desktop. The screen gets
-        // the sentence, the journal gets the system's own words.
-        if let (Some(detail), Some(accelerator)) = (refusal(&status), accelerator) {
-            refusals.push((action, accelerator, detail));
-        }
-
+        bindings.push(ShortcutView {
+            action,
+            accelerator,
+            status: status.clone(),
+        });
         statuses.insert(action, status);
     }
 
     let mut state = lock(app);
+
     state.set_shortcut_statuses(statuses);
-
-    for (action, accelerator, detail) in refusals {
-        state.log(JournalEvent::ShortcutRefused {
-            action,
-            accelerator,
-            detail,
-        });
-    }
-}
-
-/// What the system said about a combination it would not take, if it would not.
-fn refusal(status: &ShortcutStatus) -> Option<String> {
-    match status {
-        ShortcutStatus::Invalid { detail } | ShortcutStatus::Refused { detail } => {
-            Some(detail.clone())
-        }
-        _ => None,
-    }
+    // The whole set, laid down or turned down. Written unconditionally rather
+    // than only on a failure: a transcript that does not say which keys were
+    // bound cannot be read on its own, and the one status nobody used to write,
+    // a duplicate, is the one that never fires and never writes anything else.
+    state.log(JournalEvent::ShortcutsBound { bindings });
 }
 
 /// Lays one combination down and says what became of it.
@@ -202,10 +206,21 @@ fn bind(
 
 /// Called by the plugin on the main thread. Queues, and returns immediately.
 ///
-/// A send that fails means the worker thread never came up, which [`start`] has
-/// already written in the journal. Saying it again on every key press would only
-/// bury it.
+/// **Nothing is written here**, and the reason is that there is nothing left to
+/// write. A send that fails means nobody is reading the queue, and there are
+/// exactly two ways to get there: the thread never came up, which [`start`] wrote
+/// down, or it died, which it no longer does since each answer is caught. Saying
+/// it again on every key press would bury both.
+///
+/// Taking the state lock here would not deadlock, and an earlier version of this
+/// comment claimed it would: [`crate::app::tray::on_menu_event`] takes it on this
+/// same thread for three of its items. The rule on [`crate::app::state`] forbids
+/// *holding* it across a call that waits on the main thread, which is a different
+/// thing. It is left alone because it buys nothing, not because it is unsafe.
 fn fire(app: &AppHandle, action: ShortcutAction) {
+    // `let _` rather than `drop`, which does nothing on a `Result` this small:
+    // the action is `Copy`, so the error carries a copy of it and the whole thing
+    // is a `Copy` type.
     let _ = app.state::<ShortcutQueue>().send(action);
 }
 

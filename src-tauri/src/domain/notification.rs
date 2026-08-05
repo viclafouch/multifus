@@ -76,6 +76,18 @@ impl GameNotification {
     pub fn kind(&self) -> Option<NotificationKind> {
         classify(&self.body)
     }
+
+    /// There is nothing in the body to classify.
+    ///
+    /// A wording no pattern covers and a body that was never read both leave
+    /// [`GameNotification::kind`] at `None`, and they are repaired in two
+    /// different files: the first by adding a pattern to the table below, the
+    /// second in the walk of `platform::macos`. This is what tells them apart,
+    /// and the journal says which one it was.
+    #[must_use]
+    pub fn matches_blank_body(&self) -> bool {
+        self.body.trim().is_empty()
+    }
 }
 
 /// Ported from Dracoon, valid on both systems. A window title looks like

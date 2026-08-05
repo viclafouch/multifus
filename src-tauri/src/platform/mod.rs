@@ -24,6 +24,7 @@ pub mod windows;
 
 pub use error::PlatformError;
 pub use error::Result;
+pub use notification::NotificationReport;
 pub use notification::NotificationSink;
 pub use notification::NotificationWatcher;
 pub use window::GameWindow;

@@ -56,6 +56,16 @@ _Avoid_: Rotation, navigation, ordre d'initiative
 L'action d'endormir tous les personnages d'un sexe et de réveiller tous ceux de l'autre.
 _Avoid_: Inversion, permutation, changement d'équipe
 
+### Journal
+
+**Journal** (`Journal`):
+Le compte-rendu que multifus fait de lui-même, une entrée par événement. Il existe pour un seul jour, celui où une notification arrive et où aucune fenêtre ne remonte. Le tiroir de la fenêtre en montre les dernières entrées, le fichier sur le disque en garde des semaines.
+_Avoid_: Log, historique, trace, debug
+
+**Entrée** (`JournalEntry`):
+Une ligne du journal : un moment et un événement structuré. Jamais une phrase, la langue de l'interface étant écrite ailleurs. Ne porte jamais le corps d'une notification de jeu, voir [ADR 0006](./docs/adr/0006-journal-sur-disque.md).
+_Avoid_: Ligne de log, message, enregistrement
+
 ### Barre système
 
 **Barre système** (`tray`):
