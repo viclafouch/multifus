@@ -25,7 +25,7 @@ L'ensemble des personnages connus de multifus, y compris ceux qui ne sont pas co
 _Avoid_: Liste, équipe, collection
 
 **Connecté** (`online`):
-Se dit d'un personnage dont la fenêtre existe actuellement. Un personnage non connecté reste visible dans le roster mais n'est ni focusable ni endormable.
+Se dit d'un personnage dont une fenêtre porte le pseudo en ce moment. La fenêtre seule ne suffit pas : Dofus déconnecte un client resté inactif un quart d'heure, et son titre perd le pseudo sans que la fenêtre disparaisse. Le personnage cesse alors d'être connecté, ce que le balayage voit tout seul. Un personnage non connecté reste visible dans le roster mais n'est ni focusable ni endormable.
 _Avoid_: Actif, ouvert, lancé
 
 ### Fenêtres
@@ -99,3 +99,33 @@ _Avoid_: Switch automatique, auto-switch, suivi
 **Réveil des réduites** (`wakes_minimized`):
 Le réglage qui dit si l'AutoFocus sort une fenêtre réduite. Coché par défaut. Décoché, réduire une fenêtre la met hors d'atteinte de l'AutoFocus, ce qui laisse travailler ailleurs sans être ramené dans le jeu. Ne concerne que l'AutoFocus : un raccourci et un clic dans la barre système sortent toujours la fenêtre, puisque l'utilisateur les a demandés.
 _Avoid_: Mode concentration, ne pas déranger, restaurer
+
+### Relais
+
+**Relais** (`Relay`):
+Le mécanisme qui envoie sur le téléphone de l'utilisateur les messages privés reçus pendant son absence, et les avis qui disent qu'il a cessé de les entendre. Il s'active depuis la barre système au moment où l'on quitte son bureau, et ne porte que les personnages relayés. Son état actif n'est jamais persisté et repart à zéro à chaque lancement.
+_Avoid_: Intégration, passerelle, pont, webhook, notification poussée
+
+**Relayé** (`relayed`):
+Attribut d'un personnage qui dit si le relais transporte ses messages privés. Coché à l'entrée dans le roster et conservé indéfiniment, comme le sexe. On relaie son personnage principal et pas ses mules, dont les messages privés n'appellent aucun retour. Voir [ADR 0011](./docs/adr/0011-relais-par-personnage.md).
+_Avoid_: Suivi, surveillé, abonné, actif
+
+**Robot** (`bot`):
+Le compte Telegram par lequel le relais écrit. L'utilisateur le crée en dehors de multifus. Son jeton vit dans le trousseau du système et jamais dans le fichier de configuration, voir [ADR 0009](./docs/adr/0009-jeton-dans-le-trousseau.md).
+_Avoid_: Bot, compte, application, intégration
+
+**Salon** (`chat`):
+La conversation Telegram où le relais écrit, désignée par son identifiant. Un robot ne pouvant pas écrire le premier, cet identifiant n'existe qu'après que l'utilisateur a parlé au robot.
+_Avoid_: Canal, conversation, discussion, groupe, fil
+
+**Avis** (`RelayNotice`):
+Ce que le relais dit de lui-même et jamais du jeu : qu'un personnage relayé s'est déconnecté, ou qu'il n'entend plus rien du tout. Il existe parce qu'un téléphone muet se lit « personne ne m'a écrit », alors qu'il veut souvent dire « multifus n'écoute plus ». Ne porte jamais de corps de notification. Voir [ADR 0010](./docs/adr/0010-le-relais-parle-de-lui-meme.md).
+_Avoid_: Alerte, erreur, panne, notification, statut
+
+**Envoi du corps** (`send_body`):
+Le réglage qui dit si le texte du message privé accompagne le pseudo et le type. Décoché par défaut. C'est le seul endroit du projet où un corps de notification quitte la machine, voir [ADR 0008](./docs/adr/0008-corps-relaye-sur-consentement.md).
+_Avoid_: Aperçu, contenu, détail, texte
+
+**Écran tenu éveillé** (`display_awake`):
+L'état de la machine tant que le relais a quelque chose à écouter : ni extinction de l'écran, ni économiseur, donc ni verrouillage de session. Il suit les personnages relayés connectés et non l'interrupteur : plus aucun d'eux à l'écran, il tombe et la machine peut dormir, l'un d'eux revient, il est reposé. Le relais, lui, ne s'arrête que sur un raccourci. Le mot « veille » ne le désigne jamais, il appartient aux personnages.
+_Avoid_: Veille, mise en veille, éveil, assertion, caffeinate

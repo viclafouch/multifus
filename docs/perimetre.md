@@ -20,6 +20,10 @@ Ce principe arbitre tous les compromis. Une fonctionnalité qui exige d'ouvrir l
 
 **Sexe et actions groupées.** Chaque personnage se voit assigner un sexe une fois pour toutes. Deux boutons endorment ou réveillent tous les hommes ou toutes les femmes. Un raccourci bascule d'un ensemble à l'autre.
 
+**Relais.** On quitte son bureau, on active le relais depuis la barre système, et chaque message privé reçu par un personnage relayé arrive dans un salon Telegram sur le téléphone. Un des quatre raccourcis frappé signifie qu'on est revenu et coupe le relais. Tant qu'un personnage relayé est connecté, l'écran est tenu éveillé, sans quoi le verrouillage de session couperait la lecture des bannières et le relais deviendrait muet sans le dire. Le pseudo et le type partent toujours, le texte du message seulement si l'utilisateur l'a coché.
+
+Le relais dit aussi quand il cesse d'entendre, et c'est un avis et non une notification de jeu. La raison est le quart d'heure : **Dofus déconnecte un client resté inactif**, et multifus n'a pas le droit d'y remédier, voir plus bas. Une absence d'une heure est donc une absence où le relais devient sourd au bout de quinze minutes, et un téléphone muet se lit « personne ne m'a écrit ». L'avis est ce qui empêche ce contresens.
+
 ## Raccourcis
 
 | Raccourci | Effet                                            |
@@ -45,20 +49,40 @@ Tous restent inertes tant qu'une fenêtre Dofus n'est pas au premier plan. Sans 
 
 **Toute forme d'automatisation du jeu.** multifus ne lit pas la mémoire du client, ne simule aucune action de jeu, ne modifie aucun fichier. Il ne fait que gérer des fenêtres et lire des notifications système. Les outils de type macro sont interdits par Ankama et restent hors de ce projet.
 
+**Répondre depuis le téléphone.** Le relais va dans un seul sens. Répondre à un message privé demanderait d'écrire dans le jeu, ce que le paragraphe précédent interdit. Le relais dit s'il faut revenir, il ne remplace pas le retour.
+
+**Empêcher la déconnexion pour inactivité.** Dofus ferme la session d'un client resté inactif un quart d'heure, et le titre de la fenêtre perd alors le pseudo. C'est la vraie limite du relais : une absence d'une heure est une absence où plus personne n'est joignable après quinze minutes. La corriger demanderait de simuler une action de jeu, ce que l'automatisation refuse deux paragraphes plus haut. multifus ne rallonge pas l'absence, il dit quand elle est finie. Ne pas rouvrir : un anti-inactivité est exactement l'outil qu'Ankama interdit.
+
+**Relayer les six autres types de notification.** Le message privé seul, codé en dur. Combat, échange, groupe et défi sont sans usage à distance : le temps de revenir, le tour est passé ou l'échange est annulé. Le percepteur attaqué et le craft terminé ont un vrai sens, et ils sont refusés quand même pour l'instant, parce que sept interrupteurs de plus doubleraient la surface de réglages pour un besoin qui ne s'est pas encore présenté. À rouvrir sur usage constaté, et pas avant.
+
+**Un catalogue d'intégrations.** Un seul destinataire, Telegram, et les raisons de l'avoir préféré à WhatsApp, ntfy, Gotify, Bark et Pushover sont dans l'[ADR 0007](./adr/0007-telegram-plutot-que-whatsapp-ou-ntfy.md). Ce n'est pas un écran extensible, c'est un relais.
+
+**Un historique de conversation.** Le relais pousse, il ne tient pas un fil qu'on relit. Ce qui est arrivé sur le téléphone y reste, multifus n'en garde rien et le journal ne porte aucun corps.
+
+**Les réglages de relais par type de notification.** Même refus que pour l'AutoFocus par personnage, et pour la même raison : sept interrupteurs de plus pour un besoin qui ne s'est pas présenté.
+
+Le relais **par personnage**, lui, a été refusé puis rouvert, et c'est [ADR 0011](./adr/0011-relais-par-personnage.md). Ce n'est pas la même grandeur qu'une grille de sept types : c'est une case par ligne, sur un écran qui dessine déjà une ligne par personnage, et le besoin est réel. On relaie son principal et pas ses mules.
+
 ## Deux systèmes, et seulement deux
 
 multifus vise **macOS et Windows**. Ni iOS, ni Android, ni Linux, que Tauri sait pourtant viser. Ce n'est pas un manque de temps, c'est le périmètre : Dofus Retro se joue sur ces deux systèmes, et une dépendance qui ne les couvre pas tous les deux est écartée plutôt qu'ajoutée sous condition.
 
 ## Écarts entre les deux systèmes
 
-|                                        | Windows                            | macOS                          |
-| -------------------------------------- | ---------------------------------- | ------------------------------ |
-| Source des notifications               | `UserNotificationListener` (WinRT) | Bannière lue par Accessibility |
-| Autorisation requise                   | Accès aux notifications            | Accessibilité                  |
-| Suppression des notifications au focus | oui                                | impossible, pas d'API          |
-| Dépendance à l'affichage des bannières | non                                | oui                            |
+|                                        | Windows                            | macOS                                                      |
+| -------------------------------------- | ---------------------------------- | ---------------------------------------------------------- |
+| Source des notifications               | `UserNotificationListener` (WinRT) | Bannière lue par Accessibility                             |
+| Autorisation requise                   | Accès aux notifications            | Accessibilité                                              |
+| Suppression des notifications au focus | oui                                | impossible, pas d'API                                      |
+| Dépendance à l'affichage des bannières | non                                | oui                                                        |
+| Corps de notification complet          | oui                                | oui, mesuré : la bannière tronque à l'écran, `AXValue` non |
+| Écran tenu éveillé                     | `SetThreadExecutionState`          | `IOPMAssertionCreateWithName`                              |
 
 Le détail et les mesures sont dans [ADR 0002](./adr/0002-notifications-macos-via-accessibility.md).
+
+Le relais hérite de tout ce tableau. Sur macOS il ne peut relayer que ce qu'une bannière a affiché, donc il tient l'écran éveillé pour que le verrouillage de session ne le rende pas muet. Sur Windows il fonctionnerait même bannières coupées, et l'écran tenu éveillé y reste utile pour une autre raison : la machine endormie n'exécute plus le client.
+
+La ligne du corps complet a été mesurée et non supposée, ce qui décide de ce que l'écran Relais a le droit de promettre : la bannière ne montre que deux lignes, l'arbre d'accessibilité porte le texte entier. Le détail est à l'étape 11 du plan.
 
 ## Conventions
 
