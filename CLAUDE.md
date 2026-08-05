@@ -24,7 +24,9 @@ Toujours démarrer le skill `/frontend-design` sans exception avant de démarrer
 - Code et commentaires en anglais, interface en français, chaînes centralisées
   dans `src/lib/strings.ts`. Une seule exception, argumentée en tête de
   `app::tray` : le menu de la barre système, que React ne peut pas dessiner.
-- Conventional commits, changelog par `standard-version`.
+- Conventional commits, changelog par `standard-version`. Une release se pose par
+  tag, le workflow signe et notarise, et rien de ce qui signe ne vit dans le
+  dépôt : identité, certificat et clés sont des secrets du dépôt GitHub.
 - Étape terminée quand `npm run lint:fix`, `npm run lint` et `npm run build`
   sortent en zéro, plus `cargo fmt`, `clippy` et `test` si le Rust bouge.
 - Ne jamais lancer `npm run tauri dev`, c'est le mainteneur qui le fait ; les

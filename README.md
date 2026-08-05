@@ -13,8 +13,17 @@ Quand une notification de jeu arrive, multifus ramène au premier plan la fenêt
 - Une icône de barre système qui liste les personnages connectés : un clic ramène la fenêtre voulue, sans ouvrir l'application
 - Un démarrage à l'ouverture de session, en option et décoché par défaut
 - Un journal, pour comprendre le jour où rien ne se passe, et qui se copie d'un clic
+- Une mise à jour proposée quand une nouvelle version sort, à installer d'un clic ou à ignorer
 
 Fermer la fenêtre ne quitte pas multifus, qui continue dans la barre système. On le quitte par le menu de son icône.
+
+## Installation
+
+Sur macOS, télécharger le DMG de la [dernière release](https://github.com/viclafouch/multifus/releases/latest) et glisser multifus dans les Applications. Le paquet est signé et notarisé par Apple, il s'ouvre donc sans avertissement.
+
+Au premier lancement, macOS demande l'**Accessibilité**. C'est la seule autorisation dont multifus a besoin, et il ne peut rien faire sans elle : ni lire le titre des fenêtres, ni les amener au premier plan, ni entendre les notifications du jeu. L'écran d'accueil mène directement au bon panneau des Réglages Système.
+
+Les versions suivantes se proposent d'elles-mêmes, depuis l'écran À propos et depuis le menu de la barre système.
 
 ## Compatibilité
 
@@ -42,11 +51,13 @@ Prérequis : [Rust](https://www.rust-lang.org/tools/install), Node 24, et les [p
 
 ```bash
 npm install
-npm run tauri dev  # lance l'application
+npm run dev:app    # lance l'application
 npm run build      # vérifie les types et construit l'interface
 npm run lint       # oxlint
 npm run lint:fix   # corrige et formate
 ```
+
+Une release se prépare par `npm run release`, qui écrit le changelog et pose le tag, puis se déclenche en poussant ce tag : le workflow compile, signe, notarise et dépose un brouillon de release qu'il reste à relire et à publier.
 
 Le vocabulaire du projet est dans [CONTEXT.md](./CONTEXT.md), ce qu'il refuse de faire dans [docs/perimetre.md](./docs/perimetre.md), et les décisions déjà tranchées dans [docs/adr](./docs/adr).
 

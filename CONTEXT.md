@@ -62,6 +62,12 @@ _Avoid_: Barre des tâches, barre d'état, zone de notification, menu bar, systr
 Le réglage qui lance multifus à l'ouverture de session. Décoché par défaut. Ce que l'utilisateur a demandé, jamais ce que le système porte à un instant donné.
 _Avoid_: Démarrage automatique, lancement au démarrage, autostart
 
+### Distribution
+
+**Mise à jour** (`update`):
+Une version plus récente que celle qui tourne. multifus la cherche une fois au démarrage et la propose, dans la barre système et dans l'écran À propos. Il ne l'installe jamais de lui-même : installer relance l'application.
+_Avoid_: Update, upgrade, nouvelle version
+
 ### Notifications
 
 **Notification de jeu** (`GameNotification`):

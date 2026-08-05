@@ -8,26 +8,27 @@ Le vocabulaire est dans [CONTEXT.md](../CONTEXT.md), ce que le projet refuse de 
 
 ## Où on en est
 
-Les étapes 0 à 8 sont écrites, les sept premières sont vérifiées. Leurs numéros restent des étiquettes, le code y renvoie.
+Les étapes 0 à 8 et l'étape 10 sont écrites, les sept premières sont vérifiées. Leurs numéros restent des étiquettes, le code y renvoie.
 
-| #   | Étape                     | Où                                 | État                          |
-| --- | ------------------------- | ---------------------------------- | ----------------------------- |
-| 0-1 | Bootstrap et outillage    | `package.json`, `oxlint.config.ts` | fait                          |
-| 2   | Cœur métier pur           | `src-tauri/src/domain`             | fait, testé                   |
-| 3   | Frontière avec le système | `src-tauri/src/platform`           | fait                          |
-| 4   | Implémentation macOS      | `platform::macos`                  | **vérifiée sur deux clients** |
-| 5   | Persistance               | `src-tauri/src/config`             | fait, testé                   |
-| 6   | Interface React           | `src`, `src-tauri/src/app`         | faite, AutoFocus prouvé       |
-| 7   | Raccourcis globaux        | `app::shortcuts`                   | **vérifiés depuis le jeu**    |
-| 8   | Barre système et session  | `app::tray`, `app::autostart`      | écrite, à vérifier            |
+| #   | Étape                       | Où                                 | État                          |
+| --- | --------------------------- | ---------------------------------- | ----------------------------- |
+| 0-1 | Bootstrap et outillage      | `package.json`, `oxlint.config.ts` | fait                          |
+| 2   | Cœur métier pur             | `src-tauri/src/domain`             | fait, testé                   |
+| 3   | Frontière avec le système   | `src-tauri/src/platform`           | fait                          |
+| 4   | Implémentation macOS        | `platform::macos`                  | **vérifiée sur deux clients** |
+| 5   | Persistance                 | `src-tauri/src/config`             | fait, testé                   |
+| 6   | Interface React             | `src`, `src-tauri/src/app`         | faite, AutoFocus prouvé       |
+| 7   | Raccourcis globaux          | `app::shortcuts`                   | **vérifiés depuis le jeu**    |
+| 8   | Barre système et session    | `app::tray`, `app::autostart`      | écrite, à vérifier            |
+| 10  | Distribution et mise à jour | `.github/workflows`, `app::update` | écrite, à vérifier            |
 
-Les versions font foi dans `package.json` et `Cargo.toml`, nulle part ailleurs.
+Les versions font foi dans `package.json`, `tauri.conf.json` et `Cargo.toml`, nulle part ailleurs. `standard-version` les déplace ensemble, et le workflow de release refuse un tag qui ne dirait pas la même chose qu'elles.
 
 **L'activation de processus fonctionne.** C'était le fil auquel tenaient l'AutoFocus et les deux raccourcis de défilement, et il tient. Sur l'application empaquetée, avec deux clients Retro connectés, le journal a écrit : Suivant alternant dix-huit fois entre les deux personnages, Précédent remontant, la Veille agissant sur celui de devant, et l'AutoFocus ramenant la bonne fenêtre sur trois types de notification distincts, échange, défi et combat. La garde tient aussi, un Suivant frappé sans fenêtre Dofus devant écrit « ignoré » et ne fait rien.
 
 Ce qui avait été confronté à un vrai client Retro avant cela, hors de l'application et en lecture seule : le bundle est bien `com.dofus.d1elauncher`, le titre de la fenêtre principale est bien `Pseudo - Dofus Retro v1.48.21` et la regex le reconnaît, et lire `AXMainWindow` puis `AXTitle` coûte 0,05 ms en médiane.
 
-Plus rien de macOS n'est en l'air, sauf ce que l'étape 8 vient d'ajouter et qui n'a pas encore tourné.
+Plus rien de macOS n'est en l'air, sauf ce que les étapes 8 et 10 viennent d'ajouter et qui n'a pas encore tourné.
 
 Le journal se copie depuis son en-tête, puisque c'est ce qu'on en fait : on le relit ailleurs. Il part en texte brut, une ligne par entrée, l'heure devant. L'écriture passe par `tauri-plugin-clipboard-manager` et non par `navigator.clipboard`, la fenêtre étant servie par un protocole propre à Tauri. Ce plugin n'accorde rien par défaut, sa permission `default` est vide par conception : la capacité déclare `clipboard-manager:allow-write-text` et rien d'autre, multifus ne lisant jamais le presse-papiers.
 
@@ -35,7 +36,7 @@ Le journal se copie depuis son en-tête, puisque c'est ce qu'on en fait : on le 
 
 ## La suite, dans l'ordre
 
-L'ordre ci-dessous n'est pas celui des numéros : la distribution passe avant Windows, pour la raison donnée à sa section.
+L'ordre ci-dessous n'est pas celui des numéros : la distribution est passée avant Windows, pour que macOS soit fini d'un bloc et que la session Windows trouve la chaîne de compilation déjà posée, à laquelle il ne restera qu'à ajouter un runner.
 
 ### Étape 8 — Barre système et démarrage automatique
 
@@ -63,13 +64,35 @@ Et surtout, **rien n'intercepte la sortie**. `RunEvent::ExitRequested` avec `pre
 
 **Vérification.** Une journée de jeu sans jamais ouvrir la fenêtre.
 
-### Étape 10 — Intégration continue et distribution
+### Étape 10 — Distribution et mise à jour
 
-**Objectif.** Produire les binaires sans installer de chaîne de build sur le PC de jeu, et savoir enfin si le code Windows compile.
+**Écrite, pas encore vérifiée. macOS seulement, Apple Silicon seulement.** Windows n'est pas abandonné, il attend que macOS soit fini pour démarrer d'un bloc : il rejoint ces workflows à l'étape 9, en ajoutant un runner `windows-latest` aux deux endroits qui sont aujourd'hui des jobs uniques. En attendant, un `ci` vert ne dit toujours rien de `platform::windows`, et rien de ce qui a été ajouté ici n'est propre à macOS.
 
-Un workflow GitHub Actions basé sur `tauri-action`, déclenché sur tag, qui compile pour macOS et Windows et publie une release.
+Trois fichiers pour deux portes. `checks` porte les six commandes de la porte du projet et n'est déclenché par personne : il est appelé. `ci` l'appelle sur chaque poussée et chaque pull request, `release` l'appelle avant de signer quoi que ce soit. Une seule définition de « le code est en ordre », dans un seul fichier, et les deux portes passent par elle. Recopiée dans les deux, elle divergerait, et la copie qui divergerait serait celle qui garde la release.
 
-**Pourquoi avant Windows.** `cargo check --target x86_64-pc-windows-msvc` échoue depuis le Mac, donc personne ne sait aujourd'hui si `platform::windows` compile encore. Un runner `windows-latest` le dit gratuitement, et la session Windows démarre alors avec une boucle de retour au lieu de la découvrir à la fin.
+`release` se déclenche sur un tag `v*`, compile, signe, notarise, et dépose le tout dans une release **en brouillon**.
+
+**Le brouillon n'est pas de la prudence, c'est le mécanisme.** L'endpoint que l'updater interroge est `releases/latest/download/latest.json` : publier la release est donc l'acte qui annonce la version à tous les multifus installés. Ça doit rester une décision, pas l'effet de bord d'un `git push --tags`.
+
+**La signature est le vrai sujet, et elle a son ADR.** Une signature ad hoc change à chaque compilation, TCC n'y reconnaît pas la même application et l'autorisation d'Accessibilité tombe à chaque version. Un certificat Developer ID donne une identité stable et l'autorisation survit. Voir [ADR 0005](./adr/0005-signature-developer-id-plutot-qu-ad-hoc.md), qui dit aussi pourquoi ça ne change rien en développement.
+
+**Une seule version, cinq fichiers.** `standard-version` porte le numéro dans `package.json`, `package-lock.json`, `tauri.conf.json`, `Cargo.toml` et `Cargo.lock`, les deux derniers par `scripts/cargo-version.cjs`. Le workflow refuse ensuite de compiler si le tag et `tauri.conf.json` ne disent pas la même chose : deux versions qui divergent publieraient une mise à jour que personne ne se verrait jamais proposer, sans un mot.
+
+**La mise à jour se propose, elle ne s'impose pas.** `app::update` demande une fois au démarrage, jamais en boucle, et l'écran À propos redemande à la main. Ce qu'il trouve voyage dans le snapshot, comme le reste, donc la barre système et la fenêtre disent la même chose sans que ni l'une ni l'autre ait à demander. Installer remplace le paquet et relance multifus, ce qui en pleine soirée coûte tous les clients d'un coup : c'est un clic, jamais un automatisme.
+
+Rien de l'updater n'est exposé au webview. Pas de permission `updater:` dans la capacité, pas de paquet npm : la vérification et l'installation sont deux commandes de multifus, et React lit un état plutôt que d'appeler un plugin.
+
+**Ce qui reste à faire à la main, et que le dépôt ne peut pas porter.**
+
+| À faire                                                                  | Où                  |
+| ------------------------------------------------------------------------ | ------------------- |
+| Créer un certificat **Developer ID Application** et l'exporter en `.p12` | developer.apple.com |
+| Poser les huit secrets du workflow `release`                             | Réglages du dépôt   |
+| Remplacer le logo du scaffolder Tauri                                    | `src-tauri/icons`   |
+
+Les huit secrets : `APPLE_CERTIFICATE` (le `.p12` en base64), `APPLE_CERTIFICATE_PASSWORD`, `APPLE_SIGNING_IDENTITY`, `APPLE_ID`, `APPLE_PASSWORD` (un mot de passe d'application, pas celui du compte), `APPLE_TEAM_ID`, `TAURI_SIGNING_PRIVATE_KEY` (le contenu de la clé générée par `npm run tauri signer generate`) et `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`, vide ici.
+
+**Vérification.** Un tag sur une version d'essai, le brouillon relu, le DMG téléchargé depuis un autre compte pour que la quarantaine s'applique vraiment, puis une seconde version pour voir si l'autorisation d'Accessibilité tient et si la fenêtre propose la mise à jour.
 
 ### Étape 9 — Implémentation Windows
 
@@ -87,7 +110,11 @@ Ce qui attend déjà de ce côté : `platform::windows` compile en renvoyant `No
 
 ## Ce qui mord
 
-**L'autorisation d'Accessibilité se donne à un binaire, pas à un projet.** Le `target/debug/multifus` de `tauri dev` et l'application empaquetée sont deux entrées distinctes dans Réglages Système, et un `cargo build` qui remplace le binaire peut faire perdre la confiance accordée à la version de développement. Vérifier sur l'application empaquetée. Aucune identité de signature n'est configurée, donc chaque compilation change la signature ad hoc du binaire : l'entrée peut rester cochée à l'écran sans plus s'appliquer. Quand l'autorisation disparaît sans raison apparente, `tccutil reset Accessibility com.viclafouch.multifus` puis réaccorder.
+**L'autorisation d'Accessibilité se donne à une identité de code, pas à un projet.** Le `target/debug/multifus` de `tauri dev` et l'application empaquetée sont deux choses distinctes, et en développement c'est le terminal qui porte l'autorisation, jamais multifus. Sur le paquet, une signature ad hoc change à chaque compilation et l'entrée reste cochée à l'écran sans plus s'appliquer. C'est ce que l'étape 10 répare, et le raisonnement complet est dans [ADR 0005](./adr/0005-signature-developer-id-plutot-qu-ad-hoc.md). Quand l'autorisation disparaît sans raison apparente, `tccutil reset Accessibility com.viclafouch.multifus` puis réaccorder.
+
+**Une notarisation à moitié configurée ne fait pas échouer la compilation.** Lu dans `tauri-bundler`, `crates/tauri-bundler/src/bundle/macos/app.rs` : seul un identifiant d'équipe manquant est une erreur franche, tout le reste ne produit qu'un avertissement et la compilation continue. Un secret mal recopié sort donc un paquet signé mais non notarisé, qui s'installe très bien sur la machine qui l'a construit et se fait refuser partout ailleurs. Le seul contrôle qui vaille est de télécharger le DMG depuis une autre machine, ou au moins depuis un autre compte, pour que la quarantaine s'applique vraiment.
+
+**Une release en brouillon n'annonce rien, et c'est une réponse et non une panne.** L'updater interroge `releases/latest/download/latest.json`, et GitHub ne considère pas un brouillon comme la dernière release : le fichier répond donc 404 tant que rien n'est publié. Or le plugin ne distingue pas ce cas dans son type de retour, il rend `Error::ReleaseNotFound`. Laissé tel quel, ça affichait « la mise à jour n'a pas abouti » à chaque démarrage, en anglais dans une interface française, avec une ligne d'avertissement au journal à chaque fois. `app::update` traite donc cette variante-là comme « à jour », et elle seule : un réseau qui tombe rend `Reqwest` ou `Network` et reste un échec. Lu dans `plugins/updater/src/updater.rs`, où une réponse non 2xx ne renseigne pas `last_error` et sort par `ok_or(Error::ReleaseNotFound)`.
 
 **Sur macOS, une combinaison déjà prise s'enregistre sans erreur et ne se déclenche jamais.** Carbon ne refuse qu'un doublon du même processus, donc ni le bureau ni une autre application ne provoquent d'échec à la pose, et aucune API ne permet de le savoir à l'avance. Ne pas chercher à faire dire au plugin ce qu'il ne sait pas : la seule preuve est un appui depuis le jeu et la ligne que le journal écrit. Windows, lui, refuse franchement.
 
