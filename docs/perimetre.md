@@ -43,6 +43,10 @@ Tous restent inertes tant qu'une fenêtre Dofus n'est pas au premier plan. Sans 
 
 **Toute forme d'automatisation du jeu.** multifus ne lit pas la mémoire du client, ne simule aucune action de jeu, ne modifie aucun fichier. Il ne fait que gérer des fenêtres et lire des notifications système. Les outils de type macro sont interdits par Ankama et restent hors de ce projet.
 
+## Deux systèmes, et seulement deux
+
+multifus vise **macOS et Windows**. Ni iOS, ni Android, ni Linux, que Tauri sait pourtant viser. Ce n'est pas un manque de temps, c'est le périmètre : Dofus Retro se joue sur ces deux systèmes, et une dépendance qui ne les couvre pas tous les deux est écartée plutôt qu'ajoutée sous condition.
+
 ## Écarts entre les deux systèmes
 
 |                                        | Windows                            | macOS                          |

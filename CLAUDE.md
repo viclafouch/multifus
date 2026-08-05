@@ -21,7 +21,9 @@ Toujours démarrer le skill `/frontend-design` sans exception avant de démarrer
 
 ## Conventions
 
-- Code et commentaires en anglais, interface en français, chaînes centralisées.
+- Code et commentaires en anglais, interface en français, chaînes centralisées
+  dans `src/lib/strings.ts`. Une seule exception, argumentée en tête de
+  `app::tray` : le menu de la barre système, que React ne peut pas dessiner.
 - Conventional commits, changelog par `standard-version`.
 - Étape terminée quand `npm run lint:fix`, `npm run lint` et `npm run build`
   sortent en zéro, plus `cargo fmt`, `clippy` et `test` si le Rust bouge.
@@ -41,6 +43,17 @@ veille, classification des notifications. Deux interfaces l'isolent de l'OS,
 sous `platform::macos` et `platform::windows`.
 
 Ne jamais appeler d'API système depuis le cœur.
+
+## Deux systèmes, pas cinq
+
+macOS et Windows, et rien d'autre. Ni iOS, ni Android, ni Linux, quoi qu'en
+propose Tauri. Une dépendance ou un plugin qui ne couvre pas les deux est
+disqualifié, et un `cfg` mobile n'a rien à faire dans ce dépôt.
+
+## Ne jamais réinventer la roue
+
+Avant toute implémentation, lire `https://tauri.app/plugin/`, plugins officiels
+et communautaires compris. Écrire à la main ne vient qu'après, et se justifie.
 
 ## Documentation Tauri
 
