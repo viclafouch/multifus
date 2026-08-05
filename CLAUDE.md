@@ -9,4 +9,6 @@ On lance multifus et on l'oublie : une fonctionnalité qui oblige à ouvrir la f
 
 Ne démarre jamais le serveur de dev (e.g: `npm run tauri dev`). L'utilisateur le fait lui-même.
 
+Personne n'a multifus installé, donc rien à préserver : un changement cassant est accepté, sans couche de compatibilité ni migration. Quand on te demande de commiter ou de pousser, fais-le directement sur `main`, sans branche et sans pull request.
+
 Toujours démarrer le skill `/frontend-design` avant une session de design, et toujours implémenter avec l'API Tauri v2 : `https://v2.tauri.app/llms.txt`.
