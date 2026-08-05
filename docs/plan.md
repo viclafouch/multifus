@@ -88,9 +88,13 @@ Rien de l'updater n'est exposé au webview. Pas de permission `updater:` dans la
 | ------------------------------------------------------------------------ | ------------------- |
 | Créer un certificat **Developer ID Application** et l'exporter en `.p12` | developer.apple.com |
 | Poser les huit secrets du workflow `release`                             | Réglages du dépôt   |
-| Remplacer le logo du scaffolder Tauri                                    | `src-tauri/icons`   |
+| Remplacer le logo du scaffolder Tauri, voir « Le logo » à l'étape 8      | `src-tauri/icons`   |
 
-Les huit secrets : `APPLE_CERTIFICATE` (le `.p12` en base64), `APPLE_CERTIFICATE_PASSWORD`, `APPLE_SIGNING_IDENTITY`, `APPLE_ID`, `APPLE_PASSWORD` (un mot de passe d'application, pas celui du compte), `APPLE_TEAM_ID`, `TAURI_SIGNING_PRIVATE_KEY` (le contenu de la clé générée par `npm run tauri signer generate`) et `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`, vide ici.
+Les huit secrets : `APPLE_CERTIFICATE` (le `.p12` en base64), `APPLE_CERTIFICATE_PASSWORD`, `APPLE_SIGNING_IDENTITY`, `APPLE_ID`, `APPLE_PASSWORD` (un mot de passe d'application, pas celui du compte), `APPLE_TEAM_ID`, `TAURI_SIGNING_PRIVATE_KEY` et `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`, vide ici.
+
+**La paire de clés de l'updater existe déjà, ne la régénère pas.** Elle a été créée en même temps que cette étape, dans `~/.tauri/multifus.key` et son `.pub`, sans mot de passe. **La moitié publique est déjà dans `tauri.conf.json`**, c'est le champ `plugins.updater.pubkey`. Il ne reste qu'à recopier le contenu de la moitié privée dans le secret. Relancer `npm run tauri signer generate` donnerait une paire qui ne correspond plus à la clé publiée : les archives seraient signées, les multifus installés les refuseraient, et rien dans le journal ne dirait pourquoi. Si elle doit changer un jour, les deux moitiés changent ensemble, et `pubkey` est à remettre à jour dans le même commit.
+
+Perdue avant la première release, elle se régénère sans conséquence. Perdue après, plus aucune mise à jour n'est signable pour les versions déjà installées.
 
 **Vérification.** Un tag sur une version d'essai, le brouillon relu, le DMG téléchargé depuis un autre compte pour que la quarantaine s'applique vraiment, puis une seconde version pour voir si l'autorisation d'Accessibilité tient et si la fenêtre propose la mise à jour.
 
