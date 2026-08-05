@@ -12,11 +12,9 @@ pub mod config;
 pub mod domain;
 pub mod platform;
 
-use tauri::Manager;
-use tauri::Window;
-use tauri::WindowEvent;
-use tauri::Wry;
 use tauri_plugin_autostart::MacosLauncher;
+
+use crate::app::main_window;
 
 /// Builds multifus and hands it to the event loop.
 ///
@@ -28,6 +26,10 @@ use tauri_plugin_autostart::MacosLauncher;
 /// happens; and preventing it anyway would take `Cmd+Q` away from a macOS user
 /// for no gain. What ends multifus is the Quit item of the system tray, or the
 /// system's own quit, and both are meant to.
+///
+/// The run loop is given a callback, which is why this builds and runs in two
+/// steps rather than calling `run` on the builder. The one event it answers is
+/// the Dock icon being clicked, see [`main_window::show_on_dock_click`].
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_clipboard_manager::init())
@@ -37,12 +39,13 @@ pub fn run() {
         // own handler so that a key press already knows which action it is. See
         // `app::shortcuts`.
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
-        // No argument is passed to the started process: multifus reads its
-        // configuration and shows its window the same way whether it was opened
-        // by hand or by the session. See `app::autostart` for the launcher.
+        // The one argument multifus is ever started with, and the only thing
+        // that tells a session start apart from a launch by hand. What each of
+        // the two shows is `app::main_window`'s to say; the launcher that
+        // carries the argument is `app::autostart`.
         .plugin(tauri_plugin_autostart::init(
             MacosLauncher::LaunchAgent,
-            None,
+            Some(vec![main_window::FROM_SESSION_ARG]),
         ))
         // Nothing of the updater is exposed to the webview: the check and the
         // install are commands of multifus, so the window and the system tray
@@ -58,7 +61,7 @@ pub fn run() {
 
             Ok(())
         })
-        .on_window_event(hide_rather_than_quit)
+        .on_window_event(main_window::hide_rather_than_quit)
         .invoke_handler(tauri::generate_handler![
             app::commands::snapshot,
             app::commands::refresh,
@@ -79,30 +82,7 @@ pub fn run() {
             app::commands::dismiss_config_problem,
             app::commands::reveal_quarantined_config,
         ])
-        .run(tauri::generate_context!())
-        .expect("error while running multifus");
-}
-
-/// Closing the window puts it away instead of ending multifus.
-///
-/// The whole point of step 8: the window is a board one consults, and the
-/// application goes on watching the roster and answering the shortcuts without
-/// it. Quitting is the system tray's job.
-///
-/// **Unless there is no system tray icon.** If putting it up failed, hiding the
-/// window here would leave a running process with no window, no menu and no way
-/// back. In that case the close is let through and multifus ends, which is the
-/// worse of two behaviours and by far the better of two failures.
-fn hide_rather_than_quit(window: &Window<Wry>, event: &WindowEvent) {
-    let WindowEvent::CloseRequested { api, .. } = event else {
-        return;
-    };
-
-    if !app::tray::is_present(window.app_handle()) {
-        return;
-    }
-
-    api.prevent_close();
-
-    drop(window.hide());
+        .build(tauri::generate_context!())
+        .expect("error while building multifus")
+        .run(main_window::show_on_dock_click);
 }

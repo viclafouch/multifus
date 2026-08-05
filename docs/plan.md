@@ -10,17 +10,17 @@ Le vocabulaire est dans [CONTEXT.md](../CONTEXT.md), ce que le projet refuse de 
 
 Les étapes 0 à 8 et l'étape 10 sont écrites, les sept premières sont vérifiées. Leurs numéros restent des étiquettes, le code y renvoie.
 
-| #   | Étape                       | Où                                           | État                          |
-| --- | --------------------------- | -------------------------------------------- | ----------------------------- |
-| 0-1 | Bootstrap et outillage      | `package.json`, `oxlint.config.ts`, `.husky` | fait                          |
-| 2   | Cœur métier pur             | `src-tauri/src/domain`                       | fait, testé                   |
-| 3   | Frontière avec le système   | `src-tauri/src/platform`                     | fait                          |
-| 4   | Implémentation macOS        | `platform::macos`                            | **vérifiée sur deux clients** |
-| 5   | Persistance                 | `src-tauri/src/config`                       | fait, testé                   |
-| 6   | Interface React             | `src`, `src-tauri/src/app`                   | faite, AutoFocus prouvé       |
-| 7   | Raccourcis globaux          | `app::shortcuts`                             | **vérifiés depuis le jeu**    |
-| 8   | Barre système et session    | `app::tray`, `app::autostart`                | écrite, à vérifier            |
-| 10  | Distribution et mise à jour | `.github/workflows`, `app::update`           | écrite, à vérifier            |
+| #   | Étape                       | Où                                           | État                                 |
+| --- | --------------------------- | -------------------------------------------- | ------------------------------------ |
+| 0-1 | Bootstrap et outillage      | `package.json`, `oxlint.config.ts`, `.husky` | fait                                 |
+| 2   | Cœur métier pur             | `src-tauri/src/domain`                       | fait, testé                          |
+| 3   | Frontière avec le système   | `src-tauri/src/platform`                     | fait                                 |
+| 4   | Implémentation macOS        | `platform::macos`                            | **vérifiée sur deux clients**        |
+| 5   | Persistance                 | `src-tauri/src/config`                       | fait, testé                          |
+| 6   | Interface React             | `src`, `src-tauri/src/app`                   | faite, AutoFocus prouvé              |
+| 7   | Raccourcis globaux          | `app::shortcuts`                             | **vérifiés depuis le jeu**           |
+| 8   | Barre système et session    | `app::tray`, `app::autostart`                | **revient à l'ouverture de session** |
+| 10  | Distribution et mise à jour | `.github/workflows`, `app::update`           | écrite, à vérifier                   |
 
 Les versions font foi dans `package.json`, `tauri.conf.json` et `Cargo.toml`, nulle part ailleurs. `standard-version` les déplace ensemble, et le workflow de release refuse un tag qui ne dirait pas la même chose qu'elles.
 
@@ -28,7 +28,7 @@ Les versions font foi dans `package.json`, `tauri.conf.json` et `Cargo.toml`, nu
 
 Ce qui avait été confronté à un vrai client Retro avant cela, hors de l'application et en lecture seule : le bundle est bien `com.dofus.d1elauncher`, le titre de la fenêtre principale est bien `Pseudo - Dofus Retro v1.48.21` et la regex le reconnaît, et lire `AXMainWindow` puis `AXTitle` coûte 0,05 ms en médiane.
 
-Plus rien de macOS n'est en l'air, sauf ce que les étapes 8 et 10 viennent d'ajouter et qui n'a pas encore tourné.
+Plus rien de macOS n'est en l'air, sauf ce que les étapes 8 et 10 viennent d'ajouter et qui n'a pas encore tourné. De l'étape 8, une seule chose a été confrontée à la vraie machine : l'application empaquetée dans `/Applications` revient bien d'elle-même après une ouverture de session.
 
 Le journal se copie depuis son en-tête, puisque c'est ce qu'on en fait : on le relit ailleurs. Il part en texte brut, une ligne par entrée, l'heure devant. L'écriture passe par `tauri-plugin-clipboard-manager` et non par `navigator.clipboard`, la fenêtre étant servie par un protocole propre à Tauri. Ce plugin n'accorde rien par défaut, sa permission `default` est vide par conception : la capacité déclare `clipboard-manager:allow-write-text` et rien d'autre, multifus ne lisant jamais le presse-papiers.
 
@@ -40,7 +40,13 @@ L'ordre ci-dessous n'est pas celui des numéros : la distribution est passée av
 
 ### Étape 8 — Barre système et démarrage automatique
 
-**Écrite, pas encore vérifiée.** L'icône est dans `app::tray`, le démarrage dans `app::autostart`, et le réglage est une ligne de l'écran À propos.
+**Une seule chose est vérifiée sur l'application empaquetée** : posée dans `/Applications`, elle revient d'elle-même après une vraie ouverture de session. Le silence décrit ci-dessous a été essayé sur le binaire de développement, l'argument à la main, et pas encore sur un paquet. Le reste attend la journée de jeu. L'icône est dans `app::tray`, le démarrage dans `app::autostart`, et le réglage est une ligne de l'écran À propos.
+
+**Une ouverture de session n'ouvre pas la fenêtre.** Elle pose l'icône dans la barre système. Une application qu'on lance et qu'on oublie n'a pas à mettre un tableau de bord devant quelqu'un qui vient d'ouvrir sa session et qui ouvre ses clients. Un lancement à la main est l'inverse : double-cliquer une application, c'est demander à la voir, et rester muet là se lirait comme un lancement raté. Ce qui sépare les deux est l'argument `--from-session`, que le lanceur porte dans son enregistrement et que multifus relit dans les siens. Le Dock, lui, est toujours là : `Accessory` reste repoussé, voir plus bas.
+
+Une condition s'ajoute à l'argument, et c'est la même que pour la fermeture : **sans icône dans la barre système, la fenêtre s'ouvre quand même**. Sinon une ouverture de session dont l'icône a échoué laisserait un processus sans fenêtre, sans menu et sans retour possible, ce que le reste de l'étape refuse déjà.
+
+**Le clic sur l'icône du Dock ramène la fenêtre.** Rien ne répondait à `RunEvent::Reopen`, donc une fenêtre masquée laissait une icône sur laquelle un clic ne faisait rien. Le trou existait déjà après une fermeture, il devenait la situation normale une fois le démarrage silencieux posé. C'est la seule raison pour laquelle `run` prend maintenant une fonction et que `lib.rs` construit puis lance en deux temps.
 
 Le menu ne liste que les personnages **connectés**, dans l'ordre du défilement, avec `(en veille)` sur ceux qui sont hors du cycle. Un clic ramène la fenêtre au premier plan. Un personnage hors ligne n'y figure pas : une barre système est un endroit d'où l'on saute, et une ligne qui ne peut rien faire n'y a pas sa place.
 
@@ -62,7 +68,7 @@ Et surtout, **rien n'intercepte la sortie**. `RunEvent::ExitRequested` avec `pre
 
 **Le logo.** `src-tauri/icons` porte encore celui du scaffolder Tauri, et `icons/tray.png` est un glyphe provisoire. `npm run tauri icon <fichier>` régénère les onze fichiers depuis un PNG carré à transparence, et ne touche pas à `tray.png`, qui obéit à d'autres règles : voir plus bas.
 
-**Vérification.** Une journée de jeu sans jamais ouvrir la fenêtre.
+**Vérification.** Une journée de jeu sans jamais ouvrir la fenêtre. Et, sur le paquet cette fois, une ouverture de session qui ne montre que l'icône, puis un double-clic depuis `/Applications` qui montre la fenêtre.
 
 ### Étape 10 — Distribution et mise à jour
 
@@ -119,6 +125,8 @@ Ce qui attend déjà de ce côté : `platform::windows` compile en renvoyant `No
 **Une notarisation à moitié configurée ne fait pas échouer la compilation.** Lu dans `tauri-bundler`, `crates/tauri-bundler/src/bundle/macos/app.rs` : seul un identifiant d'équipe manquant est une erreur franche, tout le reste ne produit qu'un avertissement et la compilation continue. Un secret mal recopié sort donc un paquet signé mais non notarisé, qui s'installe très bien sur la machine qui l'a construit et se fait refuser partout ailleurs. Le seul contrôle qui vaille est de télécharger le DMG depuis une autre machine, ou au moins depuis un autre compte, pour que la quarantaine s'applique vraiment.
 
 **Une release en brouillon n'annonce rien, et c'est une réponse et non une panne.** L'updater interroge `releases/latest/download/latest.json`, et GitHub ne considère pas un brouillon comme la dernière release : le fichier répond donc 404 tant que rien n'est publié. Or le plugin ne distingue pas ce cas dans son type de retour, il rend `Error::ReleaseNotFound`. Laissé tel quel, ça affichait « la mise à jour n'a pas abouti » à chaque démarrage, en anglais dans une interface française, avec une ligne d'avertissement au journal à chaque fois. `app::update` traite donc cette variante-là comme « à jour », et elle seule : un réseau qui tombe rend `Reqwest` ou `Network` et reste un échec. Lu dans `plugins/updater/src/updater.rs`, où une réponse non 2xx ne renseigne pas `last_error` et sort par `ok_or(Error::ReleaseNotFound)`.
+
+**Une mise à jour installée hérite des arguments du processus qui meurt.** `AppHandle::restart` relance le binaire avec `env.args_os` moins le premier, lu dans `tauri/src/process.rs`, et rien ne permet de lui en retirer un : `restart` reconstruit l'environnement lui-même. Donc un multifus lancé par la session et mis à jour revient sans sa fenêtre, sur le clic qui ressemble le plus à celui qui devrait en montrer une. Laissé tel quel, l'icône étant là et la fenêtre à un clic. Ne pas repartir chasser ça dans `app::update`, ce n'est pas là que ça se joue.
 
 **Sur macOS, une combinaison déjà prise s'enregistre sans erreur et ne se déclenche jamais.** Carbon ne refuse qu'un doublon du même processus, donc ni le bureau ni une autre application ne provoquent d'échec à la pose, et aucune API ne permet de le savoir à l'avance. Ne pas chercher à faire dire au plugin ce qu'il ne sait pas : la seule preuve est un appui depuis le jeu et la ligne que le journal écrit. Windows, lui, refuse franchement.
 

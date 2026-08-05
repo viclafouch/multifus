@@ -45,6 +45,7 @@ use tauri::Wry;
 
 use crate::app::journal::JournalEvent;
 use crate::app::journal::TrayOutcome;
+use crate::app::main_window;
 use crate::app::runtime;
 use crate::app::state::lock;
 use crate::app::update;
@@ -116,9 +117,6 @@ const OPEN_SETTINGS_ID: &str = "multifus://open-settings";
 /// The nickname follows, whatever it contains: the prefix is what gets stripped
 /// back off, so nothing about the shape of a pseudo is assumed here.
 const CHARACTER_PREFIX: &str = "multifus://character/";
-
-/// The label of the window the interface lives in.
-const MAIN_WINDOW: &str = "main";
 
 /// The queue a clicked character travels on, from the main thread to the worker.
 type TrayQueue = Sender<String>;
@@ -400,7 +398,7 @@ fn on_menu_event(app: &AppHandle, event: MenuEvent) {
         // The window comes forward first, so that the screen it lands on is the
         // one that was asked for rather than the one it was left on.
         runtime::navigate(app, screen);
-        show_window(app);
+        main_window::show(app);
 
         return;
     }
@@ -474,17 +472,6 @@ fn screen_label(screen: Screen) -> &'static str {
         Screen::AutoFocus => MENU_AUTO_FOCUS_SCREEN,
         Screen::About => MENU_ABOUT,
     }
-}
-
-/// Brings the window back, whether it was hidden or merely behind something.
-fn show_window(app: &AppHandle) {
-    let Some(window) = app.get_webview_window(MAIN_WINDOW) else {
-        return;
-    };
-
-    let shown = window.show().and_then(|()| window.set_focus());
-
-    report(app, shown);
 }
 
 /// Starts the thread that answers a clicked character, for the life of the

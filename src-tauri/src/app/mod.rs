@@ -22,6 +22,7 @@
 pub mod autostart;
 pub mod commands;
 pub mod journal;
+pub mod main_window;
 pub mod runtime;
 pub mod shortcuts;
 pub mod state;
@@ -78,6 +79,9 @@ pub fn setup(app: &AppHandle) -> Result<(), ConfigError> {
     update::setup(app);
 
     runtime::start(app.clone());
+
+    // Last, and after the icon, which is one of the two things it asks about.
+    main_window::show_on_launch(app);
 
     Ok(())
 }

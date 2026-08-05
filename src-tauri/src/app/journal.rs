@@ -104,6 +104,10 @@ pub enum JournalEvent {
     /// quit and the roster at a glance.
     TrayFailed { detail: String },
 
+    /// The window would not come back. Nothing else stops: the roster is still
+    /// watched and the shortcuts still answer, only the board is out of reach.
+    WindowFailed { detail: String },
+
     /// The start with the session could not be made to match what the user
     /// asked for. The switch on screen is then ahead of the system.
     StartAtLoginFailed { detail: String },

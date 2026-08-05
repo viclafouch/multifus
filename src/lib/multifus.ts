@@ -152,6 +152,7 @@ export type JournalEvent =
   | { readonly kind: 'trayFailed'; readonly detail: string }
   | { readonly kind: 'updateAvailable'; readonly version: string }
   | { readonly kind: 'updateFailed'; readonly detail: string }
+  | { readonly kind: 'windowFailed'; readonly detail: string }
   | {
       readonly kind: 'trayFocus'
       readonly nickname: string
