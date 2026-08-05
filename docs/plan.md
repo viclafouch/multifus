@@ -10,17 +10,17 @@ Le vocabulaire est dans [CONTEXT.md](../CONTEXT.md), ce que le projet refuse de 
 
 Les étapes 0 à 8 et l'étape 10 sont écrites, les sept premières sont vérifiées. Leurs numéros restent des étiquettes, le code y renvoie.
 
-| #   | Étape                       | Où                                 | État                          |
-| --- | --------------------------- | ---------------------------------- | ----------------------------- |
-| 0-1 | Bootstrap et outillage      | `package.json`, `oxlint.config.ts` | fait                          |
-| 2   | Cœur métier pur             | `src-tauri/src/domain`             | fait, testé                   |
-| 3   | Frontière avec le système   | `src-tauri/src/platform`           | fait                          |
-| 4   | Implémentation macOS        | `platform::macos`                  | **vérifiée sur deux clients** |
-| 5   | Persistance                 | `src-tauri/src/config`             | fait, testé                   |
-| 6   | Interface React             | `src`, `src-tauri/src/app`         | faite, AutoFocus prouvé       |
-| 7   | Raccourcis globaux          | `app::shortcuts`                   | **vérifiés depuis le jeu**    |
-| 8   | Barre système et session    | `app::tray`, `app::autostart`      | écrite, à vérifier            |
-| 10  | Distribution et mise à jour | `.github/workflows`, `app::update` | écrite, à vérifier            |
+| #   | Étape                       | Où                                           | État                          |
+| --- | --------------------------- | -------------------------------------------- | ----------------------------- |
+| 0-1 | Bootstrap et outillage      | `package.json`, `oxlint.config.ts`, `.husky` | fait                          |
+| 2   | Cœur métier pur             | `src-tauri/src/domain`                       | fait, testé                   |
+| 3   | Frontière avec le système   | `src-tauri/src/platform`                     | fait                          |
+| 4   | Implémentation macOS        | `platform::macos`                            | **vérifiée sur deux clients** |
+| 5   | Persistance                 | `src-tauri/src/config`                       | fait, testé                   |
+| 6   | Interface React             | `src`, `src-tauri/src/app`                   | faite, AutoFocus prouvé       |
+| 7   | Raccourcis globaux          | `app::shortcuts`                             | **vérifiés depuis le jeu**    |
+| 8   | Barre système et session    | `app::tray`, `app::autostart`                | écrite, à vérifier            |
+| 10  | Distribution et mise à jour | `.github/workflows`, `app::update`           | écrite, à vérifier            |
 
 Les versions font foi dans `package.json`, `tauri.conf.json` et `Cargo.toml`, nulle part ailleurs. `standard-version` les déplace ensemble, et le workflow de release refuse un tag qui ne dirait pas la même chose qu'elles.
 

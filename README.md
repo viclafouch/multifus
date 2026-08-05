@@ -57,6 +57,8 @@ npm run lint       # oxlint
 npm run lint:fix   # corrige et formate
 ```
 
+`npm install` pose les hooks git via Husky. Chaque commit passe par `npm run lint`, et un lint en échec annule le commit.
+
 Une release se prépare par `npm run release`, qui écrit le changelog et pose le tag, puis se déclenche en poussant ce tag : le workflow compile, signe, notarise et dépose un brouillon de release qu'il reste à relire et à publier.
 
 Le vocabulaire du projet est dans [CONTEXT.md](./CONTEXT.md), ce qu'il refuse de faire dans [docs/perimetre.md](./docs/perimetre.md), et les décisions déjà tranchées dans [docs/adr](./docs/adr).

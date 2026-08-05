@@ -24,7 +24,8 @@
     "lint:fix": "oxlint --fix && oxfmt",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
-    "release": "standard-version"
+    "release": "standard-version",
+    "prepare": "husky"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",
@@ -50,6 +51,7 @@
     "@types/react-dom": "^19.2.4",
     "@viclafouch/oxc-config": "^1.0.0-alpha.24",
     "@vitejs/plugin-react": "^6.0.5",
+    "husky": "^9.1.7",
     "oxfmt": "^0.62.0",
     "oxlint": "^1.77.0",
     "oxlint-tsgolint": "^7.0.2001",
