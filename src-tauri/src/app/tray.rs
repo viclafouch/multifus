@@ -47,6 +47,7 @@ use crate::app::journal::JournalEvent;
 use crate::app::journal::TrayOutcome;
 use crate::app::runtime;
 use crate::app::state::lock;
+use crate::app::update;
 use crate::app::view::CharacterView;
 use crate::app::view::Screen;
 use crate::platform::PlatformError;
@@ -72,6 +73,13 @@ const MENU_AUTO_FOCUS_ON: &str = "Activer l'AutoFocus";
 const MENU_AUTO_FOCUS_OFF: &str = "Désactiver l'AutoFocus";
 const MENU_DENIED: &str = "Autorisation manquante";
 
+/// The line that names the version that is out. Only ever there when a check
+/// has found one, since a menu item that says « nothing new » is an item that
+/// has never been worth a click.
+fn update_label(version: &str) -> String {
+    format!("Installer la mise à jour {version}")
+}
+
 // Each system calls its own pane by its own name, exactly as the window does.
 #[cfg(target_os = "macos")]
 const MENU_OPEN_SETTINGS: &str = "Ouvrir Réglages Système";
@@ -94,6 +102,9 @@ const NOBODY_ID: &str = "multifus://nobody";
 
 /// The tick that suspends the AutoFocus without forgetting the seven kinds.
 const AUTO_FOCUS_ID: &str = "multifus://auto-focus";
+
+/// The item that replaces multifus with the version that is out and restarts it.
+const UPDATE_ID: &str = "multifus://update";
 
 /// The line that says multifus is not allowed to work, and the one that leads
 /// to the pane where that is fixed.
@@ -128,6 +139,8 @@ struct Contents {
     entries: Vec<Entry>,
     auto_focus: bool,
     granted: bool,
+    /// The version a check found, `None` when there is nothing to offer.
+    update: Option<String>,
 }
 
 /// One line of the menu: the character it aims at, and what it says.
@@ -157,6 +170,7 @@ fn contents(app: &AppHandle) -> Contents {
         entries: entries(&state.connected()),
         auto_focus: state.is_auto_focus_enabled(),
         granted: state.is_granted(),
+        update: state.available_update(),
     }
 }
 
@@ -337,6 +351,20 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
     }
 
     menu.append(&PredefinedMenuItem::separator(app)?)?;
+
+    // Next to the way out rather than at the top, and for the same reason it is
+    // offered here at all: installing restarts multifus, so it sits with the
+    // other item that ends the process and not among the ones that do not.
+    if let Some(version) = &contents.update {
+        menu.append(&MenuItem::with_id(
+            app,
+            UPDATE_ID,
+            update_label(version),
+            true,
+            None::<&str>,
+        )?)?;
+    }
+
     menu.append(&MenuItem::with_id(
         app,
         QUIT_ID,
@@ -373,6 +401,15 @@ fn on_menu_event(app: &AppHandle, event: MenuEvent) {
         // one that was asked for rather than the one it was left on.
         runtime::navigate(app, screen);
         show_window(app);
+
+        return;
+    }
+
+    if id == UPDATE_ID {
+        // The download is asked for and not waited on: what comes back through
+        // the snapshot is the menu losing this line, and then multifus
+        // restarting on its own. See `app::update`.
+        update::install(app);
 
         return;
     }

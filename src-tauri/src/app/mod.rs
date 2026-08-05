@@ -26,6 +26,7 @@ pub mod runtime;
 pub mod shortcuts;
 pub mod state;
 pub mod tray;
+pub mod update;
 pub mod view;
 
 use std::sync::Mutex;
@@ -71,6 +72,10 @@ pub fn setup(app: &AppHandle) -> Result<(), ConfigError> {
     // What the file asks for is pushed onto the system at every launch, which is
     // also what repairs a registration left pointing at a moved application.
     autostart::reconcile(app);
+
+    // After the icon, since the answer comes back through a snapshot and the
+    // menu is one of the two surfaces that draw it.
+    update::setup(app);
 
     runtime::start(app.clone());
 

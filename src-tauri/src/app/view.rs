@@ -43,7 +43,39 @@ pub struct Snapshot {
     pub start_at_login: bool,
     pub authorization: AuthorizationView,
     pub config: ConfigView,
+    /// Where multifus is with the version that is out, see [`crate::app::update`].
+    pub update: UpdateView,
     pub journal: Vec<JournalEntry>,
+}
+
+/// What multifus knows about the version that is published.
+///
+/// There is no idle state: the check starts with the process, so the first
+/// snapshot the interface ever sees is already [`UpdateView::Checking`], and a
+/// screen never has to draw « nobody has asked yet ».
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(
+    tag = "kind",
+    rename_all = "camelCase",
+    rename_all_fields = "camelCase"
+)]
+pub enum UpdateView {
+    /// The endpoint is being asked right now.
+    Checking,
+
+    /// This version is the published one.
+    UpToDate,
+
+    /// A newer version is out, and nothing has been downloaded yet.
+    Available { version: String },
+
+    /// It is being downloaded and put in place. multifus restarts on its own
+    /// when this succeeds, so this state only ever ends in a restart or in
+    /// [`UpdateView::Failed`].
+    Installing,
+
+    /// The endpoint could not be read, or the download did not go through.
+    Failed { detail: String },
 }
 
 /// One of the four screens the window can show.

@@ -1,6 +1,6 @@
 import React from 'react'
-import { RotateCcw } from 'lucide-react'
-import { FieldRow, Note, Panel, Screen } from '@/components/screen'
+import { Download, RefreshCw, RotateCcw } from 'lucide-react'
+import { FieldRow, Note, Panel, Screen, SectionRow } from '@/components/screen'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,9 +13,14 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
-import type { ConfigStatus, Snapshot } from '@/lib/multifus'
-import { reset, setStartAtLogin } from '@/lib/multifus'
-import { strings } from '@/lib/strings'
+import type { ConfigStatus, Snapshot, UpdateStatus } from '@/lib/multifus'
+import {
+  checkUpdate,
+  installUpdate,
+  reset,
+  setStartAtLogin
+} from '@/lib/multifus'
+import { strings, updateLine } from '@/lib/strings'
 
 type FactProps = Readonly<{
   label: string
@@ -34,10 +39,57 @@ const Fact = ({ label, value }: FactProps) => {
   )
 }
 
+type UpdateSectionProps = Readonly<{
+  update: UpdateStatus
+  run: (action: Promise<Snapshot>) => void
+}>
+
+/**
+ * Where multifus is with the version that is out, and the one click that takes it.
+ *
+ * It sits directly under the version it comments on, and it says its state in
+ * words rather than in a badge. The button never goes dead while a request is in
+ * flight: it says it is busy, and a second click costs one more request and
+ * nothing else.
+ */
+const UpdateSection = ({ update, run }: UpdateSectionProps) => {
+  const isChecking = update.kind === 'checking'
+  const hasUpdate = update.kind === 'available' || update.kind === 'installing'
+  const isBusy = isChecking || update.kind === 'installing'
+
+  return (
+    <SectionRow
+      title={strings.about.updateTitle}
+      description={updateLine(update)}
+    >
+      <Button
+        variant="secondary"
+        size="sm"
+        aria-busy={isBusy}
+        onClick={() => {
+          run(hasUpdate ? installUpdate() : checkUpdate())
+        }}
+      >
+        {hasUpdate ? (
+          <Download aria-hidden />
+        ) : (
+          <RefreshCw
+            aria-hidden
+            data-busy={isChecking ? '' : undefined}
+            className="data-busy:animate-spin"
+          />
+        )}
+        {hasUpdate ? strings.about.install : strings.about.check}
+      </Button>
+    </SectionRow>
+  )
+}
+
 type AboutScreenProps = Readonly<{
   version: string
   config: ConfigStatus
   startAtLogin: boolean
+  update: UpdateStatus
   run: (action: Promise<Snapshot>) => void
 }>
 
@@ -59,6 +111,7 @@ export const AboutScreen = ({
   version,
   config,
   startAtLogin,
+  update,
   run
 }: AboutScreenProps) => {
   const [isConfirming, setIsConfirming] = React.useState(false)
@@ -70,6 +123,7 @@ export const AboutScreen = ({
           <Fact label={strings.about.version} value={version} />
           <Fact label={strings.about.configPath} value={config.path} />
         </dl>
+        <UpdateSection update={update} run={run} />
         <FieldRow
           label={strings.about.startupLabel}
           description={strings.about.startupDescription}
@@ -91,13 +145,10 @@ export const AboutScreen = ({
             {strings.about.legalScope}
           </p>
         </section>
-        <section className="flex items-center gap-5 px-4 py-3.5">
-          <div className="flex min-w-0 flex-1 flex-col gap-1">
-            <h2 className="text-row font-medium">{strings.about.resetTitle}</h2>
-            <p className="max-w-prose text-note text-muted-foreground">
-              {strings.about.resetBody}
-            </p>
-          </div>
+        <SectionRow
+          title={strings.about.resetTitle}
+          description={strings.about.resetBody}
+        >
           <Button
             variant="destructive"
             size="sm"
@@ -108,7 +159,7 @@ export const AboutScreen = ({
             <RotateCcw aria-hidden />
             {strings.about.reset}
           </Button>
-        </section>
+        </SectionRow>
       </Panel>
       <Note>{strings.about.startupNote}</Note>
       <AlertDialog open={isConfirming} onOpenChange={setIsConfirming}>

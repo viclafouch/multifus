@@ -115,6 +115,15 @@ pub enum JournalEvent {
     /// is on disk is not.
     SaveFailed { detail: String },
 
+    /// A newer version is published. Written once, when the check finds it, and
+    /// not again when the user reads the same answer from another screen.
+    UpdateAvailable { version: String },
+
+    /// The update could not be looked for, or could not be put in place. The
+    /// one failure of multifus that is usually the network's and not the
+    /// system's.
+    UpdateFailed { detail: String },
+
     /// Something multifus handed to the system to open did not open: the
     /// settings pane of the authorization, the file that was set aside.
     OpenFailed { detail: String },

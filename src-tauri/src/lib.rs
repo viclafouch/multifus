@@ -44,6 +44,10 @@ pub fn run() {
             MacosLauncher::LaunchAgent,
             None,
         ))
+        // Nothing of the updater is exposed to the webview: the check and the
+        // install are commands of multifus, so the window and the system tray
+        // read the one state that travels in the snapshot. See `app::update`.
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .setup(|tauri_app| {
             // The one failure that stops multifus here: no configuration
             // directory at all means there is nowhere to ever write. Everything
@@ -70,6 +74,8 @@ pub fn run() {
             app::commands::set_auto_focus_enabled,
             app::commands::set_start_at_login,
             app::commands::reset,
+            app::commands::check_update,
+            app::commands::install_update,
             app::commands::dismiss_config_problem,
             app::commands::reveal_quarantined_config,
         ])

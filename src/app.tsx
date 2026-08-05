@@ -92,6 +92,7 @@ const CurrentScreen = ({ screen, snapshot, run }: CurrentScreenProps) => {
         version={snapshot.version}
         config={snapshot.config}
         startAtLogin={snapshot.startAtLogin}
+        update={snapshot.update}
         run={run}
       />
     )

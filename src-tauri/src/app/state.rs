@@ -33,6 +33,7 @@ use crate::app::view::ShortcutAction;
 use crate::app::view::ShortcutStatus;
 use crate::app::view::ShortcutView;
 use crate::app::view::Snapshot;
+use crate::app::view::UpdateView;
 use crate::config::ConfigError;
 use crate::config::ConfigStore;
 use crate::config::Loaded;
@@ -82,6 +83,10 @@ pub struct Multifus {
     listening: bool,
     /// Why the configuration on screen is not the one on disk, if it is not.
     problem: Option<ConfigProblem>,
+    /// Where multifus is with the version that is published, see
+    /// [`crate::app::update`]. It starts as a question because the check starts
+    /// with the process.
+    update: UpdateView,
     journal: Journal,
 }
 
@@ -124,6 +129,7 @@ impl Multifus {
             granted: None,
             listening: false,
             problem,
+            update: UpdateView::Checking,
             journal,
         }
     }
@@ -171,6 +177,7 @@ impl Multifus {
                 path: self.store.path().display().to_string(),
                 problem: self.problem.clone(),
             },
+            update: self.update.clone(),
             journal: self.journal.entries(),
         }
     }
@@ -387,6 +394,32 @@ impl Multifus {
         self.windows.clear();
         self.log(JournalEvent::Reset);
         self.save();
+    }
+
+    // -- The update -------------------------------------------------------
+
+    /// Takes in where the check got to. See [`crate::app::update`].
+    pub fn set_update(&mut self, update: UpdateView) {
+        self.update = update;
+    }
+
+    /// The version waiting to be installed, if a check found one.
+    ///
+    /// What the system tray offers, and the reason this is a question and not
+    /// the whole state: a menu has one line to give an update, so it either has
+    /// a version to name or it has nothing to say.
+    #[must_use]
+    pub fn available_update(&self) -> Option<String> {
+        // Written out rather than caught by a wildcard, so that a sixth state
+        // has to be answered for here instead of quietly meaning « nothing to
+        // offer ».
+        match &self.update {
+            UpdateView::Available { version } => Some(version.clone()),
+            UpdateView::Checking
+            | UpdateView::UpToDate
+            | UpdateView::Installing
+            | UpdateView::Failed { .. } => None,
+        }
     }
 
     // -- The windows ------------------------------------------------------

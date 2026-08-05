@@ -90,6 +90,19 @@ export type ConfigStatus = {
   readonly problem: ConfigProblem | null
 }
 
+/**
+ * What multifus knows about the version that is published.
+ *
+ * No idle state: the check starts with the process, so the first snapshot the
+ * interface ever sees is already `checking`.
+ */
+export type UpdateStatus =
+  | { readonly kind: 'available'; readonly version: string }
+  | { readonly kind: 'checking' }
+  | { readonly kind: 'failed'; readonly detail: string }
+  | { readonly kind: 'installing' }
+  | { readonly kind: 'upToDate' }
+
 /** What became of a game notification. */
 export type NotificationOutcome =
   | { readonly outcome: 'focusFailed'; readonly detail: string }
@@ -137,6 +150,8 @@ export type JournalEvent =
   | { readonly kind: 'startAtLoginFailed'; readonly detail: string }
   | { readonly kind: 'started' }
   | { readonly kind: 'trayFailed'; readonly detail: string }
+  | { readonly kind: 'updateAvailable'; readonly version: string }
+  | { readonly kind: 'updateFailed'; readonly detail: string }
   | {
       readonly kind: 'trayFocus'
       readonly nickname: string
@@ -182,6 +197,8 @@ export type Snapshot = {
   readonly startAtLogin: boolean
   readonly authorization: Authorization
   readonly config: ConfigStatus
+  /** Where multifus is with the version that is published. */
+  readonly update: UpdateStatus
   readonly journal: readonly JournalEntry[]
 }
 
@@ -296,6 +313,21 @@ export const setStartAtLogin = async (startAtLogin: boolean) => {
 /** Everything back to the defaults, roster included. */
 export const reset = async () => {
   return invoke<Snapshot>('reset')
+}
+
+/**
+ * Asks whether a newer version is out.
+ *
+ * Answers with the check in flight and not with its result: what it finds
+ * arrives a moment later, in a snapshot of its own.
+ */
+export const checkUpdate = async () => {
+  return invoke<Snapshot>('check_update')
+}
+
+/** Downloads the version that was found. multifus restarts on its own after. */
+export const installUpdate = async () => {
+  return invoke<Snapshot>('install_update')
 }
 
 export const dismissConfigProblem = async () => {

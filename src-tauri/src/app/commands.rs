@@ -25,6 +25,7 @@ use crate::app::journal::JournalEvent;
 use crate::app::runtime;
 use crate::app::shortcuts;
 use crate::app::state::lock;
+use crate::app::update;
 use crate::app::view::ShortcutAction;
 use crate::app::view::Snapshot;
 use crate::domain::Gender;
@@ -174,6 +175,26 @@ pub fn reset(app: AppHandle) -> Snapshot {
 
     // The connected characters come straight back, without their genders.
     runtime::refresh(&app);
+
+    runtime::emit_snapshot(&app)
+}
+
+/// Asks the endpoint whether a newer version is out.
+///
+/// Comes back with the check in flight rather than with its answer: the request
+/// is a network round trip, and what it finds arrives through a snapshot of its
+/// own. See [`crate::app::update`].
+#[tauri::command]
+pub fn check_update(app: AppHandle) -> Snapshot {
+    update::check(&app);
+
+    runtime::emit_snapshot(&app)
+}
+
+/// Downloads the update that was found and restarts multifus on it.
+#[tauri::command]
+pub fn install_update(app: AppHandle) -> Snapshot {
+    update::install(&app);
 
     runtime::emit_snapshot(&app)
 }

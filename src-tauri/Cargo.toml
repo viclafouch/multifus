@@ -30,6 +30,7 @@ serde_json = "1"
 regex = "1"
 tauri-plugin-clipboard-manager = "2"
 tauri-plugin-autostart = "2"
+tauri-plugin-updater = "2"
 
 [dev-dependencies]
 # Only the configuration tests, which need a directory that disappears with them

@@ -24,7 +24,8 @@ import type {
   NotificationOutcome,
   ShortcutAction,
   ShortcutOutcome,
-  TrayOutcome
+  TrayOutcome,
+  UpdateStatus
 } from '@/lib/multifus'
 
 export const strings = {
@@ -225,6 +226,21 @@ export const strings = {
     startupNote: IS_APPLE
       ? 'Fermer la fenêtre ne quitte plus multifus : il continue dans la barre système, en haut à droite de l’écran, et c’est de là qu’on le quitte.'
       : 'Fermer la fenêtre ne quitte plus multifus : il continue dans la barre système, à côté de l’horloge, et c’est de là qu’on le quitte.',
+    updateTitle: 'Mise à jour',
+    updateChecking: 'Vérification en cours…',
+    updateUpToDate: 'Cette version est la dernière publiée.',
+    // The restart is said here rather than in a confirmation dialog: it is the
+    // one consequence worth knowing before clicking, and a modal for a button
+    // one presses twice a year would cost more than it protects.
+    updateAvailable: (version: string) => {
+      return `La version ${version} est disponible. multifus se relancera une fois installée, sans toucher aux clients Dofus.`
+    },
+    updateInstalling: 'Téléchargement, puis multifus se relancera.',
+    updateFailed: (detail: string) => {
+      return `La mise à jour n’a pas abouti : ${detail}`
+    },
+    check: 'Vérifier',
+    install: 'Installer',
     legalTitle: 'Mentions légales',
     legalBody:
       'multifus est un projet personnel indépendant, sans aucun lien avec Ankama. Dofus et Dofus Retro sont des marques déposées d’Ankama.',
@@ -371,6 +387,8 @@ const TONES = {
   shortcutsFailed: 'warning',
   trayFailed: 'warning',
   startAtLoginFailed: 'warning',
+  updateAvailable: 'good',
+  updateFailed: 'warning',
   reset: 'neutral'
 } as const satisfies Record<PlainEventKind, JournalTone>
 
@@ -453,7 +471,8 @@ const DETAILED_LINES = {
   startAtLoginFailed: 'Démarrage avec la session impossible',
   scanFailed: 'Lecture des fenêtres impossible',
   saveFailed: 'Configuration non enregistrée',
-  openFailed: 'Le système n’a pas pu ouvrir cet élément'
+  openFailed: 'Le système n’a pas pu ouvrir cet élément',
+  updateFailed: 'Mise à jour impossible'
 } as const satisfies Record<DetailedEventKind, string>
 
 const isDetailed = (
@@ -500,8 +519,41 @@ export const journalLine = (event: JournalEvent) => {
     case 'trayFocus': {
       return trayLine(event)
     }
+    case 'updateAvailable': {
+      return `La version ${event.version} est disponible.`
+    }
     case 'reset': {
       return 'Configuration remise à zéro.'
+    }
+    default: {
+      return ''
+    }
+  }
+}
+
+/**
+ * Where the update got to, put into words.
+ *
+ * A sentence and not a badge: every other state of this window is said in
+ * French, and « à jour » next to a coloured dot would be the only thing here
+ * that asks to be decoded.
+ */
+export const updateLine = (update: UpdateStatus) => {
+  switch (update.kind) {
+    case 'checking': {
+      return strings.about.updateChecking
+    }
+    case 'upToDate': {
+      return strings.about.updateUpToDate
+    }
+    case 'available': {
+      return strings.about.updateAvailable(update.version)
+    }
+    case 'installing': {
+      return strings.about.updateInstalling
+    }
+    case 'failed': {
+      return strings.about.updateFailed(update.detail)
     }
     default: {
       return ''
