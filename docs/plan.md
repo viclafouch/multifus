@@ -8,7 +8,7 @@ Le vocabulaire est dans [CONTEXT.md](../CONTEXT.md), ce que le projet refuse de 
 
 ## Où on en est
 
-Les étapes 0 à 7 sont écrites. Leurs numéros restent des étiquettes, le code y renvoie.
+Les étapes 0 à 8 sont écrites, les sept premières sont vérifiées. Leurs numéros restent des étiquettes, le code y renvoie.
 
 | #   | Étape                     | Où                                 | État                          |
 | --- | ------------------------- | ---------------------------------- | ----------------------------- |
@@ -19,6 +19,7 @@ Les étapes 0 à 7 sont écrites. Leurs numéros restent des étiquettes, le cod
 | 5   | Persistance               | `src-tauri/src/config`             | fait, testé                   |
 | 6   | Interface React           | `src`, `src-tauri/src/app`         | faite, AutoFocus prouvé       |
 | 7   | Raccourcis globaux        | `app::shortcuts`                   | **vérifiés depuis le jeu**    |
+| 8   | Barre système et session  | `app::tray`, `app::autostart`      | écrite, à vérifier            |
 
 Les versions font foi dans `package.json` et `Cargo.toml`, nulle part ailleurs.
 
@@ -26,7 +27,7 @@ Les versions font foi dans `package.json` et `Cargo.toml`, nulle part ailleurs.
 
 Ce qui avait été confronté à un vrai client Retro avant cela, hors de l'application et en lecture seule : le bundle est bien `com.dofus.d1elauncher`, le titre de la fenêtre principale est bien `Pseudo - Dofus Retro v1.48.21` et la regex le reconnaît, et lire `AXMainWindow` puis `AXTitle` coûte 0,05 ms en médiane.
 
-Plus rien de macOS n'est en l'air.
+Plus rien de macOS n'est en l'air, sauf ce que l'étape 8 vient d'ajouter et qui n'a pas encore tourné.
 
 Le journal se copie depuis son en-tête, puisque c'est ce qu'on en fait : on le relit ailleurs. Il part en texte brut, une ligne par entrée, l'heure devant. L'écriture passe par `tauri-plugin-clipboard-manager` et non par `navigator.clipboard`, la fenêtre étant servie par un protocole propre à Tauri. Ce plugin n'accorde rien par défaut, sa permission `default` est vide par conception : la capacité déclare `clipboard-manager:allow-write-text` et rien d'autre, multifus ne lisant jamais le presse-papiers.
 
@@ -36,13 +37,29 @@ Le journal se copie depuis son en-tête, puisque c'est ce qu'on en fait : on le 
 
 L'ordre ci-dessous n'est pas celui des numéros : la distribution passe avant Windows, pour la raison donnée à sa section.
 
-### Étape 8 — Barre système, logo et démarrage automatique
+### Étape 8 — Barre système et démarrage automatique
 
-**Objectif.** L'application se lance et s'oublie.
+**Écrite, pas encore vérifiée.** L'icône est dans `app::tray`, le démarrage dans `app::autostart`, et le réglage est une ligne de l'écran À propos.
 
-Une icône de barre système avec un menu listant les personnages et leur état de veille, cliquables. Fermer la fenêtre ne quitte plus l'application, on quitte par le menu de l'icône ; `tauri.conf.json` bascule ici et pas avant, sinon la fenêtre se cache sans moyen de revenir. Le démarrage à l'ouverture de session est une option via `tauri-plugin-autostart`, **décochée par défaut**.
+Le menu ne liste que les personnages **connectés**, dans l'ordre du défilement, avec `(en veille)` sur ceux qui sont hors du cycle. Un clic ramène la fenêtre au premier plan. Un personnage hors ligne n'y figure pas : une barre système est un endroit d'où l'on saute, et une ligne qui ne peut rien faire n'y a pas sa place.
 
-**Le logo.** `src-tauri/icons` porte encore celui du scaffolder Tauri. Il sert au dock, à l'application empaquetée et à l'icône de barre système de cette étape, donc il se pose ici. `npm run tauri icon <fichier>` régénère les onze fichiers depuis un PNG carré à transparence.
+**Un interrupteur maître pour l'AutoFocus.** `AutoFocus::enabled` s'ajoute aux sept types plutôt que de les éteindre ensemble : les couper tous oublierait lesquels l'utilisateur avait choisis, et les rallumer lui en rendrait sept. `is_enabled(kind)` demande donc les deux, `is_kind_enabled(kind)` ne demande que la ligne, et c'est cette seconde question que l'écran dessine. Une case dans le menu de la barre système le porte, l'écran AutoFocus aussi, sans quoi couper depuis la barre laisserait sept interrupteurs allumés qui ne font rien.
+
+**Un verbe sur tout ce qui bascule.** L'AutoFocus, seul réglage du menu, dit « Activer » ou « Désactiver » plutôt que de porter une coche. Un nom coché, posé au-dessus des quatre noms d'écrans, se lisait comme un cinquième : « AutoFocus » ressemblait à un endroit où aller, pas à un interrupteur. Une ligne qui commence par un verbe ne peut être qu'une action, et le verbe dit dans quel sens elle ira. Règle pour la suite : dans ce menu, tout ce qui bascule porte un verbe.
+
+**Les quatre écrans, et pas « Ouvrir ».** Ouvrir la fenêtre n'est jamais ce qu'on veut, aller sur un de ses écrans l'est. Le menu les offre donc directement, et le rail se retrouve à un clic au lieu de trois. Ça passe par un second événement, `multifus://navigate`, séparé du snapshot : l'écran affiché n'est pas un état que multifus garde mais une demande faite une fois, et le mettre dans le snapshot ramènerait la fenêtre sur cet écran à chaque tour du balayage.
+
+**Ce que le menu porte, et ce qu'il ne porte pas.** Autorisation manquante puis « Ouvrir Réglages Système » en tête quand le système refuse, parce que le sens de cette icône est justement de ne pas avoir à ouvrir la fenêtre pour apprendre que multifus est sourd. Puis les personnages, puis l'AutoFocus. Le démarrage avec la session n'y est pas : il se règle une fois pour toutes et n'a rien à faire dans un menu qu'on ouvre en jouant. Pas d'équivalent clavier affiché : dans un menu de barre système, un accélérateur ne se déclenche que si l'application est active, et multifus ne l'est jamais. En afficher promettrait des touches mortes.
+
+**Une seule porte de sortie, `runtime::emit_snapshot`.** Une commande qui construisait sa réponse elle-même répondait à l'interface sans prévenir la barre système, et le menu ignorait alors tout ce qui venait de la fenêtre : une veille basculée, un roster réordonné, un personnage retiré. Toutes les commandes passent donc par cette fonction, qui rend le snapshot en plus de l'envoyer. Pour que ce soit tenable sans réfléchir, `tray::refresh` est **idempotent** : il compare les lignes à celles qui sont affichées et ne reconstruit rien quand elles n'ont pas bougé, ce qui rend gratuit l'appel sur un changement de raccourci ou d'AutoFocus.
+
+Fermer la fenêtre ne quitte plus, on quitte par le menu. Ce n'est **pas** un réglage de `tauri.conf.json`, aucune clé du schéma v2 ne fait ça : c'est `WindowEvent::CloseRequested` avec `prevent_close` puis `hide`, et rien d'autre. La fermeture n'est interceptée que si l'icône est bien là, sinon une fenêtre fermée laisserait un processus sans retour possible.
+
+Et surtout, **rien n'intercepte la sortie**. `RunEvent::ExitRequested` avec `prevent_exit` est le motif que tout le monde recopie, il n'a pas sa place ici : la fenêtre n'étant jamais détruite mais seulement masquée, la sortie « dernière fenêtre fermée » ne se produit pas, et la prévenir quand même retirerait `Cmd+Q` à un utilisateur macOS pour rien.
+
+**Repoussé, décidé sur mesure.** `NSApplicationActivationPolicy.Accessory`, qui sortirait multifus du dock. La question ouverte est de savoir si une application accessoire garde le droit d'activer un autre processus, dont dépendent l'AutoFocus et les deux raccourcis de défilement. On ne sait pas non plus laquelle des deux portes de `AccessibilityWindowManager::focus` travaille aujourd'hui, `activateWithOptions` ou le repli `AXFrontmost`, le journal écrivant `Focused` dans les deux cas. Poser la porte au journal d'abord, mesurer, puis décider.
+
+**Le logo.** `src-tauri/icons` porte encore celui du scaffolder Tauri, et `icons/tray.png` est un glyphe provisoire. `npm run tauri icon <fichier>` régénère les onze fichiers depuis un PNG carré à transparence, et ne touche pas à `tray.png`, qui obéit à d'autres règles : voir plus bas.
 
 **Vérification.** Une journée de jeu sans jamais ouvrir la fenêtre.
 
@@ -76,7 +93,11 @@ Ce qui attend déjà de ce côté : `platform::windows` compile en renvoyant `No
 
 **`Control+flèche` appartient à macOS**, Mission Control et le passage entre bureaux. Les combinaisons proposées au premier lancement sont donc `Control+Shift+flèche`. Et `Pause`, `ScrollLock` et `F21` à `F24` passent le parseur du plugin mais n'ont pas de code de touche sur macOS : elles échouent à la pose, ce que l'écran affiche.
 
-**Ne jamais tenir le verrou de `Multifus` en touchant au watcher de notifications ou au plugin de raccourcis.** Le premier joint le thread qui exécute le sink, le second attend le fil principal où les commandes prennent ce verrou. C'est le seul interblocage que cette application sache construire, et la règle est écrite en tête de `app::state`.
+**Ne jamais tenir le verrou de `Multifus` en touchant au watcher de notifications, au plugin de raccourcis ou à l'icône de barre système.** Le premier joint le thread qui exécute le sink, les deux autres attendent le fil principal où les commandes prennent ce verrou. Pour l'icône ce n'est pas une supposition : `TrayIcon::set_menu` passe par `run_item_main_thread!`, qui poste la tâche puis bloque sur `rx.recv()` sans délai (`tauri/src/menu/mod.rs`). C'est le seul interblocage que cette application sache construire, et la règle est écrite en tête de `app::state` et de `app::tray`.
+
+**Le démarrage automatique enregistre un chemin, et personne ne s'en aperçoit.** `tauri-plugin-autostart` écrit `~/Library/LaunchAgents/<nom>.plist` avec le chemin absolu du binaire ; l'application déplacée, `launchd` échoue en silence. Et `is_enabled()` ne fait que vérifier l'existence du fichier, sans jamais comparer le chemin qu'il contient, donc il répondrait « oui » sur un enregistrement mort. D'où la règle : la configuration porte l'intention, `app::autostart::reconcile` réécrit l'enregistrement à chaque lancement, et une application déplacée se répare à sa première ouverture manuelle. Même raison pour macOS 13 et plus, où l'utilisateur peut couper l'entrée depuis Réglages Système sans que le plist bouge.
+
+**L'image de barre système n'est pas le logo.** `tray-icon` fixe la hauteur de la `NSImage` à 18 points et déduit la largeur du rapport. Donc `icons/tray.png` est un PNG **RVBA 36 × 36**, noir pur, forme portée par le seul canal alpha, fond transparent, posé avec `icon_as_template(true)` pour que macOS le recolore selon la barre. Un logo en couleur mis là ressort gris et illisible. `tauri::include_image!` décode à la compilation et **refuse un PNG qui n'est pas en RVBA**.
 
 **L'AutoFocus macOS dépend de l'affichage des bannières, et la livraison sans affichage a été essayée.** Décocher « Bureau » en gardant « Centre de notifications » ne donne rien du tout : macOS ne construit aucun élément tant que le panneau reste fermé, donc l'observateur n'a rien à lire. Mesuré sur un combat, un défi et un échange, journal vide et aucune fenêtre ramenée. Ne pas rouvrir cette piste, elle est dans ADR 0002. Le réglage le moins gênant qui marche est bannière sur le Bureau, style temporaire, son coupé, aperçus par défaut. Sur Windows c'est l'inverse, l'écoute passe par une API et les bannières peuvent rester coupées.
 

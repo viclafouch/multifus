@@ -11,16 +11,21 @@
 //! a notification is, whether a character is in the cycle at all, that is
 //! `domain`'s and it stays there.
 //!
-//! The interface language lives on the React side. This module therefore never
-//! writes a sentence for the user: the journal carries structured events, see
+//! The interface language lives on the React side. Nothing here writes a
+//! sentence for the user: the journal carries structured events, see
 //! [`journal::JournalEvent`], and the French is written once, in the strings file
 //! of the interface.
+//!
+//! [`tray`] is the one exception, and it says so at its top. A menu of the system
+//! is a surface React cannot draw at all, so its words are built here or nowhere.
 
+pub mod autostart;
 pub mod commands;
 pub mod journal;
 pub mod runtime;
 pub mod shortcuts;
 pub mod state;
+pub mod tray;
 pub mod view;
 
 use std::sync::Mutex;
@@ -58,6 +63,14 @@ pub fn setup(app: &AppHandle) -> Result<(), ConfigError> {
     // fired in the same breath as the registration has somewhere to go.
     shortcuts::start(app);
     shortcuts::apply(app);
+
+    // The icon goes up before the scan does, so that the first roster it reports
+    // finds a menu to fill instead of building one a moment later.
+    tray::setup(app);
+
+    // What the file asks for is pushed onto the system at every launch, which is
+    // also what repairs a registration left pointing at a moved application.
+    autostart::reconcile(app);
 
     runtime::start(app.clone());
 

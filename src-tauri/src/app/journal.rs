@@ -93,6 +93,21 @@ pub enum JournalEvent {
         outcome: ShortcutOutcome,
     },
 
+    /// A character was clicked in the system tray, and this is what came of it.
+    TrayFocus {
+        nickname: String,
+        outcome: TrayOutcome,
+    },
+
+    /// The system tray icon could not be put up, or could not be kept in step with
+    /// the roster. multifus works without it; what goes missing is the way to
+    /// quit and the roster at a glance.
+    TrayFailed { detail: String },
+
+    /// The start with the session could not be made to match what the user
+    /// asked for. The switch on screen is then ahead of the system.
+    StartAtLoginFailed { detail: String },
+
     /// Enumerating the game windows failed for a reason of the system's own.
     ScanFailed { detail: String },
 
@@ -124,6 +139,24 @@ pub enum Outcome {
 
     /// The nickname belongs to nobody in the roster, or to a character whose
     /// window multifus cannot see. A notification can outlive its window.
+    NoWindow,
+
+    /// The focus was asked for and the system refused it.
+    FocusFailed { detail: String },
+}
+
+/// What became of a character clicked in the system tray.
+///
+/// Three outcomes and not the five of a notification: a click carries no kind to
+/// recognise and no switch to be turned off by, so the only questions left are
+/// whether the window is still there and whether the system agreed.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(tag = "outcome", rename_all = "camelCase")]
+pub enum TrayOutcome {
+    /// The window was asked to come to the front.
+    Focused,
+
+    /// The menu was built before this character's client closed.
     NoWindow,
 
     /// The focus was asked for and the system refused it.

@@ -1,10 +1,10 @@
 import React from 'react'
 import { ConfigNotice } from '@/components/config-notice'
 import { JournalPanel } from '@/components/journal-panel'
-import type { ScreenName } from '@/components/nav-rail'
 import { NavRail } from '@/components/nav-rail'
 import { useMultifus } from '@/hooks/use-multifus'
-import type { ConfigProblem, Snapshot } from '@/lib/multifus'
+import { useTrayNavigation } from '@/hooks/use-tray-navigation'
+import type { ConfigProblem, ScreenName, Snapshot } from '@/lib/multifus'
 import { dismissConfigProblem, revealQuarantinedConfig } from '@/lib/multifus'
 import { AboutScreen } from '@/screens/about-screen'
 import { AuthorizationScreen } from '@/screens/authorization-screen'
@@ -22,6 +22,8 @@ import { ShortcutsScreen } from '@/screens/shortcuts-screen'
 export const App = () => {
   const { snapshot, run } = useMultifus()
   const [screen, setScreen] = React.useState<ScreenName>('characters')
+
+  useTrayNavigation(setScreen)
 
   if (snapshot === null) {
     return <Backdrop />
@@ -75,7 +77,13 @@ const CurrentScreen = ({ screen, snapshot, run }: CurrentScreenProps) => {
   }
 
   if (screen === 'autoFocus') {
-    return <AutoFocusScreen switches={snapshot.autoFocus} run={run} />
+    return (
+      <AutoFocusScreen
+        switches={snapshot.autoFocus}
+        isEnabled={snapshot.autoFocusEnabled}
+        run={run}
+      />
+    )
   }
 
   if (screen === 'about') {
@@ -83,6 +91,7 @@ const CurrentScreen = ({ screen, snapshot, run }: CurrentScreenProps) => {
       <AboutScreen
         version={snapshot.version}
         config={snapshot.config}
+        startAtLogin={snapshot.startAtLogin}
         run={run}
       />
     )

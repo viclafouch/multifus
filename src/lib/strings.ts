@@ -2,9 +2,13 @@
  * Every word multifus shows, in one file.
  *
  * The interface is in French, the code and the comments are in English, and this
- * is where the two meet. Nothing else in `src` holds a sentence for the user, and
- * nothing on the Rust side holds one at all: the journal crosses the bridge as
- * structured events and is put into words here, by {@link journalLine}.
+ * is where the two meet. Nothing else in `src` holds a sentence for the user: the
+ * journal crosses the bridge as structured events and is put into words here, by
+ * {@link journalLine}.
+ *
+ * This is the file of the *window*. The system tray has words of its own, in
+ * `app::tray` on the Rust side, because an `NSMenu` is not something React can
+ * draw. That module is the only other place a French sentence lives.
  *
  * No nickname, no supposed number of accounts, no path to anybody's machine
  * appears here. multifus is a personal project written as though it were public,
@@ -19,7 +23,8 @@ import type {
   NotificationKind,
   NotificationOutcome,
   ShortcutAction,
-  ShortcutOutcome
+  ShortcutOutcome,
+  TrayOutcome
 } from '@/lib/multifus'
 
 export const strings = {
@@ -165,6 +170,11 @@ export const strings = {
     title: 'AutoFocus',
     subtitle:
       'Une notification de jeu ramène la fenêtre du personnage concerné au premier plan. Ces réglages sont globaux : ils valent pour tout le roster.',
+    masterLabel: 'AutoFocus',
+    masterDescription:
+      'Coupe tout d’un coup, sans oublier les types réglés ci-dessous. Le même interrupteur vit dans le menu de la barre système.',
+    suspended:
+      'L’AutoFocus est coupé : aucune notification ne ramène de fenêtre. Les réglages ci-dessous restent modifiables et reprendront tels quels.',
     stillApplies:
       'L’AutoFocus s’applique aussi aux personnages en veille, pour qu’un échange proposé à une mule la fasse remonter.',
     bannerWarning: IS_APPLE
@@ -207,6 +217,14 @@ export const strings = {
     title: 'À propos',
     version: 'Version',
     configPath: 'Configuration',
+    startupLabel: 'Démarrer avec la session',
+    startupDescription:
+      'multifus s’ouvre en même temps que votre session, pour n’avoir à y penser qu’une fois.',
+    // The one behaviour of step 8 the user has to be told about, since nothing
+    // on screen would otherwise explain where the application went.
+    startupNote: IS_APPLE
+      ? 'Fermer la fenêtre ne quitte plus multifus : il continue dans la barre système, en haut à droite de l’écran, et c’est de là qu’on le quitte.'
+      : 'Fermer la fenêtre ne quitte plus multifus : il continue dans la barre système, à côté de l’horloge, et c’est de là qu’on le quitte.',
     legalTitle: 'Mentions légales',
     legalBody:
       'multifus est un projet personnel indépendant, sans aucun lien avec Ankama. Dofus et Dofus Retro sont des marques déposées d’Ankama.',
@@ -337,7 +355,7 @@ export type JournalTone = 'good' | 'neutral' | 'warning'
 /** The events whose tone is decided by their kind alone. */
 type PlainEventKind = Exclude<
   JournalEvent['kind'],
-  'authorization' | 'notification' | 'shortcut'
+  'authorization' | 'notification' | 'shortcut' | 'trayFocus'
 >
 
 const TONES = {
@@ -351,6 +369,8 @@ const TONES = {
   openFailed: 'warning',
   shortcutRefused: 'warning',
   shortcutsFailed: 'warning',
+  trayFailed: 'warning',
+  startAtLoginFailed: 'warning',
   reset: 'neutral'
 } as const satisfies Record<PlainEventKind, JournalTone>
 
@@ -377,9 +397,16 @@ const SHORTCUT_TONES = {
   foregroundUnknown: 'warning'
 } as const satisfies Record<ShortcutOutcome['outcome'], JournalTone>
 
+/** The tone of each outcome a click in the system tray can have. */
+const TRAY_TONES = {
+  focused: 'good',
+  noWindow: 'neutral',
+  focusFailed: 'warning'
+} as const satisfies Record<TrayOutcome['outcome'], JournalTone>
+
 /**
  * A table rather than a switch, so a new event on the Rust side fails to compile
- * here instead of quietly taking the neutral colour. Only the three events whose
+ * here instead of quietly taking the neutral colour. Only the four events whose
  * tone depends on their payload are read by hand, and two of them read a table
  * of their own.
  */
@@ -394,6 +421,10 @@ export const journalTone = (event: JournalEvent): JournalTone => {
 
   if (event.kind === 'shortcut') {
     return SHORTCUT_TONES[event.outcome.outcome]
+  }
+
+  if (event.kind === 'trayFocus') {
+    return TRAY_TONES[event.outcome.outcome]
   }
 
   return TONES[event.kind]
@@ -435,6 +466,15 @@ export const journalLine = (event: JournalEvent) => {
     }
     case 'shortcutsFailed': {
       return `Les raccourcis ne sont pas fiables : ${event.detail}`
+    }
+    case 'trayFocus': {
+      return trayLine(event)
+    }
+    case 'trayFailed': {
+      return `La barre système n’est pas fiable : ${event.detail}`
+    }
+    case 'startAtLoginFailed': {
+      return `Démarrage avec la session impossible : ${event.detail}`
     }
     case 'scanFailed': {
       return `Lecture des fenêtres impossible : ${event.detail}`
@@ -521,6 +561,34 @@ const shortcutLine = ({ action, outcome }: ShortcutLineParams) => {
     }
     default: {
       return label
+    }
+  }
+}
+
+type TrayLineParams = {
+  readonly nickname: string
+  readonly outcome: TrayOutcome
+}
+
+/**
+ * A character clicked in the system tray, put into words.
+ *
+ * Named after where the click came from, so that the journal tells a menu click
+ * apart from the shortcut that asks the system for exactly the same thing.
+ */
+const trayLine = ({ nickname, outcome }: TrayLineParams) => {
+  switch (outcome.outcome) {
+    case 'focused': {
+      return `Barre système : ${nickname} au premier plan.`
+    }
+    case 'noWindow': {
+      return `Barre système : la fenêtre de ${nickname} a disparu.`
+    }
+    case 'focusFailed': {
+      return `Barre système : le système a refusé de ramener ${nickname} au premier plan (${outcome.detail}).`
+    }
+    default: {
+      return nickname
     }
   }
 }

@@ -138,13 +138,9 @@ impl Multifus {
                 .roster
                 .characters()
                 .iter()
-                .map(|character| CharacterView {
-                    nickname: character.nickname.clone(),
-                    gender: character.gender,
-                    asleep: character.asleep,
-                    online: character.online,
-                })
+                .map(view_of)
                 .collect(),
+            start_at_login: self.settings.start_at_login,
             shortcuts: ShortcutAction::ALL
                 .into_iter()
                 .map(|action| ShortcutView {
@@ -157,13 +153,16 @@ impl Multifus {
                         .unwrap_or(ShortcutStatus::Pending),
                 })
                 .collect(),
+            // Each row draws its own switch and not the outcome of the two, so
+            // that a suspended AutoFocus still shows what it will come back to.
             auto_focus: NotificationKind::ALL
                 .into_iter()
                 .map(|kind| AutoFocusView {
                     kind,
-                    enabled: self.settings.auto_focus.is_enabled(kind),
+                    enabled: self.settings.auto_focus.is_kind_enabled(kind),
                 })
                 .collect(),
+            auto_focus_enabled: self.settings.auto_focus.enabled,
             authorization: AuthorizationView {
                 granted: self.is_granted(),
                 listening: self.listening,
@@ -174,6 +173,21 @@ impl Multifus {
             },
             journal: self.journal.entries(),
         }
+    }
+
+    /// The connected characters, in cycle order.
+    ///
+    /// What the system tray lists. It is the roster minus everyone whose client is
+    /// closed, which is the whole of what that menu can act on.
+    #[must_use]
+    pub fn connected(&self) -> Vec<CharacterView> {
+        self.settings
+            .roster
+            .characters()
+            .iter()
+            .filter(|character| character.online)
+            .map(view_of)
+            .collect()
     }
 
     // -- The journal ------------------------------------------------------
@@ -316,10 +330,51 @@ impl Multifus {
         self.save();
     }
 
+    /// Whether the user asked multifus to start with the session.
+    ///
+    /// The file is what says so, never the system: the registration on disk can
+    /// be taken away from under multifus, and only this can be read as an
+    /// intent. See [`crate::app::autostart`].
+    #[must_use]
+    pub fn starts_at_login(&self) -> bool {
+        self.settings.start_at_login
+    }
+
+    /// Records that intent. Making the system match it is the caller's next move.
+    pub fn set_start_at_login(&mut self, start_at_login: bool) {
+        self.settings.start_at_login = start_at_login;
+        self.save();
+    }
+
     /// Flips one of the seven switches. Global, never per character.
     pub fn set_auto_focus(&mut self, kind: NotificationKind, enabled: bool) {
         self.settings.auto_focus.set(kind, enabled);
         self.save();
+    }
+
+    /// Suspends the AutoFocus as a whole, or brings it back.
+    ///
+    /// The seven are left exactly where they were: this is the switch the system
+    /// tray offers, and it has to be undoable without the user having to
+    /// remember which kinds they had turned off.
+    pub fn set_auto_focus_enabled(&mut self, enabled: bool) {
+        self.settings.auto_focus.enabled = enabled;
+        self.save();
+    }
+
+    /// Whether the AutoFocus is running at all.
+    #[must_use]
+    pub fn is_auto_focus_enabled(&self) -> bool {
+        self.settings.auto_focus.enabled
+    }
+
+    /// Suspends the AutoFocus if it was running, brings it back if it was not.
+    ///
+    /// What the system tray asks for, since a tick carries no state of its own:
+    /// reading and writing in one hold, rather than two, leaves no moment where
+    /// a command could slip between the question and the answer.
+    pub fn toggle_auto_focus(&mut self) {
+        self.set_auto_focus_enabled(!self.settings.auto_focus.enabled);
     }
 
     /// Everything back to what someone who has never opened multifus gets,
@@ -393,6 +448,15 @@ impl Multifus {
         }
 
         changed
+    }
+
+    /// Where a character's window is, if multifus can still see one.
+    ///
+    /// What the system tray aims at, the same way [`Multifus::aim_at`] does for the
+    /// cycle: reading happens under this lock, focusing does not.
+    #[must_use]
+    pub fn window_of(&self, nickname: &str) -> Option<WindowId> {
+        self.windows.get(nickname).copied()
     }
 
     /// What the scan reports when the system will not let multifus look.
@@ -556,6 +620,16 @@ impl Multifus {
 /// The nickname of the character the cycle chose, if it chose one.
 fn nickname_of(character: Option<&Character>) -> Option<String> {
     character.map(|character| character.nickname.clone())
+}
+
+/// One character, as the screens and the system tray both read it.
+fn view_of(character: &Character) -> CharacterView {
+    CharacterView {
+        nickname: character.nickname.clone(),
+        gender: character.gender,
+        asleep: character.asleep,
+        online: character.online,
+    }
 }
 
 /// What [`Multifus::decide`] concluded about a game notification.

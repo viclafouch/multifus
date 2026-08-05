@@ -31,15 +31,17 @@ export const Screen = ({ title, subtitle, children }: ScreenProps) => {
   )
 }
 
-type PanelProps = Readonly<{
-  className?: string
-  children: React.ReactNode
-}>
+/**
+ * Derived rather than written out, so that a caller can hang a `data-*` on the
+ * surface and style it with a modifier instead of a class built at runtime.
+ */
+type PanelProps = Readonly<React.ComponentProps<'div'>>
 
 /** A bordered surface. The only container this interface has. */
-export const Panel = ({ className, children }: PanelProps) => {
+export const Panel = ({ className, children, ...rest }: PanelProps) => {
   return (
     <div
+      {...rest}
       className={cn('rounded-xl border border-border bg-card/45', className)}
     >
       {children}

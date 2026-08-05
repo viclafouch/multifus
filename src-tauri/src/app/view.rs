@@ -32,11 +32,42 @@ pub struct Snapshot {
     pub characters: Vec<CharacterView>,
     /// The four combinations, in the order of the table of perimetre.md.
     pub shortcuts: Vec<ShortcutView>,
-    /// The seven switches, in the order of the notification table.
+    /// The seven switches, in the order of the notification table. Each one
+    /// carries its own state, never the outcome of the master and itself.
     pub auto_focus: Vec<AutoFocusView>,
+    /// The AutoFocus is running at all. Off, the seven above still say what
+    /// they will come back to.
+    pub auto_focus_enabled: bool,
+    /// multifus is asked to start with the session. What the user wants, not
+    /// what the system currently holds, see [`crate::app::autostart`].
+    pub start_at_login: bool,
     pub authorization: AuthorizationView,
     pub config: ConfigView,
     pub journal: Vec<JournalEntry>,
+}
+
+/// One of the four screens the window can show.
+///
+/// It crosses the bridge for one reason: the system tray offers to open any of
+/// them, and which screen is on show is React's state. Nothing on this side
+/// reads it back.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub enum Screen {
+    Characters,
+    Shortcuts,
+    AutoFocus,
+    About,
+}
+
+impl Screen {
+    /// The four of them, in the order of the rail.
+    pub const ALL: [Self; 4] = [
+        Self::Characters,
+        Self::Shortcuts,
+        Self::AutoFocus,
+        Self::About,
+    ];
 }
 
 /// One line of the roster.

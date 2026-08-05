@@ -24,6 +24,9 @@ export type NotificationKind =
   | 'private_message'
   | 'trade'
 
+/** One of the four screens the window can show. */
+export type ScreenName = 'about' | 'autoFocus' | 'characters' | 'shortcuts'
+
 /** The four actions of perimetre.md a combination can be bound to. */
 export type ShortcutAction = 'next' | 'previous' | 'swap' | 'toggleAsleep'
 
@@ -95,6 +98,12 @@ export type NotificationOutcome =
   | { readonly outcome: 'kindUnknown' }
   | { readonly outcome: 'noWindow' }
 
+/** What became of a character clicked in the system tray. */
+export type TrayOutcome =
+  | { readonly outcome: 'focusFailed'; readonly detail: string }
+  | { readonly outcome: 'focused' }
+  | { readonly outcome: 'noWindow' }
+
 /** What became of a shortcut that fired. */
 export type ShortcutOutcome =
   | {
@@ -125,7 +134,14 @@ export type JournalEvent =
   | { readonly kind: 'saveFailed'; readonly detail: string }
   | { readonly kind: 'scanFailed'; readonly detail: string }
   | { readonly kind: 'shortcutsFailed'; readonly detail: string }
+  | { readonly kind: 'startAtLoginFailed'; readonly detail: string }
   | { readonly kind: 'started' }
+  | { readonly kind: 'trayFailed'; readonly detail: string }
+  | {
+      readonly kind: 'trayFocus'
+      readonly nickname: string
+      readonly outcome: TrayOutcome
+    }
   | {
       readonly kind: 'shortcut'
       readonly action: ShortcutAction
@@ -159,6 +175,11 @@ export type Snapshot = {
   readonly characters: readonly Character[]
   readonly shortcuts: readonly ShortcutBinding[]
   readonly autoFocus: readonly AutoFocusSwitch[]
+  /** The AutoFocus is running at all. Off, the seven above still say what they
+   * will come back to. */
+  readonly autoFocusEnabled: boolean
+  /** What the user asked for, not what the system currently holds. */
+  readonly startAtLogin: boolean
   readonly authorization: Authorization
   readonly config: ConfigStatus
   readonly journal: readonly JournalEntry[]
@@ -182,6 +203,24 @@ export const onSnapshot = async (handle: (snapshot: Snapshot) => void) => {
 }
 
 type SnapshotEvent = { readonly payload: Snapshot }
+
+/** The event the system tray sends when it wants a screen brought up. */
+const NAVIGATE_EVENT = 'multifus://navigate'
+
+/**
+ * Subscribes to the screen the system tray asks for.
+ *
+ * Separate from the snapshot because it is a request and not a state: a screen
+ * carried in every snapshot would drag the window back each time the scan found
+ * a new client.
+ */
+export const onNavigate = async (handle: (screen: ScreenName) => void) => {
+  return listen<ScreenName>(NAVIGATE_EVENT, ({ payload }: NavigateEvent) => {
+    handle(payload)
+  })
+}
+
+type NavigateEvent = { readonly payload: ScreenName }
 
 export const snapshot = async () => {
   return invoke<Snapshot>('snapshot')
@@ -236,6 +275,22 @@ export const setAutoFocus = async (
   enabled: boolean
 ) => {
   return invoke<Snapshot>('set_auto_focus', { kind, enabled })
+}
+
+/** Suspends the AutoFocus as a whole, or brings it back. */
+export const setAutoFocusEnabled = async (enabled: boolean) => {
+  return invoke<Snapshot>('set_auto_focus_enabled', { enabled })
+}
+
+/**
+ * Asks multifus to start with the session, or to stop doing so.
+ *
+ * The Rust side writes the intent and then makes the system follow it, so what
+ * comes back is what the user asked for even if the registration failed. The
+ * journal is where a refusal is read.
+ */
+export const setStartAtLogin = async (startAtLogin: boolean) => {
+  return invoke<Snapshot>('set_start_at_login', { startAtLogin })
 }
 
 /** Everything back to the defaults, roster included. */

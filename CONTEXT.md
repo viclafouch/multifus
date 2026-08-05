@@ -52,6 +52,16 @@ _Avoid_: Rotation, navigation, ordre d'initiative
 L'action d'endormir tous les personnages d'un sexe et de réveiller tous ceux de l'autre.
 _Avoid_: Inversion, permutation, changement d'équipe
 
+### Barre système
+
+**Barre système** (`tray`):
+L'endroit où multifus vit une fois sa fenêtre fermée : la barre des menus sur macOS, la zone de notification sur Windows. Son icône porte un menu qui liste les personnages connectés et permet de quitter. C'est le mot employé partout, y compris quand le texte doit dire à l'utilisateur où regarder.
+_Avoid_: Barre des tâches, barre d'état, zone de notification, menu bar, systray
+
+**Démarrage avec la session** (`start_at_login`):
+Le réglage qui lance multifus à l'ouverture de session. Décoché par défaut. Ce que l'utilisateur a demandé, jamais ce que le système porte à un instant donné.
+_Avoid_: Démarrage automatique, lancement au démarrage, autostart
+
 ### Notifications
 
 **Notification de jeu** (`GameNotification`):

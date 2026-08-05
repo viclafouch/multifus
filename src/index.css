@@ -232,6 +232,14 @@
   transition-duration: 0.2s;
 }
 
+/* The seven AutoFocus rows fade when the master is off. Only the opacity moves:
+   they stay live, since they are what the AutoFocus comes back to. */
+@utility transition-suspend {
+  transition-property: opacity;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 0.2s;
+}
+
 /* The lamp of a connected, awake character. It breathes, slowly, because a board
    whose lights are all dead still is a board one stops looking at. */
 @keyframes lamp-breath {

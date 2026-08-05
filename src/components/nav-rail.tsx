@@ -2,11 +2,10 @@ import type { LucideIcon } from 'lucide-react'
 import { Info, Keyboard, Users, Zap } from 'lucide-react'
 import { Lamp } from '@/components/lamp'
 import { Button } from '@/components/ui/button'
-import type { Authorization, Character } from '@/lib/multifus'
+import type { Authorization, Character, ScreenName } from '@/lib/multifus'
 import { strings } from '@/lib/strings'
 
 /** Which of the four screens is on. */
-export type ScreenName = 'about' | 'autoFocus' | 'characters' | 'shortcuts'
 
 type NavItem = {
   readonly name: ScreenName

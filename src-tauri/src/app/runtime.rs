@@ -11,10 +11,10 @@
 //! right, and of the shortcuts having a fresh window to aim at whether or not
 //! the interface is open.
 //!
-//! The AutoFocus path below is written, and on macOS it has never run against a
-//! real client, see step 4 of the plan. Nothing here assumes it works: what it
-//! does is journal every step it goes through, so that the day it does not fire,
-//! the interface can say where it stopped.
+//! The AutoFocus path below has been run against two real Retro clients and it
+//! works, see the plan. Nothing here assumes it keeps working: what it does is
+//! journal every step it goes through, so that the day it does not fire, the
+//! interface can say where it stopped.
 
 use std::sync::MutexGuard;
 use std::sync::PoisonError;
@@ -24,12 +24,16 @@ use std::time::Duration;
 use tauri::AppHandle;
 use tauri::Emitter;
 use tauri::Manager;
+use tauri_plugin_opener::OpenerExt;
 
 use crate::app::journal::JournalEvent;
 use crate::app::journal::Outcome;
 use crate::app::state::lock;
 use crate::app::state::Decision;
 use crate::app::state::WatcherState;
+use crate::app::tray;
+use crate::app::view::Screen;
+use crate::app::view::Snapshot;
 use crate::domain::GameNotification;
 use crate::platform::Authorization;
 use crate::platform::NotificationSink;
@@ -46,9 +50,25 @@ use crate::platform::WindowManager;
 /// window.
 const SCAN_INTERVAL: Duration = Duration::from_secs(3);
 
+/// The macOS settings pane that grants Accessibility.
+#[cfg(target_os = "macos")]
+const AUTHORIZATION_SETTINGS_URL: &str =
+    "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility";
+
+/// The Windows pane for notification access, for step 9.
+#[cfg(target_os = "windows")]
+const AUTHORIZATION_SETTINGS_URL: &str = "ms-settings:privacy-notifications";
+
 /// The event the interface listens to. One event, one payload, the whole
 /// dashboard, see [`crate::app::view::Snapshot`].
 pub const SNAPSHOT_EVENT: &str = "multifus://snapshot";
+
+/// The event that asks the window to show one screen rather than another.
+///
+/// Separate from the snapshot on purpose: which screen is on show is not state
+/// multifus keeps, it is a request made once. Putting it in the snapshot would
+/// make every emission re-assert a screen the user may have left since.
+pub const NAVIGATE_EVENT: &str = "multifus://navigate";
 
 /// Starts the scan, on its own thread, for the life of the process.
 pub fn start(app: AppHandle) {
@@ -218,17 +238,62 @@ pub fn request_authorization(app: &AppHandle) {
     follow_authorization(app);
 }
 
+/// Asks the window to show one screen, without saying anything about the rest.
+pub fn navigate(app: &AppHandle, screen: Screen) {
+    drop(app.emit(NAVIGATE_EVENT, screen));
+}
+
+/// Sends the user to the settings pane that grants the authorization.
+///
+/// The system dialog only offers to open it, and only the first time it is
+/// asked. Reaching the right pane in one click is the difference between an
+/// explanation and a dead end, which is why both the window and the system tray
+/// offer it.
+pub fn open_authorization_settings(app: &AppHandle) {
+    let opened = app
+        .opener()
+        .open_url(AUTHORIZATION_SETTINGS_URL, None::<&str>);
+
+    if let Err(error) = opened {
+        lock(app).log(JournalEvent::OpenFailed {
+            detail: error.to_string(),
+        });
+
+        // Nothing comes back from here, so the journal line has to be sent
+        // rather than wait for a passing snapshot.
+        emit_snapshot(app);
+    }
+}
+
 /// Looks at the windows now rather than at the next turn of the scan.
 pub fn refresh(app: &AppHandle) {
     refresh_windows(app);
     follow_authorization(app);
 }
 
-/// Sends the whole dashboard to the interface.
-pub fn emit_snapshot(app: &AppHandle) {
+/// Sends the whole dashboard to the interface and to the system tray, and hands it
+/// back for whoever asked.
+///
+/// **Every path that changes anything ends here**, the commands included, which
+/// is why it returns the snapshot rather than only sending it: a command that
+/// built its own answer instead would leave the system tray behind, and that is
+/// exactly the bug this shape prevents. The two surfaces draw the same roster
+/// and they are refreshed together or not at all.
+///
+/// Calling it on a change the menu does not show costs one comparison, since
+/// [`tray::refresh`] does nothing when the lines have not moved.
+///
+/// The lock is taken and given back before [`tray::refresh`] runs, and that is
+/// not incidental: the menu setters block on the main thread, which is where
+/// every command takes this lock. See the note on [`crate::app::tray`].
+pub fn emit_snapshot(app: &AppHandle) -> Snapshot {
     let snapshot = lock(app).snapshot();
 
-    drop(app.emit(SNAPSHOT_EVENT, snapshot));
+    drop(app.emit(SNAPSHOT_EVENT, snapshot.clone()));
+
+    tray::refresh(app);
+
+    snapshot
 }
 
 /// The watcher, taken even if a previous holder panicked. See the note on

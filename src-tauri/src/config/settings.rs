@@ -3,7 +3,8 @@
 //!
 //! Every type here is plain data with a `Default`. Nothing reads a file, nothing
 //! registers a shortcut, nothing starts at login: this module describes the
-//! shape, [`crate::app::shortcuts`] and step 8 give it an effect.
+//! shape, [`crate::app::shortcuts`] and [`crate::app::autostart`] give it an
+//! effect.
 
 use std::fmt;
 
@@ -36,7 +37,12 @@ pub struct Settings {
     /// The seven AutoFocus switches.
     pub auto_focus: AutoFocus,
     /// Whether multifus starts with the session. Unchecked by default,
-    /// perimetre.md is explicit about it. Step 8 wires it to the plugin.
+    /// perimetre.md is explicit about it.
+    ///
+    /// This is the intent and the system is only ever its consequence: the
+    /// registration on disk records a path and can be taken away from under
+    /// multifus, so [`crate::app::autostart`] makes the system match this at
+    /// every launch rather than the other way round.
     pub start_at_login: bool,
 }
 
@@ -133,18 +139,26 @@ impl fmt::Display for Shortcut {
     }
 }
 
-/// The seven AutoFocus switches, one per [`NotificationKind`].
+/// The seven AutoFocus switches, one per [`NotificationKind`], and the one that
+/// suspends them all.
 ///
 /// Global and never per character. Dracoon offers the grid of seven icons on
 /// every line, which is forty-two buttons for six characters and the global to
 /// local synchronisation that comes with it; perimetre.md drops it. There is
 /// therefore no room here for a per-character override, and that is the point.
 ///
-/// All seven are on by default: AutoFocus is what multifus is for, and it has to
+/// All eight are on by default: AutoFocus is what multifus is for, and it has to
 /// work on a first launch without a visit to the settings.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct AutoFocus {
+    /// The master switch, the one the system tray offers.
+    ///
+    /// A field of its own rather than the seven turned off together, because
+    /// turning them off would forget which ones the user had chosen and turning
+    /// them back on would hand back all seven. Suspending is not the same as
+    /// clearing, and the file has to remember the difference.
+    pub enabled: bool,
     /// It is this character's turn to play.
     pub combat: bool,
     /// Somebody offers a trade.
@@ -168,10 +182,11 @@ impl Default for AutoFocus {
 }
 
 impl AutoFocus {
-    /// The same state for the seven of them.
+    /// The same state for the master and the seven of them.
     #[must_use]
     pub const fn all(enabled: bool) -> Self {
         Self {
+            enabled,
             combat: enabled,
             trade: enabled,
             group: enabled,
@@ -183,8 +198,22 @@ impl AutoFocus {
     }
 
     /// Whether a notification of this kind brings its character to the front.
+    ///
+    /// Both switches have to be on. The master is what the system tray offers,
+    /// so that a whole evening of AutoFocus can be called off in one click and
+    /// turned back on without having to remember which of the seven were which.
     #[must_use]
     pub fn is_enabled(&self, kind: NotificationKind) -> bool {
+        self.enabled && self.is_kind_enabled(kind)
+    }
+
+    /// Whether this kind is switched on, ignoring the master.
+    ///
+    /// What the screen draws on its row. It is deliberately not the same
+    /// question as [`AutoFocus::is_enabled`]: a suspended AutoFocus still has to
+    /// show which kinds it will come back to.
+    #[must_use]
+    pub fn is_kind_enabled(&self, kind: NotificationKind) -> bool {
         match kind {
             NotificationKind::Combat => self.combat,
             NotificationKind::Trade => self.trade,
@@ -228,9 +257,34 @@ mod tests {
     fn the_seven_switches_are_on_by_default() {
         let auto_focus = AutoFocus::default();
 
+        assert!(auto_focus.enabled);
+
         for kind in NotificationKind::ALL {
             assert!(auto_focus.is_enabled(kind), "{kind:?} should be on");
         }
+    }
+
+    #[test]
+    fn the_master_suspends_the_seven_without_forgetting_them() {
+        // The whole reason it is a field of its own: turning the seven off and
+        // back on would hand back all seven, and the user had chosen six.
+        let mut auto_focus = AutoFocus::default();
+        auto_focus.set(NotificationKind::Craft, false);
+
+        auto_focus.enabled = false;
+
+        for kind in NotificationKind::ALL {
+            assert!(!auto_focus.is_enabled(kind), "{kind:?} should be suspended");
+        }
+
+        // And the screen still knows which one was off.
+        assert!(!auto_focus.is_kind_enabled(NotificationKind::Craft));
+        assert!(auto_focus.is_kind_enabled(NotificationKind::Combat));
+
+        auto_focus.enabled = true;
+
+        assert!(auto_focus.is_enabled(NotificationKind::Combat));
+        assert!(!auto_focus.is_enabled(NotificationKind::Craft));
     }
 
     #[test]
