@@ -269,7 +269,12 @@
 /* The roster comes in from just below, one row after the other. It is the only
    orchestrated moment in the application, and it is there so that opening the
    window feels like a board powering up rather than a page repainting. Each row
-   sets its own delay inline, since only the row knows its rank. */
+   sets its own delay inline, since only the row knows its rank.
+
+   The animation ends on the opacity the row asks for and not on 1: an offline
+   row is dimmed by its own opacity, and a keyframe that always landed on full
+   strength lit it up for the length of the animation before snapping it back to
+   grey on the last frame. */
 @keyframes rise {
   from {
     opacity: 0;
@@ -277,13 +282,22 @@
   }
 
   to {
-    opacity: 1;
+    opacity: var(--rise-opacity);
     transform: none;
   }
 }
 
 @utility rise {
+  --rise-opacity: 1;
+
   animation: rise 0.3s cubic-bezier(0.4, 0, 0.2, 1) backwards;
+}
+
+/* A row that is still there but out of service: offline for the roster. */
+@utility dimmed {
+  --rise-opacity: 0.55;
+
+  opacity: var(--rise-opacity);
 }
 
 @media (prefers-reduced-motion: reduce) {

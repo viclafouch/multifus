@@ -96,7 +96,7 @@ export const CharacterRow = ({
       onDragOver={handleDragOver}
       onDragEnd={actions.handleDragEnd}
       onDrop={handleDrop}
-      className="rise transition-row group relative flex h-row items-center gap-3 rounded-lg border border-transparent px-2 hover:border-border hover:bg-card/70 data-dragging:border-primary/35 data-dragging:bg-card data-dragging:shadow-lg data-offline:opacity-55"
+      className="rise transition-row group relative flex h-row items-center gap-3 rounded-lg border border-transparent px-2 hover:border-border hover:bg-card/70 data-dragging:border-primary/35 data-dragging:bg-card data-dragging:shadow-lg data-offline:dimmed"
     >
       <Button
         variant="ghost"
