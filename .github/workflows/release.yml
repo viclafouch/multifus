@@ -1,0 +1,96 @@
+# Builds the macOS bundle on a tag, signs it, notarises it, and puts it in a
+# draft release with the JSON the updater reads.
+#
+# macOS only for now. Windows is next and not dropped: it joins this file at
+# step 9, which is the day the single job below becomes a matrix and
+# `platform::windows` finally gets a runner to prove it compiles.
+#
+# The release is left as a draft on purpose: the endpoint of the updater is
+# `releases/latest/download/latest.json`, so publishing is what tells every
+# installed multifus that a new version exists. That has to stay a decision and
+# not a side effect of pushing a tag.
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+jobs:
+  # A tag is not a promise that anything passes. Without this, pushing one would
+  # sign and notarise a bundle that no lint, no clippy and no test had ever seen.
+  checks:
+    uses: ./.github/workflows/checks.yml
+
+  macos:
+    needs: checks
+    runs-on: macos-latest
+    permissions:
+      # The action creates the release and uploads the bundle to it.
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+
+      # The tag is what the release is named after, and `tauri.conf.json` is what
+      # the updater compares against. Two versions that disagree would publish an
+      # update nobody is ever offered, silently.
+      - name: The tag and the bundle say the same version
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          bundle="$(jq -r .version src-tauri/tauri.conf.json)"
+
+          if [ "$tag" != "$bundle" ]; then
+            echo "tag ${GITHUB_REF_NAME} against tauri.conf.json ${bundle}" >&2
+            exit 1
+          fi
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: ./src-tauri -> target
+
+      - run: npm ci
+
+      - uses: tauri-apps/tauri-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+          # Signing. The identity is a secret and not a configuration key: it
+          # carries a name and a team identifier, and this repository is written
+          # as though it were public.
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+
+          # Notarisation, which Apple requires of anything signed with a
+          # Developer ID. Without it a downloaded bundle is quarantined and
+          # refused. A missing team identifier fails the build; every other
+          # missing piece only warns, so a half-filled set of secrets ships
+          # something that works here and nowhere else. See the plan.
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+
+          # The updater's own signature, which has nothing to do with Apple's:
+          # it is what proves to an installed multifus that the archive it just
+          # downloaded came from this repository.
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: multifus ${{ github.ref_name }}
+          releaseBody: 'Le détail des changements est dans le CHANGELOG.'
+          releaseDraft: true
+          prerelease: false
+          args: --target aarch64-apple-darwin

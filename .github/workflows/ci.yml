@@ -1,0 +1,19 @@
+# The checks, on every push and every pull request.
+#
+# All it does is call `checks`, which is also what `release` calls before it
+# signs anything. There is one definition of « the code is in order », in one
+# file, and both doors go through it.
+name: ci
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    uses: ./.github/workflows/checks.yml

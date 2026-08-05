@@ -1,0 +1,59 @@
+# Exactly what the project asks for by hand before calling a step done.
+#
+# It lives in its own file because two workflows need it and need it identical:
+# `ci` on every push, and `release` before it signs anything. Recopied into both,
+# it would drift, and the copy that drifted would be the one guarding the
+# release.
+#
+# One runner, macOS, because that is the only system multifus has been verified
+# on so far. Windows is next, not dropped: `platform::windows` compiles here
+# already and stays compiling. What is missing is a `windows-latest` runner to
+# prove it, and that is what step 9 adds, by turning this single job into a
+# matrix.
+name: checks
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: ./src-tauri -> target
+
+      - run: npm ci
+
+      # `lint:fix` is the command of the done-gate, and it writes. Here the two
+      # halves are asked as questions instead: `lint` for the rules, type-aware
+      # so it covers what the compiler would say, and `format:check` for the
+      # shape. Unformatted code fails rather than being quietly repaired.
+      - run: npm run lint
+
+      - run: npm run format:check
+
+      - run: npm run build
+
+      - run: cargo fmt --check
+        working-directory: src-tauri
+
+      - run: cargo clippy --all-targets -- -D warnings
+        working-directory: src-tauri
+
+      - run: cargo test
+        working-directory: src-tauri
