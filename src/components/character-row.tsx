@@ -59,12 +59,30 @@ export const CharacterRow = ({
     }
   }
 
-  const handleDragStart = () => {
+  const handleDragStart = (event: React.DragEvent<HTMLLIElement>) => {
+    const row = event.currentTarget
+    const { left, top } = row.getBoundingClientRect()
+
+    // Nothing here used to say what to drag, and left to its own heuristic the
+    // webview lifts a slab of the whole interface instead of this one row. The
+    // row names itself, and the grab point is kept under the pointer so the
+    // ghost sits exactly where the row was rather than jumping to a corner.
+    event.dataTransfer.setDragImage(
+      row,
+      event.clientX - left,
+      event.clientY - top
+    )
+    event.dataTransfer.effectAllowed = 'move'
+    event.dataTransfer.setData('text/plain', nickname)
+
     actions.handleDragStart(nickname)
   }
 
   const handleDragOver = (event: React.DragEvent<HTMLLIElement>) => {
     event.preventDefault()
+    // The counterpart of the `effectAllowed` set on the source: without it the
+    // pointer keeps the refusal cursor over a row that does accept the drop.
+    event.dataTransfer.dropEffect = 'move'
     actions.handleDragOver(nickname)
   }
 
