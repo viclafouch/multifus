@@ -1,6 +1,7 @@
 import { ExternalLink, Lock } from 'lucide-react'
 import type { Snapshot } from '@/@types/snapshot'
-import { EmptyState, Screen } from '@/components/screen'
+import { EmptyState } from '@/components/layout/empty-state'
+import { Screen } from '@/components/layout/screen'
 import { Button } from '@/components/ui/button'
 import { strings } from '@/constants/strings'
 import { openAuthorizationSettings, requestAuthorization } from '@/lib/multifus'

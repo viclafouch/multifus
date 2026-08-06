@@ -11,8 +11,8 @@ import { AboutScreen } from '@/screens/about-screen'
 import { AuthorizationScreen } from '@/screens/authorization-screen'
 import { AutoFocusScreen } from '@/screens/auto-focus-screen'
 import { CharactersScreen } from '@/screens/characters-screen'
-import { RelayScreen } from '@/screens/relay-screen'
-import { ShortcutsScreen } from '@/screens/shortcuts-screen'
+import { RelayScreen } from '@/screens/relay'
+import { ShortcutsScreen } from '@/screens/shortcuts'
 
 /**
  * The window: a rail on the left, a screen in the middle, a journal underneath.

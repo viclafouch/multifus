@@ -1,36 +1,17 @@
-import type { LucideIcon } from 'lucide-react'
-import {
-  ArrowLeftRight,
-  Coins,
-  Flag,
-  Hammer,
-  MessageSquare,
-  PictureInPicture2,
-  Radar,
-  Swords,
-  Users
-} from 'lucide-react'
-import type { AutoFocusSwitch, NotificationKind } from '@/@types/notification'
+import { PictureInPicture2, Radar } from 'lucide-react'
+import type { AutoFocusSwitch } from '@/@types/notification'
 import type { Snapshot } from '@/@types/snapshot'
-import { FieldRow, Panel, Screen } from '@/components/screen'
+import { FieldRow } from '@/components/layout/field-row'
+import { Panel } from '@/components/layout/panel'
+import { Screen } from '@/components/layout/screen'
 import { Switch } from '@/components/ui/switch'
+import { NOTIFICATION_ICONS } from '@/constants/notification'
 import { strings } from '@/constants/strings'
 import {
   setAutoFocus,
   setAutoFocusEnabled,
   setWakesMinimized
 } from '@/lib/multifus'
-
-/** One glyph per recognised event, so the seven rows can be told apart at speed. */
-const ICONS = {
-  combat: Swords,
-  trade: ArrowLeftRight,
-  group: Users,
-  private_message: MessageSquare,
-  challenge: Flag,
-  craft: Hammer,
-  perceptor: Coins
-} as const satisfies Record<NotificationKind, LucideIcon>
 
 type AutoFocusScreenProps = Readonly<{
   switches: readonly AutoFocusSwitch[]
@@ -111,7 +92,7 @@ export const AutoFocusScreen = ({
       >
         {switches.map((entry) => {
           const { label, description } = strings.autoFocus.kinds[entry.kind]
-          const Icon = ICONS[entry.kind]
+          const Icon = NOTIFICATION_ICONS[entry.kind]
 
           return (
             <FieldRow

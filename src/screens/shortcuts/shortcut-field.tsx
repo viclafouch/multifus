@@ -1,75 +1,10 @@
 import React from 'react'
-import type {
-  ShortcutAction,
-  ShortcutBinding,
-  ShortcutStatus
-} from '@/@types/shortcuts'
-import type { Snapshot } from '@/@types/snapshot'
-import { FieldRow, Note, Panel, Screen } from '@/components/screen'
+import type { ShortcutBinding, ShortcutStatus } from '@/@types/shortcuts'
 import { Button } from '@/components/ui/button'
 import { strings } from '@/constants/strings'
-import { keyLabel } from '@/helpers/accelerator'
 import type { CaptureRejection } from '@/lib/accelerator'
 import { acceleratorParts, capture, heldModifiers } from '@/lib/accelerator'
-import { setShortcut } from '@/lib/multifus'
-
-type ShortcutsScreenProps = Readonly<{
-  shortcuts: readonly ShortcutBinding[]
-  run: (action: Promise<Snapshot>) => void
-}>
-
-/**
- * The four combinations of perimetre.md.
- *
- * This screen captures, and then reports. What each combination is worth is not
- * guessed here: the Rust side lays it on the system and sends back what the
- * system answered, action by action. That is the trap of Dracoon shut, which
- * drops every shortcut and puts them back inside a swallowed try, leaving one
- * bad combination to cost the user all four and tell them nothing.
- */
-export const ShortcutsScreen = ({ shortcuts, run }: ShortcutsScreenProps) => {
-  const [editing, setEditing] = React.useState<ShortcutAction | null>(null)
-
-  return (
-    <Screen
-      title={strings.shortcuts.title}
-      subtitle={strings.shortcuts.subtitle}
-    >
-      <Panel>
-        {shortcuts.map((shortcut) => {
-          const { label, description } =
-            strings.shortcuts.actions[shortcut.action]
-
-          return (
-            <FieldRow
-              key={shortcut.action}
-              label={label}
-              description={description}
-            >
-              <ShortcutField
-                shortcut={shortcut}
-                editing={{
-                  isActive: editing === shortcut.action,
-                  handleOpen: () => {
-                    setEditing(shortcut.action)
-                  },
-                  handleClose: () => {
-                    setEditing(null)
-                  },
-                  handleCapture: (accelerator) => {
-                    setEditing(null)
-                    run(setShortcut(shortcut.action, accelerator))
-                  }
-                }}
-              />
-            </FieldRow>
-          )
-        })}
-      </Panel>
-      <Note>{strings.shortcuts.silent}</Note>
-    </Screen>
-  )
-}
+import { KeyCap } from '@/screens/shortcuts/key-cap'
 
 type ShortcutFieldProps = Readonly<{
   shortcut: ShortcutBinding
@@ -82,14 +17,10 @@ type ShortcutFieldProps = Readonly<{
 }>
 
 /**
- * One key cap that turns into a capture field.
- *
- * Everything is read off `keydown` and nothing off `key`, so the combination
- * stored is the physical one and does not move with the keyboard layout. A press
- * that is only modifiers is shown as it is held rather than rejected: it is
- * somebody halfway through a combination, not a mistake.
+ * One key cap that turns into a capture field. Everything is read off `keydown`,
+ * so the combination stored is the physical one, whatever the keyboard layout.
  */
-const ShortcutField = ({ shortcut, editing }: ShortcutFieldProps) => {
+export const ShortcutField = ({ shortcut, editing }: ShortcutFieldProps) => {
   const [held, setHeld] = React.useState<readonly string[]>([])
   const [rejected, setRejected] = React.useState<CaptureRejection | null>(null)
 
@@ -177,18 +108,6 @@ const ShortcutField = ({ shortcut, editing }: ShortcutFieldProps) => {
   )
 }
 
-type KeyCapProps = Readonly<{
-  token: string
-}>
-
-const KeyCap = ({ token }: KeyCapProps) => {
-  return (
-    <kbd className="keycap inline-flex h-cap min-w-cap items-center justify-center rounded-sm border border-border bg-card px-1.5 font-mono text-mini leading-none font-medium text-foreground/90">
-      {keyLabel(token)}
-    </kbd>
-  )
-}
-
 type FieldHintParams = {
   readonly isEditing: boolean
   readonly status: ShortcutStatus
@@ -201,11 +120,8 @@ type FieldHint = {
 }
 
 /**
- * What the line under the field says.
- *
- * It always says something. A combination that works is the state the user came
- * here to confirm, and a field that stays silent about it is a field one has to
- * go and test in the game to trust.
+ * What the line under the field says, and it always says something. A field that
+ * stays silent is a field one has to go and test in the game to trust.
  */
 const fieldHint = ({
   isEditing,

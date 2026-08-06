@@ -2,7 +2,11 @@ import React from 'react'
 import { Download, RefreshCw, RotateCcw } from 'lucide-react'
 import type { Snapshot } from '@/@types/snapshot'
 import type { ConfigStatus, UpdateStatus } from '@/@types/system'
-import { FieldRow, Note, Panel, Screen, SectionRow } from '@/components/screen'
+import { FieldRow } from '@/components/layout/field-row'
+import { Note } from '@/components/layout/note'
+import { Panel } from '@/components/layout/panel'
+import { Screen } from '@/components/layout/screen'
+import { SectionRow } from '@/components/layout/section-row'
 import {
   AlertDialog,
   AlertDialogAction,

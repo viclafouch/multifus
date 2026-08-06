@@ -1,27 +1,11 @@
-import type { LucideIcon } from 'lucide-react'
-import { Info, Keyboard, Send, Users, Zap } from 'lucide-react'
 import type { Character } from '@/@types/roster'
 import type { ScreenName } from '@/@types/snapshot'
 import type { Authorization } from '@/@types/system'
 import { Lamp } from '@/components/lamp'
 import { Button } from '@/components/ui/button'
+import type { NavItem } from '@/constants/navigation'
+import { NAV_ITEMS } from '@/constants/navigation'
 import { strings } from '@/constants/strings'
-
-/** Which of the five screens is on. */
-
-type NavItem = {
-  readonly name: ScreenName
-  readonly label: string
-  readonly Icon: LucideIcon
-}
-
-const ITEMS = [
-  { name: 'characters', label: strings.nav.characters, Icon: Users },
-  { name: 'shortcuts', label: strings.nav.shortcuts, Icon: Keyboard },
-  { name: 'autoFocus', label: strings.nav.autoFocus, Icon: Zap },
-  { name: 'relay', label: strings.nav.relay, Icon: Send },
-  { name: 'about', label: strings.nav.about, Icon: Info }
-] as const satisfies readonly NavItem[]
 
 type NavRailProps = Readonly<{
   current: ScreenName
@@ -61,7 +45,7 @@ export const NavRail = ({
         </p>
       </div>
       <ul className="flex flex-1 flex-col gap-0.5 px-3">
-        {ITEMS.map(({ name, label, Icon }) => {
+        {NAV_ITEMS.map(({ name, label, Icon }) => {
           return (
             <li key={name}>
               <NavButton

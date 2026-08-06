@@ -10,21 +10,21 @@ Le vocabulaire est dans [CONTEXT.md](../CONTEXT.md), ce que le projet refuse de 
 
 **macOS est fini.** Toute l'étape 11 est écrite et vérifiée sur un vrai robot, quart d'heure compris. Ce qui reste sur ce système n'est plus du code : le certificat Developer ID, les huit secrets du dépôt et le logo, tous les trois listés à l'étape 10. Puis l'étape 12, qui range `src` sans rien changer à l'écran, et enfin Windows, qui est l'étape 9. Les numéros restent des étiquettes, le code y renvoie.
 
-| #     | Étape                       | Où                                             | État                                 |
-| ----- | --------------------------- | ---------------------------------------------- | ------------------------------------ |
-| 0-1   | Bootstrap et outillage      | `package.json`, `oxlint.config.ts`, `.husky`   | fait                                 |
-| 2     | Cœur métier pur             | `src-tauri/src/domain`                         | fait, testé                          |
-| 3     | Frontière avec le système   | `src-tauri/src/platform`                       | fait                                 |
-| 4     | Implémentation macOS        | `platform::macos`                              | **vérifiée sur deux clients**        |
-| 5     | Persistance                 | `src-tauri/src/config`                         | fait, testé                          |
-| 6     | Interface React             | `src`, `src-tauri/src/app`                     | faite, AutoFocus prouvé              |
-| 7     | Raccourcis globaux          | `app::shortcuts`                               | **vérifiés depuis le jeu**           |
-| 8     | Barre système et session    | `app::tray`, `app::autostart`                  | **revient à l'ouverture de session** |
-| 10    | Distribution et mise à jour | `.github/workflows`, `app::update`             | écrite, à vérifier                   |
-| 11a   | Fondations du relais        | `app::relay::secret`, `platform::display`      | écrites, testées                     |
-| 11b-1 | Appariement du relais       | `app::relay::{telegram,pairing}`, écran Relais | **vérifié sur un vrai robot**        |
-| 11b-2 | Le relais lui-même          | `app::relay::run`, barre système, balayage     | **vérifié, quart d'heure compris**   |
-| 12    | Architecture de l'interface | `src`                                          | lot A fait, trois lots restants      |
+| #     | Étape                       | Où                                             | État                                  |
+| ----- | --------------------------- | ---------------------------------------------- | ------------------------------------- |
+| 0-1   | Bootstrap et outillage      | `package.json`, `oxlint.config.ts`, `.husky`   | fait                                  |
+| 2     | Cœur métier pur             | `src-tauri/src/domain`                         | fait, testé                           |
+| 3     | Frontière avec le système   | `src-tauri/src/platform`                       | fait                                  |
+| 4     | Implémentation macOS        | `platform::macos`                              | **vérifiée sur deux clients**         |
+| 5     | Persistance                 | `src-tauri/src/config`                         | fait, testé                           |
+| 6     | Interface React             | `src`, `src-tauri/src/app`                     | faite, AutoFocus prouvé               |
+| 7     | Raccourcis globaux          | `app::shortcuts`                               | **vérifiés depuis le jeu**            |
+| 8     | Barre système et session    | `app::tray`, `app::autostart`                  | **revient à l'ouverture de session**  |
+| 10    | Distribution et mise à jour | `.github/workflows`, `app::update`             | écrite, à vérifier                    |
+| 11a   | Fondations du relais        | `app::relay::secret`, `platform::display`      | écrites, testées                      |
+| 11b-1 | Appariement du relais       | `app::relay::{telegram,pairing}`, écran Relais | **vérifié sur un vrai robot**         |
+| 11b-2 | Le relais lui-même          | `app::relay::run`, barre système, balayage     | **vérifié, quart d'heure compris**    |
+| 12    | Architecture de l'interface | `src`                                          | lots A et B faits, deux lots restants |
 
 Les versions font foi dans `package.json`, `tauri.conf.json` et `Cargo.toml`, nulle part ailleurs. `standard-version` les déplace ensemble, et le workflow de release refuse un tag qui ne dirait pas la même chose qu'elles.
 
@@ -439,11 +439,17 @@ Les types d'abord, les chaînes ensuite. `@types/` sort de `multifus.ts`, et `ts
 
 Trois documents ont été mis à jour dans le même commit : `perimetre.md` § Conventions, qui disait « les chaînes centralisées dans un seul fichier » et dit maintenant « un seul endroit » ; le paragraphe de l'étape 11b-2, qui nommait l'ancien fichier de chaînes dans la chaîne d'échec de compilation et nomme maintenant `constants/journal.ts` et `helpers/journal.ts` ; et `.claude/rules/code-style.md` § Single Source of Truth et § Where things live. Un quatrième a suivi, l'[ADR 0006](./adr/0006-journal-sur-disque.md), qui citait ce même fichier : seul le chemin change, l'argument ne bouge pas.
 
-#### Lot B — Les écrans et la mise en page
+#### Lot B — Les écrans et la mise en page, fait
 
-`components/screen.tsx` porte huit composants de mise en page sous un nom au singulier, et devient `components/layout/`, un fichier par composant. `relay-screen.tsx` (413 lignes) et `shortcuts-screen.tsx` (254 lignes) deviennent des dossiers dont l'`index.tsx` n'orchestre plus que les panneaux. Les deux dépassaient la limite de 200 lignes que `.claude/rules/frontend.md` fixe.
+**Ce qui est posé.** `components/screen.tsx` portait huit composants de mise en page sous un nom au singulier : c'est `components/layout/`, un fichier par composant. Pas d'index qui réexporte, la règle du projet refusant une réexportation qui ne transforme rien, donc chaque écran nomme ce qu'il prend.
 
-Aucune ligne de JSX ne change. Les fonctions pures que ces deux écrans contiennent, `problemLine` et `statusHint`, attendent le lot C et restent sur place.
+`constants/navigation.ts` porte les cinq articles du rail, `constants/notification.ts` les sept icônes de l'AutoFocus. Les deux vivaient en tête du composant qui les lisait, avec l'`as const satisfies` que le plan attend déjà d'une table dont la clé est une union du domaine.
+
+`relay-screen.tsx`, 410 lignes, est un dossier de huit fichiers dont l'`index.tsx` fait 81 lignes ; `shortcuts-screen.tsx`, 255 lignes, un dossier de trois dont l'`index.tsx` fait 63. Le plus gros fichier de l'interface est désormais `shortcut-field.tsx` à 171 lignes, et plus rien ne dépasse la limite de 200 lignes de `.claude/rules/frontend.md`.
+
+**Aucune ligne de JSX n'a changé.** La comparaison des littéraux avant et après ne montre que des chemins d'import : pas une chaîne française n'a bougé. `problemLine`, `fieldHint` et `statusHint` sont restés avec le composant qui les lit, comme le lot C le demande.
+
+`.claude/rules/code-style.md` § Where things live a été corrigé dans le même commit : il annonçait un fichier par écran, ce qui n'est plus vrai pour deux d'entre eux, et ne connaissait pas `components/layout/`. `frontend.md` n'avait rien à corriger, il ne nomme aucun chemin.
 
 #### Lot C — Les fonctions pures
 
