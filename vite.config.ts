@@ -1,6 +1,6 @@
 import path from 'node:path'
 import process from 'node:process'
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vitest/config'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 
@@ -37,6 +37,18 @@ export default defineConfig({
     watch: {
       // 3. tell Vite to ignore watching `src-tauri`
       ignored: ['**/src-tauri/**']
+    }
+  },
+
+  test: {
+    include: ['src/**/*.test.ts'],
+    // Node and not a simulated browser: `navigator.userAgent` is `Node.js/24`
+    // there, so `IS_APPLE` is false on this machine as on the runner.
+    environment: 'node',
+    // Pinned, without which the journal reads one hour here and another on the
+    // runner, which is in UTC.
+    env: {
+      TZ: 'UTC'
     }
   }
 })

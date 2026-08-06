@@ -47,6 +47,8 @@ jobs:
 
       - run: npm run format:check
 
+      - run: npm run test
+
       - run: npm run build
 
       - run: cargo fmt --check

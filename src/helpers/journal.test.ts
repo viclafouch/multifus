@@ -1,0 +1,1102 @@
+import { describe, expect, it } from 'vitest'
+import type {
+  JournalEvent,
+  NotificationOutcome,
+  RosterChange,
+  SettingChange,
+  ShortcutOutcome,
+  TrayOutcome
+} from '@/@types/journal'
+import type { RelayFailure } from '@/@types/relay'
+import type { ShortcutBinding } from '@/@types/shortcuts'
+import type { Snapshot } from '@/@types/snapshot'
+import {
+  DETAILED_LINES,
+  NOTICE_LINES,
+  PLAIN_LINES,
+  RELAY_STOP_LINES,
+  WORK_LABELS
+} from '@/constants/journal'
+import { strings } from '@/constants/strings'
+import {
+  journalLine,
+  journalTime,
+  journalTone,
+  journalTranscript
+} from '@/helpers/journal'
+
+/** One event of the union, picked by its kind, as the module under test does. */
+type EventOf<Kind extends JournalEvent['kind']> = Extract<
+  JournalEvent,
+  { readonly kind: Kind }
+>
+
+type Case<Kind extends JournalEvent['kind']> = {
+  readonly event: EventOf<Kind>
+  readonly line: string
+}
+
+/**
+ * One case at least per kind of the union, derived and never listed: an event
+ * added on the Rust side and forgotten fails to compile here too.
+ */
+type JournalCases = {
+  readonly [Kind in JournalEvent['kind']]: readonly Case<Kind>[]
+}
+
+/** What the system said, for the events whose line is a phrase and a reason. */
+const DETAIL = 'le système n’a pas répondu'
+
+const NICKNAME = 'Alpha'
+
+const BINDINGS = [
+  {
+    action: 'next',
+    accelerator: 'Control+Shift+ArrowRight',
+    status: { kind: 'registered' }
+  },
+  { action: 'previous', accelerator: null, status: { kind: 'unbound' } },
+  {
+    action: 'toggleAsleep',
+    accelerator: 'Control+Shift+KeyS',
+    status: { kind: 'pending' }
+  },
+  {
+    action: 'swap',
+    accelerator: 'Control+Shift+KeyX',
+    status: { kind: 'invalid', detail: 'touche inconnue' }
+  }
+] as const satisfies readonly ShortcutBinding[]
+
+const BINDINGS_LINE =
+  'Raccourcis : Suivant Control+Shift+ArrowRight · Précédent non attribué · Veille pas encore posé · Bascule Control+Shift+KeyX illisible (touche inconnue).'
+
+const ROSTER_CASES = {
+  slept: [
+    {
+      event: { kind: 'roster', change: { kind: 'slept', nickname: NICKNAME } },
+      line: 'Alpha mis en veille.'
+    }
+  ],
+  woke: [
+    {
+      event: { kind: 'roster', change: { kind: 'woke', nickname: NICKNAME } },
+      line: 'Alpha remis dans le défilement.'
+    }
+  ],
+  genderAsleep: [
+    {
+      event: {
+        kind: 'roster',
+        change: { kind: 'genderAsleep', gender: 'male', asleep: true }
+      },
+      line: 'Tous les hommes connectés sont en veille.'
+    },
+    {
+      event: {
+        kind: 'roster',
+        change: { kind: 'genderAsleep', gender: 'female', asleep: false }
+      },
+      line: 'Tous les femmes connectés sont réveillés.'
+    }
+  ],
+  genderAssigned: [
+    {
+      event: {
+        kind: 'roster',
+        change: {
+          kind: 'genderAssigned',
+          nickname: NICKNAME,
+          gender: 'female'
+        }
+      },
+      line: 'Alpha est assigné comme femme.'
+    },
+    {
+      event: {
+        kind: 'roster',
+        change: { kind: 'genderAssigned', nickname: NICKNAME, gender: null }
+      },
+      line: 'Sexe retiré à Alpha.'
+    }
+  ],
+  reordered: [
+    {
+      event: {
+        kind: 'roster',
+        change: { kind: 'reordered', order: [NICKNAME, 'Beta'] }
+      },
+      line: 'Ordre du défilement : Alpha, Beta.'
+    },
+    {
+      event: { kind: 'roster', change: { kind: 'reordered', order: [] } },
+      line: 'Ordre du défilement modifié, roster vide.'
+    }
+  ],
+  removed: [
+    {
+      event: {
+        kind: 'roster',
+        change: { kind: 'removed', nickname: NICKNAME }
+      },
+      line: 'Alpha retiré du roster.'
+    }
+  ],
+  relayed: [
+    {
+      event: {
+        kind: 'roster',
+        change: { kind: 'relayed', nickname: NICKNAME, relayed: true }
+      },
+      line: 'Alpha est relayé.'
+    },
+    {
+      event: {
+        kind: 'roster',
+        change: { kind: 'relayed', nickname: NICKNAME, relayed: false }
+      },
+      line: 'Alpha n’est plus relayé.'
+    }
+  ]
+} as const satisfies Record<RosterChange['kind'], readonly Case<'roster'>[]>
+
+const SETTING_CASES = {
+  autoFocusEnabled: [
+    {
+      event: {
+        kind: 'setting',
+        change: { kind: 'autoFocusEnabled', enabled: true, from: 'tray' }
+      },
+      line: 'AutoFocus activé depuis la barre système.'
+    },
+    {
+      event: {
+        kind: 'setting',
+        change: { kind: 'autoFocusEnabled', enabled: false, from: 'window' }
+      },
+      line: 'AutoFocus désactivé depuis la fenêtre.'
+    }
+  ],
+  autoFocusKind: [
+    {
+      event: {
+        kind: 'setting',
+        change: {
+          kind: 'autoFocusKind',
+          notificationKind: 'private_message',
+          enabled: true
+        }
+      },
+      line: 'AutoFocus, type Message privé activé.'
+    }
+  ],
+  wakesMinimized: [
+    {
+      event: {
+        kind: 'setting',
+        change: { kind: 'wakesMinimized', wakes: false, from: 'tray' }
+      },
+      line: 'Réveil des fenêtres réduites désactivé depuis la barre système.'
+    }
+  ],
+  relayBody: [
+    {
+      event: {
+        kind: 'setting',
+        change: { kind: 'relayBody', sendBody: true }
+      },
+      line: 'Envoi du texte des messages privés activé.'
+    }
+  ]
+} as const satisfies Record<SettingChange['kind'], readonly Case<'setting'>[]>
+
+const SHORTCUT_CASES = {
+  focused: [
+    {
+      event: {
+        kind: 'shortcut',
+        action: 'next',
+        outcome: { outcome: 'focused', nickname: NICKNAME }
+      },
+      line: 'Suivant : Alpha au premier plan.'
+    }
+  ],
+  slept: [
+    {
+      event: {
+        kind: 'shortcut',
+        action: 'toggleAsleep',
+        outcome: { outcome: 'slept', nickname: NICKNAME }
+      },
+      line: 'Veille : Alpha mis en veille.'
+    }
+  ],
+  woke: [
+    {
+      event: {
+        kind: 'shortcut',
+        action: 'toggleAsleep',
+        outcome: { outcome: 'woke', nickname: NICKNAME }
+      },
+      line: 'Veille : Alpha remis dans le défilement.'
+    }
+  ],
+  swapped: [
+    {
+      event: {
+        kind: 'shortcut',
+        action: 'swap',
+        outcome: { outcome: 'swapped', awake: 'male' }
+      },
+      line: 'Bascule : les hommes sont réveillés, les femmes en veille.'
+    },
+    {
+      event: {
+        kind: 'shortcut',
+        action: 'swap',
+        outcome: { outcome: 'swapped', awake: 'female' }
+      },
+      line: 'Bascule : les femmes sont réveillées, les hommes en veille.'
+    }
+  ],
+  outsideGame: [
+    {
+      event: {
+        kind: 'shortcut',
+        action: 'next',
+        outcome: { outcome: 'outsideGame' }
+      },
+      line: 'Suivant : ignoré, aucune fenêtre Dofus au premier plan.'
+    }
+  ],
+  notInRoster: [
+    {
+      event: {
+        kind: 'shortcut',
+        action: 'previous',
+        outcome: { outcome: 'notInRoster', nickname: NICKNAME }
+      },
+      line: 'Précédent : Alpha n’est pas encore dans le roster.'
+    }
+  ],
+  nobodyInCycle: [
+    {
+      event: {
+        kind: 'shortcut',
+        action: 'next',
+        outcome: { outcome: 'nobodyInCycle' }
+      },
+      line: 'Suivant : personne dans le défilement.'
+    }
+  ],
+  noGender: [
+    {
+      event: {
+        kind: 'shortcut',
+        action: 'swap',
+        outcome: { outcome: 'noGender' }
+      },
+      line: 'Bascule : aucun personnage connecté n’a de sexe assigné.'
+    }
+  ],
+  noWindow: [
+    {
+      event: {
+        kind: 'shortcut',
+        action: 'next',
+        outcome: { outcome: 'noWindow', nickname: NICKNAME }
+      },
+      line: 'Suivant : la fenêtre de Alpha a disparu.'
+    }
+  ],
+  focusFailed: [
+    {
+      event: {
+        kind: 'shortcut',
+        action: 'next',
+        outcome: { outcome: 'focusFailed', nickname: NICKNAME, detail: DETAIL }
+      },
+      line: `Suivant : le système a refusé de ramener Alpha au premier plan (${DETAIL}).`
+    }
+  ],
+  foregroundUnknown: [
+    {
+      event: {
+        kind: 'shortcut',
+        action: 'previous',
+        outcome: { outcome: 'foregroundUnknown', detail: DETAIL }
+      },
+      line: `Précédent : impossible de savoir quelle fenêtre est au premier plan (${DETAIL}).`
+    }
+  ]
+} as const satisfies Record<
+  ShortcutOutcome['outcome'],
+  readonly Case<'shortcut'>[]
+>
+
+const TRAY_CASES = {
+  focused: [
+    {
+      event: {
+        kind: 'trayFocus',
+        nickname: NICKNAME,
+        outcome: { outcome: 'focused' }
+      },
+      line: 'Barre système : Alpha au premier plan.'
+    }
+  ],
+  noWindow: [
+    {
+      event: {
+        kind: 'trayFocus',
+        nickname: NICKNAME,
+        outcome: { outcome: 'noWindow' }
+      },
+      line: 'Barre système : la fenêtre de Alpha a disparu.'
+    }
+  ],
+  focusFailed: [
+    {
+      event: {
+        kind: 'trayFocus',
+        nickname: NICKNAME,
+        outcome: { outcome: 'focusFailed', detail: DETAIL }
+      },
+      line: `Barre système : le système a refusé de ramener Alpha au premier plan (${DETAIL}).`
+    }
+  ]
+} as const satisfies Record<
+  TrayOutcome['outcome'],
+  readonly Case<'trayFocus'>[]
+>
+
+/** The seven outcomes, plus the notification no pattern gave a type to. */
+const NOTIFICATION_CASES = {
+  focused: [
+    {
+      event: {
+        kind: 'notification',
+        nickname: NICKNAME,
+        notificationKind: 'private_message',
+        outcome: { outcome: 'focused' }
+      },
+      line: 'Message privé pour Alpha : fenêtre ramenée au premier plan.'
+    },
+    {
+      event: {
+        kind: 'notification',
+        nickname: NICKNAME,
+        notificationKind: null,
+        outcome: { outcome: 'focused' }
+      },
+      line: 'Notification pour Alpha : fenêtre ramenée au premier plan.'
+    }
+  ],
+  kindDisabled: [
+    {
+      event: {
+        kind: 'notification',
+        nickname: NICKNAME,
+        notificationKind: 'combat',
+        outcome: { outcome: 'kindDisabled' }
+      },
+      line: 'Combat pour Alpha : ce type est désactivé, rien n’a été fait.'
+    }
+  ],
+  kindUnknown: [
+    {
+      event: {
+        kind: 'notification',
+        nickname: NICKNAME,
+        notificationKind: null,
+        outcome: { outcome: 'kindUnknown' }
+      },
+      line: 'Notification pour Alpha : type non reconnu, rien n’a été fait.'
+    }
+  ],
+  noWindow: [
+    {
+      event: {
+        kind: 'notification',
+        nickname: NICKNAME,
+        notificationKind: 'trade',
+        outcome: { outcome: 'noWindow' }
+      },
+      line: 'Échange pour Alpha : aucune fenêtre à ramener.'
+    }
+  ],
+  leftMinimized: [
+    {
+      event: {
+        kind: 'notification',
+        nickname: NICKNAME,
+        notificationKind: 'challenge',
+        outcome: { outcome: 'leftMinimized' }
+      },
+      line: 'Défi pour Alpha : fenêtre réduite, laissée où elle est.'
+    }
+  ],
+  bodyUnread: [
+    {
+      event: {
+        kind: 'notification',
+        nickname: NICKNAME,
+        notificationKind: 'group',
+        outcome: { outcome: 'bodyUnread' }
+      },
+      line: 'Groupe pour Alpha : corps de la notification illisible, rien n’a été fait.'
+    }
+  ],
+  focusFailed: [
+    {
+      event: {
+        kind: 'notification',
+        nickname: NICKNAME,
+        notificationKind: 'perceptor',
+        outcome: { outcome: 'focusFailed', detail: DETAIL }
+      },
+      line: `Percepteur pour Alpha : le système a refusé le passage au premier plan (${DETAIL}).`
+    }
+  ]
+} as const satisfies Record<
+  NotificationOutcome['outcome'],
+  readonly Case<'notification'>[]
+>
+
+/** Three failures told apart because they are repaired in three places. */
+const RELAY_FAILURE_CASES = {
+  keychain: [
+    {
+      event: {
+        kind: 'relayFailed',
+        reason: { reason: 'keychain', detail: DETAIL }
+      },
+      line: `Relais : le trousseau du système a refusé le jeton (${DETAIL}).`
+    }
+  ],
+  telegram: [
+    {
+      event: {
+        kind: 'relayFailed',
+        reason: { reason: 'telegram', detail: DETAIL }
+      },
+      line: `Relais : Telegram a refusé la requête (${DETAIL}).`
+    }
+  ],
+  network: [
+    {
+      event: {
+        kind: 'relayFailed',
+        reason: { reason: 'network', detail: DETAIL }
+      },
+      line: `Relais : Telegram n’a pas répondu (${DETAIL}).`
+    }
+  ]
+} as const satisfies Record<
+  RelayFailure['reason'],
+  readonly Case<'relayFailed'>[]
+>
+
+const JOURNAL_CASES = {
+  started: [
+    {
+      event: {
+        kind: 'started',
+        version: '0.1.0',
+        system: 'macOS 26.0 (arm64)',
+        launch: 'session'
+      },
+      line: 'multifus 0.1.0 a démarré sur macOS 26.0 (arm64), au démarrage de la session.'
+    },
+    {
+      event: {
+        kind: 'started',
+        version: '0.1.0',
+        system: 'macOS 26.0 (arm64)',
+        launch: 'byHand'
+      },
+      line: 'multifus 0.1.0 a démarré sur macOS 26.0 (arm64), lancé à la main.'
+    }
+  ],
+  listening: [{ event: { kind: 'listening' }, line: PLAIN_LINES.listening }],
+  listeningFailed: [
+    {
+      event: { kind: 'listeningFailed', detail: DETAIL },
+      line: `${DETAILED_LINES.listeningFailed} : ${DETAIL}`
+    }
+  ],
+  notificationUnreadable: [
+    {
+      event: { kind: 'notificationUnreadable', detail: DETAIL },
+      line: `${DETAILED_LINES.notificationUnreadable} : ${DETAIL}`
+    }
+  ],
+  authorization: [
+    {
+      event: { kind: 'authorization', granted: true },
+      line: 'Autorisation accordée : les fenêtres sont lisibles.'
+    },
+    {
+      event: { kind: 'authorization', granted: false },
+      line: 'Autorisation refusée : les fenêtres ne peuvent pas être lues.'
+    }
+  ],
+  authorizationRequested: [
+    {
+      event: {
+        kind: 'authorizationRequested',
+        granted: false,
+        failure: DETAIL
+      },
+      line: `Autorisation demandée : le système n’a pas pu répondre (${DETAIL}).`
+    },
+    {
+      event: { kind: 'authorizationRequested', granted: true, failure: null },
+      line: 'Autorisation demandée : accordée.'
+    },
+    {
+      event: { kind: 'authorizationRequested', granted: false, failure: null },
+      line: 'Autorisation demandée : pas encore accordée, ce qui est normal dans la seconde qui suit.'
+    }
+  ],
+  characterOnline: [
+    {
+      event: { kind: 'characterOnline', nickname: NICKNAME },
+      line: 'Alpha est connecté.'
+    }
+  ],
+  characterOffline: [
+    {
+      event: { kind: 'characterOffline', nickname: NICKNAME },
+      line: 'Alpha n’est plus connecté.'
+    }
+  ],
+  notification: Object.values(NOTIFICATION_CASES).flat(),
+  roster: Object.values(ROSTER_CASES).flat(),
+  setting: Object.values(SETTING_CASES).flat(),
+  shortcut: Object.values(SHORTCUT_CASES).flat(),
+  trayFocus: Object.values(TRAY_CASES).flat(),
+  shortcutsBound: [
+    {
+      event: { kind: 'shortcutsBound', bindings: BINDINGS },
+      line: BINDINGS_LINE
+    },
+    {
+      event: {
+        kind: 'shortcutsBound',
+        bindings: [
+          {
+            action: 'next',
+            accelerator: 'Control+Shift+ArrowRight',
+            status: { kind: 'duplicate', action: 'previous' }
+          },
+          {
+            action: 'swap',
+            accelerator: null,
+            status: { kind: 'refused', detail: 'déjà prise' }
+          }
+        ]
+      },
+      line: 'Raccourcis : Suivant Control+Shift+ArrowRight en doublon avec Précédent, donc inerte · Bascule aucune combinaison refusé (déjà prise).'
+    }
+  ],
+  shortcutsFailed: [
+    {
+      event: { kind: 'shortcutsFailed', detail: DETAIL },
+      line: `${DETAILED_LINES.shortcutsFailed} : ${DETAIL}`
+    }
+  ],
+  scanFailed: [
+    {
+      event: { kind: 'scanFailed', detail: DETAIL },
+      line: `${DETAILED_LINES.scanFailed} : ${DETAIL}`
+    }
+  ],
+  saveFailed: [
+    {
+      event: { kind: 'saveFailed', detail: DETAIL },
+      line: `${DETAILED_LINES.saveFailed} : ${DETAIL}`
+    }
+  ],
+  openFailed: [
+    {
+      event: { kind: 'openFailed', detail: DETAIL },
+      line: `${DETAILED_LINES.openFailed} : ${DETAIL}`
+    }
+  ],
+  snapshotFailed: [
+    {
+      event: { kind: 'snapshotFailed', detail: DETAIL },
+      line: `${DETAILED_LINES.snapshotFailed} : ${DETAIL}`
+    }
+  ],
+  trayFailed: [
+    {
+      event: { kind: 'trayFailed', detail: DETAIL },
+      line: `${DETAILED_LINES.trayFailed} : ${DETAIL}`
+    }
+  ],
+  windowFailed: [
+    {
+      event: { kind: 'windowFailed', detail: DETAIL },
+      line: `${DETAILED_LINES.windowFailed} : ${DETAIL}`
+    }
+  ],
+  configLoadFailed: [
+    {
+      event: {
+        kind: 'configLoadFailed',
+        detail: DETAIL,
+        quarantined: '/tmp/multifus/config.json.bak'
+      },
+      line: `Configuration non chargée, multifus est reparti sur ses réglages par défaut (${DETAIL}). Fichier mis de côté : /tmp/multifus/config.json.bak`
+    },
+    {
+      event: { kind: 'configLoadFailed', detail: DETAIL, quarantined: null },
+      line: `Configuration non chargée, multifus est reparti sur ses réglages par défaut (${DETAIL}). Rien n’a été déplacé.`
+    }
+  ],
+  configNotSetAside: [
+    {
+      event: { kind: 'configNotSetAside', detail: DETAIL },
+      line: `${DETAILED_LINES.configNotSetAside} : ${DETAIL}`
+    }
+  ],
+  startAtLoginReconciled: [
+    {
+      event: { kind: 'startAtLoginReconciled', enabled: true },
+      line: 'Démarrage avec la session actif, enregistrement réécrit.'
+    },
+    {
+      event: { kind: 'startAtLoginReconciled', enabled: false },
+      line: 'Démarrage avec la session inactif, aucun enregistrement.'
+    }
+  ],
+  startAtLoginFailed: [
+    {
+      event: { kind: 'startAtLoginFailed', detail: DETAIL },
+      line: `${DETAILED_LINES.startAtLoginFailed} : ${DETAIL}`
+    }
+  ],
+  panicked: [
+    {
+      event: { kind: 'panicked', work: 'scan' },
+      line: `${WORK_LABELS.scan} a échoué brutalement, et a repris.`
+    },
+    {
+      event: { kind: 'panicked', work: 'shortcuts' },
+      line: `${WORK_LABELS.shortcuts} a échoué brutalement, et a repris.`
+    },
+    {
+      event: { kind: 'panicked', work: 'tray' },
+      line: `${WORK_LABELS.tray} a échoué brutalement, et a repris.`
+    }
+  ],
+  updateAvailable: [
+    {
+      event: { kind: 'updateAvailable', version: '1.4.0' },
+      line: 'La version 1.4.0 est disponible.'
+    }
+  ],
+  updateUpToDate: [
+    { event: { kind: 'updateUpToDate' }, line: PLAIN_LINES.updateUpToDate }
+  ],
+  updateFailed: [
+    {
+      event: { kind: 'updateFailed', detail: DETAIL },
+      line: `${DETAILED_LINES.updateFailed} : ${DETAIL}`
+    }
+  ],
+  relayPaired: [
+    { event: { kind: 'relayPaired' }, line: PLAIN_LINES.relayPaired }
+  ],
+  relayUnpaired: [
+    { event: { kind: 'relayUnpaired' }, line: PLAIN_LINES.relayUnpaired }
+  ],
+  relayEnabled: [
+    { event: { kind: 'relayEnabled' }, line: PLAIN_LINES.relayEnabled }
+  ],
+  relayDisabled: [
+    {
+      event: { kind: 'relayDisabled', reason: 'shortcut' },
+      line: RELAY_STOP_LINES.shortcut
+    },
+    {
+      event: { kind: 'relayDisabled', reason: 'tray' },
+      line: RELAY_STOP_LINES.tray
+    },
+    {
+      event: { kind: 'relayDisabled', reason: 'noRelayedCharacter' },
+      line: RELAY_STOP_LINES.noRelayedCharacter
+    },
+    {
+      event: { kind: 'relayDisabled', reason: 'noLongerPaired' },
+      line: RELAY_STOP_LINES.noLongerPaired
+    }
+  ],
+  relayFailed: Object.values(RELAY_FAILURE_CASES).flat(),
+  relaySent: [
+    {
+      event: { kind: 'relaySent', nickname: NICKNAME },
+      line: 'Alpha : message privé relayé sur le téléphone.'
+    }
+  ],
+  relayNoticeSent: [
+    {
+      event: { kind: 'relayNoticeSent', case: 'disconnected' },
+      line: NOTICE_LINES.disconnected
+    },
+    {
+      event: { kind: 'relayNoticeSent', case: 'nobodyLeft' },
+      line: NOTICE_LINES.nobodyLeft
+    },
+    {
+      event: { kind: 'relayNoticeSent', case: 'both' },
+      line: NOTICE_LINES.both
+    }
+  ],
+  displayAwake: [
+    {
+      event: { kind: 'displayAwake', held: true },
+      line: 'Écran tenu éveillé : le relais a quelque chose à écouter.'
+    },
+    {
+      event: { kind: 'displayAwake', held: false },
+      line: 'Écran relâché : plus aucun personnage relayé n’est connecté.'
+    }
+  ],
+  displayAwakeFailed: [
+    {
+      event: { kind: 'displayAwakeFailed', detail: DETAIL },
+      line: `${DETAILED_LINES.displayAwakeFailed} : ${DETAIL}`
+    }
+  ],
+  reset: [{ event: { kind: 'reset' }, line: PLAIN_LINES.reset }],
+  quit: [{ event: { kind: 'quit' }, line: PLAIN_LINES.quit }]
+} as const satisfies JournalCases
+
+/** The three events whose tone is decided by an outcome, minus that outcome. */
+const NOTIFIED = {
+  kind: 'notification',
+  nickname: NICKNAME,
+  notificationKind: 'private_message'
+} as const satisfies Omit<EventOf<'notification'>, 'outcome'>
+
+const FIRED = {
+  kind: 'shortcut',
+  action: 'next'
+} as const satisfies Omit<EventOf<'shortcut'>, 'outcome'>
+
+const CLICKED = {
+  kind: 'trayFocus',
+  nickname: NICKNAME
+} as const satisfies Omit<EventOf<'trayFocus'>, 'outcome'>
+
+/** Two moments of the same day, UTC, which the config of vitest pins. */
+const MORNING = Date.UTC(2026, 0, 15, 9, 5, 3)
+const NOON = Date.UTC(2026, 0, 15, 12, 30, 0)
+
+const SNAPSHOT = {
+  version: '0.1.0',
+  system: 'macOS 26.0 (arm64)',
+  characters: [],
+  shortcuts: BINDINGS,
+  autoFocus: [],
+  autoFocusEnabled: true,
+  wakesMinimized: true,
+  startAtLogin: false,
+  authorization: { granted: true, listening: true },
+  config: { path: '/tmp/multifus/config.json', problem: null },
+  update: { kind: 'upToDate' },
+  relay: {
+    paired: false,
+    sendBody: false,
+    active: false,
+    screenSaver: { kind: 'never' },
+    pairing: { kind: 'idle' }
+  },
+  journal: [
+    { id: 1, at: MORNING, event: { kind: 'listening' } },
+    { id: 2, at: NOON, event: { kind: 'characterOnline', nickname: NICKNAME } }
+  ]
+} as const satisfies Snapshot
+
+describe('journalLine', () => {
+  it.each(Object.values(JOURNAL_CASES).flat())(
+    '$event.kind se lit « $line »',
+    ({ event, line }) => {
+      // #when
+      const written = journalLine(event)
+
+      // #then
+      expect(written).toBe(line)
+    }
+  )
+})
+
+describe('journalTone', () => {
+  it('salue une autorisation accordée', () => {
+    // #when
+    const tone = journalTone({ kind: 'authorization', granted: true })
+
+    // #then
+    expect(tone).toBe('good')
+  })
+
+  it('avertit sur une autorisation refusée', () => {
+    // #when
+    const tone = journalTone({ kind: 'authorization', granted: false })
+
+    // #then
+    expect(tone).toBe('warning')
+  })
+
+  it('salue une demande d’autorisation qui a abouti', () => {
+    // #given
+    const event = {
+      kind: 'authorizationRequested',
+      granted: true,
+      failure: null
+    } as const
+
+    // #when
+    const tone = journalTone(event)
+
+    // #then
+    expect(tone).toBe('good')
+  })
+
+  it('ne compte pas comme une faute un refus dans la seconde qui suit', () => {
+    // #given
+    const event = {
+      kind: 'authorizationRequested',
+      granted: false,
+      failure: null
+    } as const
+
+    // #when
+    const tone = journalTone(event)
+
+    // #then
+    expect(tone).toBe('neutral')
+  })
+
+  it('avertit quand le système n’a pas pu répondre à la demande', () => {
+    // #given
+    const event = {
+      kind: 'authorizationRequested',
+      granted: false,
+      failure: DETAIL
+    } as const
+
+    // #when
+    const tone = journalTone(event)
+
+    // #then
+    expect(tone).toBe('warning')
+  })
+
+  it('salue une notification qui a ramené une fenêtre', () => {
+    // #given
+    const event = {
+      ...NOTIFIED,
+      outcome: { outcome: 'focused' }
+    } as const
+
+    // #when
+    const tone = journalTone(event)
+
+    // #then
+    expect(tone).toBe('good')
+  })
+
+  it('reste neutre sur une notification qui n’a rien fait', () => {
+    // #given
+    const event = {
+      ...NOTIFIED,
+      outcome: { outcome: 'kindDisabled' }
+    } as const
+
+    // #when
+    const tone = journalTone(event)
+
+    // #then
+    expect(tone).toBe('neutral')
+  })
+
+  it('salue un raccourci qui a ramené une fenêtre', () => {
+    // #given
+    const event = {
+      ...FIRED,
+      outcome: { outcome: 'focused', nickname: NICKNAME }
+    } as const
+
+    // #when
+    const tone = journalTone(event)
+
+    // #then
+    expect(tone).toBe('good')
+  })
+
+  it('reste neutre sur un raccourci frappé hors du jeu', () => {
+    // #given
+    const event = { ...FIRED, outcome: { outcome: 'outsideGame' } } as const
+
+    // #when
+    const tone = journalTone(event)
+
+    // #then
+    expect(tone).toBe('neutral')
+  })
+
+  it('avertit sur un raccourci dont le focus a été refusé', () => {
+    // #given
+    const event = {
+      ...FIRED,
+      outcome: { outcome: 'focusFailed', nickname: NICKNAME, detail: DETAIL }
+    } as const
+
+    // #when
+    const tone = journalTone(event)
+
+    // #then
+    expect(tone).toBe('warning')
+  })
+
+  it('salue un clic de la barre système qui a abouti', () => {
+    // #given
+    const event = { ...CLICKED, outcome: { outcome: 'focused' } } as const
+
+    // #when
+    const tone = journalTone(event)
+
+    // #then
+    expect(tone).toBe('good')
+  })
+
+  it('avertit sur un clic de la barre système que le système a refusé', () => {
+    // #given
+    const event = {
+      ...CLICKED,
+      outcome: { outcome: 'focusFailed', detail: DETAIL }
+    } as const
+
+    // #when
+    const tone = journalTone(event)
+
+    // #then
+    expect(tone).toBe('warning')
+  })
+
+  it('avertit dès qu’une seule combinaison n’est pas sur le système', () => {
+    // #when
+    const tone = journalTone({ kind: 'shortcutsBound', bindings: BINDINGS })
+
+    // #then
+    expect(tone).toBe('warning')
+  })
+
+  it('reste neutre quand chaque combinaison est posée ou vide', () => {
+    // #given
+    const bindings = BINDINGS.filter((binding) => {
+      return binding.status.kind !== 'invalid'
+    })
+
+    // #when
+    const tone = journalTone({ kind: 'shortcutsBound', bindings })
+
+    // #then
+    expect(tone).toBe('neutral')
+  })
+
+  it('lit dans la table le ton d’une écoute qui a démarré', () => {
+    // #when
+    const tone = journalTone({ kind: 'listening' })
+
+    // #then
+    expect(tone).toBe('good')
+  })
+
+  it('lit dans la table le ton d’une lecture des fenêtres impossible', () => {
+    // #when
+    const tone = journalTone({ kind: 'scanFailed', detail: DETAIL })
+
+    // #then
+    expect(tone).toBe('warning')
+  })
+})
+
+describe('journalTime', () => {
+  it('écrit l’heure, les minutes et les secondes sur deux chiffres', () => {
+    // #when
+    const time = journalTime(MORNING)
+
+    // #then
+    expect(time).toBe('09:05:03')
+  })
+
+  it('écrit minuit comme une heure ordinaire', () => {
+    // #when
+    const time = journalTime(Date.UTC(2026, 0, 15))
+
+    // #then
+    expect(time).toBe('00:00:00')
+  })
+})
+
+describe('journalTranscript', () => {
+  it('porte un en-tête qui se lit seul, puis une entrée par ligne', () => {
+    // #when
+    const transcript = journalTranscript(SNAPSHOT)
+
+    // #then
+    expect(transcript).toBe(
+      [
+        'multifus 0.1.0 sur macOS 26.0 (arm64)',
+        'Autorisation : accordée, écoute active',
+        'AutoFocus : actif, réveil des réduites actif',
+        BINDINGS_LINE,
+        'Configuration : /tmp/multifus/config.json',
+        `Mise à jour : ${strings.about.updateUpToDate}`,
+        'Entrées en mémoire : 2, 15/01/2026 09:05:03 → 15/01/2026 12:30:00',
+        'Le fichier du journal sur le disque va plus loin en arrière que ces lignes.',
+        '',
+        `09:05:03  ${PLAIN_LINES.listening}`,
+        '12:30:00  Alpha est connecté.'
+      ].join('\n')
+    )
+  })
+
+  it('dit l’autorisation refusée et l’écoute arrêtée', () => {
+    // #given
+    const authorization = { granted: false, listening: false }
+
+    // #when
+    const transcript = journalTranscript({ ...SNAPSHOT, authorization })
+
+    // #then
+    expect(transcript).toContain('Autorisation : refusée, écoute arrêtée')
+  })
+
+  it('dit l’AutoFocus suspendu et le réveil des réduites inactif', () => {
+    // #when
+    const transcript = journalTranscript({
+      ...SNAPSHOT,
+      autoFocusEnabled: false,
+      wakesMinimized: false
+    })
+
+    // #then
+    expect(transcript).toContain(
+      'AutoFocus : suspendu, réveil des réduites inactif'
+    )
+  })
+
+  it('ne promet aucune période quand rien n’est en mémoire', () => {
+    // #when
+    const transcript = journalTranscript({ ...SNAPSHOT, journal: [] })
+
+    // #then
+    expect(transcript).toContain('Entrées en mémoire : 0, aucune entrée')
+  })
+})

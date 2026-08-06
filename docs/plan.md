@@ -8,23 +8,23 @@ Le vocabulaire est dans [CONTEXT.md](../CONTEXT.md), ce que le projet refuse de 
 
 ## Où on en est
 
-**macOS est fini.** Toute l'étape 11 est écrite et vérifiée sur un vrai robot, quart d'heure compris. Ce qui reste sur ce système n'est plus du code : le certificat Developer ID, les huit secrets du dépôt et le logo, tous les trois listés à l'étape 10. Puis l'étape 12, qui range `src` sans rien changer à l'écran, et enfin Windows, qui est l'étape 9. Les numéros restent des étiquettes, le code y renvoie.
+**macOS est fini.** Toute l'étape 11 est écrite et vérifiée sur un vrai robot, quart d'heure compris. Ce qui reste sur ce système n'est plus du code : le certificat Developer ID, les huit secrets du dépôt et le logo, tous les trois listés à l'étape 10. L'étape 12 a rangé `src` sans rien changer à l'écran, tests compris. Reste Windows, qui est l'étape 9. Les numéros restent des étiquettes, le code y renvoie.
 
-| #     | Étape                       | Où                                             | État                                  |
-| ----- | --------------------------- | ---------------------------------------------- | ------------------------------------- |
-| 0-1   | Bootstrap et outillage      | `package.json`, `oxlint.config.ts`, `.husky`   | fait                                  |
-| 2     | Cœur métier pur             | `src-tauri/src/domain`                         | fait, testé                           |
-| 3     | Frontière avec le système   | `src-tauri/src/platform`                       | fait                                  |
-| 4     | Implémentation macOS        | `platform::macos`                              | **vérifiée sur deux clients**         |
-| 5     | Persistance                 | `src-tauri/src/config`                         | fait, testé                           |
-| 6     | Interface React             | `src`, `src-tauri/src/app`                     | faite, AutoFocus prouvé               |
-| 7     | Raccourcis globaux          | `app::shortcuts`                               | **vérifiés depuis le jeu**            |
-| 8     | Barre système et session    | `app::tray`, `app::autostart`                  | **revient à l'ouverture de session**  |
-| 10    | Distribution et mise à jour | `.github/workflows`, `app::update`             | écrite, à vérifier                    |
-| 11a   | Fondations du relais        | `app::relay::secret`, `platform::display`      | écrites, testées                      |
-| 11b-1 | Appariement du relais       | `app::relay::{telegram,pairing}`, écran Relais | **vérifié sur un vrai robot**         |
-| 11b-2 | Le relais lui-même          | `app::relay::run`, barre système, balayage     | **vérifié, quart d'heure compris**    |
-| 12    | Architecture de l'interface | `src`                                          | lots A, B et C faits, reste les tests |
+| #     | Étape                       | Où                                             | État                                 |
+| ----- | --------------------------- | ---------------------------------------------- | ------------------------------------ |
+| 0-1   | Bootstrap et outillage      | `package.json`, `oxlint.config.ts`, `.husky`   | fait                                 |
+| 2     | Cœur métier pur             | `src-tauri/src/domain`                         | fait, testé                          |
+| 3     | Frontière avec le système   | `src-tauri/src/platform`                       | fait                                 |
+| 4     | Implémentation macOS        | `platform::macos`                              | **vérifiée sur deux clients**        |
+| 5     | Persistance                 | `src-tauri/src/config`                         | fait, testé                          |
+| 6     | Interface React             | `src`, `src-tauri/src/app`                     | faite, AutoFocus prouvé              |
+| 7     | Raccourcis globaux          | `app::shortcuts`                               | **vérifiés depuis le jeu**           |
+| 8     | Barre système et session    | `app::tray`, `app::autostart`                  | **revient à l'ouverture de session** |
+| 10    | Distribution et mise à jour | `.github/workflows`, `app::update`             | écrite, à vérifier                   |
+| 11a   | Fondations du relais        | `app::relay::secret`, `platform::display`      | écrites, testées                     |
+| 11b-1 | Appariement du relais       | `app::relay::{telegram,pairing}`, écran Relais | **vérifié sur un vrai robot**        |
+| 11b-2 | Le relais lui-même          | `app::relay::run`, barre système, balayage     | **vérifié, quart d'heure compris**   |
+| 12    | Architecture de l'interface | `src`                                          | faite, 175 cas côté React            |
 
 Les versions font foi dans `package.json`, `tauri.conf.json` et `Cargo.toml`, nulle part ailleurs. `standard-version` les déplace ensemble, et le workflow de release refuse un tag qui ne dirait pas la même chose qu'elles.
 
@@ -96,7 +96,7 @@ Et surtout, **rien n'intercepte la sortie**. `RunEvent::ExitRequested` avec `pre
 
 **Écrite, pas encore vérifiée. macOS seulement, Apple Silicon seulement.** Windows n'est pas abandonné, il attend que macOS soit fini pour démarrer d'un bloc : il rejoint ces workflows à l'étape 9, en ajoutant un runner `windows-latest` aux deux endroits qui sont aujourd'hui des jobs uniques. En attendant, un `ci` vert ne dit toujours rien de `platform::windows`, et rien de ce qui a été ajouté ici n'est propre à macOS.
 
-Trois fichiers pour deux portes. `checks` porte les six commandes de la porte du projet et n'est déclenché par personne : il est appelé. `ci` l'appelle sur chaque poussée et chaque pull request, `release` l'appelle avant de signer quoi que ce soit. Une seule définition de « le code est en ordre », dans un seul fichier, et les deux portes passent par elle. Recopiée dans les deux, elle divergerait, et la copie qui divergerait serait celle qui garde la release.
+Trois fichiers pour deux portes. `checks` porte les sept commandes de la porte du projet et n'est déclenché par personne : il est appelé. `ci` l'appelle sur chaque poussée et chaque pull request, `release` l'appelle avant de signer quoi que ce soit. Une seule définition de « le code est en ordre », dans un seul fichier, et les deux portes passent par elle. Recopiée dans les deux, elle divergerait, et la copie qui divergerait serait celle qui garde la release.
 
 `release` se déclenche sur un tag `v*`, compile, signe, notarise, et dépose le tout dans une release **en brouillon**.
 
@@ -467,11 +467,25 @@ Trois documents ont été mis à jour dans le même commit : `perimetre.md` § C
 
 **Vérifié.** `npm run lint`, `npm run format:check`, `tsc` et `vite build` passent. Les littéraux ont été comparés avant et après, hors chemins d'import ils sont identiques au nombre d'occurrences près, et chaque corps déplacé a été comparé à son original : les seules différences sont les renommages ci-dessus.
 
-#### Lot D — Les tests
+#### Lot D — Les tests, fait
 
-Le côté Rust teste son domaine et sa persistance. Le côté React n'a aucun test, et son interface actuelle ne permet pas d'en écrire un. Après les trois lots précédents il y a quatre modules purs à atteindre directement : `helpers/journal.ts`, où les quarante variantes d'événement valent quarante assertions, `helpers/accelerator.ts`, `helpers/cycle.ts` avec `array.ts`, et `helpers/wording.ts` avec `format.ts`.
+**Ce qui est posé.** `vitest` 4.1, six fichiers de test posés chacun à côté de son module, **175 cas**, dont 113 pour `helpers/journal.ts`. Rien n'est monté et rien n'est simulé, ce que les trois lots précédents ont rendu possible : aucun de ces modules ne lit React ni Tauri. Six fichiers et non quatre, parce que `array.ts` et `format.ts` sont des modules et que la règle est un fichier de test par module ; ils restent les deux plus courts.
 
-`vitest`, un fichier de test par module, rien à monter et rien à simuler. Ce lot ne vaut qu'après le lot A : sans lui, un test de `journalLine` importe encore le pont Tauri.
+**L'environnement de vitest est `node`, et c'est lui qui décide de `IS_APPLE`.** `constants/keyboard.ts` lit `navigator.userAgent` au chargement, et Node rend `Node.js/24`, donc `IS_APPLE` est faux ici comme sur le runner. Les libellés attendus sont donc ceux du clavier non Apple, `Ctrl`, `Maj` et `Win`, et quatre cas en dépendent, tous dans `accelerator.test.ts`. Le premier d'entre eux affirme `IS_APPLE === false` : changer l'environnement pour un navigateur simulé fait échouer ce cas-là d'abord, avec son nom, plutôt que trois libellés au hasard. Aucun module n'est moqué, ce que le lot promettait.
+
+**Le fuseau est épinglé à UTC dans `vite.config.ts`**, par `test.env.TZ`, et pas dans un test. `journalTime` et `journalMoment` passent par `toLocaleTimeString` et `toLocaleString` en `fr-FR` : sans ça la suite passait ici et tombait sur `macos-latest`, qui est en UTC. Trois cas en dépendent, les deux de `journalTime` et la transcription complète.
+
+**Les quarante variantes se dérivent, leurs charges non.** Le fichier de test porte `Record<JournalEvent['kind'], readonly Case<Kind>[]>` : la liste des quarante n'est écrite nulle part, c'est le type qui l'exige, et un événement ajouté côté Rust fait échouer `tsc` ici comme dans `constants/journal.ts`. Ce n'est pas un jumeau du filet de `RunEventKind`, c'est le même mécanisme appliqué au même endroit. Six unions de charge ont leur propre table exhaustive, les changements de roster, les changements de réglage et les issues d'une notification, d'un raccourci, d'un clic de barre système et d'un échec de relais. Ce qui ne se dérive pas est écrit à la main : un événement d'exemple par variante, puisque TypeScript n'invente pas un pseudo, et la phrase attendue.
+
+**Les branches `default` ne sont pas couvertes, et c'est décidé.** Les atteindre demande de fabriquer un `kind` dont le type dit qu'il ne peut pas exister, donc une assertion que `no-unsafe-type-assertion` refuse, ou un détour par `JSON.parse` qui contourne la règle en faisant semblant de l'observer. Elles ne promettent d'ailleurs rien qu'un test puisse vérifier : leur travail est de ne pas planter devant un binaire Rust plus récent que la fenêtre, ce qu'aucun cas ne reproduit fidèlement. Ce qui les garde est le filet de compilation, et il est testé, lui.
+
+**D'où vient la phrase attendue.** Quand le helper écrit la phrase, le cas la recopie en toutes lettres. Quand il ne fait que la choisir dans `constants/strings` ou dans une table de `constants/journal.ts`, le cas nomme l'entrée : ce qui est en jeu est la branche, et une phrase recopiée là ne ferait que dupliquer la table qu'elle lit. Un événement à détail est entre les deux, le cas nomme la table et écrit la composition, `phrase : raison`.
+
+**Le préréglage `vitest` de `@viclafouch/oxc-config` est branché en `overrides` et non en `extends`.** Posé globalement, sa règle `require-hook` traite le montage de `main.tsx` comme du code d'installation laissé hors d'un crochet. Un `overrides` sur `src/**/*.test.ts` le limite aux fichiers de test, et aucune règle n'est éteinte. Ce préréglage impose `it` dans un `describe`, `toStrictEqual` plutôt que `toEqual`, et un titre qui commence en minuscule. Un `overrides` remplace les greffons dont il hérite au lieu de s'y ajouter, d'où `TEST_PLUGINS`, qui les renomme tous. `vitest/consistent-test-filename` est en plus, réglé sur `*.test.ts`.
+
+**Et `checks.yml` porte la commande**, entre `format:check` et `build`. `lint`, `format:check` et `tsc` couvraient déjà les fichiers de test sans rien avoir à changer : `oxlint` lit tout ce qui n'est pas ignoré, et `tsconfig.json` inclut `src`.
+
+**Une faute d'accord trouvée et laissée en place.** `Tous les femmes connectés sont réveillés`, que `rosterLine` écrit sur un `genderAsleep` féminin. Le cas la fige telle quelle : ce lot ne change rien à l'écran, et le journal est un écran.
 
 #### Pièges connus d'avance
 
