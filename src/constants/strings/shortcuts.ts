@@ -1,7 +1,7 @@
 /** The words of the Raccourcis screen, the four actions included. */
 
 import type { ShortcutAction, ShortcutStatus } from '@/@types/shortcuts'
-import type { CaptureRejection } from '@/lib/accelerator'
+import type { CaptureRejection } from '@/constants/keyboard'
 
 /** A fifth action of perimetre.md fails to compile here, and not in the screen. */
 const ACTION_LABELS = {

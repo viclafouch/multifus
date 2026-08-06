@@ -2,33 +2,7 @@ import { FolderOpen, TriangleAlert } from 'lucide-react'
 import type { ConfigProblem } from '@/@types/system'
 import { Button } from '@/components/ui/button'
 import { strings } from '@/constants/strings'
-
-/**
- * One entry per way the file can let multifus down. A table rather than a
- * switch, so that adding a fourth kind on the Rust side fails to compile here
- * instead of falling through to a wrong sentence.
- */
-const WORDING = {
-  malformed: {
-    title: strings.config.malformedTitle,
-    body: strings.config.malformedBody
-  },
-  notSaved: {
-    title: strings.config.notSavedTitle,
-    body: strings.config.notSavedBody
-  },
-  notSetAside: {
-    title: strings.config.notSetAsideTitle,
-    body: strings.config.notSetAsideBody
-  },
-  unreadable: {
-    title: strings.config.unreadableTitle,
-    body: strings.config.unreadableBody
-  }
-} as const satisfies Record<
-  ConfigProblem['kind'],
-  { readonly title: string; readonly body: string }
->
+import { CONFIG_PROBLEM_LINES } from '@/helpers/wording'
 
 type ConfigNoticeProps = Readonly<{
   problem: ConfigProblem
@@ -51,7 +25,7 @@ export const ConfigNotice = ({
   onReveal,
   onDismiss
 }: ConfigNoticeProps) => {
-  const { title, body } = WORDING[problem.kind]
+  const { title, body } = CONFIG_PROBLEM_LINES[problem.kind]
 
   return (
     <div className="flex items-start gap-3 border-b border-destructive/25 bg-destructive/8 px-7 py-3">

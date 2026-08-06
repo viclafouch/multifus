@@ -24,7 +24,7 @@ Le vocabulaire est dans [CONTEXT.md](../CONTEXT.md), ce que le projet refuse de 
 | 11a   | Fondations du relais        | `app::relay::secret`, `platform::display`      | écrites, testées                      |
 | 11b-1 | Appariement du relais       | `app::relay::{telegram,pairing}`, écran Relais | **vérifié sur un vrai robot**         |
 | 11b-2 | Le relais lui-même          | `app::relay::run`, barre système, balayage     | **vérifié, quart d'heure compris**    |
-| 12    | Architecture de l'interface | `src`                                          | lots A et B faits, deux lots restants |
+| 12    | Architecture de l'interface | `src`                                          | lots A, B et C faits, reste les tests |
 
 Les versions font foi dans `package.json`, `tauri.conf.json` et `Cargo.toml`, nulle part ailleurs. `standard-version` les déplace ensemble, et le workflow de release refuse un tag qui ne dirait pas la même chose qu'elles.
 
@@ -431,7 +431,7 @@ Les types d'abord, les chaînes ensuite. `@types/` sort de `multifus.ts`, et `ts
 
 **Un septième fichier de types, que le tableau ci-dessus n'avait pas.** `NotificationKind` et `AutoFocusSwitch` sont le vocabulaire des notifications et non celui du journal ni celui du système : ils ont leur fichier, jumeau du `constants/notification.ts` que le lot B posera. Les issues restent ensemble dans `journal.ts`, puisqu'elles n'existent que comme charge d'un événement.
 
-**`lib/strings.ts` n'existe plus.** Ses trois dernières fonctions sont à leur adresse : `keyLabel` dans `helpers/accelerator.ts`, `screenSaverDelay` dans `helpers/format.ts`, `updateLine` dans `helpers/wording.ts`. Les y laisser aurait gardé dans `lib/` un fichier qui ne portait plus une seule chaîne, donc un nom qui ment et trois domaines dans un seul fichier. Le lot C n'a plus qu'à les rejoindre. Il reste un seul import qui traverse les couches, `IS_APPLE` depuis `lib/accelerator.ts`, que `constants/strings/` et `helpers/accelerator.ts` lisent en attendant `constants/keyboard.ts`.
+**`lib/strings.ts` n'existe plus.** Ses trois dernières fonctions sont à leur adresse : `keyLabel` dans `helpers/accelerator.ts`, `screenSaverDelay` dans `helpers/format.ts`, `updateLine` dans `helpers/wording.ts`. Les y laisser aurait gardé dans `lib/` un fichier qui ne portait plus une seule chaîne, donc un nom qui ment et trois domaines dans un seul fichier. Le lot C les a rejointes. Il restait alors un seul import qui traversait les couches, `IS_APPLE` depuis `lib/accelerator.ts`, que `constants/strings/` et `helpers/accelerator.ts` lisaient en attendant `constants/keyboard.ts` : le lot C l'a fermé.
 
 **Les deux ne se séparent pas.** `helpers/journal.ts` lit les types du pont : sans `@types/`, il importe `@tauri-apps/api`, et `helpers/` cesse d'être testable sans Tauri avant même d'exister.
 
@@ -451,11 +451,21 @@ Trois documents ont été mis à jour dans le même commit : `perimetre.md` § C
 
 `.claude/rules/code-style.md` § Where things live a été corrigé dans le même commit : il annonçait un fichier par écran, ce qui n'est plus vrai pour deux d'entre eux, et ne connaissait pas `components/layout/`. `frontend.md` n'avait rien à corriger, il ne nomme aucun chemin.
 
-#### Lot C — Les fonctions pures
+#### Lot C — Les fonctions pures, fait
 
-Six fonctions font le même travail dans six fichiers sous trois noms différents : `problemLine`, `statusHint`, `statusLine`, `stateLabel`, la table `WORDING` et `updateLine`. Elles prennent une union du domaine et rendent une phrase française, exactement comme `helpers/journal.ts`. Elles se rassemblent dans `helpers/wording.ts` avec un seul suffixe.
+**Ce qui est posé.** `constants/keyboard.ts` porte les quatre tables du clavier et `IS_APPLE`, `helpers/accelerator.ts` les quatre fonctions qui les lisent. Les six mises en mots sont dans `helpers/wording.ts` sous le suffixe `Line` : `updateLine`, `pairingProblemLine`, `shortcutStatusLine`, `authorizationLine`, `characterStateLine` et la table `CONFIG_PROBLEM_LINES`. `arrange` est dans `helpers/cycle.ts`, `moved` dans `helpers/array.ts`, et `use-cycle-order.ts` ne garde que son état.
 
-`use-cycle-order.ts` garde son état de glissé et rend `arrange` à `helpers/cycle.ts`, `moved` à `helpers/array.ts`. Les deux sont des fonctions de tableaux sans un mot de React, aujourd'hui atteignables seulement en montant un composant.
+**`lib/accelerator.ts` n'existe plus, et c'est la question que ce lot posait.** Les tables parties, il restait la capture, les modificateurs tenus et le découpage d'une combinaison : rien qui parle au monde extérieur, donc rien qui justifie `lib/`. Ils rejoignent `helpers/accelerator.ts`, qui portait déjà `keyLabel`. `lib/` est réduit à `multifus.ts` et à `utils.ts`, ce que l'arbre visé demandait, et le piège de `cn` est tenu sans avoir eu à s'en occuper.
+
+**`CaptureRejection` suit les tables et non les fonctions.** C'est la clé de `REJECTION_LINES`, dans `constants/strings/shortcuts.ts` : laissé dans `helpers/`, il aurait fait lire un module de `helpers/` à un fichier de `constants/`, c'est-à-dire rouvrir dans l'autre sens l'import que ce lot ferme. Il est dans `constants/keyboard.ts` avec `Modifier`, comme `JournalTone` vit dans `constants/journal.ts`.
+
+**`WORDING` reste une table et ne devient pas une fonction.** C'est elle qui fait échouer la compilation sur un cinquième `ConfigProblem`, et une fonction qui ne ferait que l'indexer serait l'enveloppe sans transformation que `.claude/rules/code-style.md` refuse. Elle s'appelle `CONFIG_PROBLEM_LINES`, comme les tables de phrases de `constants/journal.ts`.
+
+**`FieldHint` suit `statusHint` et s'appelle maintenant `TonedLine`.** `fieldHint` ne bouge pas, elle lit un état de capture React et n'est pas une union du domaine mise en mots ; mais le type est le contrat des deux, et un écran a le droit de lire un helper quand l'inverse est interdit. Le nom a suivi l'adresse : un type nommé d'après un champ de formulaire n'a rien à faire dans un module pur.
+
+**`moved` prend `item` et non `nickname`.** Dans `helpers/array.ts`, un paramètre nommé d'après le domaine est exactement le mensonge que ce lot corrige. `nicknamesOf` reste dans le crochet, une ligne de `.map` que personne d'autre n'appelle.
+
+**Vérifié.** `npm run lint`, `npm run format:check`, `tsc` et `vite build` passent. Les littéraux ont été comparés avant et après, hors chemins d'import ils sont identiques au nombre d'occurrences près, et chaque corps déplacé a été comparé à son original : les seules différences sont les renommages ci-dessus.
 
 #### Lot D — Les tests
 

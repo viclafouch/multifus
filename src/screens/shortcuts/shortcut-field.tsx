@@ -1,9 +1,11 @@
 import React from 'react'
 import type { ShortcutBinding, ShortcutStatus } from '@/@types/shortcuts'
 import { Button } from '@/components/ui/button'
+import type { CaptureRejection } from '@/constants/keyboard'
 import { strings } from '@/constants/strings'
-import type { CaptureRejection } from '@/lib/accelerator'
-import { acceleratorParts, capture, heldModifiers } from '@/lib/accelerator'
+import { acceleratorParts, capture, heldModifiers } from '@/helpers/accelerator'
+import type { TonedLine } from '@/helpers/wording'
+import { shortcutStatusLine } from '@/helpers/wording'
 import { KeyCap } from '@/screens/shortcuts/key-cap'
 
 type ShortcutFieldProps = Readonly<{
@@ -114,11 +116,6 @@ type FieldHintParams = {
   readonly rejected: CaptureRejection | null
 }
 
-type FieldHint = {
-  readonly tone: 'bad' | 'calm'
-  readonly text: string
-}
-
 /**
  * What the line under the field says, and it always says something. A field that
  * stays silent is a field one has to go and test in the game to trust.
@@ -127,7 +124,7 @@ const fieldHint = ({
   isEditing,
   status,
   rejected
-}: FieldHintParams): FieldHint => {
+}: FieldHintParams): TonedLine => {
   if (rejected !== null) {
     return { tone: 'bad', text: strings.shortcuts.rejected[rejected] }
   }
@@ -136,36 +133,5 @@ const fieldHint = ({
     return { tone: 'calm', text: strings.shortcuts.captureHint }
   }
 
-  return statusHint(status)
-}
-
-/** What the system answered about this combination, in French. */
-const statusHint = (status: ShortcutStatus): FieldHint => {
-  const answers = strings.shortcuts.status
-
-  switch (status.kind) {
-    case 'registered': {
-      return { tone: 'calm', text: answers.registered }
-    }
-    case 'unbound': {
-      return { tone: 'calm', text: answers.unbound }
-    }
-    case 'pending': {
-      return { tone: 'calm', text: answers.pending }
-    }
-    case 'invalid': {
-      return { tone: 'bad', text: answers.invalid }
-    }
-    case 'refused': {
-      return { tone: 'bad', text: answers.refused }
-    }
-    case 'duplicate': {
-      const { label } = strings.shortcuts.actions[status.action]
-
-      return { tone: 'bad', text: answers.duplicate(label) }
-    }
-    default: {
-      return { tone: 'calm', text: answers.pending }
-    }
-  }
+  return shortcutStatusLine(status)
 }

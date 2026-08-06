@@ -146,7 +146,8 @@ Always use native modern APIs (Intl, URLSearchParams, structuredClone, etc.) ins
 
 **Global constants and helpers** (used across multiple screens):
 
-- `src/lib/` - One file per domain (`accelerator.ts`, `multifus.ts`)
+- `src/helpers/` - One file per domain (`accelerator.ts`, `wording.ts`)
+- `src/constants/` - One file per domain too (`keyboard.ts`, `journal.ts`)
 - `src/constants/strings/` - Every French string of the interface, and nothing
   else: one file per screen, an index that composes `strings`
 
@@ -185,8 +186,7 @@ Before writing ANY function, component, type, or constant inside a feature file,
 - `src/@types/` - What crosses the bridge, without a single runtime import
 - `src/constants/` - Tables and nothing else, the strings included
 - `src/helpers/` - Pure functions that know the domain, neither React nor Tauri
-- `src/lib/` - What talks to the outside world (`cn`, the IPC bridge, the
-  accelerator vocabulary)
+- `src/lib/` - What talks to the outside world: the IPC bridge, and `cn`
 - `src/hooks/` - Custom hooks, one per file, named `use-*.ts`
 - `src/components/` - Shared components
 - `src/components/layout/` - The frame a screen sits in, one file per component

@@ -1,6 +1,8 @@
 import React from 'react'
 import type { Character } from '@/@types/roster'
 import type { Snapshot } from '@/@types/snapshot'
+import { moved } from '@/helpers/array'
+import { arrange } from '@/helpers/cycle'
 import { reorder } from '@/lib/multifus'
 
 type UseCycleOrderParams = {
@@ -9,28 +11,21 @@ type UseCycleOrderParams = {
 }
 
 /**
- * The cycle order while it is being rearranged.
- *
- * The roster the interface draws is the one the Rust side stored, except while a
- * row is being dragged: then it comes from a local copy that follows the pointer,
- * and the copy is dropped as soon as an answer comes back.
+ * The cycle order while it is being rearranged: the roster the Rust side stored,
+ * except while a row is dragged, when a local copy follows the pointer.
  */
 export const useCycleOrder = ({ characters, run }: UseCycleOrderParams) => {
   const [order, setOrder] = React.useState<readonly string[] | null>(null)
   const [dragged, setDragged] = React.useState<string | null>(null)
   const [known, setKnown] = React.useState(characters)
 
-  // A new roster drops the local copy, and this is React's own answer to
-  // resetting state when a prop changes where a `key` does not fit: adjust
-  // during render rather than in an effect. An effect would clear the order in a
-  // second pass, so the frame between the two would draw the roster in its
-  // previous order and the list would visibly jump back before settling.
-  //
-  // A scan landing mid-drag is the one case that keeps the copy: pulling a row
-  // out from under the pointer is worse than being one scan behind.
+  // A new roster drops the local copy during render and not in an effect: an
+  // effect would clear it a frame later and the list would visibly jump back.
   if (known !== characters) {
     setKnown(characters)
 
+    // A scan landing mid-drag keeps the copy: pulling a row out from under the
+    // pointer is worse than being one scan behind.
     if (dragged === null) {
       setOrder(null)
     }
@@ -47,7 +42,7 @@ export const useCycleOrder = ({ characters, run }: UseCycleOrderParams) => {
     rows,
     dragged,
     handleMove: (nickname: string, delta: number) => {
-      const next = moved({ list: nicknamesOf(rows), nickname, delta })
+      const next = moved({ list: nicknamesOf(rows), item: nickname, delta })
 
       if (next !== null) {
         commit(next)
@@ -66,7 +61,7 @@ export const useCycleOrder = ({ characters, run }: UseCycleOrderParams) => {
         const list = current ?? nicknamesOf(characters)
         const delta = list.indexOf(nickname) - list.indexOf(dragged)
 
-        return moved({ list, nickname: dragged, delta }) ?? list
+        return moved({ list, item: dragged, delta }) ?? list
       })
     },
     handleDragEnd: () => {
@@ -83,63 +78,4 @@ const nicknamesOf = (characters: readonly Character[]) => {
   return characters.map((character) => {
     return character.nickname
   })
-}
-
-type ArrangeParams = {
-  readonly characters: readonly Character[]
-  readonly order: readonly string[] | null
-}
-
-/** The roster as it is drawn: the stored order, or the one being dragged. */
-const arrange = ({
-  characters,
-  order
-}: ArrangeParams): readonly Character[] => {
-  if (order === null) {
-    return characters
-  }
-
-  const known = new Map(
-    characters.map((character) => {
-      return [character.nickname, character]
-    })
-  )
-
-  const ordered = order.flatMap((nickname) => {
-    const character = known.get(nickname)
-
-    return character === undefined ? [] : [character]
-  })
-
-  const rest = characters.filter((character) => {
-    return !order.includes(character.nickname)
-  })
-
-  return [...ordered, ...rest]
-}
-
-type MovedParams = {
-  readonly list: readonly string[]
-  readonly nickname: string
-  readonly delta: number
-}
-
-/** The same list with one nickname moved, or `null` when it cannot move. */
-const moved = ({
-  list,
-  nickname,
-  delta
-}: MovedParams): readonly string[] | null => {
-  const from = list.indexOf(nickname)
-  const to = from + delta
-
-  if (from === -1 || to < 0 || to >= list.length || delta === 0) {
-    return null
-  }
-
-  const without = list.filter((_, index) => {
-    return index !== from
-  })
-
-  return [...without.slice(0, to), nickname, ...without.slice(to)]
 }

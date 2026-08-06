@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import type { NavItem } from '@/constants/navigation'
 import { NAV_ITEMS } from '@/constants/navigation'
 import { strings } from '@/constants/strings'
+import { authorizationLine } from '@/helpers/wording'
 
 type NavRailProps = Readonly<{
   current: ScreenName
@@ -65,7 +66,7 @@ export const NavRail = ({
           </span>
         </p>
         <p className="pl-4 text-mini text-muted-foreground/80">
-          {statusLine(authorization)}
+          {authorizationLine(authorization)}
         </p>
       </div>
     </nav>
@@ -99,14 +100,4 @@ const NavButton = ({ item, isCurrent, onNavigate }: NavButtonProps) => {
       {label}
     </Button>
   )
-}
-
-const statusLine = (authorization: Authorization) => {
-  if (!authorization.granted) {
-    return strings.status.denied
-  }
-
-  return authorization.listening
-    ? strings.status.listening
-    : strings.status.notListening
 }

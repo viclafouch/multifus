@@ -1,37 +1,12 @@
 import React from 'react'
 import { Link2 } from 'lucide-react'
-import type { PairingProblem, RelayStatus } from '@/@types/relay'
+import type { RelayStatus } from '@/@types/relay'
 import type { Snapshot } from '@/@types/snapshot'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { strings } from '@/constants/strings'
+import { pairingProblemLine } from '@/helpers/wording'
 import { pairRelay } from '@/lib/multifus'
-
-/** Why a pairing did not go through, put into words. */
-const problemLine = (problem: PairingProblem) => {
-  const { problem: lines } = strings.relay
-
-  switch (problem.kind) {
-    case 'tokenBlank': {
-      return lines.tokenBlank
-    }
-    case 'tokenRefused': {
-      return lines.tokenRefused(problem.detail)
-    }
-    case 'noChat': {
-      return lines.noChat
-    }
-    case 'keychain': {
-      return lines.keychain(problem.detail)
-    }
-    case 'network': {
-      return lines.network(problem.detail)
-    }
-    default: {
-      return lines.tokenBlank
-    }
-  }
-}
 
 type TokenFormProps = Readonly<{
   relay: RelayStatus
@@ -84,7 +59,7 @@ export const TokenForm = ({ relay, run }: TokenFormProps) => {
           role="alert"
           className="max-w-prose text-note text-destructive"
         >
-          {problemLine(problem)}
+          {pairingProblemLine(problem)}
         </p>
       )}
     </form>

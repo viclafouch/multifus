@@ -5,6 +5,7 @@ import { Lamp } from '@/components/lamp'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { strings } from '@/constants/strings'
+import { characterStateLine } from '@/helpers/wording'
 
 /** How long each row waits before rising, so the list powers up in sequence. */
 const STAGGER_MS = 38
@@ -121,7 +122,7 @@ export const CharacterRow = ({
           {nickname}
         </p>
         <p className="text-micro font-medium tracking-micro text-muted-foreground/65 uppercase">
-          {stateLabel(online, asleep)}
+          {characterStateLine(character)}
         </p>
       </div>
       <div className="flex shrink-0 items-center rounded-md border border-border/60 p-0.5">
@@ -205,12 +206,4 @@ const GenderButton = ({
 /** The row is a drop target, and a drop target has to say so. */
 const handleDrop = (event: React.DragEvent<HTMLLIElement>) => {
   event.preventDefault()
-}
-
-const stateLabel = (online: boolean, asleep: boolean) => {
-  if (!online) {
-    return strings.characters.offline
-  }
-
-  return asleep ? strings.characters.asleep : strings.characters.inCycle
 }

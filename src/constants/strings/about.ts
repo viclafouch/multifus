@@ -1,6 +1,6 @@
 /** The words of the À propos screen: identity, update, legal notice, reset. */
 
-import { IS_APPLE } from '@/lib/accelerator'
+import { IS_APPLE } from '@/constants/keyboard'
 
 export const ABOUT_STRINGS = {
   about: {
