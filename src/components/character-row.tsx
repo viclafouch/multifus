@@ -1,10 +1,10 @@
 import React from 'react'
 import { GripVertical, Mars, Venus, X } from 'lucide-react'
+import type { Character, Gender } from '@/@types/roster'
 import { Lamp } from '@/components/lamp'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
-import type { Character, Gender } from '@/lib/multifus'
-import { strings } from '@/lib/strings'
+import { strings } from '@/constants/strings'
 
 /** How long each row waits before rising, so the list powers up in sequence. */
 const STAGGER_MS = 38

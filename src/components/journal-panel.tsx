@@ -1,16 +1,17 @@
 import React from 'react'
 import { ChevronDown, ChevronUp, FolderOpen } from 'lucide-react'
+import type { JournalEntry } from '@/@types/journal'
+import type { Snapshot } from '@/@types/snapshot'
 import { CopyButton } from '@/components/copy-button'
 import { Button } from '@/components/ui/button'
-import type { JournalEntry, Snapshot } from '@/lib/multifus'
-import { revealJournal } from '@/lib/multifus'
+import { strings } from '@/constants/strings'
 import {
   journalLine,
   journalTime,
   journalTone,
-  journalTranscript,
-  strings
-} from '@/lib/strings'
+  journalTranscript
+} from '@/helpers/journal'
+import { revealJournal } from '@/lib/multifus'
 
 /**
  * How far from the foot of the journal still counts as being at the foot, in

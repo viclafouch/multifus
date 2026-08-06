@@ -1,7 +1,7 @@
 import { FolderOpen, TriangleAlert } from 'lucide-react'
+import type { ConfigProblem } from '@/@types/system'
 import { Button } from '@/components/ui/button'
-import type { ConfigProblem } from '@/lib/multifus'
-import { strings } from '@/lib/strings'
+import { strings } from '@/constants/strings'
 
 /**
  * One entry per way the file can let multifus down. A table rather than a

@@ -1,5 +1,6 @@
 import React from 'react'
-import type { Character, Snapshot } from '@/lib/multifus'
+import type { Character } from '@/@types/roster'
+import type { Snapshot } from '@/@types/snapshot'
 import { reorder } from '@/lib/multifus'
 
 type UseCycleOrderParams = {

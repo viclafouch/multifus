@@ -1,5 +1,5 @@
 import React from 'react'
-import type { ScreenName } from '@/lib/multifus'
+import type { ScreenName } from '@/@types/snapshot'
 import { onNavigate } from '@/lib/multifus'
 
 /**

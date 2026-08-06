@@ -10,19 +10,16 @@ import {
   Swords,
   Users
 } from 'lucide-react'
+import type { AutoFocusSwitch, NotificationKind } from '@/@types/notification'
+import type { Snapshot } from '@/@types/snapshot'
 import { FieldRow, Panel, Screen } from '@/components/screen'
 import { Switch } from '@/components/ui/switch'
-import type {
-  AutoFocusSwitch,
-  NotificationKind,
-  Snapshot
-} from '@/lib/multifus'
+import { strings } from '@/constants/strings'
 import {
   setAutoFocus,
   setAutoFocusEnabled,
   setWakesMinimized
 } from '@/lib/multifus'
-import { strings } from '@/lib/strings'
 
 /** One glyph per recognised event, so the seven rows can be told apart at speed. */
 const ICONS = {

@@ -88,7 +88,7 @@ La ligne du corps complet a été mesurée et non supposée, ce qui décide de c
 
 ## Conventions
 
-Le code et les commentaires s'écrivent en anglais. L'interface est en français, avec les chaînes centralisées dans un seul fichier.
+Le code et les commentaires s'écrivent en anglais. L'interface est en français, avec les chaînes centralisées dans un seul endroit, `src/constants/strings`, un fichier par écran et un index qui les compose.
 
 La configuration est un fichier JSON dans le dossier standard du système. Aucune donnée personnelle n'est écrite en dur nulle part : ni pseudo, ni nombre de comptes supposé, ni chemin de machine. L'application doit fonctionner au premier lancement pour quelqu'un qui ne l'a jamais ouverte.
 

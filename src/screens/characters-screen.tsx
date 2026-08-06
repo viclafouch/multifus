@@ -1,9 +1,11 @@
 import { Mars, RefreshCw, Venus } from 'lucide-react'
+import type { Character, Gender } from '@/@types/roster'
+import type { Snapshot } from '@/@types/snapshot'
 import { CharacterRow } from '@/components/character-row'
 import { EmptyState, Note, Panel, Screen } from '@/components/screen'
 import { Button } from '@/components/ui/button'
+import { strings } from '@/constants/strings'
 import { useCycleOrder } from '@/hooks/use-cycle-order'
-import type { Character, Gender, Snapshot } from '@/lib/multifus'
 import {
   refresh,
   removeCharacter,
@@ -11,7 +13,6 @@ import {
   setGenderAsleep,
   toggleAsleep
 } from '@/lib/multifus'
-import { strings } from '@/lib/strings'
 
 type CharactersScreenProps = Readonly<{
   characters: readonly Character[]

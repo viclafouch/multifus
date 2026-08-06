@@ -23,7 +23,7 @@ Chaque entrée est écrite sur le disque au moment où elle est créée, en plus
 
 Sur macOS, c'est le dossier où l'on dit à un utilisateur d'aller chercher ses logs, et Console.app le lit. Sur Windows, c'est `LocalAppData` et non `Roaming` : un journal décrit ce qui s'est passé sur une machine et n'a rien à faire à suivre un profil sur une autre.
 
-**Le format est du JSON, une ligne par entrée, en anglais.** L'événement est structuré et le reste : l'interface est la seule à posséder les mots français, et écrire des phrases dans `app::journal` aurait mis le français dans un module dont la langue est l'anglais, en double de `src/lib/strings.ts`. Le fichier se relit à l'œil, l'heure et la date devant, et se reparse si besoin.
+**Le format est du JSON, une ligne par entrée, en anglais.** L'événement est structuré et le reste : l'interface est la seule à posséder les mots français, et écrire des phrases dans `app::journal` aurait mis le français dans un module dont la langue est l'anglais, en double de `src/helpers/journal.ts`. Le fichier se relit à l'œil, l'heure et la date devant, et se reparse si besoin.
 
 **Un seul niveau de log, `info`, pour tout.** La gravité d'un événement est une lecture que fait l'interface, à partir de l'événement lui-même. Une table de gravité côté Rust serait une seconde source de vérité pour la même question. Le prix est un `[INFO]` sur chaque ligne du fichier, qui est du bruit et qui coûte moins que ce doublon.
 

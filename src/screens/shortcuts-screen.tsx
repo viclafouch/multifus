@@ -1,16 +1,17 @@
 import React from 'react'
-import { FieldRow, Note, Panel, Screen } from '@/components/screen'
-import { Button } from '@/components/ui/button'
-import type { CaptureRejection } from '@/lib/accelerator'
-import { acceleratorParts, capture, heldModifiers } from '@/lib/accelerator'
 import type {
   ShortcutAction,
   ShortcutBinding,
-  ShortcutStatus,
-  Snapshot
-} from '@/lib/multifus'
+  ShortcutStatus
+} from '@/@types/shortcuts'
+import type { Snapshot } from '@/@types/snapshot'
+import { FieldRow, Note, Panel, Screen } from '@/components/screen'
+import { Button } from '@/components/ui/button'
+import { strings } from '@/constants/strings'
+import { keyLabel } from '@/helpers/accelerator'
+import type { CaptureRejection } from '@/lib/accelerator'
+import { acceleratorParts, capture, heldModifiers } from '@/lib/accelerator'
 import { setShortcut } from '@/lib/multifus'
-import { keyLabel, strings } from '@/lib/strings'
 
 type ShortcutsScreenProps = Readonly<{
   shortcuts: readonly ShortcutBinding[]

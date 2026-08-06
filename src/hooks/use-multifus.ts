@@ -1,5 +1,5 @@
 import React from 'react'
-import type { Snapshot } from '@/lib/multifus'
+import type { Snapshot } from '@/@types/snapshot'
 import * as multifus from '@/lib/multifus'
 
 /**

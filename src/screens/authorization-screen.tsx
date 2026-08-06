@@ -1,9 +1,9 @@
 import { ExternalLink, Lock } from 'lucide-react'
+import type { Snapshot } from '@/@types/snapshot'
 import { EmptyState, Screen } from '@/components/screen'
 import { Button } from '@/components/ui/button'
-import type { Snapshot } from '@/lib/multifus'
+import { strings } from '@/constants/strings'
 import { openAuthorizationSettings, requestAuthorization } from '@/lib/multifus'
-import { strings } from '@/lib/strings'
 
 type AuthorizationScreenProps = Readonly<{
   run: (action: Promise<Snapshot>) => void

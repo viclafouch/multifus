@@ -8,7 +8,7 @@ Le vocabulaire est dans [CONTEXT.md](../CONTEXT.md), ce que le projet refuse de 
 
 ## Où on en est
 
-**macOS est fini.** Toute l'étape 11 est écrite et vérifiée sur un vrai robot, quart d'heure compris. Ce qui reste sur ce système n'est plus du code : le certificat Developer ID, les huit secrets du dépôt et le logo, tous les trois listés à l'étape 10. Puis Windows, qui est l'étape 9. Les numéros restent des étiquettes, le code y renvoie.
+**macOS est fini.** Toute l'étape 11 est écrite et vérifiée sur un vrai robot, quart d'heure compris. Ce qui reste sur ce système n'est plus du code : le certificat Developer ID, les huit secrets du dépôt et le logo, tous les trois listés à l'étape 10. Puis l'étape 12, qui range `src` sans rien changer à l'écran, et enfin Windows, qui est l'étape 9. Les numéros restent des étiquettes, le code y renvoie.
 
 | #     | Étape                       | Où                                             | État                                 |
 | ----- | --------------------------- | ---------------------------------------------- | ------------------------------------ |
@@ -24,6 +24,7 @@ Le vocabulaire est dans [CONTEXT.md](../CONTEXT.md), ce que le projet refuse de 
 | 11a   | Fondations du relais        | `app::relay::secret`, `platform::display`      | écrites, testées                     |
 | 11b-1 | Appariement du relais       | `app::relay::{telegram,pairing}`, écran Relais | **vérifié sur un vrai robot**        |
 | 11b-2 | Le relais lui-même          | `app::relay::run`, barre système, balayage     | **vérifié, quart d'heure compris**   |
+| 12    | Architecture de l'interface | `src`                                          | lot A fait, trois lots restants      |
 
 Les versions font foi dans `package.json`, `tauri.conf.json` et `Cargo.toml`, nulle part ailleurs. `standard-version` les déplace ensemble, et le workflow de release refuse un tag qui ne dirait pas la même chose qu'elles.
 
@@ -49,7 +50,7 @@ L'écriture dans le presse-papiers passe par `tauri-plugin-clipboard-manager` et
 
 ## La suite, dans l'ordre
 
-L'ordre ci-dessous n'est pas celui des numéros : la distribution est passée avant Windows, pour que macOS soit fini d'un bloc et que la session Windows trouve la chaîne de compilation déjà posée, à laquelle il ne restera qu'à ajouter un runner. Le relais s'insère par la même logique, avant Windows : il se vérifie entièrement sur macOS, et sa seule moitié propre à Windows est l'écran tenu éveillé, qui suivra le motif `NotImplemented` déjà en place dans `platform::windows`.
+L'ordre ci-dessous n'est pas celui des numéros : la distribution est passée avant Windows, pour que macOS soit fini d'un bloc et que la session Windows trouve la chaîne de compilation déjà posée, à laquelle il ne restera qu'à ajouter un runner. Le relais s'insère par la même logique, avant Windows : il se vérifie entièrement sur macOS, et sa seule moitié propre à Windows est l'écran tenu éveillé, qui suivra le motif `NotImplemented` déjà en place dans `platform::windows`. L'étape 12 passe aussi avant, parce qu'elle ne touche que `src` : rangée maintenant, la session Windows ne la traverse pas, et repoussée après, elle déplacerait du code qui vient d'être écrit.
 
 ### Étape 8 — Barre système et démarrage automatique
 
@@ -321,7 +322,7 @@ Le clic sur l'état « pas prêt » ne part pas sur le travailleur non plus : il
 
 **Ce n'est pas `journalLine` qui bute sur la complexité, c'est `runLine`.** Le seuil est `complexity: ["error", 20]`, dans `@viclafouch/oxc-config`. `journalLine` fait quatre branches et n'est pas le sujet ; `runLine` en portait onze plus deux ternaires, soit environ 15, et les trois événements de 11b-2 l'ont mené vers 18. Ça passe, à un ternaire près : les branches ajoutées délèguent donc à des fonctions nommées, comme `rosterLine` et `settingLine` le font déjà, et aucune ne porte de ternaire en ligne.
 
-**Et ce qui casse d'abord n'est pas le lint, c'est le typage, ce qui donne l'ordre de travail.** Écrire les événements côté Rust, passer `cargo test`, puis laisser `tsc` énumérer : `TONES` échoue en premier, puis `PLAIN_LINES` et `DETAILED_LINES`, puis le `switch` de `actionLine` parce que `RunEventKind` n'a pas été mis à jour. Trois tables et deux fonctions se partagent le travail dans `src/lib/strings.ts`, et `ActionEventKind` est **dérivé** de son jumeau par `Exclude` : un événement ajouté côté Rust et oublié dans `RunEventKind` fait échouer la compilation de l'autre moitié. Ne pas remettre un seul `switch`, et ne pas non plus le résoudre par une assertion de type, que `no-unsafe-type-assertion` refuse.
+**Et ce qui casse d'abord n'est pas le lint, c'est le typage, ce qui donne l'ordre de travail.** Écrire les événements côté Rust, passer `cargo test`, puis laisser `tsc` énumérer : `TONES` échoue en premier, puis `PLAIN_LINES` et `DETAILED_LINES`, puis le `switch` de `actionLine` parce que `RunEventKind` n'a pas été mis à jour. Les trois tables sont dans `src/constants/journal.ts`, les deux fonctions dans `src/helpers/journal.ts` avec `RunEventKind`, et `ActionEventKind` est **dérivé** de son jumeau par `Exclude` : un événement ajouté côté Rust et oublié dans `RunEventKind` fait échouer la compilation de l'autre moitié. Ne pas remettre un seul `switch`, et ne pas non plus le résoudre par une assertion de type, que `no-unsafe-type-assertion` refuse.
 
 **Aucun `parse_mode` demandé à Telegram.** Un corps de jeu qui contient une astérisque ou un souligné casse l'analyse Markdown, et Telegram rejette le message entier plutôt que de l'envoyer en clair. Texte brut, toujours.
 
@@ -374,6 +375,101 @@ Utiliser la crate `windows`, qui couvre WinRT nativement. `UserNotificationListe
 **Piège à ne pas reproduire.** Dracoon contourne la restriction de `SetForegroundWindow` en injectant une vraie frappe Alt dans l'application active. C'est la cause probable du bug de focus intermittent corrigé dans son commit `0b0525c`, et ça envoie une touche parasite dans le jeu. Passer par `AttachThreadInput`.
 
 Ce qui attend déjà de ce côté : `platform::windows` compile en renvoyant `NotImplemented` méthode par méthode, la regex et la table `NOTIF_TYPES` sont dans `domain` et ne sont pas à réécrire, et les raccourcis globaux échouent franchement sur cette plateforme quand une combinaison est déjà prise, contrairement à macOS.
+
+### Étape 12 — Architecture de l'interface
+
+**Objectif.** L'arbre de `src/` ne dit pas ce que les fichiers font. Rien ne change à l'écran, aucune commande Rust n'est touchée, et un lot est réussi quand `npm run lint` et `tsc` passent et que la fenêtre dessine exactement pareil.
+
+**Ce qui manque est une distinction, pas des dossiers.** `constants/` ne porte que des tables, `helpers/` que des fonctions pures qui connaissent le domaine, `lib/` que ce qui parle au monde extérieur. Aujourd'hui `lib/` porte les trois, et deux de ses fichiers font 41 % du code de l'interface : `strings.ts` a 1355 lignes dont 967 ne sont pas des chaînes, `multifus.ts` a 634 lignes dont 400 sont le contrat de la frontière avec Rust.
+
+L'arbre visé :
+
+```
+src/
+├─ @types/        ce qui traverse le pont, sans un import d'exécution
+│  ├─ roster.ts       Character, Gender
+│  ├─ journal.ts      JournalEvent, JournalEntry, les issues, RosterChange, SettingChange
+│  ├─ notification.ts NotificationKind, AutoFocusSwitch
+│  ├─ relay.ts        RelayStatus, PairingProblem, RelayLink, RelayFailure, RelayStop
+│  ├─ shortcuts.ts    ShortcutAction, ShortcutBinding, ShortcutStatus
+│  ├─ system.ts       Authorization, ConfigStatus, UpdateStatus, ScreenSaver, Launch, Surface, Work
+│  └─ snapshot.ts     Snapshot, ScreenName
+├─ constants/     des tables, aucune logique
+│  ├─ strings/       un fichier par écran, un index qui compose `strings`
+│  ├─ journal.ts     TONES, SHORTCUT_TONES, TRAY_TONES, PLAIN_LINES, DETAILED_LINES,
+│  │                 RELAY_STOP_LINES, NOTICE_LINES, WORK_LABELS
+│  ├─ keyboard.ts    MODIFIERS, KEYS, ALIASES, KEY_LABELS, IS_APPLE
+│  ├─ navigation.ts  les cinq articles du rail
+│  └─ notification.ts les sept icônes de l'AutoFocus
+├─ helpers/       pur, ni React ni Tauri
+│  ├─ journal.ts     journalLine, journalTone, journalTranscript, journalTime
+│  ├─ wording.ts     chaque union du domaine, et la phrase qu'elle vaut
+│  ├─ accelerator.ts capture, heldModifiers, acceleratorParts, keyLabel
+│  ├─ cycle.ts       arrange
+│  ├─ array.ts       moved
+│  └─ format.ts      screenSaverDelay
+├─ lib/           ce qui sort de la machine
+│  ├─ multifus.ts    les invoke et les listen, rien d'autre
+│  └─ utils.ts       cn, et il ne bouge pas
+├─ hooks/
+├─ components/
+│  ├─ layout/        Screen, Panel, PanelHeader, FieldRow, SectionRow, IconTile, Note, EmptyState
+│  ├─ ui/            shadcn, jamais touché à la main
+│  └─ character-row, journal-panel, nav-rail, lamp, copy-button, config-notice
+└─ screens/
+   ├─ relay/, shortcuts/, characters/    un index qui orchestre, une pièce par fichier
+   └─ about.tsx, auto-focus.tsx, authorization.tsx
+```
+
+**Quatre lots, une session chacun, chacune finit par un commit sur `main`.** Le découpage suit les dépendances et pas la taille : un lot dont la moitié dépend d'un autre lot écrit du code que la session suivante défait.
+
+#### Lot A — Les deux gros fichiers, fait
+
+Les types d'abord, les chaînes ensuite. `@types/` sort de `multifus.ts`, et `tsc` énumère alors chaque import à corriger. Puis `constants/strings/`, puis `constants/journal.ts`, puis `helpers/journal.ts` qui reçoit `journalLine`, `journalTone`, `journalTranscript` et `journalTime`.
+
+**Ce qui est posé.** Sept fichiers dans `@types/`, `multifus.ts` réduit à ses trente `invoke` et à ses deux `listen`, neuf fragments de chaînes plus leur index, les huit tables du journal dans `constants/journal.ts` et tout ce qui met un événement en mots dans `helpers/journal.ts`. `npm run lint` et `tsc` passent, et aucune chaîne française n'a bougé d'un caractère, ce qui a été vérifié en comparant les littéraux avant et après.
+
+**Un septième fichier de types, que le tableau ci-dessus n'avait pas.** `NotificationKind` et `AutoFocusSwitch` sont le vocabulaire des notifications et non celui du journal ni celui du système : ils ont leur fichier, jumeau du `constants/notification.ts` que le lot B posera. Les issues restent ensemble dans `journal.ts`, puisqu'elles n'existent que comme charge d'un événement.
+
+**`lib/strings.ts` n'existe plus.** Ses trois dernières fonctions sont à leur adresse : `keyLabel` dans `helpers/accelerator.ts`, `screenSaverDelay` dans `helpers/format.ts`, `updateLine` dans `helpers/wording.ts`. Les y laisser aurait gardé dans `lib/` un fichier qui ne portait plus une seule chaîne, donc un nom qui ment et trois domaines dans un seul fichier. Le lot C n'a plus qu'à les rejoindre. Il reste un seul import qui traverse les couches, `IS_APPLE` depuis `lib/accelerator.ts`, que `constants/strings/` et `helpers/accelerator.ts` lisent en attendant `constants/keyboard.ts`.
+
+**Les deux ne se séparent pas.** `helpers/journal.ts` lit les types du pont : sans `@types/`, il importe `@tauri-apps/api`, et `helpers/` cesse d'être testable sans Tauri avant même d'exister.
+
+**Les trente `invoke` restent.** Chacun tient sur une ligne, mais ils sont le seul endroit où le vocabulaire des commandes Rust est écrit, et il y est typé. Les supprimer disperserait trente noms de commande en chaînes de caractères dans les écrans.
+
+Trois documents ont été mis à jour dans le même commit : `perimetre.md` § Conventions, qui disait « les chaînes centralisées dans un seul fichier » et dit maintenant « un seul endroit » ; le paragraphe de l'étape 11b-2, qui nommait l'ancien fichier de chaînes dans la chaîne d'échec de compilation et nomme maintenant `constants/journal.ts` et `helpers/journal.ts` ; et `.claude/rules/code-style.md` § Single Source of Truth et § Where things live. Un quatrième a suivi, l'[ADR 0006](./adr/0006-journal-sur-disque.md), qui citait ce même fichier : seul le chemin change, l'argument ne bouge pas.
+
+#### Lot B — Les écrans et la mise en page
+
+`components/screen.tsx` porte huit composants de mise en page sous un nom au singulier, et devient `components/layout/`, un fichier par composant. `relay-screen.tsx` (413 lignes) et `shortcuts-screen.tsx` (254 lignes) deviennent des dossiers dont l'`index.tsx` n'orchestre plus que les panneaux. Les deux dépassaient la limite de 200 lignes que `.claude/rules/frontend.md` fixe.
+
+Aucune ligne de JSX ne change. Les fonctions pures que ces deux écrans contiennent, `problemLine` et `statusHint`, attendent le lot C et restent sur place.
+
+#### Lot C — Les fonctions pures
+
+Six fonctions font le même travail dans six fichiers sous trois noms différents : `problemLine`, `statusHint`, `statusLine`, `stateLabel`, la table `WORDING` et `updateLine`. Elles prennent une union du domaine et rendent une phrase française, exactement comme `helpers/journal.ts`. Elles se rassemblent dans `helpers/wording.ts` avec un seul suffixe.
+
+`use-cycle-order.ts` garde son état de glissé et rend `arrange` à `helpers/cycle.ts`, `moved` à `helpers/array.ts`. Les deux sont des fonctions de tableaux sans un mot de React, aujourd'hui atteignables seulement en montant un composant.
+
+#### Lot D — Les tests
+
+Le côté Rust teste son domaine et sa persistance. Le côté React n'a aucun test, et son interface actuelle ne permet pas d'en écrire un. Après les trois lots précédents il y a quatre modules purs à atteindre directement : `helpers/journal.ts`, où les quarante variantes d'événement valent quarante assertions, `helpers/accelerator.ts`, `helpers/cycle.ts` avec `array.ts`, et `helpers/wording.ts` avec `format.ts`.
+
+`vitest`, un fichier de test par module, rien à monter et rien à simuler. Ce lot ne vaut qu'après le lot A : sans lui, un test de `journalLine` importe encore le pont Tauri.
+
+#### Pièges connus d'avance
+
+**`cn` ne bouge pas de `src/lib/utils.ts`.** Le CLI shadcn écrit cet import en dur dans chaque composant qu'il génère, donc le déplacer casse la prochaine génération et non la compilation d'aujourd'hui.
+
+**La chaîne d'échec de compilation doit survivre au découpage.** Les tables partent dans `constants/journal.ts`, mais `RunEventKind` et son jumeau `ActionEventKind`, dérivé par `Exclude`, restent avec les deux fonctions qui les lisent. C'est le filet décrit à l'étape 11b-2 : un événement ajouté côté Rust et oublié fait échouer `tsc`. Un découpage qui le perd coûte plus qu'il ne rapporte.
+
+**Chaque fichier de `constants/strings/` porte son propre `as const`.** L'objet `strings` est aujourd'hui un seul littéral fermé par `as const`, et un fragment sans lui rend `string` là où les appelants attendent un littéral. L'index compose les fragments, donc aucun appelant ne change.
+
+**Et une table dont la clé est une union du domaine porte en plus son `satisfies`.** Les sept types de notification, les cinq écrans, les quatre actions, les deux sexes, les motifs d'échec d'appariement et les états d'un raccourci sortent donc du fragment et deviennent des constantes nommées, comme `TONES` le fait déjà. Sans ça, un type ajouté côté Rust échoue à la compilation dans l'écran qui indexe la table, avec un message qui parle d'index et non de traduction manquante. `typescript.md` l'exige, et un fragment qui n'est qu'un sac de phrases n'a rien à valider : lui inventer un type ne ferait que recopier ce que TypeScript sait déjà.
+
+**Les commentaires se coupent avec le déplacement, jamais en passe dédiée.** 906 lignes de commentaire sur 4803, et `use-tray-navigation.ts` est à 41 %. Beaucoup rejouent un ADR ou une section de ce plan, ce que `.claude/rules/code-style.md` interdit, et cette même règle interdit d'en faire un chantier à part. Un fichier que le lot déplace se ramène à une ou deux lignes qui portent le pourquoi et renvoient ici. Un fichier que le lot ne touche pas reste tel quel.
+
+**Ne pas refusionner `runLine` et `actionLine`.** Le seuil `complexity: 20` est atteint, le raisonnement est à l'étape 11b-2.
 
 ---
 

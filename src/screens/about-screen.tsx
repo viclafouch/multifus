@@ -1,5 +1,7 @@
 import React from 'react'
 import { Download, RefreshCw, RotateCcw } from 'lucide-react'
+import type { Snapshot } from '@/@types/snapshot'
+import type { ConfigStatus, UpdateStatus } from '@/@types/system'
 import { FieldRow, Note, Panel, Screen, SectionRow } from '@/components/screen'
 import {
   AlertDialog,
@@ -13,14 +15,14 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
-import type { ConfigStatus, Snapshot, UpdateStatus } from '@/lib/multifus'
+import { strings } from '@/constants/strings'
+import { updateLine } from '@/helpers/wording'
 import {
   checkUpdate,
   installUpdate,
   reset,
   setStartAtLogin
 } from '@/lib/multifus'
-import { strings, updateLine } from '@/lib/strings'
 
 type FactProps = Readonly<{
   label: string

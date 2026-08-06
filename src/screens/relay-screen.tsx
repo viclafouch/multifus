@@ -6,6 +6,9 @@ import {
   MessageSquareText,
   TriangleAlert
 } from 'lucide-react'
+import type { PairingProblem, RelayLink, RelayStatus } from '@/@types/relay'
+import type { Character } from '@/@types/roster'
+import type { Snapshot } from '@/@types/snapshot'
 import {
   FieldRow,
   Note,
@@ -17,13 +20,8 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
-import type {
-  Character,
-  PairingProblem,
-  RelayLink,
-  RelayStatus,
-  Snapshot
-} from '@/lib/multifus'
+import { strings } from '@/constants/strings'
+import { screenSaverDelay } from '@/helpers/format'
 import {
   openRelayLink,
   pairRelay,
@@ -31,7 +29,6 @@ import {
   setSendBody,
   unpairRelay
 } from '@/lib/multifus'
-import { screenSaverDelay, strings } from '@/lib/strings'
 
 /** Why a pairing did not go through, put into words. */
 const problemLine = (problem: PairingProblem) => {

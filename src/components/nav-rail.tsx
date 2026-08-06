@@ -1,9 +1,11 @@
 import type { LucideIcon } from 'lucide-react'
 import { Info, Keyboard, Send, Users, Zap } from 'lucide-react'
+import type { Character } from '@/@types/roster'
+import type { ScreenName } from '@/@types/snapshot'
+import type { Authorization } from '@/@types/system'
 import { Lamp } from '@/components/lamp'
 import { Button } from '@/components/ui/button'
-import type { Authorization, Character, ScreenName } from '@/lib/multifus'
-import { strings } from '@/lib/strings'
+import { strings } from '@/constants/strings'
 
 /** Which of the five screens is on. */
 
