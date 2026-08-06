@@ -299,6 +299,29 @@ pub enum JournalEvent {
     /// repaired. Never a notification body, in any form.
     RelayFailed { reason: RelayFailure },
 
+    /// The relay is on. No surface: the switch is in the system tray and
+    /// nowhere else, so the field would have one value.
+    RelayEnabled,
+
+    /// The relay is off, and this says what stopped it.
+    RelayDisabled { reason: RelayStop },
+
+    /// A private message went out. No kind, for the reason above: the private
+    /// message is the only one relayed, hardcoded. And no body, ever.
+    RelaySent { nickname: String },
+
+    /// The relay said something about itself rather than about the game, ADR
+    /// 0010. One message per scan, so one line per message.
+    RelayNoticeSent { case: NoticeCase },
+
+    /// The display is held awake, or let go. Written on the change and never on
+    /// the state, which at one scan every three seconds would flush this journal.
+    DisplayAwake { held: bool },
+
+    /// The hold could not be raised or released. Not a relay failure: messages
+    /// still go out, right up until the session locks.
+    DisplayAwakeFailed { detail: String },
+
     /// Everything went back to its defaults, roster included.
     Reset,
 
@@ -415,6 +438,40 @@ pub enum RelayFailure {
     /// and `reqwest` puts it in its own `Display`, see
     /// [`crate::app::relay::telegram`].
     Network { detail: String },
+}
+
+/// What stopped the relay. A reason and not a [`Surface`], since two of these
+/// four are not a door the user pressed.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub enum RelayStop {
+    /// A combination fired with a game window in front, so somebody is back.
+    Shortcut,
+
+    /// The item of the system tray, which is where the switch lives.
+    Tray,
+
+    /// The last relayed character was unticked, see ADR 0011.
+    NoRelayedCharacter,
+
+    /// The bot was forgotten, or everything was reset. No chat is left.
+    NoLongerPaired,
+}
+
+/// What an avis of ADR 0010 said. Three and not two, since one scan sends at
+/// most one message and the two phrases travel in it together.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub enum NoticeCase {
+    /// Relayed characters went offline, and others are still connected.
+    Disconnected,
+
+    /// Nobody relayed is connected any more, and that is all it says.
+    NobodyLeft,
+
+    /// Both phrases, in one message. No nickname on this event: six characters
+    /// falling in one scan make one message naming six.
+    Both,
 }
 
 /// Which of the two surfaces the user acted on.
@@ -720,6 +777,71 @@ mod tests {
         assert_eq!(
             serde_json::to_string(&failed).expect("the event serialises"),
             r#"{"kind":"relayFailed","reason":{"reason":"telegram","detail":"Unauthorized"}}"#
+        );
+    }
+
+    #[test]
+    fn nothing_the_running_relay_writes_carries_a_body_or_a_chat() {
+        // The same two rules, on the events of step 11b-2. These are the ones
+        // nearest a body, and adding a field to any of them fails here.
+        assert_eq!(fields_of(&JournalEvent::RelayEnabled), ["kind"]);
+
+        let sent = JournalEvent::RelaySent {
+            nickname: "Alpha".to_owned(),
+        };
+
+        assert_eq!(fields_of(&sent), ["kind", "nickname"]);
+        assert_eq!(
+            serde_json::to_string(&sent).expect("the event serialises"),
+            r#"{"kind":"relaySent","nickname":"Alpha"}"#
+        );
+
+        let notice = JournalEvent::RelayNoticeSent {
+            case: NoticeCase::Both,
+        };
+
+        assert_eq!(fields_of(&notice), ["case", "kind"]);
+        assert_eq!(
+            serde_json::to_string(&notice).expect("the event serialises"),
+            r#"{"kind":"relayNoticeSent","case":"both"}"#
+        );
+
+        let disabled = JournalEvent::RelayDisabled {
+            reason: RelayStop::Shortcut,
+        };
+
+        assert_eq!(fields_of(&disabled), ["kind", "reason"]);
+        assert_eq!(
+            fields_of(&JournalEvent::DisplayAwake { held: true }),
+            ["held", "kind"]
+        );
+    }
+
+    #[test]
+    fn a_relay_that_stops_says_which_of_the_four_gestures_stopped_it() {
+        // Two of the four are somebody coming back and two are not, and a
+        // transcript of an absence is unreadable if they look alike.
+        let stops = [
+            RelayStop::Shortcut,
+            RelayStop::Tray,
+            RelayStop::NoRelayedCharacter,
+            RelayStop::NoLongerPaired,
+        ];
+
+        let named = stops
+            .iter()
+            .map(|stop| {
+                serde_json::to_value(stop)
+                    .expect("a stop serialises")
+                    .as_str()
+                    .expect("a stop is a name")
+                    .to_owned()
+            })
+            .collect::<Vec<_>>();
+
+        assert_eq!(
+            named,
+            ["shortcut", "tray", "noRelayedCharacter", "noLongerPaired"]
         );
     }
 

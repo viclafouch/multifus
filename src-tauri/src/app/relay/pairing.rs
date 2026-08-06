@@ -19,6 +19,8 @@ use tauri::AppHandle;
 
 use crate::app::journal::JournalEvent;
 use crate::app::journal::RelayFailure;
+use crate::app::journal::RelayStop;
+use crate::app::relay::run;
 use crate::app::relay::secret;
 use crate::app::relay::secret::BotToken;
 use crate::app::relay::telegram;
@@ -52,7 +54,7 @@ pub fn pair(app: &AppHandle, token: String) {
     let app = app.clone();
 
     tauri::async_runtime::spawn(async move {
-        match run(token).await {
+        match attempt(token).await {
             Ok(chat_id) => {
                 lock(&app).set_paired(chat_id);
             }
@@ -70,6 +72,10 @@ pub fn pair(app: &AppHandle, token: String) {
 /// cannot be erased is worth saying, and it is not a reason to keep pointing at
 /// a conversation multifus can no longer write in.
 pub fn unpair(app: &AppHandle) {
+    // First, and not at the end: the sending task holds the token in memory, so
+    // a relay left running would keep writing after the screen says it is gone.
+    run::stop(app, RelayStop::NoLongerPaired);
+
     lock(app).set_pairing(PairingView::Working);
 
     runtime::emit_snapshot(app);
@@ -94,13 +100,15 @@ pub fn unpair(app: &AppHandle) {
 }
 
 /// The pairing itself, off the main thread, holding no lock across an await.
-async fn run(token: BotToken) -> Result<i64, PairingProblem> {
+async fn attempt(token: BotToken) -> Result<i64, PairingProblem> {
     let chat_id = telegram::first_chat(&token)
         .await
         .map_err(PairingProblem::from)?
         .ok_or(PairingProblem::NoChat)?;
 
-    telegram::send(&token, chat_id, TEST_MESSAGE)
+    let client = telegram::client().map_err(PairingProblem::from)?;
+
+    telegram::send(&client, &token, chat_id, TEST_MESSAGE)
         .await
         .map_err(PairingProblem::from)?;
 

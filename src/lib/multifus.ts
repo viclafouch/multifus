@@ -96,8 +96,22 @@ export type RelayStatus = {
   readonly paired: boolean
   /** The text of a private message goes out with it. Off by default, ADR 0008. */
   readonly sendBody: boolean
+  /** The relay is carrying messages right now. Never persisted: a multifus back
+   * from a crash relays nothing until somebody asks. */
+  readonly active: boolean
+  /** What this machine's screen saver is set to, since it locks the session. */
+  readonly screenSaver: ScreenSaver
   readonly pairing: PairingStatus
 }
+
+/**
+ * What the screen saver of this machine is set to. Read once at startup and not
+ * at each activation, see l'étape 11 du plan.
+ */
+export type ScreenSaver =
+  | { readonly kind: 'after'; readonly seconds: number }
+  | { readonly kind: 'never' }
+  | { readonly kind: 'unknown' }
 
 /**
  * What the system answered when multifus laid a combination down.
@@ -220,6 +234,22 @@ export type RelayFailure =
   | { readonly reason: 'network'; readonly detail: string }
   | { readonly reason: 'telegram'; readonly detail: string }
 
+/**
+ * What stopped the relay. A reason and not a {@link Surface}, since two of these
+ * four are not a door the user pressed.
+ */
+export type RelayStop =
+  | 'noLongerPaired'
+  | 'noRelayedCharacter'
+  | 'shortcut'
+  | 'tray'
+
+/**
+ * What an avis of ADR 0010 said. Three and not two, since one scan sends at most
+ * one message and the two phrases travel in it together.
+ */
+export type NoticeCase = 'both' | 'disconnected' | 'nobodyLeft'
+
 /** How multifus was started. A session start does not show the window. */
 export type Launch = 'byHand' | 'session'
 
@@ -293,14 +323,20 @@ export type JournalEvent =
   | { readonly kind: 'characterOffline'; readonly nickname: string }
   | { readonly kind: 'characterOnline'; readonly nickname: string }
   | { readonly kind: 'configNotSetAside'; readonly detail: string }
+  | { readonly kind: 'displayAwake'; readonly held: boolean }
+  | { readonly kind: 'displayAwakeFailed'; readonly detail: string }
   | { readonly kind: 'listening' }
   | { readonly kind: 'listeningFailed'; readonly detail: string }
   | { readonly kind: 'notificationUnreadable'; readonly detail: string }
   | { readonly kind: 'openFailed'; readonly detail: string }
   | { readonly kind: 'panicked'; readonly work: Work }
   | { readonly kind: 'quit' }
+  | { readonly kind: 'relayDisabled'; readonly reason: RelayStop }
+  | { readonly kind: 'relayEnabled' }
   | { readonly kind: 'relayFailed'; readonly reason: RelayFailure }
+  | { readonly kind: 'relayNoticeSent'; readonly case: NoticeCase }
   | { readonly kind: 'relayPaired' }
+  | { readonly kind: 'relaySent'; readonly nickname: string }
   | { readonly kind: 'relayUnpaired' }
   | { readonly kind: 'reset' }
   | { readonly kind: 'roster'; readonly change: RosterChange }

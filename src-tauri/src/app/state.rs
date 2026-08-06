@@ -24,6 +24,7 @@ use crate::app::journal::Journal;
 use crate::app::journal::JournalEvent;
 use crate::app::journal::Launch;
 use crate::app::journal::Outcome;
+use crate::app::journal::RelayStop;
 use crate::app::journal::RosterChange;
 use crate::app::journal::SettingChange;
 use crate::app::journal::ShortcutOutcome;
@@ -35,6 +36,7 @@ use crate::app::view::ConfigProblem;
 use crate::app::view::ConfigView;
 use crate::app::view::PairingView;
 use crate::app::view::RelayView;
+use crate::app::view::ScreenSaverView;
 use crate::app::view::ShortcutAction;
 use crate::app::view::ShortcutStatus;
 use crate::app::view::ShortcutView;
@@ -99,6 +101,11 @@ pub struct Multifus {
     /// Whether a pairing is in flight and how the last one ended, see
     /// [`crate::app::relay::pairing`]. Never persisted: it describes a click.
     pairing: PairingView,
+    /// The relay is carrying messages. The twin of `listening`: what runs lives
+    /// in [`crate::app::relay::run`], this is what the screens draw.
+    relay_active: bool,
+    /// What this machine's screen saver is set to, read once at startup.
+    screen_saver: ScreenSaverView,
     journal: Journal,
 }
 
@@ -120,6 +127,9 @@ pub struct MultifusParams {
     pub system: String,
     /// Whether the session started multifus or somebody opened it.
     pub launch: Launch,
+    /// What the screen saver of this machine is set to. Asked once here rather
+    /// than at each activation, see [`ScreenSaverView`].
+    pub screen_saver: ScreenSaverView,
 }
 
 impl Multifus {
@@ -142,6 +152,7 @@ impl Multifus {
             version,
             system,
             launch,
+            screen_saver,
         } = params;
 
         let Loaded {
@@ -179,6 +190,8 @@ impl Multifus {
             problem,
             update: UpdateView::Checking,
             pairing: PairingView::Idle,
+            relay_active: false,
+            screen_saver,
             journal,
         }
     }
@@ -234,6 +247,8 @@ impl Multifus {
                 // out several times a minute and ADR 0009 reads the token once.
                 paired: self.settings.relay.chat_id.is_some(),
                 send_body: self.settings.relay.send_body,
+                active: self.relay_active,
+                screen_saver: self.screen_saver,
                 pairing: self.pairing.clone(),
             },
             journal: self.journal.entries(),
@@ -607,6 +622,75 @@ impl Multifus {
         self.save();
     }
 
+    /// Whether a click on the relay item can switch anything on: a chat is known
+    /// and somebody is ticked. Neither question is the keychain, ADR 0009.
+    #[must_use]
+    pub fn is_relay_ready(&self) -> bool {
+        self.settings.relay.chat_id.is_some() && self.settings.roster.has_relayed()
+    }
+
+    /// Where the relay writes, once it has been switched on.
+    #[must_use]
+    pub fn chat_id(&self) -> Option<i64> {
+        self.settings.relay.chat_id
+    }
+
+    /// Whether the text of a private message goes out with it, ADR 0008.
+    #[must_use]
+    pub fn sends_body(&self) -> bool {
+        self.settings.relay.send_body
+    }
+
+    /// Whether this character's private messages are carried right now. The
+    /// veille is deliberately not looked at, see ADR 0011.
+    #[must_use]
+    pub fn relays(&self, nickname: &str) -> bool {
+        self.relay_active
+            && self
+                .settings
+                .roster
+                .get(nickname)
+                .is_some_and(|character| character.relayed)
+    }
+
+    /// The relay is carrying messages right now.
+    #[must_use]
+    pub fn is_relay_active(&self) -> bool {
+        self.relay_active
+    }
+
+    /// Whether the relay still has something to hear: a relayed character with a
+    /// window. What the display held awake follows, see CONTEXT.md.
+    #[must_use]
+    pub fn has_relayed_online(&self) -> bool {
+        self.settings.roster.has_relayed_online()
+    }
+
+    /// The relay is on. Two methods and not one taking a boolean, since only the
+    /// stopping carries a reason.
+    pub fn enable_relay(&mut self) -> bool {
+        if self.relay_active {
+            return false;
+        }
+
+        self.relay_active = true;
+        self.log(JournalEvent::RelayEnabled);
+
+        true
+    }
+
+    /// The relay is off, and this is what stopped it.
+    pub fn disable_relay(&mut self, reason: RelayStop) -> bool {
+        if !self.relay_active {
+            return false;
+        }
+
+        self.relay_active = false;
+        self.log(JournalEvent::RelayDisabled { reason });
+
+        true
+    }
+
     /// Takes in where the pairing got to. See [`crate::app::relay::pairing`].
     pub fn set_pairing(&mut self, pairing: PairingView) {
         self.pairing = pairing;
@@ -666,8 +750,9 @@ impl Multifus {
     /// A window whose nickname is unknown enters the roster at the end of the
     /// cycle, which is the only way a character is ever born. A character whose
     /// window is gone stays in the roster, offline.
-    pub fn apply_windows(&mut self, windows: &[GameWindow]) -> bool {
+    pub fn apply_windows(&mut self, windows: &[GameWindow]) -> ScanChange {
         let mut changed = self.set_granted(true);
+        let mut relayed_gone = Vec::new();
 
         self.windows = windows
             .iter()
@@ -695,11 +780,12 @@ impl Multifus {
             .filter_map(|character| {
                 let online = self.windows.contains_key(&character.nickname);
 
-                (character.online != online).then(|| (character.nickname.clone(), online))
+                (character.online != online)
+                    .then(|| (character.nickname.clone(), online, character.relayed))
             })
             .collect::<Vec<_>>();
 
-        for (nickname, online) in transitions {
+        for (nickname, online, relayed) in transitions {
             // The veille is left exactly as the user set it. ADR 0004 resets it
             // at each launch and says nothing about a reconnection, and clearing
             // it here would be silent: a single scan that misses a window, a
@@ -711,13 +797,17 @@ impl Multifus {
             if online {
                 self.log(JournalEvent::CharacterOnline { nickname });
             } else {
+                if relayed {
+                    relayed_gone.push(nickname.clone());
+                }
+
                 self.log(JournalEvent::CharacterOffline { nickname });
             }
 
             changed = true;
         }
 
-        changed
+        self.scan_change(changed, relayed_gone)
     }
 
     /// Where a character's window is, if multifus can still see one.
@@ -738,8 +828,9 @@ impl Multifus {
     /// writes it. The authorization line above says why they all left at once,
     /// and it used to be the only line: a roster emptying itself with no
     /// `CharacterOffline` anywhere read as a scan that had stopped running.
-    pub fn apply_denied(&mut self) -> bool {
+    pub fn apply_denied(&mut self) -> ScanChange {
         let mut changed = self.set_granted(false);
+        let mut relayed_gone = Vec::new();
 
         self.windows.clear();
 
@@ -749,17 +840,32 @@ impl Multifus {
             .characters()
             .iter()
             .filter(|character| character.online)
-            .map(|character| character.nickname.clone())
+            .map(|character| (character.nickname.clone(), character.relayed))
             .collect::<Vec<_>>();
 
-        for nickname in still_online {
+        for (nickname, relayed) in still_online {
             self.settings.roster.set_online(&nickname, false);
+
+            if relayed {
+                relayed_gone.push(nickname.clone());
+            }
+
             self.log(JournalEvent::CharacterOffline { nickname });
 
             changed = true;
         }
 
-        changed
+        self.scan_change(changed, relayed_gone)
+    }
+
+    /// What one turn leaves the relay to say, once the roster has taken the scan
+    /// in. See [`ScanChange`].
+    fn scan_change(&self, changed: bool, relayed_gone: Vec<String>) -> ScanChange {
+        ScanChange {
+            changed,
+            relayed_gone,
+            none_relayed_left: !self.settings.roster.has_relayed_online(),
+        }
     }
 
     /// Records the answer of the system, and journals only the changes.
@@ -956,6 +1062,21 @@ fn view_of(character: &Character) -> CharacterView {
     }
 }
 
+/// What one turn of the scan changed, beyond « something moved ».
+///
+/// The avis of ADR 0010 hang on this: the transitions are computed under the
+/// lock, and the fact travels out as data so the sending happens outside it.
+#[derive(Debug, Default, Clone, PartialEq, Eq)]
+pub struct ScanChange {
+    /// Anything at all moved, which is what decides whether a snapshot goes out.
+    pub changed: bool,
+    /// The relayed characters whose window has just gone, in roster order. The
+    /// front and never the state, see ADR 0010.
+    pub relayed_gone: Vec<String>,
+    /// And no relayed character is connected any more.
+    pub none_relayed_left: bool,
+}
+
 /// What [`Multifus::decide`] concluded about a game notification.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Decision {
@@ -1014,6 +1135,7 @@ mod tests {
             version: "0.0.0".to_owned(),
             system: "test".to_owned(),
             launch: Launch::ByHand,
+            screen_saver: ScreenSaverView::Never,
         })
     }
 
@@ -1345,6 +1467,96 @@ mod tests {
                 system: "test".to_owned(),
                 launch: Launch::ByHand,
             }
+        );
+    }
+
+    #[test]
+    fn a_scan_says_which_relayed_characters_have_just_gone() {
+        // The avis of ADR 0010 hang on this. The front and never the state: a
+        // second scan with nobody back says nothing, since nobody just left.
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha"), window(2, "Bravo")]);
+        state.set_relayed("Bravo", false);
+
+        let gone = state.apply_windows(&[window(2, "Bravo")]);
+
+        assert_eq!(gone.relayed_gone, vec!["Alpha".to_owned()]);
+        assert!(gone.none_relayed_left, "Bravo is not relayed");
+
+        let quiet = state.apply_windows(&[window(2, "Bravo")]);
+
+        assert!(quiet.relayed_gone.is_empty());
+    }
+
+    #[test]
+    fn an_authorization_taken_away_is_a_departure_the_relay_has_to_say() {
+        // The second of the four cases of ADR 0010, and the one that used to
+        // leave the telephone silent with nothing to explain it.
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha")]);
+
+        let denied = state.apply_denied();
+
+        assert_eq!(denied.relayed_gone, vec!["Alpha".to_owned()]);
+        assert!(denied.none_relayed_left);
+    }
+
+    #[test]
+    fn the_relay_is_ready_only_once_a_bot_and_somebody_are_there() {
+        // The two questions the menu item asks, and neither is the keychain.
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha")]);
+
+        assert!(!state.is_relay_ready(), "no bot yet");
+
+        state.set_paired(42);
+
+        assert!(state.is_relay_ready());
+
+        state.set_relayed("Alpha", false);
+
+        assert!(!state.is_relay_ready(), "nobody is ticked, see ADR 0011");
+    }
+
+    #[test]
+    fn an_asleep_character_is_still_relayed_and_an_unticked_one_is_not() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha"), window(2, "Bravo")]);
+        state.set_paired(42);
+        state.set_relayed("Bravo", false);
+        state.toggle_asleep("Alpha");
+
+        assert!(!state.relays("Alpha"), "the relay is not switched on");
+
+        state.enable_relay();
+
+        assert!(state.relays("Alpha"), "the veille does not silence anybody");
+        assert!(!state.relays("Bravo"));
+        assert!(!state.relays("Nobody"));
+    }
+
+    #[test]
+    fn a_relay_that_stops_writes_the_gesture_that_stopped_it() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        assert!(state.enable_relay());
+        assert!(!state.enable_relay(), "already on, nothing to write");
+        assert!(state.disable_relay(RelayStop::Shortcut));
+        assert!(!state.disable_relay(RelayStop::Tray), "already off");
+
+        let written = journalled(&state);
+
+        assert!(written.contains(&JournalEvent::RelayEnabled), "{written:?}");
+        assert!(
+            written.contains(&JournalEvent::RelayDisabled {
+                reason: RelayStop::Shortcut
+            }),
+            "{written:?}"
         );
     }
 

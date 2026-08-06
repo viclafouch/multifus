@@ -127,5 +127,5 @@ Le réglage qui dit si le texte du message privé accompagne le pseudo et le typ
 _Avoid_: Aperçu, contenu, détail, texte
 
 **Écran tenu éveillé** (`display_awake`):
-L'état de la machine tant que le relais a quelque chose à écouter : ni extinction de l'écran, ni économiseur, donc ni verrouillage de session. Il suit les personnages relayés connectés et non l'interrupteur : plus aucun d'eux à l'écran, il tombe et la machine peut dormir, l'un d'eux revient, il est reposé. Le relais, lui, ne s'arrête que sur un raccourci. Le mot « veille » ne le désigne jamais, il appartient aux personnages.
+L'état de la machine tant que le relais a quelque chose à écouter : ni extinction de l'écran, ni économiseur, donc ni verrouillage de session. Il demande deux choses ensemble, le relais actif **et** au moins un personnage relayé connecté. Relais coupé, la machine dort comme d'habitude ; relais actif, il suit les personnages et non la durée de l'interrupteur : plus aucun d'eux à l'écran, il tombe, l'un d'eux revient, il est reposé. Le relais, lui, ne s'arrête que sur un raccourci. Le mot « veille » ne le désigne jamais, il appartient aux personnages.
 _Avoid_: Veille, mise en veille, éveil, assertion, caffeinate

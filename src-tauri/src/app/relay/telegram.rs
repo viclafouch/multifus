@@ -47,15 +47,16 @@ pub async fn first_chat(token: &BotToken) -> Result<Option<i64>> {
     Ok(first_chat_of(&updates))
 }
 
-/// Writes one message in a chat.
+/// Writes one message in a chat. The client comes from the caller, so an evening
+/// of private messages does not pay a TLS handshake per message.
 ///
 /// No `parse_mode` is asked for, ADR 0008: a game body carrying an asterisk or
 /// an underscore would have Telegram reject the whole message rather than send
 /// it plain.
-pub async fn send(token: &BotToken, chat_id: i64, text: &str) -> Result<()> {
+pub async fn send(client: &Client, token: &BotToken, chat_id: i64, text: &str) -> Result<()> {
     let outgoing = Outgoing { chat_id, text };
 
-    ask::<IgnoredAny>(client()?.post(url(token, "sendMessage")).json(&outgoing)).await?;
+    ask::<IgnoredAny>(client.post(url(token, "sendMessage")).json(&outgoing)).await?;
 
     Ok(())
 }
@@ -75,9 +76,9 @@ fn url(token: &BotToken, method: &str) -> String {
     format!("{API_BASE}{}/{method}", token.as_str())
 }
 
-/// A client for one call. Built rather than shared: the pairing runs once, and
-/// the sending of step 11b-2 gets a client of its own on its own thread.
-fn client() -> Result<Client> {
+/// A client, with the timeout every call of this module answers under. The
+/// pairing drops its own, the sending task keeps one while the relay is on.
+pub fn client() -> Result<Client> {
     Client::builder().timeout(TIMEOUT).build().map_err(stripped)
 }
 

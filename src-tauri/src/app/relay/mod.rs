@@ -3,13 +3,12 @@
 //!
 //! [`secret`] is the keychain the token lives in, ADR 0009. [`telegram`] is the
 //! two calls, ADR 0007. [`pairing`] is the one moment a token enters multifus.
-//!
-//! What is not here yet is step 11b-2: the switch in the system tray, the
-//! sending of a private message, the notices of ADR 0010 and the display held
-//! awake. This module knows how to be set up, not yet how to run.
+//! [`run`] is the relay itself: the switch, the sending, the avis of ADR 0010
+//! and the display held awake.
 
 pub mod links;
 pub mod pairing;
+pub mod run;
 pub mod secret;
 pub mod telegram;
 

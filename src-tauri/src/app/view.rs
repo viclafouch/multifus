@@ -21,6 +21,21 @@ use serde::Serialize;
 use crate::app::journal::JournalEntry;
 use crate::domain::Gender;
 use crate::domain::NotificationKind;
+use crate::platform::ScreenSaverDelay;
+
+impl From<ScreenSaverDelay> for ScreenSaverView {
+    /// The boundary speaks in [`std::time::Duration`], which does not cross to
+    /// React; everything else is the same three answers.
+    fn from(delay: ScreenSaverDelay) -> Self {
+        match delay {
+            ScreenSaverDelay::Never => Self::Never,
+            ScreenSaverDelay::After(after) => Self::After {
+                seconds: after.as_secs(),
+            },
+            ScreenSaverDelay::Unknown => Self::Unknown,
+        }
+    }
+}
 
 /// Everything the five screens draw, in one piece.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -83,8 +98,35 @@ pub struct RelayView {
     /// Whether the text of a private message goes out with the nickname and the
     /// kind. Unchecked by default, ADR 0008.
     pub send_body: bool,
+    /// The relay is carrying messages right now. Never persisted: a multifus
+    /// coming back from a crash relays nothing until asked, see the plan.
+    pub active: bool,
+    /// What this machine's screen saver is set to, since it locks the session
+    /// and the hold on the display is not documented to cover it.
+    pub screen_saver: ScreenSaverView,
     /// Where the pairing got to, since it is two network round trips.
     pub pairing: PairingView,
+}
+
+/// What the screen saver of this machine is set to. Read once at startup and not
+/// at each activation, see l'étape 11 du plan.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[serde(
+    tag = "kind",
+    rename_all = "camelCase",
+    rename_all_fields = "camelCase"
+)]
+pub enum ScreenSaverView {
+    /// It never starts on its own, so there is nothing to warn about.
+    Never,
+
+    /// It starts after this long, and the session locks with it. The interface
+    /// turns the seconds into words, as it does with every other duration.
+    After { seconds: u64 },
+
+    /// The system said nothing, which is what an untouched setting looks like.
+    /// Not a failure, and not a promise either.
+    Unknown,
 }
 
 /// Whether a pairing or an unlinking is in flight, and how the last one ended.

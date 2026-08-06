@@ -31,8 +31,10 @@ use tauri_plugin_opener::OpenerExt;
 use crate::app::journal::JournalEvent;
 use crate::app::journal::Outcome;
 use crate::app::journal::Work;
+use crate::app::relay;
 use crate::app::state::lock;
 use crate::app::state::Decision;
+use crate::app::state::ScanChange;
 use crate::app::state::WatcherState;
 use crate::app::tray;
 use crate::app::view::Screen;
@@ -109,16 +111,28 @@ pub fn start(app: AppHandle) {
 /// One turn of the scan: look at the windows, keep the listening in step with
 /// the authorization, and tell the interface if anything moved.
 fn tick(app: &AppHandle) {
-    let windows_changed = refresh_windows(app);
-    let listening_changed = follow_authorization(app);
-
-    if windows_changed || listening_changed {
+    if scan(app) {
         emit_snapshot(app);
     }
 }
 
+/// One look at the system, and whether anything moved.
+///
+/// The relay is served with the lock back in its holder: the transitions are
+/// computed under it and a Telegram message has no business being there.
+fn scan(app: &AppHandle) -> bool {
+    let change = refresh_windows(app);
+    let listening_changed = follow_authorization(app);
+
+    relay::run::announce(app, &change);
+
+    let display_changed = relay::run::follow_display(app);
+
+    change.changed || listening_changed || display_changed
+}
+
 /// Asks the boundary which game windows exist and takes the answer in.
-fn refresh_windows(app: &AppHandle) -> bool {
+fn refresh_windows(app: &AppHandle) -> ScanChange {
     let outcome = app.state::<PlatformWindowManager>().game_windows();
 
     let mut state = lock(app);
@@ -127,14 +141,18 @@ fn refresh_windows(app: &AppHandle) -> bool {
         Ok(windows) => state.apply_windows(&windows),
         // Not an empty roster: multifus is not allowed to look, which is a
         // different thing from nobody being connected, and the interface has a
-        // screen for it.
+        // screen for it. It is also the second of the four cases of ADR 0010,
+        // so the relayed characters that leave here are said out loud too.
         Err(PlatformError::AuthorizationDenied) => state.apply_denied(),
         Err(error) => {
             state.log_unless_repeated(JournalEvent::ScanFailed {
                 detail: error.to_string(),
             });
 
-            true
+            ScanChange {
+                changed: true,
+                ..ScanChange::default()
+            }
         }
     }
 }
@@ -219,6 +237,11 @@ fn on_notification(app: &AppHandle, notification: GameNotification) {
     let Some(nickname) = notification.nickname().map(str::to_owned) else {
         return;
     };
+
+    // A path of its own, and taken first. The relay needs no window, so the case
+    // where the client has just gone is the one where it serves most; going
+    // through `Decision` would swallow exactly those. See docs/plan.md.
+    relay::run::offer(app, &notification, &nickname);
 
     let kind = notification.kind();
     let decision = lock(app).decide(&nickname, kind);
@@ -354,10 +377,10 @@ pub fn open_authorization_settings(app: &AppHandle) {
     }
 }
 
-/// Looks at the windows now rather than at the next turn of the scan.
+/// Looks at the system now rather than at the next turn of the scan. No
+/// snapshot: whoever asked for this is emitting one of their own.
 pub fn refresh(app: &AppHandle) {
-    refresh_windows(app);
-    follow_authorization(app);
+    scan(app);
 }
 
 /// Sends the whole dashboard to the interface and to the system tray, and hands it

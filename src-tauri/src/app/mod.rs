@@ -37,8 +37,11 @@ use std::sync::Mutex;
 use tauri::AppHandle;
 use tauri::Manager;
 
+use crate::app::view::ScreenSaverView;
 use crate::config::ConfigError;
 use crate::config::ConfigStore;
+use crate::platform::DisplayKeeper;
+use crate::platform::PlatformDisplayKeeper;
 use crate::platform::PlatformNotificationWatcher;
 use crate::platform::PlatformWindowManager;
 
@@ -60,6 +63,7 @@ pub fn setup(app: &AppHandle) -> Result<(), ConfigError> {
 
     let store = ConfigStore::for_app(app)?;
     let loaded = store.load();
+    let keeper = PlatformDisplayKeeper::new();
 
     // The first line of the journal is written by this constructor, so everything
     // that line has to carry is gathered before anything else runs.
@@ -69,9 +73,12 @@ pub fn setup(app: &AppHandle) -> Result<(), ConfigError> {
         version: app.package_info().version.to_string(),
         system: system(),
         launch: main_window::launch(),
+        screen_saver: screen_saver(&keeper),
     })));
     app.manage(PlatformWindowManager::new());
     app.manage::<WatcherState>(Mutex::new(PlatformNotificationWatcher::new()));
+
+    relay::run::setup(app, keeper);
 
     // The queue exists before any combination is laid down, so that a shortcut
     // fired in the same breath as the registration has somewhere to go.
@@ -102,6 +109,14 @@ pub fn setup(app: &AppHandle) -> Result<(), ConfigError> {
 /// does before the updater's first check, and a relay sent before that fails.
 fn install_crypto_provider() {
     drop(rustls::crypto::ring::default_provider().install_default());
+}
+
+/// What the screen saver of this machine is set to, asked once here rather than
+/// at each activation. See l'étape 11 du plan.
+fn screen_saver(keeper: &PlatformDisplayKeeper) -> ScreenSaverView {
+    keeper
+        .screen_saver_delay()
+        .map_or(ScreenSaverView::Unknown, ScreenSaverView::from)
 }
 
 /// The system multifus is running on, for the head of the journal.

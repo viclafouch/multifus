@@ -50,8 +50,10 @@ use crate::app::journal::TrayOutcome;
 use crate::app::journal::Work;
 use crate::app::journal_file;
 use crate::app::main_window;
+use crate::app::relay;
 use crate::app::runtime;
 use crate::app::state::lock;
+use crate::app::state::Multifus;
 use crate::app::update;
 use crate::app::view::CharacterView;
 use crate::app::view::Screen;
@@ -82,6 +84,11 @@ const MENU_AUTO_FOCUS_OFF: &str = "Désactiver l'AutoFocus";
 // for. « Ignorer » is what the click will do, as the rule of this menu asks.
 const MENU_WAKE_MINIMIZED: &str = "Réveiller les fenêtres réduites";
 const MENU_LEAVE_MINIMIZED: &str = "Ignorer les fenêtres réduites";
+// Three labels and not two verbs: an « Activer le relais » that fails is what
+// this step exists to avoid. The ellipsis says the first one opens something.
+const MENU_RELAY_SETUP: &str = "Configurer le relais…";
+const MENU_RELAY_ON: &str = "Activer le relais";
+const MENU_RELAY_OFF: &str = "Désactiver le relais";
 const MENU_DENIED: &str = "Autorisation manquante";
 // The journal is reachable from here and not from the window alone, and that is
 // the rule of the project rather than a convenience: what is only useful with the
@@ -129,6 +136,9 @@ const UPDATE_ID: &str = "multifus://update";
 /// The item that shows the journal file in the file browser of the system.
 const JOURNAL_ID: &str = "multifus://journal";
 
+/// The switch of the relay, and the one door it has.
+const RELAY_ID: &str = "multifus://relay";
+
 /// The line that says multifus is not allowed to work, and the one that leads
 /// to the pane where that is fixed.
 const DENIED_ID: &str = "multifus://denied";
@@ -162,6 +172,22 @@ struct Contents {
     granted: bool,
     /// The version a check found, `None` when there is nothing to offer.
     update: Option<String>,
+    /// Which of its three things the relay item says. One field and not three
+    /// booleans, which would let « unpaired and running » be written down.
+    relay: RelayItem,
+}
+
+/// The three things the relay item can say. The first two are read off the
+/// configuration and never off the keychain, ADR 0009.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum RelayItem {
+    /// No bot paired here, or nobody ticked. One label and one click for the
+    /// two, towards the one screen where both are repaired.
+    NotReady,
+    /// Ready, and off.
+    Off,
+    /// Running.
+    On,
 }
 
 /// One line of the menu: the character it aims at, and what it says.
@@ -193,6 +219,25 @@ fn contents(app: &AppHandle) -> Contents {
         wakes_minimized: state.wakes_minimized(),
         granted: state.is_granted(),
         update: state.available_update(),
+        relay: relay_item(&state),
+    }
+}
+
+/// Which of its three things the relay item says right now.
+fn relay_item(state: &Multifus) -> RelayItem {
+    match (state.is_relay_active(), state.is_relay_ready()) {
+        (true, _) => RelayItem::On,
+        (false, true) => RelayItem::Off,
+        (false, false) => RelayItem::NotReady,
+    }
+}
+
+/// What that item is labelled, and every label starts with a verb.
+fn relay_label(item: RelayItem) -> &'static str {
+    match item {
+        RelayItem::NotReady => MENU_RELAY_SETUP,
+        RelayItem::Off => MENU_RELAY_ON,
+        RelayItem::On => MENU_RELAY_OFF,
     }
 }
 
@@ -373,6 +418,16 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
         None::<&str>,
     )?)?;
 
+    // The switch of the relay, here and nowhere else: the four combinations are
+    // taken, and one switches the relay on while standing up.
+    menu.append(&MenuItem::with_id(
+        app,
+        RELAY_ID,
+        relay_label(contents.relay),
+        true,
+        None::<&str>,
+    )?)?;
+
     // Five lines rather than one « Ouvrir », because opening the window is never
     // the thing one wants: going to one of its screens is. The rail is three
     // clicks away otherwise, and this icon exists to save exactly those.
@@ -500,6 +555,21 @@ fn on_menu_event(app: &AppHandle, event: MenuEvent) {
         return;
     }
 
+    if id == RELAY_ID {
+        // The live state and never the label, which comes from a snapshot and
+        // can be a few seconds old.
+        if lock(app).is_relay_ready() {
+            // Returns straight away and reads the keychain elsewhere, exactly as
+            // `update::install` does two items above.
+            relay::run::toggle(app);
+        } else {
+            runtime::navigate(app, Screen::Relay);
+            main_window::show(app);
+        }
+
+        return;
+    }
+
     if let Some(nickname) = id.strip_prefix(CHARACTER_PREFIX) {
         // Nothing is written on a send that fails, because there is nothing left
         // to write: the worker never came up, which `start_worker` wrote down, or
@@ -622,4 +692,52 @@ fn shown_menu(app: &AppHandle) -> MutexGuard<'_, Option<Contents>> {
         .inner()
         .lock()
         .unwrap_or_else(PoisonError::into_inner)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn the_relay_item_says_a_different_thing_for_each_of_its_three_states() {
+        // A state missing from `Contents` is a change the menu sleeps through,
+        // and three labels that differ is what proves this one travels.
+        let labels = [RelayItem::NotReady, RelayItem::Off, RelayItem::On].map(relay_label);
+
+        assert_eq!(
+            labels,
+            [
+                "Configurer le relais…",
+                "Activer le relais",
+                "Désactiver le relais"
+            ]
+        );
+    }
+
+    #[test]
+    fn a_running_relay_is_never_offered_as_something_to_switch_on() {
+        // The live state outranks the configuration, so a relay switched on and
+        // then unticked still offers to be switched off.
+        let mut contents = Contents {
+            entries: Vec::new(),
+            auto_focus: true,
+            wakes_minimized: true,
+            granted: true,
+            update: None,
+            relay: RelayItem::NotReady,
+        };
+
+        assert_eq!(relay_label(contents.relay), MENU_RELAY_SETUP);
+
+        contents.relay = RelayItem::On;
+
+        assert_ne!(
+            contents,
+            Contents {
+                relay: RelayItem::NotReady,
+                ..contents.clone()
+            },
+            "the relay has to move the comparison, or the menu sleeps through it"
+        );
+    }
 }

@@ -20,9 +20,11 @@ import type {
   Gender,
   JournalEntry,
   JournalEvent,
+  NoticeCase,
   NotificationKind,
   NotificationOutcome,
   RelayFailure,
+  RelayStop,
   RosterChange,
   SettingChange,
   ShortcutAction,
@@ -299,7 +301,13 @@ export const strings = {
       return `Relayer ${nickname}`
     },
     emptyBody:
-      'Ouvrez un client Dofus : le personnage apparaît ici, déjà coché.'
+      'Ouvrez un client Dofus : le personnage apparaît ici, déjà coché.',
+    // Shown on a measured delay and never on an unknown one, which would promise
+    // a fault nobody has seen. See l'étape 11 du plan.
+    screenSaverTitle: 'Votre économiseur d’écran peut rendre le relais muet',
+    screenSaverBody: (delay: string) => {
+      return `multifus garde l’écran allumé, mais l’économiseur démarre après ${delay} et verrouille la session, ce qui coupe la lecture des notifications. Réglez-le sur Jamais dans les réglages du système.`
+    }
   },
 
   about: {
@@ -473,6 +481,27 @@ const journalMoment = (milliseconds: number) => {
   })
 }
 
+const SECONDS_IN_MINUTE = 60
+const SECONDS_IN_HOUR = 3600
+
+/**
+ * How long before the screen saver starts, in words. The system files this in
+ * seconds and offers it in minutes, so an hour is said as one and not as sixty.
+ */
+export const screenSaverDelay = (seconds: number) => {
+  const isHours = seconds >= SECONDS_IN_HOUR && seconds % SECONDS_IN_HOUR === 0
+
+  const value = isHours
+    ? seconds / SECONDS_IN_HOUR
+    : Math.round(seconds / SECONDS_IN_MINUTE)
+
+  return new Intl.NumberFormat('fr-FR', {
+    style: 'unit',
+    unit: isHours ? 'hour' : 'minute',
+    unitDisplay: 'long'
+  }).format(value)
+}
+
 /** How serious a journal entry is, which is what colours its dot. */
 export type JournalTone = 'good' | 'neutral' | 'warning'
 
@@ -515,6 +544,15 @@ const TONES = {
   relayPaired: 'good',
   relayUnpaired: 'neutral',
   relayFailed: 'warning',
+  relayEnabled: 'good',
+  // What the user asked for, whichever of the four gestures it was.
+  relayDisabled: 'neutral',
+  relaySent: 'good',
+  // The event ADR 0010 exists for, and it is not a fault: multifus saying it has
+  // stopped hearing is the whole reason the relay can be trusted.
+  relayNoticeSent: 'good',
+  displayAwake: 'neutral',
+  displayAwakeFailed: 'warning',
   reset: 'neutral',
   quit: 'neutral'
 } as const satisfies Record<PlainEventKind, JournalTone>
@@ -635,7 +673,11 @@ const DETAILED_LINES = {
   configNotSetAside:
     'Configuration illisible et impossible à déplacer, le prochain enregistrement l’écrasera',
   openFailed: 'Le système n’a pas pu ouvrir cet élément',
-  updateFailed: 'Mise à jour impossible'
+  updateFailed: 'Mise à jour impossible',
+  // Not a relay failure: the relay carries messages right up until the session
+  // locks, and only then does it go silent.
+  displayAwakeFailed:
+    'Écran impossible à tenir éveillé, la session peut se verrouiller'
 } as const satisfies Record<DetailedEventKind, string>
 
 const isDetailed = (
@@ -666,6 +708,7 @@ const PLAIN_LINES = {
   // journal is a file one hands over.
   relayPaired: 'Relais apparié à un robot Telegram.',
   relayUnpaired: 'Robot Telegram délié, jeton effacé du trousseau.',
+  relayEnabled: 'Relais activé depuis la barre système.',
   reset: 'Configuration remise à zéro.',
   quit: 'multifus a été quitté depuis la barre système.'
 } as const satisfies Record<WithoutPayload<JournalEvent>, string>
@@ -742,6 +785,28 @@ const relayFailedLine = (reason: RelayFailure) => {
     }
   }
 }
+
+/**
+ * What stopped the relay, put into words. Four gestures, and a transcript of an
+ * absence is unreadable if two of them look alike.
+ */
+const RELAY_STOP_LINES = {
+  shortcut: 'Relais coupé : un raccourci a été frappé depuis le jeu.',
+  tray: 'Relais coupé depuis la barre système.',
+  noRelayedCharacter:
+    'Relais coupé : le dernier personnage relayé a été décoché.',
+  noLongerPaired: 'Relais coupé : il n’y a plus de robot où écrire.'
+} as const satisfies Record<RelayStop, string>
+
+/**
+ * What an avis said, put into words. Never the phrases themselves, which are
+ * built on the Rust side: Telegram is a surface this window cannot draw.
+ */
+const NOTICE_LINES = {
+  disconnected: 'Avis envoyé : un personnage relayé s’est déconnecté.',
+  nobodyLeft: 'Avis envoyé : plus aucun personnage relayé n’est connecté.',
+  both: 'Avis envoyé : une déconnexion, et plus personne de relayé connecté.'
+} as const satisfies Record<NoticeCase, string>
 
 /**
  * What each thread of multifus is called when it has to be named.
@@ -1139,9 +1204,12 @@ type RunEventKind =
   | 'characterOffline'
   | 'characterOnline'
   | 'configLoadFailed'
+  | 'displayAwake'
   | 'notification'
   | 'panicked'
   | 'relayFailed'
+  | 'relayNoticeSent'
+  | 'relaySent'
   | 'shortcutsBound'
   | 'startAtLoginReconciled'
   | 'started'
@@ -1156,9 +1224,12 @@ const RUN_KINDS = new Set<ComposedEventKind>([
   'characterOffline',
   'characterOnline',
   'configLoadFailed',
+  'displayAwake',
   'notification',
   'panicked',
   'relayFailed',
+  'relayNoticeSent',
+  'relaySent',
   'shortcutsBound',
   'startAtLoginReconciled',
   'started',
@@ -1218,10 +1289,29 @@ const runLine = (event: EventOf<RunEventKind>) => {
     case 'relayFailed': {
       return relayFailedLine(event.reason)
     }
+    case 'relaySent': {
+      return `${event.nickname} : message privé relayé sur le téléphone.`
+    }
+    case 'relayNoticeSent': {
+      return NOTICE_LINES[event.case]
+    }
+    case 'displayAwake': {
+      return displayAwakeLine(event.held)
+    }
     default: {
       return ''
     }
   }
+}
+
+/**
+ * Whether the machine is being kept awake for the relay. The hold falling is
+ * normally the quart d'heure and not somebody switching off, see CONTEXT.md.
+ */
+const displayAwakeLine = (held: boolean) => {
+  return held
+    ? 'Écran tenu éveillé : le relais a quelque chose à écouter.'
+    : 'Écran relâché : plus aucun personnage relayé n’est connecté.'
 }
 
 /** What the user did, put into words. The other half of {@link runLine}. */
@@ -1241,6 +1331,9 @@ const actionLine = (event: EventOf<ActionEventKind>) => {
     }
     case 'trayFocus': {
       return trayLine(event)
+    }
+    case 'relayDisabled': {
+      return RELAY_STOP_LINES[event.reason]
     }
     default: {
       return ''

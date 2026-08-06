@@ -53,8 +53,10 @@ use tauri_plugin_global_shortcut::Shortcut;
 use tauri_plugin_global_shortcut::ShortcutState;
 
 use crate::app::journal::JournalEvent;
+use crate::app::journal::RelayStop;
 use crate::app::journal::ShortcutOutcome;
 use crate::app::journal::Work;
+use crate::app::relay;
 use crate::app::runtime;
 use crate::app::state::lock;
 use crate::app::state::ShortcutEffect;
@@ -239,7 +241,14 @@ fn answer(app: &AppHandle, action: ShortcutAction) {
         // Inert outside the game. Without this a `Control+Shift+arrow` would eat
         // word navigation in every text editor on the desktop.
         Ok(None) => ShortcutOutcome::OutsideGame,
-        Ok(Some(window)) => act(app, action, window.nickname()),
+        Ok(Some(window)) => {
+            // Behind the guard and not in `fire`, which is reached by every key
+            // press anywhere: a game window is in front and a hand is on the
+            // keyboard, so the user is back. Whatever the action then settles on.
+            relay::run::stop(app, RelayStop::Shortcut);
+
+            act(app, action, window.nickname())
+        }
         Err(error) => ShortcutOutcome::ForegroundUnknown {
             detail: error.to_string(),
         },

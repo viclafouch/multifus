@@ -1,5 +1,11 @@
 import React from 'react'
-import { ExternalLink, Link2, Link2Off, MessageSquareText } from 'lucide-react'
+import {
+  ExternalLink,
+  Link2,
+  Link2Off,
+  MessageSquareText,
+  TriangleAlert
+} from 'lucide-react'
 import {
   FieldRow,
   Note,
@@ -25,7 +31,7 @@ import {
   setSendBody,
   unpairRelay
 } from '@/lib/multifus'
-import { strings } from '@/lib/strings'
+import { screenSaverDelay, strings } from '@/lib/strings'
 
 /** Why a pairing did not go through, put into words. */
 const problemLine = (problem: PairingProblem) => {
@@ -304,6 +310,36 @@ const RelayedList = ({ characters, run }: RelayedListProps) => {
   )
 }
 
+type ScreenSaverWarningProps = Readonly<{
+  seconds: number
+}>
+
+/**
+ * The one hole the hold on the display does not close: a screen saver locks the
+ * session, and a locked session draws no banner for the relay to read.
+ */
+const ScreenSaverWarning = ({ seconds }: ScreenSaverWarningProps) => {
+  return (
+    <Panel className="mb-3">
+      <div className="flex items-start gap-3 px-4 py-3.5">
+        <TriangleAlert
+          aria-hidden
+          className="mt-0.5 size-4 shrink-0 text-destructive"
+          strokeWidth={1.9}
+        />
+        <div className="flex min-w-0 flex-1 flex-col gap-1">
+          <h2 className="text-row font-medium">
+            {strings.relay.screenSaverTitle}
+          </h2>
+          <p className="max-w-prose text-note text-muted-foreground">
+            {strings.relay.screenSaverBody(screenSaverDelay(seconds))}
+          </p>
+        </div>
+      </div>
+    </Panel>
+  )
+}
+
 type RelayScreenProps = Readonly<{
   relay: RelayStatus
   characters: readonly Character[]
@@ -331,6 +367,9 @@ export const RelayScreen = ({ relay, characters, run }: RelayScreenProps) => {
       ) : (
         <PairingGuide relay={relay} run={run} />
       )}
+      {relay.screenSaver.kind === 'after' ? (
+        <ScreenSaverWarning seconds={relay.screenSaver.seconds} />
+      ) : null}
       <Panel className="mb-3">
         <PanelHeader
           title={strings.relay.charactersTitle}

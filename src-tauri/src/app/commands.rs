@@ -22,6 +22,7 @@ use tauri_plugin_opener::OpenerExt;
 
 use crate::app::autostart;
 use crate::app::journal::JournalEvent;
+use crate::app::journal::RelayStop;
 use crate::app::journal::Surface;
 use crate::app::journal_file;
 use crate::app::relay;
@@ -179,6 +180,10 @@ pub fn set_start_at_login(app: AppHandle, start_at_login: bool) -> Snapshot {
 pub fn set_relayed(app: AppHandle, nickname: String, relayed: bool) -> Snapshot {
     lock(&app).set_relayed(&nickname, relayed);
 
+    // Unticking the last one stops a running relay rather than leaving it armed
+    // and mute, which is the state ADR 0011 declares does not exist.
+    relay::run::stop_if_unready(&app, RelayStop::NoRelayedCharacter);
+
     runtime::emit_snapshot(&app)
 }
 
@@ -228,6 +233,10 @@ pub fn open_relay_link(app: AppHandle, link: relay::RelayLink) {
 #[tauri::command]
 pub fn reset(app: AppHandle) -> Snapshot {
     lock(&app).reset();
+
+    // The chat went with the rest of the file, so there is nowhere left to
+    // write. The token stays in the keychain, which only unlinking erases.
+    relay::run::stop_if_unready(&app, RelayStop::NoLongerPaired);
 
     // The four default combinations are not the ones that were on the system a
     // moment ago, so they have to be laid down again.
