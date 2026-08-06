@@ -33,6 +33,8 @@ use crate::app::view::AutoFocusView;
 use crate::app::view::CharacterView;
 use crate::app::view::ConfigProblem;
 use crate::app::view::ConfigView;
+use crate::app::view::PairingView;
+use crate::app::view::RelayView;
 use crate::app::view::ShortcutAction;
 use crate::app::view::ShortcutStatus;
 use crate::app::view::ShortcutView;
@@ -94,6 +96,9 @@ pub struct Multifus {
     /// [`crate::app::update`]. It starts as a question because the check starts
     /// with the process.
     update: UpdateView,
+    /// Whether a pairing is in flight and how the last one ended, see
+    /// [`crate::app::relay::pairing`]. Never persisted: it describes a click.
+    pairing: PairingView,
     journal: Journal,
 }
 
@@ -173,11 +178,12 @@ impl Multifus {
             listening: false,
             problem,
             update: UpdateView::Checking,
+            pairing: PairingView::Idle,
             journal,
         }
     }
 
-    /// Everything the four screens draw, in one piece.
+    /// Everything the five screens draw, in one piece.
     #[must_use]
     pub fn snapshot(&self) -> Snapshot {
         Snapshot {
@@ -223,6 +229,13 @@ impl Multifus {
                 problem: self.problem.clone(),
             },
             update: self.update.clone(),
+            relay: RelayView {
+                // The configuration answers this, never the keychain: it goes
+                // out several times a minute and ADR 0009 reads the token once.
+                paired: self.settings.relay.chat_id.is_some(),
+                send_body: self.settings.relay.send_body,
+                pairing: self.pairing.clone(),
+            },
             journal: self.journal.entries(),
         }
     }
@@ -559,6 +572,67 @@ impl Multifus {
         self.save();
     }
 
+    // -- The relay --------------------------------------------------------
+
+    /// Puts a character in or out of the relay.
+    ///
+    /// Saved, unlike the veille: which character is the principal does not change
+    /// from one session to the next, and retyping it every evening would be a
+    /// setting one visits, see ADR 0011. No online guard either, since ticking a
+    /// character whose client is closed is exactly what one does before leaving.
+    pub fn set_relayed(&mut self, nickname: &str, relayed: bool) {
+        if !self.settings.roster.set_relayed(nickname, relayed) {
+            return;
+        }
+
+        self.log(JournalEvent::Roster {
+            change: RosterChange::Relayed {
+                nickname: nickname.to_owned(),
+                relayed,
+            },
+        });
+        self.save();
+    }
+
+    /// Says whether the text of a private message leaves the machine with it.
+    ///
+    /// The one place a notification body is allowed out, ADR 0008, and it is off
+    /// until somebody asks for it.
+    pub fn set_send_body(&mut self, send_body: bool) {
+        self.settings.relay.send_body = send_body;
+
+        self.log(JournalEvent::Setting {
+            change: SettingChange::RelayBody { send_body },
+        });
+        self.save();
+    }
+
+    /// Takes in where the pairing got to. See [`crate::app::relay::pairing`].
+    pub fn set_pairing(&mut self, pairing: PairingView) {
+        self.pairing = pairing;
+    }
+
+    /// The pairing went through: the chat is known and the token is put away.
+    ///
+    /// The chat reaches the file and never the journal, which names no
+    /// conversation of anybody's, see [`JournalEvent::RelayPaired`].
+    pub fn set_paired(&mut self, chat_id: i64) {
+        self.settings.relay.chat_id = Some(chat_id);
+        self.pairing = PairingView::Idle;
+
+        self.log(JournalEvent::RelayPaired);
+        self.save();
+    }
+
+    /// The bot is forgotten. Erasing the keychain entry is the caller's half.
+    pub fn set_unpaired(&mut self) {
+        self.settings.relay.chat_id = None;
+        self.pairing = PairingView::Idle;
+
+        self.log(JournalEvent::RelayUnpaired);
+        self.save();
+    }
+
     // -- The update -------------------------------------------------------
 
     /// Takes in where the check got to. See [`crate::app::update`].
@@ -878,6 +952,7 @@ fn view_of(character: &Character) -> CharacterView {
         gender: character.gender,
         asleep: character.asleep,
         online: character.online,
+        relayed: character.relayed,
     }
 }
 

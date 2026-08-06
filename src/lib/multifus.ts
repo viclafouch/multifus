@@ -24,8 +24,13 @@ export type NotificationKind =
   | 'private_message'
   | 'trade'
 
-/** One of the four screens the window can show. */
-export type ScreenName = 'about' | 'autoFocus' | 'characters' | 'shortcuts'
+/** One of the five screens the window can show. */
+export type ScreenName =
+  | 'about'
+  | 'autoFocus'
+  | 'characters'
+  | 'relay'
+  | 'shortcuts'
 
 /** The four actions of perimetre.md a combination can be bound to. */
 export type ShortcutAction = 'next' | 'previous' | 'swap' | 'toggleAsleep'
@@ -39,6 +44,59 @@ export type Character = {
   readonly asleep: boolean
   /** A window bears this nickname right now. */
   readonly online: boolean
+  /** The relay carries this character's private messages. Unrelated to the
+   * veille, which only takes a character out of the cycle. See ADR 0011. */
+  readonly relayed: boolean
+}
+
+/**
+ * Why a pairing did not go through.
+ *
+ * Five and not one, because they are repaired in five different places. A screen
+ * that said « la connexion a échoué » would send the user to the wrong one every
+ * time: `noChat` is not even a failure, it is the half of the pairing only the
+ * user can do.
+ */
+export type PairingProblem =
+  | { readonly kind: 'keychain'; readonly detail: string }
+  | { readonly kind: 'network'; readonly detail: string }
+  | { readonly kind: 'noChat' }
+  | { readonly kind: 'tokenBlank' }
+  | { readonly kind: 'tokenRefused'; readonly detail: string }
+
+/**
+ * One of the three Telegram pages the setup offers to open.
+ *
+ * A name and not a URL. The addresses live in `app::relay::links` on the Rust
+ * side, so nothing here can point the browser somewhere it was not meant to go.
+ */
+export type RelayLink = 'botFather' | 'faq' | 'web'
+
+/** Whether a pairing or an unlinking is in flight, and how the last one ended. */
+export type PairingStatus =
+  | { readonly kind: 'failed'; readonly problem: PairingProblem }
+  | { readonly kind: 'idle' }
+  | { readonly kind: 'working' }
+
+/**
+ * What the relay screen draws, and the whole of what crosses about the relay.
+ *
+ * **No bot token, and there could not be one**: on the Rust side a read hands
+ * back a type that is not serialisable. The screen shows a state and a button
+ * that unlinks. See ADR 0009.
+ */
+export type RelayStatus = {
+  /**
+   * The pairing has run on this machine, so a chat is known.
+   *
+   * Answered from the configuration and never from the keychain: this travels in
+   * every snapshot, and reading the token can raise a system dialog. Whether the
+   * token is still readable is asked once, when the relay is switched on.
+   */
+  readonly paired: boolean
+  /** The text of a private message goes out with it. Off by default, ADR 0008. */
+  readonly sendBody: boolean
+  readonly pairing: PairingStatus
 }
 
 /**
@@ -150,6 +208,18 @@ export type ShortcutOutcome =
   | { readonly outcome: 'swapped'; readonly awake: Gender }
   | { readonly outcome: 'woke'; readonly nickname: string }
 
+/**
+ * Why the relay could not do what was asked.
+ *
+ * Three and not one, because they are repaired in three different places: the
+ * keychain of the system, the bot at Telegram, and the network in between. No
+ * detail here ever carries the URL of a call, which holds the bot token.
+ */
+export type RelayFailure =
+  | { readonly reason: 'keychain'; readonly detail: string }
+  | { readonly reason: 'network'; readonly detail: string }
+  | { readonly reason: 'telegram'; readonly detail: string }
+
 /** How multifus was started. A session start does not show the window. */
 export type Launch = 'byHand' | 'session'
 
@@ -176,6 +246,11 @@ export type RosterChange =
       readonly nickname: string
       readonly gender: Gender | null
     }
+  | {
+      readonly kind: 'relayed'
+      readonly nickname: string
+      readonly relayed: boolean
+    }
   | { readonly kind: 'removed'; readonly nickname: string }
   | { readonly kind: 'reordered'; readonly order: readonly string[] }
   | { readonly kind: 'slept'; readonly nickname: string }
@@ -198,6 +273,7 @@ export type SettingChange =
       readonly notificationKind: NotificationKind
       readonly enabled: boolean
     }
+  | { readonly kind: 'relayBody'; readonly sendBody: boolean }
   | {
       readonly kind: 'wakesMinimized'
       readonly wakes: boolean
@@ -223,6 +299,9 @@ export type JournalEvent =
   | { readonly kind: 'openFailed'; readonly detail: string }
   | { readonly kind: 'panicked'; readonly work: Work }
   | { readonly kind: 'quit' }
+  | { readonly kind: 'relayFailed'; readonly reason: RelayFailure }
+  | { readonly kind: 'relayPaired' }
+  | { readonly kind: 'relayUnpaired' }
   | { readonly kind: 'reset' }
   | { readonly kind: 'roster'; readonly change: RosterChange }
   | { readonly kind: 'saveFailed'; readonly detail: string }
@@ -283,7 +362,7 @@ export type JournalEntry = {
   readonly event: JournalEvent
 }
 
-/** Everything the four screens draw, in one piece. */
+/** Everything the five screens draw, in one piece. */
 export type Snapshot = {
   /** The version of the bundle, the one the changelog talks about. */
   readonly version: string
@@ -311,6 +390,8 @@ export type Snapshot = {
   readonly config: ConfigStatus
   /** Where multifus is with the version that is published. */
   readonly update: UpdateStatus
+  /** What the relay screen draws. Never the bot token, ADR 0009. */
+  readonly relay: RelayStatus
   /**
    * The entries the Rust side still holds in memory, oldest first.
    *
@@ -437,6 +518,43 @@ export const setWakesMinimized = async (wakes: boolean) => {
  */
 export const setStartAtLogin = async (startAtLogin: boolean) => {
   return invoke<Snapshot>('set_start_at_login', { startAtLogin })
+}
+
+/** Puts a character in or out of the relay. Kept indefinitely, ADR 0011. */
+export const setRelayed = async (nickname: string, relayed: boolean) => {
+  return invoke<Snapshot>('set_relayed', { nickname, relayed })
+}
+
+/** Says whether the text of a private message goes out with it, ADR 0008. */
+export const setSendBody = async (sendBody: boolean) => {
+  return invoke<Snapshot>('set_send_body', { sendBody })
+}
+
+/**
+ * Pairs the relay with the bot whose token this is.
+ *
+ * Answers with the pairing in flight and not with its result: it is two network
+ * round trips and a keychain. What it finds arrives in a snapshot of its own.
+ *
+ * The token goes in and never comes back. No command returns one, and none can.
+ */
+export const pairRelay = async (token: string) => {
+  return invoke<Snapshot>('pair_relay', { token })
+}
+
+/** Forgets the bot: the token leaves the keychain, the chat leaves the file. */
+export const unpairRelay = async () => {
+  return invoke<Snapshot>('unpair_relay')
+}
+
+/**
+ * Opens one of the three Telegram pages the setup sends the user to.
+ *
+ * A destination and never an address: the URLs live on the Rust side, so nothing
+ * that crosses the bridge can point the browser somewhere else.
+ */
+export const openRelayLink = async (link: RelayLink) => {
+  return invoke<null>('open_relay_link', { link })
 }
 
 /** Everything back to the defaults, roster included. */

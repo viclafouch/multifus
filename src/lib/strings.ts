@@ -22,6 +22,7 @@ import type {
   JournalEvent,
   NotificationKind,
   NotificationOutcome,
+  RelayFailure,
   RosterChange,
   SettingChange,
   ShortcutAction,
@@ -43,6 +44,7 @@ export const strings = {
     characters: 'Personnages',
     shortcuts: 'Raccourcis',
     autoFocus: 'AutoFocus',
+    relay: 'Relais',
     about: 'À propos'
   },
 
@@ -213,6 +215,91 @@ export const strings = {
         description: 'Un percepteur est attaqué.'
       }
     }
+  },
+
+  relay: {
+    title: 'Relais',
+    subtitle:
+      'Vos messages privés arrivent sur votre téléphone pendant que vous êtes ailleurs.',
+    // The whole setup happens in Telegram Web, on this machine, and that is what
+    // makes it bearable: the token is a copy and paste rather than fifty
+    // characters read off a telephone and typed back in by hand.
+    // The title of a step says what to do, its line says why when the why
+    // surprises: a robot cannot write first, BotFather answers in English.
+    guideTitle: 'Mettre le relais en place',
+    guideIntro:
+      'Une seule fois, ici même. Les messages, eux, arriveront sur votre téléphone.',
+    steps: {
+      web: {
+        title: 'Ouvrez Telegram dans votre navigateur',
+        body: 'Connectez-vous en scannant le code affiché avec votre téléphone.',
+        action: 'Ouvrir Telegram Web'
+      },
+      create: {
+        title: 'Demandez un robot à BotFather',
+        body: 'Écrivez-lui /newbot et suivez ses questions. Il répond en anglais.',
+        action: 'Ouvrir BotFather'
+      },
+      paste: {
+        title: 'Copiez son jeton, collez-le ci-dessous',
+        body: 'Un clic sur le jeton dans Telegram suffit à le copier.'
+      },
+      write: {
+        title: 'Écrivez « salut » à votre robot',
+        body: 'Un robot ne peut pas écrire le premier : sans ça, il ne peut pas vous joindre.'
+      },
+      connect: {
+        title: 'Cliquez sur Connecter',
+        body: 'multifus envoie un message d’essai sur votre téléphone.'
+      }
+    },
+    help: 'Les robots Telegram, expliqués',
+    tokenLabel: 'Jeton du robot',
+    tokenPlaceholder: 'Collez ici le jeton donné par BotFather',
+    connect: 'Connecter',
+    connecting: 'Connexion…',
+    // The token lives in the system keychain and never comes back out, which is
+    // why this screen shows a state and not the value.
+    pairedTitle: 'Votre robot est connecté',
+    pairedBody:
+      'Le jeton est rangé dans le trousseau du système, multifus ne l’affiche nulle part.',
+    unpair: 'Délier le robot',
+    unpairing: 'Déliement…',
+    // One line each, since the five steps are on screen right above: a message
+    // that names the step left to do beats one that repeats it.
+    problem: {
+      tokenBlank: 'Collez d’abord le jeton que BotFather vous a envoyé.',
+      tokenRefused: (detail: string) => {
+        return `Telegram ne reconnaît pas ce jeton, recopiez-le en entier (${detail}).`
+      },
+      // Not a failure but the half of the pairing only the user can do, so it is
+      // worded as one step left and never as « échec ».
+      noChat:
+        'Le jeton est bon : il ne manque que l’étape 4, votre message au robot.',
+      keychain: (detail: string) => {
+        return `Le trousseau n’a pas gardé le jeton, rien n’est enregistré (${detail}).`
+      },
+      network: (detail: string) => {
+        return `Telegram n’a pas répondu, vérifiez votre connexion (${detail}).`
+      }
+    },
+    bodyLabel: 'Envoyer le texte du message',
+    bodyDescription:
+      'Décoché, vous recevez le pseudo et le type, jamais ce qui a été écrit.',
+    // The one place a notification body leaves the machine, so the screen says
+    // where it goes rather than leaving it to be guessed. See ADR 0008.
+    bodyNote:
+      'Coché, le texte passe par Telegram, dont les conversations ne sont pas chiffrées de bout en bout.',
+    charactersTitle: 'Personnages relayés',
+    // The veille is said here rather than in a note under the panels, the same
+    // way the AutoFocus screen puts every caveat on the row it belongs to.
+    charactersBody:
+      'On relaie son principal, pas ses mules. La veille n’y change rien.',
+    characterToggle: (nickname: string) => {
+      return `Relayer ${nickname}`
+    },
+    emptyBody:
+      'Ouvrez un client Dofus : le personnage apparaît ici, déjà coché.'
   },
 
   about: {
@@ -425,6 +512,9 @@ const TONES = {
   updateAvailable: 'good',
   updateUpToDate: 'neutral',
   updateFailed: 'warning',
+  relayPaired: 'good',
+  relayUnpaired: 'neutral',
+  relayFailed: 'warning',
   reset: 'neutral',
   quit: 'neutral'
 } as const satisfies Record<PlainEventKind, JournalTone>
@@ -571,6 +661,11 @@ type WithoutPayload<Event> = Event extends { readonly kind: string }
 const PLAIN_LINES = {
   listening: 'Écoute des notifications démarrée.',
   updateUpToDate: 'Aucune version plus récente.',
+  // Neither line names the salon. It is not a notification body, so the rule of
+  // l'ADR 0006 does not reach it, but it names a real conversation and this
+  // journal is a file one hands over.
+  relayPaired: 'Relais apparié à un robot Telegram.',
+  relayUnpaired: 'Robot Telegram délié, jeton effacé du trousseau.',
   reset: 'Configuration remise à zéro.',
   quit: 'multifus a été quitté depuis la barre système.'
 } as const satisfies Record<WithoutPayload<JournalEvent>, string>
@@ -582,72 +677,6 @@ const isPlain = (
   { readonly kind: WithoutPayload<JournalEvent> }
 > => {
   return event.kind in PLAIN_LINES
-}
-
-/** A journal event, put into words. */
-export const journalLine = (event: JournalEvent) => {
-  if (isDetailed(event)) {
-    return `${DETAILED_LINES[event.kind]} : ${event.detail}`
-  }
-
-  if (isPlain(event)) {
-    return PLAIN_LINES[event.kind]
-  }
-
-  switch (event.kind) {
-    case 'started': {
-      return startedLine(event)
-    }
-    case 'configLoadFailed': {
-      return configLoadFailedLine(event)
-    }
-    case 'authorization': {
-      return event.granted
-        ? 'Autorisation accordée : les fenêtres sont lisibles.'
-        : 'Autorisation refusée : les fenêtres ne peuvent pas être lues.'
-    }
-    case 'authorizationRequested': {
-      return authorizationRequestedLine(event)
-    }
-    case 'characterOnline': {
-      return `${event.nickname} est connecté.`
-    }
-    case 'characterOffline': {
-      return `${event.nickname} n’est plus connecté.`
-    }
-    case 'notification': {
-      return notificationLine(event)
-    }
-    case 'roster': {
-      return rosterLine(event.change)
-    }
-    case 'setting': {
-      return settingLine(event.change)
-    }
-    case 'shortcut': {
-      return shortcutLine(event)
-    }
-    case 'shortcutsBound': {
-      return shortcutsBoundLine(event.bindings)
-    }
-    case 'trayFocus': {
-      return trayLine(event)
-    }
-    case 'startAtLoginReconciled': {
-      return event.enabled
-        ? 'Démarrage avec la session actif, enregistrement réécrit.'
-        : 'Démarrage avec la session inactif, aucun enregistrement.'
-    }
-    case 'updateAvailable': {
-      return `La version ${event.version} est disponible.`
-    }
-    case 'panicked': {
-      return `${WORK_LABELS[event.work]} a échoué brutalement, et a repris.`
-    }
-    default: {
-      return ''
-    }
-  }
 }
 
 /**
@@ -688,6 +717,30 @@ const authorizationRequestedLine = (
   return event.granted
     ? 'Autorisation demandée : accordée.'
     : 'Autorisation demandée : pas encore accordée, ce qui est normal dans la seconde qui suit.'
+}
+
+/**
+ * What the relay could not do, put into words.
+ *
+ * Each line names the place it is repaired in, and they are three different
+ * places. « Le relais a échoué » would send the reader to the network two times
+ * out of three, when the answer is a keychain or a token.
+ */
+const relayFailedLine = (reason: RelayFailure) => {
+  switch (reason.reason) {
+    case 'keychain': {
+      return `Relais : le trousseau du système a refusé le jeton (${reason.detail}).`
+    }
+    case 'telegram': {
+      return `Relais : Telegram a refusé la requête (${reason.detail}).`
+    }
+    case 'network': {
+      return `Relais : Telegram n’a pas répondu (${reason.detail}).`
+    }
+    default: {
+      return 'Relais : échec.'
+    }
+  }
 }
 
 /**
@@ -750,6 +803,11 @@ const rosterLine = (change: RosterChange) => {
     case 'removed': {
       return `${change.nickname} retiré du roster.`
     }
+    case 'relayed': {
+      return change.relayed
+        ? `${change.nickname} est relayé.`
+        : `${change.nickname} n’est plus relayé.`
+    }
     default: {
       return ''
     }
@@ -774,6 +832,11 @@ const settingLine = (change: SettingChange) => {
       const what = change.wakes ? 'activé' : 'désactivé'
 
       return `Réveil des fenêtres réduites ${what} depuis ${surfaceLabel(change.from)}.`
+    }
+    case 'relayBody': {
+      const what = change.sendBody ? 'activé' : 'désactivé'
+
+      return `Envoi du texte des messages privés ${what}.`
     }
     default: {
       return ''
@@ -1046,4 +1109,154 @@ const notificationLine = ({
       return subject
     }
   }
+}
+
+/** One event of the union, picked by its kind. */
+type EventOf<Kind extends JournalEvent['kind']> = Extract<
+  JournalEvent,
+  { readonly kind: Kind }
+>
+
+/**
+ * The kinds the two tables above did not take: the ones whose line is built from
+ * a payload rather than looked up.
+ */
+type ComposedEventKind = Exclude<
+  JournalEvent['kind'],
+  DetailedEventKind | WithoutPayload<JournalEvent>
+>
+
+/**
+ * Of those, the ones multifus reports about itself and about the system.
+ *
+ * Listed by hand, and its other half is derived from it below. So an event added
+ * on the Rust side and forgotten here lands in {@link ActionEventKind}, whose
+ * switch then fails to compile. The safety net of {@link TONES}, kept across a
+ * pair of functions.
+ */
+type RunEventKind =
+  | 'authorization'
+  | 'characterOffline'
+  | 'characterOnline'
+  | 'configLoadFailed'
+  | 'notification'
+  | 'panicked'
+  | 'relayFailed'
+  | 'shortcutsBound'
+  | 'startAtLoginReconciled'
+  | 'started'
+  | 'updateAvailable'
+
+/** And the ones the user caused, which is everything left. */
+type ActionEventKind = Exclude<ComposedEventKind, RunEventKind>
+
+/** The kinds {@link runLine} answers for, at runtime this time. */
+const RUN_KINDS = new Set<ComposedEventKind>([
+  'authorization',
+  'characterOffline',
+  'characterOnline',
+  'configLoadFailed',
+  'notification',
+  'panicked',
+  'relayFailed',
+  'shortcutsBound',
+  'startAtLoginReconciled',
+  'started',
+  'updateAvailable'
+] as const satisfies readonly RunEventKind[])
+
+const isRunEvent = (
+  event: EventOf<ComposedEventKind>
+): event is EventOf<RunEventKind> => {
+  return RUN_KINDS.has(event.kind)
+}
+
+/**
+ * What multifus observed on its own, put into words.
+ *
+ * Half of the events that carry a payload, and the seam is real: these are facts
+ * multifus reports about itself, {@link actionLine} holds what the user did. Two
+ * functions and not one because the Rust side keeps adding events, and one
+ * branch each grows past what anybody reads in one go.
+ */
+const runLine = (event: EventOf<RunEventKind>) => {
+  switch (event.kind) {
+    case 'started': {
+      return startedLine(event)
+    }
+    case 'configLoadFailed': {
+      return configLoadFailedLine(event)
+    }
+    case 'authorization': {
+      return event.granted
+        ? 'Autorisation accordée : les fenêtres sont lisibles.'
+        : 'Autorisation refusée : les fenêtres ne peuvent pas être lues.'
+    }
+    case 'characterOnline': {
+      return `${event.nickname} est connecté.`
+    }
+    case 'characterOffline': {
+      return `${event.nickname} n’est plus connecté.`
+    }
+    case 'notification': {
+      return notificationLine(event)
+    }
+    case 'shortcutsBound': {
+      return shortcutsBoundLine(event.bindings)
+    }
+    case 'startAtLoginReconciled': {
+      return event.enabled
+        ? 'Démarrage avec la session actif, enregistrement réécrit.'
+        : 'Démarrage avec la session inactif, aucun enregistrement.'
+    }
+    case 'updateAvailable': {
+      return `La version ${event.version} est disponible.`
+    }
+    case 'panicked': {
+      return `${WORK_LABELS[event.work]} a échoué brutalement, et a repris.`
+    }
+    case 'relayFailed': {
+      return relayFailedLine(event.reason)
+    }
+    default: {
+      return ''
+    }
+  }
+}
+
+/** What the user did, put into words. The other half of {@link runLine}. */
+const actionLine = (event: EventOf<ActionEventKind>) => {
+  switch (event.kind) {
+    case 'authorizationRequested': {
+      return authorizationRequestedLine(event)
+    }
+    case 'roster': {
+      return rosterLine(event.change)
+    }
+    case 'setting': {
+      return settingLine(event.change)
+    }
+    case 'shortcut': {
+      return shortcutLine(event)
+    }
+    case 'trayFocus': {
+      return trayLine(event)
+    }
+    default: {
+      return ''
+    }
+  }
+}
+
+/** A journal event, put into words. */
+export const journalLine = (event: JournalEvent) => {
+  if (isDetailed(event)) {
+    return `${DETAILED_LINES[event.kind]} : ${event.detail}`
+  }
+
+  if (isPlain(event)) {
+    return PLAIN_LINES[event.kind]
+  }
+
+  return isRunEvent(event) ? runLine(event) : actionLine(event)
 }

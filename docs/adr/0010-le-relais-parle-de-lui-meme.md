@@ -38,6 +38,20 @@ Plus aucun personnage relayé n'est connecté.
 
 Un avis part une fois par événement et ne se répète pas. Il ne porte **aucun corps de notification**, ce qui laisse la règle de l'[ADR 0006](./0006-journal-sur-disque.md) et celle de l'[ADR 0008](./0008-corps-relaye-sur-consentement.md) exactement où elles sont. Il porte un pseudo, ce que le fichier de configuration porte déjà.
 
+**Un balayage produit au plus un message, et les deux phrases peuvent y voyager ensemble.**
+
+```
+multifus
+Maître Forgeron s'est déconnecté.
+Plus aucun personnage relayé n'est connecté.
+```
+
+Deux messages séparés diraient deux fois la même chose dans le cas dominant, un seul personnage coché qui tombe au quart d'heure. Et ils deviendraient une rafale dans le cas de l'autorisation retirée, plus haut : six personnages relayés passent hors ligne au même balayage, ce qui ferait sept messages en une seconde, contre une limite Telegram de l'ordre d'un par seconde. Les phrases ne changent pas, leur emballage si.
+
+**« Une fois par événement » se lit sur le front et jamais sur l'état.** Un personnage qui se reconnecte puis retombe produit deux avis, un par déconnexion, et c'est juste : le téléphone doit refléter chaque fait. Ce qui est interdit est de répéter l'avis à chaque tour de balayage tant qu'il reste hors ligne. Accrocher l'avis à la transition que `apply_windows` calcule déjà donne les deux propriétés sans mémoire supplémentaire.
+
+**L'activation est un troisième déclencheur.** Le relais allumé alors qu'aucun personnage relayé n'est connecté n'écoute rien, et aucune transition ne se produira jamais pour le dire. L'avis collectif part donc tout de suite, pendant que le téléphone est encore dans la main. Sans ça, l'utilisateur part avec un relais armé et sourd, ce qui est très exactement la panne que cette décision existe pour empêcher.
+
 **Le relais ne s'arrête pas pour autant.** Seul un des quatre raccourcis le coupe, et un relais qui s'arrêterait tout seul serait le minuteur que le plan refuse. L'écran tenu éveillé, lui, tombe : il n'a plus rien à garder lisible, voir CONTEXT.md.
 
 ## Ce que ça ne coûte pas

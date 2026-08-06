@@ -61,11 +61,12 @@ use crate::platform::WindowManager;
 
 // The words of the menu. See the note at the top of this module for why they are
 // here and not in the strings file of the interface.
-// The four screens carry the names the rail gives them, so that the menu and the
+// The five screens carry the names the rail gives them, so that the menu and the
 // window call the same place by the same word.
 const MENU_CHARACTERS: &str = "Personnages";
 const MENU_SHORTCUTS: &str = "Raccourcis";
 const MENU_AUTO_FOCUS_SCREEN: &str = "AutoFocus";
+const MENU_RELAY: &str = "Relais";
 const MENU_ABOUT: &str = "À propos";
 const MENU_QUIT: &str = "Quitter multifus";
 const MENU_NOBODY: &str = "Aucun personnage connecté";
@@ -372,7 +373,7 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
         None::<&str>,
     )?)?;
 
-    // Four lines rather than one « Ouvrir », because opening the window is never
+    // Five lines rather than one « Ouvrir », because opening the window is never
     // the thing one wants: going to one of its screens is. The rail is three
     // clicks away otherwise, and this icon exists to save exactly those.
     menu.append(&PredefinedMenuItem::separator(app)?)?;
@@ -387,7 +388,7 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
         )?)?;
     }
 
-    // With the four screens, because it is the same gesture: going to look at
+    // With the five screens, because it is the same gesture: going to look at
     // something. It is here rather than in the window alone because the day it is
     // wanted is a day something is wrong, and the window is one of the things
     // that can be wrong.
@@ -525,6 +526,7 @@ fn screen_id(screen: Screen) -> &'static str {
         Screen::Characters => "characters",
         Screen::Shortcuts => "shortcuts",
         Screen::AutoFocus => "autoFocus",
+        Screen::Relay => "relay",
         Screen::About => "about",
     }
 }
@@ -542,6 +544,7 @@ fn screen_label(screen: Screen) -> &'static str {
         Screen::Characters => MENU_CHARACTERS,
         Screen::Shortcuts => MENU_SHORTCUTS,
         Screen::AutoFocus => MENU_AUTO_FOCUS_SCREEN,
+        Screen::Relay => MENU_RELAY,
         Screen::About => MENU_ABOUT,
     }
 }

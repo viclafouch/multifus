@@ -1,11 +1,11 @@
 import type { LucideIcon } from 'lucide-react'
-import { Info, Keyboard, Users, Zap } from 'lucide-react'
+import { Info, Keyboard, Send, Users, Zap } from 'lucide-react'
 import { Lamp } from '@/components/lamp'
 import { Button } from '@/components/ui/button'
 import type { Authorization, Character, ScreenName } from '@/lib/multifus'
 import { strings } from '@/lib/strings'
 
-/** Which of the four screens is on. */
+/** Which of the five screens is on. */
 
 type NavItem = {
   readonly name: ScreenName
@@ -17,6 +17,7 @@ const ITEMS = [
   { name: 'characters', label: strings.nav.characters, Icon: Users },
   { name: 'shortcuts', label: strings.nav.shortcuts, Icon: Keyboard },
   { name: 'autoFocus', label: strings.nav.autoFocus, Icon: Zap },
+  { name: 'relay', label: strings.nav.relay, Icon: Send },
   { name: 'about', label: strings.nav.about, Icon: Info }
 ] as const satisfies readonly NavItem[]
 

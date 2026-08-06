@@ -231,6 +231,20 @@ mod tests {
     }
 
     #[test]
+    fn a_client_disconnected_for_inactivity_invents_nobody() {
+        // Measured on a real client left idle: the window stays, the dialog says
+        // « Tu es resté trop longtemps inactif », and the title loses the
+        // nickname without gaining one of its own. A title such as
+        // `Connexion - Dofus Retro` would have put a character named
+        // « Connexion » in the roster, and it is not what happens.
+        //
+        // The version moves on its own, so the shape is what is asserted: no
+        // dash before `Dofus`, therefore no nickname.
+        assert_eq!(extract_nickname("Dofus Retro v1.48.21"), None);
+        assert_eq!(extract_nickname("Dofus Retro v9.99.99"), None);
+    }
+
+    #[test]
     fn combat_is_recognised_in_the_three_languages() {
         assert_eq!(
             classify("de Untel : c'est à ton tour de jouer"),

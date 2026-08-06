@@ -35,7 +35,16 @@ parce que le trait de `keyring` n'active pas le sous-trait du magasin. Le trait 
 
 **Le jeton entre par une commande et ne ressort jamais.** React l'envoie une fois à l'appariement, ne le relit pas, et l'écran n'affiche qu'un état, relié ou pas relié. C'est une propriété du modèle et pas une discipline à tenir : il n'existe aucune commande qui rende le jeton.
 
-Le fichier de configuration garde l'identifiant de salon, qui n'est pas un secret, et le réglage d'envoi du corps. Le trousseau ne garde que le jeton. La question « le relais est-il configuré » se répond en interrogeant le trousseau une fois au lancement, et la réponse voyage dans le snapshot comme le reste.
+Le fichier de configuration garde l'identifiant de salon, qui n'est pas un secret, et le réglage d'envoi du corps. Le trousseau ne garde que le jeton.
+
+**Deux questions, et une seule s'adresse au trousseau.** Une version antérieure de cette décision écrivait ici « la question _le relais est-il configuré_ se répond en interrogeant le trousseau une fois au lancement », ce qui contredit le paragraphe précédent et rouvre l'invite que la mesure interdit. Les deux questions se séparent ainsi :
+
+| La question                              | Qui répond                                 | Quand                           |
+| ---------------------------------------- | ------------------------------------------ | ------------------------------- |
+| Le relais peut-il s'activer maintenant ? | le trousseau                               | à l'activation, une fois        |
+| Le relais a-t-il déjà été installé ici ? | la configuration, par la présence du salon | à chaque snapshot, gratuitement |
+
+La seconde est celle que dessinent l'écran Relais et l'article de la barre système, qui se reconstruisent plusieurs fois par minute. Le salon et le jeton sont écrits et effacés ensemble par l'appariement, donc le fichier répond fidèlement. Une réponse périmée coûte un clic qui atterrit sur l'écran Relais au lieu d'allumer, et l'activation, elle, lit le trousseau et corrige la vue.
 
 ## Ce que l'ADR 0005 ne dit pas ici
 
@@ -59,7 +68,9 @@ Cliquer « Toujours autoriser » ne sert à rien : l'autorisation est accordée 
 
 **Une configuration qui ne suffit plus à elle seule.** Copier son fichier de configuration sur une autre machine y amène le roster, les raccourcis et l'identifiant de salon, mais pas le jeton, qu'il faut recoller. C'est le prix direct de la décision et il est accepté.
 
-**Une dépendance et deux implantations à vérifier**, une par système. La crate est active, seize millions de téléchargements et une publication cette semaine, mais son architecture a changé en version 4 : le cœur est passé dans `keyring-core` et les magasins dans des crates séparées. Choisir les traits d'implantation explicitement, `apple-native` et `windows-native`, plutôt que de s'en remettre au comportement par défaut.
+**Une dépendance et deux implantations à vérifier**, une par système. La crate est active, seize millions de téléchargements et une publication cette semaine, mais son architecture a changé en version 4 : le cœur est passé dans `keyring-core` et les magasins dans des crates séparées. La déclaration reste `keyring = "4"` sans liste de traits, pour la raison que la section « Décision » démontre en citant l'erreur du compilateur. Une version antérieure de ce paragraphe demandait ici le contraire, `apple-native` et `windows-native` : ces traits n'existent pas, et les vrais noms ne compilent pas davantage.
+
+**Un chemin réseau où le secret circule dans une URL.** Le jeton est le chemin de l'appel Telegram, et `reqwest` met l'URL dans le `Display` de ses erreurs, ce que sa propre documentation signale. Une erreur de transport recopiée telle quelle dans le journal y écrirait le jeton, dans un fichier qui vit des semaines et qu'on colle dans un rapport de bug. `crate::app::relay::telegram` retire l'URL avant toute mise en chaîne, et c'est la seule chose qui tient cette règle.
 
 ## Sources
 

@@ -24,6 +24,7 @@ use crate::app::autostart;
 use crate::app::journal::JournalEvent;
 use crate::app::journal::Surface;
 use crate::app::journal_file;
+use crate::app::relay;
 use crate::app::runtime;
 use crate::app::shortcuts;
 use crate::app::state::lock;
@@ -33,7 +34,7 @@ use crate::app::view::Snapshot;
 use crate::domain::Gender;
 use crate::domain::NotificationKind;
 
-/// Everything the four screens draw. Called once on mount, before the interface
+/// Everything the five screens draw. Called once on mount, before the interface
 /// starts listening for the rest.
 #[tauri::command]
 pub fn snapshot(app: AppHandle) -> Snapshot {
@@ -169,6 +170,56 @@ pub fn set_start_at_login(app: AppHandle, start_at_login: bool) -> Snapshot {
     autostart::reconcile(&app);
 
     runtime::emit_snapshot(&app)
+}
+
+// -- The relay screen -----------------------------------------------------
+
+/// Puts a character in or out of the relay. Kept indefinitely, ADR 0011.
+#[tauri::command]
+pub fn set_relayed(app: AppHandle, nickname: String, relayed: bool) -> Snapshot {
+    lock(&app).set_relayed(&nickname, relayed);
+
+    runtime::emit_snapshot(&app)
+}
+
+/// Says whether the text of a private message goes out with it, ADR 0008.
+#[tauri::command]
+pub fn set_send_body(app: AppHandle, send_body: bool) -> Snapshot {
+    lock(&app).set_send_body(send_body);
+
+    runtime::emit_snapshot(&app)
+}
+
+/// Pairs the relay with a bot, from the token the user pasted.
+///
+/// Comes back with the pairing in flight and not with its answer: it is two
+/// network round trips and a keychain that can raise a dialog. What it finds
+/// arrives in a snapshot of its own, exactly as [`check_update`] does.
+///
+/// **The token goes in and never comes back.** No command returns one, and none
+/// can: a read hands back a `BotToken`, which is not `Serialize`. See ADR 0009.
+#[tauri::command]
+pub fn pair_relay(app: AppHandle, token: String) -> Snapshot {
+    relay::pairing::pair(&app, token);
+
+    runtime::emit_snapshot(&app)
+}
+
+/// Forgets the bot: the token leaves the keychain, the chat leaves the file.
+#[tauri::command]
+pub fn unpair_relay(app: AppHandle) -> Snapshot {
+    relay::pairing::unpair(&app);
+
+    runtime::emit_snapshot(&app)
+}
+
+/// Opens one of the three Telegram pages the pairing sends the user to.
+///
+/// The interface names a destination and never an address, see
+/// [`crate::app::relay::links`].
+#[tauri::command]
+pub fn open_relay_link(app: AppHandle, link: relay::RelayLink) {
+    relay::links::open(&app, link);
 }
 
 // -- The about screen -----------------------------------------------------

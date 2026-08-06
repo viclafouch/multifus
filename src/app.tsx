@@ -10,6 +10,7 @@ import { AboutScreen } from '@/screens/about-screen'
 import { AuthorizationScreen } from '@/screens/authorization-screen'
 import { AutoFocusScreen } from '@/screens/auto-focus-screen'
 import { CharactersScreen } from '@/screens/characters-screen'
+import { RelayScreen } from '@/screens/relay-screen'
 import { ShortcutsScreen } from '@/screens/shortcuts-screen'
 
 /**
@@ -82,6 +83,16 @@ const CurrentScreen = ({ screen, snapshot, run }: CurrentScreenProps) => {
         switches={snapshot.autoFocus}
         isEnabled={snapshot.autoFocusEnabled}
         wakesMinimized={snapshot.wakesMinimized}
+        run={run}
+      />
+    )
+  }
+
+  if (screen === 'relay') {
+    return (
+      <RelayScreen
+        relay={snapshot.relay}
+        characters={snapshot.characters}
         run={run}
       />
     )

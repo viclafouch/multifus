@@ -32,6 +32,8 @@ Le même piège existe, et il coûte plus cher : un principal décoché il y a s
 
 Ce n'est pas la persistance qui le désamorce, c'est un refus. **Le relais refuse de s'activer quand plus aucun personnage n'est relayé**, et l'écran dit pourquoi. L'état « le relais est armé et ne peut rien transporter » n'existe donc pas. Un décochage partiel reste possible et reste visible, l'écran Relais listant les personnages avec leur case.
 
+**Et le décochage du dernier personnage pendant que le relais tourne l'arrête.** Le refus ci-dessus ne gardait que l'activation, ce qui laissait revenir par la porte de derrière l'état que cette section vient de déclarer inexistant. Trois règles se rencontrent ici : celle-là, « seul un raccourci arrête le relais », et la règle d'interface qui interdit de désactiver un bouton plutôt que d'expliquer. C'est la deuxième qui cède, et de peu : elle vise le **minuteur**, un relais qui s'arrêterait tout seul pendant une absence. Décocher la dernière case est un geste délibéré, fait au clavier, dans la fenêtre, sous les yeux de son auteur. Le journal écrit l'arrêt avec ce motif-là, distinct du raccourci et de la barre système.
+
 ## Ce que ça coûte
 
 **Un champ de plus dans le fichier de configuration**, sur chaque personnage. Un fichier écrit par une version antérieure n'en a pas, et un champ absent prend son défaut, donc tout le monde est relayé, ce qui est le comportement sûr.

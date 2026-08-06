@@ -22,7 +22,7 @@ use crate::app::journal::JournalEntry;
 use crate::domain::Gender;
 use crate::domain::NotificationKind;
 
-/// Everything the four screens draw, in one piece.
+/// Everything the five screens draw, in one piece.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Snapshot {
@@ -57,7 +57,82 @@ pub struct Snapshot {
     pub config: ConfigView,
     /// Where multifus is with the version that is out, see [`crate::app::update`].
     pub update: UpdateView,
+    /// What the relay screen draws. Never the bot token, ADR 0009.
+    pub relay: RelayView,
     pub journal: Vec<JournalEntry>,
+}
+
+/// What the relay screen draws, and the whole of what crosses about the relay.
+///
+/// **No bot token, and there could not be one**: a read hands back a
+/// [`crate::app::relay::BotToken`], which is not `Serialize`. The screen shows a
+/// state and a button that unlinks, ADR 0009.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RelayView {
+    /// The pairing has run on this machine, so a chat is known.
+    ///
+    /// **Answered from the configuration and never from the keychain.** This
+    /// travels in every snapshot, several times a minute, and ADR 0009 reads the
+    /// token once, when the relay is switched on, because a read can raise a
+    /// system dialog. The chat and the token are written and erased together, so
+    /// the file is a faithful answer to « has this ever been set up », which is
+    /// the question the screen and the menu ask. Whether the token is still
+    /// readable is a different question, asked at the one moment it matters.
+    pub paired: bool,
+    /// Whether the text of a private message goes out with the nickname and the
+    /// kind. Unchecked by default, ADR 0008.
+    pub send_body: bool,
+    /// Where the pairing got to, since it is two network round trips.
+    pub pairing: PairingView,
+}
+
+/// Whether a pairing or an unlinking is in flight, and how the last one ended.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(
+    tag = "kind",
+    rename_all = "camelCase",
+    rename_all_fields = "camelCase"
+)]
+pub enum PairingView {
+    /// Nothing in flight. [`RelayView::paired`] is then the whole state.
+    Idle,
+
+    /// A pairing or an unlinking is running: the network, then the keychain.
+    Working,
+
+    /// The last attempt did not go through, and this says where it is repaired.
+    Failed { problem: PairingProblem },
+}
+
+/// Why a pairing did not go through.
+///
+/// Five and not one, because they are repaired in five different places, and a
+/// screen that said « la connexion a échoué » would send the user to the wrong
+/// one every time.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(
+    tag = "kind",
+    rename_all = "camelCase",
+    rename_all_fields = "camelCase"
+)]
+pub enum PairingProblem {
+    /// Nothing was pasted in the field.
+    TokenBlank,
+
+    /// Telegram would not take the token. A wrong one answers 401 and one
+    /// without a colon answers 404; both land here.
+    TokenRefused { detail: String },
+
+    /// The token works and nobody has written to the bot yet. Not a failure but
+    /// the second half of the pairing, which only the user can do.
+    NoChat,
+
+    /// The keychain would not keep the token, so nothing durable was written.
+    Keychain { detail: String },
+
+    /// The request never left, or never came back.
+    Network { detail: String },
 }
 
 /// What multifus knows about the version that is published.
@@ -90,7 +165,7 @@ pub enum UpdateView {
     Failed { detail: String },
 }
 
-/// One of the four screens the window can show.
+/// One of the five screens the window can show.
 ///
 /// It crosses the bridge for one reason: the system tray offers to open any of
 /// them, and which screen is on show is React's state. Nothing on this side
@@ -101,15 +176,18 @@ pub enum Screen {
     Characters,
     Shortcuts,
     AutoFocus,
+    Relay,
     About,
 }
 
 impl Screen {
-    /// The four of them, in the order of the rail.
-    pub const ALL: [Self; 4] = [
+    /// The five of them, in the order of the rail. The relay comes before the
+    /// about screen, being about the game rather than about the installation.
+    pub const ALL: [Self; 5] = [
         Self::Characters,
         Self::Shortcuts,
         Self::AutoFocus,
+        Self::Relay,
         Self::About,
     ];
 }
@@ -125,6 +203,9 @@ pub struct CharacterView {
     pub asleep: bool,
     /// A window bears this nickname right now.
     pub online: bool,
+    /// The relay carries this character's private messages. Unrelated to the
+    /// veille, which only takes a character out of the cycle. See ADR 0011.
+    pub relayed: bool,
 }
 
 /// One of the four actions a combination can be bound to.

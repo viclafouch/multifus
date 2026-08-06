@@ -8,21 +8,22 @@ Le vocabulaire est dans [CONTEXT.md](../CONTEXT.md), ce que le projet refuse de 
 
 ## Où on en est
 
-Les étapes 0 à 8 et l'étape 10 sont écrites, les sept premières sont vérifiées. De l'étape 11, les fondations sont posées et le reste attend. Leurs numéros restent des étiquettes, le code y renvoie.
+Les étapes 0 à 8 et l'étape 10 sont écrites, les sept premières sont vérifiées. De l'étape 11, les fondations et l'appariement sont posés, le relais lui-même attend. Leurs numéros restent des étiquettes, le code y renvoie.
 
-| #   | Étape                       | Où                                           | État                                 |
-| --- | --------------------------- | -------------------------------------------- | ------------------------------------ |
-| 0-1 | Bootstrap et outillage      | `package.json`, `oxlint.config.ts`, `.husky` | fait                                 |
-| 2   | Cœur métier pur             | `src-tauri/src/domain`                       | fait, testé                          |
-| 3   | Frontière avec le système   | `src-tauri/src/platform`                     | fait                                 |
-| 4   | Implémentation macOS        | `platform::macos`                            | **vérifiée sur deux clients**        |
-| 5   | Persistance                 | `src-tauri/src/config`                       | fait, testé                          |
-| 6   | Interface React             | `src`, `src-tauri/src/app`                   | faite, AutoFocus prouvé              |
-| 7   | Raccourcis globaux          | `app::shortcuts`                             | **vérifiés depuis le jeu**           |
-| 8   | Barre système et session    | `app::tray`, `app::autostart`                | **revient à l'ouverture de session** |
-| 10  | Distribution et mise à jour | `.github/workflows`, `app::update`           | écrite, à vérifier                   |
-| 11a | Fondations du relais        | `app::relay::secret`, `platform::display`    | écrites, testées                     |
-| 11b | Relais Telegram             | `app::relay`, écran, barre système           | cadré et mesuré, rien d'écrit        |
+| #     | Étape                       | Où                                             | État                                 |
+| ----- | --------------------------- | ---------------------------------------------- | ------------------------------------ |
+| 0-1   | Bootstrap et outillage      | `package.json`, `oxlint.config.ts`, `.husky`   | fait                                 |
+| 2     | Cœur métier pur             | `src-tauri/src/domain`                         | fait, testé                          |
+| 3     | Frontière avec le système   | `src-tauri/src/platform`                       | fait                                 |
+| 4     | Implémentation macOS        | `platform::macos`                              | **vérifiée sur deux clients**        |
+| 5     | Persistance                 | `src-tauri/src/config`                         | fait, testé                          |
+| 6     | Interface React             | `src`, `src-tauri/src/app`                     | faite, AutoFocus prouvé              |
+| 7     | Raccourcis globaux          | `app::shortcuts`                               | **vérifiés depuis le jeu**           |
+| 8     | Barre système et session    | `app::tray`, `app::autostart`                  | **revient à l'ouverture de session** |
+| 10    | Distribution et mise à jour | `.github/workflows`, `app::update`             | écrite, à vérifier                   |
+| 11a   | Fondations du relais        | `app::relay::secret`, `platform::display`      | écrites, testées                     |
+| 11b-1 | Appariement du relais       | `app::relay::{telegram,pairing}`, écran Relais | **vérifié sur un vrai robot**        |
+| 11b-2 | Le relais lui-même          | barre système, envoi, avis, écran éveillé      | cadré, rien d'écrit                  |
 
 Les versions font foi dans `package.json`, `tauri.conf.json` et `Cargo.toml`, nulle part ailleurs. `standard-version` les déplace ensemble, et le workflow de release refuse un tag qui ne dirait pas la même chose qu'elles.
 
@@ -132,7 +133,31 @@ Perdue avant la première release, elle se régénère sans conséquence. Perdue
 
 `app::relay::secret` pour le trousseau, `platform::display` et sa moitié macOS, `relayed` sur le personnage avec les accesseurs de `Roster` qui vont avec, `config::Relay`, les trois dépendances et le fournisseur `rustls` dans `app::setup`. Ni interface, ni réseau, ni barre système.
 
-#### 11b — Ce qui reste
+#### 11b-1 — Posé
+
+**L'appariement fonctionne de bout en bout, sauf l'essai avec un vrai robot.** `app::relay::telegram` porte les deux appels, `app::relay::pairing` porte le geste, l'écran Relais est le cinquième du rail et du menu, et `relayed` se coche par personnage. `cargo test` compte 112 cas.
+
+**L'ordre de l'appariement prouve toute la chaîne avant d'écrire quoi que ce soit.** Le salon est lu, un message d'essai y est envoyé, et le jeton n'est rangé dans le trousseau qu'après. Un appariement qui se déclare réussi est donc un appariement dont le message est vraiment arrivé sur le téléphone, et pas un qui échouera au premier message privé. Le prix est un message d'essai orphelin si le trousseau refuse en dernier, ce qui est le bon sens de l'échange.
+
+**Rien ne se fait sur le fil qui a demandé.** Deux allers-retours réseau et un trousseau que l'ADR 0009 a mesuré bloquant sur une boîte de dialogue : la commande rend la main tout de suite et la réponse arrive par un snapshot, comme `app::update`. L'écriture dans le trousseau passe par `spawn_blocking`, qui est le seul endroit où une attente de ce genre a le droit de vivre.
+
+**Cinq motifs d'échec d'appariement et pas un.** Jeton vide, jeton refusé, personne n'a écrit au robot, trousseau qui refuse, réseau absent. Ils se réparent à cinq endroits différents, et un écran qui dirait « la connexion a échoué » enverrait l'utilisateur au mauvais deux fois sur trois. Les deux premiers cas ne sont pas des pannes du relais et n'écrivent rien au journal : ce sont des étapes que l'utilisateur finit.
+
+**L'écran explique Telegram à quelqu'un qui ne l'a jamais ouvert.** C'est le seul écran de multifus qui demande d'aller faire quelque chose dans une autre application et de revenir, donc cinq étapes numérotées et pas un paragraphe. Deux d'entre elles disent **pourquoi** et pas seulement quoi : un robot n'a pas le droit d'écrire le premier, qui est l'étape que tout le monde rate, et BotFather répond en anglais, ce qui sans avertissement se lit comme une fausse route.
+
+**Trois liens, et l'interface nomme une destination sans jamais fournir d'adresse.** `web.telegram.org` pour Telegram dans le navigateur, `t.me/botfather` pour le robot qui fabrique les robots, `telegram.org/faq/fr` pour ce qu'est un robot, qui est la seule page officielle en français sur le sujet, la documentation des robots n'existant qu'en anglais. Les URL sont des constantes de `app::relay::links` et React envoie un mot parmi trois. La capacité accorde pourtant `opener:default`, donc React **pourrait** ouvrir une URL lui-même : c'est le même refus que pour `reveal_quarantined_config`, rien qui traverse le pont ne désigne une cible.
+
+**Tout le tutoriel se fait dans Telegram Web, sur la machine où tourne multifus.** C'est ce qui rend l'appariement supportable : le jeton se copie-colle au lieu d'être lu sur un téléphone et retapé à la main, cinquante caractères sans faute. Les cinq étapes sont donc cinq liens et cinq gestes sur le même écran, et le téléphone ne sert plus qu'à deux choses, se connecter à Telegram Web une fois et recevoir les messages ensuite.
+
+**Les carrés à scanner ont existé une demi-journée et ont été retirés.** L'idée était juste tant que le tutoriel visait le téléphone : un bouton y aurait ouvert la page sur la mauvaise machine. Elle tombe dès que tout se passe dans le navigateur, où un lien est un lien. Retirés avec eux : la crate `qrcodegen`, la commande qui rendait les modules, le composant et son crochet. Ne pas les remettre sans que le tutoriel reparte sur le téléphone.
+
+**Le rang d'une étape s'écrit comme un rang de défilement**, en mono et sur deux chiffres. Cet idiome veut déjà dire « le nième d'une liste ordonnée » dans cette fenêtre, et une pastille numérotée inventée ici aurait dit la même chose dans un second dialecte. Même raison pour `PanelHeader`, extrait dès qu'un second panneau en a voulu un : deux panneaux du même écran ne peuvent plus diverger d'un pixel.
+
+**Trois événements de journal, et un test qui compte leurs champs.** `RelayPaired`, `RelayUnpaired`, `RelayFailed` avec ses trois motifs. Aucun corps de notification, la règle de l'ADR 0006 ne bouge pas. Et **aucun identifiant de salon**, ce qui n'est pas cette règle-là mais la même raison que le nom de machine absent de `Started` : ce fichier est fait pour être transmis.
+
+#### 11b-2 — Ce qui reste
+
+L'article de la barre système et ses trois états, l'activation et sa lecture du trousseau, l'écran tenu éveillé branché au balayage, le fil d'envoi, le chemin des notifications, les avis, l'arrêt au raccourci et au décochage du dernier personnage relayé.
 
 Cinq décisions sont tranchées et n'ont pas à être rejouées. Le service, [ADR 0007](./adr/0007-telegram-plutot-que-whatsapp-ou-ntfy.md), qui écarte WhatsApp, ntfy, Gotify, Bark et Pushover avec les motifs de chacun. Le corps du message, [ADR 0008](./adr/0008-corps-relaye-sur-consentement.md), qui explique pourquoi l'interdit de l'ADR 0006 ne s'applique pas ici et pourquoi le réglage est décoché par défaut. Le jeton, [ADR 0009](./adr/0009-jeton-dans-le-trousseau.md), qui le range dans le trousseau du système. Les avis, [ADR 0010](./adr/0010-le-relais-parle-de-lui-meme.md), qui disent quand le relais a cessé d'entendre. Le relais par personnage, [ADR 0011](./adr/0011-relais-par-personnage.md), qui revient sur un refus du périmètre.
 
@@ -144,13 +169,17 @@ Cinq décisions sont tranchées et n'ont pas à être rejouées. Le service, [AD
 
 **L'interrupteur est dans la barre système et nulle part ailleurs.** Un article avec un verbe, comme la règle de l'étape 8 l'exige pour tout ce qui bascule dans ce menu. Pas de cinquième raccourci global : les quatre flèches de `Control+Shift` sont prises, et on active le relais en se levant, un geste qui supporte d'aller à la barre des menus.
 
-Trois états et non deux verbes, parce que l'état « aucun jeton rangé » existe et qu'un « Activer le relais » qui échoue est exactement ce que cette étape cherche à éviter :
+Trois états et non deux verbes, parce qu'un « Activer le relais » qui échoue est exactement ce que cette étape cherche à éviter. Le premier état a été mal nommé pendant tout le cadrage, et le corrigé est ici :
 
-| État                          | Ce que l'article dit                              |
-| ----------------------------- | ------------------------------------------------- |
-| Aucun jeton dans le trousseau | `Configurer le relais…`, et le clic ouvre l'écran |
-| Jeton présent, relais coupé   | `Activer le relais`                               |
-| Relais actif                  | `Désactiver le relais`                            |
+| État                                                | Ce que l'article dit                              | D'où vient la réponse          |
+| --------------------------------------------------- | ------------------------------------------------- | ------------------------------ |
+| Pas prêt : jamais apparié, **ou** personne de coché | `Configurer le relais…`, et le clic ouvre l'écran | la configuration, sans lecture |
+| Prêt, relais coupé                                  | `Activer le relais`                               | idem                           |
+| Relais actif                                        | `Désactiver le relais`                            | l'état vivant du processus     |
+
+**Ce n'est pas « aucun jeton dans le trousseau », et ça ne pouvait pas l'être.** Le menu se reconstruit à chaque snapshot, donc plusieurs fois par minute, et l'ADR 0009 interdit d'interroger le trousseau ailleurs qu'à l'activation parce que chaque lecture peut ouvrir une boîte de dialogue. La question du menu est une question de préparation, pas de présence du secret, et elle se lit sur `relay.chat_id`, que l'appariement écrit et que le déliement efface en même temps que le jeton. Le tableau de l'ADR 0009 sépare les deux questions.
+
+Le gain de bord est le quatrième état que le cadrage avait oublié : « le relais refuse de s'activer si personne n'est coché » avait besoin d'un endroit pour se dire, et un clic de menu qui ne fait rien ne le dit pas. Les deux cas partagent la même étiquette et le même clic, vers le seul écran où les deux se réparent.
 
 **L'écran Relais est le cinquième du rail et du menu.** `Screen::ALL`, `tray::build_menu` et le rail passent de quatre à cinq. C'est la première fonctionnalité qui oblige à ouvrir la fenêtre pour être installée, et l'arbitrage est en bas de cette étape.
 
@@ -180,7 +209,8 @@ Trois états et non deux verbes, parce que l'état « aucun jeton rangé » exis
 | L'assertion d'énergie se pose-t-elle ?           | **Oui.** Elle s'inscrit sous le pid de multifus avec son nom dans `pmset -g assertions`, et se relâche             |
 | `keyring` ouvre-t-il une invite en `tauri dev` ? | **Oui.** Un binaire recompilé bloque sur une boîte de dialogue. Voir le tableau de l'ADR 0009                      |
 | Que rend `getUpdates` sur un jeton invalide ?    | HTTP **401**, `{"ok":false,"error_code":401,"description":"Unauthorized"}`. Un jeton sans deux-points rend **404** |
-| Combien de crates coûte l'étape ?                | **Trois**, sur macOS comme sur Windows                                                                             |
+| Combien de crates coûte l'étape ?                | **Trois** pour le relais, plus **une** pour les carrés à scanner, sur macOS comme sur Windows                      |
+| Le titre après une déconnexion pour inactivité ? | **`Dofus Retro v1.48.21`**, sans tiret devant `Dofus`. Aucun pseudo n'y est lu, aucun personnage n'est inventé     |
 
 La question du double déclenchement de l'observateur est traitée dans « Ce qui mord », parce que la mesure a rendu autre chose que ce qu'on lui demandait et qu'elle est douteuse.
 
@@ -188,9 +218,7 @@ Deux de ces lignes sont maintenant tenues par le code de 11a et non plus par un 
 
 #### Ce qui reste à mesurer, et qui demande la vraie machine
 
-**Le titre exact de la fenêtre après une déconnexion pour inactivité.** S'il devient `Dofus Retro`, la regex n'y voit pas de pseudo et tout va bien. S'il devenait `Connexion - Dofus Retro`, elle y lirait `Connexion` et **inventerait un personnage** dans le roster. Une capture du titre suffit.
-
-**Ce que rend `getUpdates` sur un vrai robot à qui personne n'a écrit.** L'écran doit distinguer « écris à ton robot puis réessaie » d'un jeton invalide, sinon les deux se lisent comme un échec de connexion. La commande, avant d'avoir écrit au robot :
+**Ce que rend `getUpdates` sur un vrai robot à qui personne n'a écrit.** Ce n'est plus un préalable : la partition du code ne repose pas sur la forme exacte de cette réponse. Une erreur de transport est le réseau ; un HTTP non 2xx ou un `ok: false` est le jeton ; `ok: true` sans aucune mise à jour portant un `message.chat.id` est le seul cas restant, et c'est « écris à ton robot ». La commande reste bonne à passer pour confirmer :
 
 ```bash
 curl -s "https://api.telegram.org/bot<JETON>/getUpdates"
@@ -247,6 +275,22 @@ Un `sendMessage` parti avant la première vérification de mise à jour trouvera
 
 #### Pièges connus d'avance
 
+**Le jeton est dans l'URL, et `reqwest` met l'URL dans ses erreurs.** Sa propre documentation le signale et propose `without_url`. Recopier un `error.to_string()` de transport dans le journal y écrirait le jeton du robot, dans un fichier qui vit des semaines et qu'on colle dans un rapport de bug. `app::relay::telegram` le retire sur tous ses chemins d'erreur, et rien d'autre ne protège cette règle. Ne jamais formater une erreur `reqwest` de ce module autrement.
+
+**L'activation lit le trousseau, donc elle ne peut pas vivre sur le fil principal.** `tray::on_menu_event` tourne sur le fil principal, et l'ADR 0009 a mesuré une lecture bloquée sur une boîte de dialogue. Branchée directement là, l'activation gèle la fenêtre et la boucle d'événements le temps que quelqu'un clique. La file du travailleur de la barre système ne transporte aujourd'hui qu'un `String` : elle devient une énumération en 11b-2, `Focus(String)` et `ToggleRelay`, pour que l'activation parte sur le travailleur comme un focus.
+
+**`PlatformDisplayKeeper` n'est posé nulle part.** `app::setup` gère le gestionnaire de fenêtres et le watcher, pas le keeper. C'est une ligne, et elle manque depuis 11a.
+
+**Sur Windows le keeper échoue à chaque tour.** `keep_awake` rend `NotImplemented` et `is_awake` rend toujours `false`, donc chaque balayage avec un personnage relayé connecté retentera et échouera jusqu'à l'étape 9. `log_unless_repeated` le réduit à une ligne, c'est tenable. Sur macOS le keeper est idempotent en interne, donc l'appeler à chaque tour est gratuit et l'appelant ne garde aucun booléen.
+
+**L'échec de l'écran tenu éveillé n'est pas un `RelayFailed`.** Le relais marche encore, jusqu'au verrouillage. Deux événements qui recopient le couple `Listening` / `ListeningFailed` déjà présent : `DisplayAwake { held }` et `DisplayAwakeFailed { detail }`.
+
+**`RelayEnabled` ne porte pas de surface.** L'interrupteur est dans la barre système et nulle part ailleurs, donc le champ n'aurait qu'une valeur. C'est `RelayDisabled` qui porte quelque chose, et c'est un **motif** et non une surface : le raccourci, la barre système, le décochage du dernier personnage relayé.
+
+**Une notification n'est pas filtrée par l'application qui l'a émise.** L'observateur lit ce que le centre de notifications dessine, quelle qu'en soit la source, donc une notification web dont le titre finit par `- Dofus…` produit un pseudo. Sur le chemin de l'AutoFocus c'est sans effet, le pseudo n'ayant pas de fenêtre, et **le roster reste intact** : seul `apply_windows` crée un personnage, et il n'énumère que les processus du bundle `com.dofus.d1elauncher`. Sur le chemin du relais, qui n'a besoin d'aucune fenêtre par conception, le garde est que `relayed` est un attribut de personnage : un pseudo absent du roster n'est relayé par rien. Ne pas ajouter de filtre, il n'y a rien à filtrer.
+
+**`journalLine` bute sur la complexité maximale de l'analyseur.** L'union des événements grossit à chaque étape, et une fonction d'une branche par événement passe 20 vite. Trois tables et deux fonctions se partagent le travail dans `src/lib/strings.ts`, et `ActionEventKind` est **dérivé** de son jumeau par `Exclude` : un événement ajouté côté Rust et oublié dans `RunEventKind` fait échouer la compilation de l'autre moitié. Ne pas remettre un seul `switch`, et ne pas non plus le résoudre par une assertion de type, que `no-unsafe-type-assertion` refuse.
+
 **Aucun `parse_mode` demandé à Telegram.** Un corps de jeu qui contient une astérisque ou un souligné casse l'analyse Markdown, et Telegram rejette le message entier plutôt que de l'envoyer en clair. Texte brut, toujours.
 
 **Telegram limite l'envoi vers un même salon**, de l'ordre d'un message par seconde en régime établi, et répond 429 avec un `retry_after`. Une soirée de messages privés nourris peut l'atteindre. Ne pas réessayer en boucle : écrire la ligne au journal et laisser tomber ce message. Un relais qui se met à retenir des messages pour les envoyer plus tard mentirait sur l'heure à laquelle on a été appelé.
@@ -269,9 +313,11 @@ Le relais est la première fonctionnalité qui oblige à ouvrir la fenêtre pour
 
 #### Vérification
 
-De 11a, ce qui se vérifie sans le robot est fait : `cargo test` passe, `cargo tree` ne montre que les trois crates, un fichier de configuration écrit avant cette étape se relit avec tout le monde relayé, l'assertion se pose et se relâche, et la lecture de l'économiseur rend ce que `defaults -currentHost read com.apple.screensaver idleTime` rend. Ce qui suit demande le robot et la vraie machine.
+De 11a et 11b-1, ce qui se vérifie sans le robot est fait : `cargo test` passe, `cargo tree` ne montre que les trois crates, un fichier de configuration écrit avant cette étape se relit avec tout le monde relayé, l'assertion se pose et se relâche, et la lecture de l'économiseur rend ce que `defaults -currentHost read com.apple.screensaver idleTime` rend. Ce qui suit demande le robot et la vraie machine.
 
-Le robot créé, le jeton collé, un message d'essai reçu sur le téléphone. Puis un vrai message privé envoyé par quelqu'un d'autre, reçu sur le téléphone.
+**L'essai qui clôt 11b-1 est passé.** Robot créé chez BotFather dans Telegram Web, jeton collé, message écrit au robot, Connecter : le message d'essai est arrivé sur le téléphone et l'écran est passé à « Robot connecté ». L'invite de trousseau de l'ADR 0009 se produit bien en `tauri dev`, comme mesuré, et ne bloque rien une fois autorisée.
+
+Puis, en 11b-2, un vrai message privé envoyé par quelqu'un d'autre, reçu sur le téléphone.
 
 **Puis le quart d'heure, qui est l'essai qui compte.** Un seul personnage coché, la machine laissée seule vingt minutes. Il doit arriver un message privé, puis un avis de déconnexion vers la quinzième minute, puis plus rien. `pmset -g assertions` doit montrer la ligne de multifus avant l'avis et ne plus la montrer après. Le retour au clavier avec un raccourci de défilement doit couper le relais.
 
@@ -286,6 +332,8 @@ Enfin, deux personnages, un seul coché, un message privé sur chacun : un seul 
 Session à ouvrir sur le PC Windows, dépôt cloné. Prérequis : Microsoft C++ Build Tools avec la charge « Développement Desktop en C++ », puis `rustup default stable-msvc`. WebView2 est déjà présent sur un Windows 10 à jour.
 
 Utiliser la crate `windows`, qui couvre WinRT nativement. `UserNotificationListener` pour l'écoute, `EnumWindows` et `GetWindowText` pour l'énumération. Implémenter aussi la suppression des toasts au focus, possible ici et impossible sur macOS.
+
+**Filtrer sur le processus et pas sur le seul titre, et c'est un bug déjà vu.** `EnumWindows` balaie tout le bureau, et un onglet de navigateur intitulé `Quelque chose - Dofus Retro` satisfait la regex : le navigateur entre alors dans le roster comme un personnage et se fait ramener au premier plan. C'est arrivé. macOS n'a jamais eu ce trou parce que `dofus_applications` n'énumère que les processus du bundle `com.dofus.d1elauncher`, et Windows doit faire pareil : `GetWindowThreadProcessId`, puis le nom de l'exécutable du processus. Le titre reste ce qui donne le pseudo, il cesse d'être ce qui donne le droit d'entrer.
 
 **Piège à ne pas reproduire.** Dracoon contourne la restriction de `SetForegroundWindow` en injectant une vraie frappe Alt dans l'application active. C'est la cause probable du bug de focus intermittent corrigé dans son commit `0b0525c`, et ça envoie une touche parasite dans le jeu. Passer par `AttachThreadInput`.
 

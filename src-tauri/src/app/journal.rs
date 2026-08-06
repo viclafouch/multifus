@@ -282,6 +282,23 @@ pub enum JournalEvent {
     /// journal itself.
     OpenFailed { detail: String },
 
+    /// The relay is paired: a chat is known and the token is in the keychain.
+    ///
+    /// **It carries no chat identifier, on purpose.** That is not a notification
+    /// body, so the rule of ADR 0006 does not reach it, but it names a real
+    /// conversation of a real person, and this file lives for weeks and gets
+    /// pasted into a bug report. Same reason the hostname stays out of
+    /// [`JournalEvent::Started`].
+    RelayPaired,
+
+    /// The bot was forgotten: the token left the keychain and the chat left the
+    /// configuration.
+    RelayUnpaired,
+
+    /// The relay could not do what was asked, and this says where it is
+    /// repaired. Never a notification body, in any form.
+    RelayFailed { reason: RelayFailure },
+
     /// Everything went back to its defaults, roster included.
     Reset,
 
@@ -335,6 +352,11 @@ pub enum RosterChange {
 
     /// Taken out of the roster for good.
     Removed { nickname: String },
+
+    /// Put in or out of the relay. Kept indefinitely like the gender, which is
+    /// what makes this line worth writing: a principal unticked six weeks ago is
+    /// otherwise a private message lost in silence. See ADR 0011.
+    Relayed { nickname: String, relayed: bool },
 }
 
 /// What the user changed, and from where when there are two doors.
@@ -361,6 +383,38 @@ pub enum SettingChange {
 
     /// Whether the AutoFocus reaches into the Dock.
     WakesMinimized { wakes: bool, from: Surface },
+
+    /// Whether the text of a private message goes out with it, ADR 0008. The
+    /// window only: one does not decide the privacy of a message in passing,
+    /// which is why this one is not in the menu of the system tray.
+    RelayBody { send_body: bool },
+}
+
+/// Why the relay could not do what was asked.
+///
+/// Three and not one, because they are repaired in three different places: the
+/// keychain of the system, the bot at Telegram, and the network in between. One
+/// `RelayFailed` with a single detail would send the reader to the wrong one two
+/// times out of three.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(
+    tag = "reason",
+    rename_all = "camelCase",
+    rename_all_fields = "camelCase"
+)]
+pub enum RelayFailure {
+    /// The keychain would not keep, hand back or erase the token.
+    Keychain { detail: String },
+
+    /// Telegram answered and turned the call down.
+    Telegram { detail: String },
+
+    /// The request never left, or never came back.
+    ///
+    /// `detail` never carries the URL of the call: the bot token is in that URL
+    /// and `reqwest` puts it in its own `Display`, see
+    /// [`crate::app::relay::telegram`].
+    Network { detail: String },
 }
 
 /// Which of the two surfaces the user acted on.
@@ -627,15 +681,76 @@ mod tests {
             outcome: Outcome::Focused,
         };
 
-        let written = serde_json::to_value(&event).expect("the event serialises");
-        let fields = written
+        assert_eq!(
+            fields_of(&event),
+            ["kind", "nickname", "notificationKind", "outcome"]
+        );
+    }
+
+    /// The field names one event serialises to, which is what the two rules of
+    /// this module are asserted on rather than on anybody's memory.
+    fn fields_of(event: &JournalEvent) -> Vec<String> {
+        serde_json::to_value(event)
+            .expect("the event serialises")
             .as_object()
             .expect("an event is an object")
             .keys()
-            .map(String::as_str)
+            .cloned()
+            .collect()
+    }
+
+    #[test]
+    fn no_relay_event_carries_a_body_or_a_chat() {
+        // Two rules in one test, and both outlive whoever remembers them. No
+        // notification body, which is ADR 0006 and ADR 0008. And no chat
+        // identifier, which is not that rule but the same reason the hostname
+        // stays out: this file is meant to be handed over.
+        //
+        // Adding a field to any of the three fails here, which is the point.
+        assert_eq!(fields_of(&JournalEvent::RelayPaired), ["kind"]);
+        assert_eq!(fields_of(&JournalEvent::RelayUnpaired), ["kind"]);
+
+        let failed = JournalEvent::RelayFailed {
+            reason: RelayFailure::Telegram {
+                detail: "Unauthorized".to_owned(),
+            },
+        };
+
+        assert_eq!(fields_of(&failed), ["kind", "reason"]);
+        assert_eq!(
+            serde_json::to_string(&failed).expect("the event serialises"),
+            r#"{"kind":"relayFailed","reason":{"reason":"telegram","detail":"Unauthorized"}}"#
+        );
+    }
+
+    #[test]
+    fn a_relay_failure_says_which_of_the_three_places_it_is_repaired_in() {
+        // The keychain refusing, Telegram refusing and the network being absent
+        // are three different repairs. Collapsing them into one detail would
+        // send the reader looking in the wrong place two times out of three.
+        let reasons = [
+            RelayFailure::Keychain {
+                detail: "denied".to_owned(),
+            },
+            RelayFailure::Telegram {
+                detail: "Unauthorized".to_owned(),
+            },
+            RelayFailure::Network {
+                detail: "error sending request".to_owned(),
+            },
+        ];
+
+        let named = reasons
+            .iter()
+            .map(|reason| {
+                serde_json::to_value(reason).expect("a reason serialises")["reason"]
+                    .as_str()
+                    .expect("a reason is tagged")
+                    .to_owned()
+            })
             .collect::<Vec<_>>();
 
-        assert_eq!(fields, ["kind", "nickname", "notificationKind", "outcome"]);
+        assert_eq!(named, ["keychain", "telegram", "network"]);
     }
 
     #[test]

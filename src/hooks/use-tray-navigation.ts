@@ -5,7 +5,7 @@ import { onNavigate } from '@/lib/multifus'
 /**
  * The screen the system tray asks the window to show.
  *
- * The menu offers the four screens directly, since opening the window is never
+ * The menu offers the five screens directly, since opening the window is never
  * what one wants: getting to one of its screens is. This is the only thing that
  * moves the window's screen from outside a click on the rail.
  *
