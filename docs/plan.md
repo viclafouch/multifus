@@ -8,22 +8,22 @@ Le vocabulaire est dans [CONTEXT.md](../CONTEXT.md), ce que le projet refuse de 
 
 ## Où on en est
 
-Les étapes 0 à 8 et l'étape 10 sont écrites, les sept premières sont vérifiées. De l'étape 11, les fondations et l'appariement sont posés, le relais lui-même attend. Leurs numéros restent des étiquettes, le code y renvoie.
+**macOS est fini.** Toute l'étape 11 est écrite et vérifiée sur un vrai robot, quart d'heure compris. Ce qui reste sur ce système n'est plus du code : le certificat Developer ID, les huit secrets du dépôt et le logo, tous les trois listés à l'étape 10. Puis Windows, qui est l'étape 9. Les numéros restent des étiquettes, le code y renvoie.
 
-| #     | Étape                       | Où                                             | État                                  |
-| ----- | --------------------------- | ---------------------------------------------- | ------------------------------------- |
-| 0-1   | Bootstrap et outillage      | `package.json`, `oxlint.config.ts`, `.husky`   | fait                                  |
-| 2     | Cœur métier pur             | `src-tauri/src/domain`                         | fait, testé                           |
-| 3     | Frontière avec le système   | `src-tauri/src/platform`                       | fait                                  |
-| 4     | Implémentation macOS        | `platform::macos`                              | **vérifiée sur deux clients**         |
-| 5     | Persistance                 | `src-tauri/src/config`                         | fait, testé                           |
-| 6     | Interface React             | `src`, `src-tauri/src/app`                     | faite, AutoFocus prouvé               |
-| 7     | Raccourcis globaux          | `app::shortcuts`                               | **vérifiés depuis le jeu**            |
-| 8     | Barre système et session    | `app::tray`, `app::autostart`                  | **revient à l'ouverture de session**  |
-| 10    | Distribution et mise à jour | `.github/workflows`, `app::update`             | écrite, à vérifier                    |
-| 11a   | Fondations du relais        | `app::relay::secret`, `platform::display`      | écrites, testées                      |
-| 11b-1 | Appariement du relais       | `app::relay::{telegram,pairing}`, écran Relais | **vérifié sur un vrai robot**         |
-| 11b-2 | Le relais lui-même          | `app::relay::run`, barre système, balayage     | écrit, l'essai du quart d'heure reste |
+| #     | Étape                       | Où                                             | État                                 |
+| ----- | --------------------------- | ---------------------------------------------- | ------------------------------------ |
+| 0-1   | Bootstrap et outillage      | `package.json`, `oxlint.config.ts`, `.husky`   | fait                                 |
+| 2     | Cœur métier pur             | `src-tauri/src/domain`                         | fait, testé                          |
+| 3     | Frontière avec le système   | `src-tauri/src/platform`                       | fait                                 |
+| 4     | Implémentation macOS        | `platform::macos`                              | **vérifiée sur deux clients**        |
+| 5     | Persistance                 | `src-tauri/src/config`                         | fait, testé                          |
+| 6     | Interface React             | `src`, `src-tauri/src/app`                     | faite, AutoFocus prouvé              |
+| 7     | Raccourcis globaux          | `app::shortcuts`                               | **vérifiés depuis le jeu**           |
+| 8     | Barre système et session    | `app::tray`, `app::autostart`                  | **revient à l'ouverture de session** |
+| 10    | Distribution et mise à jour | `.github/workflows`, `app::update`             | écrite, à vérifier                   |
+| 11a   | Fondations du relais        | `app::relay::secret`, `platform::display`      | écrites, testées                     |
+| 11b-1 | Appariement du relais       | `app::relay::{telegram,pairing}`, écran Relais | **vérifié sur un vrai robot**        |
+| 11b-2 | Le relais lui-même          | `app::relay::run`, barre système, balayage     | **vérifié, quart d'heure compris**   |
 
 Les versions font foi dans `package.json`, `tauri.conf.json` et `Cargo.toml`, nulle part ailleurs. `standard-version` les déplace ensemble, et le workflow de release refuse un tag qui ne dirait pas la même chose qu'elles.
 
@@ -353,7 +353,9 @@ De 11a et 11b-1, ce qui se vérifie sans le robot est fait : `cargo test` passe,
 
 Reste, avec quelqu'un d'autre, un vrai message privé émis par un vrai client.
 
-**Puis le quart d'heure, qui est l'essai qui compte.** Un seul personnage coché, la machine laissée seule vingt minutes. Il doit arriver un message privé, puis un avis de déconnexion vers la quinzième minute, puis plus rien. `pmset -g assertions` doit montrer la ligne de multifus avant l'avis et ne plus la montrer après. Le retour au clavier avec un raccourci de défilement doit couper le relais.
+**Le quart d'heure est passé, et c'était l'essai qui comptait.** Protocole ci-dessous, suivi tel quel. Plus rien de macOS n'attend une vérification du relais.
+
+**Le protocole, pour qui le rejouera.** Un seul personnage coché, la machine laissée seule vingt minutes. Il doit arriver un message privé, puis un avis de déconnexion vers la quinzième minute, puis plus rien. `pmset -g assertions` doit montrer la ligne de multifus avant l'avis et ne plus la montrer après. Le retour au clavier avec un raccourci de défilement doit couper le relais.
 
 Le protocole de l'assertion est plus haut, avec les deux commandes qui rendent l'essai détectable ; l'exécuter séparément, sur une machine où l'écran s'éteint en deux minutes.
 
