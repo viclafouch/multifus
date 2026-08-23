@@ -76,7 +76,7 @@ pub fn show_on_launch(app: &AppHandle) {
 ///
 /// Read from the arguments and not from whether the window is up, because the two
 /// come apart: a session start with no system tray icon opens the window anyway,
-/// and it is still a session start. `docs/plan.md` records that macOS reopens
+/// and it is still a session start. `docs/macos.md` records that macOS reopens
 /// applications by itself at login, without the argument and with the window,
 /// which fakes the whole test; this is what makes the difference readable in the
 /// journal instead of in `ps`.

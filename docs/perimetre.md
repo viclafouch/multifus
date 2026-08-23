@@ -84,7 +84,7 @@ Le détail et les mesures sont dans [ADR 0002](./adr/0002-notifications-macos-vi
 
 Le relais hérite de tout ce tableau. Sur macOS il ne peut relayer que ce qu'une bannière a affiché, donc il tient l'écran éveillé pour que le verrouillage de session ne le rende pas muet. Sur Windows il fonctionnerait même bannières coupées, et l'écran tenu éveillé y reste utile pour une autre raison : la machine endormie n'exécute plus le client.
 
-La ligne du corps complet a été mesurée et non supposée, ce qui décide de ce que l'écran Relais a le droit de promettre : la bannière ne montre que deux lignes, l'arbre d'accessibilité porte le texte entier. Le détail est à l'étape 11 du plan.
+La ligne du corps complet a été mesurée et non supposée, ce qui décide de ce que l'écran Relais a le droit de promettre : la bannière ne montre que deux lignes, l'arbre d'accessibilité porte le texte entier. Le détail est dans [macos.md](./macos.md).
 
 ## Conventions
 

@@ -100,7 +100,7 @@ pub struct RelayView {
     /// kind. Unchecked by default, ADR 0008.
     pub send_body: bool,
     /// The relay is carrying messages right now. Never persisted: a multifus
-    /// coming back from a crash relays nothing until asked, see the plan.
+    /// coming back from a crash relays nothing until asked, see `docs/macos.md`.
     pub active: bool,
     /// A click on the tray item could switch it on: a bot is paired and somebody
     /// is ticked. Answered here rather than worked out again in the window,
@@ -172,7 +172,7 @@ pub enum TestView {
 }
 
 /// What the screen saver of this machine is set to. Read once at startup and not
-/// at each activation, see l'étape 11 du plan.
+/// at each activation, see `docs/macos.md`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(
     tag = "kind",

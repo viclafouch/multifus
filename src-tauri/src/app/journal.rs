@@ -93,7 +93,7 @@ pub enum JournalEvent {
     /// The version, because a journal is read against a release. The system,
     /// because the macOS banner tree is what ADR 0002 stands on and it belongs
     /// to an operating system version. The launch, because a session start and a
-    /// double click do not show the same thing, and `docs/plan.md` records that
+    /// double click do not show the same thing, and `docs/macos.md` records that
     /// macOS reopens applications by itself and fakes the difference.
     Started {
         version: String,

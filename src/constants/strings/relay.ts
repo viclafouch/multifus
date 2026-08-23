@@ -159,7 +159,7 @@ export const RELAY_STRINGS = {
     emptyBody:
       'Ouvrez un client Dofus : le personnage apparaît ici, déjà coché.',
     // Shown on a measured delay and never on an unknown one, which would promise
-    // a fault nobody has seen. See l'étape 11 du plan.
+    // a fault nobody has seen. See `docs/macos.md`.
     screenSaverTitle: 'Votre économiseur d’écran peut rendre le relais muet',
     screenSaverBody: (delay: string) => {
       return `multifus garde l’écran allumé, mais l’économiseur démarre après ${delay} et verrouille la session, ce qui coupe la lecture des notifications. Réglez-le sur Jamais dans les réglages du système.`

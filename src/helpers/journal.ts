@@ -532,7 +532,7 @@ const isRunEvent = (
 
 /**
  * What multifus observed on its own, put into words. Two functions and not one
- * because the Rust side keeps adding events, see l'étape 12 du plan.
+ * because the Rust side keeps adding events, see `docs/macos.md`.
  */
 const runLine = (event: EventOf<RunEventKind>) => {
   switch (event.kind) {

@@ -39,7 +39,7 @@ export type UpdateStatus =
 
 /**
  * What the screen saver of this machine is set to. Read once at startup and not
- * at each activation, see l'étape 11 du plan.
+ * at each activation, see `docs/macos.md`.
  */
 export type ScreenSaver =
   | { readonly kind: 'after'; readonly seconds: number }

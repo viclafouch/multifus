@@ -240,7 +240,7 @@ fn on_notification(app: &AppHandle, notification: GameNotification) {
 
     // A path of its own, and taken first. The relay needs no window, so the case
     // where the client has just gone is the one where it serves most; going
-    // through `Decision` would swallow exactly those. See docs/plan.md.
+    // through `Decision` would swallow exactly those. See `docs/macos.md`.
     relay::run::offer(app, &notification, &nickname);
 
     let kind = notification.kind();

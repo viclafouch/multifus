@@ -1,5 +1,5 @@
 //! The relay while it runs: the switch, the sending, the avis and the display
-//! held awake. What it stands on is step 11b-2 of `docs/plan.md`.
+//! held awake. What it stands on is step 11b-2 of `docs/macos.md`.
 
 use std::sync::Mutex;
 use std::sync::MutexGuard;
@@ -126,7 +126,7 @@ pub fn toggle(app: &AppHandle) {
 ///
 /// Returns straight away: switching on reads the keychain, which ADR 0009
 /// measured blocking on a dialog, so it goes off this thread like `pairing::pair`.
-/// The start is claimed before the task is spawned, see the plan, step 11b-2.
+/// The start is claimed before the task is spawned, see `docs/macos.md`, step 11b-2.
 pub fn set_active(app: &AppHandle, active: bool, surface: Surface) {
     if !active {
         stop(app, stop_of(surface));

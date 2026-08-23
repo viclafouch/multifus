@@ -112,7 +112,7 @@ fn install_crypto_provider() {
 }
 
 /// What the screen saver of this machine is set to, asked once here rather than
-/// at each activation. See l'étape 11 du plan.
+/// at each activation. See `docs/macos.md`.
 fn screen_saver(keeper: &PlatformDisplayKeeper) -> ScreenSaverView {
     keeper
         .screen_saver_delay()
