@@ -103,7 +103,7 @@ _Avoid_: Mode concentration, ne pas déranger, restaurer
 ### Relais
 
 **Relais** (`Relay`):
-Le mécanisme qui envoie sur le téléphone de l'utilisateur les messages privés reçus pendant son absence, et les avis qui disent qu'il a cessé de les entendre. Il s'active depuis la barre système au moment où l'on quitte son bureau, et ne porte que les personnages relayés. Son état actif n'est jamais persisté et repart à zéro à chaque lancement.
+Le mécanisme qui envoie sur le téléphone de l'utilisateur les messages privés reçus pendant son absence, et les avis qui disent qu'il a cessé de les entendre. Il s'active au moment où l'on quitte son bureau, depuis la barre système ou depuis l'écran Relais, et ne porte que les personnages relayés. Son état actif n'est jamais persisté et repart à zéro à chaque lancement.
 _Avoid_: Intégration, passerelle, pont, webhook, notification poussée
 
 **Relayé** (`relayed`):
@@ -119,8 +119,12 @@ La conversation Telegram où le relais écrit, désignée par son identifiant. U
 _Avoid_: Canal, conversation, discussion, groupe, fil
 
 **Avis** (`RelayNotice`):
-Ce que le relais dit de lui-même et jamais du jeu : qu'un personnage relayé s'est déconnecté, ou qu'il n'entend plus rien du tout. Il existe parce qu'un téléphone muet se lit « personne ne m'a écrit », alors qu'il veut souvent dire « multifus n'écoute plus ». Ne porte jamais de corps de notification. Voir [ADR 0010](./docs/adr/0010-le-relais-parle-de-lui-meme.md).
+Ce que le relais dit de lui-même et jamais du jeu : qu'un personnage relayé s'est déconnecté, qu'il n'entend plus rien du tout, ou que l'interrupteur vient d'être bougé. Il existe parce qu'un téléphone muet se lit « personne ne m'a écrit », alors qu'il veut souvent dire « multifus n'écoute plus ». Ne porte jamais de corps de notification. Voir [ADR 0010](./docs/adr/0010-le-relais-parle-de-lui-meme.md).
 _Avoid_: Alerte, erreur, panne, notification, statut
+
+**Essai** (`RelayTest`):
+Le message que l'utilisateur demande depuis l'écran Relais pour voir arriver quelque chose sur son téléphone. Il emprunte le vrai chemin d'envoi, part que le relais soit en marche ou à l'arrêt, ne nomme aucun personnage et ne porte aucun corps. Il ne prouve pas que les bons personnages sont cochés, seulement que la chaîne jusqu'à Telegram fonctionne.
+_Avoid_: Test, ping, diagnostic, vérification, démo
 
 **Envoi du corps** (`send_body`):
 Le réglage qui dit si le texte du message privé accompagne le pseudo et le type. Décoché par défaut. C'est le seul endroit du projet où un corps de notification quitte la machine, voir [ADR 0008](./docs/adr/0008-corps-relaye-sur-consentement.md).

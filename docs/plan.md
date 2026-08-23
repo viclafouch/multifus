@@ -10,6 +10,8 @@ Le vocabulaire est dans [CONTEXT.md](../CONTEXT.md), ce que le projet refuse de 
 
 **macOS est fini.** Toute l'étape 11 est écrite et vérifiée sur un vrai robot, quart d'heure compris. Ce qui reste sur ce système n'est plus du code : le certificat Developer ID, les huit secrets du dépôt et le logo, tous les trois listés à l'étape 10. L'étape 12 a rangé `src` sans rien changer à l'écran, tests compris. Reste Windows, qui est l'étape 9. Les numéros restent des étiquettes, le code y renvoie.
 
+L'écran Relais a gagné depuis un interrupteur et un message d'essai, l'étape 11b-3, écrits et à confronter à une soirée de jeu. L'étape 9 a été creusée sans une ligne de code : quatre lots, les API exactes et trois mesures à faire avant d'écrire.
+
 | #     | Étape                       | Où                                             | État                                 |
 | ----- | --------------------------- | ---------------------------------------------- | ------------------------------------ |
 | 0-1   | Bootstrap et outillage      | `package.json`, `oxlint.config.ts`, `.husky`   | fait                                 |
@@ -24,7 +26,8 @@ Le vocabulaire est dans [CONTEXT.md](../CONTEXT.md), ce que le projet refuse de 
 | 11a   | Fondations du relais        | `app::relay::secret`, `platform::display`      | écrites, testées                     |
 | 11b-1 | Appariement du relais       | `app::relay::{telegram,pairing}`, écran Relais | **vérifié sur un vrai robot**        |
 | 11b-2 | Le relais lui-même          | `app::relay::run`, barre système, balayage     | **vérifié, quart d'heure compris**   |
-| 12    | Architecture de l'interface | `src`                                          | faite, 175 cas côté React            |
+| 11b-3 | Interrupteur et essai       | `app::relay::run`, écran Relais                | écrit, à vérifier                    |
+| 12    | Architecture de l'interface | `src`                                          | faite, 179 cas côté React            |
 
 Les versions font foi dans `package.json`, `tauri.conf.json` et `Cargo.toml`, nulle part ailleurs. `standard-version` les déplace ensemble, et le workflow de release refuse un tag qui ne dirait pas la même chose qu'elles.
 
@@ -186,7 +189,9 @@ Cinq décisions sont tranchées et n'ont pas à être rejouées. Le service, [AD
 
 **Les personnages relayés se choisissent, et ça se garde.** L'attribut et ses accesseurs sont posés en 11a. Reste ce qui s'appuie dessus : l'écran Relais en dessine la liste, et le relais refuse de s'activer quand `has_relayed` est faux, ce qui est le seul garde-fou contre l'exclusion oubliée de l'ADR 0004. Voir ADR 0011.
 
-**L'interrupteur est dans la barre système et nulle part ailleurs.** Un article avec un verbe, comme la règle de l'étape 8 l'exige pour tout ce qui bascule dans ce menu. Pas de cinquième raccourci global : les quatre flèches de `Control+Shift` sont prises, et on active le relais en se levant, un geste qui supporte d'aller à la barre des menus.
+**L'interrupteur a deux portes, la barre système et l'écran Relais.** Il n'en avait qu'une, et cette ligne disait « nulle part ailleurs ». Le motif était bon pour l'usage quotidien, on active le relais en se levant et ce geste supporte d'aller à la barre des menus ; il était faux pour l'écran, où l'on regarde si tout est en place et où l'absence d'interrupteur se lisait comme « ce n'est pas ici que ça se règle », juste au-dessus d'une carte qui dit l'état. Dans le menu, l'article garde son verbe, comme la règle de l'étape 8 l'exige pour tout ce qui bascule là.
+
+Pas de cinquième raccourci global pour autant : les quatre flèches de `Control+Shift` sont prises, et rien ne justifie d'en demander une de plus pour un geste qui a déjà deux portes.
 
 Trois états et non deux verbes, parce qu'un « Activer le relais » qui échoue est exactement ce que cette étape cherche à éviter. Le premier état a été mal nommé pendant tout le cadrage, et le corrigé est ici :
 
@@ -200,6 +205,50 @@ Trois états et non deux verbes, parce qu'un « Activer le relais » qui échoue
 
 Le gain de bord est le quatrième état que le cadrage avait oublié : « le relais refuse de s'activer si personne n'est coché » avait besoin d'un endroit pour se dire, et un clic de menu qui ne fait rien ne le dit pas. Les deux cas partagent la même étiquette et le même clic, vers le seul écran où les deux se réparent.
 
+**L'écran dit ce que fait le relais, et il peut le prouver.** Ajouté après le quart d'heure, sur un doute réel : tout est coché, l'écran ne dit rien de l'état vivant, et rien ne sépare un relais qui marche d'un relais qu'on croit en marche. Deux réponses, et la seconde est la vraie.
+
+L'état d'abord. `RelayView` gagne `ready`, qui est `is_relay_ready()` rendu tel quel plutôt que rejoué en React : la règle de l'ADR 0011 s'écrit à un seul endroit. La première carte en tire trois états, en marche, à l'arrêt, incapable de démarrer, et porte l'interrupteur lui-même, voir plus haut la porte qui s'est ajoutée.
+
+**Trois cartes, et l'ordre est celui des questions.** L'interrupteur, le robot, l'essai. Une version antérieure mettait le robot à l'intérieur de la carte d'état pour qu'on cesse de lire « robot connecté » comme « relais en marche » ; l'interrupteur posé en tête règle le même problème mieux, puisque l'état vivant est alors la première chose que la carte porte, avec sa couleur et sa bascule. Le robot redevient une carte, la sienne, et sa ligne finit quand même sur « un robot relié ne met pas le relais en marche ».
+
+**L'interrupteur ne se grise jamais, même sans personne de coché.** La règle du projet interdit un bouton mort, et ici il y a mieux à faire : le badge rouge et la ligne au-dessus disent déjà ce qui manque. Le commutateur est piloté par le snapshot, donc un clic qui ne peut pas démarrer le relais ne le déplace même pas visuellement. Côté Rust, `set_active` sort tout de suite quand l'interrupteur est poussé là où le relais est déjà : sans ça, une fenêtre qui travaille sur un snapshot vieux de trois secondes pouvait démarrer un second relais par-dessus le premier et perdre la file de celui qu'elle remplaçait.
+
+**Ce que l'interrupteur a à dire tient dans `SwitchView`, et il n'avait rien.** Le commutateur ne pouvait rendre compte que de `active`, donc un trousseau verrouillé ou un Refuser sur la boîte le faisait revenir à zéro pendant que la carte continuait d'afficher « à l'arrêt, tout est prêt ». C'était un mensonge, sur le seul panneau de cet écran qui doit être cru. Trois états, la forme de `PairingView` recopiée une troisième fois : rien en cours, démarrage en cours, échec avec son motif. `start` les rend et l'appelant les pose, ce qui met les cinq sorties de la fonction dans une seule expression au lieu de cinq écritures dispersées.
+
+Le démarrage donne un `aria-busy` au commutateur, pour les secondes que l'ADR 0009 a mesurées à la boîte de dialogue. L'échec écrit une ligne rouge sous la carte, avec la même table de phrases que l'essai : un démarrage et un essai échouent aux trois mêmes endroits, donc une seule table. Et `cancel_relay_start` remet l'état à rien, sans quoi un échec dont plus personne n'attend la réponse resterait sous une carte qui vient de passer à « à l'arrêt ».
+
+**Pas de deux-points dans ces cartes.** Le deux-point français se compose avec une espace insécable devant, et sans elle il part seul en début de ligne dès que la carte est étroite. Les phrases sont écrites sans lui plutôt que d'introduire un caractère invisible dans chaque chaîne. Ailleurs, le journal continue d'en employer.
+
+**C'est le seul endroit de la fenêtre qui dépense une couleur qui n'est pas l'ocre, et l'exception est assumée.** Le vert, l'ambre et le rouge sont dans `:root` sous `--relay-*`. Une première version employait la lampe du roster, ocre qui respire pour vivant, anneau creux à l'arrêt : à l'écran, un relais coupé et un relais en marche se ressemblaient trop pour un panneau qu'on regarde en sortant de la pièce. La règle du projet reste vraie partout ailleurs, le roster compris.
+
+**La couleur passe par une seule variable.** Le panneau porte `data-relay` et pose `--tone` ; le badge, la teinte du panneau et le point qui respire la lisent, personne ne connaît de nom de couleur. Piège tenu au passage : `panel-toned` s'applique par `data-relay:` et non en classe nue, sinon le `bg-card` que `Panel` apporte lui-même gagne à égalité de spécificité et la teinte ne s'affiche jamais.
+
+**Le badge est au-dessus du titre et pas devant.** Une pastille en tête de ligne décalait le titre d'une trentaine de pixels et cette carte cessait d'être alignée sur les autres. Le badge prend une ligne à lui, les titres retrouvent la même marge, et le point vit à l'intérieur du badge.
+
+L'essai ensuite, et c'est lui qui répond vraiment. Sa carte dit d'entrée qu'il part **que le relais soit en marche ou à l'arrêt**, ce qui est la première question que le bouton pose. Il envoie un message par le vrai chemin d'envoi. Relais en marche, il passe par la file vivante, ce qui prouve aussi la tâche d'envoi ; relais à l'arrêt, il lit le trousseau et envoie lui-même, et c'est **le seul message qui sorte hors d'un relais actif**. C'est voulu : le doute vient avant de quitter le bureau, pas après. `TestView` recopie la forme de `PairingView`, ses trois états plus `Sent` et `TooSoon`, et l'échec réutilise les trois motifs de `RelayFailure` sans en inventer un quatrième. Le journal écrit `RelayTestSent`, sans surface ni corps, gardé par le même test de champs que les autres.
+
+**L'interrupteur revendique le démarrage avant de partir en tâche de fond.** Il ne suffisait pas de lire `is_relay_active` : ce drapeau ne se lève qu'une fois la file en place, et entre le clic et ce moment il y a le trousseau, que l'ADR 0009 a mesuré bloquant sur une boîte de dialogue. Deux clics dans cette fenêtre démarraient deux relais l'un sur l'autre, chacun avec sa tâche d'envoi et son « Relais activé » sur le téléphone. `begin_relay_start` tranche, et un interrupteur poussé sur arrêt pendant ce temps annule le démarrage plutôt que de se faire avaler.
+
+**La revendication est une identité et non un drapeau, et un drapeau ne suffisait pas.** Marche, arrêt, marche : le premier démarrage était annulé, le troisième clic relevait le booléen, et le premier se réveillait, lisait la revendication du troisième et s'installait quand même, avant d'éteindre celle qu'il n'avait pas prise. `begin_relay_start` rend donc un `StartId`, `is_relay_starting` le compare et `end_relay_start` ne lâche que le sien. Et la revendication, le `*running` et `enable_relay` tiennent sous un seul verrou : entre les trois, un arrêt trouvait tout à vide, n'écrivait rien, et le relais se rallumait derrière lui.
+
+**Un démarrage en vol compte pour `stop_if_unready`.** Il ne regardait que `relay_active`, faux tant que le trousseau répond, donc décocher le dernier personnage ou remettre à zéro pendant la boîte de dialogue laissait le démarrage aboutir avec le salon lu avant l'attente. Relais en marche sur une configuration vide, l'écran montrant le tutoriel : `has_relay_start` ferme le trou.
+
+**`queue` rend trois issues et non un booléen.** Un relais éteint et une file en retard d'une minute se réparent ailleurs, et l'essai confondait les deux : un arrêt tombé entre son coup d'œil à `running` et sa poussée dans la file lui faisait afficher « Telegram a refusé la requête » sans rien avoir demandé à Telegram, et le message était perdu au lieu de partir par `send_once`.
+
+**Le client HTTPS est bâti avant que la file existe.** Il l'était dans la tâche d'envoi, qui abandonnait sur un échec en lâchant le récepteur alors que la file restait ouverte : ce qui y avait été poussé entre-temps était perdu sans réponse, et un essai en vol restait sur « Envoi… » pour toujours.
+
+**Trois arrêts sur cinq écrivent au téléphone**, le raccourci et les deux interrupteurs. Un robot délié serait annoncé dans le salon même que multifus efface, et un dernier personnage décoché se fait au clavier sur un relais qui n'avait plus rien à porter.
+
+**Un essai tient le bouton trente secondes, et le compte part de l'arrivée.** Rien n'empêchait de marteler le bouton et d'envoyer une rafale sur son propre téléphone. Le délai est dans `relay::run`, à côté de l'envoi qu'il protège, et non dans un minuteur React qui repartirait à zéro dès qu'on change d'écran. Il se compte depuis le moment où le message est arrivé et pas depuis le clic, donc un essai qui échoue se rejoue tout de suite : ce qu'on protège est le téléphone, et un envoi raté ne l'a pas atteint. Un second garde couvre le double clic, un essai déjà en vol en refuse un autre.
+
+Le bouton ne se grise pas pour autant, la règle du projet l'interdit : un clic trop tôt rend `TestView::TooSoon`, une quatrième issue et pas un échec, rien n'ayant été demandé à Telegram. **Elle ne porte pas de compte à rebours, et une première version en portait un** : un snapshot ne part que quand quelque chose a bougé, donc le nombre gelait à l'écran et une région vivante annonçait un chiffre faux la seconde d'après. La phrase dit « une trentaine de secondes ».
+
+**Toute bascule de l'interrupteur écrit sur le téléphone.** « Relais activé », « Relais désactivé ». C'est ce qui a corrigé le troisième déclencheur de l'ADR 0010, qui envoyait « Plus aucun personnage relayé n'est connecté » tout seul au moment de l'activation et se lisait comme une panne. Il est maintenant la seconde ligne de la confirmation. Deux `NoticeCase` de plus, `enabled` et `disabled`, et le message d'arrêt est mis dans la file **avant** que la file soit lâchée, puisque la lâcher est ce qui la ferme.
+
+Un `NoticeCase` de moins par la même occasion, `nobodyLeft` : l'activation était son seul producteur, et `announce` refuse d'envoyer un avis qui ne nomme aucun départ. Il restait certifié par cinq artefacts, dont un cas de test, pour un chemin que le programme ne pouvait plus prendre.
+
+**Ce que l'essai ne prouve pas, c'est que les bons personnages sont cochés.** Cette question-là est celle de la première carte et de la liste plus bas, et les deux restent séparées : un essai qui exigerait un personnage coché ne partirait pas au moment où l'on veut justement savoir si le robot répond. Il ne demande que le salon, donc un robot apparié. Sans robot, la question ne se pose pas : l'écran montre alors le tutoriel et aucune des trois cartes. CONTEXT.md porte le mot.
+
 **L'écran Relais est le cinquième du rail et du menu.** `Screen::ALL`, `tray::build_menu` et le rail passent de quatre à cinq. C'est la première fonctionnalité qui oblige à ouvrir la fenêtre pour être installée, et l'arbitrage est en bas de cette étape.
 
 **L'état actif ne survit pas au processus.** Même raisonnement que l'[ADR 0004](./adr/0004-veille-ephemere-sexe-persiste.md) pour la veille : un multifus qui revient d'un plantage en tenant l'écran éveillé et en poussant des messages privés vers un téléphone, sans que personne ne l'ait demandé, est un comportement que ce projet refuse déjà ailleurs. Le jeton et l'identifiant de salon persistent, l'état actif non.
@@ -212,13 +261,13 @@ Le gain de bord est le quatrième état que le cadrage avait oublié : « le rel
 
 **L'économiseur d'écran est un trou, et il n'est pas mesuré.** `PreventUserIdleDisplaySleep` empêche l'écran de s'éteindre. Rien ne documente qu'il empêche l'économiseur de démarrer, et un économiseur qui démarre verrouille la session, ce qui rend le relais muet exactement comme une extinction. La machine de développement a `idleTime` à zéro, donc aucun économiseur, et l'essai n'y prouverait rien. La lecture est écrite en 11a et rend `Never` sur cette machine-là.
 
-**Elle est lue au démarrage et pas à l'activation, et une version de ce paragraphe demandait le contraire.** L'interrupteur est dans la barre système, donc la fenêtre est fermée au moment de l'activation : l'avertissement atterrirait sur un écran que personne ne regarde. Et rien ne persiste, donc l'écran Relais ne dirait rien tant qu'on n'a pas activé une fois dans la session. Une préférence ne coûte aucune boîte de dialogue, contrairement au trousseau de l'ADR 0009, donc rien ne justifiait de la retarder. `app::setup` la lit une fois, elle voyage dans `RelayView` à chaque snapshot, et l'écran Relais l'affiche dès qu'elle rend autre chose que `Never`, au moment où l'on installe le relais et où l'on peut encore changer le réglage. Prix accepté : une valeur périmée si l'économiseur change en cours de session.
+**Elle est lue au démarrage et pas à l'activation, et une version de ce paragraphe demandait le contraire.** L'activation quotidienne se fait depuis la barre système, la fenêtre fermée : l'avertissement atterrirait sur un écran que personne ne regarde. La seconde porte n'y change rien, puisque c'est justement celle qu'on emprunte en regardant l'écran, où l'avertissement est déjà là. Et rien ne persiste, donc l'écran Relais ne dirait rien tant qu'on n'a pas activé une fois dans la session. Une préférence ne coûte aucune boîte de dialogue, contrairement au trousseau de l'ADR 0009, donc rien ne justifiait de la retarder. `app::setup` la lit une fois, elle voyage dans `RelayView` à chaque snapshot, et l'écran Relais l'affiche dès qu'elle rend autre chose que `Never`, au moment où l'on installe le relais et où l'on peut encore changer le réglage. Prix accepté : une valeur périmée si l'économiseur change en cours de session.
 
 **Le mot « veille » est interdit dans tout ce code.** Il désigne un personnage retiré du défilement. L'état de la machine s'appelle `display_awake`, et CONTEXT.md porte l'interdit.
 
 **L'envoi part sur un autre fil.** `platform::notification` l'écrit noir sur blanc : le sink tourne sur le fil du watcher et ne doit pas bloquer, tout ce qui est plus long qu'un focus appartient à un autre fil. Un POST HTTPS est exactement ce que cette phrase interdit là. Et la règle en tête de `app::state` continue de s'appliquer, le verrou de `Multifus` ne se tient pas pendant l'appel.
 
-**Le journal, et ce qu'il ne porte pas.** `RelayEnabled` seul, `RelayDisabled` avec son motif, `RelaySent` avec le pseudo, `RelayNoticeSent` avec le cas, `RelayFailed` avec sa raison, `DisplayAwake` avec l'état posé ou relâché, `DisplayAwakeFailed` avec ce que le système a dit. Ni `RelayEnabled` ni `RelaySent` ne portent le champ qu'une version de cette ligne leur donnait, une surface et un type : l'interrupteur a une seule porte et le message privé est le seul type relayé, donc les deux champs n'auraient qu'une valeur. Aucun corps, sous aucune forme, et un test qui compare la liste exacte des champs, comme celui qui garde déjà l'événement de notification. Trois échecs à ne pas confondre, parce qu'ils se réparent dans trois endroits différents : le trousseau qui refuse de rendre le jeton, Telegram qui refuse la requête, et le réseau qui n'est pas là.
+**Le journal, et ce qu'il ne porte pas.** `RelayEnabled` avec sa surface, `RelayDisabled` avec son motif, `RelaySent` avec le pseudo, `RelayNoticeSent` avec le cas, `RelayFailed` avec sa raison, `DisplayAwake` avec l'état posé ou relâché, `DisplayAwakeFailed` avec ce que le système a dit. `RelaySent` ne porte pas le type qu'une version de cette ligne lui donnait, le message privé étant le seul type relayé ; `RelayEnabled` portait la même objection tant que l'interrupteur n'avait qu'une porte, et la perd en en gagnant une seconde, voir plus bas. Aucun corps, sous aucune forme, et un test qui compare la liste exacte des champs, comme celui qui garde déjà l'événement de notification. Trois échecs à ne pas confondre, parce qu'ils se réparent dans trois endroits différents : le trousseau qui refuse de rendre le jeton, Telegram qui refuse la requête, et le réseau qui n'est pas là.
 
 **L'appariement.** L'utilisateur crée le robot chez BotFather, colle le jeton dans l'écran Relais, écrit un message au robot depuis son téléphone, puis clique Connecter. multifus appelle `getUpdates` une seule fois, prend l'identifiant de salon du premier message, l'écrit dans la configuration, range le jeton dans le trousseau et envoie un message d'essai. Aucune boucle de scrutation : multifus n'a aucune boucle réseau vivante aujourd'hui et cette étape ne lui en donne pas.
 
@@ -312,9 +361,9 @@ Le clic sur l'état « pas prêt » ne part pas sur le travailleur non plus : il
 
 **L'échec de l'écran tenu éveillé n'est pas un `RelayFailed`.** Le relais marche encore, jusqu'au verrouillage. Deux événements qui recopient le couple `Listening` / `ListeningFailed` déjà présent : `DisplayAwake { held }` et `DisplayAwakeFailed { detail }`.
 
-**`RelayEnabled` ne porte pas de surface.** L'interrupteur est dans la barre système et nulle part ailleurs, donc le champ n'aurait qu'une valeur. `RelaySent` ne porte pas de type non plus, et pour la même raison : le message privé est le seul type relayé, codé en dur. C'est `RelayDisabled` qui porte quelque chose, et c'est un **motif** et non une surface.
+**`RelayEnabled` porte une surface, et n'en portait pas.** Tant que l'interrupteur n'avait qu'une porte, le champ n'aurait eu qu'une valeur ; il en a deux, donc `RelayEnabled { surface }` et un cinquième motif `RelayStop::Window`. `RelaySent` ne porte toujours pas de type, et pour la raison qui tient encore : le message privé est le seul type relayé, codé en dur. Ce que `RelayDisabled` porte reste un **motif** et non une surface, la moitié de ses cas n'étant pas un geste.
 
-**Quatre motifs et non trois.** Le raccourci, la barre système, le décochage du dernier personnage relayé, et le robot délié. Ce quatrième manquait, et son absence était un vrai trou : le fil d'envoi tient le jeton et le salon en mémoire, donc délier pendant que le relais tourne laissait l'écran dire « pas relié », le menu dire `Désactiver le relais`, et les messages privés continuer de partir. Même chose pour la remise à zéro, qui vide le salon. Les deux arrêtent le relais avant de toucher à la configuration.
+**Cinq motifs et non trois.** Le raccourci, la barre système, l'interrupteur de la fenêtre, le décochage du dernier personnage relayé, et le robot délié. Ce dernier manquait, et son absence était un vrai trou : le fil d'envoi tient le jeton et le salon en mémoire, donc délier pendant que le relais tourne laissait l'écran dire « pas relié », le menu dire `Désactiver le relais`, et les messages privés continuer de partir. Même chose pour la remise à zéro, qui vide le salon. Les deux arrêtent le relais avant de toucher à la configuration.
 
 **L'arrêt au raccourci se place derrière le garde du périmètre.** Un raccourci se déclenche à chaque appui, n'importe où, et `OutsideGame` est de loin l'issue la plus fréquente : branché dans `shortcuts::fire`, un `Control+Shift+flèche` frappé dans un éditeur de texte couperait le relais. Le point est dans `answer`, dans la branche `Ok(Some(window))`, avant `act` : une fenêtre du jeu est devant et une main est au clavier, ce qui est le raisonnement écrit plus haut. L'arrêt part quelle que soit l'issue de l'action, `NobodyInCycle` compris.
 
@@ -350,11 +399,13 @@ De 11a et 11b-1, ce qui se vérifie sans le robot est fait : `cargo test` passe,
 
 **L'essai qui clôt 11b-1 est passé.** Robot créé chez BotFather dans Telegram Web, jeton collé, message écrit au robot, Connecter : le message d'essai est arrivé sur le téléphone et l'écran est passé à « Robot connecté ». L'invite de trousseau de l'ADR 0009 se produit bien en `tauri dev`, comme mesuré, et ne bloque rien une fois autorisée.
 
-**Le chemin d'envoi de 11b-2 est passé aussi.** Deux essais, faits seul et sans deuxième joueur. L'activation depuis la barre système, tous les clients fermés, a fait partir l'avis collectif de l'ADR 0010 sur le téléphone : ça prouve d'un coup la lecture du trousseau, le salon, le client HTTPS, la file et la tâche d'envoi. Puis une bannière postée à `osascript`, au titre d'un client Retro et au corps d'un message privé, est arrivée sur le téléphone sous la forme attendue.
+**Le chemin d'envoi de 11b-2 est passé aussi.** Deux essais, faits seul et sans deuxième joueur. L'activation depuis la barre système, tous les clients fermés, a fait partir sur le téléphone ce qui était alors l'avis collectif de l'ADR 0010, et qui est depuis la seconde ligne de la confirmation d'activation : ça prouve d'un coup la lecture du trousseau, le salon, le client HTTPS, la file et la tâche d'envoi. Puis une bannière postée à `osascript`, au titre d'un client Retro et au corps d'un message privé, est arrivée sur le téléphone sous la forme attendue.
 
 Reste, avec quelqu'un d'autre, un vrai message privé émis par un vrai client.
 
-**Le quart d'heure est passé, et c'était l'essai qui comptait.** Protocole ci-dessous, suivi tel quel. Plus rien de macOS n'attend une vérification du relais.
+**Le quart d'heure est passé, et c'était l'essai qui comptait.** Protocole ci-dessous, suivi tel quel.
+
+Reste le bouton d'essai, ajouté depuis : à presser une fois relais à l'arrêt, où il doit ouvrir le trousseau, et une fois relais en marche, où il doit passer sans invite. Les deux fois, un message sur le téléphone et une ligne au journal.
 
 **Le protocole, pour qui le rejouera.** Un seul personnage coché, la machine laissée seule vingt minutes. Il doit arriver un message privé, puis un avis de déconnexion vers la quinzième minute, puis plus rien. `pmset -g assertions` doit montrer la ligne de multifus avant l'avis et ne plus la montrer après. Le retour au clavier avec un raccourci de défilement doit couper le relais.
 
@@ -368,13 +419,145 @@ Enfin, deux personnages, un seul coché, un message privé sur chacun : un seul 
 
 Session à ouvrir sur le PC Windows, dépôt cloné. Prérequis : Microsoft C++ Build Tools avec la charge « Développement Desktop en C++ », puis `rustup default stable-msvc`. WebView2 est déjà présent sur un Windows 10 à jour.
 
-Utiliser la crate `windows`, qui couvre WinRT nativement. `UserNotificationListener` pour l'écoute, `EnumWindows` et `GetWindowText` pour l'énumération. Implémenter aussi la suppression des toasts au focus, possible ici et impossible sur macOS.
+Ce qui attend déjà de ce côté : `platform::windows` compile en renvoyant `NotImplemented` méthode par méthode, `TITLE_PATTERN` et la table `NOTIF_TYPES` sont dans `domain`, viennent de Dracoon, sont vérifiés sur les deux systèmes et ne sont pas à réécrire. Les trois interfaces de `platform` non plus : elles ont été dessinées avec Windows en vue, et `GameWindow::from_title` reste la seule porte d'entrée d'une fenêtre.
 
-**Filtrer sur le processus et pas sur le seul titre, et c'est un bug déjà vu.** `EnumWindows` balaie tout le bureau, et un onglet de navigateur intitulé `Quelque chose - Dofus Retro` satisfait la regex : le navigateur entre alors dans le roster comme un personnage et se fait ramener au premier plan. C'est arrivé. macOS n'a jamais eu ce trou parce que `dofus_applications` n'énumère que les processus du bundle `com.dofus.d1elauncher`, et Windows doit faire pareil : `GetWindowThreadProcessId`, puis le nom de l'exécutable du processus. Le titre reste ce qui donne le pseudo, il cesse d'être ce qui donne le droit d'entrer.
+**Rien de cette étape ne se relit depuis le Mac.** `cargo check --target x86_64-pc-windows-msvc` échoue avant de compiler une ligne du projet, voir « Ce qui mord ». Les lots sont donc découpés pour finir chacun sur un `cargo test` vert et un résultat visible à l'écran, et non pour être préparés ici.
 
-**Piège à ne pas reproduire.** Dracoon contourne la restriction de `SetForegroundWindow` en injectant une vraie frappe Alt dans l'application active. C'est la cause probable du bug de focus intermittent corrigé dans son commit `0b0525c`, et ça envoie une touche parasite dans le jeu. Passer par `AttachThreadInput`.
+**`platform::windows` n'aura aucun test unitaire, comme `platform::macos`.** Tout y parle au système. Ce qui se teste est dans `domain`, et c'est déjà fait.
 
-Ce qui attend déjà de ce côté : `platform::windows` compile en renvoyant `NotImplemented` méthode par méthode, la regex et la table `NOTIF_TYPES` sont dans `domain` et ne sont pas à réécrire, et les raccourcis globaux échouent franchement sur cette plateforme quand une combinaison est déjà prise, contrairement à macOS.
+#### Ce qui se mesure avant d'écrire une ligne
+
+Un binaire jetable, une heure, trois questions. La première peut condamner toute la moitié notification de l'étape, donc elle passe avant le reste.
+
+**1. `UserNotificationListener` répond-il à un exécutable Rust non empaqueté ?** La documentation Microsoft ne parle que de `Package.appxmanifest` et de la capacité « User Notification Listener », ce qui se lit comme une identité de paquet MSIX obligatoire. Tauri livre un exécutable non empaqueté, NSIS ou MSI, jamais MSIX. Mais deux outils du même domaine s'en servent depuis un exécutable ordinaire : Dracoon, un `.exe` PyInstaller qui appelle `winsdk.windows.ui.notifications.management`, et `Madgique/dofus-multi-organizer`, en C# WinUI 3. La réponse attendue est donc oui, et il faut la voir en Rust avant de bâtir dessus. `GetAccessStatus` doit rendre autre chose que `Denied` après un `RequestAccessAsync` accepté.
+
+Si la réponse est non, la sortie de secours est le « paquet fin », officiellement l'empaquetage avec emplacement externe : un paquet d'identité signé, enregistré à côté de l'installateur existant, qui laisse les binaires où ils sont. Il coûte une signature de plus et un enregistrement au premier lancement. Ne pas partir là-dessus avant d'avoir mesuré.
+
+**2. À quoi ressemble un vrai toast de Dofus Retro ?** Il faut le premier élément de texte, qui doit satisfaire `TITLE_PATTERN`, et les suivants, qui forment le corps que `classify` lit. Poster un vrai message privé et recopier ce que le listener rend.
+
+**3. Quel est le nom de l'exécutable d'un client Dofus Retro ?** C'est ce sur quoi `game_windows` filtre, et le pendant exact du bundle `com.dofus.d1elauncher` de macOS. `GetWindowThreadProcessId` puis `QueryFullProcessImageNameW` sur une fenêtre de client, et lire.
+
+#### Lot A — Les fenêtres
+
+`Win32WindowManager`, six méthodes, et de quoi faire vivre le roster, les quatre raccourcis et le menu de la barre système sans une seule notification.
+
+`authorization` et `request_authorization` rendent `Granted` sans rien demander : lire un titre et changer le focus ne demande aucune autorisation ici. Les deux méthodes restent sur l'interface parce que macOS en a besoin.
+
+`game_windows` passe par `EnumWindows`, et pour chaque fenêtre : `IsWindowVisible`, puis `GetWindowThreadProcessId` pour le pid, puis `OpenProcess` en `PROCESS_QUERY_LIMITED_INFORMATION` et `QueryFullProcessImageNameW` pour le nom de l'exécutable, puis `GetWindowTextW` dimensionné par `GetWindowTextLengthW`. `foreground_game_window` fait le même filtre sur la seule fenêtre que rend `GetForegroundWindow`, sans balayage. `is_minimized` est `IsIconic`, une ligne.
+
+**Filtrer sur le processus et pas sur le seul titre, et c'est un bug déjà vu.** `EnumWindows` balaie tout le bureau, et un onglet de navigateur intitulé `Quelque chose - Dofus Retro` satisfait la regex : le navigateur entre alors dans le roster comme un personnage et se fait ramener au premier plan. C'est arrivé. macOS n'a jamais eu ce trou parce que `dofus_applications` n'énumère que les processus du bundle `com.dofus.d1elauncher`, et Windows doit faire pareil. Le titre reste ce qui donne le pseudo, il cesse d'être ce qui donne le droit d'entrer.
+
+**La danse `AttachThreadInput`, écrite une fois pour toutes.** `SetForegroundWindow` refuse quand le processus appelant n'a pas déjà le focus, et rend `FALSE` sans dire pourquoi. Le contournement documenté est d'attacher la file d'entrée de multifus à celle du processus qui a le focus, le temps de l'appel :
+
+```rust
+let foreground_thread = GetWindowThreadProcessId(GetForegroundWindow(), None);
+let current_thread = GetCurrentThreadId();
+AttachThreadInput(current_thread, foreground_thread, true);
+// ShowWindow(SW_RESTORE) si IsIconic, puis SetForegroundWindow
+AttachThreadInput(current_thread, foreground_thread, false);
+```
+
+Le détachement part quelle que soit l'issue, sinon multifus laisse derrière lui deux files d'entrée liées, ce qui se paie sur le bureau entier et pas dans multifus. Une structure avec un `Drop` le tient sans avoir à y penser, comme le keeper tient son handle.
+
+`ShowWindow(SW_RESTORE)` entre dans l'attache et non avant : restaurer fait partie du focus, `platform::window` l'écrit, et une fenêtre sortie de la barre des tâches mais laissée derrière n'a pas été ramenée.
+
+**Le piège de Dracoon, à ne pas reproduire.** Il contourne la même restriction en injectant une vraie frappe Alt dans l'application active. C'est la cause probable du bug de focus intermittent corrigé dans son commit `0b0525c`, et ça envoie une touche parasite dans le jeu.
+
+**`WindowGone` se lit sur `IsWindow`**, et `is_minimized` comme `focus` doivent le rendre, `platform::window` promettant la même erreur aux deux. Windows réemploie les handles, donc `IsWindow` peut dire oui d'une fenêtre qui n'est plus celle qu'on croit. C'est le prix du `HWND` comme identité, il n'y a pas mieux, et le filtre sur l'exécutable rattrape le cas qui compte.
+
+**Aucun saut vers le fil principal, contrairement à macOS.** Ces appels Win32 se font depuis n'importe quel fil, et `WindowManager` est `Send + Sync` justement parce que les rappels de raccourcis tournent sur des fils que multifus ne choisit pas. L'attache et le détachement partagent le fil appelant, ce qui est la seule contrainte.
+
+**Vérifié quand** : deux vrais clients, le roster qui les voit, les quatre raccourcis depuis le jeu, un clic sur un personnage dans la barre système, et une fenêtre réduite qui ressort.
+
+#### Lot B — Les notifications
+
+`UserNotificationWatcher`, la moitié risquée, et celle que la mesure 1 débloque.
+
+**Le fil du listener est en STA, et c'est le piège qui a coûté cher à Dracoon.** `UserNotificationListener` échoue en silence ou rend une erreur COM quand le fil qui l'utilise n'est pas dans un apartment mono-filaire. Donc `CoInitializeEx(None, COINIT_APARTMENTTHREADED)` en tête du fil du watcher, et tout le travail du listener sur ce fil-là. C'est déjà la forme que `platform::notification` attend, chaque implémentation gardant son fil et sa boucle pour elle.
+
+`authorization` lit `GetAccessStatus`, `request_authorization` attend `RequestAccessAsync` sur place. Les trois valeurs du système se réduisent à deux : `Allowed` devient `Granted`, `Denied` et `Unspecified` deviennent `Denied`. Ils ne se réparent pourtant pas de la même façon, `Denied` ne pouvant plus être redemandé et `Unspecified` remontant la boîte au prochain appel, donc c'est le détail du journal qui les sépare et non le type. La documentation demande le fil d'interface pour `RequestAccessAsync` ; un exécutable non empaqueté n'en a pas au sens WinRT, et Dracoon appelle depuis un fil ordinaire. À voir avec la mesure 1.
+
+`start` a deux routes, et la mesure tranche. L'événement `NotificationChanged` est ce que la documentation propose, et `platform::notification` avait anticipé qu'il puisse ne pas tirer. S'il ne tire pas, le repli est le sondage de `GetNotificationsAsync(NotificationKinds::Toast)` à l'intervalle du balayage, avec `UserNotification::Id` comme clé de dédoublonnage dans un ensemble qui suit ce que la plateforme tient encore, sans quoi il grossit toute la soirée. Le repli reste **interne au watcher** : le cœur ne voit qu'un sink qui pousse, et ce module l'a écrit dès l'étape 3.
+
+Lire un toast, c'est `Notification().Visual().GetBinding(KnownNotificationBindings::ToastGeneric())` puis `GetTextElements()` : le premier élément est le titre, les suivants forment le corps joints par un saut de ligne. C'est exactement le couple que `GameNotification::new` attend.
+
+**Aucun filtre sur l'application qui a émis, comme sur macOS.** `AppInfo.AppUserModelId` est disponible et ne sert pas : le raisonnement de l'étape 11b-2 vaut tel quel ici, un pseudo absent du roster n'est relayé par rien et seul `game_windows` crée un personnage. `NotificationReport::Unreadable` n'est jamais envoyé de ce côté, le listener rendant un toast structuré qui est là ou n'y est pas.
+
+`dismiss` est `RemoveNotification(id)`, donc le watcher garde une table pseudo vers identifiants, alimentée à chaque toast lu et purgée à chaque suppression. **Jamais `ClearNotifications`**, qui efface les notifications de toutes les applications, y compris celles que multifus n'a jamais lues. `stop` détache l'événement et arrête le fil, et `Drop` fait la même chose.
+
+**Ce que l'utilisateur doit régler, et ce n'est pas ce que macOS demande.** Trois réglages, dont un seul est commun. Dans le jeu, « Background Notifications » doit être activé dans les options générales : un client qui n'émet rien rend le listener muet, et c'est la panne numéro un de tous les outils qui font ça. Dans le système, l'accès aux notifications doit être accordé à multifus. En revanche, et c'est l'inverse exact de macOS, **la bannière peut rester coupée** : l'écoute passe par une API et non par ce que l'écran dessine, donc le style et le son du toast de Dofus n'ont aucune importance. La contrainte de l'ADR 0002 ne se transporte pas, elle est propre à macOS.
+
+**Une bannière coupée n'est pas une bannière absente, et ce n'est pas mesuré.** Dracoon relève que Windows ne masque pas une bannière désactivée mais la rend à 100 % de transparence, et qu'un focus posé pendant qu'elle est encore à l'écran ne prenait pas. Seconde main, non vérifié. Ne rien écrire contre ça tant que le symptôme n'apparaît pas.
+
+**Vérifié quand** : l'AutoFocus ramène la bonne fenêtre sur trois types distincts, et un toast disparaît du centre de notifications une fois sa fenêtre devant.
+
+#### Lot C — L'écran tenu éveillé
+
+**`SetThreadExecutionState` est le mauvais appel, et ce plan disait le contraire.** Il pose l'état sur **le fil appelant** et pas sur le processus : l'état meurt avec le fil, c'est un masque de bits et non un compteur, et deux composants du même fil s'écrasent l'un l'autre. Le keeper vit dans un `Mutex` de l'état Tauri, appelé par `relay::run::follow_display` depuis le fil du balayage aujourd'hui et depuis ailleurs demain, et son `is_awake` deviendrait un booléen qui ment. Microsoft déconseille d'ailleurs cet appel dès que deux composants partagent un fil.
+
+**C'est `PowerCreateRequest` et `PowerSetRequest`.** Le handle appartient au processus, n'importe quel fil le pose et le relâche, et il survit à la mort de celui qui l'a créé. C'est le jumeau exact de `IOPMAssertionCreateWithName`, nom compris : le `REASON_CONTEXT` s'affiche dans `powercfg /requests` comme l'assertion de multifus s'affiche dans `pmset -g assertions`. Les deux systèmes se vérifient alors par la même phrase du protocole du quart d'heure.
+
+| Méthode      | Appel                                                    |
+| ------------ | -------------------------------------------------------- |
+| `new`        | `PowerCreateRequest` avec un `REASON_CONTEXT` nommé      |
+| `keep_awake` | `PowerSetRequest(handle, PowerRequestDisplayRequired)`   |
+| `release`    | `PowerClearRequest(handle, PowerRequestDisplayRequired)` |
+| `is_awake`   | le booléen gardé, qui ne ment plus                       |
+| `Drop`       | `CloseHandle`                                            |
+
+`PowerRequestDisplayRequired` seul, comme `PreventUserIdleDisplaySleep` sur macOS. Le pendant système ne servirait à rien : ce qui rend le relais muet est la session verrouillée, pas la machine ralentie. Et le capot fermé lui échappe des deux côtés, ce qui est écrit dans « Ce qui mord ».
+
+Le renommage est déjà fait, pour que la structure vide ne promette plus l'appel écarté : `PowerRequestDisplayKeeper` dans `platform::windows` et dans l'alias de `platform::mod`. Aucune machine ici ne peut le compiler, donc le lot C est le premier à le relire.
+
+`screen_saver_delay` appelle `SystemParametersInfoW` deux fois, `SPI_GETSCREENSAVEACTIVE` d'abord, qui sépare `Never` d'un délai, puis `SPI_GETSCREENSAVETIMEOUT`, qui rend des secondes. Rien à mesurer ici, contrairement à macOS où la machine de développement rend `Never` et où l'essai ne prouve rien.
+
+**Vérifié quand** : le protocole du quart d'heure de l'étape 11 rejoué, `powercfg /requests` montrant la ligne de multifus avant l'avis de déconnexion et plus après.
+
+#### Lot D — La chaîne de compilation, le paquet et la barre système
+
+`checks.yml` et `release.yml` portent chacun un job unique. Ils en gagnent un second sur `windows-latest`, et un `ci` vert dit alors quelque chose de `platform::windows`, ce qu'il ne dit pas aujourd'hui.
+
+**L'image de barre système ne marche pas telle quelle.** `icons/tray.png` est un PNG noir pur dont la forme est portée par le seul canal alpha, posé avec `icon_as_template(true)` pour que macOS le recolore selon la barre. Windows ne recolore rien : le même fichier donne une icône noire sur une barre des tâches sombre, donc invisible. Il faut une seconde image, et `icon_as_template` ne vaut que sur macOS.
+
+**Le démarrage avec la session change de mécanisme et pas de forme.** `tauri-plugin-autostart` écrit une clé de registre `Run` au lieu d'un `LaunchAgent`, et porte l'argument `--from-session` de la même façon. `app::autostart::reconcile` réécrit l'enregistrement à chaque lancement et couvre les deux systèmes sans rien changer. Reste à confirmer que `is_enabled()` n'est pas plus fiable ici qu'il ne l'est sur macOS ; la configuration porte l'intention de toute façon.
+
+**Les raccourcis échouent franchement, et il n'y a rien à écrire.** Windows refuse une combinaison déjà prise, contrairement à macOS où l'enregistrement réussit et la touche reste morte. L'écran des raccourcis affiche déjà cet échec. `Control+Shift+flèche` n'est pas réservé par Windows, qui prend `Win+Control+flèche` pour ses bureaux, donc les combinaisons proposées au premier lancement conviennent aux deux systèmes.
+
+**La signature Windows est un second sujet, que l'étape 10 ne couvre pas.** Un certificat Authenticode n'est pas un Developer ID, il s'achète ailleurs et ne pose pas les mêmes secrets. Sans lui, SmartScreen avertit à chaque installation. À trancher quand macOS sera publié pour de bon, pas avant.
+
+#### Les dépendances
+
+`windows` 0.62 en dépendance directe, sous une cible pour qu'aucune machine macOS ne la compile. La crate n'expose que ce qu'on lui demande, un trait par chemin de module, le point remplacé par un tiret bas :
+
+```toml
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.62", features = [
+  "Win32_Foundation",
+  "Win32_System_Com",
+  "Win32_System_Power",
+  "Win32_System_Threading",
+  "Win32_UI_Input_KeyboardAndMouse",
+  "Win32_UI_WindowsAndMessaging",
+  "Foundation",
+  "UI_Notifications",
+  "UI_Notifications_Management",
+] }
+```
+
+| Appel                                                                                                                                                                                       | Module                                               |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| `EnumWindows`, `GetWindowTextW`, `IsWindow`, `IsWindowVisible`, `IsIconic`, `ShowWindow`, `SetForegroundWindow`, `GetForegroundWindow`, `GetWindowThreadProcessId`, `SystemParametersInfoW` | `Win32::UI::WindowsAndMessaging`                     |
+| `AttachThreadInput`                                                                                                                                                                         | `Win32::UI::Input::KeyboardAndMouse`                 |
+| `GetCurrentThreadId`, `OpenProcess`, `QueryFullProcessImageNameW`                                                                                                                           | `Win32::System::Threading`                           |
+| `PowerCreateRequest`, `PowerSetRequest`, `PowerClearRequest`, `REASON_CONTEXT`                                                                                                              | `Win32::System::Power`                               |
+| `CoInitializeEx`                                                                                                                                                                            | `Win32::System::Com`                                 |
+| `UserNotificationListener`, `KnownNotificationBindings`                                                                                                                                     | `UI::Notifications::Management`, `UI::Notifications` |
+
+Cette liste n'a jamais été compilée, aucune machine ici ne le pouvant. La corriger au premier `cargo build` fait partie du lot A.
+
+#### Vérification de l'étape
+
+Une soirée de jeu sur le PC, deux vrais clients, sans jamais ouvrir la fenêtre : les quatre raccourcis, l'AutoFocus sur trois types de notification, le menu de la barre système, et le protocole du quart d'heure de l'étape 11 rejoué avec `powercfg /requests`.
 
 ### Étape 12 — Architecture de l'interface
 

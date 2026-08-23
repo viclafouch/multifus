@@ -5,7 +5,7 @@ import { Lamp } from '@/components/lamp'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { strings } from '@/constants/strings'
-import { characterStateLine } from '@/helpers/wording'
+import { characterState, characterStateLine } from '@/helpers/wording'
 
 /** How long each row waits before rising, so the list powers up in sequence. */
 const STAGGER_MS = 38
@@ -116,7 +116,7 @@ export const CharacterRow = ({
           ? strings.characters.rankNone
           : String(rank).padStart(2, '0')}
       </span>
-      <Lamp isOnline={online} isAsleep={asleep} />
+      <Lamp state={characterState(character)} />
       <div className="flex min-w-0 flex-1 flex-col">
         <p className="selectable truncate text-row font-medium group-data-offline:text-muted-foreground">
           {nickname}

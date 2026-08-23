@@ -299,9 +299,9 @@ pub enum JournalEvent {
     /// repaired. Never a notification body, in any form.
     RelayFailed { reason: RelayFailure },
 
-    /// The relay is on. No surface: the switch is in the system tray and
-    /// nowhere else, so the field would have one value.
-    RelayEnabled,
+    /// The relay is on, and this says which of the two switches did it. It used
+    /// to carry nothing, back when the tray was the only door.
+    RelayEnabled { surface: Surface },
 
     /// The relay is off, and this says what stopped it.
     RelayDisabled { reason: RelayStop },
@@ -313,6 +313,10 @@ pub enum JournalEvent {
     /// The relay said something about itself rather than about the game, ADR
     /// 0010. One message per scan, so one line per message.
     RelayNoticeSent { case: NoticeCase },
+
+    /// The user asked the relay to prove itself, and the message landed. No
+    /// surface: the button is on the Relais screen and nowhere else.
+    RelayTestSent,
 
     /// The display is held awake, or let go. Written on the change and never on
     /// the state, which at one scan every three seconds would flush this journal.
@@ -441,15 +445,18 @@ pub enum RelayFailure {
 }
 
 /// What stopped the relay. A reason and not a [`Surface`], since two of these
-/// four are not a door the user pressed.
+/// five are not a door the user pressed.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub enum RelayStop {
     /// A combination fired with a game window in front, so somebody is back.
     Shortcut,
 
-    /// The item of the system tray, which is where the switch lives.
+    /// The item of the system tray, one of the two switches.
     Tray,
+
+    /// The switch of the Relais screen, the other one.
+    Window,
 
     /// The last relayed character was unticked, see ADR 0011.
     NoRelayedCharacter,
@@ -458,16 +465,19 @@ pub enum RelayStop {
     NoLongerPaired,
 }
 
-/// What an avis of ADR 0010 said. Three and not two, since one scan sends at
-/// most one message and the two phrases travel in it together.
+/// What an avis of ADR 0010 said. Five: the two ends of the switch, and the
+/// three the scan produces, whose phrases travel together in one message.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub enum NoticeCase {
+    /// The switch was moved on, and the telephone was told so.
+    Enabled,
+
+    /// The switch was moved off, whichever gesture did it.
+    Disabled,
+
     /// Relayed characters went offline, and others are still connected.
     Disconnected,
-
-    /// Nobody relayed is connected any more, and that is all it says.
-    NobodyLeft,
 
     /// Both phrases, in one message. No nickname on this event: six characters
     /// falling in one scan make one message naming six.
@@ -478,9 +488,9 @@ pub enum NoticeCase {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub enum Surface {
-    /// The window was open, which for these two settings is the expensive way.
+    /// The window was open, and its screen carried the switch or the setting.
     Window,
-    /// The menu of the system tray, which is what they are there for.
+    /// The menu of the system tray, the door that needs no window at all.
     Tray,
 }
 
@@ -784,7 +794,12 @@ mod tests {
     fn nothing_the_running_relay_writes_carries_a_body_or_a_chat() {
         // The same two rules, on the events of step 11b-2. These are the ones
         // nearest a body, and adding a field to any of them fails here.
-        assert_eq!(fields_of(&JournalEvent::RelayEnabled), ["kind"]);
+        let enabled = JournalEvent::RelayEnabled {
+            surface: Surface::Window,
+        };
+
+        assert_eq!(fields_of(&enabled), ["kind", "surface"]);
+        assert_eq!(fields_of(&JournalEvent::RelayTestSent), ["kind"]);
 
         let sent = JournalEvent::RelaySent {
             nickname: "Alpha".to_owned(),

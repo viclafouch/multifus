@@ -11,6 +11,7 @@ import type {
   ConfigProblem,
   UpdateStatus
 } from '@/@types/system'
+import type { LampState } from '@/components/lamp'
 import { strings } from '@/constants/strings'
 
 /** A sentence and the weight it carries, which is what colours it. */
@@ -140,13 +141,23 @@ export const authorizationLine = (authorization: Authorization) => {
     : strings.status.notListening
 }
 
-/** Where a character stands: offline, asleep, or in the cycle. */
-export const characterStateLine = (character: Character) => {
+/** The ochre goes to a character connected and in the cycle, and to it alone. */
+export const characterState = (character: Character): LampState => {
   if (!character.online) {
-    return strings.characters.offline
+    return 'offline'
   }
 
-  return character.asleep
-    ? strings.characters.asleep
-    : strings.characters.inCycle
+  return character.asleep ? 'asleep' : 'live'
+}
+
+/** One phrase per lamp, so the light and the word beside it cannot disagree. */
+const CHARACTER_STATE_LINES = {
+  offline: strings.characters.offline,
+  asleep: strings.characters.asleep,
+  live: strings.characters.inCycle
+} as const satisfies Record<LampState, string>
+
+/** Where a character stands: offline, asleep, or in the cycle. */
+export const characterStateLine = (character: Character) => {
+  return CHARACTER_STATE_LINES[characterState(character)]
 }

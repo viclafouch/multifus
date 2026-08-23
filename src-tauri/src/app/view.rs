@@ -19,6 +19,7 @@ use serde::Deserialize;
 use serde::Serialize;
 
 use crate::app::journal::JournalEntry;
+use crate::app::journal::RelayFailure;
 use crate::domain::Gender;
 use crate::domain::NotificationKind;
 use crate::platform::ScreenSaverDelay;
@@ -101,11 +102,73 @@ pub struct RelayView {
     /// The relay is carrying messages right now. Never persisted: a multifus
     /// coming back from a crash relays nothing until asked, see the plan.
     pub active: bool,
+    /// A click on the tray item could switch it on: a bot is paired and somebody
+    /// is ticked. Answered here rather than worked out again in the window,
+    /// which would be the rule of ADR 0011 written down twice.
+    pub ready: bool,
     /// What this machine's screen saver is set to, since it locks the session
     /// and the hold on the display is not documented to cover it.
     pub screen_saver: ScreenSaverView,
     /// Where the pairing got to, since it is two network round trips.
     pub pairing: PairingView,
+    /// Where the switch got to, since switching on reads the keychain.
+    pub switch: SwitchView,
+    /// Where the last test message got to, which is the one thing this screen
+    /// can answer that no amount of wording can: it really arrived.
+    pub test: TestView,
+}
+
+/// Where the switch got to, which [`RelayView::active`] cannot say on its own.
+///
+/// A refused keychain used to leave the switch springing back with the card
+/// still reading « tout est prêt », which was a lie on the one panel this screen
+/// has to be trusted on. Never persisted, like [`PairingView`].
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(
+    tag = "kind",
+    rename_all = "camelCase",
+    rename_all_fields = "camelCase"
+)]
+pub enum SwitchView {
+    /// Nothing in flight, so `active` is the whole state.
+    Idle,
+
+    /// Switching on: the keychain, then the client.
+    Starting,
+
+    /// The last start did not take, and this says where to repair it.
+    Failed { reason: RelayFailure },
+}
+
+/// Where the message the user asked for got to. A state and not a journal line:
+/// the doubt it answers is « est-ce que ça marche », and a drawer to read to
+/// find out is that doubt again. Never persisted, like [`PairingView`].
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(
+    tag = "kind",
+    rename_all = "camelCase",
+    rename_all_fields = "camelCase"
+)]
+pub enum TestView {
+    /// Nothing has been asked in this session.
+    Idle,
+
+    /// The message is on its way: the keychain, then Telegram.
+    Working,
+
+    /// Telegram took it, so the whole chain works. The telephone is the proof.
+    Sent,
+
+    /// It did not go out, and this says which of the three places to repair.
+    Failed { reason: RelayFailure },
+
+    /// One went out a moment ago and another may not yet. Not a failure, nothing
+    /// having been asked of Telegram.
+    ///
+    /// **It carries no countdown, and a first version did.** A snapshot only
+    /// goes out when something moved, so the number froze on screen and a live
+    /// region kept announcing a figure that was wrong a second later.
+    TooSoon,
 }
 
 /// What the screen saver of this machine is set to. Read once at startup and not

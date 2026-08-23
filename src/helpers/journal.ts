@@ -168,7 +168,7 @@ const relayFailedLine = (reason: RelayFailure) => {
   }
 }
 
-/** Where the user acted, for the two settings that have two doors. */
+/** Where the user acted, for the settings and the switch that have two doors. */
 const surfaceLabel = (surface: Surface) => {
   return surface === 'tray' ? 'la barre système' : 'la fenêtre'
 }
@@ -615,6 +615,9 @@ const actionLine = (event: EventOf<ActionEventKind>) => {
     }
     case 'trayFocus': {
       return trayLine(event)
+    }
+    case 'relayEnabled': {
+      return `Relais activé depuis ${surfaceLabel(event.surface)}.`
     }
     case 'relayDisabled': {
       return RELAY_STOP_LINES[event.reason]

@@ -145,6 +145,13 @@
   --sidebar-accent-foreground: oklch(0.945 0.006 84);
   --sidebar-border: oklch(0.85 0.02 80 / 11%);
   --sidebar-ring: oklch(0.796 0.142 71 / 55%);
+
+  /* The three states of the relay, and the one place this window spends a colour
+     that is not the ochre. It earns the exception: this is the panel one glances
+     at on the way out of the room, and « à l'arrêt » has to be unmissable. */
+  --relay-live: oklch(0.79 0.16 152);
+  --relay-idle: oklch(0.79 0.16 58);
+  --relay-blocked: oklch(0.7 0.19 25);
 }
 
 @layer base {
@@ -291,6 +298,51 @@
   --rise-opacity: 1;
 
   animation: rise 0.3s cubic-bezier(0.4, 0, 0.2, 1) backwards;
+}
+
+/* The state of the relay, in colour. The panel names its state once, in a data
+   attribute, and these three set the tone every piece below reads from. */
+@utility tone-live {
+  --tone: var(--relay-live);
+}
+
+@utility tone-idle {
+  --tone: var(--relay-idle);
+}
+
+@utility tone-blocked {
+  --tone: var(--relay-blocked);
+}
+
+/* The badge that carries the state: the colour full strength on the text, weak
+   on the border, weaker still behind it. */
+@utility toned {
+  color: var(--tone);
+  border-color: color-mix(in oklch, var(--tone), transparent 55%);
+  background-color: color-mix(in oklch, var(--tone), transparent 86%);
+}
+
+/* And the panel around it, tinted just enough to be read from the doorway. */
+@utility panel-toned {
+  border-color: color-mix(in oklch, var(--tone), transparent 74%);
+  background-color: color-mix(in oklch, var(--tone), transparent 94%);
+}
+
+/* The dot of a relay that is running. It breathes like the lamps of the roster,
+   since a state that is live is the one thing worth moving on this screen. */
+@keyframes tone-breath {
+  0%,
+  100% {
+    box-shadow: 0 0 0 2px color-mix(in oklch, var(--tone), transparent 74%);
+  }
+
+  50% {
+    box-shadow: 0 0 0 2px color-mix(in oklch, var(--tone), transparent 94%);
+  }
+}
+
+@utility tone-breath {
+  animation: tone-breath 3.4s ease-in-out infinite;
 }
 
 /* A row that is still there but out of service: offline for the roster. */

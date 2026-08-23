@@ -89,6 +89,8 @@ pub fn run() {
             app::commands::set_relayed,
             app::commands::set_send_body,
             app::commands::pair_relay,
+            app::commands::set_relay_active,
+            app::commands::test_relay,
             app::commands::unpair_relay,
             app::commands::open_relay_link,
             app::commands::reset,

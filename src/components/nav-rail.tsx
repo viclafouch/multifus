@@ -60,7 +60,7 @@ export const NavRail = ({
       </ul>
       <div className="m-3 flex flex-col gap-1.5 rounded-lg border border-border/80 bg-background/40 px-3 py-2.5">
         <p className="flex items-center gap-2 text-note">
-          <Lamp isOnline={connected > 0} isAsleep={false} />
+          <Lamp state={connected > 0 ? 'live' : 'offline'} />
           <span className="text-foreground/85">
             {strings.status.connected(connected)}
           </span>

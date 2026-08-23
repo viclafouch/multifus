@@ -137,6 +137,22 @@ export const pairRelay = async (token: string) => {
   return invoke<Snapshot>('pair_relay', { token })
 }
 
+/**
+ * Moves the switch of the Relais screen, the twin of the tray item. Answers with
+ * the switching in flight: it reads the keychain, which can raise a dialog.
+ */
+export const setRelayActive = async (active: boolean) => {
+  return invoke<Snapshot>('set_relay_active', { active })
+}
+
+/**
+ * Sends one message to the telephone, on demand. Answers with the sending in
+ * flight: with no relay running it reads the keychain, which can raise a dialog.
+ */
+export const testRelay = async () => {
+  return invoke<Snapshot>('test_relay')
+}
+
 /** Forgets the bot: the token leaves the keychain, the chat leaves the file. */
 export const unpairRelay = async () => {
   return invoke<Snapshot>('unpair_relay')

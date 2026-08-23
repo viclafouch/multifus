@@ -19,7 +19,9 @@ export const SectionRow = ({
     <section className="flex items-center gap-5 px-4 py-3.5">
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <h2 className="text-row font-medium">{title}</h2>
-        <p className="max-w-prose text-note text-muted-foreground">
+        {/* `text-pretty` and not a shorter sentence: it is what keeps a last
+            word from landing alone on a line of its own. */}
+        <p className="max-w-prose text-pretty text-note text-muted-foreground">
           {description}
         </p>
       </div>

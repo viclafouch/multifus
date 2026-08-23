@@ -26,6 +26,27 @@ export type PairingStatus =
   | { readonly kind: 'working' }
 
 /**
+ * Where the switch got to, which `active` cannot say on its own: a refused
+ * keychain left it springing back with the card still reading « tout est prêt ».
+ */
+export type SwitchStatus =
+  | { readonly kind: 'failed'; readonly reason: RelayFailure }
+  | { readonly kind: 'idle' }
+  | { readonly kind: 'starting' }
+
+/**
+ * Where the message the user asked for got to. A state of its own and not a
+ * journal line: the doubt it answers is « est-ce que ça marche », and sending
+ * somebody to read a drawer to find out is the doubt again.
+ */
+export type TestStatus =
+  | { readonly kind: 'failed'; readonly reason: RelayFailure }
+  | { readonly kind: 'idle' }
+  | { readonly kind: 'sent' }
+  | { readonly kind: 'tooSoon' }
+  | { readonly kind: 'working' }
+
+/**
  * What the relay screen draws. Never the bot token, and there could not be one:
  * a read hands back a type that is not serialisable, ADR 0009.
  */
@@ -40,10 +61,26 @@ export type RelayStatus = {
   /** The relay is carrying messages right now. Never persisted: a multifus back
    * from a crash relays nothing until somebody asks. */
   readonly active: boolean
+  /**
+   * A click on the tray item could switch it on: a bot is paired and somebody is
+   * ticked. Answered by Rust, so the rule of ADR 0011 is written down once.
+   */
+  readonly ready: boolean
   /** What this machine's screen saver is set to, since it locks the session. */
   readonly screenSaver: ScreenSaver
   readonly pairing: PairingStatus
+  /** Where the switch got to, since switching on reads the keychain. */
+  readonly switch: SwitchStatus
+  /** Where the last test message got to, since it is a network round trip. */
+  readonly test: TestStatus
 }
+
+/**
+ * What the state panel says the relay is doing, folded from `active` and
+ * `ready`. Three and not two: a relay that cannot start and one that is merely
+ * stopped are repaired in two different places.
+ */
+export type RelayLiveState = 'active' | 'incomplete' | 'ready'
 
 /**
  * Why the relay could not do what was asked. Three and not one: the keychain of
@@ -55,7 +92,7 @@ export type RelayFailure =
   | { readonly reason: 'telegram'; readonly detail: string }
 
 /**
- * What stopped the relay. A reason and not a surface, since two of these four
+ * What stopped the relay. A reason and not a surface, since two of these five
  * are not a door the user pressed.
  */
 export type RelayStop =
@@ -63,9 +100,10 @@ export type RelayStop =
   | 'noRelayedCharacter'
   | 'shortcut'
   | 'tray'
+  | 'window'
 
 /**
- * What an avis of ADR 0010 said. Three and not two, since one scan sends at most
- * one message and the two phrases travel in it together.
+ * What an avis of ADR 0010 said. Five: the two ends of the switch, and the three
+ * the scan produces, whose phrases travel together in one message.
  */
-export type NoticeCase = 'both' | 'disconnected' | 'nobodyLeft'
+export type NoticeCase = 'both' | 'disabled' | 'disconnected' | 'enabled'

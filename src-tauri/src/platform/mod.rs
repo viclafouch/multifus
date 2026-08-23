@@ -71,4 +71,4 @@ pub type PlatformNotificationWatcher = windows::UserNotificationWatcher;
 pub type PlatformDisplayKeeper = macos::PowerAssertionDisplayKeeper;
 /// The display keeper of the system multifus is running on.
 #[cfg(target_os = "windows")]
-pub type PlatformDisplayKeeper = windows::ExecutionStateDisplayKeeper;
+pub type PlatformDisplayKeeper = windows::PowerRequestDisplayKeeper;

@@ -55,12 +55,13 @@ export const TONES = {
   relayUnpaired: 'neutral',
   relayFailed: 'warning',
   relayEnabled: 'good',
-  // What the user asked for, whichever of the four gestures it was.
+  // What the user asked for, whichever of the five gestures it was.
   relayDisabled: 'neutral',
   relaySent: 'good',
   // The event ADR 0010 exists for, and it is not a fault: multifus saying it has
   // stopped hearing is the whole reason the relay can be trusted.
   relayNoticeSent: 'good',
+  relayTestSent: 'good',
   displayAwake: 'neutral',
   displayAwakeFailed: 'warning',
   reset: 'neutral',
@@ -148,18 +149,19 @@ export const PLAIN_LINES = {
   // l'ADR 0006 does not reach it, but this journal is a file one hands over.
   relayPaired: 'Relais apparié à un robot Telegram.',
   relayUnpaired: 'Robot Telegram délié, jeton effacé du trousseau.',
-  relayEnabled: 'Relais activé depuis la barre système.',
+  relayTestSent: 'Message d’essai envoyé sur le téléphone.',
   reset: 'Configuration remise à zéro.',
   quit: 'multifus a été quitté depuis la barre système.'
 } as const satisfies Record<WithoutPayload<JournalEvent>, string>
 
 /**
- * What stopped the relay, put into words. Four gestures, and a transcript of an
+ * What stopped the relay, put into words. Five gestures, and a transcript of an
  * absence is unreadable if two of them look alike.
  */
 export const RELAY_STOP_LINES = {
   shortcut: 'Relais coupé : un raccourci a été frappé depuis le jeu.',
   tray: 'Relais coupé depuis la barre système.',
+  window: 'Relais coupé depuis la fenêtre.',
   noRelayedCharacter:
     'Relais coupé : le dernier personnage relayé a été décoché.',
   noLongerPaired: 'Relais coupé : il n’y a plus de robot où écrire.'
@@ -170,8 +172,9 @@ export const RELAY_STOP_LINES = {
  * built on the Rust side: Telegram is a surface this window cannot draw.
  */
 export const NOTICE_LINES = {
+  enabled: 'Avis envoyé : le relais est activé.',
+  disabled: 'Avis envoyé : le relais est désactivé.',
   disconnected: 'Avis envoyé : un personnage relayé s’est déconnecté.',
-  nobodyLeft: 'Avis envoyé : plus aucun personnage relayé n’est connecté.',
   both: 'Avis envoyé : une déconnexion, et plus personne de relayé connecté.'
 } as const satisfies Record<NoticeCase, string>
 

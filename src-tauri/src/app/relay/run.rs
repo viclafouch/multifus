@@ -4,6 +4,7 @@
 use std::sync::Mutex;
 use std::sync::MutexGuard;
 use std::sync::PoisonError;
+use std::time::Duration;
 
 use reqwest::Client;
 use tauri::async_runtime::channel;
@@ -16,6 +17,7 @@ use crate::app::journal::JournalEvent;
 use crate::app::journal::NoticeCase;
 use crate::app::journal::RelayFailure;
 use crate::app::journal::RelayStop;
+use crate::app::journal::Surface;
 use crate::app::relay::secret;
 use crate::app::relay::secret::BotToken;
 use crate::app::relay::telegram;
@@ -23,6 +25,9 @@ use crate::app::relay::telegram::TelegramError;
 use crate::app::runtime;
 use crate::app::state::lock;
 use crate::app::state::ScanChange;
+use crate::app::state::StartId;
+use crate::app::view::SwitchView;
+use crate::app::view::TestView;
 use crate::domain::GameNotification;
 use crate::domain::NotificationKind;
 use crate::platform::DisplayKeeper;
@@ -34,10 +39,19 @@ const HEADER: &str = "multifus";
 const PRIVATE_MESSAGE: &str = "message privé";
 const DISCONNECTED: &str = "s’est déconnecté.";
 const NOBODY_LEFT: &str = "Plus aucun personnage relayé n’est connecté.";
+const TEST_LINE: &str = "Message d’essai.";
+const TEST_PROOF: &str = "Un vrai message privé arrivera sous cette forme.";
+const RELAY_ON: &str = "Relais activé.";
+const RELAY_OFF: &str = "Relais désactivé.";
+const NOBODY_YET: &str = "Aucun personnage relayé n’est connecté pour l’instant.";
 
 /// How many messages may wait for Telegram at once. About a minute of backlog,
 /// against a limit of roughly one message a second per chat.
 const QUEUE_CAPACITY: usize = 64;
+
+/// How long a test message holds the button. Counted from the arrival, so what
+/// it protects is the telephone and not the click.
+const TEST_COOLDOWN: Duration = Duration::from_secs(30);
 
 /// What the keychain has to say when the chat says paired and no token is there.
 const NO_TOKEN: &str = "no bot token in the keychain";
@@ -70,6 +84,29 @@ enum Message {
     },
     /// multifus talking about itself, ADR 0010. Never a notification body.
     Notice { gone: Vec<String>, none_left: bool },
+    /// The switch was moved on. The confirmation somebody is standing there
+    /// waiting for, and it carries the empty-relay warning rather than the
+    /// warning being sent on its own, where it read as an alarm.
+    Enabled { none_online: bool },
+    /// The switch was moved off by one of the three gestures that say so.
+    Disabled,
+    /// The one message the user asks for. It carries no character and no body,
+    /// so it proves the chain and tells nobody anything about the game.
+    Test,
+}
+
+/// What the queue did with a message. Three and not a boolean: a relay that is
+/// off and a queue a minute behind are answered in two different places.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Queued {
+    /// The sending task has it, and the order is kept.
+    Taken,
+
+    /// No relay is running, which is an ordinary state and not a failure.
+    NoRelay,
+
+    /// A minute of backlog, or a sending task that is gone.
+    Saturated,
 }
 
 /// Puts up the two slots the relay runs in. Neither holds anything yet.
@@ -79,33 +116,131 @@ pub fn setup(app: &AppHandle, keeper: PlatformDisplayKeeper) {
 }
 
 /// The item of the system tray was clicked on a relay that is ready.
+pub fn toggle(app: &AppHandle) {
+    let active = lock(app).is_relay_active();
+
+    set_active(app, !active, Surface::Tray);
+}
+
+/// One of the two switches was moved, and this says which one.
 ///
 /// Returns straight away: switching on reads the keychain, which ADR 0009
 /// measured blocking on a dialog, so it goes off this thread like `pairing::pair`.
-pub fn toggle(app: &AppHandle) {
-    if lock(app).is_relay_active() {
-        stop(app, RelayStop::Tray);
+/// The start is claimed before the task is spawned, see the plan, step 11b-2.
+pub fn set_active(app: &AppHandle, active: bool, surface: Surface) {
+    if !active {
+        stop(app, stop_of(surface));
 
         runtime::emit_snapshot(app);
 
         return;
     }
 
+    let Some(start_id) = lock(app).begin_relay_start() else {
+        return;
+    };
+
     let app = app.clone();
 
     tauri::async_runtime::spawn(async move {
-        start(&app).await;
+        let outcome = start(&app, surface, start_id).await;
+
+        lock(&app).end_relay_start(start_id, outcome);
 
         runtime::emit_snapshot(&app);
     });
 }
 
+/// Whether a test went out recently enough that another has to wait.
+fn is_cooling(app: &AppHandle) -> bool {
+    lock(app)
+        .since_last_test()
+        .is_some_and(|since| since < TEST_COOLDOWN)
+}
+
+/// A hand on a switch, said as one of the five reasons a relay stops.
+fn stop_of(surface: Surface) -> RelayStop {
+    match surface {
+        Surface::Tray => RelayStop::Tray,
+        Surface::Window => RelayStop::Window,
+    }
+}
+
+/// The user asked the relay to prove itself, from the Relais screen.
+///
+/// Through the live queue when there is one, which proves the sending task too;
+/// off it, this is the one message that goes out with the relay stopped. Returns
+/// straight away like [`toggle`], the keychain being read either way.
+pub fn test(app: &AppHandle) {
+    // The button stays clickable, the project forbids a dead one, so the two
+    // ways to spam a telephone are turned away here with an answer each.
+    if matches!(lock(app).test_view(), TestView::Working) {
+        return;
+    }
+
+    if is_cooling(app) {
+        lock(app).set_test(TestView::TooSoon);
+
+        runtime::emit_snapshot(app);
+
+        return;
+    }
+
+    lock(app).set_test(TestView::Working);
+
+    runtime::emit_snapshot(app);
+
+    // Asked of the queue and not of `running`, which a stop can empty between
+    // the two: a saturated queue is the one way this button could sit on
+    // « Envoi… » for ever, and a relay merely off is not that.
+    match queue(app, Message::Test) {
+        Queued::Taken => {}
+        Queued::Saturated => {
+            lock(app).set_test(TestView::Failed {
+                reason: saturated(),
+            });
+
+            runtime::emit_snapshot(app);
+        }
+        Queued::NoRelay => {
+            let app = app.clone();
+
+            tauri::async_runtime::spawn(async move {
+                send_once(&app, &Message::Test).await;
+            });
+        }
+    }
+}
+
 /// Switches the relay off. Taking the running relay out of its slot closes the
 /// queue and ends the sending task, and the display hold falls at the next scan.
 pub fn stop(app: &AppHandle, reason: RelayStop) {
+    // A start still reading the keychain is no longer wanted. Taken before the
+    // queue, so a stop always wins over a start it crossed.
+    lock(app).cancel_relay_start();
+
+    // Queued before the queue is let go, since letting it go is what closes it.
+    // The sending task drains what it already accepted before it ends. A relay
+    // that was not running has no queue, and this is then a no-op.
+    if says_so(reason) {
+        queue(app, Message::Disabled);
+    }
+
     drop(running(app).take());
 
     lock(app).disable_relay(reason);
+}
+
+/// Whether the telephone is told the relay stopped.
+///
+/// Only the three gestures. A bot being forgotten would be told in the very chat
+/// multifus is erasing, and a last character unticked happens at the keyboard on
+/// a relay that had nothing left to carry.
+fn says_so(reason: RelayStop) -> bool {
+    matches!(
+        reason,
+        RelayStop::Shortcut | RelayStop::Tray | RelayStop::Window
+    )
 }
 
 /// Switches the relay off if it can no longer carry anything: the last relayed
@@ -114,7 +249,9 @@ pub fn stop_if_unready(app: &AppHandle, reason: RelayStop) {
     let unready = {
         let state = lock(app);
 
-        state.is_relay_active() && !state.is_relay_ready()
+        // A start still reading the keychain counts: it holds the chat it read
+        // before the wait, and nothing else would ever call it off.
+        (state.is_relay_active() || state.has_relay_start()) && !state.is_relay_ready()
     };
 
     if unready {
@@ -217,35 +354,107 @@ pub fn follow_display(app: &AppHandle) -> bool {
 }
 
 /// Switching on: the keychain, then the queue, then the avis of an empty relay.
-async fn start(app: &AppHandle) {
+///
+/// Hands back what the switch has to say. A relay that was never ready is not a
+/// failure and says nothing: the card already draws « incomplet ».
+async fn start(app: &AppHandle, surface: Surface, start_id: StartId) -> SwitchView {
     // Asked again here rather than trusted from the menu, which is built from a
     // snapshot and can be a few seconds old.
     let Some(chat_id) = ready_chat(app) else {
-        return;
+        return SwitchView::Idle;
     };
 
-    let Some(token) = read_token(app).await else {
-        return;
+    let token = match read_token().await {
+        Ok(token) => token,
+        Err(reason) => {
+            lock(app).log(JournalEvent::RelayFailed {
+                reason: reason.clone(),
+            });
+
+            return SwitchView::Failed { reason };
+        }
     };
+
+    // Before the queue exists and not inside the sending task: a task that gave
+    // up on its client dropped the receiver while the queue was still open, and
+    // whatever had been pushed in between was lost without an answer.
+    let client = match telegram::client() {
+        Ok(client) => client,
+        Err(error) => {
+            return SwitchView::Failed {
+                reason: report(app, &error),
+            };
+        }
+    };
+
+    // The claim, the queue and the flag under one guard: a stop that crossed the
+    // keychain must win, and it cannot if it lands between them.
+    let mut state = lock(app);
+
+    // A switch moved off while the dialog was open, or a later click took the
+    // claim. Nothing is installed, and the stop that came in stands.
+    if !state.is_relay_starting(start_id) {
+        return SwitchView::Idle;
+    }
 
     let (outgoing, incoming) = channel::<Message>(QUEUE_CAPACITY);
 
     *running(app) = Some(Running { outgoing });
 
-    lock(app).enable_relay();
+    state.enable_relay(surface);
 
-    tauri::async_runtime::spawn(deliver(app.clone(), token, chat_id, incoming));
+    // Every activation says so, because that is the answer somebody standing
+    // with a telephone in hand is waiting for. The third trigger of ADR 0010
+    // rides in it as a second line: sent alone it read as an alarm.
+    let none_online = !state.has_relayed_online();
 
-    // The third trigger of ADR 0010: a relay switched on with nobody to hear
-    // will never see a transition, so it says so while the telephone is in hand.
-    if !lock(app).has_relayed_online() {
-        queue(
-            app,
-            Message::Notice {
-                gone: Vec::new(),
-                none_left: true,
-            },
-        );
+    drop(state);
+
+    tauri::async_runtime::spawn(deliver(app.clone(), client, token, chat_id, incoming));
+
+    queue(app, Message::Enabled { none_online });
+
+    SwitchView::Idle
+}
+
+/// Sends one message with no relay running: the chat, the keychain, a client of
+/// its own. A bot that was never paired writes nothing down, being a step left
+/// to do rather than a failure, as `pairing` treats a blank field.
+async fn send_once(app: &AppHandle, message: &Message) {
+    // Read into a binding first: this mutex is not reentrant, and taking it
+    // again from inside a `let ... else` whose scrutinee holds it is a deadlock.
+    let paired_chat = lock(app).chat_id();
+
+    let Some(chat_id) = paired_chat else {
+        lock(app).set_test(TestView::Idle);
+
+        runtime::emit_snapshot(app);
+
+        return;
+    };
+
+    let token = match read_token().await {
+        Ok(token) => token,
+        Err(reason) => {
+            let mut state = lock(app);
+
+            // Not `log`: the button stays clickable by design, and five tries
+            // against a locked keychain are one fact and not five.
+            state.log_unless_repeated(JournalEvent::RelayFailed {
+                reason: reason.clone(),
+            });
+            state.set_test(TestView::Failed { reason });
+            drop(state);
+
+            runtime::emit_snapshot(app);
+
+            return;
+        }
+    };
+
+    match telegram::client() {
+        Ok(client) => write(app, &client, &token, chat_id, message).await,
+        Err(error) => could_not_write(app, message, &error),
     }
 }
 
@@ -259,12 +468,13 @@ fn ready_chat(app: &AppHandle) -> Option<i64> {
 /// Reads the token, on a thread that may block on a system dialog.
 ///
 /// A refusal stops the activation dead rather than letting somebody walk away
-/// believing the relay is on, which is the measurement of ADR 0009.
-async fn read_token(app: &AppHandle) -> Option<BotToken> {
+/// believing the relay is on, which is the measurement of ADR 0009. The reason
+/// is handed back and not written down: one of the two callers has a screen.
+async fn read_token() -> Result<BotToken, RelayFailure> {
     let read = tauri::async_runtime::spawn_blocking(secret::read).await;
 
     let detail = match read {
-        Ok(Ok(Some(token))) => return Some(token),
+        Ok(Ok(Some(token))) => return Ok(token),
         // The file says a bot was paired here and the keychain has nothing. Only
         // the keychain is authoritative, ADR 0009.
         Ok(Ok(None)) => NO_TOKEN.to_owned(),
@@ -272,28 +482,20 @@ async fn read_token(app: &AppHandle) -> Option<BotToken> {
         Err(error) => error.to_string(),
     };
 
-    lock(app).log(JournalEvent::RelayFailed {
-        reason: RelayFailure::Keychain { detail },
-    });
-
-    None
+    Err(RelayFailure::Keychain { detail })
 }
 
 /// The sending, one message at a time, for as long as the relay is on.
 ///
 /// One task and not one per message, which is what keeps the order. It ends when
 /// the queue closes, after draining what was already accepted.
-async fn deliver(app: AppHandle, token: BotToken, chat_id: i64, mut incoming: Receiver<Message>) {
-    let client = match telegram::client() {
-        Ok(client) => client,
-        Err(error) => {
-            report(&app, &error);
-            runtime::emit_snapshot(&app);
-
-            return;
-        }
-    };
-
+async fn deliver(
+    app: AppHandle,
+    client: Client,
+    token: BotToken,
+    chat_id: i64,
+    mut incoming: Receiver<Message>,
+) {
     while let Some(message) = incoming.recv().await {
         write(&app, &client, &token, chat_id, &message).await;
     }
@@ -310,15 +512,39 @@ async fn write(
     chat_id: i64,
     message: &Message,
 ) {
-    let Err(error) = telegram::send(client, token, chat_id, &text_of(message)).await else {
-        // No snapshot: the file has the line already, and the caller of `offer`
-        // emitted one a moment ago. A failure is what the window has to be told.
-        lock(app).log(written(message));
+    match telegram::send(client, token, chat_id, &text_of(message)).await {
+        Ok(()) => wrote(app, message),
+        Err(error) => could_not_write(app, message, &error),
+    }
+}
 
+/// The message landed. No snapshot for the ordinary ones, the file has the line
+/// and `offer`'s caller emitted one; a test is watched, so it gets one.
+fn wrote(app: &AppHandle, message: &Message) {
+    let mut state = lock(app);
+
+    state.log(written(message));
+
+    if !matches!(message, Message::Test) {
         return;
-    };
+    }
 
-    report(app, &error);
+    state.set_test(TestView::Sent);
+    state.mark_test_sent();
+    drop(state);
+
+    runtime::emit_snapshot(app);
+}
+
+/// The message did not go out. A failure is always what the window has to be
+/// told, so this one always emits its snapshot.
+fn could_not_write(app: &AppHandle, message: &Message, error: &TelegramError) {
+    let reason = report(app, error);
+
+    if matches!(message, Message::Test) {
+        lock(app).set_test(TestView::Failed { reason });
+    }
+
     runtime::emit_snapshot(app);
 }
 
@@ -328,18 +554,26 @@ fn written(message: &Message) -> JournalEvent {
         Message::Private { nickname, .. } => JournalEvent::RelaySent {
             nickname: nickname.clone(),
         },
-        Message::Notice { gone, none_left } => JournalEvent::RelayNoticeSent {
-            case: case_of(gone, *none_left),
+        Message::Notice { none_left, .. } => JournalEvent::RelayNoticeSent {
+            case: case_of(*none_left),
         },
+        Message::Enabled { .. } => JournalEvent::RelayNoticeSent {
+            case: NoticeCase::Enabled,
+        },
+        Message::Disabled => JournalEvent::RelayNoticeSent {
+            case: NoticeCase::Disabled,
+        },
+        Message::Test => JournalEvent::RelayTestSent,
     }
 }
 
-/// Which of the two phrases of ADR 0010 the message carried, or both.
-fn case_of(gone: &[String], none_left: bool) -> NoticeCase {
-    match (gone.is_empty(), none_left) {
-        (true, _) => NoticeCase::NobodyLeft,
-        (false, true) => NoticeCase::Both,
-        (false, false) => NoticeCase::Disconnected,
+/// Which of the two phrases of ADR 0010 the message carried, or both. A notice
+/// always names at least one departure, [`announce`] refusing to send otherwise.
+fn case_of(none_left: bool) -> NoticeCase {
+    if none_left {
+        NoticeCase::Both
+    } else {
+        NoticeCase::Disconnected
     }
 }
 
@@ -366,6 +600,19 @@ fn text_of(message: &Message) -> String {
                 lines.push(NOBODY_LEFT.to_owned());
             }
         }
+        Message::Enabled { none_online } => {
+            lines.push(RELAY_ON.to_owned());
+
+            if *none_online {
+                lines.push(NOBODY_YET.to_owned());
+            }
+        }
+        Message::Disabled => lines.push(RELAY_OFF.to_owned()),
+        Message::Test => {
+            lines.push(TEST_LINE.to_owned());
+            lines.push(String::new());
+            lines.push(TEST_PROOF.to_owned());
+        }
     }
 
     lines.join("\n")
@@ -373,24 +620,35 @@ fn text_of(message: &Message) -> String {
 
 /// Puts a message in the queue, from whichever thread noticed it. A relay that is
 /// off has no queue, which is an ordinary state and not a failure.
-fn queue(app: &AppHandle, message: Message) {
+fn queue(app: &AppHandle, message: Message) -> Queued {
     let Some(outgoing) = running(app).as_ref().map(|relay| relay.outgoing.clone()) else {
-        return;
+        return Queued::NoRelay;
     };
 
-    if outgoing.try_send(message).is_err() {
-        // Said once rather than once per message, since a burst is one fact.
-        lock(app).log_unless_repeated(JournalEvent::RelayFailed {
-            reason: RelayFailure::Telegram {
-                detail: SATURATED.to_owned(),
-            },
-        });
+    if outgoing.try_send(message).is_ok() {
+        return Queued::Taken;
+    }
+
+    // Said once rather than once per message, since a burst is one fact.
+    lock(app).log_unless_repeated(JournalEvent::RelayFailed {
+        reason: saturated(),
+    });
+
+    Queued::Saturated
+}
+
+/// The queue would not take the message: it is a minute behind, or the sending
+/// task is gone. One reason for both, since one is not repaired without the other.
+fn saturated() -> RelayFailure {
+    RelayFailure::Telegram {
+        detail: SATURATED.to_owned(),
     }
 }
 
 /// Writes down what the relay could not do, in the words of the place it is
-/// repaired in. Never formatted any other way, see [`telegram`].
-fn report(app: &AppHandle, error: &TelegramError) {
+/// repaired in, and hands the reason back for the caller that has a screen to
+/// answer too. Never formatted any other way, see [`telegram`].
+fn report(app: &AppHandle, error: &TelegramError) -> RelayFailure {
     let reason = match error {
         TelegramError::Refused { detail } => RelayFailure::Telegram {
             detail: detail.clone(),
@@ -400,7 +658,11 @@ fn report(app: &AppHandle, error: &TelegramError) {
         },
     };
 
-    lock(app).log_unless_repeated(JournalEvent::RelayFailed { reason });
+    lock(app).log_unless_repeated(JournalEvent::RelayFailed {
+        reason: reason.clone(),
+    });
+
+    reason
 }
 
 /// The running relay, taken even if a previous holder panicked. See the note on
@@ -457,7 +719,7 @@ mod tests {
             text_of(&both),
             "multifus\nMaître Forgeron s’est déconnecté.\nPlus aucun personnage relayé n’est connecté."
         );
-        assert_eq!(case_of(&gone, true), NoticeCase::Both);
+        assert_eq!(case_of(true), NoticeCase::Both);
     }
 
     #[test]
@@ -472,7 +734,7 @@ mod tests {
         };
 
         assert_eq!(text_of(&notice).lines().count(), 5);
-        assert_eq!(case_of(&gone, true), NoticeCase::Both);
+        assert_eq!(case_of(true), NoticeCase::Both);
     }
 
     #[test]
@@ -483,24 +745,44 @@ mod tests {
         };
 
         assert_eq!(text_of(&notice), "multifus\nAlpha s’est déconnecté.");
-        assert_eq!(
-            case_of(&["Alpha".to_owned()], false),
-            NoticeCase::Disconnected
-        );
+        assert_eq!(case_of(false), NoticeCase::Disconnected);
     }
 
     #[test]
-    fn switching_on_an_empty_relay_says_so_straight_away() {
-        // The third trigger of ADR 0010: no transition will ever come to say it.
-        let notice = Message::Notice {
-            gone: Vec::new(),
-            none_left: true,
-        };
+    fn the_test_message_names_no_character_and_carries_no_body() {
+        assert_eq!(
+            text_of(&Message::Test),
+            "multifus\nMessage d’essai.\n\nUn vrai message privé arrivera sous cette forme."
+        );
+        assert_eq!(written(&Message::Test), JournalEvent::RelayTestSent);
+    }
+
+    #[test]
+    fn moving_the_switch_says_so_and_says_nothing_else() {
+        // What used to go out here was the bare « plus personne de relayé », the
+        // third trigger of ADR 0010, and on a telephone it read as an alarm.
+        assert_eq!(
+            text_of(&Message::Enabled { none_online: false }),
+            "multifus\nRelais activé."
+        );
+        assert_eq!(text_of(&Message::Disabled), "multifus\nRelais désactivé.");
+    }
+
+    #[test]
+    fn switching_on_an_empty_relay_warns_under_the_confirmation() {
+        // The third trigger of ADR 0010, kept: no transition will ever come to
+        // say it. It is a second line now, and not the whole message.
+        let enabled = Message::Enabled { none_online: true };
 
         assert_eq!(
-            text_of(&notice),
-            "multifus\nPlus aucun personnage relayé n’est connecté."
+            text_of(&enabled),
+            "multifus\nRelais activé.\nAucun personnage relayé n’est connecté pour l’instant."
         );
-        assert_eq!(case_of(&[], true), NoticeCase::NobodyLeft);
+        assert_eq!(
+            written(&enabled),
+            JournalEvent::RelayNoticeSent {
+                case: NoticeCase::Enabled
+            }
+        );
     }
 }

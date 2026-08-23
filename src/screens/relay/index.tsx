@@ -10,11 +10,13 @@ import { Screen } from '@/components/layout/screen'
 import { Switch } from '@/components/ui/switch'
 import { strings } from '@/constants/strings'
 import { setSendBody } from '@/lib/multifus'
+import { BotPanel } from '@/screens/relay/bot-panel'
 import { LinkButton } from '@/screens/relay/link-button'
-import { PairedPanel } from '@/screens/relay/paired-panel'
 import { PairingGuide } from '@/screens/relay/pairing-guide'
 import { RelayedList } from '@/screens/relay/relayed-list'
 import { ScreenSaverWarning } from '@/screens/relay/screen-saver-warning'
+import { StatePanel } from '@/screens/relay/state-panel'
+import { TestPanel } from '@/screens/relay/test-panel'
 
 type RelayScreenProps = Readonly<{
   relay: RelayStatus
@@ -23,15 +25,18 @@ type RelayScreenProps = Readonly<{
 }>
 
 /**
- * Where the relay is set up, the one screen a feature needs opened once.
- * The panels come in the order the work is done: the robot, who is relayed,
- * then how much of a message goes out.
+ * Where the relay is set up, the one screen a feature needs opened once. The
+ * cards come in the order of the questions: the switch, the bot, the essai.
  */
 export const RelayScreen = ({ relay, characters, run }: RelayScreenProps) => {
   return (
     <Screen title={strings.relay.title} subtitle={strings.relay.subtitle}>
       {relay.paired ? (
-        <PairedPanel isWorking={relay.pairing.kind === 'working'} run={run} />
+        <>
+          <StatePanel relay={relay} run={run} />
+          <BotPanel isWorking={relay.pairing.kind === 'working'} run={run} />
+          <TestPanel test={relay.test} run={run} />
+        </>
       ) : (
         <PairingGuide relay={relay} run={run} />
       )}

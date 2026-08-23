@@ -130,37 +130,37 @@ impl NotificationWatcher for UserNotificationWatcher {
     }
 }
 
-/// Keeps the display awake through `SetThreadExecutionState`. Empty until step 9,
-/// and what a sleeping machine costs here is the clients, not the banners.
+/// Keeps the display awake through a power request, the twin of the macOS
+/// assertion: the handle belongs to the process and not to the calling thread.
 #[derive(Debug, Default)]
-pub struct ExecutionStateDisplayKeeper;
+pub struct PowerRequestDisplayKeeper;
 
-impl ExecutionStateDisplayKeeper {
+impl PowerRequestDisplayKeeper {
     #[must_use]
     pub fn new() -> Self {
         Self
     }
 }
 
-impl DisplayKeeper for ExecutionStateDisplayKeeper {
+impl DisplayKeeper for PowerRequestDisplayKeeper {
     fn keep_awake(&mut self) -> Result<()> {
-        // `ES_CONTINUOUS | ES_DISPLAY_REQUIRED | ES_SYSTEM_REQUIRED`, on the
-        // calling thread, so the hold and its release share one.
+        // `PowerSetRequest` with `PowerRequestDisplayRequired`, on the handle
+        // `PowerCreateRequest` minted in `new`.
         Err(PlatformError::not_implemented(
-            "ExecutionStateDisplayKeeper::keep_awake",
+            "PowerRequestDisplayKeeper::keep_awake",
         ))
     }
 
     fn release(&mut self) -> Result<()> {
-        // `ES_CONTINUOUS` on its own, which is how the flags above are dropped.
+        // `PowerClearRequest`, same handle and same request kind.
         Err(PlatformError::not_implemented(
-            "ExecutionStateDisplayKeeper::release",
+            "PowerRequestDisplayKeeper::release",
         ))
     }
 
     fn is_awake(&self) -> bool {
-        // No token to keep, unlike the macOS assertion: the state belongs to the
-        // thread, so step 9 stores a plain boolean.
+        // A plain boolean is honest here, unlike with `SetThreadExecutionState`:
+        // the request outlives whichever thread raised it. See step 9.
         false
     }
 
@@ -168,7 +168,7 @@ impl DisplayKeeper for ExecutionStateDisplayKeeper {
         // `SystemParametersInfo`, `SPI_GETSCREENSAVEACTIVE` then
         // `SPI_GETSCREENSAVETIMEOUT`, the first telling `Never` from a delay.
         Err(PlatformError::not_implemented(
-            "ExecutionStateDisplayKeeper::screen_saver_delay",
+            "PowerRequestDisplayKeeper::screen_saver_delay",
         ))
     }
 }

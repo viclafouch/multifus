@@ -1,25 +1,25 @@
 import { cn } from '@/lib/utils'
 
+/**
+ * Three states and one colour: the ochre goes to `live` alone, `asleep` is a
+ * hollow ring and `offline` a dead dot.
+ */
+export type LampState = 'asleep' | 'live' | 'offline'
+
 type LampProps = Readonly<{
-  isOnline: boolean
-  isAsleep: boolean
+  state: LampState
   className?: string
 }>
 
 /**
- * The status light of a character.
- *
- * Three states and one colour. The ochre is spent only on a character that is
- * connected and in the cycle, which is the single thing the board is read for;
- * asleep is a hollow ring, offline is a dead dot.
- *
- * It carries no label: the row spells the state out in words right next to it.
+ * The status light of this window, on a character or on the relay. It carries no
+ * label: whatever it sits next to spells the state out right beside it.
  */
-export const Lamp = ({ isOnline, isAsleep, className }: LampProps) => {
+export const Lamp = ({ state, className }: LampProps) => {
   return (
     <span
       aria-hidden
-      data-state={lampState({ isOnline, isAsleep })}
+      data-state={state}
       className={cn(
         'size-lamp shrink-0 rounded-full transition-colors duration-300',
         'data-[state=live]:lamp-live data-[state=live]:bg-primary',
@@ -29,17 +29,4 @@ export const Lamp = ({ isOnline, isAsleep, className }: LampProps) => {
       )}
     />
   )
-}
-
-type LampStateParams = Readonly<{
-  isOnline: boolean
-  isAsleep: boolean
-}>
-
-const lampState = ({ isOnline, isAsleep }: LampStateParams) => {
-  if (!isOnline) {
-    return 'offline'
-  }
-
-  return isAsleep ? 'asleep' : 'live'
 }

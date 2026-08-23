@@ -210,6 +210,32 @@ pub fn pair_relay(app: AppHandle, token: String) -> Snapshot {
     runtime::emit_snapshot(&app)
 }
 
+/// Moves the switch of the Relais screen, the twin of the tray item.
+///
+/// Comes back with the switching in flight: it reads the keychain, and ADR 0009
+/// measured that blocking.
+#[tauri::command]
+pub fn set_relay_active(app: AppHandle, active: bool) -> Snapshot {
+    relay::run::set_active(&app, active, Surface::Window);
+
+    // Read and not emitted, unlike the commands above: `set_active` emits on
+    // every path that moved something, and a second one rebuilds the tray menu
+    // and pushes the same bytes twice.
+    lock(&app).snapshot()
+}
+
+/// Sends one message to the telephone, on demand, to prove the chain works.
+///
+/// Comes back with the sending in flight, like [`pair_relay`]: with no relay
+/// running it reads the keychain, and ADR 0009 measured that blocking.
+#[tauri::command]
+pub fn test_relay(app: AppHandle) -> Snapshot {
+    relay::run::test(&app);
+
+    // Read and not emitted, for the reason given on [`set_relay_active`].
+    lock(&app).snapshot()
+}
+
 /// Forgets the bot: the token leaves the keychain, the chat leaves the file.
 #[tauri::command]
 pub fn unpair_relay(app: AppHandle) -> Snapshot {

@@ -108,11 +108,12 @@ export type JournalEvent =
   | { readonly kind: 'panicked'; readonly work: Work }
   | { readonly kind: 'quit' }
   | { readonly kind: 'relayDisabled'; readonly reason: RelayStop }
-  | { readonly kind: 'relayEnabled' }
+  | { readonly kind: 'relayEnabled'; readonly surface: Surface }
   | { readonly kind: 'relayFailed'; readonly reason: RelayFailure }
   | { readonly kind: 'relayNoticeSent'; readonly case: NoticeCase }
   | { readonly kind: 'relayPaired' }
   | { readonly kind: 'relaySent'; readonly nickname: string }
+  | { readonly kind: 'relayTestSent' }
   | { readonly kind: 'relayUnpaired' }
   | { readonly kind: 'reset' }
   | { readonly kind: 'roster'; readonly change: RosterChange }

@@ -16,6 +16,8 @@ use std::collections::HashMap;
 use std::sync::Mutex;
 use std::sync::MutexGuard;
 use std::sync::PoisonError;
+use std::time::Duration;
+use std::time::Instant;
 
 use tauri::AppHandle;
 use tauri::Manager;
@@ -41,6 +43,8 @@ use crate::app::view::ShortcutAction;
 use crate::app::view::ShortcutStatus;
 use crate::app::view::ShortcutView;
 use crate::app::view::Snapshot;
+use crate::app::view::SwitchView;
+use crate::app::view::TestView;
 use crate::app::view::UpdateView;
 use crate::config::ConfigError;
 use crate::config::ConfigStore;
@@ -59,6 +63,11 @@ pub type AppState = Mutex<Multifus>;
 
 /// The notification watcher, which needs `&mut self` to start and stop.
 pub type WatcherState = Mutex<PlatformNotificationWatcher>;
+
+/// Which click a relay start belongs to. An identity and not a flag: a start
+/// that was cancelled must not pass on the claim a later click took out.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct StartId(u64);
 
 /// Everything multifus knows while it runs.
 #[derive(Debug)]
@@ -101,9 +110,21 @@ pub struct Multifus {
     /// Whether a pairing is in flight and how the last one ended, see
     /// [`crate::app::relay::pairing`]. Never persisted: it describes a click.
     pairing: PairingView,
+    /// Where the last test message got to. Never persisted, for the same reason
+    /// as `pairing`: it describes a click.
+    test: TestView,
+    /// When a test message last reached the telephone, which is what the delay
+    /// between two of them is counted from. See [`crate::app::relay::run`].
+    last_test: Option<Instant>,
     /// The relay is carrying messages. The twin of `listening`: what runs lives
     /// in [`crate::app::relay::run`], this is what the screens draw.
     relay_active: bool,
+    /// The start in flight and the click that owns it, see [`StartId`].
+    relay_start: Option<StartId>,
+    /// What the switch has to say beyond on or off. Never persisted.
+    switch: SwitchView,
+    /// The last identity handed out, so no two starts ever share one.
+    last_start: u64,
     /// What this machine's screen saver is set to, read once at startup.
     screen_saver: ScreenSaverView,
     journal: Journal,
@@ -190,7 +211,12 @@ impl Multifus {
             problem,
             update: UpdateView::Checking,
             pairing: PairingView::Idle,
+            test: TestView::Idle,
+            last_test: None,
             relay_active: false,
+            relay_start: None,
+            switch: SwitchView::Idle,
+            last_start: 0,
             screen_saver,
             journal,
         }
@@ -248,8 +274,11 @@ impl Multifus {
                 paired: self.settings.relay.chat_id.is_some(),
                 send_body: self.settings.relay.send_body,
                 active: self.relay_active,
+                ready: self.is_relay_ready(),
                 screen_saver: self.screen_saver,
                 pairing: self.pairing.clone(),
+                switch: self.switch.clone(),
+                test: self.test.clone(),
             },
             journal: self.journal.entries(),
         }
@@ -583,6 +612,10 @@ impl Multifus {
     pub fn reset(&mut self) {
         self.settings = Settings::default();
         self.windows.clear();
+        // The chat goes with the settings, so what the test said about it and
+        // the delay it started go too. Same reason as [`Multifus::set_unpaired`].
+        self.test = TestView::Idle;
+        self.last_test = None;
         self.log(JournalEvent::Reset);
         self.save();
     }
@@ -666,15 +699,52 @@ impl Multifus {
         self.settings.roster.has_relayed_online()
     }
 
-    /// The relay is on. Two methods and not one taking a boolean, since only the
-    /// stopping carries a reason.
-    pub fn enable_relay(&mut self) -> bool {
+    /// Claims the start, `None` when the relay is already on or already
+    /// starting. The one place that decides a second click does nothing.
+    pub fn begin_relay_start(&mut self) -> Option<StartId> {
+        if self.relay_active || self.relay_start.is_some() {
+            return None;
+        }
+
+        self.last_start += 1;
+        self.relay_start = Some(StartId(self.last_start));
+        self.switch = SwitchView::Starting;
+
+        self.relay_start
+    }
+
+    /// Whether this start, and not a later one, is the one still wanted. `false`
+    /// once a stop has come in, which is how a switch moved off mid-dialog wins.
+    pub fn is_relay_starting(&self, start: StartId) -> bool {
+        self.relay_start == Some(start)
+    }
+
+    /// Whether any start is in flight, for the rules that have to see one coming.
+    #[must_use]
+    pub fn has_relay_start(&self) -> bool {
+        self.relay_start.is_some()
+    }
+
+    /// Lets go of this start and leaves what it has to say on screen. Does
+    /// nothing when a later start has taken the claim since.
+    pub fn end_relay_start(&mut self, start: StartId, outcome: SwitchView) {
+        if self.relay_start != Some(start) {
+            return;
+        }
+
+        self.relay_start = None;
+        self.switch = outcome;
+    }
+
+    /// The relay is on. Two methods and not one taking a boolean, since the two
+    /// do not carry the same thing: a door here, a reason there.
+    pub fn enable_relay(&mut self, surface: Surface) -> bool {
         if self.relay_active {
             return false;
         }
 
         self.relay_active = true;
-        self.log(JournalEvent::RelayEnabled);
+        self.log(JournalEvent::RelayEnabled { surface });
 
         true
     }
@@ -691,9 +761,41 @@ impl Multifus {
         true
     }
 
+    /// A stop arrived, so a start still reading the keychain is no longer
+    /// wanted. Called on every stop, including one that finds nothing running.
+    pub fn cancel_relay_start(&mut self) {
+        self.relay_start = None;
+        // A stop wipes what a start had to say: the card is about to draw « à
+        // l'arrêt », and a failure nobody is waiting on would sit under it.
+        self.switch = SwitchView::Idle;
+    }
+
     /// Takes in where the pairing got to. See [`crate::app::relay::pairing`].
     pub fn set_pairing(&mut self, pairing: PairingView) {
         self.pairing = pairing;
+    }
+
+    /// Takes in where the test message got to. See [`crate::app::relay::run`].
+    pub fn set_test(&mut self, test: TestView) {
+        self.test = test;
+    }
+
+    /// Where the test message got to, for the one caller that has to know
+    /// whether another may be asked for.
+    pub fn test_view(&self) -> &TestView {
+        &self.test
+    }
+
+    /// A test message just reached the telephone, which starts the delay.
+    pub fn mark_test_sent(&mut self) {
+        self.last_test = Some(Instant::now());
+    }
+
+    /// How long ago a test last reached the telephone, `None` when none ever
+    /// did. Counted from the arrival and not from the click, so a test that
+    /// failed can be tried again straight away: nothing was sent to spam.
+    pub fn since_last_test(&self) -> Option<Duration> {
+        self.last_test.map(|at| at.elapsed())
     }
 
     /// The pairing went through: the chat is known and the token is put away.
@@ -703,6 +805,10 @@ impl Multifus {
     pub fn set_paired(&mut self, chat_id: i64) {
         self.settings.relay.chat_id = Some(chat_id);
         self.pairing = PairingView::Idle;
+        // Cleared here too, and not only on the unlinking: an essai still in
+        // flight when the last bot was forgotten lands after it.
+        self.test = TestView::Idle;
+        self.last_test = None;
 
         self.log(JournalEvent::RelayPaired);
         self.save();
@@ -712,6 +818,11 @@ impl Multifus {
     pub fn set_unpaired(&mut self) {
         self.settings.relay.chat_id = None;
         self.pairing = PairingView::Idle;
+        // The test and its delay belonged to the bot being forgotten. Kept, they
+        // would greet the next one with « Message d'essai parti », or refuse its
+        // first essai for a message it never received.
+        self.test = TestView::Idle;
+        self.last_test = None;
 
         self.log(JournalEvent::RelayUnpaired);
         self.save();
@@ -1119,6 +1230,8 @@ pub fn lock(app: &AppHandle) -> MutexGuard<'_, Multifus> {
 mod tests {
     use tempfile::TempDir;
 
+    use crate::app::journal::RelayFailure;
+
     use super::*;
 
     /// A multifus with nothing on disk, writing into a directory that dies with
@@ -1522,6 +1635,31 @@ mod tests {
     }
 
     #[test]
+    fn a_test_message_does_not_outlive_the_bot_it_proved() {
+        // Kept, it would greet the next bot with « Message d'essai parti », which
+        // is the false reassurance the panel exists to remove.
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.set_paired(42);
+        state.set_test(TestView::Sent);
+
+        state.set_unpaired();
+
+        assert_eq!(state.snapshot().relay.test, TestView::Idle);
+
+        // The essai that was in flight when the bot was forgotten, landing late.
+        state.set_test(TestView::Sent);
+        state.set_paired(43);
+
+        assert_eq!(state.snapshot().relay.test, TestView::Idle);
+
+        state.set_test(TestView::Sent);
+        state.reset();
+
+        assert_eq!(state.snapshot().relay.test, TestView::Idle);
+    }
+
+    #[test]
     fn an_asleep_character_is_still_relayed_and_an_unticked_one_is_not() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
@@ -1532,7 +1670,7 @@ mod tests {
 
         assert!(!state.relays("Alpha"), "the relay is not switched on");
 
-        state.enable_relay();
+        state.enable_relay(Surface::Tray);
 
         assert!(state.relays("Alpha"), "the veille does not silence anybody");
         assert!(!state.relays("Bravo"));
@@ -1544,20 +1682,60 @@ mod tests {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
 
-        assert!(state.enable_relay());
-        assert!(!state.enable_relay(), "already on, nothing to write");
+        assert!(state.enable_relay(Surface::Window));
+        assert!(
+            !state.enable_relay(Surface::Tray),
+            "already on, nothing to write"
+        );
         assert!(state.disable_relay(RelayStop::Shortcut));
         assert!(!state.disable_relay(RelayStop::Tray), "already off");
 
         let written = journalled(&state);
 
-        assert!(written.contains(&JournalEvent::RelayEnabled), "{written:?}");
+        assert!(
+            written.contains(&JournalEvent::RelayEnabled {
+                surface: Surface::Window
+            }),
+            "{written:?}"
+        );
         assert!(
             written.contains(&JournalEvent::RelayDisabled {
                 reason: RelayStop::Shortcut
             }),
             "{written:?}"
         );
+    }
+
+    #[test]
+    fn a_cancelled_start_never_rides_a_later_click_s_claim() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        let first = state.begin_relay_start().expect("nothing was starting");
+
+        assert!(state.begin_relay_start().is_none(), "one start at a time");
+
+        state.cancel_relay_start();
+
+        let second = state.begin_relay_start().expect("the claim was let go");
+
+        assert!(!state.is_relay_starting(first));
+        assert!(state.is_relay_starting(second));
+
+        // The cancelled start finishing must leave nothing behind on the claim
+        // of the click that replaced it, its screen state included.
+        state.end_relay_start(
+            first,
+            SwitchView::Failed {
+                reason: RelayFailure::Keychain {
+                    detail: "refusé".to_owned(),
+                },
+            },
+        );
+
+        assert!(state.is_relay_starting(second));
+        assert!(state.has_relay_start(), "the stop_if_unready rule sees it");
+        assert_eq!(state.snapshot().relay.switch, SwitchView::Starting);
     }
 
     #[test]

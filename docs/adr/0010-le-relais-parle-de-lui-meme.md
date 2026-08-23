@@ -24,7 +24,7 @@ Un avis ne fait pas partie de ces sept. Ce n'est pas une notification de jeu, c'
 
 ## Décision
 
-Le relais envoie un **avis** quand il cesse d'entendre. Deux cas seulement, et rien d'autre :
+Le relais envoie un **avis** quand il cesse d'entendre. Deux cas, auxquels s'est ajoutée depuis la bascule de l'interrupteur, voir plus bas :
 
 ```
 multifus
@@ -50,7 +50,9 @@ Deux messages séparés diraient deux fois la même chose dans le cas dominant, 
 
 **« Une fois par événement » se lit sur le front et jamais sur l'état.** Un personnage qui se reconnecte puis retombe produit deux avis, un par déconnexion, et c'est juste : le téléphone doit refléter chaque fait. Ce qui est interdit est de répéter l'avis à chaque tour de balayage tant qu'il reste hors ligne. Accrocher l'avis à la transition que `apply_windows` calcule déjà donne les deux propriétés sans mémoire supplémentaire.
 
-**L'activation est un troisième déclencheur.** Le relais allumé alors qu'aucun personnage relayé n'est connecté n'écoute rien, et aucune transition ne se produira jamais pour le dire. L'avis collectif part donc tout de suite, pendant que le téléphone est encore dans la main. Sans ça, l'utilisateur part avec un relais armé et sourd, ce qui est très exactement la panne que cette décision existe pour empêcher.
+**L'activation est un troisième déclencheur.** Le relais allumé alors qu'aucun personnage relayé n'est connecté n'écoute rien, et aucune transition ne se produira jamais pour le dire. L'avertissement part donc tout de suite, pendant que le téléphone est encore dans la main. Sans ça, l'utilisateur part avec un relais armé et sourd, ce qui est très exactement la panne que cette décision existe pour empêcher.
+
+**Mais il voyage dans la confirmation d'activation et jamais seul, ce qui n'était pas le cas au départ.** Envoyé seul, ce téléphone qui affichait « Plus aucun personnage relayé n'est connecté » à la seconde où l'on active se lisait comme une panne, et non comme un relais qui vient de démarrer. Toute bascule de l'interrupteur écrit donc maintenant sur le téléphone, « Relais activé » ou « Relais désactivé », et l'avertissement est la seconde ligne de la première. La confirmation est ce que l'utilisateur attend en tenant son téléphone ; l'avertissement est ce qu'il doit lire ensuite.
 
 **Le relais ne s'arrête pas pour autant.** Seul un des quatre raccourcis le coupe, et un relais qui s'arrêterait tout seul serait le minuteur que le plan refuse. L'écran tenu éveillé, lui, tombe : il n'a plus rien à garder lisible, voir CONTEXT.md.
 
@@ -68,4 +70,4 @@ La détection est déjà écrite. Le balayage tourne toutes les trois secondes, 
 
 Un avis au retour, du type « je réentends ». Il doublerait le trafic pour dire ce que le premier avis a déjà rendu inutile : une fois qu'on sait qu'on est déconnecté, on rentre.
 
-Un avis pour chaque changement d'état de multifus. Deux cas, et la liste ne s'allonge pas sans un besoin constaté, exactement comme pour les sept types.
+Un avis pour chaque changement d'état de multifus. La liste ne s'allonge pas sans un besoin constaté, exactement comme pour les sept types. La bascule de l'interrupteur est le seul besoin qui se soit présenté, et il était réel : l'avertissement du troisième déclencheur, envoyé seul, se lisait comme une panne. Tout le reste, l'appariement, le déliement, la remise à zéro, se dit dans la fenêtre et pas sur le téléphone.

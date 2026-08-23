@@ -30,11 +30,9 @@ use crate::app::state::lock;
 use crate::app::view::PairingProblem;
 use crate::app::view::PairingView;
 
-/// What the bot writes once the pairing has gone through.
-///
-/// French on this side, like the menu of the system tray and for the same
-/// reason: a Telegram message is a surface React cannot draw.
-const TEST_MESSAGE: &str = "multifus\nLe relais est connecté.";
+/// What the bot writes once the pairing has gone through. Never an « essai »,
+/// which CONTEXT.md gives to the message the Relais screen asks for.
+const PAIRED_MESSAGE: &str = "multifus\nLe relais est connecté.";
 
 /// Pairs the relay with the bot whose token this is.
 ///
@@ -108,7 +106,7 @@ async fn attempt(token: BotToken) -> Result<i64, PairingProblem> {
 
     let client = telegram::client().map_err(PairingProblem::from)?;
 
-    telegram::send(&client, &token, chat_id, TEST_MESSAGE)
+    telegram::send(&client, &token, chat_id, PAIRED_MESSAGE)
         .await
         .map_err(PairingProblem::from)?;
 

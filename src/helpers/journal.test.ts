@@ -7,7 +7,7 @@ import type {
   ShortcutOutcome,
   TrayOutcome
 } from '@/@types/journal'
-import type { RelayFailure } from '@/@types/relay'
+import type { NoticeCase, RelayFailure } from '@/@types/relay'
 import type { ShortcutBinding } from '@/@types/shortcuts'
 import type { Snapshot } from '@/@types/snapshot'
 import {
@@ -497,6 +497,34 @@ const RELAY_FAILURE_CASES = {
   readonly Case<'relayFailed'>[]
 >
 
+/** Every avis of ADR 0010, keyed so a sixth one fails to compile here. */
+const NOTICE_CASES = {
+  enabled: [
+    {
+      event: { kind: 'relayNoticeSent', case: 'enabled' },
+      line: NOTICE_LINES.enabled
+    }
+  ],
+  disabled: [
+    {
+      event: { kind: 'relayNoticeSent', case: 'disabled' },
+      line: NOTICE_LINES.disabled
+    }
+  ],
+  disconnected: [
+    {
+      event: { kind: 'relayNoticeSent', case: 'disconnected' },
+      line: NOTICE_LINES.disconnected
+    }
+  ],
+  both: [
+    {
+      event: { kind: 'relayNoticeSent', case: 'both' },
+      line: NOTICE_LINES.both
+    }
+  ]
+} as const satisfies Record<NoticeCase, readonly Case<'relayNoticeSent'>[]>
+
 const JOURNAL_CASES = {
   started: [
     {
@@ -714,7 +742,17 @@ const JOURNAL_CASES = {
     { event: { kind: 'relayUnpaired' }, line: PLAIN_LINES.relayUnpaired }
   ],
   relayEnabled: [
-    { event: { kind: 'relayEnabled' }, line: PLAIN_LINES.relayEnabled }
+    {
+      event: { kind: 'relayEnabled', surface: 'tray' },
+      line: 'Relais activé depuis la barre système.'
+    },
+    {
+      event: { kind: 'relayEnabled', surface: 'window' },
+      line: 'Relais activé depuis la fenêtre.'
+    }
+  ],
+  relayTestSent: [
+    { event: { kind: 'relayTestSent' }, line: PLAIN_LINES.relayTestSent }
   ],
   relayDisabled: [
     {
@@ -724,6 +762,10 @@ const JOURNAL_CASES = {
     {
       event: { kind: 'relayDisabled', reason: 'tray' },
       line: RELAY_STOP_LINES.tray
+    },
+    {
+      event: { kind: 'relayDisabled', reason: 'window' },
+      line: RELAY_STOP_LINES.window
     },
     {
       event: { kind: 'relayDisabled', reason: 'noRelayedCharacter' },
@@ -741,20 +783,7 @@ const JOURNAL_CASES = {
       line: 'Alpha : message privé relayé sur le téléphone.'
     }
   ],
-  relayNoticeSent: [
-    {
-      event: { kind: 'relayNoticeSent', case: 'disconnected' },
-      line: NOTICE_LINES.disconnected
-    },
-    {
-      event: { kind: 'relayNoticeSent', case: 'nobodyLeft' },
-      line: NOTICE_LINES.nobodyLeft
-    },
-    {
-      event: { kind: 'relayNoticeSent', case: 'both' },
-      line: NOTICE_LINES.both
-    }
-  ],
+  relayNoticeSent: Object.values(NOTICE_CASES).flat(),
   displayAwake: [
     {
       event: { kind: 'displayAwake', held: true },
@@ -812,8 +841,11 @@ const SNAPSHOT = {
     paired: false,
     sendBody: false,
     active: false,
+    ready: false,
     screenSaver: { kind: 'never' },
-    pairing: { kind: 'idle' }
+    pairing: { kind: 'idle' },
+    switch: { kind: 'idle' },
+    test: { kind: 'idle' }
   },
   journal: [
     { id: 1, at: MORNING, event: { kind: 'listening' } },

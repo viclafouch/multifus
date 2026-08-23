@@ -6,21 +6,21 @@ import { Button } from '@/components/ui/button'
 import { strings } from '@/constants/strings'
 import { unpairRelay } from '@/lib/multifus'
 
-type PairedPanelProps = Readonly<{
+type BotPanelProps = Readonly<{
   isWorking: boolean
   run: (action: Promise<Snapshot>) => void
 }>
 
 /**
- * What is left once the pairing has gone through: a state and one button.
- * No field: multifus never reads the token back out, see ADR 0009.
+ * The bot, second card and under the switch. No field, the token never comes
+ * back out and there could not be one, see ADR 0009.
  */
-export const PairedPanel = ({ isWorking, run }: PairedPanelProps) => {
+export const BotPanel = ({ isWorking, run }: BotPanelProps) => {
   return (
     <Panel className="mb-3">
       <SectionRow
-        title={strings.relay.pairedTitle}
-        description={strings.relay.pairedBody}
+        title={strings.relay.botTitle}
+        description={strings.relay.botBody}
       >
         <Button
           variant="secondary"

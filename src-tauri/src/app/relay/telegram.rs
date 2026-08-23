@@ -203,9 +203,7 @@ mod tests {
     fn a_refused_token_is_told_apart_by_the_envelope_and_not_by_the_status() {
         // Measured, and in the plan: an invalid token is a 401, one without a
         // colon is a 404. Both answer with this shape.
-        let answer = updates_of(
-            r#"{"ok":false,"error_code":401,"description":"Unauthorized"}"#,
-        );
+        let answer = updates_of(r#"{"ok":false,"error_code":401,"description":"Unauthorized"}"#);
 
         assert!(!answer.ok);
         assert!(answer.result.is_none());
