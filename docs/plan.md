@@ -91,17 +91,50 @@ finit malgré tout en erreur, et c'est attendu, voir « Ce qui mord ».
 
 **`platform::windows` n'aura aucun test unitaire, comme `platform::macos`.** Tout y parle au système. Ce qui se teste est dans `domain`, et c'est déjà fait.
 
-### Ce qui se mesure avant d'écrire une ligne
+### Ce qui a été mesuré, et ce que ça tranche
 
-Un binaire jetable, une heure, trois questions. La première peut condamner toute la moitié notification de l'étape, donc elle passe avant le reste.
+Fait le 23 août 2026, avec un binaire jetable, sur ce PC et un vrai client. Les
+trois questions sont fermées et une quatrième réponse est venue avec, celle qui
+choisit la route du lot B. La moitié notification n'est plus un pari.
 
-**1. `UserNotificationListener` répond-il à un exécutable Rust non empaqueté ?** La documentation Microsoft ne parle que de `Package.appxmanifest` et de la capacité « User Notification Listener », ce qui se lit comme une identité de paquet MSIX obligatoire. Tauri livre un exécutable non empaqueté, NSIS ou MSI, jamais MSIX. Mais deux outils du même domaine s'en servent depuis un exécutable ordinaire : Dracoon, un `.exe` PyInstaller qui appelle `winsdk.windows.ui.notifications.management`, et `Madgique/dofus-multi-organizer`, en C# WinUI 3. La réponse attendue est donc oui, et il faut la voir en Rust avant de bâtir dessus. `GetAccessStatus` doit rendre autre chose que `Denied` après un `RequestAccessAsync` accepté.
+**1. Le listener sert un exécutable non empaqueté, et ne demande rien.**
+`UserNotificationListener::Current()` rend un listener depuis un `.exe` Rust nu,
+sans identité de paquet, et `GetAccessStatus` rend `Allowed` **avant même**
+`RequestAccessAsync` : aucune boîte ne sort. Le « paquet fin » est écarté, il n'y
+a plus de sortie de secours à prévoir. `request_authorization` reste sur
+l'interface pour macOS, et se contente ici de rendre ce que le système dit déjà.
 
-Si la réponse est non, la sortie de secours est le « paquet fin », officiellement l'empaquetage avec emplacement externe : un paquet d'identité signé, enregistré à côté de l'installateur existant, qui laisse les binaires où ils sont. Il coûte une signature de plus et un enregistrement au premier lancement. Ne pas partir là-dessus avant d'avoir mesuré.
+**2. `NotificationChanged` n'existe pas de ce côté, et le sondage n'est plus un
+repli mais la route.** L'abonnement lui-même échoue, `HRESULT 0x80070490`
+« Élément introuvable », et pas l'événement qui resterait muet : il n'y a rien à
+attendre ni à déboguer. C'est le prix de l'exécutable non empaqueté, et la mesure
+1 dit que c'est le seul. `start` part donc directement sur
+`GetNotificationsAsync(NotificationKinds::Toast)`, sans écrire les deux routes.
 
-**2. À quoi ressemble un vrai toast de Dofus Retro ?** Il faut le premier élément de texte, qui doit satisfaire `TITLE_PATTERN`, et les suivants, qui forment le corps que `classify` lit. Poster un vrai message privé et recopier ce que le listener rend.
+**3. Un toast de Dofus est exactement ce que `GameNotification::new` attend.**
+Mesuré sur un vrai message privé :
 
-**3. Quel est le nom de l'exécutable d'un client Dofus Retro ?** C'est ce sur quoi `game_windows` filtre, et le pendant exact du bundle `com.dofus.d1elauncher` de macOS. `GetWindowThreadProcessId` puis `QueryFullProcessImageNameW` sur une fenêtre de client, et lire.
+| Ce que rend le listener | Valeur                                |
+| ----------------------- | ------------------------------------- |
+| `AppUserModelId`        | `com.dofus.d1elauncher`               |
+| `texte[0]`              | `Dj-blop-[ART] - Dofus Retro v1.49.0` |
+| `texte[1]`              | `de Trusted-sheriff-[ART] : test`     |
+
+`TITLE_PATTERN` mord sur `texte[0]` et rend le pseudo, le `^de ` de
+`NOTIF_TYPES` mord sur `texte[1]` et rend `PrivateMessage`. Le corps arrive
+entier, ce qui ferme la ligne « corps complet » de [perimetre.md](./perimetre.md)
+sur les deux systèmes. L'`AppUserModelId` est le bundle de macOS au caractère
+près : le filtre reste inutile pour la raison écrite au lot B, il est seulement
+devenu gratuit si le besoin apparaissait.
+
+Deux toasts d'identifiants distincts sont sortis pour un même texte, ce qui rend
+la dédup par `UserNotification::Id` obligatoire et non prudente.
+
+**4. L'exécutable du client est `Dofus Retro.exe`**, sous
+`%LOCALAPPDATA%\Ankama\Retro\`. C'est le nom de fichier qui sert de filtre et
+jamais le chemin, que l'installation déplace. Un client rend une fenêtre et une
+seule, comme un processus rend un client sur macOS. Le titre est en `v1.49.0` et
+`TITLE_PATTERN`, écrit contre `v1.48.21`, mord sans retouche.
 
 ### Lot A — Les fenêtres
 
@@ -110,6 +143,8 @@ Si la réponse est non, la sortie de secours est le « paquet fin », officielle
 `authorization` et `request_authorization` rendent `Granted` sans rien demander : lire un titre et changer le focus ne demande aucune autorisation ici. Les deux méthodes restent sur l'interface parce que macOS en a besoin.
 
 `game_windows` passe par `EnumWindows`, et pour chaque fenêtre : `IsWindowVisible`, puis `GetWindowThreadProcessId` pour le pid, puis `OpenProcess` en `PROCESS_QUERY_LIMITED_INFORMATION` et `QueryFullProcessImageNameW` pour le nom de l'exécutable, puis `GetWindowTextW` dimensionné par `GetWindowTextLengthW`. `foreground_game_window` fait le même filtre sur la seule fenêtre que rend `GetForegroundWindow`, sans balayage. `is_minimized` est `IsIconic`, une ligne.
+
+Ce chemin est déjà écrit et mesuré, mesure 4 : il rend `Dofus Retro.exe` et une fenêtre unique par client. **Comparer le nom de fichier et jamais le chemin**, que l'installation déplace, et sans tenir compte de la casse.
 
 **Filtrer sur le processus et pas sur le seul titre, et c'est un bug déjà vu.** `EnumWindows` balaie tout le bureau, et un onglet de navigateur intitulé `Quelque chose - Dofus Retro` satisfait la regex : le navigateur entre alors dans le roster comme un personnage et se fait ramener au premier plan. C'est arrivé. macOS n'a jamais eu ce trou parce que `dofus_applications` n'énumère que les processus du bundle `com.dofus.d1elauncher`, et Windows doit faire pareil. Le titre reste ce qui donne le pseudo, il cesse d'être ce qui donne le droit d'entrer.
 
@@ -137,21 +172,21 @@ Le détachement part quelle que soit l'issue, sinon multifus laisse derrière lu
 
 ### Lot B — Les notifications
 
-`UserNotificationWatcher`, la moitié risquée, et celle que la mesure 1 débloque.
+`UserNotificationWatcher`. C'était la moitié risquée, les mesures l'ont débloquée : le listener répond, la route est le sondage, et un toast de Dofus se lit sans une ligne de plus que ce que `domain` sait déjà faire.
 
 **Le fil du listener est en STA, et c'est le piège qui a coûté cher à Dracoon.** `UserNotificationListener` échoue en silence ou rend une erreur COM quand le fil qui l'utilise n'est pas dans un apartment mono-filaire. Donc `CoInitializeEx(None, COINIT_APARTMENTTHREADED)` en tête du fil du watcher, et tout le travail du listener sur ce fil-là. C'est déjà la forme que `platform::notification` attend, chaque implémentation gardant son fil et sa boucle pour elle.
 
-`authorization` lit `GetAccessStatus`, `request_authorization` attend `RequestAccessAsync` sur place. Les trois valeurs du système se réduisent à deux : `Allowed` devient `Granted`, `Denied` et `Unspecified` deviennent `Denied`. Ils ne se réparent pourtant pas de la même façon, `Denied` ne pouvant plus être redemandé et `Unspecified` remontant la boîte au prochain appel, donc c'est le détail du journal qui les sépare et non le type. La documentation demande le fil d'interface pour `RequestAccessAsync` ; un exécutable non empaqueté n'en a pas au sens WinRT, et Dracoon appelle depuis un fil ordinaire. À voir avec la mesure 1.
+`authorization` lit `GetAccessStatus`, `request_authorization` attend `RequestAccessAsync` sur place. Les trois valeurs du système se réduisent à deux : `Allowed` devient `Granted`, `Denied` et `Unspecified` deviennent `Denied`. Ils ne se réparent pourtant pas de la même façon, `Denied` ne pouvant plus être redemandé et `Unspecified` remontant la boîte au prochain appel, donc c'est le détail du journal qui les sépare et non le type. La documentation demande le fil d'interface pour `RequestAccessAsync` ; la mesure 1 l'a appelé depuis un fil ordinaire, sans boîte et sans erreur, l'accès étant déjà accordé.
 
-`start` a deux routes, et la mesure tranche. L'événement `NotificationChanged` est ce que la documentation propose, et `platform::notification` avait anticipé qu'il puisse ne pas tirer. S'il ne tire pas, le repli est le sondage de `GetNotificationsAsync(NotificationKinds::Toast)` à l'intervalle du balayage, avec `UserNotification::Id` comme clé de dédoublonnage dans un ensemble qui suit ce que la plateforme tient encore, sans quoi il grossit toute la soirée. Le repli reste **interne au watcher** : le cœur ne voit qu'un sink qui pousse, et ce module l'a écrit dès l'étape 3.
+`start` sonde, et n'écrit pas la seconde route. `NotificationChanged` refuse l'abonnement de ce côté, mesure 2, donc `GetNotificationsAsync(NotificationKinds::Toast)` à l'intervalle du balayage, avec `UserNotification::Id` comme clé de dédoublonnage dans un ensemble qui suit ce que la plateforme tient encore, sans quoi il grossit toute la soirée. Le sondage reste **interne au watcher** : le cœur ne voit qu'un sink qui pousse, et ce module l'a écrit dès l'étape 3.
 
-Lire un toast, c'est `Notification().Visual().GetBinding(KnownNotificationBindings::ToastGeneric())` puis `GetTextElements()` : le premier élément est le titre, les suivants forment le corps joints par un saut de ligne. C'est exactement le couple que `GameNotification::new` attend.
+Lire un toast, c'est `Notification().Visual().GetBinding(KnownNotificationBindings::ToastGeneric())` puis `GetTextElements()` : le premier élément est le titre, les suivants forment le corps joints par un saut de ligne. C'est exactement le couple que `GameNotification::new` attend, et la mesure 3 l'a vu sur un vrai message privé.
 
-**Aucun filtre sur l'application qui a émis, comme sur macOS.** `AppInfo.AppUserModelId` est disponible et ne sert pas : le raisonnement de l'étape 11b-2 de [macos.md](./macos.md) vaut tel quel ici, un pseudo absent du roster n'est relayé par rien et seul `game_windows` crée un personnage. `NotificationReport::Unreadable` n'est jamais envoyé de ce côté, le listener rendant un toast structuré qui est là ou n'y est pas.
+**Aucun filtre sur l'application qui a émis, comme sur macOS.** `AppInfo.AppUserModelId` vaut `com.dofus.d1elauncher`, le bundle de macOS au caractère près, et ne sert pas : le raisonnement de l'étape 11b-2 de [macos.md](./macos.md) vaut tel quel ici, un pseudo absent du roster n'est relayé par rien et seul `game_windows` crée un personnage. `NotificationReport::Unreadable` n'est jamais envoyé de ce côté, le listener rendant un toast structuré qui est là ou n'y est pas.
 
-`dismiss` est `RemoveNotification(id)`, donc le watcher garde une table pseudo vers identifiants, alimentée à chaque toast lu et purgée à chaque suppression. **Jamais `ClearNotifications`**, qui efface les notifications de toutes les applications, y compris celles que multifus n'a jamais lues. `stop` détache l'événement et arrête le fil, et `Drop` fait la même chose.
+`dismiss` est `RemoveNotification(id)`, donc le watcher garde une table pseudo vers identifiants, alimentée à chaque toast lu et purgée à chaque suppression. **Jamais `ClearNotifications`**, qui efface les notifications de toutes les applications, y compris celles que multifus n'a jamais lues. `stop` arrête le fil du sondage, et `Drop` fait la même chose.
 
-**Ce que l'utilisateur doit régler, et ce n'est pas ce que macOS demande.** Trois réglages, dont un seul est commun. Dans le jeu, « Background Notifications » doit être activé dans les options générales : un client qui n'émet rien rend le listener muet, et c'est la panne numéro un de tous les outils qui font ça. Dans le système, l'accès aux notifications doit être accordé à multifus. En revanche, et c'est l'inverse exact de macOS, **la bannière peut rester coupée** : l'écoute passe par une API et non par ce que l'écran dessine, donc le style et le son du toast de Dofus n'ont aucune importance. La contrainte de l'ADR 0002 ne se transporte pas, elle est propre à macOS.
+**Ce que l'utilisateur doit régler, et ce n'est pas ce que macOS demande.** Dans le jeu, « Background Notifications » doit être activé dans les options générales : un client qui n'émet rien rend le listener muet, et c'est la panne numéro un de tous les outils qui font ça. Côté système il n'y a rien à demander, la mesure 1 ayant trouvé l'accès déjà accordé ; l'écran des autorisations garde quand même le cas refusé, que l'utilisateur peut couper à la main. En revanche, et c'est l'inverse exact de macOS, **la bannière peut rester coupée** : l'écoute passe par une API et non par ce que l'écran dessine, donc le style et le son du toast de Dofus n'ont aucune importance. La contrainte de l'ADR 0002 ne se transporte pas, elle est propre à macOS.
 
 **Une bannière coupée n'est pas une bannière absente, et ce n'est pas mesuré.** Dracoon relève que Windows ne masque pas une bannière désactivée mais la rend à 100 % de transparence, et qu'un focus posé pendant qu'elle est encore à l'écran ne prenait pas. Seconde main, non vérifié. Ne rien écrire contre ça tant que le symptôme n'apparaît pas.
 
@@ -219,7 +254,9 @@ windows = { version = "0.62", features = [
 | `CoInitializeEx`                                                                                                                                                                            | `Win32::System::Com`                                 |
 | `UserNotificationListener`, `KnownNotificationBindings`                                                                                                                                     | `UI::Notifications::Management`, `UI::Notifications` |
 
-Cette liste n'a jamais été compilée, aucune machine ici ne le pouvant. La corriger au premier `cargo build` fait partie du lot A.
+Le binaire des mesures a compilé toute cette liste sauf `Win32_System_Power` et `Win32_UI_Input_KeyboardAndMouse`, qu'aucune des trois questions n'appelait. Ce qui reste à corriger au premier `cargo build` est donc petit, et tient au lot A.
+
+**`IAsyncOperation::get()` n'existe pas, c'est `.join()`.** Méthode inhérente de `windows-future`, donc rien à ajouter aux dépendances ni à importer, mais tout exemple en circulation est écrit avec l'ancien nom.
 
 ### Vérification de l'étape
 
