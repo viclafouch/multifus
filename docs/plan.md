@@ -164,9 +164,11 @@ Le détachement part quelle que soit l'issue, sinon multifus laisse derrière lu
 
 **Le piège de Dracoon, à ne pas reproduire.** Il contourne la même restriction en injectant une vraie frappe Alt dans l'application active. C'est la cause probable du bug de focus intermittent corrigé dans son commit `0b0525c`, et ça envoie une touche parasite dans le jeu.
 
-**`WindowGone` se lit sur `IsWindow`**, et `is_minimized` comme `focus` doivent le rendre, `platform::window` promettant la même erreur aux deux. Windows réemploie les handles, donc `IsWindow` peut dire oui d'une fenêtre qui n'est plus celle qu'on croit. C'est le prix du `HWND` comme identité, il n'y a pas mieux, et le filtre sur l'exécutable rattrape le cas qui compte.
+**`WindowGone` se lit sur `IsWindow` et sur l'exécutable**, et `is_minimized` comme `focus` doivent le rendre, `platform::window` promettant la même erreur aux deux. Windows réemploie les handles, donc `IsWindow` peut dire oui d'une fenêtre qui n'est plus celle qu'on croit ; le filtre sur l'exécutable la rattrape, et les deux méthodes passent par le même `live_game_window`, comme macOS passe par `live_application`. Deux clients qui échangent leurs handles restent hors de portée, et c'est le prix du `HWND` comme identité.
 
 **Aucun saut vers le fil principal, contrairement à macOS.** Ces appels Win32 se font depuis n'importe quel fil, et `WindowManager` est `Send + Sync` justement parce que les rappels de raccourcis tournent sur des fils que multifus ne choisit pas. L'attache et le détachement partagent le fil appelant, ce qui est la seule contrainte.
+
+**Écrit, et pas encore vu à l'écran.** Les six méthodes ont un corps, le done-gate Rust passe, et `EnumWindows` rend `Ok(())` sur ce PC : il n'y a pas d'erreur fantôme à avaler, propager est juste.
 
 **Vérifié quand** : deux vrais clients, le roster qui les voit, les quatre raccourcis depuis le jeu, un clic sur un personnage dans la barre système, et une fenêtre réduite qui ressort.
 
@@ -228,33 +230,28 @@ Le renommage est déjà fait, pour que la structure vide ne promette plus l'appe
 
 ### Les dépendances
 
-`windows` 0.62 en dépendance directe, sous une cible pour qu'aucune machine macOS ne la compile. La crate n'expose que ce qu'on lui demande, un trait par chemin de module, le point remplacé par un tiret bas :
+`windows` 0.62 en dépendance directe, sous une cible pour qu'aucune machine macOS ne la compile. La crate n'expose que ce qu'on lui demande, un trait par chemin de module, le point remplacé par un tiret bas. **Les traits arrivent lot par lot**, pour que rien ne se compile avant d'être appelé ; le lot A a posé les siens :
 
 ```toml
-[target.'cfg(windows)'.dependencies]
+[target.'cfg(target_os = "windows")'.dependencies]
 windows = { version = "0.62", features = [
   "Win32_Foundation",
-  "Win32_System_Com",
-  "Win32_System_Power",
   "Win32_System_Threading",
-  "Win32_UI_Input_KeyboardAndMouse",
   "Win32_UI_WindowsAndMessaging",
-  "Foundation",
-  "UI_Notifications",
-  "UI_Notifications_Management",
 ] }
 ```
+
+Restent à poser `Win32_System_Com`, `Foundation`, `UI_Notifications` et `UI_Notifications_Management` au lot B, `Win32_System_Power` au lot C.
 
 | Appel                                                                                                                                                                                       | Module                                               |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
 | `EnumWindows`, `GetWindowTextW`, `IsWindow`, `IsWindowVisible`, `IsIconic`, `ShowWindow`, `SetForegroundWindow`, `GetForegroundWindow`, `GetWindowThreadProcessId`, `SystemParametersInfoW` | `Win32::UI::WindowsAndMessaging`                     |
-| `AttachThreadInput`                                                                                                                                                                         | `Win32::UI::Input::KeyboardAndMouse`                 |
-| `GetCurrentThreadId`, `OpenProcess`, `QueryFullProcessImageNameW`                                                                                                                           | `Win32::System::Threading`                           |
+| `AttachThreadInput`, `GetCurrentThreadId`, `OpenProcess`, `QueryFullProcessImageNameW`                                                                                                      | `Win32::System::Threading`                           |
 | `PowerCreateRequest`, `PowerSetRequest`, `PowerClearRequest`, `REASON_CONTEXT`                                                                                                              | `Win32::System::Power`                               |
 | `CoInitializeEx`                                                                                                                                                                            | `Win32::System::Com`                                 |
 | `UserNotificationListener`, `KnownNotificationBindings`                                                                                                                                     | `UI::Notifications::Management`, `UI::Notifications` |
 
-Le binaire des mesures a compilé toute cette liste sauf `Win32_System_Power` et `Win32_UI_Input_KeyboardAndMouse`, qu'aucune des trois questions n'appelait. Ce qui reste à corriger au premier `cargo build` est donc petit, et tient au lot A.
+**`AttachThreadInput` n'est pas où la documentation le range.** Il vit dans `Win32::System::Threading` et non dans `Win32::UI::Input::KeyboardAndMouse`, donc le trait `Win32_UI_Input_KeyboardAndMouse` ne sert à rien et n'est pas posé. Une version de ce tableau l'a rangé ailleurs, le lot A l'a corrigé au premier `cargo build`.
 
 **`IAsyncOperation::get()` n'existe pas, c'est `.join()`.** Méthode inhérente de `windows-future`, donc rien à ajouter aux dépendances ni à importer, mais tout exemple en circulation est écrit avec l'ancien nom.
 
