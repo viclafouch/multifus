@@ -59,9 +59,31 @@ Rien de tout ça n'est à réécrire.
 
 **Objectif.** La parité, sur la machine où l'application sert vraiment.
 
-Session à ouvrir sur le PC Windows, dépôt cloné. Prérequis : Microsoft C++ Build
-Tools avec la charge « Développement Desktop en C++ », puis
-`rustup default stable-msvc`. WebView2 est déjà présent sur un Windows 10 à jour.
+### La machine est prête, et il n'y a plus rien à installer
+
+Fait le 23 août 2026, sur le PC Windows 10 où les lots se joueront. Une session
+qui ouvre ce dépôt compile à la première commande, sans rien préparer.
+
+| Outil                     | Version                         |
+| ------------------------- | ------------------------------- |
+| Node                      | 24.19.0, ce que dit `.nvmrc`    |
+| Rust                      | 1.98.0                          |
+| Visual Studio Build Tools | 2026, charge « Desktop en C++ » |
+| WebView2                  | 151.0.4129.101, déjà présent    |
+
+`rustup default stable-msvc` n'a pas eu lieu d'être et cette ligne est retirée :
+`x86_64-pc-windows-msvc` est le toolchain par défaut ici, l'installeur l'ayant
+choisi seul.
+
+**Le done-gate passe de ce côté, en entier.** Les sept commandes de `checks.yml`
+jouées à la main : `lint`, `format:check` sur 116 fichiers, 179 tests
+JavaScript, `build`, `cargo fmt --check`, `cargo clippy --all-targets -- -D
+warnings`, 124 tests Rust. Aucun avertissement nulle part. Ce que ça prouve tient
+en une phrase : tout ce qui n'est pas `platform::windows` fonctionne déjà ici.
+
+**Le paquet aussi.** `npm run tauri build` sort le MSI et l'installateur NSIS,
+Tauri allant chercher WiX 3.14 et NSIS 3.11 de lui-même au premier passage. Il
+finit malgré tout en erreur, et c'est attendu, voir « Ce qui mord ».
 
 ## L'étape, en quatre lots
 
@@ -159,7 +181,7 @@ Le renommage est déjà fait, pour que la structure vide ne promette plus l'appe
 
 ### Lot D — La chaîne de compilation, le paquet et la barre système
 
-`checks.yml` et `release.yml` portent chacun un job unique. Ils en gagnent un second sur `windows-latest`, et un `ci` vert dit alors quelque chose de `platform::windows`, ce qu'il ne dit pas aujourd'hui.
+`checks.yml` et `release.yml` portent chacun un job unique. Ils en gagnent un second sur `windows-latest`, et un `ci` vert dit alors quelque chose de `platform::windows`, ce qu'il ne dit pas aujourd'hui. Le runner s'ajoute en confiance : les sept commandes du gate ont déjà été jouées à la main sur ce PC et passent, voir « La machine est prête ». Sans le `.gitattributes`, `format:check` aurait échoué sur ce runner pour une raison qui n'a rien à voir avec Windows.
 
 **L'image de barre système ne marche pas telle quelle.** `icons/tray.png` est un PNG noir pur dont la forme est portée par le seul canal alpha, posé avec `icon_as_template(true)` pour que macOS le recolore selon la barre. Windows ne recolore rien : le même fichier donne une icône noire sur une barre des tâches sombre, donc invisible. Il faut une seconde image, et `icon_as_template` ne vaut que sur macOS.
 
@@ -234,3 +256,9 @@ Une soirée de jeu sur le PC, deux vrais clients, sans jamais ouvrir la fenêtre
 **`tauri-plugin-log` écrit du `[INFO]` sur chaque ligne, et c'est voulu.** Le journal n'a pas de niveaux, il a des événements, et la gravité est une lecture que fait l'interface. Ne pas ajouter une table de gravité côté Rust pour rendre le fichier plus joli : ce serait une seconde source de vérité. Ne pas non plus passer par `.format()`, qui est écrasé par `.timezone_strategy()` appelé après lui.
 
 **oxfmt réécrit `tableau[tableau.length - 1]` en `tableau.at(-1)`**, que la `lib` TypeScript du projet n'a pas, donc le code ne compile plus après un `lint:fix`. Passer l'index par une variable. Constaté dans `journalPeriod`.
+
+**Un clone sous Windows arrive en CRLF, et oxfmt ne sait pas s'en accommoder.** `core.autocrlf` vaut `true` sur une installation Windows de git, qui réécrit alors tout le répertoire de travail : 115 fichiers sur 116 échouent `format:check` sur leurs seules fins de ligne, sans qu'une ligne de code soit en cause. Régler `endOfLine` ferait échouer l'autre système à la place, les seules valeurs étant `lf`, `crlf` et `cr`, et `"auto"` n'existe pas, voir [oxc#17856](https://github.com/oxc-project/oxc/issues/17856). C'est donc à git qu'on le dit, par un `.gitattributes` en `* text=auto eol=lf`. Les blobs étant déjà en LF, il ne modifie aucun fichier : il empêche seulement la conversion au checkout.
+
+**Un `tauri build` local finit en erreur ici, et le paquet est pourtant bon.** `createUpdaterArtifacts` étant à `true`, la dernière étape signe les artefacts de mise à jour et réclame `TAURI_SIGNING_PRIVATE_KEY`. La clé privée est sur le Mac, dans `~/.tauri/multifus.key`, et **ne se régénère pas**, voir plus haut. Le MSI et le NSIS sont écrits avant cette étape et existent malgré le code de sortie 1. Pour un build local complet de ce côté, recopier la clé depuis le Mac ; la CI, elle, la fournit en secret.
+
+**`crate-type` ne garde que `rlib`, et le Mac ne l'a pas encore compilé.** Le scaffolder Tauri pose `["staticlib", "cdylib", "rlib"]`, dont les deux premiers sont les points d'entrée d'iOS et d'Android ; le desktop ne lie que le troisième, par `main.rs`. Sous Windows le `cdylib` faisait annoncer son import library par `link.exe`, ce que la lint `linker_messages` remonte, et c'était le seul avertissement du projet. Le mobile étant refusé par [perimetre.md](./perimetre.md), ces deux types sont du poids mort et non une sécurité qu'on retire. **À confirmer par un `cargo build` sur le Mac**, seule machine à pouvoir le dire.
