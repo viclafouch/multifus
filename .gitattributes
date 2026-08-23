@@ -1,0 +1,9 @@
+# Le répertoire de travail est en LF sur les deux systèmes, quel que soit le
+# `core.autocrlf` de la machine. oxfmt ne sait vouloir qu'une fin de ligne et
+# `endOfLine: "auto"` n'existe pas, voir oxc-project/oxc#17856.
+* text=auto eol=lf
+
+# Les icônes du bundle, que l'heuristique de git n'a pas à deviner.
+*.png binary
+*.ico binary
+*.icns binary
