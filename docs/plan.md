@@ -1,35 +1,47 @@
-# Plan de développement, Windows
+# Plan de développement, les phrases
 
-**Ce document ne parle que d'une chose : faire tourner multifus sur Windows.**
-Tout le reste est fini et ne se retouche pas. Une session qui travaille ici
-n'ouvre pas un autre chantier, ne refactorise pas ce qui marche, et ne
-réorganise rien de `src`.
+**Ce document ne porte qu'un chantier à la fois, et c'est celui des phrases.**
+Une session qui travaille ici n'en ouvre pas un autre, ne refactorise pas ce qui
+marche, et ne réorganise rien de `src`.
 
-Le vocabulaire est dans [CONTEXT.md](../CONTEXT.md), ce que le projet refuse de
-faire dans [perimetre.md](./perimetre.md), les décisions structurantes dans
-[adr](./adr), les règles d'écriture du code dans [.claude/rules](../.claude/rules).
-Ce qui a été fait sur macOS et ce qui y mord est archivé dans
-[macos.md](./macos.md) : à relire quand un comportement surprend, jamais à
-reprendre.
+Il vise **macOS et Windows ensemble**. Les deux systèmes ont leur code écrit et
+leur parité tenue, donc une fonctionnalité neuve arrive des deux côtés dans le
+même chantier ou n'arrive pas.
+
+**La session qui écrit l'écran démarre `/frontend-design` avant sa première ligne
+d'interface.** C'est la règle de `CLAUDE.md`, elle vaut pour le temps 4 et pour
+toute retouche d'interface qui viendrait après.
+
+| Où lire quoi                              |                                   |
+| ----------------------------------------- | --------------------------------- |
+| Le vocabulaire                            | [CONTEXT.md](../CONTEXT.md)       |
+| Ce que le projet refuse de faire          | [perimetre.md](./perimetre.md)    |
+| Les décisions déjà tranchées              | [adr](./adr)                      |
+| Les pièges qui ne sont propres à personne | [pieges.md](./pieges.md)          |
+| macOS, fait et archivé                    | [macos.md](./macos.md)            |
+| Windows, fait et archivé                  | [windows.md](./windows.md)        |
+| Les règles d'écriture du code             | [.claude/rules](../.claude/rules) |
+
+Les archives se relisent quand un comportement surprend, jamais pour être
+reprises. **Ce document ne recopie rien d'elles** : c'est ce qui l'a fait rouler
+la dernière fois, et le nettoyage du 24 août 2026 a séparé les trois choses qui
+s'y étaient mélangées, le chantier en cours, l'archive d'un système, et les
+pièges durables.
 
 ---
 
-## Ce qui est fini, et qu'on ne touche pas
+## Ce qui attend encore, hors de ce chantier
 
-macOS, de bout en bout, vérifié sur deux vrais clients et sur une soirée de
-relais. Le cœur métier, la frontière avec le système, la persistance, l'interface
-React et ses 179 cas de test, les quatre raccourcis globaux, la barre système, le
-démarrage avec la session, le relais Telegram et l'écran qui le pilote. Le détail
-est dans [macos.md](./macos.md).
+Rien de cette liste n'est du ressort d'une session qui écrit les phrases.
 
-Trois choses attendent encore hors du code, et **aucune n'est du ressort d'une
-session Windows** :
-
-| À faire                                                                  | Où                  |
-| ------------------------------------------------------------------------ | ------------------- |
-| Créer un certificat **Developer ID Application** et l'exporter en `.p12` | developer.apple.com |
-| Poser les huit secrets du workflow `release`                             | Réglages du dépôt   |
-| Remplacer le logo du scaffolder Tauri                                    | `src-tauri/icons`   |
+| À faire                                                                  | Où                         |
+| ------------------------------------------------------------------------ | -------------------------- |
+| Créer un certificat **Developer ID Application** et l'exporter en `.p12` | developer.apple.com        |
+| Poser les huit secrets du workflow `release`                             | Réglages du dépôt          |
+| Remplacer le logo du scaffolder Tauri                                    | `src-tauri/icons`          |
+| La soirée de vérification Windows, deux vrais clients                    | [windows.md](./windows.md) |
+| Le certificat Authenticode, à trancher quand macOS sera publié           | [windows.md](./windows.md) |
+| Confirmer `crate-type = ["rlib"]` par un `cargo build` sur le Mac        | [windows.md](./windows.md) |
 
 Les huit secrets : `APPLE_CERTIFICATE` (le `.p12` en base64),
 `APPLE_CERTIFICATE_PASSWORD`, `APPLE_SIGNING_IDENTITY`, `APPLE_ID`,
@@ -42,303 +54,249 @@ Les huit secrets : `APPLE_CERTIFICATE` (le `.p12` en base64),
 est déjà le champ `plugins.updater.pubkey` de `tauri.conf.json`. Une nouvelle
 paire rendrait insignables les mises à jour des versions déjà installées.
 
-**Le logo** : `npm run tauri icon <fichier>` régénère les onze fichiers depuis un
-PNG carré à transparence, dont `icons/32x32.png`, qui est aussi l'icône de barre
-système de Windows. Il ne touche pas à `icons/tray.png`, celle de macOS, qui obéit
-à d'autres règles, voir « Ce qui mord ».
-
 ---
 
-## Ce qui attend de ce côté
+## Le chantier : les phrases
 
-`platform::windows` a désormais un corps par méthode, les trois interfaces
-comprises : plus une seule ne renvoie `NotImplemented`, et la variante a disparu
-du type d'erreur avec la dernière. Les trois interfaces de `platform` ont été
-dessinées avec Windows en vue, `TITLE_PATTERN` et la table `NOTIF_TYPES` viennent
-de Dracoon et sont vérifiés sur les deux systèmes, et `GameWindow::from_title`
-reste la seule porte d'entrée d'une fenêtre. Rien de tout ça n'est à réécrire.
-Les quatre lots sont écrits, le dernier compris, qui ne parlait plus au système
-mais à la chaîne de compilation. Ce qui reste n'est plus du code : la soirée de
-vérification, et la signature Windows qui attend la publication de macOS.
+### Ce que c'est
 
-**Objectif.** La parité, sur la machine où l'application sert vraiment.
+On répond toujours la même chose aux mêmes questions. Une **phrase** est un texte
+rangé sous une combinaison de touches : la combinaison frappée depuis le jeu met
+le texte dans le presse-papiers, pose la combinaison de collage vers la fenêtre,
+et rend le presse-papiers d'avant. Le mot est dans
+[CONTEXT.md](../CONTEXT.md), l'ouverture du périmètre qu'il demande est dans
+l'[ADR 0012](./adr/0012-une-phrase-se-colle-dans-le-jeu.md).
 
-### La machine est prête, et il n'y a plus rien à installer
+### Ce qui est tranché, et qui ne se rejoue pas
 
-Fait le 23 août 2026, sur le PC Windows 10 où les lots se joueront. Une session
-qui ouvre ce dépôt compile à la première commande, sans rien préparer.
+| Question                                  | Réponse                                                                    |
+| ----------------------------------------- | -------------------------------------------------------------------------- |
+| Le geste                                  | Presse-papiers **et** collage posé sur le système, ADR 0012                |
+| Jusqu'où va la frappe                     | **Coller seulement.** Pas d'Entrée, pas d'ouverture du chat                |
+| Le presse-papiers                         | Emprunté et rendu, délai mesuré. Non textuel, perdu et dit à l'écran       |
+| La garde                                  | Inerte hors du jeu, comme les quatre autres                                |
+| Le relais                                 | Une phrase frappée le coupe, comme les quatre autres                       |
+| L'identité d'une phrase                   | **Le texte seul**, pas de nom à tenir à jour                               |
+| Le texte                                  | Une ligne, saut de ligne refusé, aucune longueur maximale imposée ici      |
+| Le premier lancement                      | **Zéro phrase**, aucun maximum                                             |
+| Par personnage                            | Non, une phrase est globale                                                |
+| Les combinaisons prises ailleurs          | Aucune liste noire. On pose, et le statut par ligne dit ce qui s'est passé |
+| La combinaison de collage comme raccourci | Refusée à la capture, elle se déclencherait elle-même                      |
 
-| Outil                     | Version                         |
-| ------------------------- | ------------------------------- |
-| Node                      | 24.19.0, ce que dit `.nvmrc`    |
-| Rust                      | 1.98.0                          |
-| Visual Studio Build Tools | 2026, charge « Desktop en C++ » |
-| WebView2                  | 151.0.4129.101, déjà présent    |
+### Temps 1 — La mesure, et rien d'autre
 
-`rustup default stable-msvc` n'a pas eu lieu d'être et cette ligne est retirée :
-`x86_64-pc-windows-msvc` est le toolchain par défaut ici, l'installeur l'ayant
-choisi seul.
+**Un binaire jetable, avant une ligne de l'application.** Sur le Mac d'abord,
+puisque c'est la machine où le code s'écrit et que rien de `platform::windows` ne
+se relit d'ici, voir [windows.md](./windows.md). Sur le PC ensuite, et les quatre
+réponses s'y rejouent : aucune ne se transporte d'un système à l'autre.
 
-**Le done-gate passe de ce côté, en entier.** Les sept commandes de `checks.yml`
-jouées à la main : `lint`, `format:check` sur 116 fichiers, 179 tests
-JavaScript, `build`, `cargo fmt --check`, `cargo clippy --all-targets -- -D
-warnings`, 124 tests Rust. Aucun avertissement nulle part. Ce que ça prouve tient
-en une phrase : tout ce qui n'est pas `platform::windows` fonctionne déjà ici.
+| #   | Question                                                                             | Ce que la réponse décide                      |
+| --- | ------------------------------------------------------------------------------------ | --------------------------------------------- |
+| 1   | La combinaison de collage posée sur le système arrive-t-elle dans le chat de Dofus ? | L'ADR 0012 tient, ou il est remplacé          |
+| 2   | Faut-il attendre que les modificateurs physiques soient relâchés avant ?             | La forme de `send_paste_combination`          |
+| 3   | Quel délai avant de rendre l'ancien presse-papiers ?                                 | Une constante nommée, et pas un nombre deviné |
+| 4   | Le chat doit-il déjà avoir le focus ?                                                | Confirme « coller seulement »                 |
 
-**Le paquet aussi.** `npm run tauri build` sort le MSI et l'installateur NSIS,
-Tauri allant chercher WiX 3.14 et NSIS 3.11 de lui-même au premier passage. Il
-finit malgré tout en erreur, et c'est attendu, voir « Ce qui mord ».
+`Super+V` sur macOS, `Control+V` sur Windows. Dofus Retro est un client **AIR** :
+il ne lit pas forcément le presse-papiers du système comme une application
+native, et un événement posé n'est pas une frappe réelle. Rien de ce qui suit ne
+s'écrit avant que la question 1 ait une réponse vue à l'écran.
 
-## L'étape, en quatre lots
+**Une session distante ne peut pas jouer ce temps-là.** Il demande un vrai client
+Dofus au premier plan et un résultat vu à l'écran. Ce qu'elle peut faire est
+écrire le binaire jetable et le protocole, que l'utilisateur lance sur sa machine
+et dont il rapporte les quatre réponses. Les temps 2 à 4 s'écrivent ensuite sans
+la machine.
 
-**Rien de cette étape ne se relit depuis le Mac.** `cargo check --target x86_64-pc-windows-msvc` échoue avant de compiler une ligne du projet, voir « Ce qui mord ». Les lots sont donc découpés pour finir chacun sur un `cargo test` vert et un résultat visible à l'écran, et non pour être préparés ici.
+**Sur le Mac, le binaire jetable emprunte l'autorisation de son lanceur.**
+`CGEventPost` demande l'Accessibilité, et en développement c'est le terminal qui
+la porte et jamais multifus, ce que [macos.md](./macos.md) écrit. Un essai lancé
+depuis un terminal non autorisé échoue sans rien dire, et ça se lit comme « Dofus
+n'accepte pas le collage ». Accorder l'Accessibilité au terminal avant de
+mesurer, sinon la question 1 rend une fausse réponse négative.
 
-**`platform::windows` n'aura aucun test unitaire, comme `platform::macos`.** Tout y parle au système. Ce qui se teste est dans `domain`, et c'est déjà fait.
+**Si la question 1 répond non**, la phrase se réduit à remplir le presse-papiers,
+l'utilisateur colle lui-même, l'ADR 0012 est remplacé par cette version courte et
+le périmètre ne s'ouvre pas. Le reste du plan tient presque tel quel, seul le
+temps 3 disparaît.
 
-### Ce qui a été mesuré, et ce que ça tranche
+### Temps 2 — La configuration et le cœur
 
-Fait le 23 août 2026, avec un binaire jetable, sur ce PC et un vrai client. Les
-trois questions sont fermées et une quatrième réponse est venue avec, celle qui
-choisit la route du lot B. La moitié notification n'est plus un pari.
-
-**1. Le listener sert un exécutable non empaqueté, et ne demande rien.**
-`UserNotificationListener::Current()` rend un listener depuis un `.exe` Rust nu,
-sans identité de paquet, et `GetAccessStatus` rend `Allowed` **avant même**
-`RequestAccessAsync` : aucune boîte ne sort. Le « paquet fin » est écarté, il n'y
-a plus de sortie de secours à prévoir. `request_authorization` reste sur
-l'interface pour macOS, et se contente ici de rendre ce que le système dit déjà.
-
-**2. `NotificationChanged` n'existe pas de ce côté, et le sondage n'est plus un
-repli mais la route.** L'abonnement lui-même échoue, `HRESULT 0x80070490`
-« Élément introuvable », et pas l'événement qui resterait muet : il n'y a rien à
-attendre ni à déboguer. C'est le prix de l'exécutable non empaqueté, et la mesure
-1 dit que c'est le seul. `start` part donc directement sur
-`GetNotificationsAsync(NotificationKinds::Toast)`, sans écrire les deux routes.
-
-**3. Un toast de Dofus est exactement ce que `GameNotification::new` attend.**
-Mesuré sur un vrai message privé :
-
-| Ce que rend le listener | Valeur                                |
-| ----------------------- | ------------------------------------- |
-| `AppUserModelId`        | `com.dofus.d1elauncher`               |
-| `texte[0]`              | `Dj-blop-[ART] - Dofus Retro v1.49.0` |
-| `texte[1]`              | `de Trusted-sheriff-[ART] : test`     |
-
-`TITLE_PATTERN` mord sur `texte[0]` et rend le pseudo, le `^de ` de
-`NOTIF_TYPES` mord sur `texte[1]` et rend `PrivateMessage`. Le corps arrive
-entier, ce qui ferme la ligne « corps complet » de [perimetre.md](./perimetre.md)
-sur les deux systèmes. L'`AppUserModelId` est le bundle de macOS au caractère
-près : le filtre reste inutile pour la raison écrite au lot B, il est seulement
-devenu gratuit si le besoin apparaissait.
-
-Deux toasts d'identifiants distincts sont sortis pour un même texte, ce qui rend
-la dédup par `UserNotification::Id` obligatoire et non prudente.
-
-**4. L'exécutable du client est `Dofus Retro.exe`**, sous
-`%LOCALAPPDATA%\Ankama\Retro\`. C'est le nom de fichier qui sert de filtre et
-jamais le chemin, que l'installation déplace. Un client rend une fenêtre et une
-seule, comme un processus rend un client sur macOS. Le titre est en `v1.49.0` et
-`TITLE_PATTERN`, écrit contre `v1.48.21`, mord sans retouche.
-
-### Lot A — Les fenêtres
-
-`Win32WindowManager`, six méthodes, et de quoi faire vivre le roster, les quatre raccourcis et le menu de la barre système sans une seule notification.
-
-`authorization` et `request_authorization` rendent `Granted` sans rien demander : lire un titre et changer le focus ne demande aucune autorisation ici. Les deux méthodes restent sur l'interface parce que macOS en a besoin.
-
-`game_windows` passe par `EnumWindows`, et pour chaque fenêtre : `IsWindowVisible`, puis `GetWindowThreadProcessId` pour le pid, puis `OpenProcess` en `PROCESS_QUERY_LIMITED_INFORMATION` et `QueryFullProcessImageNameW` pour le nom de l'exécutable, puis `GetWindowTextW` dimensionné par `GetWindowTextLengthW`. `foreground_game_window` fait le même filtre sur la seule fenêtre que rend `GetForegroundWindow`, sans balayage. `is_minimized` est `IsIconic`, une ligne.
-
-Ce chemin est déjà écrit et mesuré, mesure 4 : il rend `Dofus Retro.exe` et une fenêtre unique par client. **Comparer le nom de fichier et jamais le chemin**, que l'installation déplace, et sans tenir compte de la casse.
-
-**Filtrer sur le processus et pas sur le seul titre, et c'est un bug déjà vu.** `EnumWindows` balaie tout le bureau, et un onglet de navigateur intitulé `Quelque chose - Dofus Retro` satisfait la regex : le navigateur entre alors dans le roster comme un personnage et se fait ramener au premier plan. C'est arrivé. macOS n'a jamais eu ce trou parce que `dofus_applications` n'énumère que les processus du bundle `com.dofus.d1elauncher`, et Windows doit faire pareil. Le titre reste ce qui donne le pseudo, il cesse d'être ce qui donne le droit d'entrer.
-
-**La danse `AttachThreadInput`, écrite une fois pour toutes.** `SetForegroundWindow` refuse quand le processus appelant n'a pas déjà le focus, et rend `FALSE` sans dire pourquoi. Le contournement documenté est d'attacher la file d'entrée de multifus à celle du processus qui a le focus, le temps de l'appel :
+**La forme en configuration.**
 
 ```rust
-let current = GetCurrentThreadId();
-let foreground = GetWindowThreadProcessId(GetForegroundWindow(), None);
-let owner = GetWindowThreadProcessId(target, None);
-AttachThreadInput(current, foreground, true);
-AttachThreadInput(current, owner, true);
-// ShowWindow(SW_RESTORE) si IsIconic, BringWindowToTop, puis SetForegroundWindow
-AttachThreadInput(current, owner, false);
-AttachThreadInput(current, foreground, false);
+pub struct Phrase {
+    pub id: PhraseId,
+    pub text: String,
+    pub shortcut: Option<Shortcut>,
+}
 ```
 
-**Attacher la seule file du premier plan ne suffit pas, et ce plan disait le contraire.** Il faut y joindre le fil propriétaire de la fenêtre visée, et appeler `BringWindowToTop` avant `SetForegroundWindow`. Mesuré des deux côtés : la recette courte a ramené une fenêtre sur trois, la recette complète quatre sur quatre, dans la même condition et sur la même machine.
+`Settings` gagne `phrases: Vec<Phrase>`, vide par défaut. `PhraseId` est un `u32`
+enveloppé, alloué à la création comme le plus grand identifiant existant plus un :
+aucun compteur à persister, aucune crate d'identifiants, et un identifiant qui
+survit à une réécriture du texte comme à un réordonnancement. `Settings` porte
+déjà `#[serde(default)]`, donc un fichier écrit avant ce chantier s'ouvre sans
+phrase. **Poser un défaut par champ sur `Phrase`** dès maintenant, le piège de
+`Character` étant écrit dans [pieges.md](./pieges.md).
 
-Ce qui a rendu la mesure difficile mérite d'être écrit, parce qu'il se retendra à la prochaine panne de focus : **toutes les recettes marchent quand multifus vient de recevoir une frappe.** « Le processus a reçu le dernier événement d'entrée » est une des conditions qui autorisent `SetForegroundWindow`, donc un banc d'essai où l'on clique avant de mesurer donne cinq recettes gagnantes et n'apprend rien. C'est aussi pourquoi les quatre raccourcis marchaient pendant que l'AutoFocus échouait, sur la même ligne de code. Une notification n'apporte aucune entrée, et c'est la seule condition qui compte ici.
+**Le lien touche vers action, et `ShortcutAction` ne bouge pas.** Il garde ses
+quatre valeurs, son `ALL` de taille fixe et sa table de chaînes exhaustive, dont
+le commentaire dit qu'une cinquième action doit échouer à la compilation. Un type
+neuf porte les deux familles :
 
-Le détachement part quelle que soit l'issue, sinon multifus laisse derrière lui des files d'entrée liées, ce qui se paie sur le bureau entier et pas dans multifus. Une structure avec un `Drop` le tient sans avoir à y penser, comme le keeper tient son handle.
-
-`ShowWindow(SW_RESTORE)` entre dans l'attache et non avant : restaurer fait partie du focus, `platform::window` l'écrit, et une fenêtre sortie de la barre des tâches mais laissée derrière n'a pas été ramenée.
-
-**Le piège de Dracoon, à ne pas reproduire.** Il contourne la même restriction en injectant une vraie frappe Alt dans l'application active. C'est la cause probable du bug de focus intermittent corrigé dans son commit `0b0525c`, et ça envoie une touche parasite dans le jeu.
-
-**`WindowGone` se lit sur `IsWindow` et sur l'exécutable**, et `is_minimized` comme `focus` doivent le rendre, `platform::window` promettant la même erreur aux deux. Windows réemploie les handles, donc `IsWindow` peut dire oui d'une fenêtre qui n'est plus celle qu'on croit ; le filtre sur l'exécutable la rattrape, et les deux méthodes passent par le même `live_game_window`, comme macOS passe par `live_application`. Deux clients qui échangent leurs handles restent hors de portée, et c'est le prix du `HWND` comme identité.
-
-**Aucun saut vers le fil principal, contrairement à macOS.** Ces appels Win32 se font depuis n'importe quel fil, et `WindowManager` est `Send + Sync` justement parce que les rappels de raccourcis tournent sur des fils que multifus ne choisit pas. L'attache et le détachement partagent le fil appelant, ce qui est la seule contrainte.
-
-**Écrit, et pas encore vu à l'écran.** Les six méthodes ont un corps, le done-gate Rust passe, et `EnumWindows` rend `Ok(())` sur ce PC : il n'y a pas d'erreur fantôme à avaler, propager est juste.
-
-**Vérifié quand** : deux vrais clients, le roster qui les voit, les quatre raccourcis depuis le jeu, un clic sur un personnage dans la barre système, et une fenêtre réduite qui ressort.
-
-### Lot B — Les notifications
-
-`UserNotificationWatcher`. C'était la moitié risquée, les mesures l'ont débloquée : le listener répond, la route est le sondage, et un toast de Dofus se lit sans une ligne de plus que ce que `domain` sait déjà faire.
-
-**Le fil du listener est en STA, et c'est le piège qui a coûté cher à Dracoon.** `UserNotificationListener` échoue en silence ou rend une erreur COM quand le fil qui l'utilise n'est pas dans un apartment mono-filaire. Donc `CoInitializeEx(None, COINIT_APARTMENTTHREADED)` en tête du fil du watcher, et tout le travail du listener sur ce fil-là. C'est déjà la forme que `platform::notification` attend, chaque implémentation gardant son fil et sa boucle pour elle.
-
-`authorization` lit `GetAccessStatus`, `request_authorization` attend `RequestAccessAsync` sur place. Les trois valeurs du système se réduisent à deux : `Allowed` devient `Granted`, `Denied` et `Unspecified` deviennent `Denied`. Ils ne se réparent pourtant pas de la même façon, `Denied` ne pouvant plus être redemandé et `Unspecified` remontant la boîte au prochain appel, donc c'est le détail du journal qui les sépare et non le type. La documentation demande le fil d'interface pour `RequestAccessAsync` ; la mesure 1 l'a appelé depuis un fil ordinaire, sans boîte et sans erreur, l'accès étant déjà accordé.
-
-`start` sonde, et n'écrit pas la seconde route. `NotificationChanged` refuse l'abonnement de ce côté, mesure 2, donc `GetNotificationsAsync(NotificationKinds::Toast)`, avec `UserNotification::Id` comme clé de dédoublonnage dans un ensemble qui suit ce que la plateforme tient encore, sans quoi il grossit toute la soirée. Le sondage reste **interne au watcher** : le cœur ne voit qu'un sink qui pousse, et ce module l'a écrit dès l'étape 3.
-
-**Le sondage est à 500 ms et non à l'intervalle du balayage, et ce plan disait le contraire.** Les trois secondes se tenaient tant que l'événement était la route principale et le sondage un repli. L'événement n'existant pas, ce délai est devenu celui de l'AutoFocus tout entier : trois secondes pour qu'une fenêtre remonte sur un tour de combat, là où macOS remonte à l'instant où la bannière est dessinée. Un appel WinRT deux fois par seconde ne se voit pas sur la machine, une seconde et demie d'attente moyenne se voit dans le jeu.
-
-Lire un toast, c'est `Notification().Visual().GetBinding(KnownNotificationBindings::ToastGeneric())` puis `GetTextElements()` : le premier élément est le titre, les suivants forment le corps joints par un saut de ligne. C'est exactement le couple que `GameNotification::new` attend, et la mesure 3 l'a vu sur un vrai message privé.
-
-**Aucun filtre sur l'application qui a émis, comme sur macOS.** `AppInfo.AppUserModelId` vaut `com.dofus.d1elauncher`, le bundle de macOS au caractère près, et ne sert pas : le raisonnement de l'étape 11b-2 de [macos.md](./macos.md) vaut tel quel ici, un pseudo absent du roster n'est relayé par rien et seul `game_windows` crée un personnage. `NotificationReport::Unreadable` n'est jamais envoyé de ce côté, le listener rendant un toast structuré qui est là ou n'y est pas.
-
-`dismiss` est `RemoveNotification(id)`, donc le watcher garde une table pseudo vers identifiants, alimentée à chaque toast lu et purgée à chaque suppression. **Jamais `ClearNotifications`**, qui efface les notifications de toutes les applications, y compris celles que multifus n'a jamais lues. `stop` arrête le fil du sondage, et `Drop` fait la même chose.
-
-**`dismiss` met en file et ne supprime pas sur place, et c'est la règle du verrou qui le décide.** Il est appelé depuis `on_notification`, qui tourne sur le fil du watcher, alors que `start` et `stop` tiennent le mutex de `WatcherState` pendant un `join` de ce fil-là. Deux conséquences, et aucune n'est un détail : le watcher pousse le pseudo dans sa propre table et le tour de sondage suivant appelle `RemoveNotification`, ce qui ne joint jamais rien ; et le site d'appel prend ce mutex en `try_lock`, une suppression sautée pendant que l'écoute se reconstruit n'ayant plus rien à supprimer. C'est le premier appelant de `dismiss` du projet, macOS n'en ayant jamais eu.
-
-**Ce que l'utilisateur doit régler, et ce n'est pas ce que macOS demande.** Dans le jeu, « Background Notifications » doit être activé dans les options générales : un client qui n'émet rien rend le listener muet, et c'est la panne numéro un de tous les outils qui font ça. Côté système il n'y a rien à demander, la mesure 1 ayant trouvé l'accès déjà accordé ; l'écran des autorisations garde quand même le cas refusé, que l'utilisateur peut couper à la main. En revanche, et c'est l'inverse exact de macOS, **la bannière peut rester coupée** : l'écoute passe par une API et non par ce que l'écran dessine, donc le style et le son du toast de Dofus n'ont aucune importance. La contrainte de l'ADR 0002 ne se transporte pas, elle est propre à macOS.
-
-**La bannière ne bloque pas le focus, et Dracoon laissait croire le contraire.** Il relève que Windows ne masque pas une bannière désactivée mais la rend à 100 % de transparence, et qu'un focus posé pendant qu'elle est encore à l'écran ne prenait pas. Mesuré ici et faux : quatre toasts sur quatre, bannière à l'écran, la fenêtre remonte en 130 ms. Le symptôme que ce paragraphe attendait est bien apparu, et il venait d'ailleurs, voir la recette d'attache au lot A. Ne pas rouvrir cette piste.
-
-**Écrit, l'AutoFocus vérifié, la suppression des toasts non.** Deux messages privés d'affilée ramènent la bonne fenêtre, dont le second, qui est celui que la recette courte refusait. Restent à voir un second type de notification et un toast qui quitte le centre de notifications.
-
-**Vérifié quand** : l'AutoFocus ramène la bonne fenêtre sur trois types distincts, et un toast disparaît du centre de notifications une fois sa fenêtre devant.
-
-### Lot C — L'écran tenu éveillé
-
-**`SetThreadExecutionState` est le mauvais appel, et ce plan disait le contraire.** Il pose l'état sur **le fil appelant** et pas sur le processus : l'état meurt avec le fil, c'est un masque de bits et non un compteur, et deux composants du même fil s'écrasent l'un l'autre. Le keeper vit dans un `Mutex` de l'état Tauri, appelé par `relay::run::follow_display` depuis le fil du balayage aujourd'hui et depuis ailleurs demain, et son `is_awake` deviendrait un booléen qui ment. Microsoft déconseille d'ailleurs cet appel dès que deux composants partagent un fil.
-
-**C'est `PowerCreateRequest` et `PowerSetRequest`.** Le handle appartient au processus, n'importe quel fil le pose et le relâche, et il survit à la mort de celui qui l'a créé. C'est le jumeau exact de `IOPMAssertionCreateWithName`, nom compris : le `REASON_CONTEXT` s'affiche dans `powercfg /requests` comme l'assertion de multifus s'affiche dans `pmset -g assertions`. Les deux systèmes se vérifient alors par la même phrase du protocole du quart d'heure.
-
-| Méthode      | Appel                                                    |
-| ------------ | -------------------------------------------------------- |
-| `new`        | `PowerCreateRequest` avec un `REASON_CONTEXT` nommé      |
-| `keep_awake` | `PowerSetRequest(handle, PowerRequestDisplayRequired)`   |
-| `release`    | `PowerClearRequest(handle, PowerRequestDisplayRequired)` |
-| `is_awake`   | le booléen gardé, qui ne ment plus                       |
-| `Drop`       | `CloseHandle`                                            |
-
-`PowerRequestDisplayRequired` seul, comme `PreventUserIdleDisplaySleep` sur macOS. Le pendant système ne servirait à rien : ce qui rend le relais muet est la session verrouillée, pas la machine ralentie. Et le capot fermé lui échappe des deux côtés, ce qui est écrit dans « Ce qui mord ».
-
-**La demande naît du maintien et pas du constructeur, et ce plan disait le contraire.** `new` ne peut rien rendre, donc un `PowerCreateRequest` posé là perd son échec en silence ou oblige à garder un `Option` qui ment. Le handle vit exactement le temps du maintien : `keep_awake` le crée et le pose, `release` le retire et le ferme, `is_awake` est `held.is_some()`. C'est la forme de macOS au mot près, et `Drop` relâche avant que le processus meure.
-
-**`POWER_REQUEST_CONTEXT_VERSION` n'est pas dans `Win32_System_Power`.** Il vit dans `Win32_System_SystemServices`, une fonctionnalité entière pour un zéro : la constante est écrite dans le module.
-
-`screen_saver_delay` appelle `SystemParametersInfoW` deux fois, `SPI_GETSCREENSAVEACTIVE` d'abord, qui sépare `Never` d'un délai, puis `SPI_GETSCREENSAVETIMEOUT`, qui rend des secondes. Zéro seconde est l'économiseur coupé, comme sur macOS.
-
-**Les quatre appels passent, mesuré sur ce PC avec un binaire jetable.** `PowerCreateRequest`, `PowerSetRequest`, `PowerClearRequest` et `CloseHandle` rendent tous `Ok`. `SPI_GETSCREENSAVEACTIVE` rend 0 sur cette machine, donc `Never` : la branche du délai n'a pas de témoin ici, exactement comme sur le Mac de développement.
-
-**`powercfg /requests` demande une invite élevée**, et la refuse autrement avec un message et rien d'autre. Le protocole du quart d'heure se joue donc dans un terminal administrateur, sans quoi il ne montre rien.
-
-**Vérifié quand** : le protocole du quart d'heure de [macos.md](./macos.md) rejoué, `powercfg /requests` montrant la ligne de multifus avant l'avis de déconnexion et plus après.
-
-### Lot D — La chaîne de compilation, le paquet et la barre système
-
-**`checks.yml` a deux runners, et un `ci` vert dit désormais quelque chose de `platform::windows`.** Le job unique est devenu une matrice `macos-latest, windows-latest`, `fail-fast` coupé pour qu'un système qui casse n'empêche pas de savoir ce que dit l'autre. Le runner s'est ajouté en confiance : les sept commandes du gate avaient déjà été jouées à la main sur ce PC, voir « La machine est prête ». Sans le `.gitattributes`, `format:check` aurait échoué là pour une raison qui n'a rien à voir avec Windows.
-
-**`release.yml` a deux jobs et pas une matrice.** Ce qui entoure la compilation n'a rien de commun : les secrets Apple et la notarisation n'appartiennent qu'à macOS, et Windows ne signe rien du tout. La vérification « le tag et le paquet disent la même version » ne se recopie pas non plus, le job Windows venant après celui qui l'a faite.
-
-**Le job Windows suit celui de macOS au lieu d'être à côté, et c'est le `latest.json` qui l'impose.** `tauri-action` télécharge le `latest.json` déjà posé sur la publication et fusionne ses plateformes dans celui qu'il téléverse : c'est une lecture puis une écriture. Joués en parallèle, le job le plus lent publierait un fichier où la plateforme de l'autre n'a jamais existé, et aucun multifus installé ne se verrait jamais proposer la mise à jour. Vérifié dans `upload-version-json.ts` de l'action, pas déduit.
-
-**La barre système n'a pas eu besoin d'une seconde image, et ce plan disait le contraire.** Windows reçoit `icons/32x32.png`, le logo, celui-là même que `npm run tauri icon` régénère avec les dix autres : rien à dessiner, rien à maintenir, et le jour où le logo du scaffolder part, la barre système part avec lui. `icons/tray.png` reste à macOS seul, avec `icon_as_template` qui devient `cfg!(target_os = "macos")` puisqu'il ne vaut que là.
-
-**Le démarrage avec la session échouait pour une raison que ce plan cherchait au mauvais endroit.** Ce n'était ni le binaire de développement ni un chemin : `auto-launch` 0.5.0 garde son `disable` sur macOS, `if file.exists()`, et ne le garde pas sur Windows, où il appelle `delete_value` sur la clé `Run` sans regarder. `start_at_login` étant décoché par défaut, `reconcile` demandait à chaque lancement le retrait d'un enregistrement qui n'avait jamais existé, et le registre répondait `ERROR_FILE_NOT_FOUND`, l'`os error 2` du journal. Rien à reprendre sur un paquet installé.
-
-**Le retrait est donc gardé, l'ajout non.** `reconcile` ne demande le retrait que si `is_enabled` dit qu'il y a quelque chose à retirer, et c'est un usage étroit qui ne contredit pas ce qui est écrit plus bas : `is_enabled` est une mauvaise réponse à « l'utilisateur veut-il ça ». Ce n'est pas non plus tout à fait « y a-t-il quelque chose à enlever », voir « Ce qui mord ». Une lecture qui échoue tombe sur le retrait, qui dit alors ce qui s'est passé. L'ajout reste inconditionnel, c'est lui qui réécrit le chemin.
-
-**Windows ne publie qu'un installateur, et le `latest.json` l'impose.** `bundle.targets` vaut `all`, donc un `tauri build` sort le MSI et le NSIS ; mais `latest.json` ne porte qu'une archive par plateforme, et `tauri-action` y met le MSI d'abord, son `updaterJsonPreferNsis` valant `false` par défaut. Une installation faite au NSIS, par utilisateur et sans UAC, se verrait donc mettre à jour par le MSI, par machine et ailleurs sur le disque : deux copies, et l'enregistrement de démarrage qui pointe vers l'ancienne puisqu'il porte un chemin absolu. Le job passe `--bundles nsis`, qui est celui qui convient à une application qu'on lance et qu'on oublie.
-
-**Les raccourcis échouent franchement, et il n'y a rien à écrire.** Windows refuse une combinaison déjà prise, contrairement à macOS où l'enregistrement réussit et la touche reste morte. L'écran des raccourcis affiche déjà cet échec. `Control+Shift+flèche` n'est pas réservé par Windows, qui prend `Win+Control+flèche` pour ses bureaux, donc les combinaisons proposées au premier lancement conviennent aux deux systèmes.
-
-**La signature Windows est un second sujet, que la distribution macOS ne couvre pas.** Un certificat Authenticode n'est pas un Developer ID, il s'achète ailleurs et ne pose pas les mêmes secrets. Sans lui, SmartScreen avertit à chaque installation. À trancher quand macOS sera publié pour de bon, pas avant : le job Windows publie non signé en attendant, et c'est écrit dans le fichier.
-
-**Vu à l'écran le 24 août 2026** : l'icône est là et lisible dans la zone de notification, et le journal n'écrit plus d'échec de démarrage avec la session. Reste à voir le menu ouvert et ses articles suivis, ce que la soirée de vérification couvre.
-
-**L'appairage disait « connecté », le mot que l'écran Relais s'interdit.** La carte annonce « Robot Telegram relié » et la note dessous prévient que « connecté » se lit « le relais marche » ; le message qui partait sur le téléphone disait pourtant « Le relais est connecté », puis l'interrupteur en envoyait un second, « Relais activé. ». Vu le 24 août 2026 en reliant depuis Windows le robot déjà apparié sur le Mac. Le message d'appairage porte maintenant deux lignes comme l'avis d'activation, et un test refuse qu'il prononce l'un des deux mots de l'interrupteur.
-
-**Un robot se réutilise d'une machine à l'autre, un jeton non.** Le jeton vit dans le trousseau du système, jamais dans la configuration : le second poste recolle le même jeton et retombe sur le même salon. Il faut en revanche réécrire au robot juste avant Connecter, `getUpdates` ne gardant ses mises à jour que vingt-quatre heures. Deux multifus relais actif sur le même robot écrivent dans le même salon, et rien ne dit lequel a parlé.
-
-### Les dépendances
-
-`windows` 0.62 en dépendance directe, sous une cible pour qu'aucune machine macOS ne la compile. La crate n'expose que ce qu'on lui demande, un trait par chemin de module, le point remplacé par un tiret bas. **Les traits sont arrivés lot par lot**, pour que rien ne se compile avant d'être appelé, et la liste est close :
-
-```toml
-[target.'cfg(target_os = "windows")'.dependencies]
-windows = { version = "0.62", features = [
-  "Foundation",
-  "UI_Notifications",
-  "UI_Notifications_Management",
-  "Win32_Foundation",
-  "Win32_System_Com",
-  "Win32_System_Power",
-  "Win32_System_Threading",
-  "Win32_UI_WindowsAndMessaging",
-] }
+```rust
+pub enum Binding {
+    Action(ShortcutAction),
+    Phrase(PhraseId),
+}
 ```
 
-`Win32_System_SystemServices` n'y est pas, et c'est délibéré : `POWER_REQUEST_CONTEXT_VERSION` y vit seul et vaut zéro, écrit dans le module plutôt que payé d'un trait.
+Il ne sert qu'à trois endroits : la table `claimed` de `shortcuts::apply`, qui
+détecte alors les doublons **entre les deux familles** d'un seul coup, la file que
+`fire` alimente, et la répartition dans `answer`. Il reste `Copy`, comme
+`ShortcutAction`, donc `fire` ne change pas de forme.
 
-| Appel                                                                                                                                                                                       | Module                                               |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| `EnumWindows`, `GetWindowTextW`, `IsWindow`, `IsWindowVisible`, `IsIconic`, `ShowWindow`, `SetForegroundWindow`, `GetForegroundWindow`, `GetWindowThreadProcessId`, `SystemParametersInfoW` | `Win32::UI::WindowsAndMessaging`                     |
-| `AttachThreadInput`, `GetCurrentThreadId`, `OpenProcess`, `QueryFullProcessImageNameW`                                                                                                      | `Win32::System::Threading`                           |
-| `PowerCreateRequest`, `PowerSetRequest`, `PowerClearRequest`, `REASON_CONTEXT`                                                                                                              | `Win32::System::Power`                               |
-| `CoInitializeEx`                                                                                                                                                                            | `Win32::System::Com`                                 |
-| `UserNotificationListener`, `KnownNotificationBindings`                                                                                                                                     | `UI::Notifications::Management`, `UI::Notifications` |
+`ShortcutStatus::Duplicate` porte désormais un `Binding` et non une
+`ShortcutAction`. Les quatre actions se posent avant les phrases, pour qu'un
+doublon nomme l'action qui tient la combinaison et non l'inverse.
 
-**`AttachThreadInput` n'est pas où la documentation le range.** Il vit dans `Win32::System::Threading` et non dans `Win32::UI::Input::KeyboardAndMouse`, donc le trait `Win32_UI_Input_KeyboardAndMouse` ne sert à rien et n'est pas posé. Une version de ce tableau l'a rangé ailleurs, le lot A l'a corrigé au premier `cargo build`.
+**La file porte l'identifiant et jamais le texte.** Le texte se lit sous le verrou
+au moment où la touche part, sinon une phrase modifiée pendant que multifus tourne
+collerait son ancienne version.
 
-**`IAsyncOperation::get()` n'existe pas, c'est `.join()`.** Méthode inhérente de `windows-future`, donc rien à ajouter aux dépendances ni à importer, mais tout exemple en circulation est écrit avec l'ancien nom.
+**Les commandes.** `add_phrase`, `set_phrase_text`, `set_phrase_shortcut`,
+`remove_phrase`. Toutes passent par `runtime::emit_snapshot`, qui est la seule
+porte de sortie. `set_phrase_shortcut` rappelle `shortcuts::apply`, comme
+`set_shortcut`.
+
+**Le journal gagne deux événements.** `PhrasePasted` avec un extrait du texte,
+quarante caractères, et `PhraseFailed` avec son motif. Trois motifs qui se
+réparent à trois endroits différents : le presse-papiers illisible, l'écriture du
+presse-papiers refusée, le collage refusé par le système. Le test qui compare la
+liste exacte des champs les couvre comme les autres. L'extrait est le texte de
+l'utilisateur et non le corps d'un message reçu, donc l'ADR 0006 ne s'y oppose
+pas ; le fichier étant fait pour être transmis, l'ADR 0012 écrit ce que ça coûte.
+
+**La barre système ne gagne rien.** Une phrase a une combinaison, donc le principe
+directeur est satisfait, et un sous-menu de phrases dans une barre système est
+exactement le réglage qu'on ne visite jamais.
+
+### Temps 3 — Le collage, des deux côtés
+
+**Une seule chose traverse la frontière : poser la combinaison.** Le
+presse-papiers passe par `tauri-plugin-clipboard-manager`, qui est déjà une
+dépendance et qui est le même code sur les deux systèmes. La sauvegarde, le
+remplacement, le délai et la restitution vivent donc **au-dessus** de la
+frontière, dans `app::phrases`, écrits une fois. `platform` gagne une interface
+qui ne sait faire qu'une chose.
+
+L'ordre, sur le fil des raccourcis qui existe déjà et qui a le droit de bloquer :
+
+1. lire le texte du presse-papiers, et retenir qu'il n'y en avait pas ;
+2. y écrire le texte de la phrase ;
+3. poser la combinaison de collage vers le premier plan ;
+4. attendre le délai de la mesure 3 ;
+5. réécrire l'ancien texte, s'il y en avait un.
+
+**Jamais le fil principal, jamais le verrou tenu.** Le texte de la phrase se lit
+sous le verrou de `Multifus`, qui est rendu avant l'étape 1. La règle en tête de
+`app::state` s'applique telle quelle.
+
+| Système | Appel         | Trait ou crate                                                        |
+| ------- | ------------- | --------------------------------------------------------------------- |
+| macOS   | `CGEventPost` | une crate de plus, `objc2-core-graphics` ou l'équivalent, à confirmer |
+| Windows | `SendInput`   | `Win32_UI_Input_KeyboardAndMouse`, à ajouter à `Cargo.toml`           |
+
+Sur macOS l'autorisation d'Accessibilité est déjà accordée et déjà exigée par
+l'AutoFocus : poser un événement n'en demande pas une seconde. Sur Windows rien
+n'est à demander.
+
+**La combinaison est `Control+V` sur Windows et `Super+V` sur macOS.** Deux
+constantes nommées, jamais un caractère écrit à la volée.
+
+### Temps 4 — L'écran
+
+**Démarrer `/frontend-design` avant d'y toucher**, la règle du projet l'exige pour
+toute session de design. Et la règle qu'il croise ici est celle de
+`.claude/rules/frontend.md` : consistance avant créativité. Cette section
+réemploie la grammaire de l'écran, elle n'en invente pas une seconde.
+
+**Un second panneau sous les quatre actions**, dans `src/screens/shortcuts/`.
+
+- `SectionRow` porte le titre « Phrases », sa description, et le bouton
+  « Ajouter » à droite. C'est le composant fait pour un sujet plus une action, et
+  `PanelHeader` n'aurait pas de place pour le bouton.
+- Une ligne par phrase, dans un composant `PhraseRow` : un `<Input>` d'une ligne
+  à gauche, le champ de combinaison à droite, un bouton de retrait au bout. Le
+  retrait ne demande pas de confirmation, comme le retrait d'un personnage.
+- Aucune phrase, aucun `EmptyState` : ce composant remplace le contenu d'un écran
+  entier, pas le corps d'un panneau. Une ligne atténuée dans le panneau, et le
+  bouton reste dans l'en-tête.
+- Une `Note` sous le panneau dit ce que la restitution ne sait pas rendre : un
+  presse-papiers qui portait une image ou un fichier est perdu.
+
+**`ShortcutField` se généralise, et c'est la seule retouche de l'existant.** Il
+lit aujourd'hui `strings.shortcuts.actions[shortcut.action]` pour son
+`aria-label`. Il prend désormais ce libellé en propriété et ne connaît plus les
+quatre actions, ce qui le rend employable par les deux familles sans copie. Sa
+propriété `shortcut` se réduit à ce qu'il lit vraiment, la combinaison et le
+statut.
+
+**La capture refuse la combinaison de collage.** `CaptureRejection` gagne une
+troisième valeur, `pasteCombination`, sa phrase dans `REJECTION_LINES`, et son cas
+dans `accelerator.test.ts`. Sans ça, une phrase posée sur `Control+V` se
+déclencherait elle-même.
+
+**Le texte s'écrit à la sortie du champ et non à chaque frappe.** La configuration
+va sur le disque, et une phrase de trente caractères vaudrait trente écritures.
+
+**Les chaînes** vont dans `src/constants/strings/shortcuts.ts`, sous une clé
+`phrases`. La ligne du doublon doit maintenant nommer soit une action soit une
+phrase, donc `shortcutStatusLine` gagne ce cas dans `helpers/wording.ts`, avec ses
+tests.
+
+**La limite des 200 lignes de JSX** met la section dans ses propres fichiers,
+`phrases-panel.tsx` et `phrase-row.tsx`, l'`index.tsx` de l'écran orchestrant sans
+implémenter.
 
 ### Vérification de l'étape
 
-Une soirée de jeu sur le PC, deux vrais clients, sans jamais ouvrir la fenêtre : les quatre raccourcis, l'AutoFocus sur trois types de notification, le menu de la barre système, et le protocole du quart d'heure de [macos.md](./macos.md) rejoué avec `powercfg /requests`.
+Sur les deux machines, avec un vrai client au premier plan. Trois phrases créées
+depuis la fenêtre, dont une sans combinaison. La combinaison frappée depuis le jeu
+écrit le texte dans le chat, sans l'envoyer. Un texte copié avant se retrouve
+dans le presse-papiers après. La phrase sans combinaison ne fait rien et l'écran
+le dit. Une combinaison déjà prise par le Défilement est refusée par son nom. La
+même combinaison frappée hors du jeu ne fait rien du tout. Et le journal porte une
+ligne par collage.
 
 ---
 
-## Ce qui mord
+## Ce qui mord, ici
 
-**Une mise à jour installée hérite des arguments du processus qui meurt.** `AppHandle::restart` relance le binaire avec `env.args_os` moins le premier, lu dans `tauri/src/process.rs`, et rien ne permet de lui en retirer un : `restart` reconstruit l'environnement lui-même. Donc un multifus lancé par la session et mis à jour revient sans sa fenêtre, sur le clic qui ressemble le plus à celui qui devrait en montrer une. Laissé tel quel, l'icône étant là et la fenêtre à un clic. Ne pas repartir chasser ça dans `app::update`, ce n'est pas là que ça se joue.
+**Le presse-papiers rendu trop tôt colle l'ancien contenu.** Le client lit le
+presse-papiers quand il traite l'événement, pas quand il le reçoit. C'est la
+mesure 3, et le nombre qu'elle rend devient une constante nommée avec la date de
+la mesure à côté.
 
-**Ne jamais tenir le verrou de `Multifus` en touchant au watcher de notifications, au plugin de raccourcis ou à l'icône de barre système.** Le premier joint le thread qui exécute le sink, les deux autres attendent le fil principal où les commandes prennent ce verrou. Pour l'icône ce n'est pas une supposition : `TrayIcon::set_menu` passe par `run_item_main_thread!`, qui poste la tâche puis bloque sur `rx.recv()` sans délai (`tauri/src/menu/mod.rs`). C'est le seul interblocage que cette application sache construire, et la règle est écrite en tête de `app::state` et de `app::tray`.
+**Les modificateurs de la phrase sont encore enfoncés quand le collage part.**
+`Control+K` frappé, le `Control` est physiquement bas au moment où la combinaison
+de collage est posée, et le client peut lire tout autre chose. C'est la mesure 2,
+et c'est le piège qui fera perdre le plus de temps si personne ne le mesure.
 
-**Le retrait du démarrage automatique n'est pas gardé sous Windows.** `auto-launch` 0.5.0 appelle `delete_value` sur la clé `Run` sans regarder si la valeur existe, là où sa version macOS teste `file.exists()` d'abord. Une intention décochée, qui est celle du premier lancement, réclamait donc à chaque démarrage le retrait de rien, et le registre répondait `os error 2`. `app::autostart::reconcile` garde le retrait derrière `is_enabled` pour ça, et pour ça seulement.
+**Une phrase posée sur la combinaison de collage se déclenche elle-même.** Refusé
+à la capture, temps 4.
 
-**Et `is_enabled` n'est pas exactement la question posée.** Sous Windows il rend `Run` **et** l'accord du gestionnaire des tâches, `StartupApproved\Run` : une entrée désactivée depuis cet onglet se lit absente alors que la valeur est là, et le retrait la laisse. Ça ne coûte rien tant que l'accord manque, Windows ne démarrant rien ; le jour où l'utilisateur le redonne, multifus démarre une fois contre son réglage, et le `reconcile` de ce lancement-là voit enfin l'enregistrement et l'enlève. C'est la même réparation au lancement suivant que pour une application déplacée, et le prix de ne pas réécrire le registre à la main.
+**Ne pas accorder `clipboard-manager:allow-read-text` à la capacité.** Le
+presse-papiers est lu depuis Rust, où la capacité ne s'applique pas. La fenêtre
+n'a jamais lu le presse-papiers et n'a aucune raison de commencer : la capacité
+n'accorde que `allow-write-text`, pour le bouton de copie du journal.
 
-**Le démarrage automatique enregistre un chemin, et personne ne s'en aperçoit.** `tauri-plugin-autostart` écrit `~/Library/LaunchAgents/<nom>.plist` avec le chemin absolu du binaire ; l'application déplacée, `launchd` échoue en silence. Et `is_enabled()` ne fait que vérifier l'existence du fichier, sans jamais comparer le chemin qu'il contient, donc il répondrait « oui » sur un enregistrement mort. D'où la règle : la configuration porte l'intention, `app::autostart::reconcile` réécrit l'enregistrement à chaque lancement, et une application déplacée se répare à sa première ouverture manuelle. Même raison pour macOS 13 et plus, où l'utilisateur peut couper l'entrée depuis Réglages Système sans que le plist bouge.
+**Un client AIR n'est pas une application native.** Tout ce qui se lit ailleurs
+sur `SendInput` et `CGEventPost` est écrit contre des applications natives. La
+mesure 1 est la seule source qui vaille ici.
 
-**L'image de barre système n'est pas le logo, sur macOS.** `tray-icon` fixe la hauteur de la `NSImage` à 18 points et déduit la largeur du rapport. Donc `icons/tray.png` est un PNG **RVBA 36 × 36**, noir pur, forme portée par le seul canal alpha, fond transparent, posé avec `icon_as_template(true)` pour que macOS le recolore selon la barre. Un logo en couleur mis là ressort gris et illisible. `tauri::include_image!` décode à la compilation et **refuse un PNG qui n'est pas en RVBA**. Windows, lui, ne recolore rien : il reçoit `icons/32x32.png`, le logo, et `icon_as_template` n'y vaut pas.
-
-**Le capot fermé endort tout, et l'assertion n'y peut rien.** `PreventUserIdleDisplaySleep` ne vaut que contre une extinction faute d'activité ; fermer le capot est un geste explicite, et aucune assertion ne l'arrête. Le processus est suspendu, donc le balayage aussi, et l'avis de déconnexion part au réveil, dans les trois secondes du premier balayage qui voit le pseudo quitter le titre. Symptôme : un avis qui arrive pendant qu'on est assis devant la machine rouverte. Ce n'est pas un bug du relais, c'est le refus écrit dans perimetre.md. Le sommeil n'étant pas un arrêt du processus, le relais est en revanche toujours actif au réveil et reprend seul, jeton et file compris.
-
-**Un client Dofus sur l'écran de connexion existe déjà en tant que processus** avec des fenêtres, mais sans titre exploitable. Toujours filtrer sur le titre, jamais sur la taille. Un client **déconnecté pour inactivité** ressemble à ça : la fenêtre reste, le pseudo quitte le titre, et le personnage passe hors ligne tout seul au tour de balayage suivant. C'est ce qui rend l'avis de déconnexion gratuit à détecter.
-
-**`Character` n'a pas de `#[serde(default)]` de structure, et `Settings` en a un.** Un champ ajouté au personnage sans défaut à lui fait échouer la lecture de tout fichier existant : la configuration part en quarantaine, les défauts se chargent, et les sexes assignés partent avec. Poser `#[serde(default)]` sur la structure pour s'en tirer ferait pire, un personnage tronqué revenant sans pseudo.
-
-**Les traits de `keyring` 4 ne s'appellent pas comme on croit.** `apple-native` et `windows-native` n'existent pas, et nommer les vrais, `apple-native-keyring-store` seul, ne compile pas : le trait de `keyring` n'active pas le sous-trait `keychain` du magasin. La bonne déclaration est `keyring = "4"` sans rien, dont le trait par défaut `v1` fait déjà le bon choix par cible. Détail dans l'ADR 0009.
-
-**`cargo check --target x86_64-pc-windows-msvc` échoue depuis macOS**, avant même de compiler une ligne du projet : le build script de Tauri réclame `llvm-rc`, absent de la machine. C'est antérieur au projet, constaté sur un dépôt neuf, ne pas partir chasser ça dans le code.
-
-**TypeScript 7 a supprimé `baseUrl`.** Les `paths` du `tsconfig.json` se résolvent relativement au fichier lui-même. Ne pas le réintroduire, le build casse.
-
-**shadcn 4.16 repose sur Base UI, pas sur Radix.** Les API de composants diffèrent de la plupart des tutoriels shadcn en circulation.
-
-**Ce que la règle du verrou interdit, c'est de le tenir, pas de le prendre.** `shortcuts::fire` et le clic sur un personnage dans la barre système avalent l'échec de leur `send` parce qu'il n'y a plus rien à écrire : le worker n'a jamais démarré, ce que `start` a noté, ou il est mort, ce qu'un `catch_unwind` autour de chaque réponse empêche désormais. Ce n'est pas une question d'interblocage, et une version de ce texte l'a prétendu à tort : `tray::on_menu_event` prend ce verrou sur ce même fil principal pour trois de ses articles. L'interdit porte sur le fait de le tenir pendant un appel qui attend le fil principal.
-
-**`tauri-plugin-log` écrit du `[INFO]` sur chaque ligne, et c'est voulu.** Le journal n'a pas de niveaux, il a des événements, et la gravité est une lecture que fait l'interface. Ne pas ajouter une table de gravité côté Rust pour rendre le fichier plus joli : ce serait une seconde source de vérité. Ne pas non plus passer par `.format()`, qui est écrasé par `.timezone_strategy()` appelé après lui.
-
-**oxfmt réécrit `tableau[tableau.length - 1]` en `tableau.at(-1)`**, que la `lib` TypeScript du projet n'a pas, donc le code ne compile plus après un `lint:fix`. Passer l'index par une variable. Constaté dans `journalPeriod`.
-
-**Un clone sous Windows arrive en CRLF, et oxfmt ne sait pas s'en accommoder.** `core.autocrlf` vaut `true` sur une installation Windows de git, qui réécrit alors tout le répertoire de travail : 115 fichiers sur 116 échouent `format:check` sur leurs seules fins de ligne, sans qu'une ligne de code soit en cause. Régler `endOfLine` ferait échouer l'autre système à la place, les seules valeurs étant `lf`, `crlf` et `cr`, et `"auto"` n'existe pas, voir [oxc#17856](https://github.com/oxc-project/oxc/issues/17856). C'est donc à git qu'on le dit, par un `.gitattributes` en `* text=auto eol=lf`. Les blobs étant déjà en LF, il ne modifie aucun fichier : il empêche seulement la conversion au checkout.
-
-**Un `tauri build` local finit en erreur ici, et le paquet est pourtant bon.** `createUpdaterArtifacts` étant à `true`, la dernière étape signe les artefacts de mise à jour et réclame `TAURI_SIGNING_PRIVATE_KEY`. La clé privée est sur le Mac, dans `~/.tauri/multifus.key`, et **ne se régénère pas**, voir plus haut. Le MSI et le NSIS sont écrits avant cette étape et existent malgré le code de sortie 1. Pour un build local complet de ce côté, recopier la clé depuis le Mac ; la CI, elle, la fournit en secret.
-
-**`crate-type` ne garde que `rlib`, et le Mac ne l'a pas encore compilé.** Le scaffolder Tauri pose `["staticlib", "cdylib", "rlib"]`, dont les deux premiers sont les points d'entrée d'iOS et d'Android ; le desktop ne lie que le troisième, par `main.rs`. Sous Windows le `cdylib` faisait annoncer son import library par `link.exe`, ce que la lint `linker_messages` remonte, et c'était le seul avertissement du projet. Le mobile étant refusé par [perimetre.md](./perimetre.md), ces deux types sont du poids mort et non une sécurité qu'on retire. **À confirmer par un `cargo build` sur le Mac**, seule machine à pouvoir le dire.
+**Le verrou de `Multifus` ne se tient pas pendant un collage.** Cinq étapes dont
+une attente mesurée en centaines de millisecondes, sur un verrou que le balayage
+prend plusieurs fois par minute. La règle est en tête de `app::state`, et
+[pieges.md](./pieges.md) la répète.

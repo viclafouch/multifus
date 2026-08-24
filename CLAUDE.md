@@ -3,9 +3,14 @@ Gestionnaire de fenêtres Dofus Retro en multicompte, macOS et Windows. À lire 
 - [CONTEXT.md](./CONTEXT.md) — le vocabulaire. L'employer partout, code compris.
 - [docs/perimetre.md](./docs/perimetre.md) — ce que le projet refuse de faire.
 - [docs/adr](./docs/adr) — décisions déjà tranchées, ne pas les rejouer.
-- [docs/plan.md](./docs/plan.md) — le chantier en cours, Windows, et rien d'autre.
-- [docs/macos.md](./docs/macos.md) — macOS, fini. Archive à relire quand un
-  comportement surprend, jamais un travail à reprendre.
+- [docs/plan.md](./docs/plan.md) — le chantier en cours, un seul à la fois, sur
+  les deux systèmes. Aujourd'hui, les **phrases** : un texte tout prêt collé dans
+  le jeu au raccourci, ce qu'on appelle aussi les copier-coller multiples.
+- [docs/pieges.md](./docs/pieges.md) — ce qui mord partout, propre à aucun
+  chantier ni à aucun système.
+- [docs/macos.md](./docs/macos.md) et [docs/windows.md](./docs/windows.md) —
+  archives à relire quand un comportement surprend, jamais un travail à
+  reprendre.
 
 On lance multifus et on l'oublie : une fonctionnalité qui oblige à ouvrir la fenêtre pour être utile doit avoir un raccourci clavier, ou ne pas exister.
 

@@ -317,7 +317,7 @@ const journalPeriod = (entries: readonly JournalEntry[]) => {
 
 /**
  * The journal as plain text, a header and then one entry per line, oldest first.
- * The header is not decoration, see le plan, « Le journal ».
+ * The header is not decoration, see `docs/macos.md`, « Le journal ».
  */
 export const journalTranscript = (snapshot: Snapshot) => {
   const { journal } = snapshot

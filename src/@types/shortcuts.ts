@@ -5,7 +5,8 @@ export type ShortcutAction = 'next' | 'previous' | 'swap' | 'toggleAsleep'
 
 /**
  * What the system answered when multifus laid a combination down. `registered`
- * says the system took it, never that it will fire: see le plan, « Ce qui mord ».
+ * says the system took it, never that it will fire: see `docs/macos.md` and
+ * `docs/windows.md`, « Ce qui mord ».
  */
 export type ShortcutStatus =
   | { readonly kind: 'duplicate'; readonly action: ShortcutAction }

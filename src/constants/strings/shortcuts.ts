@@ -55,7 +55,7 @@ export const SHORTCUTS_STRINGS = {
     subtitle:
       'Ces combinaisons restent inertes tant qu’une fenêtre Dofus n’est pas au premier plan.',
     // A combination the system accepts is not one that fires, and this note is
-    // the only place the interface can say so. See le plan, « Ce qui mord ».
+    // the only place the interface can say so. See `docs/macos.md`, « Ce qui mord ».
     silent:
       'Le système accepte parfois une combinaison qu’une autre application intercepte déjà : elle est alors posée, mais n’arrive jamais jusqu’ici. En cas de doute, appuyez dessus depuis le jeu et regardez le journal.',
     capture: 'Appuyez sur une combinaison',

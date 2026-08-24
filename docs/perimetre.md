@@ -20,18 +20,21 @@ Ce principe arbitre tous les compromis. Une fonctionnalité qui exige d'ouvrir l
 
 **Sexe et actions groupées.** Chaque personnage se voit assigner un sexe une fois pour toutes. Deux boutons endorment ou réveillent tous les hommes ou toutes les femmes. Un raccourci bascule d'un ensemble à l'autre.
 
+**Phrases.** On range sous une combinaison un texte qu'on écrit souvent, « prix libre », « de rien ». La combinaison frappée depuis le jeu colle ce texte dans le chat, et s'arrête là : l'envoi reste un geste de l'utilisateur. Le presse-papiers d'avant est rendu. C'est la seule chose que multifus écrive vers le jeu, et elle a son [ADR 0012](./adr/0012-une-phrase-se-colle-dans-le-jeu.md).
+
 **Relais.** On quitte son bureau, on active le relais depuis la barre système ou depuis l'écran Relais, et chaque message privé reçu par un personnage relayé arrive dans un salon Telegram sur le téléphone. Un des quatre raccourcis frappé signifie qu'on est revenu et coupe le relais. Tant qu'un personnage relayé est connecté, l'écran est tenu éveillé, sans quoi le verrouillage de session couperait la lecture des bannières et le relais deviendrait muet sans le dire. Le pseudo et le type partent toujours, le texte du message seulement si l'utilisateur l'a coché.
 
 Le relais dit aussi quand il cesse d'entendre, et c'est un avis et non une notification de jeu. La raison est le quart d'heure : **Dofus déconnecte un client resté inactif**, et multifus n'a pas le droit d'y remédier, voir plus bas. Une absence d'une heure est donc une absence où le relais devient sourd au bout de quinze minutes, et un téléphone muet se lit « personne ne m'a écrit ». L'avis est ce qui empêche ce contresens.
 
 ## Raccourcis
 
-| Raccourci | Effet                                            |
-| --------- | ------------------------------------------------ |
-| Suivant   | Passe au personnage suivant, hors veille         |
-| Précédent | Passe au personnage précédent, hors veille       |
-| Veille    | Endort ou réveille le personnage au premier plan |
-| Bascule   | Endort un sexe et réveille l'autre               |
+| Raccourci | Effet                                                |
+| --------- | ---------------------------------------------------- |
+| Suivant   | Passe au personnage suivant, hors veille             |
+| Précédent | Passe au personnage précédent, hors veille           |
+| Veille    | Endort ou réveille le personnage au premier plan     |
+| Bascule   | Endort un sexe et réveille l'autre                   |
+| Phrase    | Colle un texte tout prêt, une combinaison par phrase |
 
 Tous restent inertes tant qu'une fenêtre Dofus n'est pas au premier plan. Sans cette garde, un raccourci du type `ctrl+flèche` casserait la navigation par mot dans tous les éditeurs de texte.
 
@@ -47,11 +50,21 @@ Tous restent inertes tant qu'une fenêtre Dofus n'est pas au premier plan. Sans 
 
 **La mise à jour silencieuse.** multifus cherche une version plus récente au démarrage et la propose, dans la barre système et dans l'écran À propos. Il ne l'installe jamais tout seul : installer relance l'application, ce qui en pleine soirée revient à couper le gestionnaire de fenêtres de tous les clients d'un coup. La proposer sans l'imposer est le seul comportement compatible avec le principe directeur.
 
-**Toute forme d'automatisation du jeu.** multifus ne lit pas la mémoire du client, ne simule aucune action de jeu, ne modifie aucun fichier. Il ne fait que gérer des fenêtres et lire des notifications système. Les outils de type macro sont interdits par Ankama et restent hors de ce projet.
+**Toute forme d'automatisation du jeu, à une exception écrite.** multifus ne lit pas la mémoire du client, ne modifie aucun fichier, ne joue à la place de personne et n'empêche pas la déconnexion pour inactivité. Les outils de type macro sont interdits par Ankama et restent hors de ce projet.
 
-**Répondre depuis le téléphone.** Le relais va dans un seul sens. Répondre à un message privé demanderait d'écrire dans le jeu, ce que le paragraphe précédent interdit. Le relais dit s'il faut revenir, il ne remplace pas le retour.
+L'exception est le collage d'une phrase, qui pose une combinaison et une seule vers la fenêtre du jeu, sur un appui de l'utilisateur, pour un texte qu'il a écrit lui-même, et qui n'envoie rien. C'est le point le plus discutable du projet, et il est écrit dans l'[ADR 0012](./adr/0012-une-phrase-se-colle-dans-le-jeu.md) plutôt que caché dans une fonction. Rien d'autre n'est jamais posé sur le système : ni touche Entrée, ni séquence, ni frappe parasite pour contourner une restriction de focus, ce que Dracoon fait et que le plan garde comme un piège.
 
-**Empêcher la déconnexion pour inactivité.** Dofus ferme la session d'un client resté inactif un quart d'heure, et le titre de la fenêtre perd alors le pseudo. C'est la vraie limite du relais : une absence d'une heure est une absence où plus personne n'est joignable après quinze minutes. La corriger demanderait de simuler une action de jeu, ce que l'automatisation refuse deux paragraphes plus haut. multifus ne rallonge pas l'absence, il dit quand elle est finie. Ne pas rouvrir : un anti-inactivité est exactement l'outil qu'Ankama interdit.
+**L'envoi d'une phrase.** Coller n'est pas envoyer. multifus ne frappe pas Entrée, n'ouvre pas le chat et ne choisit pas le canal. Trois touches posées sur le système au lieu d'une pour économiser un appui, et un message qui part sans relecture le jour où le collage rate : le prix est trop haut. La touche Entrée reste celle de l'utilisateur.
+
+**Le texte d'une phrase sur plusieurs lignes.** Un saut de ligne collé dans le chat envoie le message, ce qui ferait rentrer le refus ci-dessus par la porte de derrière. Le champ tient sur une ligne.
+
+**Les phrases par personnage.** Même refus que les réglages d'AutoFocus par personnage, avec le motif d'origine. Une phrase est globale.
+
+**Lire les combinaisons que le bureau tient déjà.** Aucun système ne rend cette liste. multifus pose la combinaison et rapporte ce que le système répond, ce que l'écran Raccourcis affiche ligne par ligne. Une liste noire écrite à la main serait une demi-vérité qui ne couvrirait jamais les applications de l'utilisateur.
+
+**Répondre depuis le téléphone.** Le relais va dans un seul sens. Une phrase ne rouvre pas cette porte et l'ADR 0012 l'écrit : elle se frappe au clavier, devant le jeu, sur une fenêtre au premier plan. Rien ne se déclenche depuis le téléphone, jamais. Le relais dit s'il faut revenir, il ne remplace pas le retour.
+
+**Empêcher la déconnexion pour inactivité.** Dofus ferme la session d'un client resté inactif un quart d'heure, et le titre de la fenêtre perd alors le pseudo. C'est la vraie limite du relais : une absence d'une heure est une absence où plus personne n'est joignable après quinze minutes. La corriger demanderait de jouer à la place du joueur, ce que l'automatisation refuse plus haut et que l'exception du collage ne couvre pas : une phrase répond à un appui, un anti-inactivité répond à une horloge. multifus ne rallonge pas l'absence, il dit quand elle est finie. Ne pas rouvrir : un anti-inactivité est exactement l'outil qu'Ankama interdit.
 
 **Relayer capot fermé.** L'écran tenu éveillé pose `PreventUserIdleDisplaySleep`, et le mot qui compte est **Idle** : l'assertion empêche l'écran de s'éteindre faute d'activité, elle ne s'oppose pas à un geste explicite. Fermer le capot endort la machine entière, et aucune assertion d'énergie ne bloque ça. Le balayage s'arrête, plus aucune bannière n'est dessinée, et l'avis de déconnexion part au moment où l'on rouvre, c'est-à-dire au seul moment où il ne sert plus à rien. On laisse donc le Mac ouvert, ce qui est le cas d'usage prévu, ou on branche un écran externe et l'alimentation. Le quart d'heure limite l'absence utile de toute façon, et l'assertion se relâche dès que le dernier personnage relayé tombe : l'écran ne reste pas allumé une heure pour rien.
 
@@ -79,6 +92,7 @@ multifus vise **macOS et Windows**. Ni iOS, ni Android, ni Linux, que Tauri sait
 | Dépendance à l'affichage des bannières | non                                | oui                                                        |
 | Corps de notification complet          | oui                                | oui, mesuré : la bannière tronque à l'écran, `AXValue` non |
 | Écran tenu éveillé                     | `PowerSetRequest`                  | `IOPMAssertionCreateWithName`                              |
+| Collage d'une phrase                   | `SendInput`, `Control+V`           | `CGEventPost`, `Super+V`                                   |
 
 Le détail et les mesures sont dans [ADR 0002](./adr/0002-notifications-macos-via-accessibility.md).
 

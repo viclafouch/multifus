@@ -3,15 +3,16 @@
 **Archive. Aucun travail n'attend dans ce document.** macOS est fini, vérifié
 sur deux vrais clients et sur une soirée de relais, quart d'heure compris. Ce
 qui suit est là pour être relu quand un comportement surprend, jamais pour être
-repris. Le travail en cours est dans [plan.md](./plan.md), et il ne parle que de
-Windows.
+repris. Le travail en cours est dans [plan.md](./plan.md), Windows est archivé
+dans [windows.md](./windows.md).
 
 Trois choses restent à faire hors de ce document, et elles sont dans le plan :
 le certificat Developer ID, les huit secrets du dépôt et le logo.
 
 Le vocabulaire est dans [CONTEXT.md](../CONTEXT.md), ce que le projet refuse de
 faire dans [perimetre.md](./perimetre.md), les décisions structurantes dans
-[adr](./adr).
+[adr](./adr), et les pièges qui ne sont propres à aucun système dans
+[pieges.md](./pieges.md).
 
 ---
 
