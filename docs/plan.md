@@ -43,8 +43,9 @@ est déjà le champ `plugins.updater.pubkey` de `tauri.conf.json`. Une nouvelle
 paire rendrait insignables les mises à jour des versions déjà installées.
 
 **Le logo** : `npm run tauri icon <fichier>` régénère les onze fichiers depuis un
-PNG carré à transparence. Il ne touche pas à `icons/tray.png`, qui obéit à
-d'autres règles, voir « Ce qui mord ».
+PNG carré à transparence, dont `icons/32x32.png`, qui est aussi l'icône de barre
+système de Windows. Il ne touche pas à `icons/tray.png`, celle de macOS, qui obéit
+à d'autres règles, voir « Ce qui mord ».
 
 ---
 
@@ -56,7 +57,9 @@ du type d'erreur avec la dernière. Les trois interfaces de `platform` ont été
 dessinées avec Windows en vue, `TITLE_PATTERN` et la table `NOTIF_TYPES` viennent
 de Dracoon et sont vérifiés sur les deux systèmes, et `GameWindow::from_title`
 reste la seule porte d'entrée d'une fenêtre. Rien de tout ça n'est à réécrire.
-Reste le lot D, qui ne parle plus au système mais à la chaîne de compilation.
+Les quatre lots sont écrits, le dernier compris, qui ne parlait plus au système
+mais à la chaîne de compilation. Ce qui reste n'est plus du code : la soirée de
+vérification, et la signature Windows qui attend la publication de macOS.
 
 **Objectif.** La parité, sur la machine où l'application sert vraiment.
 
@@ -238,17 +241,25 @@ Lire un toast, c'est `Notification().Visual().GetBinding(KnownNotificationBindin
 
 ### Lot D — La chaîne de compilation, le paquet et la barre système
 
-`checks.yml` et `release.yml` portent chacun un job unique. Ils en gagnent un second sur `windows-latest`, et un `ci` vert dit alors quelque chose de `platform::windows`, ce qu'il ne dit pas aujourd'hui. Le runner s'ajoute en confiance : les sept commandes du gate ont déjà été jouées à la main sur ce PC et passent, voir « La machine est prête ». Sans le `.gitattributes`, `format:check` aurait échoué sur ce runner pour une raison qui n'a rien à voir avec Windows.
+**`checks.yml` a deux runners, et un `ci` vert dit désormais quelque chose de `platform::windows`.** Le job unique est devenu une matrice `macos-latest, windows-latest`, `fail-fast` coupé pour qu'un système qui casse n'empêche pas de savoir ce que dit l'autre. Le runner s'est ajouté en confiance : les sept commandes du gate avaient déjà été jouées à la main sur ce PC, voir « La machine est prête ». Sans le `.gitattributes`, `format:check` aurait échoué là pour une raison qui n'a rien à voir avec Windows.
 
-**L'image de barre système ne marche pas telle quelle.** `icons/tray.png` est un PNG noir pur dont la forme est portée par le seul canal alpha, posé avec `icon_as_template(true)` pour que macOS le recolore selon la barre. Windows ne recolore rien : le même fichier donne une icône noire sur une barre des tâches sombre, donc invisible. Il faut une seconde image, et `icon_as_template` ne vaut que sur macOS.
+**`release.yml` a deux jobs et pas une matrice.** Ce qui entoure la compilation n'a rien de commun : les secrets Apple et la notarisation n'appartiennent qu'à macOS, et Windows ne signe rien du tout. La vérification « le tag et le paquet disent la même version » ne se recopie pas non plus, le job Windows venant après celui qui l'a faite.
 
-**Le démarrage avec la session change de mécanisme et pas de forme.** `tauri-plugin-autostart` écrit une clé de registre `Run` au lieu d'un `LaunchAgent`, et porte l'argument `--from-session` de la même façon. `app::autostart::reconcile` réécrit l'enregistrement à chaque lancement et couvre les deux systèmes sans rien changer. Reste à confirmer que `is_enabled()` n'est pas plus fiable ici qu'il ne l'est sur macOS ; la configuration porte l'intention de toute façon.
+**Le job Windows suit celui de macOS au lieu d'être à côté, et c'est le `latest.json` qui l'impose.** `tauri-action` télécharge le `latest.json` déjà posé sur la publication et fusionne ses plateformes dans celui qu'il téléverse : c'est une lecture puis une écriture. Joués en parallèle, le job le plus lent publierait un fichier où la plateforme de l'autre n'a jamais existé, et aucun multifus installé ne se verrait jamais proposer la mise à jour. Vérifié dans `upload-version-json.ts` de l'action, pas déduit.
 
-**Et il échoue de ce côté, chaque lancement l'écrit.** `Démarrage avec la session impossible : Le fichier spécifié est introuvable. (os error 2)`, vu au lot B sur un `tauri dev`. Une piste avant d'en ouvrir d'autres : en développement le binaire lancé n'est pas celui d'une installation, et le plugin enregistre un chemin. À reprendre sur un paquet installé avant de conclure à un bug du plugin.
+**La barre système n'a pas eu besoin d'une seconde image, et ce plan disait le contraire.** Windows reçoit `icons/32x32.png`, le logo, celui-là même que `npm run tauri icon` régénère avec les dix autres : rien à dessiner, rien à maintenir, et le jour où le logo du scaffolder part, la barre système part avec lui. `icons/tray.png` reste à macOS seul, avec `icon_as_template` qui devient `cfg!(target_os = "macos")` puisqu'il ne vaut que là.
+
+**Le démarrage avec la session échouait pour une raison que ce plan cherchait au mauvais endroit.** Ce n'était ni le binaire de développement ni un chemin : `auto-launch` 0.5.0 garde son `disable` sur macOS, `if file.exists()`, et ne le garde pas sur Windows, où il appelle `delete_value` sur la clé `Run` sans regarder. `start_at_login` étant décoché par défaut, `reconcile` demandait à chaque lancement le retrait d'un enregistrement qui n'avait jamais existé, et le registre répondait `ERROR_FILE_NOT_FOUND`, l'`os error 2` du journal. Rien à reprendre sur un paquet installé.
+
+**Le retrait est donc gardé, l'ajout non.** `reconcile` ne demande le retrait que si `is_enabled` dit qu'il y a quelque chose à retirer, et c'est un usage étroit qui ne contredit pas ce qui est écrit plus bas : `is_enabled` est une mauvaise réponse à « l'utilisateur veut-il ça ». Ce n'est pas non plus tout à fait « y a-t-il quelque chose à enlever », voir « Ce qui mord ». Une lecture qui échoue tombe sur le retrait, qui dit alors ce qui s'est passé. L'ajout reste inconditionnel, c'est lui qui réécrit le chemin.
+
+**Windows ne publie qu'un installateur, et le `latest.json` l'impose.** `bundle.targets` vaut `all`, donc un `tauri build` sort le MSI et le NSIS ; mais `latest.json` ne porte qu'une archive par plateforme, et `tauri-action` y met le MSI d'abord, son `updaterJsonPreferNsis` valant `false` par défaut. Une installation faite au NSIS, par utilisateur et sans UAC, se verrait donc mettre à jour par le MSI, par machine et ailleurs sur le disque : deux copies, et l'enregistrement de démarrage qui pointe vers l'ancienne puisqu'il porte un chemin absolu. Le job passe `--bundles nsis`, qui est celui qui convient à une application qu'on lance et qu'on oublie.
 
 **Les raccourcis échouent franchement, et il n'y a rien à écrire.** Windows refuse une combinaison déjà prise, contrairement à macOS où l'enregistrement réussit et la touche reste morte. L'écran des raccourcis affiche déjà cet échec. `Control+Shift+flèche` n'est pas réservé par Windows, qui prend `Win+Control+flèche` pour ses bureaux, donc les combinaisons proposées au premier lancement conviennent aux deux systèmes.
 
-**La signature Windows est un second sujet, que la distribution macOS ne couvre pas.** Un certificat Authenticode n'est pas un Developer ID, il s'achète ailleurs et ne pose pas les mêmes secrets. Sans lui, SmartScreen avertit à chaque installation. À trancher quand macOS sera publié pour de bon, pas avant.
+**La signature Windows est un second sujet, que la distribution macOS ne couvre pas.** Un certificat Authenticode n'est pas un Developer ID, il s'achète ailleurs et ne pose pas les mêmes secrets. Sans lui, SmartScreen avertit à chaque installation. À trancher quand macOS sera publié pour de bon, pas avant : le job Windows publie non signé en attendant, et c'est écrit dans le fichier.
+
+**Vérifié quand** : l'icône est lisible dans la barre des tâches, le menu s'ouvre et ses articles font ce qu'ils disent, et le journal n'écrit plus d'échec de démarrage avec la session.
 
 ### Les dépendances
 
@@ -294,9 +305,13 @@ Une soirée de jeu sur le PC, deux vrais clients, sans jamais ouvrir la fenêtre
 
 **Ne jamais tenir le verrou de `Multifus` en touchant au watcher de notifications, au plugin de raccourcis ou à l'icône de barre système.** Le premier joint le thread qui exécute le sink, les deux autres attendent le fil principal où les commandes prennent ce verrou. Pour l'icône ce n'est pas une supposition : `TrayIcon::set_menu` passe par `run_item_main_thread!`, qui poste la tâche puis bloque sur `rx.recv()` sans délai (`tauri/src/menu/mod.rs`). C'est le seul interblocage que cette application sache construire, et la règle est écrite en tête de `app::state` et de `app::tray`.
 
+**Le retrait du démarrage automatique n'est pas gardé sous Windows.** `auto-launch` 0.5.0 appelle `delete_value` sur la clé `Run` sans regarder si la valeur existe, là où sa version macOS teste `file.exists()` d'abord. Une intention décochée, qui est celle du premier lancement, réclamait donc à chaque démarrage le retrait de rien, et le registre répondait `os error 2`. `app::autostart::reconcile` garde le retrait derrière `is_enabled` pour ça, et pour ça seulement.
+
+**Et `is_enabled` n'est pas exactement la question posée.** Sous Windows il rend `Run` **et** l'accord du gestionnaire des tâches, `StartupApproved\Run` : une entrée désactivée depuis cet onglet se lit absente alors que la valeur est là, et le retrait la laisse. Ça ne coûte rien tant que l'accord manque, Windows ne démarrant rien ; le jour où l'utilisateur le redonne, multifus démarre une fois contre son réglage, et le `reconcile` de ce lancement-là voit enfin l'enregistrement et l'enlève. C'est la même réparation au lancement suivant que pour une application déplacée, et le prix de ne pas réécrire le registre à la main.
+
 **Le démarrage automatique enregistre un chemin, et personne ne s'en aperçoit.** `tauri-plugin-autostart` écrit `~/Library/LaunchAgents/<nom>.plist` avec le chemin absolu du binaire ; l'application déplacée, `launchd` échoue en silence. Et `is_enabled()` ne fait que vérifier l'existence du fichier, sans jamais comparer le chemin qu'il contient, donc il répondrait « oui » sur un enregistrement mort. D'où la règle : la configuration porte l'intention, `app::autostart::reconcile` réécrit l'enregistrement à chaque lancement, et une application déplacée se répare à sa première ouverture manuelle. Même raison pour macOS 13 et plus, où l'utilisateur peut couper l'entrée depuis Réglages Système sans que le plist bouge.
 
-**L'image de barre système n'est pas le logo.** `tray-icon` fixe la hauteur de la `NSImage` à 18 points et déduit la largeur du rapport. Donc `icons/tray.png` est un PNG **RVBA 36 × 36**, noir pur, forme portée par le seul canal alpha, fond transparent, posé avec `icon_as_template(true)` pour que macOS le recolore selon la barre. Un logo en couleur mis là ressort gris et illisible. `tauri::include_image!` décode à la compilation et **refuse un PNG qui n'est pas en RVBA**.
+**L'image de barre système n'est pas le logo, sur macOS.** `tray-icon` fixe la hauteur de la `NSImage` à 18 points et déduit la largeur du rapport. Donc `icons/tray.png` est un PNG **RVBA 36 × 36**, noir pur, forme portée par le seul canal alpha, fond transparent, posé avec `icon_as_template(true)` pour que macOS le recolore selon la barre. Un logo en couleur mis là ressort gris et illisible. `tauri::include_image!` décode à la compilation et **refuse un PNG qui n'est pas en RVBA**. Windows, lui, ne recolore rien : il reçoit `icons/32x32.png`, le logo, et `icon_as_template` n'y vaut pas.
 
 **Le capot fermé endort tout, et l'assertion n'y peut rien.** `PreventUserIdleDisplaySleep` ne vaut que contre une extinction faute d'activité ; fermer le capot est un geste explicite, et aucune assertion ne l'arrête. Le processus est suspendu, donc le balayage aussi, et l'avis de déconnexion part au réveil, dans les trois secondes du premier balayage qui voit le pseudo quitter le titre. Symptôme : un avis qui arrive pendant qu'on est assis devant la machine rouverte. Ce n'est pas un bug du relais, c'est le refus écrit dans perimetre.md. Le sommeil n'étant pas un arrêt du processus, le relais est en revanche toujours actif au réveil et reprend seul, jeton et file compris.
 

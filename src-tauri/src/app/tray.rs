@@ -37,6 +37,7 @@ use std::sync::MutexGuard;
 use std::sync::PoisonError;
 use std::thread;
 
+use tauri::image::Image;
 use tauri::menu::Menu;
 use tauri::menu::MenuEvent;
 use tauri::menu::MenuItem;
@@ -256,6 +257,20 @@ fn entries(connected: &[CharacterView]) -> Vec<Entry> {
         .collect()
 }
 
+/// The template macOS recolours: pure black, the shape carried by the alpha
+/// channel alone. See « Ce qui mord » in the plan for what it must be.
+#[cfg(target_os = "macos")]
+fn tray_image() -> Image<'static> {
+    tauri::include_image!("./icons/tray.png")
+}
+
+/// The logo, since Windows recolours nothing and the template would be a black
+/// glyph on a dark taskbar. `npm run tauri icon` regenerates it with the rest.
+#[cfg(target_os = "windows")]
+fn tray_image() -> Image<'static> {
+    tauri::include_image!("./icons/32x32.png")
+}
+
 /// Puts the icon in the system tray and starts the thread that answers it.
 ///
 /// A failure here costs the icon and nothing else: the window, the shortcuts and
@@ -268,11 +283,12 @@ pub fn setup(app: &AppHandle) {
     start_worker(app);
 
     let built = tauri::tray::TrayIconBuilder::with_id(TRAY_ID)
-        .icon(tauri::include_image!("./icons/tray.png"))
+        .icon(tray_image())
         // macOS recolours a template image itself, white on a dark menu bar and
         // black on a light one. Without this the glyph goes up as it is drawn
-        // and disappears into one of the two.
-        .icon_as_template(true)
+        // and disappears into one of the two. Windows recolours nothing, so the
+        // flag is macOS's alone and [`tray_image`] is what changes.
+        .icon_as_template(cfg!(target_os = "macos"))
         .tooltip(tooltip(0))
         .on_menu_event(on_menu_event)
         .build(app);

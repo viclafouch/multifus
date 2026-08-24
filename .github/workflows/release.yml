@@ -1,9 +1,9 @@
-# Builds the macOS bundle on a tag, signs it, notarises it, and puts it in a
-# draft release with the JSON the updater reads.
+# Builds the two bundles on a tag, signs and notarises the macOS one, and puts
+# them in a draft release with the JSON the updater reads.
 #
-# macOS only for now. Windows is next and not dropped: it joins this file at
-# step 9, which is the day the single job below becomes a matrix and
-# `platform::windows` finally gets a runner to prove it compiles.
+# Two jobs and not a matrix: what they do around the build has nothing in
+# common, the Apple secrets and the notarisation being macOS's alone. They run
+# one after the other for a reason of the updater, written on the Windows job.
 #
 # The release is left as a draft on purpose: the endpoint of the updater is
 # `releases/latest/download/latest.json`, so publishing is what tells every
@@ -94,3 +94,58 @@ jobs:
           releaseDraft: true
           prerelease: false
           args: --target aarch64-apple-darwin
+
+  # After macOS and not beside it, because both jobs write the same `latest.json`.
+  # `tauri-action` reads the one already on the release and merges its platforms
+  # into the one it uploads, which is a read then a write: run in parallel, the
+  # slower job would publish a file where the faster one's platform never
+  # existed, and no installed multifus would ever be offered it.
+  windows:
+    needs: macos
+    runs-on: windows-latest
+    permissions:
+      # The release already exists at this point; the bundle is uploaded to it.
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: ./src-tauri -> target
+
+      - run: npm ci
+
+      # No target is named: the runner's own is the one wanted, and naming it
+      # would only be a second place for `x86_64-pc-windows-msvc` to be wrong.
+      #
+      # One installer and not two, `all` being what the configuration says
+      # otherwise. `latest.json` carries a single archive per platform, so
+      # publishing the MSI beside the NSIS would update half the installations
+      # with the other one's package. See the plan.
+      #
+      # Nothing signs it, so SmartScreen warns at every install. An Authenticode
+      # certificate is bought elsewhere than a Developer ID and poses other
+      # secrets; see the plan for why that waits.
+      - uses: tauri-apps/tauri-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+          # The updater's own signature, the same key as macOS: it is what proves
+          # to an installed multifus that the archive it just downloaded came
+          # from this repository, whichever system built it.
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: multifus ${{ github.ref_name }}
+          releaseBody: 'Le détail des changements est dans le CHANGELOG.'
+          releaseDraft: true
+          prerelease: false
+          args: --bundles nsis

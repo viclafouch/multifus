@@ -48,6 +48,10 @@ pub fn reconcile(app: &AppHandle) {
     // is done unconditionally rather than only on a change.
     let outcome = if wanted {
         manager.enable()
+    } else if matches!(manager.is_enabled(), Ok(false)) {
+        // Removing nothing fails on Windows, at every launch of a fresh install.
+        // `is_enabled` is the nearest question there is, see « Ce qui mord ».
+        Ok(())
     } else {
         manager.disable()
     };

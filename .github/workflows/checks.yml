@@ -5,11 +5,14 @@
 # it would drift, and the copy that drifted would be the one guarding the
 # release.
 #
-# One runner, macOS, because that is the only system multifus has been verified
-# on so far. Windows is next, not dropped: `platform::windows` compiles here
-# already and stays compiling. What is missing is a `windows-latest` runner to
-# prove it, and that is what step 9 adds, by turning this single job into a
-# matrix.
+# Two runners, because multifus is one application on two systems and a green
+# `ci` has to say something about both. `platform::macos` and `platform::windows`
+# are each compiled by one of them and by no other, so a single runner would let
+# half the boundary rot untouched.
+#
+# `fail-fast` is off: one system failing is not a reason to stop asking the
+# other, and knowing whether a failure is shared or local is most of the
+# diagnosis.
 name: checks
 
 on:
@@ -20,7 +23,11 @@ permissions:
 
 jobs:
   checks:
-    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v5
 
