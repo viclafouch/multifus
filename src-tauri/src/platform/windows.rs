@@ -7,6 +7,7 @@
 use std::collections::HashMap;
 use std::collections::HashSet;
 use std::ffi::c_void;
+use std::iter::once;
 use std::panic::catch_unwind;
 use std::panic::AssertUnwindSafe;
 use std::path::Path;
@@ -25,16 +26,24 @@ use std::time::Instant;
 use windows::core::BOOL;
 use windows::core::PWSTR;
 use windows::Win32::Foundation::CloseHandle;
+use windows::Win32::Foundation::HANDLE;
 use windows::Win32::Foundation::HWND;
 use windows::Win32::Foundation::LPARAM;
 use windows::Win32::System::Com::CoInitializeEx;
 use windows::Win32::System::Com::COINIT_APARTMENTTHREADED;
+use windows::Win32::System::Power::PowerClearRequest;
+use windows::Win32::System::Power::PowerCreateRequest;
+use windows::Win32::System::Power::PowerRequestDisplayRequired;
+use windows::Win32::System::Power::PowerSetRequest;
 use windows::Win32::System::Threading::AttachThreadInput;
 use windows::Win32::System::Threading::GetCurrentThreadId;
 use windows::Win32::System::Threading::OpenProcess;
 use windows::Win32::System::Threading::QueryFullProcessImageNameW;
+use windows::Win32::System::Threading::POWER_REQUEST_CONTEXT_SIMPLE_STRING;
 use windows::Win32::System::Threading::PROCESS_NAME_WIN32;
 use windows::Win32::System::Threading::PROCESS_QUERY_LIMITED_INFORMATION;
+use windows::Win32::System::Threading::REASON_CONTEXT;
+use windows::Win32::System::Threading::REASON_CONTEXT_0;
 use windows::Win32::UI::WindowsAndMessaging::BringWindowToTop;
 use windows::Win32::UI::WindowsAndMessaging::DispatchMessageW;
 use windows::Win32::UI::WindowsAndMessaging::EnumWindows;
@@ -48,10 +57,15 @@ use windows::Win32::UI::WindowsAndMessaging::IsWindowVisible;
 use windows::Win32::UI::WindowsAndMessaging::PeekMessageW;
 use windows::Win32::UI::WindowsAndMessaging::SetForegroundWindow;
 use windows::Win32::UI::WindowsAndMessaging::ShowWindow;
+use windows::Win32::UI::WindowsAndMessaging::SystemParametersInfoW;
 use windows::Win32::UI::WindowsAndMessaging::TranslateMessage;
 use windows::Win32::UI::WindowsAndMessaging::MSG;
 use windows::Win32::UI::WindowsAndMessaging::PM_REMOVE;
+use windows::Win32::UI::WindowsAndMessaging::SPI_GETSCREENSAVEACTIVE;
+use windows::Win32::UI::WindowsAndMessaging::SPI_GETSCREENSAVETIMEOUT;
 use windows::Win32::UI::WindowsAndMessaging::SW_RESTORE;
+use windows::Win32::UI::WindowsAndMessaging::SYSTEM_PARAMETERS_INFO_ACTION;
+use windows::Win32::UI::WindowsAndMessaging::SYSTEM_PARAMETERS_INFO_UPDATE_FLAGS;
 use windows::UI::Notifications::KnownNotificationBindings;
 use windows::UI::Notifications::Management::UserNotificationListener;
 use windows::UI::Notifications::Management::UserNotificationListenerAccessStatus;
@@ -634,45 +648,146 @@ fn read(toast: &UserNotification) -> Option<GameNotification> {
     Some(GameNotification::new(title, body.join("\n")))
 }
 
+/// What `powercfg /requests` shows next to multifus, the twin of the name
+/// `pmset -g assertions` shows on macOS.
+const POWER_REQUEST_REASON: &str = "multifus relay";
+
+/// The only version a `REASON_CONTEXT` has. Written here rather than pulled from
+/// `Win32_System_SystemServices`, a whole feature for one zero.
+const REASON_CONTEXT_VERSION: u32 = 0;
+
+/// The update flags of a read of the system settings, which changes nothing.
+const READ_ONLY: SYSTEM_PARAMETERS_INFO_UPDATE_FLAGS = SYSTEM_PARAMETERS_INFO_UPDATE_FLAGS(0);
+
 /// Keeps the display awake through a power request, the twin of the macOS
-/// assertion: the handle belongs to the process and not to the calling thread.
+/// assertion: the request belongs to the process and not to the thread that
+/// raised it, unlike `SetThreadExecutionState`.
 #[derive(Debug, Default)]
-pub struct PowerRequestDisplayKeeper;
+pub struct PowerRequestDisplayKeeper {
+    /// The request currently raised, `None` when the machine may sleep.
+    held: Option<HANDLE>,
+}
+
+// SAFETY: a power request belongs to the process, so any thread may raise, clear
+// or close it, and the relay calls this keeper from whichever thread it runs on.
+unsafe impl Send for PowerRequestDisplayKeeper {}
+// SAFETY: same reason, and the shared methods only read a boolean.
+unsafe impl Sync for PowerRequestDisplayKeeper {}
 
 impl PowerRequestDisplayKeeper {
     #[must_use]
     pub fn new() -> Self {
-        Self
+        Self::default()
     }
 }
 
 impl DisplayKeeper for PowerRequestDisplayKeeper {
     fn keep_awake(&mut self) -> Result<()> {
-        // `PowerSetRequest` with `PowerRequestDisplayRequired`, on the handle
-        // `PowerCreateRequest` minted in `new`.
-        Err(PlatformError::not_implemented(
-            "PowerRequestDisplayKeeper::keep_awake",
-        ))
+        if self.held.is_some() {
+            return Ok(());
+        }
+
+        let request = power_request()?;
+
+        // SAFETY: the handle comes from a call that reported success.
+        let raised = unsafe { PowerSetRequest(request, PowerRequestDisplayRequired) };
+
+        if let Err(error) = raised {
+            let _ = unsafe { CloseHandle(request) };
+
+            return Err(PlatformError::system(
+                "holding the display awake",
+                error.to_string(),
+            ));
+        }
+
+        self.held = Some(request);
+
+        Ok(())
     }
 
     fn release(&mut self) -> Result<()> {
-        // `PowerClearRequest`, same handle and same request kind.
-        Err(PlatformError::not_implemented(
-            "PowerRequestDisplayKeeper::release",
-        ))
+        let Some(request) = self.held.take() else {
+            return Ok(());
+        };
+
+        // SAFETY: the handle comes from a call that reported success, and taking
+        // it out of the field is what stops it being cleared twice. Closing it
+        // frees the request whatever the clear answered, so nothing is reported.
+        let _ = unsafe { PowerClearRequest(request, PowerRequestDisplayRequired) };
+        let _ = unsafe { CloseHandle(request) };
+
+        Ok(())
     }
 
     fn is_awake(&self) -> bool {
-        // A plain boolean is honest here, unlike with `SetThreadExecutionState`:
-        // the request outlives whichever thread raised it. See lot C.
-        false
+        self.held.is_some()
     }
 
     fn screen_saver_delay(&self) -> Result<ScreenSaverDelay> {
-        // `SystemParametersInfo`, `SPI_GETSCREENSAVEACTIVE` then
-        // `SPI_GETSCREENSAVETIMEOUT`, the first telling `Never` from a delay.
-        Err(PlatformError::not_implemented(
-            "PowerRequestDisplayKeeper::screen_saver_delay",
-        ))
+        Ok(screen_saver_delay())
     }
+}
+
+impl Drop for PowerRequestDisplayKeeper {
+    fn drop(&mut self) {
+        // No hold survives the keeper, and a failure here reaches nobody: the
+        // request dies with the process whatever the system answered.
+        drop(self.release());
+    }
+}
+
+/// Mints the request a hold is raised on, named so that `powercfg /requests`
+/// says which application is keeping the display on.
+fn power_request() -> Result<HANDLE> {
+    let mut reason: Vec<u16> = POWER_REQUEST_REASON.encode_utf16().chain(once(0)).collect();
+    let context = REASON_CONTEXT {
+        Version: REASON_CONTEXT_VERSION,
+        Flags: POWER_REQUEST_CONTEXT_SIMPLE_STRING,
+        Reason: REASON_CONTEXT_0 {
+            SimpleReasonString: PWSTR(reason.as_mut_ptr()),
+        },
+    };
+
+    // SAFETY: the reason string is alive for the call, which is all the system
+    // reads of it.
+    unsafe { PowerCreateRequest(&context) }
+        .map_err(|error| PlatformError::system("holding the display awake", error.to_string()))
+}
+
+/// Reads what the screen saver of this machine is set to. Whether it starts at
+/// all is asked first, a timeout alone not telling a delay from `Never`.
+fn screen_saver_delay() -> ScreenSaverDelay {
+    let Some(active) = system_parameter(SPI_GETSCREENSAVEACTIVE) else {
+        return ScreenSaverDelay::Unknown;
+    };
+
+    if active == 0 {
+        return ScreenSaverDelay::Never;
+    }
+
+    match system_parameter(SPI_GETSCREENSAVETIMEOUT) {
+        Some(0) => ScreenSaverDelay::Never,
+        Some(seconds) => ScreenSaverDelay::After(Duration::from_secs(u64::from(seconds))),
+        None => ScreenSaverDelay::Unknown,
+    }
+}
+
+/// Reads one setting of the system, `None` when it refuses to answer.
+fn system_parameter(action: SYSTEM_PARAMETERS_INFO_ACTION) -> Option<u32> {
+    let mut value = 0_u32;
+
+    // SAFETY: the pointer is to a live four-byte value, which is what both the
+    // screen saver actions write.
+    unsafe {
+        SystemParametersInfoW(
+            action,
+            0,
+            Some(std::ptr::from_mut(&mut value).cast()),
+            READ_ONLY,
+        )
+    }
+    .ok()?;
+
+    Some(value)
 }

@@ -47,8 +47,8 @@ keyring = "4"
 tempfile = "3"
 
 # The Windows side of the boundary, and nothing else in the crate, talks to this.
-# Features land lot by lot, so that nothing compiles before it is called: these
-# are lots A and B's, the power one comes with lot C.
+# Features land lot by lot, so that nothing compiles before it is called: lots A,
+# B and C have all landed theirs.
 [target.'cfg(target_os = "windows")'.dependencies]
 windows = { version = "0.62", features = [
   "Foundation",
@@ -56,6 +56,7 @@ windows = { version = "0.62", features = [
   "UI_Notifications_Management",
   "Win32_Foundation",
   "Win32_System_Com",
+  "Win32_System_Power",
   "Win32_System_Threading",
   "Win32_UI_WindowsAndMessaging",
 ] }

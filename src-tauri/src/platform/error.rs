@@ -30,14 +30,6 @@ pub enum PlatformError {
     /// [`WindowId`]: crate::platform::WindowId
     WindowGone,
 
-    /// The platform implementation has no body yet. Only the empty
-    /// implementations of step 3 return this, and each one disappears as its
-    /// system gets implemented, macOS at step 4 and Windows at step 9.
-    NotImplemented {
-        /// The method that is still empty, for the log.
-        method: &'static str,
-    },
-
     /// The system call failed for a reason of its own.
     System {
         /// What was being attempted, in the boundary's own words.
@@ -48,12 +40,6 @@ pub enum PlatformError {
 }
 
 impl PlatformError {
-    /// The error every method of an empty platform implementation returns.
-    #[must_use]
-    pub fn not_implemented(method: &'static str) -> Self {
-        Self::NotImplemented { method }
-    }
-
     /// A system call that failed on its own terms.
     #[must_use]
     pub fn system(operation: &'static str, detail: impl Into<String>) -> Self {
@@ -71,9 +57,6 @@ impl fmt::Display for PlatformError {
                 write!(formatter, "the system authorization was not granted")
             }
             Self::WindowGone => write!(formatter, "the window does not exist any more"),
-            Self::NotImplemented { method } => {
-                write!(formatter, "{method} is not implemented on this system yet")
-            }
             Self::System { operation, detail } => write!(formatter, "{operation} failed: {detail}"),
         }
     }

@@ -323,12 +323,6 @@ pub fn follow_display(app: &AppHandle) -> bool {
     let mut keeper = keeper(app);
     let was = keeper.is_awake();
 
-    // Nothing to raise and nothing to let go. Without this, `platform::windows`
-    // answers `NotImplemented` every three seconds until step 9.
-    if !wanted && !was {
-        return false;
-    }
-
     let outcome = if wanted {
         keeper.keep_awake()
     } else {

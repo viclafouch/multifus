@@ -62,7 +62,7 @@ const SCAN_INTERVAL: Duration = Duration::from_secs(3);
 const AUTHORIZATION_SETTINGS_URL: &str =
     "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility";
 
-/// The Windows pane for notification access, for step 9.
+/// The Windows pane for notification access.
 #[cfg(target_os = "windows")]
 const AUTHORIZATION_SETTINGS_URL: &str = "ms-settings:privacy-notifications";
 
@@ -352,8 +352,7 @@ pub fn request_authorization(app: &AppHandle) {
         Ok(authorization) => (authorization.is_granted(), None),
         // Collapsed into a plain refusal, this looked exactly like the system
         // saying no, and the button wrote nothing at all when the answer had not
-        // changed. Windows answers this way until step 9, and macOS does when a
-        // framework constant is missing.
+        // changed. macOS answers this way when a framework constant is missing.
         Err(error) => (false, Some(error.to_string())),
     };
 

@@ -86,7 +86,7 @@ pub trait NotificationWatcher: Send + Sync {
     /// Dismisses the notifications already on screen for a character, once its
     /// window has been focused and they have served their purpose.
     ///
-    /// Only Windows can do this, see ADR 0002 and step 9. macOS has no public
+    /// Only Windows can do this, see ADR 0002. macOS has no public
     /// API for it, and its implementation will do nothing and return `Ok`
     /// rather than an error, so that the caller stays free of any `cfg`.
     fn dismiss(&self, nickname: &str) -> Result<()>;

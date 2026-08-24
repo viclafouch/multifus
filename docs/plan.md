@@ -50,12 +50,13 @@ d'autres règles, voir « Ce qui mord ».
 
 ## Ce qui attend de ce côté
 
-`platform::windows` compile aujourd'hui en renvoyant `NotImplemented` méthode par
-méthode, et c'est tout ce qui manque à multifus sur ce système. Les trois
-interfaces de `platform` ont été dessinées avec Windows en vue, `TITLE_PATTERN` et
-la table `NOTIF_TYPES` viennent de Dracoon et sont vérifiés sur les deux
-systèmes, et `GameWindow::from_title` reste la seule porte d'entrée d'une fenêtre.
-Rien de tout ça n'est à réécrire.
+`platform::windows` a désormais un corps par méthode, les trois interfaces
+comprises : plus une seule ne renvoie `NotImplemented`, et la variante a disparu
+du type d'erreur avec la dernière. Les trois interfaces de `platform` ont été
+dessinées avec Windows en vue, `TITLE_PATTERN` et la table `NOTIF_TYPES` viennent
+de Dracoon et sont vérifiés sur les deux systèmes, et `GameWindow::from_title`
+reste la seule porte d'entrée d'une fenêtre. Rien de tout ça n'est à réécrire.
+Reste le lot D, qui ne parle plus au système mais à la chaîne de compilation.
 
 **Objectif.** La parité, sur la machine où l'application sert vraiment.
 
@@ -223,9 +224,15 @@ Lire un toast, c'est `Notification().Visual().GetBinding(KnownNotificationBindin
 
 `PowerRequestDisplayRequired` seul, comme `PreventUserIdleDisplaySleep` sur macOS. Le pendant système ne servirait à rien : ce qui rend le relais muet est la session verrouillée, pas la machine ralentie. Et le capot fermé lui échappe des deux côtés, ce qui est écrit dans « Ce qui mord ».
 
-Le renommage est déjà fait, pour que la structure vide ne promette plus l'appel écarté : `PowerRequestDisplayKeeper` dans `platform::windows` et dans l'alias de `platform::mod`. Aucune machine ici ne peut le compiler, donc le lot C est le premier à le relire.
+**La demande naît du maintien et pas du constructeur, et ce plan disait le contraire.** `new` ne peut rien rendre, donc un `PowerCreateRequest` posé là perd son échec en silence ou oblige à garder un `Option` qui ment. Le handle vit exactement le temps du maintien : `keep_awake` le crée et le pose, `release` le retire et le ferme, `is_awake` est `held.is_some()`. C'est la forme de macOS au mot près, et `Drop` relâche avant que le processus meure.
 
-`screen_saver_delay` appelle `SystemParametersInfoW` deux fois, `SPI_GETSCREENSAVEACTIVE` d'abord, qui sépare `Never` d'un délai, puis `SPI_GETSCREENSAVETIMEOUT`, qui rend des secondes. Rien à mesurer ici, contrairement à macOS où la machine de développement rend `Never` et où l'essai ne prouve rien.
+**`POWER_REQUEST_CONTEXT_VERSION` n'est pas dans `Win32_System_Power`.** Il vit dans `Win32_System_SystemServices`, une fonctionnalité entière pour un zéro : la constante est écrite dans le module.
+
+`screen_saver_delay` appelle `SystemParametersInfoW` deux fois, `SPI_GETSCREENSAVEACTIVE` d'abord, qui sépare `Never` d'un délai, puis `SPI_GETSCREENSAVETIMEOUT`, qui rend des secondes. Zéro seconde est l'économiseur coupé, comme sur macOS.
+
+**Les quatre appels passent, mesuré sur ce PC avec un binaire jetable.** `PowerCreateRequest`, `PowerSetRequest`, `PowerClearRequest` et `CloseHandle` rendent tous `Ok`. `SPI_GETSCREENSAVEACTIVE` rend 0 sur cette machine, donc `Never` : la branche du délai n'a pas de témoin ici, exactement comme sur le Mac de développement.
+
+**`powercfg /requests` demande une invite élevée**, et la refuse autrement avec un message et rien d'autre. Le protocole du quart d'heure se joue donc dans un terminal administrateur, sans quoi il ne montre rien.
 
 **Vérifié quand** : le protocole du quart d'heure de [macos.md](./macos.md) rejoué, `powercfg /requests` montrant la ligne de multifus avant l'avis de déconnexion et plus après.
 
@@ -245,18 +252,23 @@ Le renommage est déjà fait, pour que la structure vide ne promette plus l'appe
 
 ### Les dépendances
 
-`windows` 0.62 en dépendance directe, sous une cible pour qu'aucune machine macOS ne la compile. La crate n'expose que ce qu'on lui demande, un trait par chemin de module, le point remplacé par un tiret bas. **Les traits arrivent lot par lot**, pour que rien ne se compile avant d'être appelé ; le lot A a posé les siens :
+`windows` 0.62 en dépendance directe, sous une cible pour qu'aucune machine macOS ne la compile. La crate n'expose que ce qu'on lui demande, un trait par chemin de module, le point remplacé par un tiret bas. **Les traits sont arrivés lot par lot**, pour que rien ne se compile avant d'être appelé, et la liste est close :
 
 ```toml
 [target.'cfg(target_os = "windows")'.dependencies]
 windows = { version = "0.62", features = [
+  "Foundation",
+  "UI_Notifications",
+  "UI_Notifications_Management",
   "Win32_Foundation",
+  "Win32_System_Com",
+  "Win32_System_Power",
   "Win32_System_Threading",
   "Win32_UI_WindowsAndMessaging",
 ] }
 ```
 
-Restent à poser `Win32_System_Com`, `Foundation`, `UI_Notifications` et `UI_Notifications_Management` au lot B, `Win32_System_Power` au lot C.
+`Win32_System_SystemServices` n'y est pas, et c'est délibéré : `POWER_REQUEST_CONTEXT_VERSION` y vit seul et vaut zéro, écrit dans le module plutôt que payé d'un trait.
 
 | Appel                                                                                                                                                                                       | Module                                               |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
