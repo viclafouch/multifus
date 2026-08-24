@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "multifus",
+  "productName": "Multifus",
   "version": "0.1.0",
   "identifier": "com.viclafouch.multifus",
   "build": {
@@ -13,7 +13,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "multifus",
+        "title": "Multifus",
         "width": 880,
         "height": 660,
         "minWidth": 720,

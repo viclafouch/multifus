@@ -42,7 +42,7 @@ export type Snapshot = {
   readonly startAtLogin: boolean
   readonly authorization: Authorization
   readonly config: ConfigStatus
-  /** Where multifus is with the version that is published. */
+  /** Where Multifus is with the version that is published. */
   readonly update: UpdateStatus
   /** What the relay screen draws. Never the bot token, ADR 0009. */
   readonly relay: RelayStatus

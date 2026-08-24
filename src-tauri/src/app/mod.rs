@@ -53,12 +53,12 @@ pub use state::MultifusParams;
 pub use state::WatcherState;
 pub use view::Snapshot;
 
-/// Loads the configuration and puts everything multifus needs in the Tauri state.
+/// Loads the configuration and puts everything Multifus needs in the Tauri state.
 ///
 /// A configuration that could not be read is no reason to refuse to start:
 /// [`ConfigStore::load`] always comes back with a usable one and says what it
 /// cost, and that reason travels to the interface inside the snapshot. Only the
-/// system having no configuration directory at all stops multifus here, since
+/// system having no configuration directory at all stops Multifus here, since
 /// there would then be nowhere to ever write.
 pub fn setup(app: &AppHandle) -> Result<(), ConfigError> {
     install_crypto_provider();
@@ -122,7 +122,7 @@ fn screen_saver(keeper: &PlatformDisplayKeeper) -> ScreenSaverView {
         .map_or(ScreenSaverView::Unknown, ScreenSaverView::from)
 }
 
-/// The system multifus is running on, for the head of the journal.
+/// The system Multifus is running on, for the head of the journal.
 ///
 /// The version matters more than the name here: the macOS banner tree ADR 0002
 /// stands on belongs to an operating system version, so « the AutoFocus stopped

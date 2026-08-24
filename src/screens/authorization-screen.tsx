@@ -11,7 +11,7 @@ type AuthorizationScreenProps = Readonly<{
 }>
 
 /**
- * What stands in for the roster while the system will not let multifus look.
+ * What stands in for the roster while the system will not let Multifus look.
  *
  * It has to hold rather than blink. macOS never grants Accessibility in the
  * second that follows the request, so the ordinary state right after asking is

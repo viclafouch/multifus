@@ -1,4 +1,4 @@
-//! Every combination multifus lays on the system, and what it does when one
+//! Every combination Multifus lays on the system, and what it does when one
 //! fires: the four actions of perimetre.md and the quick replies of ADR 0012.
 //!
 //! Two halves. [`apply`] hands the stored combinations to the global shortcut
@@ -80,7 +80,7 @@ use crate::platform::WindowManager;
 /// The queue a fired shortcut travels on, from the main thread to the worker.
 ///
 /// A [`Binding`] and never the text of a quick reply, which is read at the far end so
-/// that a quick reply rewritten while multifus runs pastes what it says now.
+/// that a quick reply rewritten while Multifus runs pastes what it says now.
 pub type ShortcutQueue = Sender<Binding>;
 
 /// Starts the thread that answers the shortcuts, for the life of the process.
@@ -131,7 +131,7 @@ pub fn start(app: &AppHandle) {
 pub fn apply(app: &AppHandle) {
     let wanted = lock(app).bindings();
 
-    // Everything multifus put up comes down first, so a combination the user has
+    // Everything Multifus put up comes down first, so a combination the user has
     // just freed stops answering rather than lingering until the next launch.
     if let Err(error) = app.global_shortcut().unregister_all() {
         lock(app).log_unless_repeated(JournalEvent::ShortcutsFailed {

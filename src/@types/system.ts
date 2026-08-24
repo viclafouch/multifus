@@ -1,4 +1,4 @@
-/** What multifus knows about the machine it runs on, and about itself. */
+/** What Multifus knows about the machine it runs on, and about itself. */
 
 export type Authorization = {
   /** Accessibility on macOS, notification access on Windows. */
@@ -27,7 +27,7 @@ export type ConfigStatus = {
 }
 
 /**
- * What multifus knows about the version that is published. No idle state: the
+ * What Multifus knows about the version that is published. No idle state: the
  * check starts with the process, so the first snapshot is already `checking`.
  */
 export type UpdateStatus =
@@ -46,14 +46,14 @@ export type ScreenSaver =
   | { readonly kind: 'never' }
   | { readonly kind: 'unknown' }
 
-/** How multifus was started. A session start does not show the window. */
+/** How Multifus was started. A session start does not show the window. */
 export type Launch = 'byHand' | 'session'
 
 /** Which of the two surfaces the user acted on. */
 export type Surface = 'tray' | 'window'
 
 /**
- * One of the three things multifus does on a thread of its own, and what
+ * One of the three things Multifus does on a thread of its own, and what
  * `panicked` names. Each of them going quiet used to look like a quiet user.
  */
 export type Work = 'scan' | 'shortcuts' | 'tray'

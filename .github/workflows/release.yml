@@ -7,7 +7,7 @@
 #
 # The release is left as a draft on purpose: the endpoint of the updater is
 # `releases/latest/download/latest.json`, so publishing is what tells every
-# installed multifus that a new version exists. That has to stay a decision and
+# installed Multifus that a new version exists. That has to stay a decision and
 # not a side effect of pushing a tag.
 name: release
 
@@ -83,13 +83,13 @@ jobs:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
 
           # The updater's own signature, which has nothing to do with Apple's:
-          # it is what proves to an installed multifus that the archive it just
+          # it is what proves to an installed Multifus that the archive it just
           # downloaded came from this repository.
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           tagName: ${{ github.ref_name }}
-          releaseName: multifus ${{ github.ref_name }}
+          releaseName: Multifus ${{ github.ref_name }}
           releaseBody: 'Le détail des changements est dans le CHANGELOG.'
           releaseDraft: true
           prerelease: false
@@ -99,7 +99,7 @@ jobs:
   # `tauri-action` reads the one already on the release and merges its platforms
   # into the one it uploads, which is a read then a write: run in parallel, the
   # slower job would publish a file where the faster one's platform never
-  # existed, and no installed multifus would ever be offered it.
+  # existed, and no installed Multifus would ever be offered it.
   windows:
     needs: macos
     runs-on: windows-latest
@@ -138,13 +138,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
           # The updater's own signature, the same key as macOS: it is what proves
-          # to an installed multifus that the archive it just downloaded came
+          # to an installed Multifus that the archive it just downloaded came
           # from this repository, whichever system built it.
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           tagName: ${{ github.ref_name }}
-          releaseName: multifus ${{ github.ref_name }}
+          releaseName: Multifus ${{ github.ref_name }}
           releaseBody: 'Le détail des changements est dans le CHANGELOG.'
           releaseDraft: true
           prerelease: false

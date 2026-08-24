@@ -31,7 +31,7 @@ const EXCERPT_LENGTH: usize = 40;
 /// called with a game window in front.
 pub fn paste(app: &AppHandle, id: QuickReplyId) {
     // Read under the lock and never carried on the queue: a quick reply rewritten
-    // while multifus runs must paste what it says now.
+    // while Multifus runs must paste what it says now.
     let Some(text) = lock(app).quick_reply_text(id) else {
         return failed(app, QuickReplyFailure::Gone);
     };

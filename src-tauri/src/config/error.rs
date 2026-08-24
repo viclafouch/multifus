@@ -2,7 +2,7 @@
 //!
 //! Every way reading or writing the file can go wrong crosses back to the caller
 //! through here. Nothing in this module panics or unwraps: a configuration that
-//! cannot be read is an ordinary state, multifus starts on its defaults and the
+//! cannot be read is an ordinary state, Multifus starts on its defaults and the
 //! interface has something to say about it, see [`crate::config::Loaded`].
 
 use std::error::Error;
@@ -18,7 +18,7 @@ pub type Result<T> = core::result::Result<T, ConfigError>;
 pub enum ConfigError {
     /// The system did not give a configuration directory to write into.
     ///
-    /// Comes from Tauri's own path resolution, which is the only way multifus
+    /// Comes from Tauri's own path resolution, which is the only way Multifus
     /// asks for that directory. Never a hard-coded path, see perimetre.md.
     NoDirectory {
         /// What Tauri said about it.
@@ -36,7 +36,7 @@ pub enum ConfigError {
         detail: String,
     },
 
-    /// The bytes were read but are not a configuration multifus understands:
+    /// The bytes were read but are not a configuration Multifus understands:
     /// truncated by an old crash, hand-edited into invalid JSON, or written by
     /// something else entirely.
     ///
@@ -101,7 +101,7 @@ impl fmt::Display for ConfigError {
             ),
             Self::Malformed { path, detail } => write!(
                 formatter,
-                "{} is not a multifus configuration: {detail}",
+                "{} is not a Multifus configuration: {detail}",
                 path.display()
             ),
             Self::Encoding { detail } => {

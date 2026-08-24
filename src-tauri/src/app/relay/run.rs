@@ -35,7 +35,7 @@ use crate::platform::PlatformDisplayKeeper;
 
 // What the bot writes. French here for the reason `app::tray` gives at its top:
 // a Telegram message is a surface React cannot draw.
-const HEADER: &str = "multifus";
+const HEADER: &str = "Multifus";
 const PRIVATE_MESSAGE: &str = "message privé";
 const DISCONNECTED: &str = "s’est déconnecté.";
 const NOBODY_LEFT: &str = "Plus aucun personnage relayé n’est connecté.";
@@ -66,7 +66,7 @@ type RelayState = Mutex<Option<Running>>;
 /// The display keeper, which needs `&mut self` to raise and release its hold.
 type KeeperState = Mutex<PlatformDisplayKeeper>;
 
-/// The one handle the rest of multifus needs on a running relay.
+/// The one handle the rest of Multifus needs on a running relay.
 #[derive(Debug)]
 struct Running {
     outgoing: Sender<Message>,
@@ -82,7 +82,7 @@ enum Message {
         /// notification body leaves the machine.
         body: Option<String>,
     },
-    /// multifus talking about itself, ADR 0010. Never a notification body.
+    /// Multifus talking about itself, ADR 0010. Never a notification body.
     Notice { gone: Vec<String>, none_left: bool },
     /// The switch was moved on. The confirmation somebody is standing there
     /// waiting for, and it carries the empty-relay warning rather than the
@@ -234,7 +234,7 @@ pub fn stop(app: &AppHandle, reason: RelayStop) {
 /// Whether the telephone is told the relay stopped.
 ///
 /// Only the three gestures. A bot being forgotten would be told in the very chat
-/// multifus is erasing, and a last character unticked happens at the keyboard on
+/// Multifus is erasing, and a last character unticked happens at the keyboard on
 /// a relay that had nothing left to carry.
 fn says_so(reason: RelayStop) -> bool {
     matches!(
@@ -687,7 +687,7 @@ mod tests {
             body: None,
         };
 
-        assert_eq!(text_of(&quiet), "multifus\nAlpha, message privé.");
+        assert_eq!(text_of(&quiet), "Multifus\nAlpha, message privé.");
 
         let spoken = Message::Private {
             nickname: "Alpha".to_owned(),
@@ -696,7 +696,7 @@ mod tests {
 
         assert_eq!(
             text_of(&spoken),
-            "multifus\nAlpha, message privé.\n\nOn se rejoint où ?"
+            "Multifus\nAlpha, message privé.\n\nOn se rejoint où ?"
         );
     }
 
@@ -711,7 +711,7 @@ mod tests {
 
         assert_eq!(
             text_of(&both),
-            "multifus\nMaître Forgeron s’est déconnecté.\nPlus aucun personnage relayé n’est connecté."
+            "Multifus\nMaître Forgeron s’est déconnecté.\nPlus aucun personnage relayé n’est connecté."
         );
         assert_eq!(case_of(true), NoticeCase::Both);
     }
@@ -738,7 +738,7 @@ mod tests {
             none_left: false,
         };
 
-        assert_eq!(text_of(&notice), "multifus\nAlpha s’est déconnecté.");
+        assert_eq!(text_of(&notice), "Multifus\nAlpha s’est déconnecté.");
         assert_eq!(case_of(false), NoticeCase::Disconnected);
     }
 
@@ -746,7 +746,7 @@ mod tests {
     fn the_test_message_names_no_character_and_carries_no_body() {
         assert_eq!(
             text_of(&Message::Test),
-            "multifus\nMessage d’essai.\n\nUn vrai message privé arrivera sous cette forme."
+            "Multifus\nMessage d’essai.\n\nUn vrai message privé arrivera sous cette forme."
         );
         assert_eq!(written(&Message::Test), JournalEvent::RelayTestSent);
     }
@@ -757,9 +757,9 @@ mod tests {
         // third trigger of ADR 0010, and on a telephone it read as an alarm.
         assert_eq!(
             text_of(&Message::Enabled { none_online: false }),
-            "multifus\nRelais activé."
+            "Multifus\nRelais activé."
         );
-        assert_eq!(text_of(&Message::Disabled), "multifus\nRelais désactivé.");
+        assert_eq!(text_of(&Message::Disabled), "Multifus\nRelais désactivé.");
     }
 
     #[test]
@@ -770,7 +770,7 @@ mod tests {
 
         assert_eq!(
             text_of(&enabled),
-            "multifus\nRelais activé.\nAucun personnage relayé n’est connecté pour l’instant."
+            "Multifus\nRelais activé.\nAucun personnage relayé n’est connecté pour l’instant."
         );
         assert_eq!(
             written(&enabled),

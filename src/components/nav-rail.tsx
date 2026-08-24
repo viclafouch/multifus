@@ -17,10 +17,10 @@ type NavRailProps = Readonly<{
 }>
 
 /**
- * The left rail: where one is, and how multifus is doing.
+ * The left rail: where one is, and how Multifus is doing.
  *
  * The status block at the bottom is the reason this rail is not a row of tabs.
- * multifus is meant to be launched and forgotten, so the two facts that say
+ * Multifus is meant to be launched and forgotten, so the two facts that say
  * whether it is working at all have to be on screen whatever screen one is on.
  */
 export const NavRail = ({

@@ -187,7 +187,7 @@ impl WindowManager for Win32WindowManager {
     }
 }
 
-/// Ties multifus's input queue to the ones a focus call has to convince,
+/// Ties Multifus's input queue to the ones a focus call has to convince,
 /// `SetForegroundWindow` refusing a caller that is not already in front.
 ///
 /// Never an injected Alt keystroke, which is Dracoon's way and sends a stray
@@ -200,7 +200,7 @@ struct AttachedInput {
 impl AttachedInput {
     /// The foreground thread **and** the target's own, and the second is not a
     /// belt: measured, attaching to the foreground alone leaves the focus where
-    /// it was as soon as no keystroke of multifus is what asked for it.
+    /// it was as soon as no keystroke of Multifus is what asked for it.
     fn new(target: HWND) -> Self {
         let current = unsafe { GetCurrentThreadId() };
         let foreground = unsafe { GetWindowThreadProcessId(GetForegroundWindow(), None) };
@@ -224,7 +224,7 @@ impl AttachedInput {
 impl Drop for AttachedInput {
     fn drop(&mut self) {
         // Input queues left tied are paid for on the whole desktop and not in
-        // multifus, so the detach leaves whatever the focus call did.
+        // Multifus, so the detach leaves whatever the focus call did.
         for thread in &self.attached {
             let _ = unsafe { AttachThreadInput(self.current, *thread, false) };
         }
@@ -475,7 +475,7 @@ fn listener() -> Result<UserNotificationListener> {
 /// The three values of the system, read as the two the boundary has.
 ///
 /// `Denied` and `Unspecified` are not repaired the same way, the first being
-/// unaskable again, but neither lets multifus hear anything.
+/// unaskable again, but neither lets Multifus hear anything.
 fn granted(status: windows::core::Result<UserNotificationListenerAccessStatus>) -> Authorization {
     if status.is_ok_and(|status| status == UserNotificationListenerAccessStatus::Allowed) {
         Authorization::Granted
@@ -631,7 +631,7 @@ fn dismiss_queued(listener: &UserNotificationListener, toasts: &Mutex<ToastTable
 
     for id in queued {
         // Never `ClearNotifications`, which wipes every application's, including
-        // the ones multifus has never read.
+        // the ones Multifus has never read.
         drop(listener.RemoveNotification(id));
     }
 }
@@ -659,9 +659,9 @@ fn read(toast: &UserNotification) -> Option<GameNotification> {
     Some(GameNotification::new(title, body.join("\n")))
 }
 
-/// What `powercfg /requests` shows next to multifus, the twin of the name
+/// What `powercfg /requests` shows next to Multifus, the twin of the name
 /// `pmset -g assertions` shows on macOS.
-const POWER_REQUEST_REASON: &str = "multifus relay";
+const POWER_REQUEST_REASON: &str = "Multifus relay";
 
 /// The only version a `REASON_CONTEXT` has. Written here rather than pulled from
 /// `Win32_System_SystemServices`, a whole feature for one zero.

@@ -14,7 +14,7 @@ edition = "2021"
 # minds, see https://github.com/rust-lang/cargo/issues/8519.
 name = "multifus_lib"
 # `rlib` alone, which is all `main.rs` links. `staticlib` and `cdylib` are the
-# mobile entry points of the scaffolder, and multifus has none, see perimetre.md.
+# mobile entry points of the scaffolder, and Multifus has none, see perimetre.md.
 crate-type = ["rlib"]
 
 [build-dependencies]

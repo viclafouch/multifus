@@ -6,7 +6,7 @@ use std::fmt;
 
 use keyring::Entry;
 
-/// The service the credential is filed under, the bundle identifier of multifus.
+/// The service the credential is filed under, the bundle identifier of Multifus.
 const SERVICE: &str = "com.viclafouch.multifus";
 
 /// The account inside that service. One token, one name.
@@ -75,7 +75,7 @@ impl fmt::Display for SecretError {
 
 impl Error for SecretError {}
 
-/// The one entry multifus ever opens.
+/// The one entry Multifus ever opens.
 fn entry(operation: &'static str) -> Result<Entry> {
     Entry::new(SERVICE, ACCOUNT).map_err(|error| SecretError::new(operation, &error))
 }

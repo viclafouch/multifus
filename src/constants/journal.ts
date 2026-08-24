@@ -60,7 +60,7 @@ export const TONES = {
   // What the user asked for, whichever of the five gestures it was.
   relayDisabled: 'neutral',
   relaySent: 'good',
-  // The event ADR 0010 exists for, and it is not a fault: multifus saying it has
+  // The event ADR 0010 exists for, and it is not a fault: Multifus saying it has
   // stopped hearing is the whole reason the relay can be trusted.
   relayNoticeSent: 'good',
   relayTestSent: 'good',
@@ -107,7 +107,7 @@ export const SHORTCUT_TONES = {
 
 /**
  * The statuses that mean a combination is not on the desktop. A duplicate
- * belongs here even though multifus, and not the system, turned it down.
+ * belongs here even though Multifus, and not the system, turned it down.
  */
 export const DEAD_SHORTCUT_STATUSES = new Set<
   ShortcutBinding['status']['kind']
@@ -135,7 +135,7 @@ export const DETAILED_LINES = {
   notificationUnreadable: 'Notification impossible à lire',
   shortcutsFailed: 'Les raccourcis ne sont pas fiables',
   trayFailed: 'La barre système n’est pas fiable',
-  windowFailed: 'La fenêtre de multifus n’a pas suivi',
+  windowFailed: 'La fenêtre de Multifus n’a pas suivi',
   snapshotFailed: 'La fenêtre n’a pas reçu le tableau de bord',
   startAtLoginFailed: 'Démarrage avec la session impossible',
   scanFailed: 'Lecture des fenêtres impossible',
@@ -170,7 +170,7 @@ export const PLAIN_LINES = {
   relayUnpaired: 'Robot Telegram délié, jeton effacé du trousseau.',
   relayTestSent: 'Message d’essai envoyé sur le téléphone.',
   reset: 'Configuration remise à zéro.',
-  quit: 'multifus a été quitté depuis la barre système.'
+  quit: 'Multifus a été quitté depuis la barre système.'
 } as const satisfies Record<WithoutPayload<JournalEvent>, string>
 
 /**
@@ -198,7 +198,7 @@ export const NOTICE_LINES = {
 } as const satisfies Record<NoticeCase, string>
 
 /**
- * What each thread of multifus is called when it has to be named. A table
+ * What each thread of Multifus is called when it has to be named. A table
  * because the Rust side sends an enum and not a sentence.
  */
 export const WORK_LABELS = {

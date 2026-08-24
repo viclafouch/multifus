@@ -8,7 +8,7 @@
    the key caps, the journal and the file paths, so that a column of figures reads
    as a column. Fraunces speaks only where there is room to breathe, the screen
    titles and the empty states: it is the one warm, hand-cut voice in an otherwise
-   instrumental board, and it is what keeps multifus from looking like a settings
+   instrumental board, and it is what keeps Multifus from looking like a settings
    dialog. */
 @import '@fontsource-variable/inter';
 @import '@fontsource-variable/fraunces/wght.css';
@@ -103,7 +103,7 @@
   --container-blurb: 46ch;
 }
 
-/* multifus never shows a light theme: it lives on a desktop next to game clients
+/* Multifus never shows a light theme: it lives on a desktop next to game clients
    at night. The palette therefore sits on `:root` once, and `.dark` stays on the
    document only so that the `dark:` variants shadcn ships keep applying.
 

@@ -18,7 +18,7 @@ use crate::app::state::lock;
 ///
 /// The official client needs no install and logs in by showing a code the
 /// telephone scans once. It is what turns the bot token from fifty characters to
-/// retype by hand into a copy and paste on the machine multifus runs on.
+/// retype by hand into a copy and paste on the machine Multifus runs on.
 const WEB_URL: &str = "https://web.telegram.org";
 
 /// BotFather, the official bot that makes bots. A `t.me` link opens the

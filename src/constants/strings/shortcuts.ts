@@ -33,7 +33,7 @@ const ACTION_LABELS = {
 
 /** What became of a combination, one line per answer it can get. */
 const STATUS_LINES = {
-  pending: 'Un instant, multifus s’en occupe.',
+  pending: 'Un instant, Multifus s’en occupe.',
   // Worded for the two families: this line sits under an action as under a
   // quick reply, and neither has a gender the other shares.
   unbound: 'Aucune touche choisie, il ne se passera rien.',
@@ -82,7 +82,7 @@ const QUICK_REPLIES_STRINGS = {
   // What the giving back cannot do, and the screen is the only place to say it:
   // the journal is read after the fact, this is read before.
   clipboard:
-    'Le temps du collage, multifus se sert de votre presse-papiers, puis vous le rend. Une image ou un fichier que vous y aviez copié, lui, ne revient pas.'
+    'Le temps du collage, Multifus se sert de votre presse-papiers, puis vous le rend. Une image ou un fichier que vous y aviez copié, lui, ne revient pas.'
 } as const
 
 export const SHORTCUTS_STRINGS = {
@@ -93,7 +93,7 @@ export const SHORTCUTS_STRINGS = {
     // A combination the system accepts is not one that fires, and this note is
     // the only place the interface can say so. See `docs/macos.md`, « Ce qui mord ».
     silent:
-      'Une autre application peut déjà utiliser les mêmes touches. multifus les accepte quand même, mais ne les recevra jamais, et rien ne se passera dans le jeu. En cas de doute, essayez le raccourci depuis Dofus et regardez le journal, en bas.',
+      'Une autre application peut déjà utiliser les mêmes touches. Multifus les accepte quand même, mais ne les recevra jamais, et rien ne se passera dans le jeu. En cas de doute, essayez le raccourci depuis Dofus et regardez le journal, en bas.',
     capture: 'Appuyez sur vos touches',
     captureHint: 'Échap pour annuler, Retour arrière pour effacer.',
     empty: 'Aucune',

@@ -36,7 +36,7 @@ pub use window::GameWindow;
 pub use window::WindowId;
 pub use window::WindowManager;
 
-/// Whether the system lets multifus do its job.
+/// Whether the system lets Multifus do its job.
 ///
 /// Both systems gate the boundary behind a user authorization, Accessibility on
 /// macOS and notification access on Windows, and both let it be revoked at any
@@ -55,30 +55,30 @@ impl Authorization {
     }
 }
 
-/// The window manager of the system multifus is running on.
+/// The window manager of the system Multifus is running on.
 #[cfg(target_os = "macos")]
 pub type PlatformWindowManager = macos::AccessibilityWindowManager;
-/// The window manager of the system multifus is running on.
+/// The window manager of the system Multifus is running on.
 #[cfg(target_os = "windows")]
 pub type PlatformWindowManager = windows::Win32WindowManager;
 
-/// The notification watcher of the system multifus is running on.
+/// The notification watcher of the system Multifus is running on.
 #[cfg(target_os = "macos")]
 pub type PlatformNotificationWatcher = macos::BannerNotificationWatcher;
-/// The notification watcher of the system multifus is running on.
+/// The notification watcher of the system Multifus is running on.
 #[cfg(target_os = "windows")]
 pub type PlatformNotificationWatcher = windows::UserNotificationWatcher;
 
-/// The display keeper of the system multifus is running on.
+/// The display keeper of the system Multifus is running on.
 #[cfg(target_os = "macos")]
 pub type PlatformDisplayKeeper = macos::PowerAssertionDisplayKeeper;
-/// The display keeper of the system multifus is running on.
+/// The display keeper of the system Multifus is running on.
 #[cfg(target_os = "windows")]
 pub type PlatformDisplayKeeper = windows::PowerRequestDisplayKeeper;
 
-/// The paste sender of the system multifus is running on.
+/// The paste sender of the system Multifus is running on.
 #[cfg(target_os = "macos")]
 pub type PlatformPasteSender = macos::CoreGraphicsPasteSender;
-/// The paste sender of the system multifus is running on.
+/// The paste sender of the system Multifus is running on.
 #[cfg(target_os = "windows")]
 pub type PlatformPasteSender = windows::SendInputPasteSender;

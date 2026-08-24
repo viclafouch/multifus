@@ -12,7 +12,7 @@ export type Binding =
   | { readonly kind: 'quickReply'; readonly id: QuickReplyId }
 
 /**
- * What the system answered when multifus laid a combination down. `registered`
+ * What the system answered when Multifus laid a combination down. `registered`
  * says the system took it, never that it will fire: see `docs/macos.md` and
  * `docs/windows.md`, « Ce qui mord ».
  */

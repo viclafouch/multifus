@@ -1,6 +1,6 @@
 //! The system tray icon, and the roster it shows without opening the window.
 //!
-//! multifus is meant to be launched and forgotten, so the window is not the
+//! Multifus is meant to be launched and forgotten, so the window is not the
 //! application: closing it leaves the icon behind, and quitting is a menu item.
 //! The menu lists the connected characters in cycle order with their veille, and
 //! clicking one brings its window to the front. Only the connected ones are
@@ -71,7 +71,7 @@ const MENU_SHORTCUTS: &str = "Raccourcis";
 const MENU_AUTO_FOCUS_SCREEN: &str = "AutoFocus";
 const MENU_RELAY: &str = "Relais";
 const MENU_ABOUT: &str = "À propos";
-const MENU_QUIT: &str = "Quitter multifus";
+const MENU_QUIT: &str = "Quitter Multifus";
 const MENU_NOBODY: &str = "Aucun personnage connecté";
 const MENU_ASLEEP: &str = " (en veille)";
 // The two settings say the verb rather than wear a tick. A ticked noun sat next
@@ -94,7 +94,7 @@ const MENU_DENIED: &str = "Autorisation manquante";
 // The journal is reachable from here and not from the window alone, and that is
 // the rule of the project rather than a convenience: what is only useful with the
 // window open needs a way in that does not need the window. « La fenêtre de
-// multifus n'est pas revenue » is one of the lines this journal can hold, and a
+// Multifus n'est pas revenue » is one of the lines this journal can hold, and a
 // journal reachable only through the window is a journal for the good days.
 const MENU_JOURNAL: &str = "Montrer le journal";
 
@@ -111,7 +111,7 @@ const MENU_OPEN_SETTINGS: &str = "Ouvrir Réglages Système";
 #[cfg(not(target_os = "macos"))]
 const MENU_OPEN_SETTINGS: &str = "Ouvrir les réglages du système";
 
-/// The one icon multifus puts in the system tray.
+/// The one icon Multifus puts in the system tray.
 const TRAY_ID: &str = "multifus";
 
 /// What every screen item's identifier starts with. The screen follows, as its
@@ -131,7 +131,7 @@ const AUTO_FOCUS_ID: &str = "multifus://auto-focus";
 /// The one that says whether the AutoFocus reaches into the Dock.
 const WAKE_MINIMIZED_ID: &str = "multifus://wake-minimized";
 
-/// The item that replaces multifus with the version that is out and restarts it.
+/// The item that replaces Multifus with the version that is out and restarts it.
 const UPDATE_ID: &str = "multifus://update";
 
 /// The item that shows the journal file in the file browser of the system.
@@ -140,7 +140,7 @@ const JOURNAL_ID: &str = "multifus://journal";
 /// The switch of the relay, and the one door it has.
 const RELAY_ID: &str = "multifus://relay";
 
-/// The line that says multifus is not allowed to work, and the one that leads
+/// The line that says Multifus is not allowed to work, and the one that leads
 /// to the pane where that is fixed.
 const DENIED_ID: &str = "multifus://denied";
 const OPEN_SETTINGS_ID: &str = "multifus://open-settings";
@@ -201,9 +201,9 @@ struct Entry {
 /// The tooltip, which is what the icon says without being clicked.
 fn tooltip(connected: usize) -> String {
     match connected {
-        0 => "multifus, aucun personnage connecté".to_owned(),
-        1 => "multifus, 1 personnage connecté".to_owned(),
-        count => format!("multifus, {count} personnages connectés"),
+        0 => "Multifus, aucun personnage connecté".to_owned(),
+        1 => "Multifus, 1 personnage connecté".to_owned(),
+        count => format!("Multifus, {count} personnages connectés"),
     }
 }
 
@@ -274,7 +274,7 @@ fn tray_image() -> Image<'static> {
 /// Puts the icon in the system tray and starts the thread that answers it.
 ///
 /// A failure here costs the icon and nothing else: the window, the shortcuts and
-/// the AutoFocus are untouched, so it is written down and multifus carries on.
+/// the AutoFocus are untouched, so it is written down and Multifus carries on.
 /// What it does cost is the way to quit, which is why the close of the window is
 /// only intercepted when [`is_present`] says there is an icon to fall back on.
 pub fn setup(app: &AppHandle) {
@@ -301,7 +301,7 @@ pub fn setup(app: &AppHandle) {
     }
 }
 
-/// There is an icon in the system tray, so closing the window is not losing multifus.
+/// There is an icon in the system tray, so closing the window is not losing Multifus.
 #[must_use]
 pub fn is_present(app: &AppHandle) -> bool {
     app.tray_by_id(TRAY_ID).is_some()
@@ -362,7 +362,7 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
 
     // A refused authorization comes first, because nothing below it works. The
     // window would say the same thing, but the whole point of this icon is not
-    // having to open the window: multifus gone deaf has to be readable from the
+    // having to open the window: Multifus gone deaf has to be readable from the
     // system tray, with the way to fix it right underneath.
     if !contents.granted {
         menu.append(&MenuItem::with_id(
@@ -474,7 +474,7 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
     menu.append(&PredefinedMenuItem::separator(app)?)?;
 
     // Next to the way out rather than at the top, and for the same reason it is
-    // offered here at all: installing restarts multifus, so it sits with the
+    // offered here at all: installing restarts Multifus, so it sits with the
     // other item that ends the process and not among the ones that do not.
     if let Some(version) = &contents.update {
         menu.append(&MenuItem::with_id(
@@ -539,7 +539,7 @@ fn on_menu_event(app: &AppHandle, event: MenuEvent) {
 
     if id == UPDATE_ID {
         // The download is asked for and not waited on: what comes back through
-        // the snapshot is the menu losing this line, and then multifus
+        // the snapshot is the menu losing this line, and then Multifus
         // restarting on its own. See `app::update`.
         update::install(app);
 

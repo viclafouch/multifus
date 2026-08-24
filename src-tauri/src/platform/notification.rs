@@ -42,7 +42,7 @@ pub enum NotificationReport {
     /// A game notification, for the core to decide about.
     Heard(GameNotification),
 
-    /// Something was notified and the system would not let multifus read it.
+    /// Something was notified and the system would not let Multifus read it.
     ///
     /// Only ever sent when a read was actually refused. The ordinary case, an
     /// element that is simply not a game notification, is dropped by the
@@ -59,7 +59,7 @@ pub enum NotificationReport {
 ///
 /// [`WindowManager`]: crate::platform::WindowManager
 pub trait NotificationWatcher: Send + Sync {
-    /// Whether the system already lets multifus read notifications, without
+    /// Whether the system already lets Multifus read notifications, without
     /// prompting for anything.
     fn authorization(&self) -> Result<Authorization>;
 

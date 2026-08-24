@@ -10,7 +10,7 @@
 //! last [`CAPACITY`] entries, which is what the drawer of the window draws and
 //! what travels in every snapshot. What is on disk is weeks of it, because the
 //! question this journal answers is rarely asked in the minute it is created:
-//! multifus is launched and forgotten, and a focus that did not happen is
+//! Multifus is launched and forgotten, and a focus that did not happen is
 //! reported hours later. The two are the same events; only the window they cover
 //! differs. See ADR 0006 for the retention, the disk cost and the privacy.
 //!
@@ -43,7 +43,7 @@ use crate::domain::NotificationKind;
 /// the right end to lose on screen, since what is being looked at just happened.
 const CAPACITY: usize = 200;
 
-/// One of the three things multifus does on a thread of its own.
+/// One of the three things Multifus does on a thread of its own.
 ///
 /// What [`JournalEvent::Panicked`] names. An enum and not a sentence, for the
 /// reason the whole module exists: `catch_unwind` hands back an opaque payload,
@@ -86,7 +86,7 @@ pub struct JournalEntry {
     rename_all_fields = "camelCase"
 )]
 pub enum JournalEvent {
-    /// multifus started, and everything needed to read the rest of the journal
+    /// Multifus started, and everything needed to read the rest of the journal
     /// without asking the user a single question.
     ///
     /// The three fields are the ones that turn a transcript into a diagnosis.
@@ -104,7 +104,7 @@ pub enum JournalEvent {
         launch: Launch,
     },
 
-    /// The stored configuration was not the one multifus started on.
+    /// The stored configuration was not the one Multifus started on.
     ///
     /// A roster that opens empty is the worst failure this application has, and
     /// until now it lived only in the snapshot, where
@@ -146,7 +146,7 @@ pub enum JournalEvent {
     /// authorization, which has its own event; anything else lands here.
     ListeningFailed { detail: String },
 
-    /// Something was drawn on screen and the system would not let multifus read
+    /// Something was drawn on screen and the system would not let Multifus read
     /// it.
     ///
     /// The one hole this journal used to have on the path it exists for: a
@@ -163,7 +163,7 @@ pub enum JournalEvent {
     /// Its window is gone. The character stays in the roster, greyed out.
     CharacterOffline { nickname: String },
 
-    /// A game notification arrived, and this is what multifus did with it. The
+    /// A game notification arrived, and this is what Multifus did with it. The
     /// one event this whole journal exists for.
     ///
     /// **It carries no word of the notification and never will**, see the note
@@ -206,7 +206,7 @@ pub enum JournalEvent {
     /// could not be taken down.
     ShortcutsFailed { detail: String },
 
-    /// A shortcut fired, and this is what multifus did with it.
+    /// A shortcut fired, and this is what Multifus did with it.
     Shortcut {
         action: ShortcutAction,
         outcome: ShortcutOutcome,
@@ -229,7 +229,7 @@ pub enum JournalEvent {
     },
 
     /// The system tray icon could not be put up, could not be kept in step with
-    /// the roster, or its worker died. multifus works without it; what goes
+    /// the roster, or its worker died. Multifus works without it; what goes
     /// missing is the way to quit and the roster at a glance.
     TrayFailed { detail: String },
 
@@ -279,15 +279,15 @@ pub enum JournalEvent {
     /// The check reached the endpoint and this version is the published one.
     ///
     /// Written so that a check which has never once succeeded stops looking
-    /// exactly like a multifus that is up to date.
+    /// exactly like a Multifus that is up to date.
     UpdateUpToDate,
 
     /// The update could not be looked for, or could not be put in place. The
-    /// one failure of multifus that is usually the network's and not the
+    /// one failure of Multifus that is usually the network's and not the
     /// system's.
     UpdateFailed { detail: String },
 
-    /// Something multifus handed to the system to open did not open: the
+    /// Something Multifus handed to the system to open did not open: the
     /// settings pane of the authorization, a file that was set aside, the
     /// journal itself.
     OpenFailed { detail: String },
@@ -339,7 +339,7 @@ pub enum JournalEvent {
     /// Everything went back to its defaults, roster included.
     Reset,
 
-    /// multifus was asked to quit from the system tray.
+    /// Multifus was asked to quit from the system tray.
     ///
     /// The last line of a run that ended on purpose. Its absence at the end of a
     /// run is therefore a fact of its own, and only a file can hold that
@@ -347,7 +347,7 @@ pub enum JournalEvent {
     Quit,
 }
 
-/// How multifus was started.
+/// How Multifus was started.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub enum Launch {
@@ -548,7 +548,7 @@ pub enum Outcome {
     /// The switch for that kind is off, so nothing was meant to happen.
     KindDisabled,
 
-    /// No pattern matched the body. multifus has no idea what the event is and
+    /// No pattern matched the body. Multifus has no idea what the event is and
     /// focuses nothing, which is the honest answer.
     KindUnknown,
 
@@ -556,13 +556,13 @@ pub enum Outcome {
     ///
     /// Told apart from [`Outcome::KindUnknown`] on purpose, and the two used to
     /// be one. A wording no pattern covers is repaired by adding a pattern to
-    /// `NOTIF_TYPES`; a body multifus never read is repaired in the walk of
+    /// `NOTIF_TYPES`; a body Multifus never read is repaired in the walk of
     /// `platform::macos`. Reporting the first when it is the second sends the
     /// reader to the wrong file.
     BodyUnread,
 
     /// The nickname belongs to nobody in the roster, or to a character whose
-    /// window multifus cannot see. A notification can outlive its window.
+    /// window Multifus cannot see. A notification can outlive its window.
     NoWindow,
 
     /// The window is in the Dock and the réveil des réduites is off, so it was
@@ -595,7 +595,7 @@ pub enum TrayOutcome {
 /// What became of a shortcut that fired.
 ///
 /// The question this answers is the one asked out loud the day a combination
-/// seems dead: multifus heard the keys, and then what. « Nothing happened »
+/// seems dead: Multifus heard the keys, and then what. « Nothing happened »
 /// has five different reasons here, and telling them apart is the whole point.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 #[serde(tag = "outcome", rename_all = "camelCase")]
@@ -626,7 +626,7 @@ pub enum ShortcutOutcome {
     /// The swap had nothing to swap: no connected character has a gender.
     NoGender,
 
-    /// The character to go to has no window multifus can see any more.
+    /// The character to go to has no window Multifus can see any more.
     NoWindow { nickname: String },
 
     /// The focus was asked for and the system refused it.
@@ -782,7 +782,7 @@ mod tests {
         // The one rule of this module that is not about diagnosis, and the one
         // somebody will ask about after reading the source on GitHub. A private
         // message is a real person writing to the user; the kind of event is all
-        // multifus needs and all it keeps.
+        // Multifus needs and all it keeps.
         //
         // The fields are named here on purpose. Adding one to the event fails
         // this test, which is the point: the rule outlives whoever remembers it.

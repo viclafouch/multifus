@@ -11,7 +11,7 @@ import type { Launch, Surface, Work } from '@/@types/system'
 
 /**
  * What became of a game notification. `kindUnknown` is a wording no pattern
- * covers, `bodyUnread` a body multifus never got to read: two different repairs.
+ * covers, `bodyUnread` a body Multifus never got to read: two different repairs.
  */
 export type NotificationOutcome =
   | { readonly outcome: 'bodyUnread' }

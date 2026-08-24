@@ -10,7 +10,7 @@ const FEEDBACK_DURATION = 2000
  * The clipboard goes through the Tauri plugin rather than `navigator.clipboard`:
  * the window is served over a custom protocol, and the plugin is the route the
  * documentation guarantees. It needs `clipboard-manager:allow-write-text` in the
- * capability, and nothing more, since multifus never reads the clipboard.
+ * capability, and nothing more, since Multifus never reads the clipboard.
  *
  * A refusal leaves `hasCopied` false and shows nothing. There is no wording for
  * a clipboard that will not take text, and inventing one would be a sentence the

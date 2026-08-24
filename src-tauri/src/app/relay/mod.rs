@@ -2,7 +2,7 @@
 //! while nobody is at the machine.
 //!
 //! [`secret`] is the keychain the token lives in, ADR 0009. [`telegram`] is the
-//! two calls, ADR 0007. [`pairing`] is the one moment a token enters multifus.
+//! two calls, ADR 0007. [`pairing`] is the one moment a token enters Multifus.
 //! [`run`] is the relay itself: the switch, the sending, the avis of ADR 0010
 //! and the display held awake.
 

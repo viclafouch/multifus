@@ -7,12 +7,12 @@
 //! **The retention is the whole reason this module exists.** The journal used to
 //! be two hundred entries in memory that died with the process, which is a few
 //! minutes of active play: a défilement between two characters writes one line
-//! per key press. multifus is launched and forgotten, so the question it answers
+//! per key press. Multifus is launched and forgotten, so the question it answers
 //! is asked hours later, or the next morning. See ADR 0006.
 //!
-//! **Nothing is written by anybody but multifus.** The logging plugin exposes a
+//! **Nothing is written by anybody but Multifus.** The logging plugin exposes a
 //! command to the webview, and the capability deliberately does not grant it: the
-//! journal is multifus's own account of what it did, and a channel React could
+//! journal is Multifus's own account of what it did, and a channel React could
 //! write into would make it something else. The filter below is the second half
 //! of that: only lines this module produces reach the file, so a chatty
 //! dependency cannot bury the one thing being looked for.

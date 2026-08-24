@@ -56,7 +56,7 @@ export const useMultifus = () => {
 /**
  * A rejection nothing can be done about.
  *
- * No command of multifus reports its trouble this way: a save that did not go
+ * No command of Multifus reports its trouble this way: a save that did not go
  * through, a system that refused, they all come back inside the snapshot. A
  * rejection here means the bridge itself failed, and the window scan puts the
  * interface back in step within a few seconds.

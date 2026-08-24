@@ -1,4 +1,4 @@
-//! What React is allowed to ask multifus to do.
+//! What React is allowed to ask Multifus to do.
 //!
 //! Every command that changes something returns the whole [`Snapshot`], so the
 //! interface never has to guess what a change did to the rest of the screen and
@@ -12,7 +12,7 @@
 //! it.
 //!
 //! Almost nothing here returns a `Result`. A save that fails, a system that
-//! refuses, a file that will not open: none of them stop multifus, all of them
+//! refuses, a file that will not open: none of them stop Multifus, all of them
 //! belong in the journal and, when the user has to act, in the snapshot. A
 //! command that answered with an error string would put a second, English,
 //! parallel channel next to those two.
@@ -51,7 +51,7 @@ pub fn refresh(app: AppHandle) -> Snapshot {
     runtime::emit_snapshot(&app)
 }
 
-/// Opens the system dialog for the authorization multifus needs.
+/// Opens the system dialog for the authorization Multifus needs.
 #[tauri::command]
 pub fn request_authorization(app: AppHandle) -> Snapshot {
     runtime::request_authorization(&app);
@@ -207,7 +207,7 @@ pub fn set_wakes_minimized(app: AppHandle, wakes: bool) -> Snapshot {
     runtime::emit_snapshot(&app)
 }
 
-/// Asks multifus to start with the session, or to stop doing so.
+/// Asks Multifus to start with the session, or to stop doing so.
 ///
 /// The configuration is written first and the system is made to follow, never
 /// the other way round: what the file holds is the intent, and the registration
@@ -338,7 +338,7 @@ pub fn check_update(app: AppHandle) -> Snapshot {
     runtime::emit_snapshot(&app)
 }
 
-/// Downloads the update that was found and restarts multifus on it.
+/// Downloads the update that was found and restarts Multifus on it.
 #[tauri::command]
 pub fn install_update(app: AppHandle) -> Snapshot {
     update::install(&app);

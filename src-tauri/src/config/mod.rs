@@ -1,7 +1,7 @@
-//! What multifus remembers between two launches, and the file it lives in.
+//! What Multifus remembers between two launches, and the file it lives in.
 //!
 //! Third module of the crate, named after the thing it owns: the configuration
-//! file of perimetre.md, the only piece of multifus that is neither pure logic
+//! file of perimetre.md, the only piece of Multifus that is neither pure logic
 //! nor a system interface but durable state.
 //!
 //! It sits outside the other two on purpose. [`crate::domain`] is pure, it does

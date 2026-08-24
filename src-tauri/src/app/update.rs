@@ -1,11 +1,11 @@
-//! The update multifus offers, and never applies behind the user's back.
+//! The update Multifus offers, and never applies behind the user's back.
 //!
 //! One check when the process starts, and one more whenever the about screen
 //! asks. Nothing periodic: a release is a rare event, and a timer polling GitHub
 //! for a window nobody has open would cost more than it ever saves.
 //!
 //! **Found is not installed.** The check writes a state into the snapshot and
-//! stops there. Replacing the bundle restarts multifus, which on a playing
+//! stops there. Replacing the bundle restarts Multifus, which on a playing
 //! evening means every client losing its window manager mid-combat, so it takes
 //! a click. The system tray carries that click too, since an update the user
 //! only learns about by opening the window is an update they never see.
@@ -97,7 +97,7 @@ async fn look(app: &AppHandle) -> tauri_plugin_updater::Result<Option<Update>> {
 
 /// Downloads the update that was found and puts it in place.
 ///
-/// multifus restarts itself on success and never comes back from that call, so
+/// Multifus restarts itself on success and never comes back from that call, so
 /// nothing is journalled on the way out: what proves it worked is the version
 /// the about screen shows on the next launch.
 ///
@@ -108,7 +108,7 @@ async fn look(app: &AppHandle) -> tauri_plugin_updater::Result<Option<Update>> {
 /// second between a menu being drawn with the line and the check answering that
 /// there is nothing to install, and the menu loses the line on the spot through
 /// the snapshot. A journal line for it would describe the timing of a redraw
-/// rather than anything about multifus.
+/// rather than anything about Multifus.
 pub fn install(app: &AppHandle) {
     let Some(update) = pending(app).take() else {
         return;
@@ -138,7 +138,7 @@ pub fn install(app: &AppHandle) {
 /// This version is the published one.
 ///
 /// Written down as well as shown, which it was not: a check that has never once
-/// reached the endpoint looked exactly like a multifus that is up to date, and
+/// reached the endpoint looked exactly like a Multifus that is up to date, and
 /// over weeks that is the difference between « no release yet » and « this
 /// machine has not been able to ask since March ». Collapsed into one line per
 /// run by `log_unless_repeated`, since the answer does not change between two

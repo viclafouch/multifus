@@ -631,7 +631,7 @@ const JOURNAL_CASES = {
         system: 'macOS 26.0 (arm64)',
         launch: 'session'
       },
-      line: 'multifus 0.1.0 a démarré sur macOS 26.0 (arm64), au démarrage de la session.'
+      line: 'Multifus 0.1.0 a démarré sur macOS 26.0 (arm64), au démarrage de la session.'
     },
     {
       event: {
@@ -640,7 +640,7 @@ const JOURNAL_CASES = {
         system: 'macOS 26.0 (arm64)',
         launch: 'byHand'
       },
-      line: 'multifus 0.1.0 a démarré sur macOS 26.0 (arm64), lancé à la main.'
+      line: 'Multifus 0.1.0 a démarré sur macOS 26.0 (arm64), lancé à la main.'
     }
   ],
   listening: [{ event: { kind: 'listening' }, line: PLAIN_LINES.listening }],
@@ -800,11 +800,11 @@ const JOURNAL_CASES = {
         detail: DETAIL,
         quarantined: '/tmp/multifus/config.json.bak'
       },
-      line: `Configuration non chargée, multifus est reparti sur ses réglages par défaut (${DETAIL}). Fichier mis de côté : /tmp/multifus/config.json.bak`
+      line: `Configuration non chargée, Multifus est reparti sur ses réglages par défaut (${DETAIL}). Fichier mis de côté : /tmp/multifus/config.json.bak`
     },
     {
       event: { kind: 'configLoadFailed', detail: DETAIL, quarantined: null },
-      line: `Configuration non chargée, multifus est reparti sur ses réglages par défaut (${DETAIL}). Rien n’a été déplacé.`
+      line: `Configuration non chargée, Multifus est reparti sur ses réglages par défaut (${DETAIL}). Rien n’a été déplacé.`
     }
   ],
   configNotSetAside: [
@@ -1208,7 +1208,7 @@ describe('journalTranscript', () => {
     // #then
     expect(transcript).toBe(
       [
-        'multifus 0.1.0 sur macOS 26.0 (arm64)',
+        'Multifus 0.1.0 sur macOS 26.0 (arm64)',
         'Autorisation : accordée, écoute active',
         'AutoFocus : actif, réveil des réduites actif',
         BINDINGS_LINE,

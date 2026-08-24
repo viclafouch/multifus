@@ -1,6 +1,6 @@
 //! Laying the paste combination on the system, fourth interface of the boundary.
 //!
-//! The one thing multifus writes towards the system instead of reading from it,
+//! The one thing Multifus writes towards the system instead of reading from it,
 //! and the exception ADR 0012 opens in perimetre.md.
 
 use crate::platform::error::Result;

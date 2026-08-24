@@ -11,7 +11,7 @@ use regex::RegexSet;
 use serde::Deserialize;
 use serde::Serialize;
 
-/// The category of a game event multifus recognises.
+/// The category of a game event Multifus recognises.
 ///
 /// The order of the variants is the order of the table below, which is the
 /// order the patterns are tried in. It matters, see [`classify`].
@@ -187,7 +187,7 @@ static MATCHERS: LazyLock<Vec<(NotificationKind, RegexSet)>> = LazyLock::new(|| 
 /// Reads the kind of event out of a notification body.
 ///
 /// The kinds are tried in table order and the first one whose patterns match
-/// wins, as in Dracoon. `None` means no pattern matched, and multifus focuses
+/// wins, as in Dracoon. `None` means no pattern matched, and Multifus focuses
 /// nothing.
 #[must_use]
 pub fn classify(body: &str) -> Option<NotificationKind> {

@@ -12,7 +12,7 @@ type LinkButtonProps = Readonly<{
 }>
 
 /**
- * A page multifus offers to open, named and never addressed. The URL lives in
+ * A page Multifus offers to open, named and never addressed. The URL lives in
  * `app::relay::links`, so nothing here can point the browser elsewhere.
  */
 export const LinkButton = ({ link, label }: LinkButtonProps) => {

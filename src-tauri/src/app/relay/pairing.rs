@@ -1,4 +1,4 @@
-//! The pairing, which is the one moment a bot token enters multifus.
+//! The pairing, which is the one moment a bot token enters Multifus.
 //!
 //! A bot cannot write first, ADR 0007, so the chat only exists once the user has
 //! written to it. The screen therefore asks for two things in two moments, and
@@ -36,7 +36,7 @@ use crate::app::view::PairingView;
 /// Two lines like the activation notice: the first alone was read as a relay
 /// that had started, which the Relais screen exists to never let anybody believe.
 const PAIRED_MESSAGE: &str =
-    "multifus\nVotre robot est relié.\nLe relais n’est pas encore en marche.";
+    "Multifus\nVotre robot est relié.\nLe relais n’est pas encore en marche.";
 
 /// Pairs the relay with the bot whose token this is.
 ///
@@ -72,7 +72,7 @@ pub fn pair(app: &AppHandle, token: String) {
 /// The erasing is a keychain call like any other, so it goes off the calling
 /// thread too. The chat is dropped whatever the keychain answered: a token that
 /// cannot be erased is worth saying, and it is not a reason to keep pointing at
-/// a conversation multifus can no longer write in.
+/// a conversation Multifus can no longer write in.
 pub fn unpair(app: &AppHandle) {
     // First, and not at the end: the sending task holds the token in memory, so
     // a relay left running would keep writing after the screen says it is gone.
@@ -136,7 +136,7 @@ async fn store(token: BotToken) -> Result<(), PairingProblem> {
     Err(PairingProblem::Keychain { detail })
 }
 
-/// Says what went wrong, on screen and, when it is multifus's business, in the
+/// Says what went wrong, on screen and, when it is Multifus's business, in the
 /// journal.
 ///
 /// A blank field and a bot nobody has written to are steps of the pairing that

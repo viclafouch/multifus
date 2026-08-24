@@ -1,4 +1,4 @@
-//! A character known to multifus, and the gender used by the swap.
+//! A character known to Multifus, and the gender used by the swap.
 
 use serde::Deserialize;
 use serde::Serialize;

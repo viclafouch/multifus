@@ -5,7 +5,7 @@
 # it would drift, and the copy that drifted would be the one guarding the
 # release.
 #
-# Two runners, because multifus is one application on two systems and a green
+# Two runners, because Multifus is one application on two systems and a green
 # `ci` has to say something about both. `platform::macos` and `platform::windows`
 # are each compiled by one of them and by no other, so a single runner would let
 # half the boundary rot untouched.

@@ -1,8 +1,8 @@
-//! What multifus knows while it runs, and the one lock that guards it.
+//! What Multifus knows while it runs, and the one lock that guards it.
 //!
 //! [`Multifus`] holds the settings as they are right now, veille and connected
 //! state included, which the file deliberately does not hold; where every
-//! connected character's window is; whether the system is letting multifus work;
+//! connected character's window is; whether the system is letting Multifus work;
 //! and the journal. Every command and the window scan go through the same mutex.
 //!
 //! One rule keeps that mutex safe: **never hold this lock while touching the
@@ -73,7 +73,7 @@ pub type WatcherState = Mutex<PlatformNotificationWatcher>;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct StartId(u64);
 
-/// Everything multifus knows while it runs.
+/// Everything Multifus knows while it runs.
 #[derive(Debug)]
 pub struct Multifus {
     store: ConfigStore,
@@ -96,7 +96,7 @@ pub struct Multifus {
     /// Where each connected character's window is. Refilled by every scan, since
     /// a [`WindowId`] means nothing once its window is gone.
     windows: HashMap<String, WindowId>,
-    /// The system lets multifus read window titles and hear the banners.
+    /// The system lets Multifus read window titles and hear the banners.
     ///
     /// `None` until the first scan has asked. Three states and not two, so that
     /// the first answer reaches the journal even when it is the one the field
@@ -107,7 +107,7 @@ pub struct Multifus {
     listening: bool,
     /// Why the configuration on screen is not the one on disk, if it is not.
     problem: Option<ConfigProblem>,
-    /// Where multifus is with the version that is published, see
+    /// Where Multifus is with the version that is published, see
     /// [`crate::app::update`]. It starts as a question because the check starts
     /// with the process.
     update: UpdateView,
@@ -150,7 +150,7 @@ pub struct MultifusParams {
     /// The system, its version and its architecture. No hostname and no locale:
     /// the file this ends up in is meant to be shareable.
     pub system: String,
-    /// Whether the session started multifus or somebody opened it.
+    /// Whether the session started Multifus or somebody opened it.
     pub launch: Launch,
     /// What the screen saver of this machine is set to. Asked once here rather
     /// than at each activation, see [`ScreenSaverView`].
@@ -392,7 +392,7 @@ impl Multifus {
     ///
     /// Nothing is saved: the veille never reaches the file, see ADR 0004. It is
     /// written to the journal, which is a different question: the file is what
-    /// multifus starts from tomorrow, the journal is what explains today. A
+    /// Multifus starts from tomorrow, the journal is what explains today. A
     /// défilement that reports « personne dans le défilement » is only ever
     /// explained by the rows somebody put to sleep a minute earlier.
     pub fn toggle_asleep(&mut self, nickname: &str) {
@@ -403,7 +403,7 @@ impl Multifus {
             Some(false) => RosterChange::Woke {
                 nickname: nickname.to_owned(),
             },
-            // Not a character multifus knows, so nothing moved and there is
+            // Not a character Multifus knows, so nothing moved and there is
             // nothing to report.
             None => return,
         };
@@ -562,7 +562,7 @@ impl Multifus {
     /// The line a quick reply would paste, `None` for one that has been removed.
     ///
     /// Read at the moment the key fires and never carried on the queue: a quick reply
-    /// rewritten while multifus runs would otherwise paste its old version.
+    /// rewritten while Multifus runs would otherwise paste its old version.
     #[must_use]
     pub fn quick_reply_text(&self, id: QuickReplyId) -> Option<String> {
         self.settings
@@ -631,10 +631,10 @@ impl Multifus {
             .find(|quick_reply| quick_reply.id == id)
     }
 
-    /// Whether the user asked multifus to start with the session.
+    /// Whether the user asked Multifus to start with the session.
     ///
     /// The file is what says so, never the system: the registration on disk can
-    /// be taken away from under multifus, and only this can be read as an
+    /// be taken away from under Multifus, and only this can be read as an
     /// intent. See [`crate::app::autostart`].
     #[must_use]
     pub fn starts_at_login(&self) -> bool {
@@ -718,7 +718,7 @@ impl Multifus {
         self.set_wakes_minimized(!self.settings.auto_focus.wakes_minimized, Surface::Tray);
     }
 
-    /// Everything back to what someone who has never opened multifus gets,
+    /// Everything back to what someone who has never opened Multifus gets,
     /// roster included.
     ///
     /// The connected characters come back on the next scan, without the genders
@@ -1035,7 +1035,7 @@ impl Multifus {
         self.scan_change(changed, relayed_gone)
     }
 
-    /// Where a character's window is, if multifus can still see one.
+    /// Where a character's window is, if Multifus can still see one.
     ///
     /// What the system tray aims at, the same way [`Multifus::aim_at`] does for the
     /// cycle: reading happens under this lock, focusing does not.
@@ -1044,9 +1044,9 @@ impl Multifus {
         self.windows.get(nickname).copied()
     }
 
-    /// What the scan reports when the system will not let multifus look.
+    /// What the scan reports when the system will not let Multifus look.
     ///
-    /// Everyone goes offline: multifus has no idea who is connected, and saying
+    /// Everyone goes offline: Multifus has no idea who is connected, and saying
     /// nobody is closer to the truth than leaving stale lamps lit.
     ///
     /// Each departure is written down, exactly as [`Multifus::apply_windows`]
@@ -1105,7 +1105,7 @@ impl Multifus {
         true
     }
 
-    /// Whether the system is letting multifus work. An authorization nobody has
+    /// Whether the system is letting Multifus work. An authorization nobody has
     /// asked about yet reads as a refusal, which is what the screens should draw
     /// in that half second.
     #[must_use]
@@ -1338,7 +1338,7 @@ pub enum ShortcutEffect {
 ///
 /// A poisoned mutex here means some earlier call died holding it. The data
 /// behind it is a roster and a handful of booleans, not an invariant that a
-/// panic can half-break, and multifus refusing to work for the rest of the
+/// panic can half-break, and Multifus refusing to work for the rest of the
 /// session would be a worse answer than carrying on.
 pub fn lock(app: &AppHandle) -> MutexGuard<'_, Multifus> {
     app.state::<AppState>()
@@ -1355,7 +1355,7 @@ mod tests {
 
     use super::*;
 
-    /// A multifus with nothing on disk, writing into a directory that dies with
+    /// A Multifus with nothing on disk, writing into a directory that dies with
     /// the test rather than into a path written in the source.
     fn multifus(directory: &TempDir) -> Multifus {
         Multifus::new(MultifusParams {

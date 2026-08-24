@@ -2,7 +2,7 @@
 //!
 //! The store knows one path and does two things with it, [`ConfigStore::load`]
 //! and [`ConfigStore::save`]. It is built either from a directory, which is what
-//! the tests do, or from the application, which is what multifus does: the path
+//! the tests do, or from the application, which is what Multifus does: the path
 //! comes from Tauri's own resolver and never from a string assembled here, so no
 //! machine of anyone's ends up in the source.
 
@@ -39,7 +39,7 @@ pub struct ConfigStore {
 }
 
 impl ConfigStore {
-    /// The store of a running multifus: `config.json` in the configuration
+    /// The store of a running Multifus: `config.json` in the configuration
     /// directory the system gives this application.
     ///
     /// The directory is `app_config_dir`, which Tauri builds from the bundle
@@ -76,7 +76,7 @@ impl ConfigStore {
 
     /// Reads the configuration, and always comes back with a usable one.
     ///
-    /// There is no `Result` here because multifus starts either way. What can be
+    /// There is no `Result` here because Multifus starts either way. What can be
     /// read is read, what cannot be read is replaced by the defaults, and
     /// [`Loaded::failure`] carries the reason so the interface can say it out
     /// loud one day rather than have it swallowed.
@@ -84,7 +84,7 @@ impl ConfigStore {
     /// Three outcomes:
     ///
     /// - no file at all, the first launch of someone who has never opened
-    ///   multifus: the defaults, and no failure, since nothing failed;
+    ///   Multifus: the defaults, and no failure, since nothing failed;
     /// - a file that is not a configuration, truncated by an old crash or
     ///   hand-edited into invalid JSON: the defaults, the failure, and the file
     ///   is renamed out of the way rather than overwritten by the first save,
@@ -136,7 +136,7 @@ impl ConfigStore {
     /// that a truncate-then-write would leave. The leftover of an interrupted
     /// save is a stray temporary file, which the next save overwrites.
     ///
-    /// multifus is the only writer of this file, so no two saves race for the
+    /// Multifus is the only writer of this file, so no two saves race for the
     /// temporary name.
     pub fn save(&self, settings: &Settings) -> Result<()> {
         if let Some(directory) = self.path.parent() {
@@ -551,7 +551,7 @@ mod tests {
             "the corrupt file is moved, not left"
         );
 
-        // And multifus keeps working: the next save writes a clean file.
+        // And Multifus keeps working: the next save writes a clean file.
         store
             .save(&loaded.settings)
             .expect("the configuration is written after a recovery");
@@ -583,7 +583,7 @@ mod tests {
     #[test]
     fn a_file_from_another_program_is_not_mistaken_for_a_configuration() {
         let (_directory, store) = store();
-        // Valid JSON, no field in common. Nothing here says multifus.
+        // Valid JSON, no field in common. Nothing here says Multifus.
         fs::write(store.path(), "[1, 2, 3]").expect("the foreign file is written");
 
         let loaded = store.load();

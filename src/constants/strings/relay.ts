@@ -46,7 +46,7 @@ const FAILURE_LINES = {
   // Never « le trousseau a refusé »: the commonest case by far is the user
   // clicking Refuser on the dialog, which is a choice and not a fault.
   keychain: (detail: string) => {
-    return `multifus n’a pas pu lire le jeton dans le trousseau du système (${detail}).`
+    return `Multifus n’a pas pu lire le jeton dans le trousseau du système (${detail}).`
   },
   telegram: (detail: string) => {
     return `Telegram a refusé la requête (${detail}).`
@@ -109,7 +109,7 @@ export const RELAY_STRINGS = {
       },
       connect: {
         title: 'Cliquez sur Connecter',
-        body: 'multifus écrit à votre robot pour confirmer que la liaison tient.'
+        body: 'Multifus écrit à votre robot pour confirmer que la liaison tient.'
       }
     },
     help: 'Les robots Telegram, expliqués',
@@ -121,7 +121,7 @@ export const RELAY_STRINGS = {
     // screen must not let anybody believe. The line says so outright.
     botTitle: 'Robot Telegram relié',
     botBody:
-      'Le jeton est rangé dans le trousseau du système, multifus ne l’affiche nulle part. Un robot relié ne met pas le relais en marche, l’interrupteur du dessus s’en charge.',
+      'Le jeton est rangé dans le trousseau du système, Multifus ne l’affiche nulle part. Un robot relié ne met pas le relais en marche, l’interrupteur du dessus s’en charge.',
     switchLabel: 'Activer le relais',
     unpair: 'Délier le robot',
     unpairing: 'Déliement…',
@@ -162,7 +162,7 @@ export const RELAY_STRINGS = {
     // a fault nobody has seen. See `docs/macos.md`.
     screenSaverTitle: 'Votre économiseur d’écran peut rendre le relais muet',
     screenSaverBody: (delay: string) => {
-      return `multifus garde l’écran allumé, mais l’économiseur démarre après ${delay} et verrouille la session, ce qui coupe la lecture des notifications. Réglez-le sur Jamais dans les réglages du système.`
+      return `Multifus garde l’écran allumé, mais l’économiseur démarre après ${delay} et verrouille la session, ce qui coupe la lecture des notifications. Réglez-le sur Jamais dans les réglages du système.`
     }
   }
 } as const

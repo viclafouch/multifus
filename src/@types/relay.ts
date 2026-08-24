@@ -58,7 +58,7 @@ export type RelayStatus = {
   readonly paired: boolean
   /** The text of a private message goes out with it. Off by default, ADR 0008. */
   readonly sendBody: boolean
-  /** The relay is carrying messages right now. Never persisted: a multifus back
+  /** The relay is carrying messages right now. Never persisted: a Multifus back
    * from a crash relays nothing until somebody asks. */
   readonly active: boolean
   /**

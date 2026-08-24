@@ -4,7 +4,7 @@
 //! Nothing in this crate is allowed to `unwrap` a system call or to panic
 //! because an authorization was denied: on both systems a user who has not yet
 //! granted Accessibility, or notification access, is the normal first-launch
-//! case and multifus has a screen to show them.
+//! case and Multifus has a screen to show them.
 
 use std::error::Error;
 use std::fmt;

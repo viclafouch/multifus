@@ -131,7 +131,7 @@ const startedLine = (event: Extract<JournalEvent, { kind: 'started' }>) => {
       ? 'au démarrage de la session'
       : 'lancé à la main'
 
-  return `multifus ${event.version} a démarré sur ${event.system}, ${how}.`
+  return `Multifus ${event.version} a démarré sur ${event.system}, ${how}.`
 }
 
 const configLoadFailedLine = (
@@ -142,7 +142,7 @@ const configLoadFailedLine = (
       ? 'Rien n’a été déplacé.'
       : `Fichier mis de côté : ${event.quarantined}`
 
-  return `Configuration non chargée, multifus est reparti sur ses réglages par défaut (${event.detail}). ${whereItWent}`
+  return `Configuration non chargée, Multifus est reparti sur ses réglages par défaut (${event.detail}). ${whereItWent}`
 }
 
 const authorizationRequestedLine = (
@@ -392,7 +392,7 @@ export const journalTranscript = (snapshot: Snapshot) => {
   })
 
   return [
-    `multifus ${snapshot.version} sur ${snapshot.system}`,
+    `Multifus ${snapshot.version} sur ${snapshot.system}`,
     `Autorisation : ${snapshot.authorization.granted ? 'accordée' : 'refusée'}, écoute ${snapshot.authorization.listening ? 'active' : 'arrêtée'}`,
     `AutoFocus : ${snapshot.autoFocusEnabled ? 'actif' : 'suspendu'}, réveil des réduites ${snapshot.wakesMinimized ? 'actif' : 'inactif'}`,
     shortcutsBoundLine(boundCombinations(snapshot)),
@@ -549,7 +549,7 @@ type ComposedEventKind = Exclude<
 >
 
 /**
- * Of those, the ones multifus reports about itself. Listed by hand, its other
+ * Of those, the ones Multifus reports about itself. Listed by hand, its other
  * half derived below, so an event forgotten here fails to compile there.
  */
 type RunEventKind =
@@ -596,7 +596,7 @@ const isRunEvent = (
 }
 
 /**
- * What multifus observed on its own, put into words. Two functions and not one
+ * What Multifus observed on its own, put into words. Two functions and not one
  * because the Rust side keeps adding events, see `docs/macos.md`.
  */
 const runLine = (event: EventOf<RunEventKind>) => {

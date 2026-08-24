@@ -13,7 +13,7 @@
 //! shortcuts.
 //!
 //! No text for the user crosses here. A path does, and a system error detail
-//! does, because those are not sentences multifus writes but facts it passes on.
+//! does, because those are not sentences Multifus writes but facts it passes on.
 
 use serde::Deserialize;
 use serde::Serialize;
@@ -69,12 +69,12 @@ pub struct Snapshot {
     /// A notification takes a window out of the Dock. Off, minimizing a client
     /// puts it out of the AutoFocus's reach, and only the AutoFocus's.
     pub wakes_minimized: bool,
-    /// multifus is asked to start with the session. What the user wants, not
+    /// Multifus is asked to start with the session. What the user wants, not
     /// what the system currently holds, see [`crate::app::autostart`].
     pub start_at_login: bool,
     pub authorization: AuthorizationView,
     pub config: ConfigView,
-    /// Where multifus is with the version that is out, see [`crate::app::update`].
+    /// Where Multifus is with the version that is out, see [`crate::app::update`].
     pub update: UpdateView,
     /// What the relay screen draws. Never the bot token, ADR 0009.
     pub relay: RelayView,
@@ -102,7 +102,7 @@ pub struct RelayView {
     /// Whether the text of a private message goes out with the nickname and the
     /// kind. Unchecked by default, ADR 0008.
     pub send_body: bool,
-    /// The relay is carrying messages right now. Never persisted: a multifus
+    /// The relay is carrying messages right now. Never persisted: a Multifus
     /// coming back from a crash relays nothing until asked, see `docs/macos.md`.
     pub active: bool,
     /// A click on the tray item could switch it on: a bot is paired and somebody
@@ -243,7 +243,7 @@ pub enum PairingProblem {
     Network { detail: String },
 }
 
-/// What multifus knows about the version that is published.
+/// What Multifus knows about the version that is published.
 ///
 /// There is no idle state: the check starts with the process, so the first
 /// snapshot the interface ever sees is already [`UpdateView::Checking`], and a
@@ -264,7 +264,7 @@ pub enum UpdateView {
     /// A newer version is out, and nothing has been downloaded yet.
     Available { version: String },
 
-    /// It is being downloaded and put in place. multifus restarts on its own
+    /// It is being downloaded and put in place. Multifus restarts on its own
     /// when this succeeds, so this state only ever ends in a restart or in
     /// [`UpdateView::Failed`].
     Installing,
@@ -354,7 +354,7 @@ pub struct ShortcutView {
     /// The combination as the global shortcut plugin reads it, `null` for an
     /// action the user has cleared. Nothing here interprets it.
     pub accelerator: Option<String>,
-    /// What the system answered when multifus laid this combination down.
+    /// What the system answered when Multifus laid this combination down.
     pub status: ShortcutStatus,
 }
 
@@ -398,7 +398,7 @@ pub struct BindingView {
     rename_all_fields = "camelCase"
 )]
 pub enum ShortcutStatus {
-    /// multifus has not tried yet. Only ever visible in the instant between the
+    /// Multifus has not tried yet. Only ever visible in the instant between the
     /// window opening and the first registration.
     Pending,
 
@@ -416,7 +416,7 @@ pub enum ShortcutStatus {
     /// The stored text is not a combination this system can express.
     Invalid { detail: String },
 
-    /// Something else of multifus already answers to it, an action or a quick reply.
+    /// Something else of Multifus already answers to it, an action or a quick reply.
     /// The system keys a shortcut by the combination alone, so it cannot hold
     /// the two. The four actions are laid down first, so this always names the
     /// one that holds the keys.
@@ -435,7 +435,7 @@ pub struct AutoFocusView {
     pub enabled: bool,
 }
 
-/// Whether the system lets multifus work, and whether it is working.
+/// Whether the system lets Multifus work, and whether it is working.
 ///
 /// Two booleans and not one. On macOS both hang on Accessibility, but being
 /// allowed to listen and actually listening are different states, and the day

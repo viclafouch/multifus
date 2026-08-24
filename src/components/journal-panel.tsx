@@ -28,7 +28,7 @@ type JournalPanelProps = Readonly<{
  * The drawer at the foot of the window, shut by default.
  *
  * It exists for one day: the one where a notification arrives and nothing comes
- * to the front. Every step multifus goes through is written here, so the answer
+ * to the front. Every step Multifus goes through is written here, so the answer
  * is a scroll away instead of a rebuild with a print statement in it.
  *
  * It draws what the Rust side holds in memory and not the whole journal, which

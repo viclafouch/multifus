@@ -1,4 +1,4 @@
-//! What multifus does on its own, without anyone opening the window.
+//! What Multifus does on its own, without anyone opening the window.
 //!
 //! Two things run outside the commands. A scan asks the boundary which game
 //! windows exist, which is how a character enters the roster and how a lamp goes
@@ -52,7 +52,7 @@ use crate::platform::WindowManager;
 
 /// How often the game windows are looked at.
 ///
-/// Slow enough that an unattended multifus costs nothing, quick enough that a
+/// Slow enough that an unattended Multifus costs nothing, quick enough that a
 /// client one has just opened shows up before one has finished looking at the
 /// window.
 const SCAN_INTERVAL: Duration = Duration::from_secs(3);
@@ -73,7 +73,7 @@ pub const SNAPSHOT_EVENT: &str = "multifus://snapshot";
 /// The event that asks the window to show one screen rather than another.
 ///
 /// Separate from the snapshot on purpose: which screen is on show is not state
-/// multifus keeps, it is a request made once. Putting it in the snapshot would
+/// Multifus keeps, it is a request made once. Putting it in the snapshot would
 /// make every emission re-assert a screen the user may have left since.
 pub const NAVIGATE_EVENT: &str = "multifus://navigate";
 
@@ -140,7 +140,7 @@ fn refresh_windows(app: &AppHandle) -> ScanChange {
 
     match outcome {
         Ok(windows) => state.apply_windows(&windows),
-        // Not an empty roster: multifus is not allowed to look, which is a
+        // Not an empty roster: Multifus is not allowed to look, which is a
         // different thing from nobody being connected, and the interface has a
         // screen for it. It is also the second of the four cases of ADR 0010,
         // so the relayed characters that leave here are said out loud too.
@@ -162,7 +162,7 @@ fn refresh_windows(app: &AppHandle) -> ScanChange {
 /// the authorization goes away.
 ///
 /// macOS grants Accessibility long after it was asked for, and takes it back
-/// whenever the user says so. Neither moment is an event multifus can subscribe
+/// whenever the user says so. Neither moment is an event Multifus can subscribe
 /// to, so it is looked at here, every turn.
 fn follow_authorization(app: &AppHandle) -> bool {
     let (granted, listening) = {
@@ -248,7 +248,7 @@ fn on_notification(app: &AppHandle, notification: GameNotification) {
     let decision = lock(app).decide(&nickname, kind);
 
     let outcome = match decision {
-        // A body multifus never read reaches `decide` looking exactly like one
+        // A body Multifus never read reaches `decide` looking exactly like one
         // whose wording it does not know, and only this side can tell them apart.
         // They are two different failures repaired in two different files, see
         // [`Outcome::BodyUnread`].
@@ -273,7 +273,7 @@ fn on_notification(app: &AppHandle, notification: GameNotification) {
     emit_snapshot(app);
 }
 
-/// Something was notified and the system would not let multifus read it.
+/// Something was notified and the system would not let Multifus read it.
 ///
 /// An authorization taken away refuses every element the notification centre
 /// builds, until the scan takes the listening down a turn or two later, so the
@@ -424,7 +424,7 @@ pub fn refresh(app: &AppHandle) {
 /// every command takes this lock. See the note on [`crate::app::tray`].
 /// The failure of this emission is the one thing the window can never show, since
 /// the journal travels inside the very payload that did not arrive: the board
-/// stays frozen on an older roster and looks like a multifus that has stopped.
+/// stays frozen on an older roster and looks like a Multifus that has stopped.
 /// It is in the file, and that is the plainest argument for the file.
 pub fn emit_snapshot(app: &AppHandle) -> Snapshot {
     let snapshot = lock(app).snapshot();

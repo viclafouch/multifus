@@ -1,5 +1,5 @@
 /**
- * The bridge to the Rust side: every call multifus can make, and the two events
+ * The bridge to the Rust side: every call Multifus can make, and the two events
  * it listens to. What crosses is typed in `@types/`, which imports nothing.
  */
 
@@ -52,7 +52,7 @@ export const refresh = async () => {
   return invoke<Snapshot>('refresh')
 }
 
-/** Opens the system dialog for the authorization multifus needs. */
+/** Opens the system dialog for the authorization Multifus needs. */
 export const requestAuthorization = async () => {
   return invoke<Snapshot>('request_authorization')
 }
@@ -137,7 +137,7 @@ export const setWakesMinimized = async (wakes: boolean) => {
 }
 
 /**
- * Asks multifus to start with the session, or to stop doing so. What comes back
+ * Asks Multifus to start with the session, or to stop doing so. What comes back
  * is what the user asked for even if the registration failed, see the journal.
  */
 export const setStartAtLogin = async (startAtLogin: boolean) => {
@@ -204,7 +204,7 @@ export const checkUpdate = async () => {
   return invoke<Snapshot>('check_update')
 }
 
-/** Downloads the version that was found. multifus restarts on its own after. */
+/** Downloads the version that was found. Multifus restarts on its own after. */
 export const installUpdate = async () => {
   return invoke<Snapshot>('install_update')
 }

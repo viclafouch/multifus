@@ -1,14 +1,14 @@
-//! The window multifus draws its screens in: when it opens, and when it comes
+//! The window Multifus draws its screens in: when it opens, and when it comes
 //! back.
 //!
 //! Named `main_window` and not `window` because in this project a « fenêtre » is
 //! a game one, see CONTEXT.md. There is exactly one of these, it is never
 //! destroyed, and closing it only puts it away.
 //!
-//! **It does not open when the session starts multifus.** An application one
+//! **It does not open when the session starts Multifus.** An application one
 //! launches and forgets has no business putting a board in front of someone who
 //! just logged in and is opening their clients. So the registration written by
-//! [`crate::app::autostart`] carries [`FROM_SESSION_ARG`], multifus reads its own
+//! [`crate::app::autostart`] carries [`FROM_SESSION_ARG`], Multifus reads its own
 //! arguments, and the icon in the system tray is the whole of what a session
 //! start shows. A launch by hand is the opposite: double-clicking an application
 //! is asking to see it, and staying silent there would read as a failed launch.
@@ -26,7 +26,7 @@
 //!
 //! **An update installed from a session start comes back silent too.**
 //! `AppHandle::restart` hands the arguments of the dying process to the new one,
-//! [`FROM_SESSION_ARG`] included, so multifus restarts without its window on the
+//! [`FROM_SESSION_ARG`] included, so Multifus restarts without its window on the
 //! one click that most looks like it should end with one. It is left as is: the
 //! system tray icon is up, so the window is one click away, and the alternative
 //! is reimplementing Tauri's restart to take an argument away from it.
@@ -49,13 +49,13 @@ pub const LABEL: &str = "main";
 /// What the session launcher adds after the path of the binary.
 ///
 /// On macOS it lands in the `ProgramArguments` array of
-/// `~/Library/LaunchAgents/multifus.plist`, right after the executable, so it
+/// `~/Library/LaunchAgents/Multifus.plist`, right after the executable, so it
 /// reaches [`std::env::args`] like any other argument. The registration is
 /// rewritten at every launch, so an agent written before this argument existed
-/// gains it on its own the first time multifus is opened by hand.
+/// gains it on its own the first time Multifus is opened by hand.
 pub const FROM_SESSION_ARG: &str = "--from-session";
 
-/// Opens the window, unless the session started multifus and has somewhere to
+/// Opens the window, unless the session started Multifus and has somewhere to
 /// put it away to.
 ///
 /// **The system tray icon is a condition and not a detail.** If putting it up
@@ -72,7 +72,7 @@ pub fn show_on_launch(app: &AppHandle) {
     show(app);
 }
 
-/// How multifus was started, for the head of the journal.
+/// How Multifus was started, for the head of the journal.
 ///
 /// Read from the arguments and not from whether the window is up, because the two
 /// come apart: a session start with no system tray icon opens the window anyway,
@@ -123,7 +123,7 @@ pub fn show(app: &AppHandle) {
     }
 }
 
-/// Closing the window puts it away instead of ending multifus.
+/// Closing the window puts it away instead of ending Multifus.
 ///
 /// The whole point of step 8: the window is a board one consults, and the
 /// application goes on watching the roster and answering the shortcuts without
@@ -131,7 +131,7 @@ pub fn show(app: &AppHandle) {
 ///
 /// **Unless there is no system tray icon.** If putting it up failed, hiding the
 /// window here would leave a running process with no window, no menu and no way
-/// back. In that case the close is let through and multifus ends, which is the
+/// back. In that case the close is let through and Multifus ends, which is the
 /// worse of two behaviours and by far the better of two failures.
 pub fn hide_rather_than_quit(window: &Window<Wry>, event: &WindowEvent) {
     let WindowEvent::CloseRequested { api, .. } = event else {
@@ -167,7 +167,7 @@ fn matches_session_launch(arguments: impl IntoIterator<Item = String>) -> bool {
 mod tests {
     use super::*;
 
-    const BINARY: &str = "/Applications/multifus.app/Contents/MacOS/multifus";
+    const BINARY: &str = "/Applications/Multifus.app/Contents/MacOS/Multifus";
 
     #[test]
     fn a_launch_by_hand_carries_the_binary_alone() {

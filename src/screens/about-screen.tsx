@@ -51,7 +51,7 @@ type UpdateSectionProps = Readonly<{
 }>
 
 /**
- * Where multifus is with the version that is out, and the one click that takes it.
+ * Where Multifus is with the version that is out, and the one click that takes it.
  *
  * It sits directly under the version it comments on, and it says its state in
  * words rather than in a badge. The button never goes dead while a request is in
@@ -100,7 +100,7 @@ type AboutScreenProps = Readonly<{
 }>
 
 /**
- * How multifus sits on this machine: which version, where its file is, when it
+ * How Multifus sits on this machine: which version, where its file is, when it
  * starts, and how to wipe it.
  *
  * The start with the session belongs here rather than on a screen of its own.

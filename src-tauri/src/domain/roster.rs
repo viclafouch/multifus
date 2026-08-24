@@ -9,7 +9,7 @@ use serde::Serialize;
 use super::character::Character;
 use super::character::Gender;
 
-/// Every character multifus knows about, connected or not.
+/// Every character Multifus knows about, connected or not.
 ///
 /// The order of the characters is the cycle order, the one the user rearranges
 /// by drag and drop.
@@ -148,7 +148,7 @@ impl Roster {
     ///
     /// Returns `None` when nobody is in the cycle. Returns `current` itself
     /// when it is the only one left. An unknown `current` starts the search at
-    /// the head of the roster, so a shortcut fired from a window multifus does
+    /// the head of the roster, so a shortcut fired from a window Multifus does
     /// not know about still goes somewhere sensible.
     #[must_use]
     pub fn next_in_cycle(&self, current: &str) -> Option<&Character> {

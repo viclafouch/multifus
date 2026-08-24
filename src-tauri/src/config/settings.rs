@@ -1,5 +1,5 @@
 //! What the configuration file holds, and what it holds for someone who has
-//! never opened multifus.
+//! never opened Multifus.
 //!
 //! Every type here is plain data with a `Default`. Nothing reads a file, nothing
 //! registers a shortcut, nothing starts at login: this module describes the
@@ -23,7 +23,7 @@ use crate::domain::Roster;
 ///
 /// A field missing from the file takes its default rather than failing the whole
 /// load, and a field the file has and this version does not is ignored. So a
-/// configuration written by a later multifus still opens in an earlier one, and
+/// configuration written by a later Multifus still opens in an earlier one, and
 /// a new setting can be added here without invalidating everyone's file.
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(default)]
@@ -42,12 +42,12 @@ pub struct Settings {
     /// Where the relay writes, and how much of a private message it carries.
     /// Never the bot token, see ADR 0009.
     pub relay: Relay,
-    /// Whether multifus starts with the session. Unchecked by default,
+    /// Whether Multifus starts with the session. Unchecked by default,
     /// perimetre.md is explicit about it.
     ///
     /// This is the intent and the system is only ever its consequence: the
     /// registration on disk records a path and can be taken away from under
-    /// multifus, so [`crate::app::autostart`] makes the system match this at
+    /// Multifus, so [`crate::app::autostart`] makes the system match this at
     /// every launch rather than the other way round.
     pub start_at_login: bool,
 }
@@ -70,11 +70,11 @@ pub struct Shortcuts {
     pub swap: Option<Shortcut>,
 }
 
-/// The combinations multifus proposes on a first launch.
+/// The combinations Multifus proposes on a first launch.
 ///
 /// `Control+Shift+arrow` rather than `Control+arrow`: macOS binds the latter to
 /// Mission Control and to moving between Spaces, so the four would be taken
-/// before multifus ever saw them. They stay a proposal, the user changes them at
+/// before Multifus ever saw them. They stay a proposal, the user changes them at
 /// step 6, and the registration is what finds out whether the system takes them.
 const DEFAULT_NEXT: &str = "Control+Shift+Right";
 const DEFAULT_PREVIOUS: &str = "Control+Shift+Left";
@@ -213,7 +213,7 @@ impl QuickReply {
 /// local synchronisation that comes with it; perimetre.md drops it. There is
 /// therefore no room here for a per-character override, and that is the point.
 ///
-/// All eight are on by default: AutoFocus is what multifus is for, and it has to
+/// All eight are on by default: AutoFocus is what Multifus is for, and it has to
 /// work on a first launch without a visit to the settings.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(default)]
@@ -379,7 +379,7 @@ mod tests {
 
     #[test]
     fn the_minimized_are_woken_by_default() {
-        // multifus is for bringing the right window forward, and a first launch
+        // Multifus is for bringing the right window forward, and a first launch
         // has to do that whatever the user has put away in the Dock.
         assert!(AutoFocus::default().wakes_minimized);
     }
@@ -387,7 +387,7 @@ mod tests {
     #[test]
     fn a_file_written_before_this_setting_existed_wakes_the_minimized() {
         // The switch is new. Every configuration already on disk is missing it,
-        // and reading `false` there would silently change what those multifus
+        // and reading `false` there would silently change what those Multifus
         // do on a notification.
         let auto_focus =
             serde_json::from_str::<AutoFocus>("{}").expect("an AutoFocus with nothing in it");

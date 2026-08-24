@@ -18,7 +18,7 @@ import { ShortcutsScreen } from '@/screens/shortcuts'
  * The window: a rail on the left, a screen in the middle, a journal underneath.
  *
  * It is meant to be a board one consults, not a panel one visits. Everything
- * that says whether multifus is working is visible without a click; the settings
+ * that says whether Multifus is working is visible without a click; the settings
  * are three screens away because they are set once and then forgotten.
  */
 export const App = () => {

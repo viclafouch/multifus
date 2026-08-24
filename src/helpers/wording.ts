@@ -21,7 +21,7 @@ export type TonedLine = {
 }
 
 /**
- * One entry per way the file can let multifus down. A table and not a switch, so
+ * One entry per way the file can let Multifus down. A table and not a switch, so
  * a fifth kind added on the Rust side fails to compile instead of going silent.
  */
 export const CONFIG_PROBLEM_LINES = {
@@ -179,7 +179,7 @@ export const shortcutStatusLine = (
   }
 }
 
-/** Whether multifus is hearing the system, which is the fact the rail carries. */
+/** Whether Multifus is hearing the system, which is the fact the rail carries. */
 export const authorizationLine = (authorization: Authorization) => {
   if (!authorization.granted) {
     return strings.status.denied

@@ -87,10 +87,10 @@ impl GameWindow {
 ///
 /// `Send + Sync` is required rather than incidental: the implementation lives in
 /// the Tauri state and gets called from the global shortcut callbacks, which run
-/// on threads multifus does not choose. An implementation that needs the main
+/// on threads Multifus does not choose. An implementation that needs the main
 /// thread, as the macOS one will, hops there on its own.
 pub trait WindowManager: Send + Sync {
-    /// Whether the system already lets multifus read window titles and change
+    /// Whether the system already lets Multifus read window titles and change
     /// the focus, without prompting for anything.
     fn authorization(&self) -> Result<Authorization>;
 
@@ -102,7 +102,7 @@ pub trait WindowManager: Send + Sync {
     /// Clients on the login screen are left out, see [`GameWindow::from_title`].
     /// Returns [`PlatformError::AuthorizationDenied`] rather than an empty list
     /// when the authorization is missing, so that the caller can tell "nobody is
-    /// connected" from "multifus is not allowed to look".
+    /// connected" from "Multifus is not allowed to look".
     ///
     /// [`PlatformError::AuthorizationDenied`]: crate::platform::PlatformError::AuthorizationDenied
     fn game_windows(&self) -> Result<Vec<GameWindow>>;

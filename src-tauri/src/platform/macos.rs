@@ -201,7 +201,7 @@ fn attribute(element: &AXUIElement, name: &str) -> Result<Option<CFRetained<CFTy
 ///
 /// A value of another type reads as an absence, like every other ordinary absence
 /// [`attribute`] folds into `Ok(None)`. That is the honest answer rather than a
-/// swallowed failure: multifus wants a title, and an attribute that is not a
+/// swallowed failure: Multifus wants a title, and an attribute that is not a
 /// string is not a title. Only the walk of a banner cares about the difference,
 /// and what it needs to report is a system that refused, which arrives as an
 /// error above.
@@ -227,7 +227,7 @@ fn element_attribute(element: &AXUIElement, name: &str) -> Result<Option<CFRetai
 ///
 /// Anything in the list that is not an accessibility object is dropped rather
 /// than reported: the Accessibility API is free to hand back whatever it likes,
-/// and multifus only ever wants the elements.
+/// and Multifus only ever wants the elements.
 fn element_array_attribute(
     element: &AXUIElement,
     name: &str,
@@ -501,9 +501,9 @@ impl WindowManager for AccessibilityWindowManager {
         }
 
         // Cooperative activation lets the system turn down a request coming from
-        // an application that is not in front, which multifus never is. Setting
+        // an application that is not in front, which Multifus never is. Setting
         // `AXFrontmost` asks for the same thing through the authorization
-        // multifus already holds. Same process, same intent, second door.
+        // Multifus already holds. Same process, same intent, second door.
         set_frontmost(&element)
     }
 }
@@ -752,7 +752,7 @@ unsafe extern "C-unwind" fn on_banner_created(
     let element: &AXUIElement = unsafe { element.as_ref() };
 
     // A panic must not cross back into the C callback, and the sink is code
-    // multifus does not own. Reading and reporting are caught separately so that
+    // Multifus does not own. Reading and reporting are caught separately so that
     // a panic in the reading still reaches the journal: swallowed together, a
     // notification would be lost without a line, which is the one thing the two
     // variants of `NotificationReport` exist to prevent.
@@ -895,12 +895,12 @@ type IOPMAssertionLevel = u32;
 const IO_RETURN_SUCCESS: IOReturn = 0;
 const IO_PM_ASSERTION_LEVEL_ON: IOPMAssertionLevel = 255;
 
-/// The assertion multifus takes. Not `PreventUserIdleSystemSleep`, which lets the
+/// The assertion Multifus takes. Not `PreventUserIdleSystemSleep`, which lets the
 /// display go dark and the banners with it.
 const PREVENT_USER_IDLE_DISPLAY_SLEEP: &str = "PreventUserIdleDisplaySleep";
 
-/// What `pmset -g assertions` shows next to the pid of multifus.
-const ASSERTION_NAME: &str = "multifus relay";
+/// What `pmset -g assertions` shows next to the pid of Multifus.
+const ASSERTION_NAME: &str = "Multifus relay";
 
 // The screen saver delay, filed per host, which is what `defaults -currentHost`
 // reaches and what `CFPreferencesCopyAppValue` would miss.
@@ -1150,7 +1150,7 @@ mod tests {
 
     #[test]
     fn enumerating_without_the_authorization_is_not_an_empty_roster() {
-        // The caller must be able to tell "nobody is connected" from "multifus
+        // The caller must be able to tell "nobody is connected" from "Multifus
         // is not allowed to look", so the refusal has to be an error.
         let manager = AccessibilityWindowManager::new();
 

@@ -1,8 +1,8 @@
-# multifus
+# Multifus
 
 Gestionnaire de fenêtres pour **Dofus Retro** en multicompte, sur macOS et Windows.
 
-Quand une notification de jeu arrive, multifus ramène au premier plan la fenêtre du personnage concerné. On le lance, on l'oublie, et la bonne fenêtre est devant soi sans avoir à la chercher.
+Quand une notification de jeu arrive, Multifus ramène au premier plan la fenêtre du personnage concerné. On le lance, on l'oublie, et la bonne fenêtre est devant soi sans avoir à la chercher.
 
 ## Fonctionnalités
 
@@ -15,13 +15,13 @@ Quand une notification de jeu arrive, multifus ramène au premier plan la fenêt
 - Un journal, pour comprendre le jour où rien ne se passe, et qui se copie d'un clic
 - Une mise à jour proposée quand une nouvelle version sort, à installer d'un clic ou à ignorer
 
-Fermer la fenêtre ne quitte pas multifus, qui continue dans la barre système. On le quitte par le menu de son icône.
+Fermer la fenêtre ne quitte pas Multifus, qui continue dans la barre système. On le quitte par le menu de son icône.
 
 ## Installation
 
-Sur macOS, télécharger le DMG de la [dernière release](https://github.com/viclafouch/multifus/releases/latest) et glisser multifus dans les Applications. Le paquet est signé et notarisé par Apple, il s'ouvre donc sans avertissement.
+Sur macOS, télécharger le DMG de la [dernière release](https://github.com/viclafouch/multifus/releases/latest) et glisser Multifus dans les Applications. Le paquet est signé et notarisé par Apple, il s'ouvre donc sans avertissement.
 
-Au premier lancement, macOS demande l'**Accessibilité**. C'est la seule autorisation dont multifus a besoin, et il ne peut rien faire sans elle : ni lire le titre des fenêtres, ni les amener au premier plan, ni entendre les notifications du jeu. L'écran d'accueil mène directement au bon panneau des Réglages Système.
+Au premier lancement, macOS demande l'**Accessibilité**. C'est la seule autorisation dont Multifus a besoin, et il ne peut rien faire sans elle : ni lire le titre des fenêtres, ni les amener au premier plan, ni entendre les notifications du jeu. L'écran d'accueil mène directement au bon panneau des Réglages Système.
 
 Les versions suivantes se proposent d'elles-mêmes, depuis l'écran À propos et depuis le menu de la barre système.
 
@@ -33,13 +33,13 @@ Les versions suivantes se proposent d'elles-mêmes, depuis l'écran À propos et
 | Windows          | Prévu                                |
 | Linux et mobiles | Hors périmètre                       |
 
-Les notifications en arrière-plan doivent être activées dans le jeu, via Options puis Général. Sur macOS, les bannières de Dofus doivent rester visibles dans les réglages du système, faute de quoi multifus n'a rien à lire.
+Les notifications en arrière-plan doivent être activées dans le jeu, via Options puis Général. Sur macOS, les bannières de Dofus doivent rester visibles dans les réglages du système, faute de quoi Multifus n'a rien à lire.
 
 > En développement. La feuille de route est dans [docs/plan.md](./docs/plan.md).
 
-## Ce que multifus ne fait pas
+## Ce que Multifus ne fait pas
 
-multifus ne lit pas la mémoire du client, ne simule aucune action de jeu et ne modifie aucun fichier. Il se contente de gérer des fenêtres et de lire des notifications système. Les outils de type macro sont interdits par Ankama et restent hors de ce projet.
+Multifus ne lit pas la mémoire du client, ne simule aucune action de jeu et ne modifie aucun fichier. Il se contente de gérer des fenêtres et de lire des notifications système. Les outils de type macro sont interdits par Ankama et restent hors de ce projet.
 
 Dofus et Dofus Retro sont des marques déposées d'Ankama. Ce projet n'y est pas affilié.
 

@@ -13,7 +13,7 @@ const SCREEN_LABELS = {
 
 export const NAV_RAIL_STRINGS = {
   app: {
-    name: 'multifus'
+    name: 'Multifus'
   },
 
   nav: SCREEN_LABELS,
