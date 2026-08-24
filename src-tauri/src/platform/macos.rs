@@ -53,6 +53,12 @@ use objc2_core_foundation::CFRetained;
 use objc2_core_foundation::CFRunLoop;
 use objc2_core_foundation::CFString;
 use objc2_core_foundation::CFType;
+use objc2_core_graphics::CGEvent;
+use objc2_core_graphics::CGEventFlags;
+use objc2_core_graphics::CGEventSource;
+use objc2_core_graphics::CGEventSourceStateID;
+use objc2_core_graphics::CGEventTapLocation;
+use objc2_core_graphics::CGKeyCode;
 use objc2_foundation::NSString;
 
 use crate::domain::extract_nickname;
@@ -64,6 +70,7 @@ use crate::platform::error::Result;
 use crate::platform::notification::NotificationReport;
 use crate::platform::notification::NotificationSink;
 use crate::platform::notification::NotificationWatcher;
+use crate::platform::paste::PasteSender;
 use crate::platform::window::GameWindow;
 use crate::platform::window::WindowId;
 use crate::platform::window::WindowManager;
@@ -988,6 +995,65 @@ impl Drop for PowerAssertionDisplayKeeper {
         // assertion dies with the process whatever the system answered.
         drop(self.release());
     }
+}
+
+/// `kVK_ANSI_V`, a position on the keyboard and not a letter: the combination is
+/// the same key on an AZERTY layout.
+const PASTE_KEY: CGKeyCode = 9;
+
+/// How long the key stays down. Measured with it on 24 August 2026.
+const PRESS_TO_RELEASE: Duration = Duration::from_millis(10);
+
+/// Lays `Super+V` on the system through Core Graphics.
+///
+/// Measured against a real client on 24 August 2026, and the four answers are in
+/// `docs/plan.md`, temps 1.
+#[derive(Debug, Default)]
+pub struct CoreGraphicsPasteSender;
+
+impl CoreGraphicsPasteSender {
+    #[must_use]
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+impl PasteSender for CoreGraphicsPasteSender {
+    fn send_paste_combination(&self) -> Result<()> {
+        // Read rather than left to fail silently: a post the system refuses does
+        // nothing at all, and reads exactly like a game that will not paste.
+        if !accessibility_authorization().is_granted() {
+            return Err(PlatformError::AuthorizationDenied);
+        }
+
+        // A private source, so the event carries the flags set below and not the
+        // modifiers the user is holding down at that moment.
+        let source = CGEventSource::new(CGEventSourceStateID::Private);
+        let source = source.as_deref();
+
+        let press = keyboard_event(source, true)?;
+        let release = keyboard_event(source, false)?;
+
+        CGEvent::set_flags(Some(&press), CGEventFlags::MaskCommand);
+        CGEvent::set_flags(Some(&release), CGEventFlags::MaskCommand);
+
+        CGEvent::post(CGEventTapLocation::HIDEventTap, Some(&press));
+        thread::sleep(PRESS_TO_RELEASE);
+        CGEvent::post(CGEventTapLocation::HIDEventTap, Some(&release));
+
+        Ok(())
+    }
+}
+
+/// One half of the combination. `CGEventPost` itself answers nothing, so this is
+/// the only place the system can turn the paste down.
+fn keyboard_event(source: Option<&CGEventSource>, key_down: bool) -> Result<CFRetained<CGEvent>> {
+    CGEvent::new_keyboard_event(source, PASTE_KEY, key_down).ok_or_else(|| {
+        PlatformError::system(
+            "posting the paste combination",
+            "CGEventCreateKeyboardEvent returned nothing",
+        )
+    })
 }
 
 /// Reads the screen saver delay of this machine. Every way the answer can be

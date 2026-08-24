@@ -32,6 +32,7 @@ use crate::app::state::lock;
 use crate::app::update;
 use crate::app::view::ShortcutAction;
 use crate::app::view::Snapshot;
+use crate::config::QuickReplyId;
 use crate::domain::Gender;
 use crate::domain::NotificationKind;
 
@@ -123,6 +124,53 @@ pub fn set_shortcut(
 ) -> Snapshot {
     lock(&app).set_shortcut(action, accelerator);
 
+    shortcuts::apply(&app);
+
+    runtime::emit_snapshot(&app)
+}
+
+/// Adds an empty quick reply at the end of the list. Nothing is laid on the system,
+/// a quick reply being born without a combination.
+#[tauri::command]
+pub fn add_quick_reply(app: AppHandle) -> Snapshot {
+    lock(&app).add_quick_reply();
+
+    runtime::emit_snapshot(&app)
+}
+
+/// Rewrites the line a quick reply pastes, folded onto one line.
+///
+/// Called when the field loses the focus and not on every key press: this writes
+/// the configuration to disk.
+#[tauri::command]
+pub fn set_quick_reply_text(app: AppHandle, id: QuickReplyId, text: String) -> Snapshot {
+    lock(&app).set_quick_reply_text(id, &text);
+
+    runtime::emit_snapshot(&app)
+}
+
+/// Binds a combination to a quick reply, or clears it with `null`. Everything is laid
+/// on the system again right after, exactly as [`set_shortcut`] does.
+#[tauri::command]
+pub fn set_quick_reply_shortcut(
+    app: AppHandle,
+    id: QuickReplyId,
+    accelerator: Option<String>,
+) -> Snapshot {
+    lock(&app).set_quick_reply_shortcut(id, accelerator);
+
+    shortcuts::apply(&app);
+
+    runtime::emit_snapshot(&app)
+}
+
+/// Takes a quick reply away. No confirmation, like taking a character out.
+#[tauri::command]
+pub fn remove_quick_reply(app: AppHandle, id: QuickReplyId) -> Snapshot {
+    lock(&app).remove_quick_reply(id);
+
+    // Its combination has to come off the system, or it would keep firing at a
+    // quick reply that is not there until the next launch.
     shortcuts::apply(&app);
 
     runtime::emit_snapshot(&app)

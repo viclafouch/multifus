@@ -75,7 +75,13 @@ type CurrentScreenProps = Readonly<{
 
 const CurrentScreen = ({ screen, snapshot, run }: CurrentScreenProps) => {
   if (screen === 'shortcuts') {
-    return <ShortcutsScreen shortcuts={snapshot.shortcuts} run={run} />
+    return (
+      <ShortcutsScreen
+        shortcuts={snapshot.shortcuts}
+        quickReplies={snapshot.quickReplies}
+        run={run}
+      />
+    )
   }
 
   if (screen === 'autoFocus') {

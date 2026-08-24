@@ -1,7 +1,8 @@
 import React from 'react'
-import { GripVertical, Mars, Venus, X } from 'lucide-react'
+import { GripVertical, Mars, Venus } from 'lucide-react'
 import type { Character, Gender } from '@/@types/roster'
 import { Lamp } from '@/components/lamp'
+import { RemoveButton } from '@/components/remove-button'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { strings } from '@/constants/strings'
@@ -149,17 +150,12 @@ export const CharacterRow = ({
       />
       <span className="flex w-6 shrink-0 justify-end">
         {online ? null : (
-          <Button
-            variant="ghost"
-            size="icon-xs"
-            aria-label={strings.characters.remove(nickname)}
-            onClick={() => {
+          <RemoveButton
+            label={strings.characters.remove(nickname)}
+            onRemove={() => {
               actions.handleRemove(nickname)
             }}
-            className="text-muted-foreground/50 opacity-0 group-hover:opacity-100 hover:text-destructive focus-visible:opacity-100"
-          >
-            <X strokeWidth={2.2} />
-          </Button>
+          />
         )}
       </span>
     </li>

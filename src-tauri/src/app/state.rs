@@ -33,10 +33,12 @@ use crate::app::journal::ShortcutOutcome;
 use crate::app::journal::Surface;
 use crate::app::view::AuthorizationView;
 use crate::app::view::AutoFocusView;
+use crate::app::view::Binding;
 use crate::app::view::CharacterView;
 use crate::app::view::ConfigProblem;
 use crate::app::view::ConfigView;
 use crate::app::view::PairingView;
+use crate::app::view::QuickReplyView;
 use crate::app::view::RelayView;
 use crate::app::view::ScreenSaverView;
 use crate::app::view::ShortcutAction;
@@ -49,6 +51,8 @@ use crate::app::view::UpdateView;
 use crate::config::ConfigError;
 use crate::config::ConfigStore;
 use crate::config::Loaded;
+use crate::config::QuickReply;
+use crate::config::QuickReplyId;
 use crate::config::Settings;
 use crate::config::Shortcut;
 use crate::domain::Character;
@@ -85,10 +89,10 @@ pub struct Multifus {
     /// The live configuration. Its roster carries the veille and the connected
     /// state, which never reach the file, see ADR 0004.
     settings: Settings,
-    /// What the system answered for each of the four combinations. Filled in one
-    /// piece by [`crate::app::shortcuts::apply`], so an action missing from it
-    /// is one nobody has tried to lay down yet.
-    shortcut_statuses: HashMap<ShortcutAction, ShortcutStatus>,
+    /// What the system answered for each combination, actions and quick replies alike.
+    /// Filled in one piece by [`crate::app::shortcuts::apply`], so a binding
+    /// missing from it is one nobody has tried to lay down yet.
+    shortcut_statuses: HashMap<Binding, ShortcutStatus>,
     /// Where each connected character's window is. Refilled by every scan, since
     /// a [`WindowId`] means nothing once its window is gone.
     windows: HashMap<String, WindowId>,
@@ -241,11 +245,18 @@ impl Multifus {
                 .map(|action| ShortcutView {
                     action,
                     accelerator: self.accelerator(action),
-                    status: self
-                        .shortcut_statuses
-                        .get(&action)
-                        .cloned()
-                        .unwrap_or(ShortcutStatus::Pending),
+                    status: self.status_of(Binding::Action { action }),
+                })
+                .collect(),
+            quick_replies: self
+                .settings
+                .quick_replies
+                .iter()
+                .map(|quick_reply| QuickReplyView {
+                    id: quick_reply.id,
+                    text: quick_reply.text.clone(),
+                    accelerator: accelerator_of(quick_reply.shortcut.as_ref()),
+                    status: self.status_of(Binding::QuickReply { id: quick_reply.id }),
                 })
                 .collect(),
             // Each row draws its own switch and not the outcome of the two, so
@@ -487,13 +498,42 @@ impl Multifus {
 
     /// The combination bound to an action, as the plugin reads it.
     #[must_use]
-    pub fn accelerator(&self, action: ShortcutAction) -> Option<String> {
-        self.shortcut(action)
-            .map(|shortcut| shortcut.as_str().to_owned())
+    fn accelerator(&self, action: ShortcutAction) -> Option<String> {
+        accelerator_of(self.shortcut(action))
     }
 
-    /// Takes in what the system answered for the four combinations.
-    pub fn set_shortcut_statuses(&mut self, statuses: HashMap<ShortcutAction, ShortcutStatus>) {
+    /// What the system answered about one combination, or that nobody has tried
+    /// to lay it down yet.
+    #[must_use]
+    fn status_of(&self, binding: Binding) -> ShortcutStatus {
+        self.shortcut_statuses
+            .get(&binding)
+            .cloned()
+            .unwrap_or(ShortcutStatus::Pending)
+    }
+
+    /// Every combination to lay on the system, with what it fires.
+    ///
+    /// **The four actions come first, and that order is the whole point**: the
+    /// first to claim a combination holds it, so a duplicate names the action.
+    #[must_use]
+    pub fn bindings(&self) -> Vec<(Binding, Option<String>)> {
+        let actions = ShortcutAction::ALL
+            .into_iter()
+            .map(|action| (Binding::Action { action }, self.accelerator(action)));
+
+        let quick_replies = self.settings.quick_replies.iter().map(|quick_reply| {
+            (
+                Binding::QuickReply { id: quick_reply.id },
+                accelerator_of(quick_reply.shortcut.as_ref()),
+            )
+        });
+
+        actions.chain(quick_replies).collect()
+    }
+
+    /// Takes in what the system answered for every combination.
+    pub fn set_shortcut_statuses(&mut self, statuses: HashMap<Binding, ShortcutStatus>) {
         self.shortcut_statuses = statuses;
     }
 
@@ -515,6 +555,80 @@ impl Multifus {
         *slot = shortcut;
 
         self.save();
+    }
+
+    // -- The quick replies ------------------------------------------------------
+
+    /// The line a quick reply would paste, `None` for one that has been removed.
+    ///
+    /// Read at the moment the key fires and never carried on the queue: a quick reply
+    /// rewritten while multifus runs would otherwise paste its old version.
+    #[must_use]
+    pub fn quick_reply_text(&self, id: QuickReplyId) -> Option<String> {
+        self.settings
+            .quick_replies
+            .iter()
+            .find(|quick_reply| quick_reply.id == id)
+            .map(|quick_reply| quick_reply.text.clone())
+    }
+
+    /// Adds an empty quick reply at the end of the list and hands back its identifier.
+    ///
+    /// The largest one plus one, so nothing has to be persisted to allocate it.
+    pub fn add_quick_reply(&mut self) -> QuickReplyId {
+        let id = self
+            .settings
+            .quick_replies
+            .iter()
+            .map(|quick_reply| quick_reply.id)
+            .max()
+            .map_or_else(QuickReplyId::default, QuickReplyId::next);
+
+        self.settings.quick_replies.push(QuickReply::new(id));
+        self.save();
+
+        id
+    }
+
+    /// Rewrites the text of a quick reply, on one line. See [`QuickReply::set_text`].
+    pub fn set_quick_reply_text(&mut self, id: QuickReplyId, text: &str) {
+        let Some(quick_reply) = self.quick_reply_mut(id) else {
+            return;
+        };
+
+        quick_reply.set_text(text);
+        self.save();
+    }
+
+    /// Binds a combination to a quick reply, or clears it. Stored as it comes and
+    /// never interpreted here, exactly as [`Multifus::set_shortcut`] does.
+    pub fn set_quick_reply_shortcut(&mut self, id: QuickReplyId, accelerator: Option<String>) {
+        let shortcut = accelerator.and_then(Shortcut::new);
+
+        let Some(quick_reply) = self.quick_reply_mut(id) else {
+            return;
+        };
+
+        quick_reply.shortcut = shortcut;
+        self.save();
+    }
+
+    /// Takes a quick reply away for good. No confirmation is asked for, the same as
+    /// taking a character out of the roster.
+    pub fn remove_quick_reply(&mut self, id: QuickReplyId) {
+        self.settings
+            .quick_replies
+            .retain(|quick_reply| quick_reply.id != id);
+        self.save();
+    }
+
+    /// The quick reply this identifier designates, for the two setters that change it.
+    #[must_use]
+    fn quick_reply_mut(&mut self, id: QuickReplyId) -> Option<&mut QuickReply> {
+        self.settings
+            .quick_replies
+            .iter_mut()
+            .find(|quick_reply| quick_reply.id == id)
     }
 
     /// Whether the user asked multifus to start with the session.
@@ -1157,6 +1271,13 @@ fn triage_config(
     Some(ConfigProblem::NotSetAside { detail })
 }
 
+/// A combination as the global shortcut plugin reads it, `None` for a binding
+/// nothing fires.
+#[must_use]
+fn accelerator_of(shortcut: Option<&Shortcut>) -> Option<String> {
+    shortcut.map(|shortcut| shortcut.as_str().to_owned())
+}
+
 /// The nickname of the character the cycle chose, if it chose one.
 fn nickname_of(character: Option<&Character>) -> Option<String> {
     character.map(|character| character.nickname.clone())
@@ -1736,6 +1857,80 @@ mod tests {
         assert!(state.is_relay_starting(second));
         assert!(state.has_relay_start(), "the stop_if_unready rule sees it");
         assert_eq!(state.snapshot().relay.switch, SwitchView::Starting);
+    }
+
+    #[test]
+    fn no_two_quick_replies_ever_share_an_identifier() {
+        // The largest plus one, so nothing has to be persisted to allocate one.
+        // It is only ever unique among the quick replies that exist: the one taken by
+        // the last row removed comes back, and nothing holds a stale one, its
+        // combination having come off the system with it.
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        let first = state.add_quick_reply();
+        let second = state.add_quick_reply();
+
+        assert_ne!(first, second);
+
+        state.set_quick_reply_text(first, "prix libre");
+        state.remove_quick_reply(second);
+
+        let third = state.add_quick_reply();
+
+        assert_ne!(third, first);
+        assert_eq!(state.quick_reply_text(first).as_deref(), Some("prix libre"));
+        assert_eq!(state.quick_reply_text(third).as_deref(), Some(""));
+    }
+
+    #[test]
+    fn the_four_actions_come_before_the_quick_replies() {
+        // The system keys a shortcut by the keys alone, so whoever is laid down
+        // first holds them, and a duplicate then names the action.
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        let id = state.add_quick_reply();
+        state.set_quick_reply_shortcut(id, Some("Alt+P".to_owned()));
+
+        let bindings = state.bindings();
+
+        assert_eq!(bindings.len(), 5);
+        assert_eq!(
+            bindings.first().map(|(binding, _)| *binding),
+            Some(Binding::Action {
+                action: ShortcutAction::Next
+            })
+        );
+        assert_eq!(
+            bindings.last().cloned(),
+            Some((Binding::QuickReply { id }, Some("Alt+P".to_owned())))
+        );
+    }
+
+    #[test]
+    fn a_quick_reply_that_is_gone_pastes_nothing_and_shows_nothing() {
+        // The queue carries the identifier alone, so a quick reply removed between
+        // the key press and the answer has to be an absence and not a panic.
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        let id = state.add_quick_reply();
+
+        state.remove_quick_reply(id);
+
+        assert_eq!(state.quick_reply_text(id), None);
+        assert!(state.snapshot().quick_replies.is_empty());
+    }
+
+    #[test]
+    fn a_quick_reply_pastes_what_it_says_now_and_not_what_it_said_at_startup() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        let id = state.add_quick_reply();
+
+        state.set_quick_reply_text(id, "prix libre");
+        state.set_quick_reply_text(id, "de rien");
+
+        assert_eq!(state.quick_reply_text(id).as_deref(), Some("de rien"));
     }
 
     #[test]

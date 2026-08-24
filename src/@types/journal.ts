@@ -6,7 +6,7 @@
 import type { NotificationKind } from '@/@types/notification'
 import type { NoticeCase, RelayFailure, RelayStop } from '@/@types/relay'
 import type { Gender } from '@/@types/roster'
-import type { ShortcutAction, ShortcutBinding } from '@/@types/shortcuts'
+import type { BoundCombination, ShortcutAction } from '@/@types/shortcuts'
 import type { Launch, Surface, Work } from '@/@types/system'
 
 /**
@@ -45,6 +45,18 @@ export type ShortcutOutcome =
   | { readonly outcome: 'slept'; readonly nickname: string }
   | { readonly outcome: 'swapped'; readonly awake: Gender }
   | { readonly outcome: 'woke'; readonly nickname: string }
+
+/**
+ * Why a quick reply did not reach the chat, or did and cost the clipboard. Six
+ * places to repair it in, and the last one follows a paste that worked.
+ */
+export type QuickReplyFailure =
+  | { readonly reason: 'clipboardNotGivenBack'; readonly detail: string }
+  | { readonly reason: 'clipboardRefused'; readonly detail: string }
+  | { readonly reason: 'foregroundUnknown'; readonly detail: string }
+  | { readonly reason: 'gone' }
+  | { readonly reason: 'outsideGame' }
+  | { readonly reason: 'pasteRefused'; readonly detail: string }
 
 /** What the user did to the roster from the window. */
 export type RosterChange =
@@ -106,6 +118,10 @@ export type JournalEvent =
   | { readonly kind: 'notificationUnreadable'; readonly detail: string }
   | { readonly kind: 'openFailed'; readonly detail: string }
   | { readonly kind: 'panicked'; readonly work: Work }
+  | { readonly kind: 'quickReplyFailed'; readonly reason: QuickReplyFailure }
+  /** The first forty characters of the line, and the one place this file holds
+   * words somebody typed. See ADR 0012. */
+  | { readonly kind: 'quickReplyPasted'; readonly excerpt: string }
   | { readonly kind: 'quit' }
   | { readonly kind: 'relayDisabled'; readonly reason: RelayStop }
   | { readonly kind: 'relayEnabled'; readonly surface: Surface }
@@ -122,7 +138,7 @@ export type JournalEvent =
   | { readonly kind: 'setting'; readonly change: SettingChange }
   | {
       readonly kind: 'shortcutsBound'
-      readonly bindings: readonly ShortcutBinding[]
+      readonly bindings: readonly BoundCombination[]
     }
   | { readonly kind: 'shortcutsFailed'; readonly detail: string }
   | { readonly kind: 'snapshotFailed'; readonly detail: string }

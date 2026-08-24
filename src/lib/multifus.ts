@@ -8,7 +8,7 @@ import { listen } from '@tauri-apps/api/event'
 import type { NotificationKind } from '@/@types/notification'
 import type { RelayLink } from '@/@types/relay'
 import type { Gender } from '@/@types/roster'
-import type { ShortcutAction } from '@/@types/shortcuts'
+import type { QuickReplyId, ShortcutAction } from '@/@types/shortcuts'
 import type { ScreenName, Snapshot } from '@/@types/snapshot'
 
 /** The one event the Rust side pushes, carrying the same snapshot. */
@@ -89,6 +89,31 @@ export const setShortcut = async (
   accelerator: string | null
 ) => {
   return invoke<Snapshot>('set_shortcut', { action, accelerator })
+}
+
+/** Adds an empty quick reply at the end of the list. It fires nothing until a
+ * combination is bound to it. */
+export const addQuickReply = async () => {
+  return invoke<Snapshot>('add_quick_reply')
+}
+
+/**
+ * Rewrites the line a quick reply pastes. Called when the field loses the focus and
+ * not on every key press: this writes the configuration to disk.
+ */
+export const setQuickReplyText = async (id: QuickReplyId, text: string) => {
+  return invoke<Snapshot>('set_quick_reply_text', { id, text })
+}
+
+export const setQuickReplyShortcut = async (
+  id: QuickReplyId,
+  accelerator: string | null
+) => {
+  return invoke<Snapshot>('set_quick_reply_shortcut', { id, accelerator })
+}
+
+export const removeQuickReply = async (id: QuickReplyId) => {
+  return invoke<Snapshot>('remove_quick_reply', { id })
 }
 
 export const setAutoFocus = async (

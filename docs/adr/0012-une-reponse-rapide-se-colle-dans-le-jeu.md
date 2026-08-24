@@ -1,4 +1,4 @@
-# Une phrase se colle dans le jeu, et le périmètre s'ouvre d'un cran
+# Une réponse rapide se colle dans le jeu, et le périmètre s'ouvre d'un cran
 
 Le périmètre refusait « toute forme d'automatisation du jeu », et nommait la
 simulation d'une action de jeu. Cette décision ouvre une exception, une seule, et
@@ -30,12 +30,13 @@ le jeu. multifus ne l'a jamais fait et ne le fera pas.
 Les mots employés, « ne simule aucune action de jeu », sont plus larges que ce
 qu'ils visaient. Ils attrapent au passage un copier-coller.
 
-## Ce qu'une phrase n'est pas
+## Ce qu'une réponse rapide n'est pas
 
 Elle ne part que sur un appui de l'utilisateur, jamais toute seule et jamais sur
 un minuteur. Elle ne part que si une fenêtre Dofus est au premier plan. Elle
-colle un texte que l'utilisateur a écrit lui-même, dans un champ de chat qu'il a
-ouvert. Elle n'envoie rien.
+colle un texte que l'utilisateur a écrit lui-même, là où il était déjà en train
+d'écrire : le chat, un message privé, un champ quelconque du jeu. multifus ne
+choisit pas la destination et ne l'ouvre pas. Elle n'envoie rien.
 
 Elle ne rallonge aucune absence, ne gagne aucun tour de combat, ne décide rien à
 la place de personne. Ce qu'elle remplace est le copier-coller que l'utilisateur
@@ -52,7 +53,7 @@ fenêtre du jeu au premier plan, en réponse à un appui de l'utilisateur.
 
 Le presse-papiers est emprunté et rendu. Son contenu textuel est relu avant le
 collage et réécrit après, pour que ce que l'utilisateur avait copié survive à une
-phrase.
+réponse rapide.
 
 Rien d'autre n'est posé sur le système. Pas de touche Entrée, pas d'ouverture du
 chat, pas de séquence.
@@ -83,19 +84,27 @@ l'utilisateur.
 **Le texte sur plusieurs lignes.** Un saut de ligne collé dans le chat envoie le
 message, ce qui ferait rentrer l'envoi par la porte de derrière.
 
-**Les phrases par personnage.** Même refus que l'AutoFocus par personnage, avec
-le motif d'origine du périmètre.
+**Les réponses rapides par personnage.** Même refus que l'AutoFocus par
+personnage, avec le motif d'origine du périmètre.
 
-**Répondre depuis le téléphone.** Le relais reste à sens unique. Une phrase se
-frappe au clavier, devant le jeu.
+**Répondre depuis le téléphone.** Le relais reste à sens unique. Une réponse
+rapide se frappe au clavier, devant le jeu.
 
-## Ce qui remplacerait cet ADR
+## Ce qui remplaçait cet ADR, et ne le remplace plus
 
-La mesure. Personne n'a encore vérifié qu'un `Control+V` posé sur le système
-arrive jusqu'au chat de Dofus Retro, qui est un client AIR et ne se comporte pas
-forcément comme une application native.
+La mesure, faite le 24 août 2026 sur un vrai client Retro, sur le Mac. Un
+`Super+V` posé par `CGEventPost` arrive dans le chat, avec `Control` et `Shift`
+physiquement tenus, et l'ancien presse-papiers revient. Cet ADR tient donc, et
+les quatre réponses sont dans [plan.md](../plan.md).
 
-Si la mesure dit non, cet ADR est remplacé par une décision plus courte : la
-phrase remplit le presse-papiers, l'utilisateur colle lui-même, et le périmètre
-ne s'ouvre pas du tout. Il est écrit avant la mesure pour que la session qui
-mesure sache exactement ce qu'elle vérifie.
+**Sur Windows, la mesure n'a pas été faite.** Le code est écrit et n'a jamais été
+vu marcher. Si `SendInput` n'arrive pas jusqu'au jeu de ce côté-là, ce n'est pas
+cet ADR qui tombe mais la parité : la réponse rapide se colle sur un système et
+remplit seulement le presse-papiers sur l'autre, et ça s'écrira ici.
+
+## Le mot
+
+Cette fonctionnalité s'est appelée « phrase » pendant tout son cadrage, et le mot
+est mort à la première relecture de l'écran : il ne dit pas qu'on peut coller. Le
+mot est **réponse rapide** partout depuis, interface et code compris, et
+CONTEXT.md le porte.

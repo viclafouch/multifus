@@ -14,7 +14,10 @@ export const MODIFIERS = [
 export type Modifier = (typeof MODIFIERS)[number]
 
 /** Why a key press did not make a combination. */
-export type CaptureRejection = 'noModifier' | 'unsupportedKey'
+export type CaptureRejection =
+  | 'noModifier'
+  | 'pasteCombination'
+  | 'unsupportedKey'
 
 /** A key the parser of the plugin accepts, spelled as `KeyboardEvent.code`. */
 export const KEYS: ReadonlySet<string> = new Set([
@@ -89,6 +92,12 @@ export const ALIASES = new Map<string, string>([
 
 /** Whether the keyboard in front of the user has a Command key on it. */
 export const IS_APPLE = navigator.userAgent.includes('Mac')
+
+/**
+ * The combination this system pastes with, the one a quick reply lays down itself.
+ * Bound to anything, it would fire on its own paste. See ADR 0012.
+ */
+export const PASTE_COMBINATION = IS_APPLE ? 'Super+KeyV' : 'Control+KeyV'
 
 /** The tokens whose label is not their own name, this keyboard being read. */
 export const KEY_LABELS = new Map<string, string>([

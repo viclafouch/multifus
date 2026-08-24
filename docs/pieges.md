@@ -54,7 +54,7 @@ un.** Un champ ajouté au personnage sans défaut à lui fait échouer la lectur
 tout fichier existant : la configuration part en quarantaine, les défauts se
 chargent, et les sexes assignés partent avec. Poser `#[serde(default)]` sur la
 structure pour s'en tirer ferait pire, un personnage tronqué revenant sans pseudo.
-La règle vaut pour toute structure imbriquée qu'on ajoute, `Phrase` comprise.
+La règle vaut pour toute structure imbriquée qu'on ajoute, `QuickReply` comprise.
 
 ## La distribution
 

@@ -20,6 +20,7 @@ use serde::Serialize;
 
 use crate::app::journal::JournalEntry;
 use crate::app::journal::RelayFailure;
+use crate::config::QuickReplyId;
 use crate::domain::Gender;
 use crate::domain::NotificationKind;
 use crate::platform::ScreenSaverDelay;
@@ -57,6 +58,8 @@ pub struct Snapshot {
     pub characters: Vec<CharacterView>,
     /// The four combinations, in the order of the table of perimetre.md.
     pub shortcuts: Vec<ShortcutView>,
+    /// The quick replies, in the order of the file. Empty on a first launch.
+    pub quick_replies: Vec<QuickReplyView>,
     /// The seven switches, in the order of the notification table. Each one
     /// carries its own state, never the outcome of the master and itself.
     pub auto_focus: Vec<AutoFocusView>,
@@ -328,6 +331,21 @@ impl ShortcutAction {
     pub const ALL: [Self; 4] = [Self::Next, Self::Previous, Self::ToggleAsleep, Self::Swap];
 }
 
+/// What a key combination fires: one of the four actions, or one quick reply.
+///
+/// A type of its own and not a fifth action, so [`ShortcutAction`] keeps its four
+/// values and its exhaustive tables. Its three callers are in `app::shortcuts`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize)]
+#[serde(
+    tag = "kind",
+    rename_all = "camelCase",
+    rename_all_fields = "camelCase"
+)]
+pub enum Binding {
+    Action { action: ShortcutAction },
+    QuickReply { id: QuickReplyId },
+}
+
 /// One row of the shortcuts screen.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -337,6 +355,32 @@ pub struct ShortcutView {
     /// action the user has cleared. Nothing here interprets it.
     pub accelerator: Option<String>,
     /// What the system answered when multifus laid this combination down.
+    pub status: ShortcutStatus,
+}
+
+/// One row of the quick replies panel.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct QuickReplyView {
+    pub id: QuickReplyId,
+    /// The line the user wrote, whole. The journal only ever gets an excerpt of
+    /// it, see [`crate::app::journal::JournalEvent::QuickReplyPasted`].
+    pub text: String,
+    /// The combination as the plugin reads it, `null` for a quick reply nothing
+    /// fires yet.
+    pub accelerator: Option<String>,
+    pub status: ShortcutStatus,
+}
+
+/// One combination laid on the system, whichever family it belongs to.
+///
+/// What the journal writes when the whole set goes up, and it carries no text:
+/// that file is meant to be handed over.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct BindingView {
+    pub binding: Binding,
+    pub accelerator: Option<String>,
     pub status: ShortcutStatus,
 }
 
@@ -372,9 +416,11 @@ pub enum ShortcutStatus {
     /// The stored text is not a combination this system can express.
     Invalid { detail: String },
 
-    /// Another action of multifus already answers to it. The system keys a
-    /// shortcut by the combination alone, so it cannot hold the two.
-    Duplicate { action: ShortcutAction },
+    /// Something else of multifus already answers to it, an action or a quick reply.
+    /// The system keys a shortcut by the combination alone, so it cannot hold
+    /// the two. The four actions are laid down first, so this always names the
+    /// one that holds the keys.
+    Duplicate { binding: Binding },
 
     /// The system turned it down. On Windows that is what another application
     /// holding the combination looks like.

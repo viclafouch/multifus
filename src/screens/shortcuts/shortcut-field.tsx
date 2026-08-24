@@ -1,15 +1,19 @@
 import React from 'react'
-import type { ShortcutBinding, ShortcutStatus } from '@/@types/shortcuts'
 import { Button } from '@/components/ui/button'
 import type { CaptureRejection } from '@/constants/keyboard'
 import { strings } from '@/constants/strings'
 import { acceleratorParts, capture, heldModifiers } from '@/helpers/accelerator'
 import type { TonedLine } from '@/helpers/wording'
-import { shortcutStatusLine } from '@/helpers/wording'
 import { KeyCap } from '@/screens/shortcuts/key-cap'
 
 type ShortcutFieldProps = Readonly<{
-  shortcut: ShortcutBinding
+  /** As the plugin reads it, `null` for a binding with no combination. */
+  accelerator: string | null
+  /** What the system answered, already in words: this field knows neither the
+   * four actions nor the quick replies. */
+  statusLine: TonedLine
+  /** What a screen reader is told this button opens. */
+  editLabel: string
   editing: Readonly<{
     isActive: boolean
     handleOpen: () => void
@@ -19,10 +23,15 @@ type ShortcutFieldProps = Readonly<{
 }>
 
 /**
- * One key cap that turns into a capture field. Everything is read off `keydown`,
- * so the combination stored is the physical one, whatever the keyboard layout.
+ * One key cap that turns into a capture field, for an action as for a quick reply.
+ * Read off `keydown`, so the combination stored is the physical one.
  */
-export const ShortcutField = ({ shortcut, editing }: ShortcutFieldProps) => {
+export const ShortcutField = ({
+  accelerator,
+  statusLine,
+  editLabel,
+  editing
+}: ShortcutFieldProps) => {
   const [held, setHeld] = React.useState<readonly string[]>([])
   const [rejected, setRejected] = React.useState<CaptureRejection | null>(null)
 
@@ -63,13 +72,11 @@ export const ShortcutField = ({ shortcut, editing }: ShortcutFieldProps) => {
     setRejected(result.status === 'rejected' ? result.reason : null)
   }
 
-  const parts = editing.isActive
-    ? held
-    : acceleratorParts(shortcut.accelerator ?? '')
+  const parts = editing.isActive ? held : acceleratorParts(accelerator ?? '')
 
   const hint = fieldHint({
     isEditing: editing.isActive,
-    status: shortcut.status,
+    statusLine,
     rejected
   })
 
@@ -77,9 +84,7 @@ export const ShortcutField = ({ shortcut, editing }: ShortcutFieldProps) => {
     <div className="flex flex-col items-end gap-1">
       <Button
         variant="outline"
-        aria-label={strings.shortcuts.edit(
-          strings.shortcuts.actions[shortcut.action].label
-        )}
+        aria-label={editLabel}
         data-editing={editing.isActive ? '' : undefined}
         data-error={hint.tone === 'bad' ? '' : undefined}
         onClick={editing.handleOpen}
@@ -112,7 +117,7 @@ export const ShortcutField = ({ shortcut, editing }: ShortcutFieldProps) => {
 
 type FieldHintParams = {
   readonly isEditing: boolean
-  readonly status: ShortcutStatus
+  readonly statusLine: TonedLine
   readonly rejected: CaptureRejection | null
 }
 
@@ -122,7 +127,7 @@ type FieldHintParams = {
  */
 const fieldHint = ({
   isEditing,
-  status,
+  statusLine,
   rejected
 }: FieldHintParams): TonedLine => {
   if (rejected !== null) {
@@ -133,5 +138,5 @@ const fieldHint = ({
     return { tone: 'calm', text: strings.shortcuts.captureHint }
   }
 
-  return shortcutStatusLine(status)
+  return statusLine
 }

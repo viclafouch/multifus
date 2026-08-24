@@ -34,6 +34,9 @@ pub struct Settings {
     pub roster: Roster,
     /// The four key combinations of perimetre.md.
     pub shortcuts: Shortcuts,
+    /// The ready-made lines, in the order the screen shows them. Empty on a
+    /// first launch, and with no maximum, see ADR 0012.
+    pub quick_replies: Vec<QuickReply>,
     /// The seven AutoFocus switches.
     pub auto_focus: AutoFocus,
     /// Where the relay writes, and how much of a private message it carries.
@@ -139,6 +142,66 @@ impl From<Shortcut> for String {
 impl fmt::Display for Shortcut {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         formatter.write_str(&self.0)
+    }
+}
+
+/// The identity of a quick reply, allocated as the largest existing one plus one.
+///
+/// A number and not the text, so that rewriting a quick reply or dragging it
+/// elsewhere in the list leaves its key combination where it was.
+#[derive(
+    Debug, Clone, Copy, Default, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize,
+)]
+#[serde(transparent)]
+pub struct QuickReplyId(u32);
+
+impl QuickReplyId {
+    /// The identifier that comes after this one.
+    #[must_use]
+    pub const fn next(self) -> Self {
+        Self(self.0.saturating_add(1))
+    }
+}
+
+/// A ready-made line of text, filed under a key combination. Global, and with no
+/// name of its own: the text is what identifies it, see CONTEXT.md.
+///
+/// **No `#[serde(default)]` on the structure, one per field.** The trap is
+/// written down in `docs/pieges.md`.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct QuickReply {
+    #[serde(default)]
+    pub id: QuickReplyId,
+    /// One line, always. See [`QuickReply::set_text`].
+    #[serde(default)]
+    pub text: String,
+    /// `None` for a quick reply nothing fires yet, exactly as for the four actions.
+    #[serde(default)]
+    pub shortcut: Option<Shortcut>,
+}
+
+impl QuickReply {
+    /// An empty quick reply under this identifier, which is what « Ajouter » makes.
+    #[must_use]
+    pub fn new(id: QuickReplyId) -> Self {
+        Self {
+            id,
+            text: String::new(),
+            shortcut: None,
+        }
+    }
+
+    /// Rewrites the text, folded onto one line and trimmed.
+    ///
+    /// A line break pasted into the chat sends the message, which ADR 0012
+    /// refuses. Folded rather than cut, so nothing the user pasted is lost.
+    pub fn set_text(&mut self, text: &str) {
+        self.text = text
+            .lines()
+            .map(str::trim)
+            .filter(|line| !line.is_empty())
+            .collect::<Vec<_>>()
+            .join(" ");
     }
 }
 
@@ -428,6 +491,57 @@ mod tests {
     }
 
     #[test]
+    fn a_first_launch_has_no_quick_reply_at_all() {
+        assert!(Settings::default().quick_replies.is_empty());
+    }
+
+    #[test]
+    fn a_quick_reply_holds_its_text_on_one_line() {
+        // A line break pasted into the chat sends the message, ADR 0012.
+        let mut quick_reply = QuickReply::new(QuickReplyId::default());
+
+        quick_reply.set_text("  prix libre\nde rien  ");
+
+        assert_eq!(quick_reply.text, "prix libre de rien");
+
+        quick_reply.set_text("prix libre\r\n\r\nde rien");
+
+        assert_eq!(quick_reply.text, "prix libre de rien");
+    }
+
+    #[test]
+    fn a_quick_reply_written_before_a_field_existed_still_loads() {
+        // The trap of `Character`, written down in docs/pieges.md: a field with
+        // no default of its own sends the whole configuration to quarantine.
+        let quick_reply = serde_json::from_str::<QuickReply>(r#"{"text":"prix libre"}"#)
+            .expect("a partial quick_reply");
+
+        assert_eq!(quick_reply.text, "prix libre");
+        assert_eq!(quick_reply.id, QuickReplyId::default());
+        assert_eq!(quick_reply.shortcut, None);
+    }
+
+    #[test]
+    fn a_quick_reply_keeps_its_identifier_across_the_file() {
+        let quick_reply = QuickReply {
+            id: QuickReplyId::default().next().next(),
+            text: "de rien".to_owned(),
+            shortcut: Shortcut::new("Control+Shift+K"),
+        };
+
+        let json = serde_json::to_string(&quick_reply).expect("a quick_reply serialises");
+
+        assert_eq!(
+            json,
+            r#"{"id":2,"text":"de rien","shortcut":"Control+Shift+K"}"#
+        );
+        assert_eq!(
+            serde_json::from_str::<QuickReply>(&json).expect("a quick_reply reads back"),
+            quick_reply
+        );
+    }
+
+    #[test]
     fn the_body_of_a_private_message_stays_on_the_machine_until_it_is_asked_for() {
         let relay = Relay::default();
 
@@ -462,5 +576,6 @@ mod tests {
         assert_eq!(settings.auto_focus, AutoFocus::default());
         assert_eq!(settings.relay, Relay::default());
         assert!(settings.roster.is_empty());
+        assert!(settings.quick_replies.is_empty());
     }
 }

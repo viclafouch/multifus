@@ -5,6 +5,7 @@
 
 import type {
   JournalEvent,
+  QuickReplyFailure,
   ShortcutOutcome,
   TrayOutcome
 } from '@/@types/journal'
@@ -21,6 +22,7 @@ type PlainEventKind = Exclude<
   | 'authorization'
   | 'authorizationRequested'
   | 'notification'
+  | 'quickReplyFailed'
   | 'shortcut'
   | 'shortcutsBound'
   | 'trayFocus'
@@ -64,9 +66,26 @@ export const TONES = {
   relayTestSent: 'good',
   displayAwake: 'neutral',
   displayAwakeFailed: 'warning',
+  // The key was pressed and the line went into the chat, which is the whole of
+  // what a quick reply is for.
+  quickReplyPasted: 'good',
   reset: 'neutral',
   quit: 'neutral'
 } as const satisfies Record<PlainEventKind, JournalTone>
+
+/**
+ * The tone of each way a quick reply can be turned down. Being outside the game is
+ * the guard of perimetre.md doing its job, and a quick reply removed under the key
+ * press is nobody's fault either.
+ */
+export const QUICK_REPLY_FAILURE_TONES = {
+  outsideGame: 'neutral',
+  gone: 'neutral',
+  foregroundUnknown: 'warning',
+  clipboardRefused: 'warning',
+  pasteRefused: 'warning',
+  clipboardNotGivenBack: 'warning'
+} as const satisfies Record<QuickReplyFailure['reason'], JournalTone>
 
 /**
  * The tone of each outcome a shortcut can have. Ochre is spent on the four that

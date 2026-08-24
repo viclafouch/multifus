@@ -7,6 +7,7 @@ import type {
   JournalEntry,
   JournalEvent,
   NotificationOutcome,
+  QuickReplyFailure,
   RosterChange,
   SettingChange,
   ShortcutOutcome,
@@ -15,7 +16,11 @@ import type {
 import type { NotificationKind } from '@/@types/notification'
 import type { RelayFailure } from '@/@types/relay'
 import type { Gender } from '@/@types/roster'
-import type { ShortcutAction, ShortcutBinding } from '@/@types/shortcuts'
+import type {
+  Binding,
+  BoundCombination,
+  ShortcutAction
+} from '@/@types/shortcuts'
 import type { Snapshot } from '@/@types/snapshot'
 import type { Surface } from '@/@types/system'
 import type { JournalTone } from '@/constants/journal'
@@ -23,6 +28,7 @@ import {
   DEAD_SHORTCUT_STATUSES,
   DETAILED_LINES,
   NOTICE_LINES,
+  QUICK_REPLY_FAILURE_TONES,
   PLAIN_LINES,
   RELAY_STOP_LINES,
   SHORTCUT_TONES,
@@ -78,6 +84,10 @@ export const journalTone = (event: JournalEvent): JournalTone => {
 
   if (event.kind === 'shortcut') {
     return SHORTCUT_TONES[event.outcome.outcome]
+  }
+
+  if (event.kind === 'quickReplyFailed') {
+    return QUICK_REPLY_FAILURE_TONES[event.reason.reason]
   }
 
   if (event.kind === 'shortcutsBound') {
@@ -168,6 +178,36 @@ const relayFailedLine = (reason: RelayFailure) => {
   }
 }
 
+/**
+ * Why a quick reply did not reach the chat, put into words. Each line names the place
+ * it is repaired in, and they are six different places.
+ */
+const quickReplyFailedLine = (reason: QuickReplyFailure) => {
+  switch (reason.reason) {
+    case 'outsideGame': {
+      return 'Réponse rapide ignorée : aucune fenêtre Dofus au premier plan.'
+    }
+    case 'foregroundUnknown': {
+      return `Réponse rapide ignorée : impossible de savoir quelle fenêtre est au premier plan (${reason.detail}).`
+    }
+    case 'gone': {
+      return 'Réponse rapide introuvable : elle a été retirée entre l’appui et le collage.'
+    }
+    case 'clipboardRefused': {
+      return `Réponse rapide non collée : le presse-papiers a refusé le texte (${reason.detail}).`
+    }
+    case 'pasteRefused': {
+      return `Réponse rapide non collée : le système a refusé la combinaison de collage (${reason.detail}).`
+    }
+    case 'clipboardNotGivenBack': {
+      return `Réponse rapide collée, mais le presse-papiers d’avant n’a pas pu être rendu (${reason.detail}).`
+    }
+    default: {
+      return 'Réponse rapide non collée.'
+    }
+  }
+}
+
 /** Where the user acted, for the settings and the switch that have two doors. */
 const surfaceLabel = (surface: Surface) => {
   return surface === 'tray' ? 'la barre système' : 'la fenêtre'
@@ -254,20 +294,28 @@ const settingLine = (change: SettingChange) => {
 }
 
 /**
- * The four combinations as the system left them, on one line. Written as they
- * are stored, since a transcript sits next to a configuration file.
+ * Every combination as the system left it, on one line, the quick replies after the
+ * four actions. Written as they are stored, next to a configuration file.
  */
-const shortcutsBoundLine = (bindings: readonly ShortcutBinding[]) => {
-  const parts = bindings.map((binding) => {
-    const { label } = strings.shortcuts.actions[binding.action]
-
-    return `${label} ${shortcutBindingLabel(binding)}`
+const shortcutsBoundLine = (bindings: readonly BoundCombination[]) => {
+  const parts = bindings.map((bound) => {
+    return `${journalBindingLabel(bound.binding)} ${boundCombinationLabel(bound)}`
   })
 
   return `Raccourcis : ${parts.join(' · ')}.`
 }
 
-const shortcutBindingLabel = ({ accelerator, status }: ShortcutBinding) => {
+/**
+ * What a combination fires, named for a reader of the file. Never the
+ * `bindingLabel` of `wording.ts`, which quotes a quick reply: this file holds no text.
+ */
+const journalBindingLabel = (binding: Binding) => {
+  return binding.kind === 'action'
+    ? strings.shortcuts.actions[binding.action].label
+    : `Réponse rapide ${binding.id}`
+}
+
+const boundCombinationLabel = ({ accelerator, status }: BoundCombination) => {
   // `null` is a combination the user cleared, which the status reports as
   // `unbound`. Naming it here as well keeps every branch readable on its own.
   const combination = accelerator ?? 'aucune combinaison'
@@ -286,9 +334,7 @@ const shortcutBindingLabel = ({ accelerator, status }: ShortcutBinding) => {
       return `${combination} illisible (${status.detail})`
     }
     case 'duplicate': {
-      const { label } = strings.shortcuts.actions[status.action]
-
-      return `${combination} en doublon avec ${label}, donc inerte`
+      return `${combination} en doublon avec ${journalBindingLabel(status.binding)}, donc inerte`
     }
     case 'refused': {
       return `${combination} refusé (${status.detail})`
@@ -297,6 +343,25 @@ const shortcutBindingLabel = ({ accelerator, status }: ShortcutBinding) => {
       return combination
     }
   }
+}
+
+/** Everything laid on the system, in the order the Rust side lays it down. */
+const boundCombinations = (snapshot: Snapshot): readonly BoundCombination[] => {
+  const actions = snapshot.shortcuts.map(({ action, accelerator, status }) => {
+    return { binding: { kind: 'action', action }, accelerator, status } as const
+  })
+
+  const quickReplies = snapshot.quickReplies.map(
+    ({ id, accelerator, status }) => {
+      return {
+        binding: { kind: 'quickReply', id },
+        accelerator,
+        status
+      } as const
+    }
+  )
+
+  return [...actions, ...quickReplies]
 }
 
 /**
@@ -330,7 +395,7 @@ export const journalTranscript = (snapshot: Snapshot) => {
     `multifus ${snapshot.version} sur ${snapshot.system}`,
     `Autorisation : ${snapshot.authorization.granted ? 'accordée' : 'refusée'}, écoute ${snapshot.authorization.listening ? 'active' : 'arrêtée'}`,
     `AutoFocus : ${snapshot.autoFocusEnabled ? 'actif' : 'suspendu'}, réveil des réduites ${snapshot.wakesMinimized ? 'actif' : 'inactif'}`,
-    shortcutsBoundLine(snapshot.shortcuts),
+    shortcutsBoundLine(boundCombinations(snapshot)),
     `Configuration : ${snapshot.config.path}`,
     `Mise à jour : ${updateLine(snapshot.update)}`,
     `Entrées en mémoire : ${journal.length}, ${journalPeriod(journal)}`,
@@ -612,6 +677,12 @@ const actionLine = (event: EventOf<ActionEventKind>) => {
     }
     case 'shortcut': {
       return shortcutLine(event)
+    }
+    case 'quickReplyPasted': {
+      return `Réponse rapide collée dans le jeu : « ${event.excerpt} »`
+    }
+    case 'quickReplyFailed': {
+      return quickReplyFailedLine(event.reason)
     }
     case 'trayFocus': {
       return trayLine(event)

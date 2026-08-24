@@ -44,6 +44,16 @@ use windows::Win32::System::Threading::PROCESS_NAME_WIN32;
 use windows::Win32::System::Threading::PROCESS_QUERY_LIMITED_INFORMATION;
 use windows::Win32::System::Threading::REASON_CONTEXT;
 use windows::Win32::System::Threading::REASON_CONTEXT_0;
+use windows::Win32::UI::Input::KeyboardAndMouse::SendInput;
+use windows::Win32::UI::Input::KeyboardAndMouse::INPUT;
+use windows::Win32::UI::Input::KeyboardAndMouse::INPUT_0;
+use windows::Win32::UI::Input::KeyboardAndMouse::INPUT_KEYBOARD;
+use windows::Win32::UI::Input::KeyboardAndMouse::KEYBDINPUT;
+use windows::Win32::UI::Input::KeyboardAndMouse::KEYBD_EVENT_FLAGS;
+use windows::Win32::UI::Input::KeyboardAndMouse::KEYEVENTF_KEYUP;
+use windows::Win32::UI::Input::KeyboardAndMouse::VIRTUAL_KEY;
+use windows::Win32::UI::Input::KeyboardAndMouse::VK_CONTROL;
+use windows::Win32::UI::Input::KeyboardAndMouse::VK_V;
 use windows::Win32::UI::WindowsAndMessaging::BringWindowToTop;
 use windows::Win32::UI::WindowsAndMessaging::DispatchMessageW;
 use windows::Win32::UI::WindowsAndMessaging::EnumWindows;
@@ -80,6 +90,7 @@ use crate::platform::error::Result;
 use crate::platform::notification::NotificationReport;
 use crate::platform::notification::NotificationSink;
 use crate::platform::notification::NotificationWatcher;
+use crate::platform::paste::PasteSender;
 use crate::platform::window::GameWindow;
 use crate::platform::window::WindowId;
 use crate::platform::window::WindowManager;
@@ -734,6 +745,71 @@ impl Drop for PowerRequestDisplayKeeper {
         // No hold survives the keeper, and a failure here reaches nobody: the
         // request dies with the process whatever the system answered.
         drop(self.release());
+    }
+}
+
+/// How many events one paste puts into the input stream: `Control` and `V`, down
+/// then up.
+const PASTE_EVENTS: usize = 4;
+
+/// Lays `Control+V` on the system through `SendInput`.
+///
+/// Never measured on a real client, unlike the macOS half. The four questions of
+/// `docs/plan.md`, temps 1, are entire on this system.
+#[derive(Debug, Default)]
+pub struct SendInputPasteSender;
+
+impl SendInputPasteSender {
+    #[must_use]
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+impl PasteSender for SendInputPasteSender {
+    fn send_paste_combination(&self) -> Result<()> {
+        let events: [INPUT; PASTE_EVENTS] = [
+            key_event(VK_CONTROL, true),
+            key_event(VK_V, true),
+            key_event(VK_V, false),
+            key_event(VK_CONTROL, false),
+        ];
+
+        // SAFETY: the slice is alive for the call and the size is that of the
+        // structure the system expects.
+        let sent = unsafe {
+            SendInput(
+                &events,
+                i32::try_from(size_of::<INPUT>()).unwrap_or(i32::MAX),
+            )
+        };
+
+        if sent as usize != PASTE_EVENTS {
+            return Err(PlatformError::system(
+                "posting the paste combination",
+                format!("SendInput took {sent} of {PASTE_EVENTS} events"),
+            ));
+        }
+
+        Ok(())
+    }
+}
+
+/// One half of one key of the combination.
+fn key_event(key: VIRTUAL_KEY, key_down: bool) -> INPUT {
+    INPUT {
+        r#type: INPUT_KEYBOARD,
+        Anonymous: INPUT_0 {
+            ki: KEYBDINPUT {
+                wVk: key,
+                dwFlags: if key_down {
+                    KEYBD_EVENT_FLAGS(0)
+                } else {
+                    KEYEVENTF_KEYUP
+                },
+                ..KEYBDINPUT::default()
+            },
+        },
     }
 }
 

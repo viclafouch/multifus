@@ -24,6 +24,7 @@ pub mod commands;
 pub mod journal;
 pub mod journal_file;
 pub mod main_window;
+pub mod quick_replies;
 pub mod relay;
 pub mod runtime;
 pub mod shortcuts;
@@ -43,6 +44,7 @@ use crate::config::ConfigStore;
 use crate::platform::DisplayKeeper;
 use crate::platform::PlatformDisplayKeeper;
 use crate::platform::PlatformNotificationWatcher;
+use crate::platform::PlatformPasteSender;
 use crate::platform::PlatformWindowManager;
 
 pub use state::AppState;
@@ -76,6 +78,7 @@ pub fn setup(app: &AppHandle) -> Result<(), ConfigError> {
         screen_saver: screen_saver(&keeper),
     })));
     app.manage(PlatformWindowManager::new());
+    app.manage(PlatformPasteSender::new());
     app.manage::<WatcherState>(Mutex::new(PlatformNotificationWatcher::new()));
 
     relay::run::setup(app, keeper);

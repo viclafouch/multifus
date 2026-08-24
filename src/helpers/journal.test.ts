@@ -2,13 +2,18 @@ import { describe, expect, it } from 'vitest'
 import type {
   JournalEvent,
   NotificationOutcome,
+  QuickReplyFailure,
   RosterChange,
   SettingChange,
   ShortcutOutcome,
   TrayOutcome
 } from '@/@types/journal'
 import type { NoticeCase, RelayFailure } from '@/@types/relay'
-import type { ShortcutBinding } from '@/@types/shortcuts'
+import type {
+  BoundCombination,
+  QuickReply,
+  ShortcutBinding
+} from '@/@types/shortcuts'
 import type { Snapshot } from '@/@types/snapshot'
 import {
   DETAILED_LINES,
@@ -49,7 +54,7 @@ const DETAIL = 'le système n’a pas répondu'
 
 const NICKNAME = 'Alpha'
 
-const BINDINGS = [
+const SHORTCUTS = [
   {
     action: 'next',
     accelerator: 'Control+Shift+ArrowRight',
@@ -68,8 +73,46 @@ const BINDINGS = [
   }
 ] as const satisfies readonly ShortcutBinding[]
 
+const QUICK_REPLIES = [
+  {
+    id: 1,
+    text: 'prix libre',
+    accelerator: 'Control+Shift+KeyP',
+    status: { kind: 'registered' }
+  }
+] as const satisfies readonly QuickReply[]
+
+/** The set as the Rust side lays it down: the four actions, then the quick replies. */
+const BINDINGS = [
+  {
+    binding: { kind: 'action', action: 'next' },
+    accelerator: 'Control+Shift+ArrowRight',
+    status: { kind: 'registered' }
+  },
+  {
+    binding: { kind: 'action', action: 'previous' },
+    accelerator: null,
+    status: { kind: 'unbound' }
+  },
+  {
+    binding: { kind: 'action', action: 'toggleAsleep' },
+    accelerator: 'Control+Shift+KeyS',
+    status: { kind: 'pending' }
+  },
+  {
+    binding: { kind: 'action', action: 'swap' },
+    accelerator: 'Control+Shift+KeyX',
+    status: { kind: 'invalid', detail: 'touche inconnue' }
+  },
+  {
+    binding: { kind: 'quickReply', id: 1 },
+    accelerator: 'Control+Shift+KeyP',
+    status: { kind: 'registered' }
+  }
+] as const satisfies readonly BoundCombination[]
+
 const BINDINGS_LINE =
-  'Raccourcis : Suivant Control+Shift+ArrowRight · Précédent non attribué · Veille pas encore posé · Bascule Control+Shift+KeyX illisible (touche inconnue).'
+  'Raccourcis : Suivant Control+Shift+ArrowRight · Précédent non attribué · Veille pas encore posé · Bascule Control+Shift+KeyX illisible (touche inconnue) · Réponse rapide 1 Control+Shift+KeyP.'
 
 const ROSTER_CASES = {
   slept: [
@@ -332,6 +375,60 @@ const SHORTCUT_CASES = {
 } as const satisfies Record<
   ShortcutOutcome['outcome'],
   readonly Case<'shortcut'>[]
+>
+
+const QUICK_REPLY_CASES = {
+  outsideGame: [
+    {
+      event: { kind: 'quickReplyFailed', reason: { reason: 'outsideGame' } },
+      line: 'Réponse rapide ignorée : aucune fenêtre Dofus au premier plan.'
+    }
+  ],
+  foregroundUnknown: [
+    {
+      event: {
+        kind: 'quickReplyFailed',
+        reason: { reason: 'foregroundUnknown', detail: DETAIL }
+      },
+      line: `Réponse rapide ignorée : impossible de savoir quelle fenêtre est au premier plan (${DETAIL}).`
+    }
+  ],
+  gone: [
+    {
+      event: { kind: 'quickReplyFailed', reason: { reason: 'gone' } },
+      line: 'Réponse rapide introuvable : elle a été retirée entre l’appui et le collage.'
+    }
+  ],
+  clipboardRefused: [
+    {
+      event: {
+        kind: 'quickReplyFailed',
+        reason: { reason: 'clipboardRefused', detail: DETAIL }
+      },
+      line: `Réponse rapide non collée : le presse-papiers a refusé le texte (${DETAIL}).`
+    }
+  ],
+  pasteRefused: [
+    {
+      event: {
+        kind: 'quickReplyFailed',
+        reason: { reason: 'pasteRefused', detail: DETAIL }
+      },
+      line: `Réponse rapide non collée : le système a refusé la combinaison de collage (${DETAIL}).`
+    }
+  ],
+  clipboardNotGivenBack: [
+    {
+      event: {
+        kind: 'quickReplyFailed',
+        reason: { reason: 'clipboardNotGivenBack', detail: DETAIL }
+      },
+      line: `Réponse rapide collée, mais le presse-papiers d’avant n’a pas pu être rendu (${DETAIL}).`
+    }
+  ]
+} as const satisfies Record<
+  QuickReplyFailure['reason'],
+  readonly Case<'quickReplyFailed'>[]
 >
 
 const TRAY_CASES = {
@@ -603,6 +700,13 @@ const JOURNAL_CASES = {
   roster: Object.values(ROSTER_CASES).flat(),
   setting: Object.values(SETTING_CASES).flat(),
   shortcut: Object.values(SHORTCUT_CASES).flat(),
+  quickReplyFailed: Object.values(QUICK_REPLY_CASES).flat(),
+  quickReplyPasted: [
+    {
+      event: { kind: 'quickReplyPasted', excerpt: 'prix libre' },
+      line: 'Réponse rapide collée dans le jeu : « prix libre »'
+    }
+  ],
   trayFocus: Object.values(TRAY_CASES).flat(),
   shortcutsBound: [
     {
@@ -614,18 +718,37 @@ const JOURNAL_CASES = {
         kind: 'shortcutsBound',
         bindings: [
           {
-            action: 'next',
+            binding: { kind: 'action', action: 'next' },
             accelerator: 'Control+Shift+ArrowRight',
-            status: { kind: 'duplicate', action: 'previous' }
+            status: {
+              kind: 'duplicate',
+              binding: { kind: 'action', action: 'previous' }
+            }
           },
           {
-            action: 'swap',
+            binding: { kind: 'action', action: 'swap' },
             accelerator: null,
             status: { kind: 'refused', detail: 'déjà prise' }
           }
         ]
       },
       line: 'Raccourcis : Suivant Control+Shift+ArrowRight en doublon avec Précédent, donc inerte · Bascule aucune combinaison refusé (déjà prise).'
+    },
+    {
+      event: {
+        kind: 'shortcutsBound',
+        bindings: [
+          {
+            binding: { kind: 'quickReply', id: 2 },
+            accelerator: 'Control+Shift+KeyP',
+            status: {
+              kind: 'duplicate',
+              binding: { kind: 'action', action: 'next' }
+            }
+          }
+        ]
+      },
+      line: 'Raccourcis : Réponse rapide 2 Control+Shift+KeyP en doublon avec Suivant, donc inerte.'
     }
   ],
   shortcutsFailed: [
@@ -829,7 +952,8 @@ const SNAPSHOT = {
   version: '0.1.0',
   system: 'macOS 26.0 (arm64)',
   characters: [],
-  shortcuts: BINDINGS,
+  shortcuts: SHORTCUTS,
+  quickReplies: QUICK_REPLIES,
   autoFocus: [],
   autoFocusEnabled: true,
   wakesMinimized: true,

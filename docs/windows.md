@@ -132,7 +132,7 @@ restaurer fait partie du focus.
 injectant une vraie frappe Alt dans l'application active. C'est la cause probable
 du bug de focus intermittent corrigé dans son commit `0b0525c`, et ça envoie une
 touche parasite dans le jeu. L'exception du collage de
-l'[ADR 0012](./adr/0012-une-phrase-se-colle-dans-le-jeu.md) ne couvre pas ça et ne
+l'[ADR 0012](./adr/0012-une-reponse-rapide-se-colle-dans-le-jeu.md) ne couvre pas ça et ne
 l'a jamais couvert.
 
 **`WindowGone` se lit sur `IsWindow` et sur l'exécutable.** Windows réemploie les
@@ -323,7 +323,7 @@ lot**, pour que rien ne se compile avant d'être appelé.
 `windows-future`, donc rien à ajouter aux dépendances, mais tout exemple en
 circulation est écrit avec l'ancien nom.
 
-Le chantier des phrases ajoutera `Win32_UI_Input_KeyboardAndMouse` pour
+Le chantier des réponses rapides ajoutera `Win32_UI_Input_KeyboardAndMouse` pour
 `SendInput`, et ce sera le premier appel de ce trait dans le projet.
 
 ---

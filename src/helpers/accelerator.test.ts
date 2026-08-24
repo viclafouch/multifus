@@ -74,6 +74,35 @@ describe('capture', () => {
     expect(result).toStrictEqual({ status: 'rejected', reason: 'noModifier' })
   })
 
+  it('refuse la combinaison de collage, qu’une quickReply déclencherait elle-même', () => {
+    // #given
+    // Sous Node le clavier n’est pas un clavier Apple, donc c’est Control+V.
+    const press = { ...NOTHING_HELD, code: 'KeyV', ctrlKey: true }
+
+    // #when
+    const result = capture(press)
+
+    // #then
+    expect(result).toStrictEqual({
+      status: 'rejected',
+      reason: 'pasteCombination'
+    })
+  })
+
+  it('laisse passer la touche du collage sous un autre modificateur', () => {
+    // #given
+    const press = { ...NOTHING_HELD, code: 'KeyV', ctrlKey: true, altKey: true }
+
+    // #when
+    const result = capture(press)
+
+    // #then
+    expect(result).toStrictEqual({
+      status: 'captured',
+      accelerator: 'Control+Alt+KeyV'
+    })
+  })
+
   it('refuse une touche que le parseur du greffon ne connaît pas', () => {
     // #given
     const press = { ...NOTHING_HELD, code: 'ContextMenu', ctrlKey: true }

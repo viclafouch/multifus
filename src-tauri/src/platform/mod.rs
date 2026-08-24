@@ -1,7 +1,8 @@
 //! The boundary between the business core and the operating system.
 //!
-//! Three interfaces, [`WindowManager`], [`NotificationWatcher`] and
-//! [`DisplayKeeper`], one implementation of each per system, selected by `cfg`.
+//! Four interfaces, [`WindowManager`], [`NotificationWatcher`],
+//! [`DisplayKeeper`] and [`PasteSender`], one implementation of each per system,
+//! selected by `cfg`.
 //!
 //! The dependency runs one way only. This module uses the types of
 //! [`crate::domain`], `domain` knows nothing of this module and calls nothing of
@@ -15,6 +16,7 @@
 pub mod display;
 pub mod error;
 pub mod notification;
+pub mod paste;
 pub mod window;
 
 #[cfg(target_os = "macos")]
@@ -29,6 +31,7 @@ pub use error::Result;
 pub use notification::NotificationReport;
 pub use notification::NotificationSink;
 pub use notification::NotificationWatcher;
+pub use paste::PasteSender;
 pub use window::GameWindow;
 pub use window::WindowId;
 pub use window::WindowManager;
@@ -72,3 +75,10 @@ pub type PlatformDisplayKeeper = macos::PowerAssertionDisplayKeeper;
 /// The display keeper of the system multifus is running on.
 #[cfg(target_os = "windows")]
 pub type PlatformDisplayKeeper = windows::PowerRequestDisplayKeeper;
+
+/// The paste sender of the system multifus is running on.
+#[cfg(target_os = "macos")]
+pub type PlatformPasteSender = macos::CoreGraphicsPasteSender;
+/// The paste sender of the system multifus is running on.
+#[cfg(target_os = "windows")]
+pub type PlatformPasteSender = windows::SendInputPasteSender;

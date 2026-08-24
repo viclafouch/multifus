@@ -1,12 +1,13 @@
 import { describe, expect, it } from 'vitest'
 import type { PairingProblem } from '@/@types/relay'
 import type { Character } from '@/@types/roster'
-import type { ShortcutStatus } from '@/@types/shortcuts'
+import type { QuickReply, ShortcutStatus } from '@/@types/shortcuts'
 import type { UpdateStatus } from '@/@types/system'
 import { strings } from '@/constants/strings'
 import type { TonedLine } from '@/helpers/wording'
 import {
   authorizationLine,
+  bindingLabel,
   characterStateLine,
   pairingProblemLine,
   shortcutStatusLine,
@@ -14,7 +15,7 @@ import {
 } from '@/helpers/wording'
 
 /**
- * The phrases live in `constants/strings`, so a case names the one it expects
+ * The quick replies live in `constants/strings`, so a case names the one it expects
  * instead of recopying it: what these functions decide is the branch.
  */
 type UpdateCase = {
@@ -100,15 +101,25 @@ const STATUS_CASES = {
     answer: { tone: 'bad', text: strings.shortcuts.status.refused }
   },
   duplicate: {
-    status: { kind: 'duplicate', action: 'next' },
+    status: { kind: 'duplicate', binding: { kind: 'action', action: 'next' } },
     answer: {
       tone: 'bad',
       text: strings.shortcuts.status.duplicate(
-        strings.shortcuts.actions.next.label
+        `« ${strings.shortcuts.actions.next.label} »`
       )
     }
   }
 } as const satisfies Record<ShortcutStatus['kind'], StatusCase>
+
+const QUICK_REPLIES = [
+  {
+    id: 1,
+    text: 'prix libre',
+    accelerator: 'Control+Shift+KeyP',
+    status: { kind: 'registered' }
+  },
+  { id: 2, text: '', accelerator: null, status: { kind: 'unbound' } }
+] as const satisfies readonly QuickReply[]
 
 const ONLINE_CHARACTER = {
   nickname: 'Alpha',
@@ -149,7 +160,7 @@ describe('shortcutStatusLine', () => {
     'met en mots le statut $status.kind, avec le ton qui va avec',
     ({ status, answer }) => {
       // #when
-      const written = shortcutStatusLine(status)
+      const written = shortcutStatusLine(status, QUICK_REPLIES)
 
       // #then
       expect(written).toStrictEqual(answer)
@@ -157,11 +168,68 @@ describe('shortcutStatusLine', () => {
   )
 
   it('nomme l’action qui tient déjà la combinaison', () => {
+    // #given
+    const status = {
+      kind: 'duplicate',
+      binding: { kind: 'action', action: 'swap' }
+    } as const
+
     // #when
-    const { text } = shortcutStatusLine({ kind: 'duplicate', action: 'swap' })
+    const { text } = shortcutStatusLine(status, QUICK_REPLIES)
 
     // #then
     expect(text).toContain(strings.shortcuts.actions.swap.label)
+  })
+
+  it('nomme par son texte la quickReply qui tient déjà la combinaison', () => {
+    // #given
+    const status = {
+      kind: 'duplicate',
+      binding: { kind: 'quickReply', id: 1 }
+    } as const
+
+    // #when
+    const { text } = shortcutStatusLine(status, QUICK_REPLIES)
+
+    // #then
+    expect(text).toContain('la réponse « prix libre »')
+  })
+
+  it('nomme une quickReply sans texte sans prétendre la citer', () => {
+    // #given
+    const status = {
+      kind: 'duplicate',
+      binding: { kind: 'quickReply', id: 2 }
+    } as const
+
+    // #when
+    const { text } = shortcutStatusLine(status, QUICK_REPLIES)
+
+    // #then
+    expect(text).toContain(strings.shortcuts.quickReplies.unnamed)
+  })
+})
+
+describe('bindingLabel', () => {
+  it('coupe un texte trop long sur un caractère et non au milieu d’un', () => {
+    // #given
+    const quickReplies = [
+      { ...QUICK_REPLIES[0], text: 'é'.repeat(60) }
+    ] as const satisfies readonly QuickReply[]
+
+    // #when
+    const label = bindingLabel({ kind: 'quickReply', id: 1 }, quickReplies)
+
+    // #then
+    expect(label).toBe(`la réponse « ${'é'.repeat(30)}… »`)
+  })
+
+  it('nomme une quickReply que le tableau ne porte plus', () => {
+    // #when
+    const label = bindingLabel({ kind: 'quickReply', id: 404 }, QUICK_REPLIES)
+
+    // #then
+    expect(label).toBe(strings.shortcuts.quickReplies.unnamed)
   })
 })
 

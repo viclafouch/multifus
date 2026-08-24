@@ -7,7 +7,7 @@ import type { JournalEntry } from '@/@types/journal'
 import type { AutoFocusSwitch } from '@/@types/notification'
 import type { RelayStatus } from '@/@types/relay'
 import type { Character } from '@/@types/roster'
-import type { ShortcutBinding } from '@/@types/shortcuts'
+import type { QuickReply, ShortcutBinding } from '@/@types/shortcuts'
 import type { Authorization, ConfigStatus, UpdateStatus } from '@/@types/system'
 
 /** One of the five screens the window can show. */
@@ -29,6 +29,8 @@ export type Snapshot = {
   /** The roster, in cycle order. */
   readonly characters: readonly Character[]
   readonly shortcuts: readonly ShortcutBinding[]
+  /** The quick replies, in the order of the file. Empty on a first launch. */
+  readonly quickReplies: readonly QuickReply[]
   readonly autoFocus: readonly AutoFocusSwitch[]
   /** The AutoFocus is running at all. Off, the seven above still say what they
    * will come back to. */

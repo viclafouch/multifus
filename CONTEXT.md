@@ -56,14 +56,14 @@ _Avoid_: Rotation, navigation, ordre d'initiative
 L'action d'endormir tous les personnages d'un sexe et de réveiller tous ceux de l'autre.
 _Avoid_: Inversion, permutation, changement d'équipe
 
-### Phrases
+### Réponses rapides
 
-**Phrase** (`Phrase`):
-Un texte prêt à écrire dans le jeu, rangé sous une combinaison de touches. On en crée autant qu'on veut, le texte tient sur une ligne, et une phrase n'appartient à aucun personnage. Elle existe parce qu'on répond toujours la même chose aux mêmes questions, « prix libre », « de rien ».
-_Avoid_: Macro, modèle, texte prédéfini, message, raccourci de texte
+**Réponse rapide** (`QuickReply`):
+Un texte tout prêt, rangé sous une combinaison de touches, que le raccourci colle là où l'utilisateur est en train d'écrire dans le jeu. On en crée autant qu'on veut, le texte tient sur une ligne, et une réponse rapide n'appartient à aucun personnage. Elle existe parce qu'on répond toujours la même chose aux mêmes questions. Le mot dit ce que c'est à quelqu'un qui veut juste jouer, là où « phrase », le premier mot employé ici, ne disait pas qu'on peut la coller.
+_Avoid_: Phrase, macro, modèle, texte prédéfini, message, raccourci de texte
 
 **Collage** (`paste`):
-Le geste complet d'une phrase : l'ancien presse-papiers est gardé, le texte le remplace, la combinaison de collage du système est posée vers la fenêtre du jeu, puis l'ancien presse-papiers revient. Il colle et n'envoie pas, la touche Entrée restant à l'utilisateur. Comme les quatre raccourcis, il ne part que si une fenêtre Dofus est au premier plan. Voir [ADR 0012](./docs/adr/0012-une-phrase-se-colle-dans-le-jeu.md).
+Le geste complet d'une réponse rapide : l'ancien presse-papiers est gardé, le texte le remplace, la combinaison de collage du système est posée vers la fenêtre du jeu, puis l'ancien presse-papiers revient. Il colle et n'envoie pas, la touche Entrée restant à l'utilisateur. Comme les quatre raccourcis, il ne part que si une fenêtre Dofus est au premier plan. Voir [ADR 0012](./docs/adr/0012-une-reponse-rapide-se-colle-dans-le-jeu.md).
 _Avoid_: Macro, automatisation, envoi, frappe
 
 ### Journal

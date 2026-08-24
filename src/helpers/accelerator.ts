@@ -4,7 +4,13 @@
  */
 
 import type { CaptureRejection, Modifier } from '@/constants/keyboard'
-import { ALIASES, KEY_LABELS, KEYS, MODIFIERS } from '@/constants/keyboard'
+import {
+  ALIASES,
+  KEY_LABELS,
+  KEYS,
+  MODIFIERS,
+  PASTE_COMBINATION
+} from '@/constants/keyboard'
 
 export type CaptureResult =
   | { readonly status: 'captured'; readonly accelerator: string }
@@ -43,10 +49,15 @@ export const capture = (event: KeyPress): CaptureResult => {
     return { status: 'rejected', reason: 'noModifier' }
   }
 
-  return {
-    status: 'captured',
-    accelerator: [...modifiers, event.code].join('+')
+  const accelerator = [...modifiers, event.code].join('+')
+
+  // A quick reply laid on it would fire on the paste it lays down itself, and an
+  // action laid on it would eat the paste of every application. See ADR 0012.
+  if (accelerator === PASTE_COMBINATION) {
+    return { status: 'rejected', reason: 'pasteCombination' }
   }
+
+  return { status: 'captured', accelerator }
 }
 
 /**

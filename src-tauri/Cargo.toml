@@ -58,6 +58,8 @@ windows = { version = "0.62", features = [
   "Win32_System_Com",
   "Win32_System_Power",
   "Win32_System_Threading",
+  # The paste combination of ADR 0012, and nothing else in the crate calls it.
+  "Win32_UI_Input_KeyboardAndMouse",
   "Win32_UI_WindowsAndMessaging",
 ] }
 
@@ -78,6 +80,15 @@ objc2-application-services = { version = "0.3", default-features = false, featur
   "HIServices",
   "AXError",
   "AXUIElement",
+] }
+# The paste combination of ADR 0012, and nothing else in the crate calls it.
+objc2-core-graphics = { version = "0.3", default-features = false, features = [
+  "std",
+  "CGEvent",
+  "CGEventSource",
+  "CGEventTypes",
+  # What `CGEventCreateKeyboardEvent` sits behind, and the keycode type with it.
+  "CGRemoteOperation",
 ] }
 objc2-core-foundation = { version = "0.3", default-features = false, features = [
   "std",

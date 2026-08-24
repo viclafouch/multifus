@@ -5,7 +5,7 @@
 
 import type { PairingProblem } from '@/@types/relay'
 import type { Character } from '@/@types/roster'
-import type { ShortcutStatus } from '@/@types/shortcuts'
+import type { Binding, QuickReply, ShortcutStatus } from '@/@types/shortcuts'
 import type {
   Authorization,
   ConfigProblem,
@@ -99,8 +99,56 @@ export const pairingProblemLine = (problem: PairingProblem) => {
   }
 }
 
-/** What the system answered about a combination, in French. */
-export const shortcutStatusLine = (status: ShortcutStatus): TonedLine => {
+/** How much of a quick reply's text is enough to tell it from its neighbours. */
+const QUICK_REPLY_LABEL_LENGTH = 30
+
+/**
+ * What a combination fires, named the way the screen names it, quotes included.
+ * A quick reply has no name of its own, so it is named by the head of its text.
+ */
+export const bindingLabel = (
+  binding: Binding,
+  quickReplies: readonly QuickReply[]
+): string => {
+  const words = strings.shortcuts.quickReplies
+
+  if (binding.kind === 'action') {
+    return `« ${strings.shortcuts.actions[binding.action].label} »`
+  }
+
+  const quickReply = quickReplies.find((candidate) => {
+    return candidate.id === binding.id
+  })
+
+  if (quickReply === undefined || quickReply.text.length === 0) {
+    return words.unnamed
+  }
+
+  return words.named(shorten(quickReply.text))
+}
+
+/**
+ * The head of a line. `Array.from` walks code points, where a `slice` on the
+ * string would split an accent in two.
+ */
+const shorten = (text: string) => {
+  const letters = Array.from(text)
+
+  if (letters.length <= QUICK_REPLY_LABEL_LENGTH) {
+    return text
+  }
+
+  return `${letters.slice(0, QUICK_REPLY_LABEL_LENGTH).join('')}…`
+}
+
+/**
+ * What the system answered about a combination, in French. The quick replies come
+ * along because a doublon names whichever binding holds the keys.
+ */
+export const shortcutStatusLine = (
+  status: ShortcutStatus,
+  quickReplies: readonly QuickReply[]
+): TonedLine => {
   const answers = strings.shortcuts.status
 
   switch (status.kind) {
@@ -120,9 +168,10 @@ export const shortcutStatusLine = (status: ShortcutStatus): TonedLine => {
       return { tone: 'bad', text: answers.refused }
     }
     case 'duplicate': {
-      const { label } = strings.shortcuts.actions[status.action]
-
-      return { tone: 'bad', text: answers.duplicate(label) }
+      return {
+        tone: 'bad',
+        text: answers.duplicate(bindingLabel(status.binding, quickReplies))
+      }
     }
     default: {
       return { tone: 'calm', text: answers.pending }

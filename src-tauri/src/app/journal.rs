@@ -31,8 +31,8 @@ use std::time::UNIX_EPOCH;
 use serde::Serialize;
 
 use crate::app::journal_file;
+use crate::app::view::BindingView;
 use crate::app::view::ShortcutAction;
-use crate::app::view::ShortcutView;
 use crate::domain::Gender;
 use crate::domain::NotificationKind;
 
@@ -191,15 +191,15 @@ pub enum JournalEvent {
     /// measure of the whole principle of this project.
     Setting { change: SettingChange },
 
-    /// The four combinations were laid on the system, and this is what each of
-    /// them answered.
+    /// Every combination was laid on the system, the four actions and the
+    /// quick replies, and this is what each of them answered.
     ///
-    /// One line for the four rather than one per action, because the question is
+    /// One line for the set rather than one per binding, because the question is
     /// always about the set: which keys were bound at that moment. It is also
     /// the only place a [`crate::app::view::ShortcutStatus::Duplicate`] is ever
     /// said out loud, and a duplicate is a combination that never fires and
     /// never writes a line of its own.
-    ShortcutsBound { bindings: Vec<ShortcutView> },
+    ShortcutsBound { bindings: Vec<BindingView> },
 
     /// The shortcuts as a whole are in trouble: the thread that runs them could
     /// not start, could not be reached, or died; or the previous combinations
@@ -211,6 +211,16 @@ pub enum JournalEvent {
         action: ShortcutAction,
         outcome: ShortcutOutcome,
     },
+
+    /// A quick reply was pasted into the game.
+    ///
+    /// **The first forty characters of the text**, and the one place this file
+    /// holds words somebody typed. What that costs is in ADR 0012.
+    QuickReplyPasted { excerpt: String },
+
+    /// A quick reply was fired and something turned it down, and this says where it
+    /// is repaired. Never the text.
+    QuickReplyFailed { reason: QuickReplyFailure },
 
     /// A character was clicked in the system tray, and this is what came of it.
     TrayFocus {
@@ -442,6 +452,40 @@ pub enum RelayFailure {
     /// and `reqwest` puts it in its own `Display`, see
     /// [`crate::app::relay::telegram`].
     Network { detail: String },
+}
+
+/// Why a quick reply did not reach the chat, or did and cost the clipboard.
+///
+/// Six and not one, because they are repaired in six different places. The list
+/// and its reasons are in `docs/plan.md`, temps 2.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(
+    tag = "reason",
+    rename_all = "camelCase",
+    rename_all_fields = "camelCase"
+)]
+pub enum QuickReplyFailure {
+    /// The foreground window is not a game one, so the quick reply stayed inert,
+    /// exactly as the four actions do.
+    OutsideGame,
+
+    /// The system would not say what is in the foreground, so the guard could
+    /// not be checked and nothing was pasted.
+    ForegroundUnknown { detail: String },
+
+    /// The quick reply was removed between the key press and the answer.
+    Gone,
+
+    /// The text could not be put on the clipboard, so nothing was there to
+    /// paste.
+    ClipboardRefused { detail: String },
+
+    /// The system turned down the paste combination.
+    PasteRefused { detail: String },
+
+    /// The quick reply went in and what the user had copied did not come back. The
+    /// one reason here that follows a paste which worked.
+    ClipboardNotGivenBack { detail: String },
 }
 
 /// What stopped the relay. A reason and not a [`Surface`], since two of these
@@ -888,6 +932,71 @@ mod tests {
             .collect::<Vec<_>>();
 
         assert_eq!(named, ["keychain", "telegram", "network"]);
+    }
+
+    #[test]
+    fn a_paste_carries_an_excerpt_of_the_user_s_own_line_and_nothing_more() {
+        // The one place this file holds words somebody typed, ADR 0012. Adding a
+        // field here fails, exactly as it does for the relay events.
+        let pasted = JournalEvent::QuickReplyPasted {
+            excerpt: "prix libre".to_owned(),
+        };
+
+        assert_eq!(fields_of(&pasted), ["excerpt", "kind"]);
+
+        let failed = JournalEvent::QuickReplyFailed {
+            reason: QuickReplyFailure::PasteRefused {
+                detail: "refusé".to_owned(),
+            },
+        };
+
+        assert_eq!(fields_of(&failed), ["kind", "reason"]);
+        assert_eq!(
+            serde_json::to_string(&failed).expect("the event serialises"),
+            r#"{"kind":"quickReplyFailed","reason":{"reason":"pasteRefused","detail":"refusé"}}"#
+        );
+    }
+
+    #[test]
+    fn a_quick_reply_that_failed_says_which_of_the_six_places_it_is_repaired_in() {
+        let reasons = [
+            QuickReplyFailure::OutsideGame,
+            QuickReplyFailure::ForegroundUnknown {
+                detail: "denied".to_owned(),
+            },
+            QuickReplyFailure::Gone,
+            QuickReplyFailure::ClipboardRefused {
+                detail: "denied".to_owned(),
+            },
+            QuickReplyFailure::PasteRefused {
+                detail: "denied".to_owned(),
+            },
+            QuickReplyFailure::ClipboardNotGivenBack {
+                detail: "denied".to_owned(),
+            },
+        ];
+
+        let named = reasons
+            .iter()
+            .map(|reason| {
+                serde_json::to_value(reason).expect("a reason serialises")["reason"]
+                    .as_str()
+                    .expect("a reason is tagged")
+                    .to_owned()
+            })
+            .collect::<Vec<_>>();
+
+        assert_eq!(
+            named,
+            [
+                "outsideGame",
+                "foregroundUnknown",
+                "gone",
+                "clipboardRefused",
+                "pasteRefused",
+                "clipboardNotGivenBack"
+            ]
+        );
     }
 
     #[test]

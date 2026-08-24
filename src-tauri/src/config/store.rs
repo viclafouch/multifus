@@ -323,6 +323,8 @@ mod tests {
 
     use super::*;
     use crate::config::settings::AutoFocus;
+    use crate::config::settings::QuickReply;
+    use crate::config::settings::QuickReplyId;
     use crate::config::settings::Relay;
     use crate::config::settings::Shortcut;
     use crate::config::settings::Shortcuts;
@@ -361,6 +363,11 @@ mod tests {
                 toggle_asleep: None,
                 swap: Shortcut::new("Alt+Space"),
             },
+            quick_replies: vec![QuickReply {
+                id: QuickReplyId::default().next(),
+                text: "prix libre".to_owned(),
+                shortcut: Shortcut::new("Alt+P"),
+            }],
             auto_focus,
             relay: Relay {
                 chat_id: Some(-1_001_234_567_890),

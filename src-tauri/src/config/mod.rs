@@ -24,6 +24,8 @@ pub mod store;
 pub use error::ConfigError;
 pub use error::Result;
 pub use settings::AutoFocus;
+pub use settings::QuickReply;
+pub use settings::QuickReplyId;
 pub use settings::Relay;
 pub use settings::Settings;
 pub use settings::Shortcut;
