@@ -32,7 +32,11 @@ use crate::app::view::PairingView;
 
 /// What the bot writes once the pairing has gone through. Never an « essai »,
 /// which CONTEXT.md gives to the message the Relais screen asks for.
-const PAIRED_MESSAGE: &str = "multifus\nLe relais est connecté.";
+///
+/// Two lines like the activation notice: the first alone was read as a relay
+/// that had started, which the Relais screen exists to never let anybody believe.
+const PAIRED_MESSAGE: &str =
+    "multifus\nVotre robot est relié.\nLe relais n’est pas encore en marche.";
 
 /// Pairs the relay with the bot whose token this is.
 ///
@@ -173,5 +177,18 @@ impl From<TelegramError> for PairingProblem {
             TelegramError::Refused { detail } => Self::TokenRefused { detail },
             TelegramError::Network { detail } => Self::Network { detail },
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn the_paired_message_never_says_the_relay_is_running() {
+        // The screen says « relié » and the switch alone says « activé ». What is
+        // read on a telephone, far from that screen, must not contradict it.
+        assert!(!PAIRED_MESSAGE.contains("connecté"));
+        assert!(!PAIRED_MESSAGE.contains("activé"));
     }
 }

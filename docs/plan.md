@@ -259,7 +259,11 @@ Lire un toast, c'est `Notification().Visual().GetBinding(KnownNotificationBindin
 
 **La signature Windows est un second sujet, que la distribution macOS ne couvre pas.** Un certificat Authenticode n'est pas un Developer ID, il s'achète ailleurs et ne pose pas les mêmes secrets. Sans lui, SmartScreen avertit à chaque installation. À trancher quand macOS sera publié pour de bon, pas avant : le job Windows publie non signé en attendant, et c'est écrit dans le fichier.
 
-**Vérifié quand** : l'icône est lisible dans la barre des tâches, le menu s'ouvre et ses articles font ce qu'ils disent, et le journal n'écrit plus d'échec de démarrage avec la session.
+**Vu à l'écran le 24 août 2026** : l'icône est là et lisible dans la zone de notification, et le journal n'écrit plus d'échec de démarrage avec la session. Reste à voir le menu ouvert et ses articles suivis, ce que la soirée de vérification couvre.
+
+**L'appairage disait « connecté », le mot que l'écran Relais s'interdit.** La carte annonce « Robot Telegram relié » et la note dessous prévient que « connecté » se lit « le relais marche » ; le message qui partait sur le téléphone disait pourtant « Le relais est connecté », puis l'interrupteur en envoyait un second, « Relais activé. ». Vu le 24 août 2026 en reliant depuis Windows le robot déjà apparié sur le Mac. Le message d'appairage porte maintenant deux lignes comme l'avis d'activation, et un test refuse qu'il prononce l'un des deux mots de l'interrupteur.
+
+**Un robot se réutilise d'une machine à l'autre, un jeton non.** Le jeton vit dans le trousseau du système, jamais dans la configuration : le second poste recolle le même jeton et retombe sur le même salon. Il faut en revanche réécrire au robot juste avant Connecter, `getUpdates` ne gardant ses mises à jour que vingt-quatre heures. Deux multifus relais actif sur le même robot écrivent dans le même salon, et rien ne dit lequel a parlé.
 
 ### Les dépendances
 
