@@ -20,6 +20,7 @@ use std::panic::catch_unwind;
 use std::panic::AssertUnwindSafe;
 use std::sync::MutexGuard;
 use std::sync::PoisonError;
+use std::sync::TryLockError;
 use std::thread;
 use std::time::Duration;
 
@@ -259,6 +260,10 @@ fn on_notification(app: &AppHandle, notification: GameNotification) {
         Decision::FocusUnlessMinimized(window) => focus_unless_minimized(app, window),
     };
 
+    if outcome == Outcome::Focused {
+        dismiss(app, &nickname);
+    }
+
     lock(app).log(JournalEvent::Notification {
         nickname,
         notification_kind: kind,
@@ -280,6 +285,26 @@ fn on_unreadable(app: &AppHandle, detail: String) {
     if written {
         emit_snapshot(app);
     }
+}
+
+/// Takes the toasts of a character off the screen, its window being in front.
+///
+/// `try_lock` and not [`watcher`]: this runs on the watcher's own thread, and
+/// `start` and `stop` hold that mutex across a join of this very thread. A
+/// dismissal skipped while the listening is being rebuilt costs nothing, since
+/// what would be dismissed is going away with it.
+fn dismiss(app: &AppHandle, nickname: &str) {
+    let state = app.state::<WatcherState>();
+
+    let watcher = match state.inner().try_lock() {
+        Ok(watcher) => watcher,
+        Err(TryLockError::Poisoned(poisoned)) => poisoned.into_inner(),
+        Err(TryLockError::WouldBlock) => return,
+    };
+
+    // macOS has no API for this and answers `Ok` without doing anything, which
+    // is what keeps this call site free of any `cfg`.
+    drop(watcher.dismiss(nickname));
 }
 
 /// Brings the window forward and says what came of it.

@@ -4,20 +4,39 @@
 //! `SetForegroundWindow` behind an `AttachThreadInput` attach, and toasts from
 //! the WinRT `UserNotificationListener`, which also lets one be removed.
 
+use std::collections::HashMap;
+use std::collections::HashSet;
 use std::ffi::c_void;
+use std::panic::catch_unwind;
+use std::panic::AssertUnwindSafe;
 use std::path::Path;
+use std::sync::atomic::AtomicBool;
+use std::sync::atomic::Ordering;
+use std::sync::mpsc;
+use std::sync::Arc;
+use std::sync::Mutex;
+use std::sync::MutexGuard;
+use std::sync::PoisonError;
+use std::thread;
+use std::thread::JoinHandle;
+use std::time::Duration;
+use std::time::Instant;
 
 use windows::core::BOOL;
 use windows::core::PWSTR;
 use windows::Win32::Foundation::CloseHandle;
 use windows::Win32::Foundation::HWND;
 use windows::Win32::Foundation::LPARAM;
+use windows::Win32::System::Com::CoInitializeEx;
+use windows::Win32::System::Com::COINIT_APARTMENTTHREADED;
 use windows::Win32::System::Threading::AttachThreadInput;
 use windows::Win32::System::Threading::GetCurrentThreadId;
 use windows::Win32::System::Threading::OpenProcess;
 use windows::Win32::System::Threading::QueryFullProcessImageNameW;
 use windows::Win32::System::Threading::PROCESS_NAME_WIN32;
 use windows::Win32::System::Threading::PROCESS_QUERY_LIMITED_INFORMATION;
+use windows::Win32::UI::WindowsAndMessaging::BringWindowToTop;
+use windows::Win32::UI::WindowsAndMessaging::DispatchMessageW;
 use windows::Win32::UI::WindowsAndMessaging::EnumWindows;
 use windows::Win32::UI::WindowsAndMessaging::GetForegroundWindow;
 use windows::Win32::UI::WindowsAndMessaging::GetWindowTextLengthW;
@@ -26,14 +45,25 @@ use windows::Win32::UI::WindowsAndMessaging::GetWindowThreadProcessId;
 use windows::Win32::UI::WindowsAndMessaging::IsIconic;
 use windows::Win32::UI::WindowsAndMessaging::IsWindow;
 use windows::Win32::UI::WindowsAndMessaging::IsWindowVisible;
+use windows::Win32::UI::WindowsAndMessaging::PeekMessageW;
 use windows::Win32::UI::WindowsAndMessaging::SetForegroundWindow;
 use windows::Win32::UI::WindowsAndMessaging::ShowWindow;
+use windows::Win32::UI::WindowsAndMessaging::TranslateMessage;
+use windows::Win32::UI::WindowsAndMessaging::MSG;
+use windows::Win32::UI::WindowsAndMessaging::PM_REMOVE;
 use windows::Win32::UI::WindowsAndMessaging::SW_RESTORE;
+use windows::UI::Notifications::KnownNotificationBindings;
+use windows::UI::Notifications::Management::UserNotificationListener;
+use windows::UI::Notifications::Management::UserNotificationListenerAccessStatus;
+use windows::UI::Notifications::NotificationKinds;
+use windows::UI::Notifications::UserNotification;
 
+use crate::domain::GameNotification;
 use crate::platform::display::DisplayKeeper;
 use crate::platform::display::ScreenSaverDelay;
 use crate::platform::error::PlatformError;
 use crate::platform::error::Result;
+use crate::platform::notification::NotificationReport;
 use crate::platform::notification::NotificationSink;
 use crate::platform::notification::NotificationWatcher;
 use crate::platform::window::GameWindow;
@@ -51,6 +81,15 @@ const PROCESS_PATH_UNITS: usize = 1024;
 
 /// What an `EnumWindows` callback returns to be handed the next window.
 const CONTINUE_ENUMERATION: BOOL = BOOL(1);
+
+/// How long the watcher waits between two reads of the notification centre.
+///
+/// Shorter than the roster sweep on purpose: polling is the only route here, so
+/// the whole delay of the AutoFocus is this number. See lot B of the plan.
+const POLL_INTERVAL: Duration = Duration::from_millis(500);
+
+/// How long the watcher sleeps between two turns at its message queue.
+const PUMP_INTERVAL: Duration = Duration::from_millis(25);
 
 /// Reads windows and changes focus through the Win32 window API.
 ///
@@ -102,13 +141,15 @@ impl WindowManager for Win32WindowManager {
 
     fn focus(&self, window: WindowId) -> Result<()> {
         let handle = live_game_window(window)?;
-        let _attached = AttachedInput::new();
+        let _attached = AttachedInput::new(handle);
 
         // Restoring belongs inside the attach: a window pulled out of the
         // taskbar and left behind has not been brought to the front.
         if unsafe { IsIconic(handle) }.as_bool() {
             let _ = unsafe { ShowWindow(handle, SW_RESTORE) };
         }
+
+        let _ = unsafe { BringWindowToTop(handle) };
 
         if unsafe { SetForegroundWindow(handle) }.as_bool() {
             return Ok(());
@@ -121,41 +162,47 @@ impl WindowManager for Win32WindowManager {
     }
 }
 
-/// Ties multifus's input queue to the foreground one for the length of a focus
-/// call, `SetForegroundWindow` refusing a caller that is not already in front.
+/// Ties multifus's input queue to the ones a focus call has to convince,
+/// `SetForegroundWindow` refusing a caller that is not already in front.
 ///
 /// Never an injected Alt keystroke, which is Dracoon's way and sends a stray
 /// key into the game.
 struct AttachedInput {
     current: u32,
-    foreground: u32,
+    attached: Vec<u32>,
 }
 
 impl AttachedInput {
-    /// `None` when there is nothing to attach to, or when the system turned the
-    /// attach down. Focus is then attempted bare rather than not at all.
-    fn new() -> Option<Self> {
+    /// The foreground thread **and** the target's own, and the second is not a
+    /// belt: measured, attaching to the foreground alone leaves the focus where
+    /// it was as soon as no keystroke of multifus is what asked for it.
+    fn new(target: HWND) -> Self {
         let current = unsafe { GetCurrentThreadId() };
         let foreground = unsafe { GetWindowThreadProcessId(GetForegroundWindow(), None) };
+        let owner = unsafe { GetWindowThreadProcessId(target, None) };
+        let mut attached = Vec::new();
 
-        if foreground == 0 || foreground == current {
-            return None;
+        for thread in [foreground, owner] {
+            if thread == 0 || thread == current || attached.contains(&thread) {
+                continue;
+            }
+
+            if unsafe { AttachThreadInput(current, thread, true) }.as_bool() {
+                attached.push(thread);
+            }
         }
 
-        unsafe { AttachThreadInput(current, foreground, true) }
-            .as_bool()
-            .then_some(Self {
-                current,
-                foreground,
-            })
+        Self { current, attached }
     }
 }
 
 impl Drop for AttachedInput {
     fn drop(&mut self) {
-        // Two input queues left tied are paid for on the whole desktop and not
-        // in multifus, so the detach leaves whatever the focus call did.
-        let _ = unsafe { AttachThreadInput(self.current, self.foreground, false) };
+        // Input queues left tied are paid for on the whole desktop and not in
+        // multifus, so the detach leaves whatever the focus call did.
+        for thread in &self.attached {
+            let _ = unsafe { AttachThreadInput(self.current, *thread, false) };
+        }
     }
 }
 
@@ -257,50 +304,334 @@ fn window_handle(window: WindowId) -> HWND {
 /// Hears game notifications through the WinRT `UserNotificationListener`, the
 /// official route, independent of whether banners are displayed.
 #[derive(Debug, Default)]
-pub struct UserNotificationWatcher;
+pub struct UserNotificationWatcher {
+    listening: Option<Listening>,
+    toasts: Arc<Mutex<ToastTable>>,
+}
 
 impl UserNotificationWatcher {
     #[must_use]
     pub fn new() -> Self {
-        Self
+        Self::default()
     }
 }
 
 impl NotificationWatcher for UserNotificationWatcher {
     fn authorization(&self) -> Result<Authorization> {
-        // `UserNotificationListener::GetAccessStatus`, the notification access
-        // the user grants in the system settings.
-        Err(PlatformError::not_implemented(
-            "UserNotificationWatcher::authorization",
-        ))
+        Ok(granted(listener()?.GetAccessStatus()))
     }
 
     fn request_authorization(&self) -> Result<Authorization> {
-        // `RequestAccessAsync`, awaited on the spot.
-        Err(PlatformError::not_implemented(
-            "UserNotificationWatcher::request_authorization",
+        // Awaited on the spot. The system grants this to a plain executable
+        // without ever showing a dialog, which the measurements recorded.
+        Ok(granted(
+            listener()?
+                .RequestAccessAsync()
+                .and_then(|request| request.join()),
         ))
     }
 
-    fn start(&mut self, _sink: NotificationSink) -> Result<()> {
-        Err(PlatformError::not_implemented(
-            "UserNotificationWatcher::start",
-        ))
+    fn start(&mut self, sink: NotificationSink) -> Result<()> {
+        self.stop()?;
+
+        let running = Arc::new(AtomicBool::new(true));
+        let toasts = Arc::clone(&self.toasts);
+        let (ready_sender, ready_receiver) = mpsc::channel();
+
+        let thread = thread::Builder::new()
+            .name("multifus-toast-watcher".to_owned())
+            .spawn({
+                let running = Arc::clone(&running);
+
+                move || watch(&sink, &running, &toasts, &ready_sender)
+            })
+            .map_err(|error| {
+                PlatformError::system("starting the toast watcher", error.to_string())
+            })?;
+
+        // The thread says how the setup went before it starts polling, so that a
+        // denied access comes back to the caller instead of dying in silence.
+        let outcome = ready_receiver.recv().unwrap_or_else(|_| {
+            Err(PlatformError::system(
+                "starting the toast watcher",
+                "the watcher thread stopped before it was listening",
+            ))
+        });
+
+        match outcome {
+            Ok(()) => {
+                self.listening = Some(Listening { running, thread });
+
+                Ok(())
+            }
+            Err(error) => {
+                drop(thread.join());
+
+                Err(error)
+            }
+        }
     }
 
     fn stop(&mut self) -> Result<()> {
-        Err(PlatformError::not_implemented(
-            "UserNotificationWatcher::stop",
-        ))
+        let Some(listening) = self.listening.take() else {
+            return Ok(());
+        };
+
+        listening.running.store(false, Ordering::Relaxed);
+
+        // Joining is what makes the promise of the interface true: once `stop`
+        // returns, the sink will not be called again.
+        listening.thread.join().map_err(|_| {
+            PlatformError::system("stopping the toast watcher", "the watcher thread panicked")
+        })
     }
 
-    fn dismiss(&self, _nickname: &str) -> Result<()> {
-        // The one thing Windows can do and macOS cannot: clearing the toasts of
-        // a character once its window is in front.
-        Err(PlatformError::not_implemented(
-            "UserNotificationWatcher::dismiss",
-        ))
+    fn dismiss(&self, nickname: &str) -> Result<()> {
+        // Queued rather than done here: the listener belongs to the watcher's
+        // apartment, and this is called from whichever thread focused a window.
+        table(&self.toasts).to_dismiss.push(nickname.to_owned());
+
+        Ok(())
     }
+}
+
+impl Drop for UserNotificationWatcher {
+    fn drop(&mut self) {
+        // No watcher thread survives the application. A failure here reaches
+        // nobody, and that is not a swallowed one: the process is ending.
+        drop(self.stop());
+    }
+}
+
+/// A watcher thread and the flag that stops it.
+#[derive(Debug)]
+struct Listening {
+    running: Arc<AtomicBool>,
+    thread: JoinHandle<()>,
+}
+
+/// What the watcher remembers of the toasts the platform still holds.
+///
+/// Shared between the polling thread and whoever calls `dismiss`, so it carries
+/// the pending dismissals rather than a second lock for them.
+#[derive(Debug, Default)]
+struct ToastTable {
+    reported: HashSet<u32>,
+    by_nickname: HashMap<String, Vec<u32>>,
+    to_dismiss: Vec<String>,
+}
+
+impl ToastTable {
+    /// Forgets every toast the platform has let go, without which the table
+    /// grows for a whole evening of play.
+    fn retain(&mut self, live: &HashSet<u32>) {
+        self.reported.retain(|id| live.contains(id));
+
+        for ids in self.by_nickname.values_mut() {
+            ids.retain(|id| live.contains(id));
+        }
+
+        self.by_nickname.retain(|_, ids| !ids.is_empty());
+    }
+}
+
+/// A poisoned table is still a usable one: the watcher would rather keep
+/// listening with a table it cannot trust than stop hearing the game.
+fn table(toasts: &Mutex<ToastTable>) -> MutexGuard<'_, ToastTable> {
+    toasts.lock().unwrap_or_else(PoisonError::into_inner)
+}
+
+/// The listener of this session, which any thread may ask for.
+fn listener() -> Result<UserNotificationListener> {
+    UserNotificationListener::Current()
+        .map_err(|error| PlatformError::system("UserNotificationListener", error.to_string()))
+}
+
+/// The three values of the system, read as the two the boundary has.
+///
+/// `Denied` and `Unspecified` are not repaired the same way, the first being
+/// unaskable again, but neither lets multifus hear anything.
+fn granted(status: windows::core::Result<UserNotificationListenerAccessStatus>) -> Authorization {
+    if status.is_ok_and(|status| status == UserNotificationListenerAccessStatus::Allowed) {
+        Authorization::Granted
+    } else {
+        Authorization::Denied
+    }
+}
+
+/// Sets the apartment up, then polls until the flag says to stop.
+fn watch(
+    sink: &NotificationSink,
+    running: &AtomicBool,
+    toasts: &Mutex<ToastTable>,
+    ready: &mpsc::Sender<Result<()>>,
+) {
+    // The listener answers a thread that is not in a single-threaded apartment
+    // with a COM error, and that is the trap which cost Dracoon dearly.
+    let apartment = unsafe { CoInitializeEx(None, COINIT_APARTMENTTHREADED) };
+
+    if apartment.is_err() {
+        drop(ready.send(Err(PlatformError::system(
+            "CoInitializeEx",
+            apartment.message(),
+        ))));
+
+        return;
+    }
+
+    let listener = match listener() {
+        Ok(listener) => listener,
+        Err(error) => {
+            drop(ready.send(Err(error)));
+
+            return;
+        }
+    };
+
+    if !granted(listener.GetAccessStatus()).is_granted() {
+        drop(ready.send(Err(PlatformError::AuthorizationDenied)));
+
+        return;
+    }
+
+    drop(ready.send(Ok(())));
+
+    while running.load(Ordering::Relaxed) {
+        dismiss_queued(&listener, toasts);
+        drop(poll(&listener, sink, toasts));
+
+        wait(running);
+    }
+}
+
+/// Waits out the interval, pumping, and looks at the stop flag far more often
+/// than the poll needs so that `stop` does not sit through a whole one.
+fn wait(running: &AtomicBool) {
+    let deadline = Instant::now() + POLL_INTERVAL;
+
+    while running.load(Ordering::Relaxed) && Instant::now() < deadline {
+        pump();
+
+        thread::sleep(PUMP_INTERVAL);
+    }
+}
+
+/// Serves the apartment's message queue.
+///
+/// An apartment that never pumps stops being served, and the watcher then hears
+/// its first toast and no other. Measured: the probe pumped and kept hearing.
+fn pump() {
+    let mut message = MSG::default();
+
+    while unsafe { PeekMessageW(&mut message, None, 0, 0, PM_REMOVE) }.as_bool() {
+        unsafe {
+            let _ = TranslateMessage(&message);
+            DispatchMessageW(&message);
+        }
+    }
+}
+
+/// Reads what the platform holds and reports the toasts not seen before.
+fn poll(
+    listener: &UserNotificationListener,
+    sink: &NotificationSink,
+    toasts: &Mutex<ToastTable>,
+) -> Result<()> {
+    let current = listener
+        .GetNotificationsAsync(NotificationKinds::Toast)
+        .and_then(|request| request.join())
+        .map_err(|error| PlatformError::system("GetNotificationsAsync", error.to_string()))?;
+
+    let mut live = HashSet::new();
+    let mut fresh = Vec::new();
+
+    {
+        let mut table = table(toasts);
+
+        for toast in &current {
+            let Ok(id) = toast.Id() else {
+                continue;
+            };
+
+            live.insert(id);
+
+            if !table.reported.insert(id) {
+                continue;
+            }
+
+            let Some(notification) = read(&toast) else {
+                continue;
+            };
+
+            let Some(nickname) = notification.nickname() else {
+                continue;
+            };
+
+            table
+                .by_nickname
+                .entry(nickname.to_owned())
+                .or_default()
+                .push(id);
+            fresh.push(notification);
+        }
+
+        table.retain(&live);
+    }
+
+    // Outside the lock: the sink focuses a window, and the core answers a focus
+    // by dismissing, which would want this very table back.
+    for notification in fresh {
+        // A panic in the core would otherwise take this thread with it, and the
+        // watcher would go quiet for the rest of the evening without saying so.
+        drop(catch_unwind(AssertUnwindSafe(|| {
+            sink(NotificationReport::Heard(notification));
+        })));
+    }
+
+    Ok(())
+}
+
+/// Takes off the screen the toasts of the characters `dismiss` named.
+fn dismiss_queued(listener: &UserNotificationListener, toasts: &Mutex<ToastTable>) {
+    let queued: Vec<u32> = {
+        let mut table = table(toasts);
+        let nicknames = std::mem::take(&mut table.to_dismiss);
+
+        nicknames
+            .iter()
+            .filter_map(|nickname| table.by_nickname.remove(nickname))
+            .flatten()
+            .collect()
+    };
+
+    for id in queued {
+        // Never `ClearNotifications`, which wipes every application's, including
+        // the ones multifus has never read.
+        drop(listener.RemoveNotification(id));
+    }
+}
+
+/// Reads a toast as the title and body pair the core expects.
+///
+/// The first text element is the title, the ones after it make the body, which
+/// the measurements saw on a real private message.
+fn read(toast: &UserNotification) -> Option<GameNotification> {
+    let elements = toast
+        .Notification()
+        .and_then(|notification| notification.Visual())
+        .and_then(|visual| visual.GetBinding(&KnownNotificationBindings::ToastGeneric()?))
+        .and_then(|binding| binding.GetTextElements())
+        .ok()?;
+
+    let lines: Vec<String> = elements
+        .into_iter()
+        .filter_map(|element| element.Text().ok())
+        .map(|text| text.to_string())
+        .collect();
+
+    let (title, body) = lines.split_first()?;
+
+    Some(GameNotification::new(title, body.join("\n")))
 }
 
 /// Keeps the display awake through a power request, the twin of the macOS

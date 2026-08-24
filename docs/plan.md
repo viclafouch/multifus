@@ -151,14 +151,21 @@ Ce chemin est déjà écrit et mesuré, mesure 4 : il rend `Dofus Retro.exe` et 
 **La danse `AttachThreadInput`, écrite une fois pour toutes.** `SetForegroundWindow` refuse quand le processus appelant n'a pas déjà le focus, et rend `FALSE` sans dire pourquoi. Le contournement documenté est d'attacher la file d'entrée de multifus à celle du processus qui a le focus, le temps de l'appel :
 
 ```rust
-let foreground_thread = GetWindowThreadProcessId(GetForegroundWindow(), None);
-let current_thread = GetCurrentThreadId();
-AttachThreadInput(current_thread, foreground_thread, true);
-// ShowWindow(SW_RESTORE) si IsIconic, puis SetForegroundWindow
-AttachThreadInput(current_thread, foreground_thread, false);
+let current = GetCurrentThreadId();
+let foreground = GetWindowThreadProcessId(GetForegroundWindow(), None);
+let owner = GetWindowThreadProcessId(target, None);
+AttachThreadInput(current, foreground, true);
+AttachThreadInput(current, owner, true);
+// ShowWindow(SW_RESTORE) si IsIconic, BringWindowToTop, puis SetForegroundWindow
+AttachThreadInput(current, owner, false);
+AttachThreadInput(current, foreground, false);
 ```
 
-Le détachement part quelle que soit l'issue, sinon multifus laisse derrière lui deux files d'entrée liées, ce qui se paie sur le bureau entier et pas dans multifus. Une structure avec un `Drop` le tient sans avoir à y penser, comme le keeper tient son handle.
+**Attacher la seule file du premier plan ne suffit pas, et ce plan disait le contraire.** Il faut y joindre le fil propriétaire de la fenêtre visée, et appeler `BringWindowToTop` avant `SetForegroundWindow`. Mesuré des deux côtés : la recette courte a ramené une fenêtre sur trois, la recette complète quatre sur quatre, dans la même condition et sur la même machine.
+
+Ce qui a rendu la mesure difficile mérite d'être écrit, parce qu'il se retendra à la prochaine panne de focus : **toutes les recettes marchent quand multifus vient de recevoir une frappe.** « Le processus a reçu le dernier événement d'entrée » est une des conditions qui autorisent `SetForegroundWindow`, donc un banc d'essai où l'on clique avant de mesurer donne cinq recettes gagnantes et n'apprend rien. C'est aussi pourquoi les quatre raccourcis marchaient pendant que l'AutoFocus échouait, sur la même ligne de code. Une notification n'apporte aucune entrée, et c'est la seule condition qui compte ici.
+
+Le détachement part quelle que soit l'issue, sinon multifus laisse derrière lui des files d'entrée liées, ce qui se paie sur le bureau entier et pas dans multifus. Une structure avec un `Drop` le tient sans avoir à y penser, comme le keeper tient son handle.
 
 `ShowWindow(SW_RESTORE)` entre dans l'attache et non avant : restaurer fait partie du focus, `platform::window` l'écrit, et une fenêtre sortie de la barre des tâches mais laissée derrière n'a pas été ramenée.
 
@@ -180,7 +187,9 @@ Le détachement part quelle que soit l'issue, sinon multifus laisse derrière lu
 
 `authorization` lit `GetAccessStatus`, `request_authorization` attend `RequestAccessAsync` sur place. Les trois valeurs du système se réduisent à deux : `Allowed` devient `Granted`, `Denied` et `Unspecified` deviennent `Denied`. Ils ne se réparent pourtant pas de la même façon, `Denied` ne pouvant plus être redemandé et `Unspecified` remontant la boîte au prochain appel, donc c'est le détail du journal qui les sépare et non le type. La documentation demande le fil d'interface pour `RequestAccessAsync` ; la mesure 1 l'a appelé depuis un fil ordinaire, sans boîte et sans erreur, l'accès étant déjà accordé.
 
-`start` sonde, et n'écrit pas la seconde route. `NotificationChanged` refuse l'abonnement de ce côté, mesure 2, donc `GetNotificationsAsync(NotificationKinds::Toast)` à l'intervalle du balayage, avec `UserNotification::Id` comme clé de dédoublonnage dans un ensemble qui suit ce que la plateforme tient encore, sans quoi il grossit toute la soirée. Le sondage reste **interne au watcher** : le cœur ne voit qu'un sink qui pousse, et ce module l'a écrit dès l'étape 3.
+`start` sonde, et n'écrit pas la seconde route. `NotificationChanged` refuse l'abonnement de ce côté, mesure 2, donc `GetNotificationsAsync(NotificationKinds::Toast)`, avec `UserNotification::Id` comme clé de dédoublonnage dans un ensemble qui suit ce que la plateforme tient encore, sans quoi il grossit toute la soirée. Le sondage reste **interne au watcher** : le cœur ne voit qu'un sink qui pousse, et ce module l'a écrit dès l'étape 3.
+
+**Le sondage est à 500 ms et non à l'intervalle du balayage, et ce plan disait le contraire.** Les trois secondes se tenaient tant que l'événement était la route principale et le sondage un repli. L'événement n'existant pas, ce délai est devenu celui de l'AutoFocus tout entier : trois secondes pour qu'une fenêtre remonte sur un tour de combat, là où macOS remonte à l'instant où la bannière est dessinée. Un appel WinRT deux fois par seconde ne se voit pas sur la machine, une seconde et demie d'attente moyenne se voit dans le jeu.
 
 Lire un toast, c'est `Notification().Visual().GetBinding(KnownNotificationBindings::ToastGeneric())` puis `GetTextElements()` : le premier élément est le titre, les suivants forment le corps joints par un saut de ligne. C'est exactement le couple que `GameNotification::new` attend, et la mesure 3 l'a vu sur un vrai message privé.
 
@@ -188,9 +197,13 @@ Lire un toast, c'est `Notification().Visual().GetBinding(KnownNotificationBindin
 
 `dismiss` est `RemoveNotification(id)`, donc le watcher garde une table pseudo vers identifiants, alimentée à chaque toast lu et purgée à chaque suppression. **Jamais `ClearNotifications`**, qui efface les notifications de toutes les applications, y compris celles que multifus n'a jamais lues. `stop` arrête le fil du sondage, et `Drop` fait la même chose.
 
+**`dismiss` met en file et ne supprime pas sur place, et c'est la règle du verrou qui le décide.** Il est appelé depuis `on_notification`, qui tourne sur le fil du watcher, alors que `start` et `stop` tiennent le mutex de `WatcherState` pendant un `join` de ce fil-là. Deux conséquences, et aucune n'est un détail : le watcher pousse le pseudo dans sa propre table et le tour de sondage suivant appelle `RemoveNotification`, ce qui ne joint jamais rien ; et le site d'appel prend ce mutex en `try_lock`, une suppression sautée pendant que l'écoute se reconstruit n'ayant plus rien à supprimer. C'est le premier appelant de `dismiss` du projet, macOS n'en ayant jamais eu.
+
 **Ce que l'utilisateur doit régler, et ce n'est pas ce que macOS demande.** Dans le jeu, « Background Notifications » doit être activé dans les options générales : un client qui n'émet rien rend le listener muet, et c'est la panne numéro un de tous les outils qui font ça. Côté système il n'y a rien à demander, la mesure 1 ayant trouvé l'accès déjà accordé ; l'écran des autorisations garde quand même le cas refusé, que l'utilisateur peut couper à la main. En revanche, et c'est l'inverse exact de macOS, **la bannière peut rester coupée** : l'écoute passe par une API et non par ce que l'écran dessine, donc le style et le son du toast de Dofus n'ont aucune importance. La contrainte de l'ADR 0002 ne se transporte pas, elle est propre à macOS.
 
-**Une bannière coupée n'est pas une bannière absente, et ce n'est pas mesuré.** Dracoon relève que Windows ne masque pas une bannière désactivée mais la rend à 100 % de transparence, et qu'un focus posé pendant qu'elle est encore à l'écran ne prenait pas. Seconde main, non vérifié. Ne rien écrire contre ça tant que le symptôme n'apparaît pas.
+**La bannière ne bloque pas le focus, et Dracoon laissait croire le contraire.** Il relève que Windows ne masque pas une bannière désactivée mais la rend à 100 % de transparence, et qu'un focus posé pendant qu'elle est encore à l'écran ne prenait pas. Mesuré ici et faux : quatre toasts sur quatre, bannière à l'écran, la fenêtre remonte en 130 ms. Le symptôme que ce paragraphe attendait est bien apparu, et il venait d'ailleurs, voir la recette d'attache au lot A. Ne pas rouvrir cette piste.
+
+**Écrit, l'AutoFocus vérifié, la suppression des toasts non.** Deux messages privés d'affilée ramènent la bonne fenêtre, dont le second, qui est celui que la recette courte refusait. Restent à voir un second type de notification et un toast qui quitte le centre de notifications.
 
 **Vérifié quand** : l'AutoFocus ramène la bonne fenêtre sur trois types distincts, et un toast disparaît du centre de notifications une fois sa fenêtre devant.
 
@@ -223,6 +236,8 @@ Le renommage est déjà fait, pour que la structure vide ne promette plus l'appe
 **L'image de barre système ne marche pas telle quelle.** `icons/tray.png` est un PNG noir pur dont la forme est portée par le seul canal alpha, posé avec `icon_as_template(true)` pour que macOS le recolore selon la barre. Windows ne recolore rien : le même fichier donne une icône noire sur une barre des tâches sombre, donc invisible. Il faut une seconde image, et `icon_as_template` ne vaut que sur macOS.
 
 **Le démarrage avec la session change de mécanisme et pas de forme.** `tauri-plugin-autostart` écrit une clé de registre `Run` au lieu d'un `LaunchAgent`, et porte l'argument `--from-session` de la même façon. `app::autostart::reconcile` réécrit l'enregistrement à chaque lancement et couvre les deux systèmes sans rien changer. Reste à confirmer que `is_enabled()` n'est pas plus fiable ici qu'il ne l'est sur macOS ; la configuration porte l'intention de toute façon.
+
+**Et il échoue de ce côté, chaque lancement l'écrit.** `Démarrage avec la session impossible : Le fichier spécifié est introuvable. (os error 2)`, vu au lot B sur un `tauri dev`. Une piste avant d'en ouvrir d'autres : en développement le binaire lancé n'est pas celui d'une installation, et le plugin enregistre un chemin. À reprendre sur un paquet installé avant de conclure à un bug du plugin.
 
 **Les raccourcis échouent franchement, et il n'y a rien à écrire.** Windows refuse une combinaison déjà prise, contrairement à macOS où l'enregistrement réussit et la touche reste morte. L'écran des raccourcis affiche déjà cet échec. `Control+Shift+flèche` n'est pas réservé par Windows, qui prend `Win+Control+flèche` pour ses bureaux, donc les combinaisons proposées au premier lancement conviennent aux deux systèmes.
 
