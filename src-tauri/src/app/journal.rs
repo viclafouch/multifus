@@ -222,11 +222,12 @@ pub enum JournalEvent {
     /// is repaired. Never the text.
     QuickReplyFailed { reason: QuickReplyFailure },
 
-    /// A client had just opened and its window was filled to the screen.
-    WindowMaximized { nickname: String },
+    /// A client had just opened and its window was filled to the screen. No
+    /// pseudo: it is filled on sight, and the login screen carries none.
+    ClientMaximized,
 
     /// A client had just opened and its window would not be filled.
-    WindowMaximizeFailed { nickname: String, detail: String },
+    ClientMaximizeFailed { detail: String },
 
     /// A character was clicked in the system tray, and this is what came of it.
     TrayFocus {

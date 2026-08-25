@@ -63,6 +63,7 @@ use windows::Win32::UI::WindowsAndMessaging::BringWindowToTop;
 use windows::Win32::UI::WindowsAndMessaging::DispatchMessageW;
 use windows::Win32::UI::WindowsAndMessaging::EnumWindows;
 use windows::Win32::UI::WindowsAndMessaging::GetForegroundWindow;
+use windows::Win32::UI::WindowsAndMessaging::GetWindow;
 use windows::Win32::UI::WindowsAndMessaging::GetWindowTextLengthW;
 use windows::Win32::UI::WindowsAndMessaging::GetWindowTextW;
 use windows::Win32::UI::WindowsAndMessaging::GetWindowThreadProcessId;
@@ -75,6 +76,7 @@ use windows::Win32::UI::WindowsAndMessaging::SetWindowPos;
 use windows::Win32::UI::WindowsAndMessaging::ShowWindow;
 use windows::Win32::UI::WindowsAndMessaging::SystemParametersInfoW;
 use windows::Win32::UI::WindowsAndMessaging::TranslateMessage;
+use windows::Win32::UI::WindowsAndMessaging::GW_OWNER;
 use windows::Win32::UI::WindowsAndMessaging::MSG;
 use windows::Win32::UI::WindowsAndMessaging::PM_REMOVE;
 use windows::Win32::UI::WindowsAndMessaging::SPI_GETSCREENSAVEACTIVE;
@@ -195,6 +197,16 @@ impl WindowManager for Win32WindowManager {
         ))
     }
 
+    fn client_windows(&self) -> Result<Vec<WindowId>> {
+        let mut clients: Vec<WindowId> = Vec::new();
+        let sink = std::ptr::from_mut(&mut clients) as isize;
+
+        unsafe { EnumWindows(Some(collect_client_window), LPARAM(sink)) }
+            .map_err(|error| PlatformError::system("EnumWindows", error.to_string()))?;
+
+        Ok(clients)
+    }
+
     fn maximize(&self, window: WindowId) -> Result<()> {
         let handle = live_game_window(window)?;
         let work = work_area(handle)?;
@@ -288,6 +300,28 @@ unsafe extern "system" fn collect_game_window(handle: HWND, lparam: LPARAM) -> B
     }
 
     CONTINUE_ENUMERATION
+}
+
+/// Collects the client windows of the desktop, one call per window.
+unsafe extern "system" fn collect_client_window(handle: HWND, lparam: LPARAM) -> BOOL {
+    let clients = unsafe { &mut *(lparam.0 as *mut Vec<WindowId>) };
+
+    if is_client_window(handle) {
+        clients.push(window_id(handle));
+    }
+
+    CONTINUE_ENUMERATION
+}
+
+/// Whether a Dofus client draws this window for itself, login screen included.
+/// An owned window is one of its dialogs and is left where it is.
+fn is_client_window(handle: HWND) -> bool {
+    if !unsafe { IsWindowVisible(handle) }.as_bool() || !runs_dofus(handle) {
+        return false;
+    }
+
+    // A window with no owner answers either an error or a null handle.
+    unsafe { GetWindow(handle, GW_OWNER) }.map_or(true, |owner| owner.is_invalid())
 }
 
 /// Keeps a window only when a Dofus client draws it and its title has a nickname.

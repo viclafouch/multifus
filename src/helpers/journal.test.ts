@@ -809,20 +809,16 @@ const JOURNAL_CASES = {
       line: `${DETAILED_LINES.windowFailed} : ${DETAIL}`
     }
   ],
-  windowMaximized: [
+  clientMaximized: [
     {
-      event: { kind: 'windowMaximized', nickname: NICKNAME },
-      line: 'Alpha vient d’ouvrir : sa fenêtre a été agrandie à l’écran.'
+      event: { kind: 'clientMaximized' },
+      line: PLAIN_LINES.clientMaximized
     }
   ],
-  windowMaximizeFailed: [
+  clientMaximizeFailed: [
     {
-      event: {
-        kind: 'windowMaximizeFailed',
-        nickname: NICKNAME,
-        detail: DETAIL
-      },
-      line: `Alpha vient d’ouvrir : le système a refusé d’agrandir sa fenêtre (${DETAIL}).`
+      event: { kind: 'clientMaximizeFailed', detail: DETAIL },
+      line: `${DETAILED_LINES.clientMaximizeFailed} : ${DETAIL}`
     }
   ],
   configLoadFailed: [

@@ -14,6 +14,6 @@ export const SETTINGS_STRINGS = {
       : 'Fermer la fenêtre ne quitte plus Multifus : il continue dans la barre système, à côté de l’horloge, et c’est de là qu’on le quitte.',
     maximizeLabel: 'Agrandir les fenêtres au lancement',
     maximizeDescription:
-      'Un client qui s’ouvre remplit l’écran, une seule fois : le réduire ensuite le laisse réduit. Les fenêtres déjà ouvertes ne bougent pas.'
+      'Un client qui s’ouvre remplit l’écran dès la connexion, une seule fois : le réduire ensuite le laisse réduit. Les fenêtres déjà ouvertes ne bougent pas.'
   }
 } as const

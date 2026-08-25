@@ -48,8 +48,8 @@ export const TONES = {
   snapshotFailed: 'warning',
   trayFailed: 'warning',
   windowFailed: 'warning',
-  windowMaximized: 'good',
-  windowMaximizeFailed: 'warning',
+  clientMaximized: 'good',
+  clientMaximizeFailed: 'warning',
   startAtLoginReconciled: 'neutral',
   startAtLoginFailed: 'warning',
   updateAvailable: 'good',
@@ -124,11 +124,11 @@ export const TRAY_TONES = {
 
 /**
  * The events whose whole line is a stock phrase and the reason the system gave.
- * The two exceptions name something of their own, a file and a character.
+ * `configLoadFailed` is not one of them: it has to name where the file went.
  */
 type DetailedEventKind = Exclude<
   Extract<JournalEvent, { readonly detail: string }>['kind'],
-  'configLoadFailed' | 'windowMaximizeFailed'
+  'configLoadFailed'
 >
 
 /** What each of them says before the colon. */
@@ -141,6 +141,7 @@ export const DETAILED_LINES = {
   snapshotFailed: 'La fenêtre n’a pas reçu le tableau de bord',
   startAtLoginFailed: 'Démarrage avec la session impossible',
   scanFailed: 'Lecture des fenêtres impossible',
+  clientMaximizeFailed: 'Agrandissement de la fenêtre d’un client impossible',
   saveFailed: 'Configuration non enregistrée',
   configNotSetAside:
     'Configuration illisible et impossible à déplacer, le prochain enregistrement l’écrasera',
@@ -165,6 +166,8 @@ type WithoutPayload<Event> = Event extends { readonly kind: string }
 /** Each of them is one fact with nothing to add about it. */
 export const PLAIN_LINES = {
   listening: 'Écoute des notifications démarrée.',
+  clientMaximized:
+    'Un client Dofus vient d’ouvrir : sa fenêtre a été agrandie à l’écran.',
   updateUpToDate: 'Aucune version plus récente.',
   // Neither line names the salon. It is not a notification body, so the rule of
   // l'ADR 0006 does not reach it, but this journal is a file one hands over.

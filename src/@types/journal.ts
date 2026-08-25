@@ -111,6 +111,10 @@ export type JournalEvent =
   | { readonly kind: 'authorization'; readonly granted: boolean }
   | { readonly kind: 'characterOffline'; readonly nickname: string }
   | { readonly kind: 'characterOnline'; readonly nickname: string }
+  /** No pseudo: a client is filled to the screen on sight, and the login screen
+   * carries none. */
+  | { readonly kind: 'clientMaximized' }
+  | { readonly kind: 'clientMaximizeFailed'; readonly detail: string }
   | { readonly kind: 'configNotSetAside'; readonly detail: string }
   | { readonly kind: 'displayAwake'; readonly held: boolean }
   | { readonly kind: 'displayAwakeFailed'; readonly detail: string }
@@ -150,12 +154,6 @@ export type JournalEvent =
   | { readonly kind: 'updateFailed'; readonly detail: string }
   | { readonly kind: 'updateUpToDate' }
   | { readonly kind: 'windowFailed'; readonly detail: string }
-  | { readonly kind: 'windowMaximized'; readonly nickname: string }
-  | {
-      readonly kind: 'windowMaximizeFailed'
-      readonly nickname: string
-      readonly detail: string
-    }
   | {
       readonly kind: 'authorizationRequested'
       readonly granted: boolean

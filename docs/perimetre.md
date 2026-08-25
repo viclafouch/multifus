@@ -22,7 +22,7 @@ Ce principe arbitre tous les compromis. Une fonctionnalité qui exige d'ouvrir l
 
 **Réponses rapides.** On range sous une combinaison un texte qu'on écrit souvent, « prix libre », « de rien ». La combinaison frappée depuis le jeu colle ce texte dans le chat, et s'arrête là : l'envoi reste un geste de l'utilisateur. Le presse-papiers d'avant est rendu. C'est la seule chose que multifus écrive vers le jeu, et elle a son [ADR 0012](./adr/0012-une-reponse-rapide-se-colle-dans-le-jeu.md).
 
-**Agrandissement au lancement.** Un client qui s'ouvre remplit l'écran tout seul, une seule fois. Réglage décoché par défaut : multifus ne déplace aucune fenêtre sans qu'on le lui ait demandé. Une fois coché, il ne s'applique qu'aux clients ouverts ensuite, et jamais à ceux qui sont déjà là.
+**Agrandissement au lancement.** Un client qui s'ouvre remplit l'écran tout seul, une seule fois, dès l'écran de connexion et sans attendre qu'un personnage soit choisi. Réglage décoché par défaut : multifus ne déplace aucune fenêtre sans qu'on le lui ait demandé. Une fois coché, il ne s'applique qu'aux clients ouverts ensuite, et jamais à ceux qui sont déjà là.
 
 **Relais.** On quitte son bureau, on active le relais depuis la barre système ou depuis l'écran Relais, et chaque message privé reçu par un personnage relayé arrive dans un salon Telegram sur le téléphone. Un des quatre raccourcis frappé signifie qu'on est revenu et coupe le relais. Tant qu'un personnage relayé est connecté, l'écran est tenu éveillé, sans quoi le verrouillage de session couperait la lecture des bannières et le relais deviendrait muet sans le dire. Le pseudo et le type partent toujours, le texte du message seulement si l'utilisateur l'a coché.
 

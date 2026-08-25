@@ -572,8 +572,6 @@ type RunEventKind =
   | 'startAtLoginReconciled'
   | 'started'
   | 'updateAvailable'
-  | 'windowMaximizeFailed'
-  | 'windowMaximized'
 
 /** And the ones the user caused, which is everything left. */
 type ActionEventKind = Exclude<ComposedEventKind, RunEventKind>
@@ -593,9 +591,7 @@ const RUN_KINDS = new Set<ComposedEventKind>([
   'shortcutsBound',
   'startAtLoginReconciled',
   'started',
-  'updateAvailable',
-  'windowMaximizeFailed',
-  'windowMaximized'
+  'updateAvailable'
 ] as const satisfies readonly RunEventKind[])
 
 const isRunEvent = (
@@ -655,12 +651,6 @@ const runLine = (event: EventOf<RunEventKind>) => {
     }
     case 'displayAwake': {
       return displayAwakeLine(event.held)
-    }
-    case 'windowMaximized': {
-      return `${event.nickname} vient d’ouvrir : sa fenêtre a été agrandie à l’écran.`
-    }
-    case 'windowMaximizeFailed': {
-      return `${event.nickname} vient d’ouvrir : le système a refusé d’agrandir sa fenêtre (${event.detail}).`
     }
     default: {
       return ''

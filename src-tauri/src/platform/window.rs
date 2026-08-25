@@ -144,6 +144,14 @@ pub trait WindowManager: Send + Sync {
     /// [`PlatformError::WindowGone`]: crate::platform::PlatformError::WindowGone
     fn focus(&self, window: WindowId) -> Result<()>;
 
+    /// Every window a Dofus client draws right now, login screen included.
+    ///
+    /// The one place a window exists without a nickname, and deliberately so:
+    /// what is filled to the screen is a client that has just opened, and a
+    /// client sitting on the login screen has opened. Nothing else may use this,
+    /// the roster reads [`WindowManager::game_windows`].
+    fn client_windows(&self) -> Result<Vec<WindowId>>;
+
     /// Fills the work area of its screen with a window, without ever asking for
     /// the focus.
     ///

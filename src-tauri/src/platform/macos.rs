@@ -634,10 +634,37 @@ impl WindowManager for AccessibilityWindowManager {
         set_frontmost(&element)
     }
 
+    fn client_windows(&self) -> Result<Vec<WindowId>> {
+        if !accessibility_authorization().is_granted() {
+            return Err(PlatformError::AuthorizationDenied);
+        }
+
+        let mut clients = Vec::new();
+
+        for application in dofus_applications() {
+            let pid = application.processIdentifier();
+            let Ok(raw) = u64::try_from(pid) else {
+                continue;
+            };
+
+            // SAFETY: the pid is the one the system just reported for a running
+            // application, and the call is valid for any pid anyway.
+            let element = unsafe { AXUIElement::new_application(pid) };
+
+            // A client whose window is not drawn yet must not be counted, or it
+            // would be known before there was anything to fill.
+            if !windows_of(&element)?.is_empty() {
+                clients.push(WindowId::from_raw(raw));
+            }
+        }
+
+        Ok(clients)
+    }
+
     fn maximize(&self, window: WindowId) -> Result<()> {
         let (_, element) = live_application(window)?;
 
-        let Some(game_window) = game_window_element(&element)? else {
+        let Some(game_window) = windows_of(&element)?.into_iter().next() else {
             return Err(PlatformError::WindowGone);
         };
 
