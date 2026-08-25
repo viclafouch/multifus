@@ -222,6 +222,12 @@ pub enum JournalEvent {
     /// is repaired. Never the text.
     QuickReplyFailed { reason: QuickReplyFailure },
 
+    /// A client had just opened and its window was filled to the screen.
+    WindowMaximized { nickname: String },
+
+    /// A client had just opened and its window would not be filled.
+    WindowMaximizeFailed { nickname: String, detail: String },
+
     /// A character was clicked in the system tray, and this is what came of it.
     TrayFocus {
         nickname: String,
@@ -420,6 +426,9 @@ pub enum SettingChange {
 
     /// Whether the AutoFocus reaches into the Dock.
     WakesMinimized { wakes: bool, from: Surface },
+
+    /// Whether a game window is filled to the screen when it first appears.
+    MaximizeOnLaunch { maximize: bool },
 
     /// Whether the text of a private message goes out with it, ADR 0008. The
     /// window only: one does not decide the privacy of a message in passing,

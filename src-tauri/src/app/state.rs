@@ -13,6 +13,7 @@
 //! of deadlock, and not holding the two at once is enough to make it impossible.
 
 use std::collections::HashMap;
+use std::collections::HashSet;
 use std::sync::Mutex;
 use std::sync::MutexGuard;
 use std::sync::PoisonError;
@@ -96,6 +97,16 @@ pub struct Multifus {
     /// Where each connected character's window is. Refilled by every scan, since
     /// a [`WindowId`] means nothing once its window is gone.
     windows: HashMap<String, WindowId>,
+    /// Every window Multifus has already seen in this run, which is what makes a
+    /// new one new.
+    ///
+    /// It grows and is never pruned, so a client that Dofus disconnects for
+    /// inactivity is still known when it comes back: its title loses the pseudo,
+    /// its window leaves the scan, and it must not read as a launch on return.
+    ///
+    /// `None` until a scan has looked. Three states and not two: on a first turn
+    /// every window is unknown, and none of them was just launched.
+    seen_windows: Option<HashSet<WindowId>>,
     /// The system lets Multifus read window titles and hear the banners.
     ///
     /// `None` until the first scan has asked. Three states and not two, so that
@@ -210,6 +221,7 @@ impl Multifus {
             settings,
             shortcut_statuses: HashMap::new(),
             windows: HashMap::new(),
+            seen_windows: None,
             granted: None,
             listening: false,
             problem,
@@ -240,6 +252,7 @@ impl Multifus {
                 .map(view_of)
                 .collect(),
             start_at_login: self.settings.start_at_login,
+            maximize_on_launch: self.settings.maximize_on_launch,
             shortcuts: ShortcutAction::ALL
                 .into_iter()
                 .map(|action| ShortcutView {
@@ -647,6 +660,21 @@ impl Multifus {
         self.save();
     }
 
+    /// Whether a game window is filled to the screen when it first appears.
+    #[must_use]
+    pub fn maximizes_on_launch(&self) -> bool {
+        self.settings.maximize_on_launch
+    }
+
+    pub fn set_maximize_on_launch(&mut self, maximize: bool) {
+        self.settings.maximize_on_launch = maximize;
+
+        self.log(JournalEvent::Setting {
+            change: SettingChange::MaximizeOnLaunch { maximize },
+        });
+        self.save();
+    }
+
     /// Flips one of the seven switches. Global, never per character.
     ///
     /// The window only, so no surface travels with it: the menu has no room for
@@ -978,6 +1006,7 @@ impl Multifus {
     pub fn apply_windows(&mut self, windows: &[GameWindow]) -> ScanChange {
         let mut changed = self.set_granted(true);
         let mut relayed_gone = Vec::new();
+        let appeared = self.take_appeared(windows);
 
         self.windows = windows
             .iter()
@@ -1032,7 +1061,27 @@ impl Multifus {
             changed = true;
         }
 
-        self.scan_change(changed, relayed_gone)
+        self.scan_change(changed, relayed_gone, appeared)
+    }
+
+    /// The windows this turn sees and no earlier turn did, in the order the
+    /// system gave them. Empty on the first turn of a run, and on the first one
+    /// after the authorization came back.
+    fn take_appeared(&mut self, windows: &[GameWindow]) -> Vec<AppearedWindow> {
+        let Some(seen) = self.seen_windows.as_mut() else {
+            self.seen_windows = Some(windows.iter().map(GameWindow::id).collect());
+
+            return Vec::new();
+        };
+
+        windows
+            .iter()
+            .filter(|window| seen.insert(window.id()))
+            .map(|window| AppearedWindow {
+                nickname: window.nickname().to_owned(),
+                window: window.id(),
+            })
+            .collect()
     }
 
     /// Where a character's window is, if Multifus can still see one.
@@ -1058,6 +1107,7 @@ impl Multifus {
         let mut relayed_gone = Vec::new();
 
         self.windows.clear();
+        self.seen_windows = None;
 
         let still_online = self
             .settings
@@ -1080,16 +1130,22 @@ impl Multifus {
             changed = true;
         }
 
-        self.scan_change(changed, relayed_gone)
+        self.scan_change(changed, relayed_gone, Vec::new())
     }
 
     /// What one turn leaves the relay to say, once the roster has taken the scan
     /// in. See [`ScanChange`].
-    fn scan_change(&self, changed: bool, relayed_gone: Vec<String>) -> ScanChange {
+    fn scan_change(
+        &self,
+        changed: bool,
+        relayed_gone: Vec<String>,
+        appeared: Vec<AppearedWindow>,
+    ) -> ScanChange {
         ScanChange {
             changed,
             relayed_gone,
             none_relayed_left: !self.settings.roster.has_relayed_online(),
+            appeared,
         }
     }
 
@@ -1307,6 +1363,16 @@ pub struct ScanChange {
     pub relayed_gone: Vec<String>,
     /// And no relayed character is connected any more.
     pub none_relayed_left: bool,
+    /// The windows that were not there a turn ago, which is what a client just
+    /// launched looks like. See [`crate::app::runtime`].
+    pub appeared: Vec<AppearedWindow>,
+}
+
+/// A game window Multifus is seeing for the first time.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AppearedWindow {
+    pub nickname: String,
+    pub window: WindowId,
 }
 
 /// What [`Multifus::decide`] concluded about a game notification.
@@ -1931,6 +1997,108 @@ mod tests {
         state.set_quick_reply_text(id, "de rien");
 
         assert_eq!(state.quick_reply_text(id).as_deref(), Some("de rien"));
+    }
+
+    #[test]
+    fn the_first_scan_of_a_run_finds_nothing_that_has_just_opened() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        let change = state.apply_windows(&[window(1, "Alpha"), window(2, "Bravo")]);
+
+        assert_eq!(change.appeared, Vec::new());
+    }
+
+    #[test]
+    fn a_client_opened_after_the_first_scan_is_the_only_one_that_appears() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha")]);
+
+        let change = state.apply_windows(&[window(1, "Alpha"), window(2, "Bravo")]);
+
+        assert_eq!(
+            change.appeared,
+            vec![AppearedWindow {
+                nickname: "Bravo".to_owned(),
+                window: WindowId::from_raw(2),
+            }]
+        );
+    }
+
+    #[test]
+    fn a_window_that_stays_open_never_appears_twice() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha")]);
+        state.apply_windows(&[window(1, "Alpha"), window(2, "Bravo")]);
+
+        let change = state.apply_windows(&[window(1, "Alpha"), window(2, "Bravo")]);
+
+        assert_eq!(change.appeared, Vec::new());
+    }
+
+    #[test]
+    fn a_client_disconnected_for_inactivity_does_not_appear_again_on_reconnection() {
+        // Dofus drops the pseudo from the title after a quarter of an hour, so
+        // the window leaves the scan without the client being closed.
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha")]);
+        state.apply_windows(&[]);
+
+        let change = state.apply_windows(&[window(1, "Alpha")]);
+
+        assert_eq!(change.appeared, Vec::new());
+    }
+
+    #[test]
+    fn an_authorization_taken_away_and_given_back_opens_nothing() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha")]);
+        state.apply_denied();
+
+        let change = state.apply_windows(&[window(1, "Alpha")]);
+
+        assert_eq!(change.appeared, Vec::new());
+    }
+
+    #[test]
+    fn a_scan_that_finds_nobody_leaves_the_next_client_to_appear() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[]);
+
+        let change = state.apply_windows(&[window(1, "Alpha")]);
+
+        assert_eq!(
+            change.appeared,
+            vec![AppearedWindow {
+                nickname: "Alpha".to_owned(),
+                window: WindowId::from_raw(1),
+            }]
+        );
+    }
+
+    #[test]
+    fn nothing_is_filled_to_the_screen_until_somebody_asks_for_it() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        assert!(!state.maximizes_on_launch());
+
+        state.set_maximize_on_launch(true);
+
+        assert!(state.maximizes_on_launch());
+        assert!(state.snapshot().maximize_on_launch);
+        assert!(
+            journalled(&state).contains(&JournalEvent::Setting {
+                change: SettingChange::MaximizeOnLaunch { maximize: true }
+            }),
+            "{:?}",
+            journalled(&state)
+        );
     }
 
     #[test]

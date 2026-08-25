@@ -1,5 +1,5 @@
 /**
- * Everything the five screens draw, in one piece. One payload for the whole
+ * Everything the six screens draw, in one piece. One payload for the whole
  * board is what keeps two panels from ever disagreeing.
  */
 
@@ -10,12 +10,13 @@ import type { Character } from '@/@types/roster'
 import type { QuickReply, ShortcutBinding } from '@/@types/shortcuts'
 import type { Authorization, ConfigStatus, UpdateStatus } from '@/@types/system'
 
-/** One of the five screens the window can show. */
+/** One of the six screens the window can show. */
 export type ScreenName =
   | 'about'
   | 'autoFocus'
   | 'characters'
   | 'relay'
+  | 'settings'
   | 'shortcuts'
 
 export type Snapshot = {
@@ -40,6 +41,8 @@ export type Snapshot = {
   readonly wakesMinimized: boolean
   /** What the user asked for, not what the system currently holds. */
   readonly startAtLogin: boolean
+  /** A game window is filled to the screen the first time Multifus sees it. */
+  readonly maximizeOnLaunch: boolean
   readonly authorization: Authorization
   readonly config: ConfigStatus
   /** Where Multifus is with the version that is published. */

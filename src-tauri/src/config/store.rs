@@ -363,6 +363,7 @@ mod tests {
                 toggle_asleep: None,
                 swap: Shortcut::new("Alt+Space"),
             },
+            maximize_on_launch: true,
             quick_replies: vec![QuickReply {
                 id: QuickReplyId::default().next(),
                 text: "prix libre".to_owned(),

@@ -55,6 +55,8 @@ windows = { version = "0.62", features = [
   "UI_Notifications",
   "UI_Notifications_Management",
   "Win32_Foundation",
+  # The work area an agrandissement fills, taskbar left out.
+  "Win32_Graphics_Gdi",
   "Win32_System_Com",
   "Win32_System_Power",
   "Win32_System_Threading",
@@ -69,10 +71,15 @@ windows = { version = "0.62", features = [
 [target.'cfg(target_os = "macos")'.dependencies]
 libc = "0.2"
 objc2 = "0.6"
+# Already in the lock file as an indirect dependency. The hop to the main thread
+# `NSScreen` demands, and nothing else in the crate, see `platform::macos`.
+dispatch2 = "0.3"
 objc2-app-kit = { version = "0.3", default-features = false, features = [
   "std",
   "libc",
   "NSRunningApplication",
+  # The work area a maximized window fills, which no Core Graphics call gives.
+  "NSScreen",
 ] }
 objc2-application-services = { version = "0.3", default-features = false, features = [
   "std",
@@ -80,6 +87,8 @@ objc2-application-services = { version = "0.3", default-features = false, featur
   "HIServices",
   "AXError",
   "AXUIElement",
+  # A window's position and size cross the API wrapped in one of these.
+  "AXValue",
 ] }
 # The paste combination of ADR 0012, and nothing else in the crate calls it.
 objc2-core-graphics = { version = "0.3", default-features = false, features = [

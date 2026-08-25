@@ -29,16 +29,21 @@ use std::thread;
 use std::thread::JoinHandle;
 use std::time::Duration;
 
+use dispatch2::DispatchQueue;
 use libc::pid_t;
 use objc2::rc::Retained;
+use objc2::MainThreadMarker;
 use objc2_app_kit::NSApplicationActivationOptions;
 use objc2_app_kit::NSRunningApplication;
+use objc2_app_kit::NSScreen;
 use objc2_application_services::kAXTrustedCheckOptionPrompt;
 use objc2_application_services::AXError;
 use objc2_application_services::AXIsProcessTrusted;
 use objc2_application_services::AXIsProcessTrustedWithOptions;
 use objc2_application_services::AXObserver;
 use objc2_application_services::AXUIElement;
+use objc2_application_services::AXValue;
+use objc2_application_services::AXValueType;
 use objc2_core_foundation::kCFBooleanFalse;
 use objc2_core_foundation::kCFBooleanTrue;
 use objc2_core_foundation::kCFPreferencesCurrentHost;
@@ -53,6 +58,10 @@ use objc2_core_foundation::CFRetained;
 use objc2_core_foundation::CFRunLoop;
 use objc2_core_foundation::CFString;
 use objc2_core_foundation::CFType;
+use objc2_core_foundation::CGFloat;
+use objc2_core_foundation::CGPoint;
+use objc2_core_foundation::CGRect;
+use objc2_core_foundation::CGSize;
 use objc2_core_graphics::CGEvent;
 use objc2_core_graphics::CGEventFlags;
 use objc2_core_graphics::CGEventSource;
@@ -90,6 +99,8 @@ const NOTIFICATION_CENTRE_BUNDLE_ID: &str = "com.apple.notificationcenterui";
 const AX_TITLE: &str = "AXTitle";
 const AX_MAIN_WINDOW: &str = "AXMainWindow";
 const AX_MINIMIZED: &str = "AXMinimized";
+const AX_POSITION: &str = "AXPosition";
+const AX_SIZE: &str = "AXSize";
 const AX_WINDOWS: &str = "AXWindows";
 const AX_CHILDREN: &str = "AXChildren";
 const AX_ROLE: &str = "AXRole";
@@ -414,6 +425,122 @@ fn restore(window: &AXUIElement) -> Result<()> {
     }
 }
 
+/// Reads an attribute that holds a point, which crosses wrapped in an `AXValue`.
+fn point_attribute(element: &AXUIElement, name: &str) -> Result<Option<CGPoint>> {
+    let Some(value) = attribute(element, name)? else {
+        return Ok(None);
+    };
+
+    let Ok(value) = value.downcast::<AXValue>() else {
+        return Ok(None);
+    };
+
+    let mut point = CGPoint::ZERO;
+
+    // SAFETY: the type asked for is the one `point` holds.
+    let read = unsafe { value.value(AXValueType::CGPoint, NonNull::from(&mut point).cast()) };
+
+    Ok(read.then_some(point))
+}
+
+fn set_position(window: &AXUIElement, mut position: CGPoint) -> Result<()> {
+    // SAFETY: the pointer is to a live `CGPoint`, which is the type named.
+    let value = unsafe { AXValue::new(AXValueType::CGPoint, NonNull::from(&mut position).cast()) };
+
+    set_window_value(window, AX_POSITION, value.as_deref(), "moving a window")
+}
+
+fn set_size(window: &AXUIElement, mut size: CGSize) -> Result<()> {
+    // SAFETY: the pointer is to a live `CGSize`, which is the type named.
+    let value = unsafe { AXValue::new(AXValueType::CGSize, NonNull::from(&mut size).cast()) };
+
+    set_window_value(window, AX_SIZE, value.as_deref(), "resizing a window")
+}
+
+fn set_window_value(
+    window: &AXUIElement,
+    name: &str,
+    value: Option<&AXValue>,
+    operation: &'static str,
+) -> Result<()> {
+    let Some(value) = value else {
+        return Err(PlatformError::system(
+            operation,
+            "AXValueCreate returned nothing",
+        ));
+    };
+
+    let name = CFString::from_str(name);
+
+    // SAFETY: the attribute takes the structure that was just encoded into it.
+    let status = unsafe { window.set_attribute_value(&name, value) };
+
+    match status {
+        AXError::InvalidUIElement | AXError::CannotComplete => Err(PlatformError::WindowGone),
+        other => ax_result(other, operation),
+    }
+}
+
+/// The work area of the screen a window sits on, in the flipped coordinates the
+/// Accessibility API reads and writes.
+fn work_area(position: CGPoint) -> Option<CGRect> {
+    on_main_thread(move |marker| {
+        let screens = NSScreen::screens(marker);
+        // AppKit places every screen relative to the first, so its height is
+        // what the two coordinate systems are flipped around.
+        let flip = screens.firstObject()?.frame().size.height;
+
+        let screen = screens
+            .iter()
+            .find(|screen| holds(flipped(screen.frame(), flip), position))
+            .or_else(|| NSScreen::mainScreen(marker))?;
+
+        Some(flipped(screen.visibleFrame(), flip))
+    })
+    .flatten()
+}
+
+/// A Cocoa rectangle in the flipped coordinates the Accessibility API uses,
+/// where the origin is the top left corner and y grows downwards.
+fn flipped(frame: CGRect, flip: CGFloat) -> CGRect {
+    CGRect::new(
+        CGPoint::new(frame.origin.x, flip - frame.max().y),
+        frame.size,
+    )
+}
+
+/// Whether a screen holds this corner, both far edges excluded so that two
+/// screens side by side never both answer yes. Flipped coordinates on both
+/// sides, or a window flush against the top of a screen would land on the one
+/// above it.
+fn holds(frame: CGRect, corner: CGPoint) -> bool {
+    let (min, max) = (frame.min(), frame.max());
+
+    corner.x >= min.x && corner.x < max.x && corner.y >= min.y && corner.y < max.y
+}
+
+/// Runs a piece of AppKit on the main thread, `NSScreen` being main thread only
+/// and the window scan a thread of its own. `None` when the work panicked, which
+/// must not cross back through the dispatch queue.
+fn on_main_thread<T: Send>(work: impl FnOnce(MainThreadMarker) -> T + Send) -> Option<T> {
+    if let Some(marker) = MainThreadMarker::new() {
+        return Some(work(marker));
+    }
+
+    let mut done = None;
+
+    DispatchQueue::main().exec_sync(|| {
+        done = catch_unwind(AssertUnwindSafe(|| {
+            let marker = MainThreadMarker::new().expect("the main queue runs on the main thread");
+
+            work(marker)
+        }))
+        .ok();
+    });
+
+    done
+}
+
 /// Reads windows and changes focus through the macOS Accessibility API.
 ///
 /// A [`WindowId`] here carries the pid of the client process.
@@ -505,6 +632,32 @@ impl WindowManager for AccessibilityWindowManager {
         // `AXFrontmost` asks for the same thing through the authorization
         // Multifus already holds. Same process, same intent, second door.
         set_frontmost(&element)
+    }
+
+    fn maximize(&self, window: WindowId) -> Result<()> {
+        let (_, element) = live_application(window)?;
+
+        let Some(game_window) = game_window_element(&element)? else {
+            return Err(PlatformError::WindowGone);
+        };
+
+        // Its own position first: it is what says which screen to fill.
+        let Some(position) = point_attribute(&game_window, AX_POSITION)? else {
+            return Err(PlatformError::system(
+                "maximizing a window",
+                "the window has no position",
+            ));
+        };
+
+        let Some(area) = work_area(position) else {
+            return Err(PlatformError::system(
+                "maximizing a window",
+                "the system reports no screen",
+            ));
+        };
+
+        set_position(&game_window, area.origin)?;
+        set_size(&game_window, area.size)
     }
 }
 

@@ -95,6 +95,7 @@ export type SettingChange =
       readonly notificationKind: NotificationKind
       readonly enabled: boolean
     }
+  | { readonly kind: 'maximizeOnLaunch'; readonly maximize: boolean }
   | { readonly kind: 'relayBody'; readonly sendBody: boolean }
   | {
       readonly kind: 'wakesMinimized'
@@ -149,6 +150,12 @@ export type JournalEvent =
   | { readonly kind: 'updateFailed'; readonly detail: string }
   | { readonly kind: 'updateUpToDate' }
   | { readonly kind: 'windowFailed'; readonly detail: string }
+  | { readonly kind: 'windowMaximized'; readonly nickname: string }
+  | {
+      readonly kind: 'windowMaximizeFailed'
+      readonly nickname: string
+      readonly detail: string
+    }
   | {
       readonly kind: 'authorizationRequested'
       readonly granted: boolean

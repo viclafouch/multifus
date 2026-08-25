@@ -2,8 +2,6 @@ import React from 'react'
 import { Download, RefreshCw, RotateCcw } from 'lucide-react'
 import type { Snapshot } from '@/@types/snapshot'
 import type { ConfigStatus, UpdateStatus } from '@/@types/system'
-import { FieldRow } from '@/components/layout/field-row'
-import { Note } from '@/components/layout/note'
 import { Panel } from '@/components/layout/panel'
 import { Screen } from '@/components/layout/screen'
 import { SectionRow } from '@/components/layout/section-row'
@@ -18,15 +16,9 @@ import {
   AlertDialogTitle
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
-import { Switch } from '@/components/ui/switch'
 import { strings } from '@/constants/strings'
 import { updateLine } from '@/helpers/wording'
-import {
-  checkUpdate,
-  installUpdate,
-  reset,
-  setStartAtLogin
-} from '@/lib/multifus'
+import { checkUpdate, installUpdate, reset } from '@/lib/multifus'
 
 type FactProps = Readonly<{
   label: string
@@ -94,19 +86,13 @@ const UpdateSection = ({ update, run }: UpdateSectionProps) => {
 type AboutScreenProps = Readonly<{
   version: string
   config: ConfigStatus
-  startAtLogin: boolean
   update: UpdateStatus
   run: (action: Promise<Snapshot>) => void
 }>
 
 /**
- * How Multifus sits on this machine: which version, where its file is, when it
- * starts, and how to wipe it.
- *
- * The start with the session belongs here rather than on a screen of its own.
- * It is a fact about the installation and not about the game, it is set once and
- * never touched again, and a fifth entry in the rail for a single switch would
- * cost more than it explains.
+ * How Multifus sits on this machine: which version, where its file is, and how
+ * to wipe it. What it does on its own is the Paramètres screen.
  *
  * Dracoon opens on a modal warning that cannot be dismissed for thirty seconds.
  * perimetre.md drops it: the notice lives here, on a screen one visits, and it
@@ -116,7 +102,6 @@ type AboutScreenProps = Readonly<{
 export const AboutScreen = ({
   version,
   config,
-  startAtLogin,
   update,
   run
 }: AboutScreenProps) => {
@@ -130,18 +115,6 @@ export const AboutScreen = ({
           <Fact label={strings.about.configPath} value={config.path} />
         </dl>
         <UpdateSection update={update} run={run} />
-        <FieldRow
-          label={strings.about.startupLabel}
-          description={strings.about.startupDescription}
-        >
-          <Switch
-            checked={startAtLogin}
-            aria-label={strings.about.startupLabel}
-            onCheckedChange={(checked) => {
-              run(setStartAtLogin(checked))
-            }}
-          />
-        </FieldRow>
         <section className="flex flex-col gap-1.5 px-4 py-3.5">
           <h2 className="text-row font-medium">{strings.about.legalTitle}</h2>
           <p className="max-w-prose text-note text-muted-foreground">
@@ -167,7 +140,6 @@ export const AboutScreen = ({
           </Button>
         </SectionRow>
       </Panel>
-      <Note>{strings.about.startupNote}</Note>
       <AlertDialog open={isConfirming} onOpenChange={setIsConfirming}>
         <AlertDialogContent>
           <AlertDialogHeader>

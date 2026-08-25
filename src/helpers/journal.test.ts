@@ -242,6 +242,22 @@ const SETTING_CASES = {
       line: 'Réveil des fenêtres réduites désactivé depuis la barre système.'
     }
   ],
+  maximizeOnLaunch: [
+    {
+      event: {
+        kind: 'setting',
+        change: { kind: 'maximizeOnLaunch', maximize: true }
+      },
+      line: 'Agrandissement des fenêtres au lancement activé.'
+    },
+    {
+      event: {
+        kind: 'setting',
+        change: { kind: 'maximizeOnLaunch', maximize: false }
+      },
+      line: 'Agrandissement des fenêtres au lancement désactivé.'
+    }
+  ],
   relayBody: [
     {
       event: {
@@ -793,6 +809,22 @@ const JOURNAL_CASES = {
       line: `${DETAILED_LINES.windowFailed} : ${DETAIL}`
     }
   ],
+  windowMaximized: [
+    {
+      event: { kind: 'windowMaximized', nickname: NICKNAME },
+      line: 'Alpha vient d’ouvrir : sa fenêtre a été agrandie à l’écran.'
+    }
+  ],
+  windowMaximizeFailed: [
+    {
+      event: {
+        kind: 'windowMaximizeFailed',
+        nickname: NICKNAME,
+        detail: DETAIL
+      },
+      line: `Alpha vient d’ouvrir : le système a refusé d’agrandir sa fenêtre (${DETAIL}).`
+    }
+  ],
   configLoadFailed: [
     {
       event: {
@@ -958,6 +990,7 @@ const SNAPSHOT = {
   autoFocusEnabled: true,
   wakesMinimized: true,
   startAtLogin: false,
+  maximizeOnLaunch: false,
   authorization: { granted: true, listening: true },
   config: { path: '/tmp/multifus/config.json', problem: null },
   update: { kind: 'upToDate' },

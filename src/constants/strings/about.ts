@@ -1,20 +1,10 @@
 /** The words of the À propos screen: identity, update, legal notice, reset. */
 
-import { IS_APPLE } from '@/constants/keyboard'
-
 export const ABOUT_STRINGS = {
   about: {
     title: 'À propos',
     version: 'Version',
     configPath: 'Configuration',
-    startupLabel: 'Démarrer avec la session',
-    startupDescription:
-      'Multifus s’ouvre en même temps que votre session, pour n’avoir à y penser qu’une fois.',
-    // The one behaviour of step 8 the user has to be told about, since nothing
-    // on screen would otherwise explain where the application went.
-    startupNote: IS_APPLE
-      ? 'Fermer la fenêtre ne quitte plus Multifus : il continue dans la barre système, en haut à droite de l’écran, et c’est de là qu’on le quitte.'
-      : 'Fermer la fenêtre ne quitte plus Multifus : il continue dans la barre système, à côté de l’horloge, et c’est de là qu’on le quitte.',
     updateTitle: 'Mise à jour',
     updateChecking: 'Vérification en cours…',
     updateUpToDate: 'Cette version est la dernière publiée.',

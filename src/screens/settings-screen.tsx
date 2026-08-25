@@ -1,0 +1,58 @@
+import { Maximize2, Power } from 'lucide-react'
+import type { Snapshot } from '@/@types/snapshot'
+import { FieldRow } from '@/components/layout/field-row'
+import { Note } from '@/components/layout/note'
+import { Panel } from '@/components/layout/panel'
+import { Screen } from '@/components/layout/screen'
+import { Switch } from '@/components/ui/switch'
+import { strings } from '@/constants/strings'
+import { setMaximizeOnLaunch, setStartAtLogin } from '@/lib/multifus'
+
+type SettingsScreenProps = Readonly<{
+  startAtLogin: boolean
+  maximizeOnLaunch: boolean
+  run: (action: Promise<Snapshot>) => void
+}>
+
+/** What Multifus does without being asked, set once and then forgotten. */
+export const SettingsScreen = ({
+  startAtLogin,
+  maximizeOnLaunch,
+  run
+}: SettingsScreenProps) => {
+  return (
+    <Screen title={strings.settings.title} subtitle={strings.settings.subtitle}>
+      <Panel>
+        <FieldRow
+          label={strings.settings.startupLabel}
+          description={strings.settings.startupDescription}
+          icon={<Power className="size-glyph" strokeWidth={1.75} aria-hidden />}
+        >
+          <Switch
+            checked={startAtLogin}
+            aria-label={strings.settings.startupLabel}
+            onCheckedChange={(checked) => {
+              run(setStartAtLogin(checked))
+            }}
+          />
+        </FieldRow>
+        <FieldRow
+          label={strings.settings.maximizeLabel}
+          description={strings.settings.maximizeDescription}
+          icon={
+            <Maximize2 className="size-glyph" strokeWidth={1.75} aria-hidden />
+          }
+        >
+          <Switch
+            checked={maximizeOnLaunch}
+            aria-label={strings.settings.maximizeLabel}
+            onCheckedChange={(checked) => {
+              run(setMaximizeOnLaunch(checked))
+            }}
+          />
+        </FieldRow>
+      </Panel>
+      <Note>{strings.settings.startupNote}</Note>
+    </Screen>
+  )
+}

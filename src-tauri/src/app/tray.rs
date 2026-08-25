@@ -70,6 +70,7 @@ const MENU_CHARACTERS: &str = "Personnages";
 const MENU_SHORTCUTS: &str = "Raccourcis";
 const MENU_AUTO_FOCUS_SCREEN: &str = "AutoFocus";
 const MENU_RELAY: &str = "Relais";
+const MENU_SETTINGS: &str = "Paramètres";
 const MENU_ABOUT: &str = "À propos";
 const MENU_QUIT: &str = "Quitter Multifus";
 const MENU_NOBODY: &str = "Aucun personnage connecté";
@@ -613,6 +614,7 @@ fn screen_id(screen: Screen) -> &'static str {
         Screen::Shortcuts => "shortcuts",
         Screen::AutoFocus => "autoFocus",
         Screen::Relay => "relay",
+        Screen::Settings => "settings",
         Screen::About => "about",
     }
 }
@@ -631,6 +633,7 @@ fn screen_label(screen: Screen) -> &'static str {
         Screen::Shortcuts => MENU_SHORTCUTS,
         Screen::AutoFocus => MENU_AUTO_FOCUS_SCREEN,
         Screen::Relay => MENU_RELAY,
+        Screen::Settings => MENU_SETTINGS,
         Screen::About => MENU_ABOUT,
     }
 }

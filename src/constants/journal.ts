@@ -48,6 +48,8 @@ export const TONES = {
   snapshotFailed: 'warning',
   trayFailed: 'warning',
   windowFailed: 'warning',
+  windowMaximized: 'good',
+  windowMaximizeFailed: 'warning',
   startAtLoginReconciled: 'neutral',
   startAtLoginFailed: 'warning',
   updateAvailable: 'good',
@@ -122,11 +124,11 @@ export const TRAY_TONES = {
 
 /**
  * The events whose whole line is a stock phrase and the reason the system gave.
- * `configLoadFailed` is not one of them: it has to name where the file went.
+ * The two exceptions name something of their own, a file and a character.
  */
 type DetailedEventKind = Exclude<
   Extract<JournalEvent, { readonly detail: string }>['kind'],
-  'configLoadFailed'
+  'configLoadFailed' | 'windowMaximizeFailed'
 >
 
 /** What each of them says before the colon. */

@@ -42,6 +42,9 @@ pub struct Settings {
     /// Where the relay writes, and how much of a private message it carries.
     /// Never the bot token, see ADR 0009.
     pub relay: Relay,
+    /// Whether a game window is filled to the screen the first time Multifus
+    /// sees it. Unchecked by default: nothing moves a window unasked.
+    pub maximize_on_launch: bool,
     /// Whether Multifus starts with the session. Unchecked by default,
     /// perimetre.md is explicit about it.
     ///
@@ -341,6 +344,14 @@ mod tests {
 
         assert!(settings.roster.is_empty());
         assert!(!settings.start_at_login);
+        assert!(!settings.maximize_on_launch);
+    }
+
+    #[test]
+    fn a_file_written_before_the_maximizing_existed_leaves_the_windows_alone() {
+        let settings = serde_json::from_str::<Settings>("{}").expect("an empty configuration");
+
+        assert!(!settings.maximize_on_launch);
     }
 
     #[test]

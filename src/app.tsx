@@ -12,6 +12,7 @@ import { AuthorizationScreen } from '@/screens/authorization-screen'
 import { AutoFocusScreen } from '@/screens/auto-focus-screen'
 import { CharactersScreen } from '@/screens/characters-screen'
 import { RelayScreen } from '@/screens/relay'
+import { SettingsScreen } from '@/screens/settings-screen'
 import { ShortcutsScreen } from '@/screens/shortcuts'
 
 /**
@@ -19,7 +20,7 @@ import { ShortcutsScreen } from '@/screens/shortcuts'
  *
  * It is meant to be a board one consults, not a panel one visits. Everything
  * that says whether Multifus is working is visible without a click; the settings
- * are three screens away because they are set once and then forgotten.
+ * are further down the rail because they are set once and then forgotten.
  */
 export const App = () => {
   const { snapshot, run } = useMultifus()
@@ -105,12 +106,21 @@ const CurrentScreen = ({ screen, snapshot, run }: CurrentScreenProps) => {
     )
   }
 
+  if (screen === 'settings') {
+    return (
+      <SettingsScreen
+        startAtLogin={snapshot.startAtLogin}
+        maximizeOnLaunch={snapshot.maximizeOnLaunch}
+        run={run}
+      />
+    )
+  }
+
   if (screen === 'about') {
     return (
       <AboutScreen
         version={snapshot.version}
         config={snapshot.config}
-        startAtLogin={snapshot.startAtLogin}
         update={snapshot.update}
         run={run}
       />

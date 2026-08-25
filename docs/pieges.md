@@ -12,9 +12,13 @@ Ce qui est propre à un système est dans [macos.md](./macos.md) et
 ## Le cœur et les fils
 
 **Ne jamais tenir le verrou de `Multifus` en touchant au watcher de
-notifications, au plugin de raccourcis ou à l'icône de barre système.** Le premier
-joint le thread qui exécute le sink, les deux autres attendent le fil principal où
-les commandes prennent ce verrou. Pour l'icône ce n'est pas une supposition :
+notifications, au plugin de raccourcis, à l'icône de barre système ou à
+l'agrandissement d'une fenêtre.** Le premier
+joint le thread qui exécute le sink, les trois autres attendent le fil principal où
+les commandes prennent ce verrou. L'agrandissement le fait sur macOS seulement, où
+`NSScreen` n'existe que là : `platform::macos::on_main_thread` y saute tout seul,
+et `runtime::maximize_appeared` prend le verrou avant l'appel et après, jamais
+pendant. Pour l'icône ce n'est pas une supposition :
 `TrayIcon::set_menu` passe par `run_item_main_thread!`, qui poste la tâche puis
 bloque sur `rx.recv()` sans délai (`tauri/src/menu/mod.rs`). C'est le seul
 interblocage que cette application sache construire, et la règle est écrite en

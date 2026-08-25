@@ -39,7 +39,7 @@ impl From<ScreenSaverDelay> for ScreenSaverView {
     }
 }
 
-/// Everything the five screens draw, in one piece.
+/// Everything the six screens draw, in one piece.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Snapshot {
@@ -72,6 +72,8 @@ pub struct Snapshot {
     /// Multifus is asked to start with the session. What the user wants, not
     /// what the system currently holds, see [`crate::app::autostart`].
     pub start_at_login: bool,
+    /// A game window is filled to the screen the first time Multifus sees it.
+    pub maximize_on_launch: bool,
     pub authorization: AuthorizationView,
     pub config: ConfigView,
     /// Where Multifus is with the version that is out, see [`crate::app::update`].
@@ -273,7 +275,7 @@ pub enum UpdateView {
     Failed { detail: String },
 }
 
-/// One of the five screens the window can show.
+/// One of the six screens the window can show.
 ///
 /// It crosses the bridge for one reason: the system tray offers to open any of
 /// them, and which screen is on show is React's state. Nothing on this side
@@ -285,17 +287,19 @@ pub enum Screen {
     Shortcuts,
     AutoFocus,
     Relay,
+    Settings,
     About,
 }
 
 impl Screen {
-    /// The five of them, in the order of the rail. The relay comes before the
-    /// about screen, being about the game rather than about the installation.
-    pub const ALL: [Self; 5] = [
+    /// The six of them, in the order of the rail. The four about the game come
+    /// first, then the two about the installation.
+    pub const ALL: [Self; 6] = [
         Self::Characters,
         Self::Shortcuts,
         Self::AutoFocus,
         Self::Relay,
+        Self::Settings,
         Self::About,
     ];
 }

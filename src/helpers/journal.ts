@@ -282,6 +282,11 @@ const settingLine = (change: SettingChange) => {
 
       return `Réveil des fenêtres réduites ${what} depuis ${surfaceLabel(change.from)}.`
     }
+    case 'maximizeOnLaunch': {
+      const what = change.maximize ? 'activé' : 'désactivé'
+
+      return `Agrandissement des fenêtres au lancement ${what}.`
+    }
     case 'relayBody': {
       const what = change.sendBody ? 'activé' : 'désactivé'
 
@@ -567,6 +572,8 @@ type RunEventKind =
   | 'startAtLoginReconciled'
   | 'started'
   | 'updateAvailable'
+  | 'windowMaximizeFailed'
+  | 'windowMaximized'
 
 /** And the ones the user caused, which is everything left. */
 type ActionEventKind = Exclude<ComposedEventKind, RunEventKind>
@@ -586,7 +593,9 @@ const RUN_KINDS = new Set<ComposedEventKind>([
   'shortcutsBound',
   'startAtLoginReconciled',
   'started',
-  'updateAvailable'
+  'updateAvailable',
+  'windowMaximizeFailed',
+  'windowMaximized'
 ] as const satisfies readonly RunEventKind[])
 
 const isRunEvent = (
@@ -646,6 +655,12 @@ const runLine = (event: EventOf<RunEventKind>) => {
     }
     case 'displayAwake': {
       return displayAwakeLine(event.held)
+    }
+    case 'windowMaximized': {
+      return `${event.nickname} vient d’ouvrir : sa fenêtre a été agrandie à l’écran.`
+    }
+    case 'windowMaximizeFailed': {
+      return `${event.nickname} vient d’ouvrir : le système a refusé d’agrandir sa fenêtre (${event.detail}).`
     }
     default: {
       return ''

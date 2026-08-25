@@ -123,13 +123,45 @@ fn tick(app: &AppHandle) {
 /// computed under it and a Telegram message has no business being there.
 fn scan(app: &AppHandle) -> bool {
     let change = refresh_windows(app);
+    let maximized = maximize_appeared(app, &change);
     let listening_changed = follow_authorization(app);
 
     relay::run::announce(app, &change);
 
     let display_changed = relay::run::follow_display(app);
 
-    change.changed || listening_changed || display_changed
+    change.changed || maximized || listening_changed || display_changed
+}
+
+/// Fills the screen with the clients that have just opened, and says whether it
+/// wrote a line about it.
+///
+/// The lock is never held across the call: macOS hops to the main thread there,
+/// which is where every command takes this very mutex.
+fn maximize_appeared(app: &AppHandle, change: &ScanChange) -> bool {
+    if change.appeared.is_empty() || !lock(app).maximizes_on_launch() {
+        return false;
+    }
+
+    for appeared in &change.appeared {
+        let outcome = app
+            .state::<PlatformWindowManager>()
+            .maximize(appeared.window);
+
+        let nickname = appeared.nickname.clone();
+
+        let event = match outcome {
+            Ok(()) => JournalEvent::WindowMaximized { nickname },
+            Err(error) => JournalEvent::WindowMaximizeFailed {
+                nickname,
+                detail: error.to_string(),
+            },
+        };
+
+        lock(app).log(event);
+    }
+
+    true
 }
 
 /// Asks the boundary which game windows exist and takes the answer in.

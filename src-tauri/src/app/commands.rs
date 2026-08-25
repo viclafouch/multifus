@@ -36,7 +36,7 @@ use crate::config::QuickReplyId;
 use crate::domain::Gender;
 use crate::domain::NotificationKind;
 
-/// Everything the five screens draw. Called once on mount, before the interface
+/// Everything the six screens draw. Called once on mount, before the interface
 /// starts listening for the rest.
 #[tauri::command]
 pub fn snapshot(app: AppHandle) -> Snapshot {
@@ -217,6 +217,15 @@ pub fn set_start_at_login(app: AppHandle, start_at_login: bool) -> Snapshot {
     lock(&app).set_start_at_login(start_at_login);
 
     autostart::reconcile(&app);
+
+    runtime::emit_snapshot(&app)
+}
+
+/// Says whether a client that opens has its window filled to the screen. Only
+/// the ones that open after this, the others not having been launched.
+#[tauri::command]
+pub fn set_maximize_on_launch(app: AppHandle, maximize: bool) -> Snapshot {
+    lock(&app).set_maximize_on_launch(maximize);
 
     runtime::emit_snapshot(&app)
 }

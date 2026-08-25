@@ -22,6 +22,8 @@ Ce principe arbitre tous les compromis. Une fonctionnalité qui exige d'ouvrir l
 
 **Réponses rapides.** On range sous une combinaison un texte qu'on écrit souvent, « prix libre », « de rien ». La combinaison frappée depuis le jeu colle ce texte dans le chat, et s'arrête là : l'envoi reste un geste de l'utilisateur. Le presse-papiers d'avant est rendu. C'est la seule chose que multifus écrive vers le jeu, et elle a son [ADR 0012](./adr/0012-une-reponse-rapide-se-colle-dans-le-jeu.md).
 
+**Agrandissement au lancement.** Un client qui s'ouvre remplit l'écran tout seul, une seule fois. Réglage décoché par défaut : multifus ne déplace aucune fenêtre sans qu'on le lui ait demandé. Une fois coché, il ne s'applique qu'aux clients ouverts ensuite, et jamais à ceux qui sont déjà là.
+
 **Relais.** On quitte son bureau, on active le relais depuis la barre système ou depuis l'écran Relais, et chaque message privé reçu par un personnage relayé arrive dans un salon Telegram sur le téléphone. Un des quatre raccourcis frappé signifie qu'on est revenu et coupe le relais. Tant qu'un personnage relayé est connecté, l'écran est tenu éveillé, sans quoi le verrouillage de session couperait la lecture des bannières et le relais deviendrait muet sans le dire. Le pseudo et le type partent toujours, le texte du message seulement si l'utilisateur l'a coché.
 
 Le relais dit aussi quand il cesse d'entendre, et c'est un avis et non une notification de jeu. La raison est le quart d'heure : **Dofus déconnecte un client resté inactif**, et multifus n'a pas le droit d'y remédier, voir plus bas. Une absence d'une heure est donc une absence où le relais devient sourd au bout de quinze minutes, et un téléphone muet se lit « personne ne m'a écrit ». L'avis est ce qui empêche ce contresens.
@@ -49,6 +51,12 @@ Tous restent inertes tant qu'une fenêtre Dofus n'est pas au premier plan. Sans 
 **La popup de bienvenue.** Dracoon affiche au premier lancement un avertissement modal impossible à fermer pendant trente secondes. Les mentions légales figurent dans l'écran À propos, sans blocage.
 
 **La mise à jour silencieuse.** multifus cherche une version plus récente au démarrage et la propose, dans la barre système et dans l'écran À propos. Il ne l'installe jamais tout seul : installer relance l'application, ce qui en pleine soirée revient à couper le gestionnaire de fenêtres de tous les clients d'un coup. La proposer sans l'imposer est le seul comportement compatible avec le principe directeur.
+
+**Le plein écran de macOS.** Agrandir remplit la zone utile de l'écran, comme le fait le bouton du système, et n'emploie jamais `AXFullScreen`. Un client rangé dans un bureau à lui ferait changer de bureau à chaque raccourci du défilement et à chaque notification, ce qui coûterait plus cher que la place gagnée.
+
+**Rejouer l'agrandissement.** Une fenêtre est agrandie la première fois que multifus la voit, jamais une seconde. Remise en petit à la main, elle reste en petit : forcer serait un gestionnaire de fenêtres qui se dispute avec l'utilisateur. La déconnexion du quart d'heure et le retour à l'écran des personnages ne la rendent pas neuve.
+
+**Passer au premier plan en agrandissant.** Agrandir n'est pas focus. Un client qui s'ouvre pendant qu'on joue dans une autre fenêtre remplit son écran là où il est et ne prend rien. C'est pour ça que Windows n'emploie pas `ShowWindow`, dont le `SW_MAXIMIZE` active.
 
 **Toute forme d'automatisation du jeu, à une exception écrite.** multifus ne lit pas la mémoire du client, ne modifie aucun fichier, ne joue à la place de personne et n'empêche pas la déconnexion pour inactivité. Les outils de type macro sont interdits par Ankama et restent hors de ce projet.
 
@@ -93,6 +101,7 @@ multifus vise **macOS et Windows**. Ni iOS, ni Android, ni Linux, que Tauri sait
 | Corps de notification complet          | oui                                | oui, mesuré : la bannière tronque à l'écran, `AXValue` non |
 | Écran tenu éveillé                     | `PowerSetRequest`                  | `IOPMAssertionCreateWithName`                              |
 | Collage d’une réponse                  | `SendInput`, `Control+V`           | `CGEventPost`, `Super+V`                                   |
+| Agrandissement d’une fenêtre           | `SetWindowPos` sur le `rcWork`     | `AXPosition` et `AXSize` sur le `visibleFrame`             |
 
 Le détail et les mesures sont dans [ADR 0002](./adr/0002-notifications-macos-via-accessibility.md).
 

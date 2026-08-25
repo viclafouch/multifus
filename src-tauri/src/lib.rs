@@ -90,6 +90,7 @@ pub fn run() {
             app::commands::set_auto_focus_enabled,
             app::commands::set_wakes_minimized,
             app::commands::set_start_at_login,
+            app::commands::set_maximize_on_launch,
             app::commands::set_relayed,
             app::commands::set_send_body,
             app::commands::pair_relay,

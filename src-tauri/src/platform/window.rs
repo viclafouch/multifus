@@ -143,6 +143,13 @@ pub trait WindowManager: Send + Sync {
     ///
     /// [`PlatformError::WindowGone`]: crate::platform::PlatformError::WindowGone
     fn focus(&self, window: WindowId) -> Result<()>;
+
+    /// Fills the work area of its screen with a window, without ever asking for
+    /// the focus.
+    ///
+    /// Never the macOS fullscreen, which moves the client into a Space of its
+    /// own and would make the défilement change desktop at every shortcut.
+    fn maximize(&self, window: WindowId) -> Result<()>;
 }
 
 #[cfg(test)]

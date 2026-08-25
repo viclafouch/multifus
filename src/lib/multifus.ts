@@ -144,6 +144,10 @@ export const setStartAtLogin = async (startAtLogin: boolean) => {
   return invoke<Snapshot>('set_start_at_login', { startAtLogin })
 }
 
+export const setMaximizeOnLaunch = async (maximize: boolean) => {
+  return invoke<Snapshot>('set_maximize_on_launch', { maximize })
+}
+
 /** Puts a character in or out of the relay. Kept indefinitely, ADR 0011. */
 export const setRelayed = async (nickname: string, relayed: boolean) => {
   return invoke<Snapshot>('set_relayed', { nickname, relayed })
