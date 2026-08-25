@@ -18,6 +18,9 @@
 
 use std::panic::catch_unwind;
 use std::panic::AssertUnwindSafe;
+use std::sync::Condvar;
+use std::sync::LazyLock;
+use std::sync::Mutex;
 use std::sync::MutexGuard;
 use std::sync::PoisonError;
 use std::sync::TryLockError;
@@ -55,6 +58,15 @@ use crate::platform::WindowManager;
 /// A second, and not three: `SW_MAXIMIZE` takes the foreground, so a client that
 /// has just opened has to be filled while it is still the one in front.
 const SCAN_INTERVAL: Duration = Duration::from_secs(1);
+
+/// The scan thread's own alarm clock: it sleeps on this between two turns, and
+/// a réglage that has just changed rings it rather than waiting the interval out.
+///
+/// The work stays on that thread and never moves to the command that rang: a
+/// title is written by waiting on the client's own message pump, and a command
+/// runs on the main thread, where it would freeze the window.
+static NEXT_TURN: LazyLock<(Mutex<bool>, Condvar)> =
+    LazyLock::new(|| (Mutex::new(false), Condvar::new()));
 
 /// The macOS settings pane that grants Accessibility.
 #[cfg(target_os = "macos")]
@@ -95,7 +107,7 @@ pub fn start(app: AppHandle) {
                     lock(&app).log_unless_repeated(JournalEvent::Panicked { work: Work::Scan });
                 }
 
-                thread::sleep(SCAN_INTERVAL);
+                wait_for_next_turn();
             }
         });
 
@@ -108,15 +120,54 @@ pub fn start(app: AppHandle) {
     }
 }
 
+/// Sleeps until the next turn is due, or until somebody asks for one now.
+///
+/// A spurious wake-up costs one early turn, which for a poller is nothing, so
+/// the flag is read once rather than looped on.
+fn wait_for_next_turn() {
+    let (asked, alarm) = &*NEXT_TURN;
+    let mut guard = asked.lock().unwrap_or_else(PoisonError::into_inner);
+
+    if !*guard {
+        let (waited, _) = alarm
+            .wait_timeout(guard, SCAN_INTERVAL)
+            .unwrap_or_else(PoisonError::into_inner);
+
+        guard = waited;
+    }
+
+    *guard = false;
+}
+
+/// Asks the scan for a turn now, and hands the main thread straight back.
+///
+/// What this is for is the réglage one has just ticked: waiting the interval out
+/// showed a second of nothing happening, which reads as an application that did
+/// not hear the click.
+pub fn wake() {
+    let (asked, alarm) = &*NEXT_TURN;
+
+    *asked.lock().unwrap_or_else(PoisonError::into_inner) = true;
+
+    alarm.notify_one();
+}
+
 /// One turn of the scan: look at the windows, keep the listening in step with
 /// the authorization, and tell the interface if anything moved.
 fn tick(app: &AppHandle) {
+    // Before the sweep, and that is not cosmetic: it is what tells the boundary
+    // whether a bare title is one of its own, and the sweep right after is what
+    // reads them. The other way round, a launch with the réglage ticked would
+    // find nobody connected for its first turn.
+    //
+    // This thread and never a command: filling a window and renaming one both
+    // wait on the client's own message pump, and a command runs on the main
+    // thread.
+    let renamed = apply_short_titles(app);
     let changed = scan(app);
-    // This thread and never a command: filling a window waits on the client's
-    // own message pump, and a command runs on the main thread.
     let maximized = maximize_new_clients(app);
 
-    if changed || maximized {
+    if changed || maximized || renamed {
         emit_snapshot(app);
     }
 }
@@ -181,6 +232,33 @@ fn maximize_new_clients(app: &AppHandle) -> bool {
     }
 
     written
+}
+
+/// Puts the bare nickname in the title bar of the game windows, or puts back
+/// the title the client wrote, and says whether it wrote a line about it.
+///
+/// Asked on every turn and not only when the réglage moves: a client rewrites
+/// its own title when the character changes and when the quarter-hour
+/// disconnection strikes, and neither is an event Multifus can subscribe to.
+/// The boundary compares before it writes, so a turn that has nothing to do
+/// costs one comparison per window.
+///
+/// The lock is taken and given back around the boundary call, never held across
+/// it: writing a title waits on a client that Multifus does not control.
+fn apply_short_titles(app: &AppHandle) -> bool {
+    let short = lock(app).shortens_titles();
+    let written = app
+        .state::<PlatformWindowManager>()
+        .apply_short_titles(short);
+
+    match written {
+        // A client closed between the sweep and the write is the ordinary case
+        // and reads as one, exactly as it does for the AutoFocus.
+        Ok(()) | Err(PlatformError::AuthorizationDenied) | Err(PlatformError::WindowGone) => false,
+        Err(error) => lock(app).log_unless_repeated(JournalEvent::ShortTitlesFailed {
+            detail: error.to_string(),
+        }),
+    }
 }
 
 /// Asks the boundary which game windows exist and takes the answer in.

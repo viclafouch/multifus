@@ -14,6 +14,12 @@ export const SETTINGS_STRINGS = {
       : 'Fermer la fenêtre ne quitte plus Multifus : il continue dans la barre système, à côté de l’horloge, et c’est de là qu’on le quitte.',
     maximizeLabel: 'Agrandir les fenêtres au lancement',
     maximizeDescription:
-      'Un client qui s’ouvre remplit l’écran dès la connexion, une seule fois : le réduire ensuite le laisse réduit. Les fenêtres déjà ouvertes ne bougent pas.'
+      'Un client qui s’ouvre remplit l’écran dès la connexion, une seule fois : le réduire ensuite le laisse réduit. Les fenêtres déjà ouvertes ne bougent pas.',
+    shortTitlesLabel: IS_APPLE
+      ? 'N’afficher que le pseudo dans la barre de titre'
+      : 'N’afficher que le pseudo dans la barre des tâches',
+    shortTitlesDescription: IS_APPLE
+      ? 'Chaque fenêtre Dofus ne porte plus que le nom du personnage, dans sa barre de titre et dans Mission Control. Le pseudo n’apparaît qu’une fois le personnage choisi, et décocher rend leur titre aux fenêtres renommées depuis l’ouverture de Multifus.'
+      : 'Chaque fenêtre Dofus ne porte plus que le nom du personnage, dans la barre des tâches comme au Alt+Tab. Le pseudo n’apparaît qu’une fois le personnage choisi, et décocher rend leur titre aux fenêtres renommées depuis l’ouverture de Multifus.'
   }
 } as const

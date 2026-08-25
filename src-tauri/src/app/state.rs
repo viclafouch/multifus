@@ -247,6 +247,7 @@ impl Multifus {
                 .collect(),
             start_at_login: self.settings.start_at_login,
             maximize_on_launch: self.settings.maximize_on_launch,
+            short_titles: self.settings.short_titles,
             shortcuts: ShortcutAction::ALL
                 .into_iter()
                 .map(|action| ShortcutView {
@@ -664,6 +665,20 @@ impl Multifus {
 
         self.log(JournalEvent::Setting {
             change: SettingChange::MaximizeOnLaunch { maximize },
+        });
+        self.save();
+    }
+
+    #[must_use]
+    pub fn shortens_titles(&self) -> bool {
+        self.settings.short_titles
+    }
+
+    pub fn set_short_titles(&mut self, short: bool) {
+        self.settings.short_titles = short;
+
+        self.log(JournalEvent::Setting {
+            change: SettingChange::ShortTitles { short },
         });
         self.save();
     }
@@ -2092,6 +2107,26 @@ mod tests {
         assert!(
             journalled(&state).contains(&JournalEvent::Setting {
                 change: SettingChange::MaximizeOnLaunch { maximize: true }
+            }),
+            "{:?}",
+            journalled(&state)
+        );
+    }
+
+    #[test]
+    fn no_window_is_renamed_until_somebody_asks_for_it() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        assert!(!state.shortens_titles());
+
+        state.set_short_titles(true);
+
+        assert!(state.shortens_titles());
+        assert!(state.snapshot().short_titles);
+        assert!(
+            journalled(&state).contains(&JournalEvent::Setting {
+                change: SettingChange::ShortTitles { short: true }
             }),
             "{:?}",
             journalled(&state)

@@ -1,5 +1,7 @@
 //! Game windows as the core sees them, and the interface that produces them.
 
+use std::collections::HashMap;
+
 use crate::domain::extract_nickname;
 use crate::platform::error::Result;
 use crate::platform::Authorization;
@@ -41,7 +43,7 @@ impl WindowId {
 /// A Dofus window currently on screen, and the character it belongs to.
 ///
 /// The fields are private and [`GameWindow::from_title`] is the only way in, so
-/// that a window can exist here only if its title yielded a nickname. That rule
+/// that a window can exist here only if a title yielded a nickname. That rule
 /// is the type-level form of a known trap: a client sitting on the login screen
 /// already is a process with windows, but with no usable title. Filtering
 /// happens on the title, never on the size.
@@ -69,6 +71,37 @@ impl GameWindow {
         })
     }
 
+    /// Reads the title a Dofus client window shows, which Multifus may have
+    /// written itself.
+    ///
+    /// **Nothing is remembered here, and that is the point.** A table of what
+    /// Multifus renamed would be empty on the next launch, and six windows left
+    /// titled `Alpha` would then belong to nobody: empty roster, empty system
+    /// tray, dead shortcuts, until each client happened to rewrite its own
+    /// title. The rule is read off the title instead.
+    ///
+    /// That rule is that **a client writes `Dofus` into every title it produces**
+    /// — the game window, the login screen, the loader — so a titled window of a
+    /// Dofus process with no `Dofus` in it is one Multifus cut down. The caller
+    /// has already established the process, see [`WindowManager::game_windows`].
+    ///
+    /// `short` gates the second rule, and it is **what the last sweep saw on the
+    /// screen** rather than what the user asked for: a window Multifus cannot
+    /// put back stays one this rule is the only reader of, so unticking never
+    /// takes a character offline. Nobody who leaves the réglage alone ever has a
+    /// window read this way, the flag having no other way to become true.
+    #[must_use]
+    pub fn from_client_title(id: WindowId, title: &str, short: bool) -> Option<Self> {
+        Self::from_title(id, title).or_else(|| {
+            let nickname = matches_short_title(title).filter(|_| short)?;
+
+            Some(Self {
+                id,
+                nickname: nickname.to_owned(),
+            })
+        })
+    }
+
     /// The token to hand back to [`WindowManager::focus`].
     #[must_use]
     pub fn id(&self) -> WindowId {
@@ -81,6 +114,45 @@ impl GameWindow {
         &self.nickname
     }
 }
+
+/// The nickname in a title Multifus wrote, `None` for one the client wrote.
+///
+/// The one test of the whole feature, see [`GameWindow::from_client_title`] for
+/// why it is a test and not a memory. It answers the two questions the boundary
+/// asks: whether a window still needs cutting down, and whether it still bears
+/// the title that is Multifus's to put back.
+///
+/// **A Dofus nickname is one word.** That is what separates it from every title
+/// a client writes for itself, `Dofus Retro` on the login screen and
+/// `Pseudo - Dofus Retro v1.48.21` in game, which all carry a space. Testing for
+/// the word `Dofus` instead looked simpler and was wrong: a character called
+/// `Dofusito` would have gone offline the moment the réglage was ticked, and its
+/// window would have stayed renamed for good.
+#[must_use]
+pub fn matches_short_title(title: &str) -> Option<&str> {
+    let nickname = title.trim();
+
+    if nickname.is_empty() || nickname.contains(char::is_whitespace) {
+        return None;
+    }
+
+    // A window a client titled with the bare name of the game, which is nobody.
+    if nickname.eq_ignore_ascii_case(THE_GAME) {
+        return None;
+    }
+
+    Some(nickname)
+}
+
+/// The name of the game, which no character answers to.
+const THE_GAME: &str = "Dofus";
+
+/// The title the client had written, for each window Multifus renamed.
+///
+/// Its one job is putting a title back when the réglage is unticked. Losing it
+/// costs that and nothing else: reading a nickname never goes through it, see
+/// [`GameWindow::from_client_title`].
+pub type OriginalTitles = HashMap<WindowId, String>;
 
 /// Enumerates the game windows, focuses one, and tells whether the foreground
 /// window is a Dofus one.
@@ -100,6 +172,9 @@ pub trait WindowManager: Send + Sync {
     /// Every game window open right now, one per character connected.
     ///
     /// Clients on the login screen are left out, see [`GameWindow::from_title`].
+    /// A window Multifus has cut down to a short title still belongs here, see
+    /// [`GameWindow::from_client_title`].
+    ///
     /// Returns [`PlatformError::AuthorizationDenied`] rather than an empty list
     /// when the authorization is missing, so that the caller can tell "nobody is
     /// connected" from "Multifus is not allowed to look".
@@ -158,6 +233,23 @@ pub trait WindowManager: Send + Sync {
     /// Never the macOS fullscreen, which moves the client into a Space of its
     /// own and would make the défilement change desktop at every shortcut.
     fn maximize(&self, window: WindowId) -> Result<()>;
+
+    /// Cuts every game window's title down to the bare nickname, or puts back
+    /// the title the client wrote.
+    ///
+    /// The whole sweep and not one window: what has to be written is decided by
+    /// reading every title, and reading them one at a time from the core would
+    /// cost a system call each. Idempotent, and called on every turn of the scan
+    /// so that a client rewriting its own title — a character changed, the
+    /// quarter-hour disconnection — is served again on the turn that follows.
+    ///
+    /// Only windows that already carry a nickname are touched. A login screen
+    /// has no character to name, and its title is what a nickname will replace.
+    ///
+    /// **It is also what tells the implementation what the user asked for**, and
+    /// [`WindowManager::game_windows`] reads short titles only once it has been
+    /// told `true`. Call it before the sweep that reads the roster.
+    fn apply_short_titles(&self, short: bool) -> Result<()>;
 }
 
 #[cfg(test)]
@@ -171,6 +263,65 @@ mod tests {
         let window = window.expect("a Dofus title makes a game window");
         assert_eq!(window.nickname(), "Alpha");
         assert_eq!(window.id(), WindowId::from_raw(42));
+    }
+
+    #[test]
+    fn a_window_multifus_renamed_still_carries_its_character() {
+        // What the next launch reads on a window left short by the one before,
+        // with nothing remembered of it.
+        let window = GameWindow::from_client_title(WindowId::from_raw(42), "Alpha", true);
+
+        let window = window.expect("a short title is still a game window");
+        assert_eq!(window.nickname(), "Alpha");
+        assert_eq!(window.id(), WindowId::from_raw(42));
+    }
+
+    #[test]
+    fn a_title_the_client_wrote_is_read_the_way_it_always_was() {
+        let id = WindowId::from_raw(42);
+
+        assert_eq!(
+            GameWindow::from_client_title(id, "Bravo - Dofus Retro v1.48.21", true)
+                .map(|window| window.nickname().to_owned()),
+            Some("Bravo".to_owned())
+        );
+        // The login screen and the quarter-hour disconnection both land here,
+        // and neither is a character.
+        assert_eq!(GameWindow::from_client_title(id, "Dofus Retro", true), None);
+        assert_eq!(GameWindow::from_client_title(id, "  ", true), None);
+    }
+
+    #[test]
+    fn nothing_is_read_as_a_short_title_until_somebody_asks_for_it() {
+        // A dialog of the client would otherwise walk into the roster under its
+        // own name, and that must not happen to anyone who left the réglage be.
+        assert_eq!(
+            GameWindow::from_client_title(WindowId::from_raw(42), "Alpha", false),
+            None
+        );
+    }
+
+    #[test]
+    fn a_short_title_is_told_from_one_a_client_wrote() {
+        assert_eq!(matches_short_title("Alpha"), Some("Alpha"));
+        assert_eq!(matches_short_title("  Alpha  "), Some("Alpha"));
+        assert_eq!(matches_short_title("Alpha - Dofus Retro v1.48.21"), None);
+        assert_eq!(matches_short_title("Dofus Retro"), None);
+        assert_eq!(matches_short_title("dofus"), None);
+        assert_eq!(matches_short_title(""), None);
+    }
+
+    #[test]
+    fn a_character_named_after_the_game_is_a_character_like_any_other() {
+        // The word `Dofus` in a nickname is not the game naming itself, and
+        // reading it that way took `Dofusito` offline the moment the réglage
+        // was ticked, its window renamed for good.
+        assert_eq!(matches_short_title("Dofusito"), Some("Dofusito"));
+        assert_eq!(
+            GameWindow::from_client_title(WindowId::from_raw(42), "Dofusito", true)
+                .map(|window| window.nickname().to_owned()),
+            Some("Dofusito".to_owned())
+        );
     }
 
     #[test]

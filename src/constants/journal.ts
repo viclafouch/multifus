@@ -50,6 +50,7 @@ export const TONES = {
   windowFailed: 'warning',
   clientMaximized: 'good',
   clientMaximizeFailed: 'warning',
+  shortTitlesFailed: 'warning',
   startAtLoginReconciled: 'neutral',
   startAtLoginFailed: 'warning',
   updateAvailable: 'good',
@@ -142,6 +143,7 @@ export const DETAILED_LINES = {
   startAtLoginFailed: 'Démarrage avec la session impossible',
   scanFailed: 'Lecture des fenêtres impossible',
   clientMaximizeFailed: 'Agrandissement de la fenêtre d’un client impossible',
+  shortTitlesFailed: 'Titre d’une fenêtre impossible à changer',
   saveFailed: 'Configuration non enregistrée',
   configNotSetAside:
     'Configuration illisible et impossible à déplacer, le prochain enregistrement l’écrasera',

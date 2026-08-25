@@ -1,6 +1,7 @@
-# Plan de développement, l'agrandissement au lancement
+# Plan de développement, l'écran Paramètres
 
-**Le chantier en cours est l'écran Paramètres et son premier réglage**, plus bas.
+**Le chantier en cours est l'écran Paramètres et ses deux réglages**, plus bas :
+l'agrandissement au lancement, puis le titre court.
 Il ne porte qu'un chantier à la fois, sur les deux systèmes ensemble : une
 fonctionnalité neuve arrive des deux côtés ou n'arrive pas. Ce document redescend
 à sa liste quand le chantier est fini.
@@ -224,7 +225,158 @@ dialogue du client, qui ne doivent pas se retrouver à remplir l'écran.
 
 ---
 
+## Le chantier : le titre court
+
+### Ce que c'est
+
+Un client Dofus titre sa fenêtre `Alpha - Dofus Retro v1.48.21`, et la barre des
+tâches n'en montre que les premiers caractères. Le **titre court** est le réglage
+qui la ramène au seul `Alpha`. Il vit dans le même écran Paramètres, sur une
+troisième ligne, et ce qu'il refuse de faire est dans
+[perimetre.md](./perimetre.md).
+
+### Ce qui est tranché, et qui ne se rejoue pas
+
+| Question                     | Réponse                                                                  |
+| ---------------------------- | ------------------------------------------------------------------------ |
+| Le déclencheur               | Un titre de fenêtre qui porte un pseudo, donc l'entrée en jeu            |
+| L'écran de connexion         | **Laissé.** Aucun pseudo à mettre, et le client charge encore            |
+| Rejouer                      | **Oui, à chaque tour.** Un client qui réécrit son titre est resservi     |
+| Décocher le réglage          | Chaque fenêtre retrouve le titre que Dofus lui avait écrit               |
+| Le reste des fonctionnalités | **Inchangé.** La frontière garde le titre d'origine et continue d'y lire |
+| Le fil                       | Celui du balayage, comme l'agrandissement, et jamais une commande        |
+| L'attente après un clic      | **Aucune.** La commande sonne le balayage au lieu d'attendre son tour    |
+| L'échec                      | Une ligne de journal, et un nouvel essai au tour suivant                 |
+| Relancer multifus            | **Relit les titres courts** sans rien avoir retenu, voir plus bas        |
+| Quitter multifus             | **Ne rend rien.** Le client réécrit son titre, voir perimetre.md         |
+| Un raccourci                 | Aucun. Le réglage se pose une fois                                       |
+
+### Ce que le code fait
+
+**La configuration.** `Settings` gagne `short_titles: bool`, faux par défaut.
+
+**Le pseudo se relit dans le titre court, et rien ne s'en souvient.** C'est la
+décision qui porte tout le reste. Une table `fenêtre → pseudo` tenue en mémoire
+paraissait suffire, et elle est vide au lancement suivant : six fenêtres laissées
+titrées `Alpha` n'auraient plus appartenu à personne, roster vide, barre système
+vide, raccourcis morts, jusqu'à ce que chaque client réécrive son titre de
+lui-même. La règle est donc lue dans le titre : **un client écrit `Dofus` dans
+tous les titres qu'il produit** — fenêtre de jeu, écran de connexion, chargement
+— donc une fenêtre titrée d'un processus Dofus sans `Dofus` dedans est une
+fenêtre que multifus a raccourcie. C'est `matches_short_title`, et
+`GameWindow::from_client_title` la pose derrière `from_title`.
+
+**La règle est « un pseudo Dofus est un seul mot ».** Tous les titres qu'un
+client écrit portent une espace, `Dofus Retro` comme
+`Pseudo - Dofus Retro v1.48.21`. Chercher le mot `Dofus` paraissait plus simple
+et était faux : un personnage nommé `Dofusito` serait passé hors ligne au moment
+même où l'on coche, et sa fenêtre serait restée renommée pour toujours.
+
+**Cette seconde porte ne s'ouvre que si une fenêtre courte est à l'écran**, et
+c'est lu sur l'écran et jamais sur le réglage. Le drapeau posé depuis le réglage
+faisait disparaître tout le roster dans un cas précis : coché, on quitte, on
+relance — les titres sont relus, mais la table est vide —, puis on décoche, et
+plus rien ne savait lire ces fenêtres-là. Il est donc posé à la fin de la
+tournée, d'après ce qu'elle a vu : une fenêtre qu'on n'a pas pu rendre reste une
+fenêtre dont cette règle est le seul lecteur. Une écriture refusée le pose à
+vrai, faute d'écran confirmé.
+
+**Une fenêtre possédée reste dehors.** Un titre court étant un mot, une boîte de
+dialogue du client titrée `Erreur` en est un aussi : sans le filtre `GW_OWNER`,
+elle entrait au roster comme un personnage. `titled_window` fait donc le même
+test que `is_client_window`, et sur macOS `game_window` essaie tous les titres
+écrits par le client avant de retomber sur la lecture courte.
+
+**`tick` appelle `apply_short_titles` avant le balayage.** Dans l'autre ordre, un
+lancement réglage coché ne verrait personne pendant son premier tour.
+
+**Ce que la table garde, c'est seulement quoi remettre.** `OriginalTitles` est un
+`WindowId → titre d'origine`, et la perdre ne coûte que la restauration. Elle
+n'est jamais tenue pendant une écriture : elle est sortie du mutex, travaillée à
+part, puis remise, parce que les raccourcis lisent ce même mutex depuis le fil
+principal et qu'une écriture attend un client que multifus ne commande pas.
+
+| Système | Écrire un titre                              | Où ça se voit                   |
+| ------- | -------------------------------------------- | ------------------------------- |
+| Windows | `WM_SETTEXT` par `SendMessageTimeoutW`       | Barre des tâches, Alt+Tab       |
+| macOS   | `AXTitle` par `AXUIElementSetAttributeValue` | Barre de titre, Mission Control |
+
+**Jamais `SetWindowTextW`.** Il envoie `WM_SETTEXT` et attend la boucle de
+messages du client sans délai maximal, ce qui est exactement le gel que
+`ShowWindowAsync` évite pour l'agrandissement. Poster n'est pas une option non
+plus : le système ne transporte le texte entre deux processus que pour un message
+envoyé. D'où `SendMessageTimeoutW` avec `SMTO_ABORTIFHUNG` et cent millisecondes,
+et `GetLastError` pour séparer la fenêtre fermée du client qui n'a pas répondu.
+
+**Le balayage a un réveil, et c'est ce qui rend le clic instantané.** Le réglage
+écrivait la configuration et s'arrêtait là : le renommage attendait le tour
+suivant, donc jusqu'à une seconde de rien, ce qui se lit comme une application
+qui n'a pas entendu le clic. `runtime` tient un `NEXT_TURN`, un `Mutex<bool>` et
+sa `Condvar` ; la boucle y dort au lieu d'un `thread::sleep`, et
+`commands::set_short_titles` la sonne. Le travail ne bouge pas de son fil pour
+autant : renommer depuis le clic gèlerait la fenêtre le temps que six clients
+répondent. Dracoon, lui, renomme dans le handler de sa case, et c'est ce qu'on ne
+peut pas copier.
+
+**`runs_dofus` est passé en dernier des tests de `titled_window`.** Il ouvre le
+processus derrière une fenêtre, et `EnumWindows` en présente plusieurs centaines
+à chaque tour, trois fois par seconde depuis ce chantier. Visible, non possédée,
+titrée, et alors seulement le processus : il ne reste qu'une poignée de fenêtres
+à ouvrir au lieu de tout l'écran. `is_client_window` fait pareil.
+
+**Deux balayages par tour, et c'est le prix du fil.** `apply_short_titles` refait
+l'énumération que `game_windows` vient de faire, au lieu de rouler avec elle. Les
+fusionner ferait renommer depuis `commands::refresh` et `commands::reset`, qui
+traversent `scan` sur le fil principal : c'est exactement le gel que
+l'agrandissement évite en n'étant appelé que depuis `tick`. Le réglage décoché,
+la moitié système sort avant d'énumérer quoi que ce soit, donc ce prix n'est payé
+que par qui l'a coché.
+
+### Vérification de l'étape
+
+`cargo test` compte 151 cas sur le PC, `vitest` 206, `tsc`, `oxlint` et `clippy`
+passent. Les cinq cas neufs de `platform::window` verrouillent ce qui compte :
+une fenêtre laissée courte par le lancement d'avant porte toujours son personnage
+sans que rien ne s'en souvienne, un titre que le client a écrit se lit comme il
+s'est toujours lu, rien ne se lit comme un titre court tant que personne ne l'a
+demandé, et un personnage nommé `Dofusito` est un personnage comme un autre.
+
+**Vu marcher sur le PC le 25 août 2026**, et une seule chose : cocher la case
+pose le pseudo dans la barre des tâches sur-le-champ, sans l'attente d'une
+seconde qu'avait la première version. C'est le réveil du balayage, plus haut.
+
+**Tout le reste n'a été vu sur aucun des deux systèmes.** Ce qui demande
+une soirée : six clients connectés, la barre des tâches qui montre six pseudos ;
+le réglage décoché, les titres d'origine qui reviennent ; un personnage changé
+sans quitter le client, le titre qui suit ; une mule laissée inactive un quart
+d'heure, qui doit repasser hors ligne comme avant ; et surtout les quatre
+raccourcis, l'AutoFocus, la barre système et le relais, qui doivent se comporter
+exactement comme réglage décoché.
+
+**`AXTitle` est en lecture seule sur beaucoup d'applications**, et rien ne dit
+encore que le client Retro accepte l'écriture. S'il la refuse, le journal le
+dira, ligne par ligne, et c'est ce qui tranchera si la moitié macOS reste ou si
+`perimetre.md` gagne un refus de plus.
+
+---
+
 ## Ce qui mord, ici
+
+**Une fenêtre manquée un seul tour perd son titre d'origine.** Le `retain` de
+`write_titles` élague sur ce que la tournée a vu, et `runs_dofus` fait un
+`OpenProcess` qui peut échouer une fois pour rien ; côté macOS c'est
+`dofus_applications()`. La fenêtre reste alors courte pour de bon. Depuis que la
+lecture est sans mémoire, ça ne coûte plus qu'un titre non rendu et plus jamais
+un personnage hors ligne, et c'est ce qui rend le compromis tenable.
+
+**Trois `EnumWindows` par seconde quand tout est coché**, contre deux avant :
+`apply_short_titles`, `game_windows`, `client_windows`. La première ne reprend sa
+sortie anticipée que quand plus aucune fenêtre courte n'est à l'écran : décocher
+après un relancement laisse des fenêtres que multifus ne sait plus rendre, donc
+le troisième balayage dure jusqu'à ce que le client réécrive son titre. En
+échange, `runs_dofus` est passé en dernier des quatre tests de `titled_window` :
+il ouvre le processus derrière la fenêtre, et le bureau en présente plusieurs
+centaines à chaque tour.
 
 **Le roster n'est pas la bonne liste.** Une fenêtre n'y entre qu'avec un pseudo
 dans son titre, donc à l'entrée en jeu. Branché là, l'agrandissement laissait

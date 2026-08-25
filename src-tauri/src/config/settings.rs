@@ -45,6 +45,9 @@ pub struct Settings {
     /// Whether a game window is filled to the screen the first time Multifus
     /// sees it. Unchecked by default: nothing moves a window unasked.
     pub maximize_on_launch: bool,
+    /// Whether a game window's title is cut down to the bare nickname, so the
+    /// taskbar shows the character and nothing else. Unchecked by default.
+    pub short_titles: bool,
     /// Whether Multifus starts with the session. Unchecked by default,
     /// perimetre.md is explicit about it.
     ///
@@ -345,6 +348,7 @@ mod tests {
         assert!(settings.roster.is_empty());
         assert!(!settings.start_at_login);
         assert!(!settings.maximize_on_launch);
+        assert!(!settings.short_titles);
     }
 
     #[test]
@@ -352,6 +356,7 @@ mod tests {
         let settings = serde_json::from_str::<Settings>("{}").expect("an empty configuration");
 
         assert!(!settings.maximize_on_launch);
+        assert!(!settings.short_titles);
     }
 
     #[test]

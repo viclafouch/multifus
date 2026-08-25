@@ -1,4 +1,4 @@
-import { Maximize2, Power } from 'lucide-react'
+import { Maximize2, Power, Tag } from 'lucide-react'
 import type { Snapshot } from '@/@types/snapshot'
 import { FieldRow } from '@/components/layout/field-row'
 import { Note } from '@/components/layout/note'
@@ -6,11 +6,16 @@ import { Panel } from '@/components/layout/panel'
 import { Screen } from '@/components/layout/screen'
 import { Switch } from '@/components/ui/switch'
 import { strings } from '@/constants/strings'
-import { setMaximizeOnLaunch, setStartAtLogin } from '@/lib/multifus'
+import {
+  setMaximizeOnLaunch,
+  setShortTitles,
+  setStartAtLogin
+} from '@/lib/multifus'
 
 type SettingsScreenProps = Readonly<{
   startAtLogin: boolean
   maximizeOnLaunch: boolean
+  shortTitles: boolean
   run: (action: Promise<Snapshot>) => void
 }>
 
@@ -18,6 +23,7 @@ type SettingsScreenProps = Readonly<{
 export const SettingsScreen = ({
   startAtLogin,
   maximizeOnLaunch,
+  shortTitles,
   run
 }: SettingsScreenProps) => {
   return (
@@ -48,6 +54,19 @@ export const SettingsScreen = ({
             aria-label={strings.settings.maximizeLabel}
             onCheckedChange={(checked) => {
               run(setMaximizeOnLaunch(checked))
+            }}
+          />
+        </FieldRow>
+        <FieldRow
+          label={strings.settings.shortTitlesLabel}
+          description={strings.settings.shortTitlesDescription}
+          icon={<Tag className="size-glyph" strokeWidth={1.75} aria-hidden />}
+        >
+          <Switch
+            checked={shortTitles}
+            aria-label={strings.settings.shortTitlesLabel}
+            onCheckedChange={(short) => {
+              run(setShortTitles(short))
             }}
           />
         </FieldRow>

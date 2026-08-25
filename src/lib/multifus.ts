@@ -148,6 +148,14 @@ export const setMaximizeOnLaunch = async (maximize: boolean) => {
   return invoke<Snapshot>('set_maximize_on_launch', { maximize })
 }
 
+/**
+ * Says whether a game window's title is cut down to the bare nickname. The
+ * windows follow on the next sweep, at most a second later.
+ */
+export const setShortTitles = async (short: boolean) => {
+  return invoke<Snapshot>('set_short_titles', { short })
+}
+
 /** Puts a character in or out of the relay. Kept indefinitely, ADR 0011. */
 export const setRelayed = async (nickname: string, relayed: boolean) => {
   return invoke<Snapshot>('set_relayed', { nickname, relayed })

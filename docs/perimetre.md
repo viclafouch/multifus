@@ -24,6 +24,8 @@ Ce principe arbitre tous les compromis. Une fonctionnalité qui exige d'ouvrir l
 
 **Agrandissement au lancement.** Un client qui s'ouvre remplit l'écran tout seul, une seule fois, dès l'écran de connexion et sans attendre qu'un personnage soit choisi. Réglage décoché par défaut : multifus ne déplace aucune fenêtre sans qu'on le lui ait demandé. Une fois coché, il ne s'applique qu'aux clients ouverts ensuite, et jamais à ceux qui sont déjà là.
 
+**Titre court.** Une fenêtre de client ne porte plus que le pseudo du personnage, `Alpha` au lieu de `Alpha - Dofus Retro v1.48.21`. Six clients deviennent lisibles d'un coup d'œil dans la barre des tâches de Windows, dans la barre de titre de macOS. Réglage décoché par défaut, et décoché à nouveau chaque fenêtre retrouve le titre que Dofus lui avait écrit. Le pseudo n'apparaît qu'une fois le personnage choisi, l'écran de connexion n'en portant aucun.
+
 **Relais.** On quitte son bureau, on active le relais depuis la barre système ou depuis l'écran Relais, et chaque message privé reçu par un personnage relayé arrive dans un salon Telegram sur le téléphone. Un des quatre raccourcis frappé signifie qu'on est revenu et coupe le relais. Tant qu'un personnage relayé est connecté, l'écran est tenu éveillé, sans quoi le verrouillage de session couperait la lecture des bannières et le relais deviendrait muet sans le dire. Le pseudo et le type partent toujours, le texte du message seulement si l'utilisateur l'a coché.
 
 Le relais dit aussi quand il cesse d'entendre, et c'est un avis et non une notification de jeu. La raison est le quart d'heure : **Dofus déconnecte un client resté inactif**, et multifus n'a pas le droit d'y remédier, voir plus bas. Une absence d'une heure est donc une absence où le relais devient sourd au bout de quinze minutes, et un téléphone muet se lit « personne ne m'a écrit ». L'avis est ce qui empêche ce contresens.
@@ -57,6 +59,14 @@ Tous restent inertes tant qu'une fenêtre Dofus n'est pas au premier plan. Sans 
 **Rejouer l'agrandissement.** Une fenêtre est agrandie la première fois que multifus la voit, jamais une seconde. Remise en petit à la main, elle reste en petit : forcer serait un gestionnaire de fenêtres qui se dispute avec l'utilisateur. La déconnexion du quart d'heure et le retour à l'écran des personnages ne la rendent pas neuve.
 
 **Passer au premier plan en agrandissant.** Agrandir n'est pas focus. Un client qui s'ouvre pendant qu'on joue dans une autre fenêtre remplit son écran là où il est et ne prend rien. C'est pour ça que Windows n'emploie pas `ShowWindow`, dont le `SW_MAXIMIZE` active.
+
+**Renommer une fenêtre qui n'a pas encore de personnage.** L'écran de connexion et l'écran de sélection ne portent aucun pseudo, et un titre court n'y aurait rien à mettre. Contrairement à l'agrandissement, qui part dès l'ouverture du client, celui-ci attend l'entrée en jeu. C'est aussi ce qui le rend sûr : la fenêtre renommée est celle d'un client qui répond, jamais celle d'un client en train de charger.
+
+**Rendre les titres en quittant.** multifus s'arrête sur le menu de la barre système, qui tourne sur le fil principal. Rendre six titres y ferait attendre la fermeture derrière six clients qui n'ont aucune obligation de répondre, et sur macOS une écriture d'accessibilité attend six secondes par appel avant d'abandonner. Le prix est une fermeture qui peut se figer une demi-minute, contre un titre que le client réécrit lui-même au changement de personnage, à la déconnexion du quart d'heure et au lancement suivant. Les fenêtres restent donc nommées, et multifus relancé continue de les lire.
+
+**Rendre un titre que multifus n'a pas écrit.** Décocher rend son titre à chaque fenêtre renommée depuis le lancement en cours, et à celles-là seulement. Quitté puis relancé, multifus sait toujours lire le pseudo d'une fenêtre courte, mais il ne sait plus quelle version du client était écrite derrière : reconstruire un `Alpha - Dofus Retro` sans numéro serait inventer un titre, ce qui est pire qu'en laisser un que le client rendra tout seul.
+
+**Renommer autre chose que le titre.** Ni l'icône de la fenêtre, que Dracoon change par personnage, ni l'ordre des boutons de la barre des tâches, que l'[ADR 0003](./adr/0003-abandon-ordre-initiative.md) a déjà refusé. Un titre suffit à distinguer six clients, et c'est la seule chose que les deux systèmes savent écrire.
 
 **Toute forme d'automatisation du jeu, à une exception écrite.** multifus ne lit pas la mémoire du client, ne modifie aucun fichier, ne joue à la place de personne et n'empêche pas la déconnexion pour inactivité. Les outils de type macro sont interdits par Ankama et restent hors de ce projet.
 
@@ -102,6 +112,7 @@ multifus vise **macOS et Windows**. Ni iOS, ni Android, ni Linux, que Tauri sait
 | Écran tenu éveillé                     | `PowerSetRequest`                  | `IOPMAssertionCreateWithName`                              |
 | Collage d’une réponse                  | `SendInput`, `Control+V`           | `CGEventPost`, `Super+V`                                   |
 | Agrandissement d’une fenêtre           | `SetWindowPos` sur le `rcWork`     | `AXPosition` et `AXSize` sur le `visibleFrame`             |
+| Titre court                            | `WM_SETTEXT`, barre des tâches     | `AXTitle`, barre de titre et Mission Control               |
 
 Le détail et les mesures sont dans [ADR 0002](./adr/0002-notifications-macos-via-accessibility.md).
 

@@ -111,6 +111,7 @@ const CurrentScreen = ({ screen, snapshot, run }: CurrentScreenProps) => {
       <SettingsScreen
         startAtLogin={snapshot.startAtLogin}
         maximizeOnLaunch={snapshot.maximizeOnLaunch}
+        shortTitles={snapshot.shortTitles}
         run={run}
       />
     )

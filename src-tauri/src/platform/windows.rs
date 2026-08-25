@@ -8,6 +8,7 @@ use std::collections::HashMap;
 use std::collections::HashSet;
 use std::ffi::c_void;
 use std::iter::once;
+use std::mem::take;
 use std::panic::catch_unwind;
 use std::panic::AssertUnwindSafe;
 use std::path::Path;
@@ -26,9 +27,12 @@ use std::time::Instant;
 use windows::core::BOOL;
 use windows::core::PWSTR;
 use windows::Win32::Foundation::CloseHandle;
+use windows::Win32::Foundation::GetLastError;
+use windows::Win32::Foundation::ERROR_INVALID_WINDOW_HANDLE;
 use windows::Win32::Foundation::HANDLE;
 use windows::Win32::Foundation::HWND;
 use windows::Win32::Foundation::LPARAM;
+use windows::Win32::Foundation::WPARAM;
 use windows::Win32::System::Com::CoInitializeEx;
 use windows::Win32::System::Com::COINIT_APARTMENTTHREADED;
 use windows::Win32::System::Power::PowerClearRequest;
@@ -66,6 +70,7 @@ use windows::Win32::UI::WindowsAndMessaging::IsIconic;
 use windows::Win32::UI::WindowsAndMessaging::IsWindow;
 use windows::Win32::UI::WindowsAndMessaging::IsWindowVisible;
 use windows::Win32::UI::WindowsAndMessaging::PeekMessageW;
+use windows::Win32::UI::WindowsAndMessaging::SendMessageTimeoutW;
 use windows::Win32::UI::WindowsAndMessaging::SetForegroundWindow;
 use windows::Win32::UI::WindowsAndMessaging::ShowWindow;
 use windows::Win32::UI::WindowsAndMessaging::ShowWindowAsync;
@@ -74,12 +79,14 @@ use windows::Win32::UI::WindowsAndMessaging::TranslateMessage;
 use windows::Win32::UI::WindowsAndMessaging::GW_OWNER;
 use windows::Win32::UI::WindowsAndMessaging::MSG;
 use windows::Win32::UI::WindowsAndMessaging::PM_REMOVE;
+use windows::Win32::UI::WindowsAndMessaging::SMTO_ABORTIFHUNG;
 use windows::Win32::UI::WindowsAndMessaging::SPI_GETSCREENSAVEACTIVE;
 use windows::Win32::UI::WindowsAndMessaging::SPI_GETSCREENSAVETIMEOUT;
 use windows::Win32::UI::WindowsAndMessaging::SW_MAXIMIZE;
 use windows::Win32::UI::WindowsAndMessaging::SW_RESTORE;
 use windows::Win32::UI::WindowsAndMessaging::SYSTEM_PARAMETERS_INFO_ACTION;
 use windows::Win32::UI::WindowsAndMessaging::SYSTEM_PARAMETERS_INFO_UPDATE_FLAGS;
+use windows::Win32::UI::WindowsAndMessaging::WM_SETTEXT;
 use windows::Win32::UI::WindowsAndMessaging::WNDENUMPROC;
 use windows::UI::Notifications::KnownNotificationBindings;
 use windows::UI::Notifications::Management::UserNotificationListener;
@@ -87,6 +94,7 @@ use windows::UI::Notifications::Management::UserNotificationListenerAccessStatus
 use windows::UI::Notifications::NotificationKinds;
 use windows::UI::Notifications::UserNotification;
 
+use crate::domain::extract_nickname;
 use crate::domain::GameNotification;
 use crate::platform::display::DisplayKeeper;
 use crate::platform::display::ScreenSaverDelay;
@@ -96,7 +104,9 @@ use crate::platform::notification::NotificationReport;
 use crate::platform::notification::NotificationSink;
 use crate::platform::notification::NotificationWatcher;
 use crate::platform::paste::PasteSender;
+use crate::platform::window::matches_short_title;
 use crate::platform::window::GameWindow;
+use crate::platform::window::OriginalTitles;
 use crate::platform::window::WindowId;
 use crate::platform::window::WindowManager;
 use crate::platform::Authorization;
@@ -121,18 +131,49 @@ const POLL_INTERVAL: Duration = Duration::from_millis(500);
 /// How long the watcher sleeps between two turns at its message queue.
 const PUMP_INTERVAL: Duration = Duration::from_millis(25);
 
+/// How long a title change waits on a client that is not answering.
+const TITLE_TIMEOUT_MS: u32 = 100;
+
+/// A visible window of a Dofus client, and the title it bears right now.
+type TitledWindow = (WindowId, String);
+
 /// Reads windows and changes focus through the Win32 window API.
 ///
 /// A [`WindowId`] here carries an `HWND`, and a client can own several windows,
 /// unlike macOS where one process is one client. Only the ones whose title
 /// yields a nickname become a [`GameWindow`], which settles the difference.
+///
+/// **What is remembered here is only what to put back.** Reading a nickname out
+/// of a title Multifus wrote goes through no memory at all, see
+/// [`GameWindow::from_client_title`].
 #[derive(Debug, Default)]
-pub struct Win32WindowManager;
+pub struct Win32WindowManager {
+    original_titles: Mutex<OriginalTitles>,
+    /// A window of the desktop bore a short title as of the last sweep.
+    ///
+    /// Read off the screen and never off the réglage, which is what keeps
+    /// unticking from taking a roster offline: a window Multifus cannot put back
+    /// — one an earlier launch renamed, one a client refuses to rename — is one
+    /// this rule stays the only reader of.
+    short: AtomicBool,
+}
 
 impl Win32WindowManager {
     #[must_use]
     pub fn new() -> Self {
-        Self
+        Self::default()
+    }
+
+    /// The table, taken even if a previous holder panicked.
+    fn original_titles(&self) -> MutexGuard<'_, OriginalTitles> {
+        self.original_titles
+            .lock()
+            .unwrap_or_else(PoisonError::into_inner)
+    }
+
+    /// Whether the sweep may read a bare title as a nickname.
+    fn shortens(&self) -> bool {
+        self.short.load(Ordering::Relaxed)
     }
 }
 
@@ -148,17 +189,26 @@ impl WindowManager for Win32WindowManager {
     }
 
     fn game_windows(&self) -> Result<Vec<GameWindow>> {
-        let mut windows = Vec::new();
+        let mut windows: Vec<TitledWindow> = Vec::new();
 
-        enumerate(Some(collect_game_window), &mut windows)?;
+        enumerate(Some(collect_titled_window), &mut windows)?;
 
-        Ok(windows)
+        let short = self.shortens();
+
+        Ok(windows
+            .iter()
+            .filter_map(|(id, title)| GameWindow::from_client_title(*id, title, short))
+            .collect())
     }
 
     fn foreground_game_window(&self) -> Result<Option<GameWindow>> {
         // The one window the system says is in front, put through the same
         // filter, so a shortcut costs no sweep.
-        Ok(game_window(unsafe { GetForegroundWindow() }))
+        let Some((id, title)) = titled_window(unsafe { GetForegroundWindow() }) else {
+            return Ok(None);
+        };
+
+        Ok(GameWindow::from_client_title(id, &title, self.shortens()))
     }
 
     fn is_minimized(&self, window: WindowId) -> Result<bool> {
@@ -206,6 +256,170 @@ impl WindowManager for Win32WindowManager {
 
         Ok(())
     }
+
+    fn apply_short_titles(&self, short: bool) -> Result<()> {
+        // Nothing asked for, and no short title on the desktop as of last turn:
+        // the state every launch starts on, and there is nothing to sweep for.
+        if !short && !self.shortens() {
+            return Ok(());
+        }
+
+        let mut windows: Vec<TitledWindow> = Vec::new();
+
+        enumerate(Some(collect_titled_window), &mut windows)?;
+
+        // Taken out rather than held: every write below waits on a client
+        // Multifus does not control, and the shortcuts read this same mutex from
+        // the main thread. An empty table in between costs nothing, no nickname
+        // being read through it.
+        let mut originals = take(&mut *self.original_titles());
+        let written = write_titles(&mut originals, &windows, short);
+
+        *self.original_titles() = originals;
+
+        match written {
+            Ok(short_left) => {
+                self.short.store(short_left, Ordering::Relaxed);
+
+                Ok(())
+            }
+            // A write Multifus did not see go through leaves a desktop it has
+            // not confirmed, so it keeps reading short titles until it has.
+            Err(error) => {
+                self.short.store(true, Ordering::Relaxed);
+
+                Err(error)
+            }
+        }
+    }
+}
+
+/// Cuts every game window down to its nickname, or puts back what the clients
+/// had written, and says whether any window still bears a short title.
+///
+/// One refusal never stops the windows that come after it, and the first one is
+/// what comes back.
+fn write_titles(
+    originals: &mut OriginalTitles,
+    windows: &[TitledWindow],
+    short: bool,
+) -> Result<bool> {
+    let mut failure = None;
+    let mut short_left = false;
+
+    for (id, title) in windows {
+        let written = if short {
+            shorten(originals, *id, title)
+        } else {
+            lengthen(originals, *id, title)
+        };
+
+        match written {
+            Ok(left) => short_left |= left,
+            Err(error) => {
+                short_left = true;
+                failure = failure.or(Some(error));
+            }
+        }
+    }
+
+    // What is not on the desktop any more has no title left to put back. A
+    // window that refused keeps its entry and is served again next turn.
+    let open: HashSet<WindowId> = windows.iter().map(|(id, _)| *id).collect();
+
+    originals.retain(|id, _| open.contains(id));
+
+    failure.map_or(Ok(short_left), Err)
+}
+
+/// Puts the bare nickname in a window's title bar, once, and says whether the
+/// window bears one now.
+///
+/// A title Multifus has already written is left alone, so the sweep costs one
+/// comparison per window. Anything else is read afresh, which is how a client
+/// that renames its own window — a character changed, the quarter-hour
+/// disconnection — is served again on the turn that follows.
+fn shorten(originals: &mut OriginalTitles, id: WindowId, title: &str) -> Result<bool> {
+    if matches_short_title(title).is_some() {
+        return Ok(true);
+    }
+
+    // The login screen and the loader, which have no character to name. And
+    // never a nickname the rule would not hand back: writing one no reader can
+    // find would take the character offline and lose the title for good.
+    let Some(nickname) =
+        extract_nickname(title).filter(|nickname| matches_short_title(nickname).is_some())
+    else {
+        return Ok(false);
+    };
+
+    set_window_title(window_handle(id), nickname)?;
+    originals.insert(id, title.to_owned());
+
+    Ok(true)
+}
+
+/// Puts back the title the client had written, and says whether the window
+/// still bears a short title.
+///
+/// A window Multifus never touched, and one that has renamed itself since, are
+/// both left alone. A window an earlier launch renamed has no title to put back
+/// and stays short, which is why it answers `true`: nothing else can read a
+/// nickname in it.
+fn lengthen(originals: &mut OriginalTitles, id: WindowId, title: &str) -> Result<bool> {
+    let short = matches_short_title(title).is_some();
+
+    let Some(original) = originals.get(&id) else {
+        return Ok(short);
+    };
+
+    // The `?` leaves the forgetting below unreached, so a window that refuses
+    // keeps its entry and is served again next turn.
+    if short {
+        set_window_title(window_handle(id), original)?;
+    }
+
+    originals.remove(&id);
+
+    Ok(false)
+}
+
+/// Writes a window's title, without ever waiting on a client that is not
+/// answering.
+///
+/// Never `SetWindowTextW`: it sends `WM_SETTEXT` and waits on the client's own
+/// message pump with no ceiling, which is the freeze `ShowWindowAsync` was
+/// chosen to avoid for the maximizing. Posting is not an option either, the
+/// system only marshals the text across processes for a message that is sent.
+fn set_window_title(handle: HWND, title: &str) -> Result<()> {
+    let text: Vec<u16> = title.encode_utf16().chain(once(0)).collect();
+
+    let answered = unsafe {
+        SendMessageTimeoutW(
+            handle,
+            WM_SETTEXT,
+            WPARAM(0),
+            LPARAM(text.as_ptr() as isize),
+            SMTO_ABORTIFHUNG,
+            TITLE_TIMEOUT_MS,
+            None,
+        )
+    };
+
+    if answered.0 != 0 {
+        return Ok(());
+    }
+
+    // A client closed between the sweep and the write answers here, and it is
+    // the ordinary case rather than a failure the journal has to shout about.
+    if unsafe { GetLastError() } == ERROR_INVALID_WINDOW_HANDLE {
+        return Err(PlatformError::WindowGone);
+    }
+
+    Err(PlatformError::system(
+        "WM_SETTEXT",
+        "the client did not take the title in time",
+    ))
 }
 
 /// Ties Multifus's input queue to the ones a focus call has to convince,
@@ -252,11 +466,11 @@ impl Drop for AttachedInput {
     }
 }
 
-/// Collects the game windows of the desktop, one call per window.
-unsafe extern "system" fn collect_game_window(handle: HWND, lparam: LPARAM) -> BOOL {
-    let windows = unsafe { &mut *(lparam.0 as *mut Vec<GameWindow>) };
+/// Collects the titled windows of the desktop, one call per window.
+unsafe extern "system" fn collect_titled_window(handle: HWND, lparam: LPARAM) -> BOOL {
+    let windows = unsafe { &mut *(lparam.0 as *mut Vec<TitledWindow>) };
 
-    if let Some(window) = game_window(handle) {
+    if let Some(window) = titled_window(handle) {
         windows.push(window);
     }
 
@@ -287,9 +501,10 @@ unsafe extern "system" fn collect_client_window(handle: HWND, lparam: LPARAM) ->
 ///
 /// An owned window is one of its dialogs, and an untitled one is a splash or a
 /// loader; both are left where they are. The title is not read beyond being
-/// there, which is what separates this from [`game_window`].
+/// there, which is what separates this from [`GameWindow::from_title`].
 fn is_client_window(handle: HWND) -> bool {
-    if !unsafe { IsWindowVisible(handle) }.as_bool() || !runs_dofus(handle) {
+    // The cheap questions first, for the reason on [`titled_window`].
+    if !unsafe { IsWindowVisible(handle) }.as_bool() || !is_unowned(handle) {
         return false;
     }
 
@@ -297,21 +512,41 @@ fn is_client_window(handle: HWND) -> bool {
         return false;
     }
 
-    // A window with no owner answers either an error or a null handle.
-    unsafe { GetWindow(handle, GW_OWNER) }.map_or(true, |owner| owner.is_invalid())
+    runs_dofus(handle)
 }
 
-/// Keeps a window only when a Dofus client draws it and its title has a nickname.
-fn game_window(handle: HWND) -> Option<GameWindow> {
-    if !unsafe { IsWindowVisible(handle) }.as_bool() {
+/// A visible window a Dofus client draws for itself, and the title it bears,
+/// `None` for anything else on the desktop.
+///
+/// The owner test is not decoration: a dialog of the client titled `Erreur`
+/// reads as a short title, and without it that dialog would walk into the roster
+/// as a character. It is the same test [`is_client_window`] makes.
+///
+/// **`runs_dofus` comes last, and that is a measure and not a style.** It opens
+/// the process behind the window, and the desktop hands this callback every
+/// top-level window there is, three times a second. Asking the three cheap
+/// questions first leaves it a handful of windows to look up instead of every
+/// one on the screen.
+fn titled_window(handle: HWND) -> Option<TitledWindow> {
+    if !unsafe { IsWindowVisible(handle) }.as_bool() || !is_unowned(handle) {
         return None;
     }
 
-    if !runs_dofus(handle) {
+    let title = window_title(handle);
+
+    // A client's own untitled window is a splash or a loader, and no caller has
+    // anything to do with one: neither a nickname to read nor a title to write.
+    if title.trim().is_empty() || !runs_dofus(handle) {
         return None;
     }
 
-    GameWindow::from_title(window_id(handle), &window_title(handle))
+    Some((window_id(handle), title))
+}
+
+/// Whether a window is one a client draws for itself rather than one of its
+/// dialogs. A window with no owner answers either an error or a null handle.
+fn is_unowned(handle: HWND) -> bool {
+    unsafe { GetWindow(handle, GW_OWNER) }.map_or(true, |owner| owner.is_invalid())
 }
 
 /// The handle behind a token, once it is known to still be a client's.

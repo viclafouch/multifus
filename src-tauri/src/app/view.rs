@@ -73,6 +73,9 @@ pub struct Snapshot {
     /// what the system currently holds, see [`crate::app::autostart`].
     pub start_at_login: bool,
     pub maximize_on_launch: bool,
+    /// A game window's title is cut down to the bare nickname, so the taskbar
+    /// shows the character and nothing else.
+    pub short_titles: bool,
     pub authorization: AuthorizationView,
     pub config: ConfigView,
     /// Where Multifus is with the version that is out, see [`crate::app::update`].

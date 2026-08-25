@@ -96,6 +96,7 @@ export type SettingChange =
       readonly enabled: boolean
     }
   | { readonly kind: 'maximizeOnLaunch'; readonly maximize: boolean }
+  | { readonly kind: 'shortTitles'; readonly short: boolean }
   | { readonly kind: 'relayBody'; readonly sendBody: boolean }
   | {
       readonly kind: 'wakesMinimized'
@@ -113,6 +114,7 @@ export type JournalEvent =
   | { readonly kind: 'characterOnline'; readonly nickname: string }
   | { readonly kind: 'clientMaximized' }
   | { readonly kind: 'clientMaximizeFailed'; readonly detail: string }
+  | { readonly kind: 'shortTitlesFailed'; readonly detail: string }
   | { readonly kind: 'configNotSetAside'; readonly detail: string }
   | { readonly kind: 'displayAwake'; readonly held: boolean }
   | { readonly kind: 'displayAwakeFailed'; readonly detail: string }

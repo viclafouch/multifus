@@ -258,6 +258,22 @@ const SETTING_CASES = {
       line: 'Agrandissement des fenêtres au lancement désactivé.'
     }
   ],
+  shortTitles: [
+    {
+      event: {
+        kind: 'setting',
+        change: { kind: 'shortTitles', short: true }
+      },
+      line: 'Pseudo seul dans le titre des fenêtres activé.'
+    },
+    {
+      event: {
+        kind: 'setting',
+        change: { kind: 'shortTitles', short: false }
+      },
+      line: 'Pseudo seul dans le titre des fenêtres désactivé.'
+    }
+  ],
   relayBody: [
     {
       event: {
@@ -815,6 +831,12 @@ const JOURNAL_CASES = {
       line: PLAIN_LINES.clientMaximized
     }
   ],
+  shortTitlesFailed: [
+    {
+      event: { kind: 'shortTitlesFailed', detail: DETAIL },
+      line: `${DETAILED_LINES.shortTitlesFailed} : ${DETAIL}`
+    }
+  ],
   clientMaximizeFailed: [
     {
       event: { kind: 'clientMaximizeFailed', detail: DETAIL },
@@ -987,6 +1009,7 @@ const SNAPSHOT = {
   wakesMinimized: true,
   startAtLogin: false,
   maximizeOnLaunch: false,
+  shortTitles: false,
   authorization: { granted: true, listening: true },
   config: { path: '/tmp/multifus/config.json', problem: null },
   update: { kind: 'upToDate' },

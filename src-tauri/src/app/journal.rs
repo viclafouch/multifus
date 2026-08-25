@@ -229,6 +229,10 @@ pub enum JournalEvent {
     /// A client had just opened and its window would not be filled.
     ClientMaximizeFailed { detail: String },
 
+    /// A window's title could not be cut down to the nickname, or put back.
+    /// Nobody is named: what the system turned down is the write itself.
+    ShortTitlesFailed { detail: String },
+
     /// A character was clicked in the system tray, and this is what came of it.
     TrayFocus {
         nickname: String,
@@ -436,6 +440,11 @@ pub enum SettingChange {
 
     MaximizeOnLaunch {
         maximize: bool,
+    },
+
+    /// Whether a game window's title is cut down to the bare nickname.
+    ShortTitles {
+        short: bool,
     },
 
     /// Whether the text of a private message goes out with it, ADR 0008. The

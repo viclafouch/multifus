@@ -42,6 +42,9 @@ export type Snapshot = {
   /** What the user asked for, not what the system currently holds. */
   readonly startAtLogin: boolean
   readonly maximizeOnLaunch: boolean
+  /** A game window's title is cut down to the bare nickname, so the taskbar
+   * shows the character and nothing else. */
+  readonly shortTitles: boolean
   readonly authorization: Authorization
   readonly config: ConfigStatus
   /** Where Multifus is with the version that is published. */

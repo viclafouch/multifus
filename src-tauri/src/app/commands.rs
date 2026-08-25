@@ -230,6 +230,21 @@ pub fn set_maximize_on_launch(app: AppHandle, maximize: bool) -> Snapshot {
     runtime::emit_snapshot(&app)
 }
 
+/// Says whether a game window's title is cut down to the bare nickname.
+///
+/// The windows are not renamed here: the write waits on the client's own message
+/// pump, and a command runs on the main thread, where it would freeze the
+/// window. The scan is rung instead, so the taskbar follows the click rather
+/// than the interval.
+#[tauri::command]
+pub fn set_short_titles(app: AppHandle, short: bool) -> Snapshot {
+    lock(&app).set_short_titles(short);
+
+    runtime::wake();
+
+    runtime::emit_snapshot(&app)
+}
+
 // -- The relay screen -----------------------------------------------------
 
 /// Puts a character in or out of the relay. Kept indefinitely, ADR 0011.

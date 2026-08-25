@@ -287,6 +287,11 @@ const settingLine = (change: SettingChange) => {
 
       return `Agrandissement des fenêtres au lancement ${what}.`
     }
+    case 'shortTitles': {
+      const what = change.short ? 'activé' : 'désactivé'
+
+      return `Pseudo seul dans le titre des fenêtres ${what}.`
+    }
     case 'relayBody': {
       const what = change.sendBody ? 'activé' : 'désactivé'
 

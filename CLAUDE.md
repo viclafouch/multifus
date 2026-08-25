@@ -4,9 +4,9 @@ Gestionnaire de fenêtres Dofus Retro en multicompte, macOS et Windows. À lire 
 - [docs/perimetre.md](./docs/perimetre.md) — ce que le projet refuse de faire.
 - [docs/adr](./docs/adr) — décisions déjà tranchées, ne pas les rejouer.
 - [docs/plan.md](./docs/plan.md) — le chantier en cours, un seul à la fois, sur
-  les deux systèmes. Aujourd'hui, l'**agrandissement au lancement** : un client
-  qui s'ouvre remplit l'écran tout seul, une fois, et l'écran Paramètres qui le
-  règle.
+  les deux systèmes. Aujourd'hui, l'écran Paramètres et ce qu'il règle :
+  l'**agrandissement au lancement**, un client qui s'ouvre remplit l'écran tout
+  seul une fois, et le **titre court**, une fenêtre ne porte plus que le pseudo.
 - [docs/pieges.md](./docs/pieges.md) — ce qui mord partout, propre à aucun
   chantier ni à aucun système.
 - [docs/macos.md](./docs/macos.md) et [docs/windows.md](./docs/windows.md) —
