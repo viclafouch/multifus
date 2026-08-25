@@ -1,7 +1,5 @@
 //! Game windows as the core sees them, and the interface that produces them.
 
-use std::collections::HashMap;
-
 use crate::domain::extract_nickname;
 use crate::platform::error::Result;
 use crate::platform::Authorization;
@@ -147,12 +145,36 @@ pub fn matches_short_title(title: &str) -> Option<&str> {
 /// The name of the game, which no character answers to.
 const THE_GAME: &str = "Dofus";
 
-/// The title the client had written, for each window Multifus renamed.
+/// What a client writes after a nickname in a window title, ` - Dofus Retro
+/// v1.48.21`, read off a real one.
 ///
-/// Its one job is putting a title back when the réglage is unticked. Losing it
-/// costs that and nothing else: reading a nickname never goes through it, see
-/// [`GameWindow::from_client_title`].
-pub type OriginalTitles = HashMap<WindowId, String>;
+/// **One string is the whole of what putting a short title back needs**, and it
+/// is what a table of renamed windows could not be: it survives the launch that
+/// learned it. A table was tried first, and unticking after a relaunch then put
+/// nothing back — every window Multifus had renamed in an earlier run was one it
+/// no longer knew a title for.
+///
+/// Never guessed. A suffix nobody has been seen writing means a window is left
+/// short, which is a title left alone rather than one invented.
+#[must_use]
+pub fn title_suffix(title: &str) -> Option<&str> {
+    let nickname = extract_nickname(title)?;
+
+    title.trim().strip_prefix(nickname)
+}
+
+/// What one sweep of [`WindowManager::apply_short_titles`] found out.
+///
+/// The implementations' own tally, and the shape of it is the same on both
+/// systems because the two questions are: does the boundary still have to read
+/// short titles, and did a client teach it what it writes after a nickname.
+#[derive(Debug, Default, Clone, PartialEq, Eq)]
+pub struct ShortTitleReport {
+    /// A window still bears a short title, so the sweep has to keep reading them.
+    pub on_screen: bool,
+    /// What a client was seen writing after a nickname, when a title showed it.
+    pub suffix: Option<String>,
+}
 
 /// Enumerates the game windows, focuses one, and tells whether the foreground
 /// window is a Dofus one.
@@ -249,7 +271,11 @@ pub trait WindowManager: Send + Sync {
     /// **It is also what tells the implementation what the user asked for**, and
     /// [`WindowManager::game_windows`] reads short titles only once it has been
     /// told `true`. Call it before the sweep that reads the roster.
-    fn apply_short_titles(&self, short: bool) -> Result<()>;
+    ///
+    /// `suffix` is what a client was last seen writing after a nickname, and it
+    /// is what a title is put back from, see [`title_suffix`]. What comes back
+    /// is what this turn saw one write, for the caller to keep across launches.
+    fn apply_short_titles(&self, short: bool, suffix: Option<&str>) -> Result<Option<String>>;
 }
 
 #[cfg(test)]
@@ -322,6 +348,28 @@ mod tests {
                 .map(|window| window.nickname().to_owned()),
             Some("Dofusito".to_owned())
         );
+    }
+
+    #[test]
+    fn what_a_client_writes_after_a_nickname_is_read_off_a_real_title() {
+        assert_eq!(
+            title_suffix("Alpha - Dofus Retro v1.48.21"),
+            Some(" - Dofus Retro v1.48.21")
+        );
+        // Put back together, it is the title the client had written.
+        assert_eq!(
+            format!(
+                "Alpha{}",
+                title_suffix("Alpha - Dofus Retro").expect("a suffix")
+            ),
+            "Alpha - Dofus Retro"
+        );
+    }
+
+    #[test]
+    fn a_title_with_no_nickname_teaches_nothing() {
+        assert_eq!(title_suffix("Dofus Retro"), None);
+        assert_eq!(title_suffix(""), None);
     }
 
     #[test]

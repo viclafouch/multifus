@@ -30,11 +30,13 @@ use std::time::Duration;
 use tauri::AppHandle;
 use tauri::Emitter;
 use tauri::Manager;
+use tauri::RunEvent;
 use tauri_plugin_opener::OpenerExt;
 
 use crate::app::journal::JournalEvent;
 use crate::app::journal::Outcome;
 use crate::app::journal::Work;
+use crate::app::main_window;
 use crate::app::relay;
 use crate::app::state::lock;
 use crate::app::state::Decision;
@@ -246,22 +248,69 @@ fn maximize_new_clients(app: &AppHandle) -> bool {
 /// The lock is taken and given back around the boundary call, never held across
 /// it: writing a title waits on a client that Multifus does not control.
 fn apply_short_titles(app: &AppHandle) -> bool {
-    let short = lock(app).shortens_titles();
+    let (short, suffix) = {
+        let state = lock(app);
+
+        (state.shortens_titles(), state.client_title_suffix())
+    };
+
     let written = app
         .state::<PlatformWindowManager>()
-        .apply_short_titles(short);
+        .apply_short_titles(short, suffix.as_deref());
 
     match written {
+        Ok(Some(learned)) => {
+            lock(app).learn_title_suffix(learned);
+
+            false
+        }
         // A client closed between the sweep and the write is the ordinary case
         // and reads as one, exactly as it does for the AutoFocus.
-        Ok(()) | Err(PlatformError::AuthorizationDenied) | Err(PlatformError::WindowGone) => false,
+        Ok(None) | Err(PlatformError::AuthorizationDenied) | Err(PlatformError::WindowGone) => {
+            false
+        }
         Err(error) => lock(app).log_unless_repeated(JournalEvent::ShortTitlesFailed {
             detail: error.to_string(),
         }),
     }
 }
 
-/// Asks the boundary which game windows exist and takes the answer in.
+/// The one callback of the run loop.
+///
+/// Two things reach it. The Dock icon being clicked, which is
+/// [`main_window::show_on_dock_click`]'s to answer, and the process ending,
+/// which is the last moment a client can be handed its title back.
+pub fn on_run_event(app: &AppHandle, event: RunEvent) {
+    if matches!(event, RunEvent::Exit) {
+        give_titles_back(app);
+
+        return;
+    }
+
+    main_window::show_on_dock_click(app, event);
+}
+
+/// Puts every renamed window's title back on the way out.
+///
+/// Quitting is not unticking, so the réglage stays as the user left it and the
+/// next launch shortens again; what this leaves behind is a desktop as it was
+/// found. It runs on the main thread, and the process is ending anyway, so a
+/// client that has wedged can slow the quit down — bounded on Windows by the
+/// timeout of each write, and on macOS by accessibility's own.
+///
+/// A quit this never sees, a crash or a kill, costs nothing that cannot be
+/// repaired: the title is put back from the suffix on the launch that follows.
+/// Nothing is journalled, the file being on its way out too.
+fn give_titles_back(app: &AppHandle) {
+    let suffix = lock(app).client_title_suffix();
+
+    drop(
+        app.state::<PlatformWindowManager>()
+            .apply_short_titles(false, suffix.as_deref()),
+    );
+}
+
+/// Asks the boundary which game windows exist and takes the answer in./// Asks the boundary which game windows exist and takes the answer in.
 fn refresh_windows(app: &AppHandle) -> ScanChange {
     let outcome = app.state::<PlatformWindowManager>().game_windows();
 

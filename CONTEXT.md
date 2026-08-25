@@ -43,7 +43,7 @@ Se dit d'une fenêtre que l'utilisateur a rangée dans le Dock ou la barre des t
 _Avoid_: Minimisée, masquée, iconifiée, cachée
 
 **Titre court** (`short_title`):
-Le titre d'une fenêtre ramené au seul pseudo, `Alpha` au lieu de `Alpha - Dofus Retro v1.48.21`. C'est ce que la barre des tâches montre sur Windows et la barre de titre sur macOS, et six clients y deviennent lisibles d'un coup d'œil. Réglage global, décoché par défaut ; décoché à nouveau, chaque fenêtre renommée depuis le lancement en cours retrouve le titre que Dofus lui avait écrit. Il ne cache rien à multifus, qui reconnaît un titre court et y lit le pseudo sans avoir eu besoin de se souvenir de l'avoir écrit : rien d'autre dans l'application ne change de comportement, un relancement compris.
+Le titre d'une fenêtre ramené au seul pseudo, `Alpha` au lieu de `Alpha - Dofus Retro v1.48.21`. C'est ce que la barre des tâches montre sur Windows et la barre de titre sur macOS, et six clients y deviennent lisibles d'un coup d'œil. Réglage global, décoché par défaut ; décocher, comme quitter multifus, rend à chaque fenêtre le titre que Dofus lui avait écrit. Il ne cache rien à multifus, qui reconnaît un titre court et y lit le pseudo sans avoir eu besoin de se souvenir de l'avoir écrit : rien d'autre dans l'application ne change de comportement, un relancement compris.
 _Avoid_: Renommage, titre raccourci, alias, étiquette
 
 ### Veille et défilement

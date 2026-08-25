@@ -365,6 +365,7 @@ mod tests {
             },
             maximize_on_launch: true,
             short_titles: true,
+            client_title_suffix: Some(" - Dofus Retro v1.48.21".to_owned()),
             quick_replies: vec![QuickReply {
                 id: QuickReplyId::default().next(),
                 text: "prix libre".to_owned(),

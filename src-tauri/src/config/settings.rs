@@ -48,6 +48,14 @@ pub struct Settings {
     /// Whether a game window's title is cut down to the bare nickname, so the
     /// taskbar shows the character and nothing else. Unchecked by default.
     pub short_titles: bool,
+    /// What a client was last seen writing after a nickname in a window title,
+    /// ` - Dofus Retro v1.48.21`.
+    ///
+    /// Learned, never asked for and never guessed, and it is here rather than in
+    /// memory for one reason: a title Multifus shortened outlives the launch
+    /// that shortened it, so what puts it back has to outlive it too. See
+    /// [`crate::platform::window::title_suffix`].
+    pub client_title_suffix: Option<String>,
     /// Whether Multifus starts with the session. Unchecked by default,
     /// perimetre.md is explicit about it.
     ///
@@ -349,6 +357,7 @@ mod tests {
         assert!(!settings.start_at_login);
         assert!(!settings.maximize_on_launch);
         assert!(!settings.short_titles);
+        assert_eq!(settings.client_title_suffix, None);
     }
 
     #[test]

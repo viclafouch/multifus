@@ -21,15 +21,18 @@ use crate::app::main_window;
 /// No mobile entry point: this application targets macOS and Windows and
 /// nothing else, see perimetre.md.
 ///
-/// Nothing intercepts the exit. The window is never destroyed, only hidden, so
-/// the « last window closed » exit this application would have to prevent never
-/// happens; and preventing it anyway would take `Cmd+Q` away from a macOS user
-/// for no gain. What ends Multifus is the Quit item of the system tray, or the
-/// system's own quit, and both are meant to.
+/// Nothing prevents the exit, and the one thing that answers it does not delay
+/// it by choice: the window is never destroyed, only hidden, so the « last
+/// window closed » exit this application would have to prevent never happens,
+/// and preventing it anyway would take `Cmd+Q` away from a macOS user for no
+/// gain. What ends Multifus is the Quit item of the system tray, or the system's
+/// own quit, and both are meant to. On the way out, the clients are handed their
+/// titles back, see [`app::runtime::on_run_event`].
 ///
 /// The run loop is given a callback, which is why this builds and runs in two
-/// steps rather than calling `run` on the builder. The one event it answers is
-/// the Dock icon being clicked, see [`main_window::show_on_dock_click`].
+/// steps rather than calling `run` on the builder. It answers two events, the
+/// Dock icon being clicked and the process ending, see
+/// [`app::runtime::on_run_event`].
 pub fn run() {
     tauri::Builder::default()
         // First, so that everything the setup below writes is already on disk.
@@ -108,5 +111,5 @@ pub fn run() {
         ])
         .build(tauri::generate_context!())
         .expect("error while building Multifus")
-        .run(main_window::show_on_dock_click);
+        .run(app::runtime::on_run_event);
 }

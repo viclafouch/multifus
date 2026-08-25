@@ -8,7 +8,6 @@ use std::collections::HashMap;
 use std::collections::HashSet;
 use std::ffi::c_void;
 use std::iter::once;
-use std::mem::take;
 use std::panic::catch_unwind;
 use std::panic::AssertUnwindSafe;
 use std::path::Path;
@@ -105,8 +104,9 @@ use crate::platform::notification::NotificationSink;
 use crate::platform::notification::NotificationWatcher;
 use crate::platform::paste::PasteSender;
 use crate::platform::window::matches_short_title;
+use crate::platform::window::title_suffix;
 use crate::platform::window::GameWindow;
-use crate::platform::window::OriginalTitles;
+use crate::platform::window::ShortTitleReport;
 use crate::platform::window::WindowId;
 use crate::platform::window::WindowManager;
 use crate::platform::Authorization;
@@ -143,18 +143,18 @@ type TitledWindow = (WindowId, String);
 /// unlike macOS where one process is one client. Only the ones whose title
 /// yields a nickname become a [`GameWindow`], which settles the difference.
 ///
-/// **What is remembered here is only what to put back.** Reading a nickname out
-/// of a title Multifus wrote goes through no memory at all, see
-/// [`GameWindow::from_client_title`].
+/// **Nothing is remembered here.** Reading a nickname out of a title Multifus
+/// wrote goes through no memory, see [`GameWindow::from_client_title`], and
+/// putting one back goes through one string the core keeps across launches, see
+/// [`title_suffix`].
 #[derive(Debug, Default)]
 pub struct Win32WindowManager {
-    original_titles: Mutex<OriginalTitles>,
     /// A window of the desktop bore a short title as of the last sweep.
     ///
     /// Read off the screen and never off the réglage, which is what keeps
     /// unticking from taking a roster offline: a window Multifus cannot put back
-    /// — one an earlier launch renamed, one a client refuses to rename — is one
-    /// this rule stays the only reader of.
+    /// — one a client refuses to rename — is one this rule stays the only reader
+    /// of.
     short: AtomicBool,
 }
 
@@ -162,13 +162,6 @@ impl Win32WindowManager {
     #[must_use]
     pub fn new() -> Self {
         Self::default()
-    }
-
-    /// The table, taken even if a previous holder panicked.
-    fn original_titles(&self) -> MutexGuard<'_, OriginalTitles> {
-        self.original_titles
-            .lock()
-            .unwrap_or_else(PoisonError::into_inner)
     }
 
     /// Whether the sweep may read a bare title as a nickname.
@@ -257,79 +250,67 @@ impl WindowManager for Win32WindowManager {
         Ok(())
     }
 
-    fn apply_short_titles(&self, short: bool) -> Result<()> {
+    fn apply_short_titles(&self, short: bool, suffix: Option<&str>) -> Result<Option<String>> {
         // Nothing asked for, and no short title on the desktop as of last turn:
         // the state every launch starts on, and there is nothing to sweep for.
         if !short && !self.shortens() {
-            return Ok(());
+            return Ok(None);
         }
 
         let mut windows: Vec<TitledWindow> = Vec::new();
 
         enumerate(Some(collect_titled_window), &mut windows)?;
 
-        // Taken out rather than held: every write below waits on a client
-        // Multifus does not control, and the shortcuts read this same mutex from
-        // the main thread. An empty table in between costs nothing, no nickname
-        // being read through it.
-        let mut originals = take(&mut *self.original_titles());
-        let written = write_titles(&mut originals, &windows, short);
+        let written = write_titles(&windows, short, suffix);
 
-        *self.original_titles() = originals;
-
-        match written {
-            Ok(short_left) => {
-                self.short.store(short_left, Ordering::Relaxed);
-
-                Ok(())
-            }
+        match &written {
+            Ok(report) => self.short.store(report.on_screen, Ordering::Relaxed),
             // A write Multifus did not see go through leaves a desktop it has
             // not confirmed, so it keeps reading short titles until it has.
-            Err(error) => {
-                self.short.store(true, Ordering::Relaxed);
-
-                Err(error)
-            }
+            Err(_) => self.short.store(true, Ordering::Relaxed),
         }
+
+        written.map(|report| report.suffix)
     }
 }
 
 /// Cuts every game window down to its nickname, or puts back what the clients
-/// had written, and says whether any window still bears a short title.
+/// had written, and tallies what the turn saw.
 ///
 /// One refusal never stops the windows that come after it, and the first one is
 /// what comes back.
 fn write_titles(
-    originals: &mut OriginalTitles,
     windows: &[TitledWindow],
     short: bool,
-) -> Result<bool> {
+    suffix: Option<&str>,
+) -> Result<ShortTitleReport> {
+    let mut report = ShortTitleReport::default();
     let mut failure = None;
-    let mut short_left = false;
 
     for (id, title) in windows {
+        // Learned whether or not this window is renamed: any title a client
+        // wrote teaches what it writes after a nickname.
+        report.suffix = report
+            .suffix
+            .take()
+            .or_else(|| title_suffix(title).map(str::to_owned));
+
         let written = if short {
-            shorten(originals, *id, title)
+            shorten(*id, title)
         } else {
-            lengthen(originals, *id, title)
+            lengthen(*id, title, suffix)
         };
 
         match written {
-            Ok(left) => short_left |= left,
+            Ok(on_screen) => report.on_screen |= on_screen,
             Err(error) => {
-                short_left = true;
+                report.on_screen = true;
                 failure = failure.or(Some(error));
             }
         }
     }
 
-    // What is not on the desktop any more has no title left to put back. A
-    // window that refused keeps its entry and is served again next turn.
-    let open: HashSet<WindowId> = windows.iter().map(|(id, _)| *id).collect();
-
-    originals.retain(|id, _| open.contains(id));
-
-    failure.map_or(Ok(short_left), Err)
+    failure.map_or(Ok(report), Err)
 }
 
 /// Puts the bare nickname in a window's title bar, once, and says whether the
@@ -339,14 +320,14 @@ fn write_titles(
 /// comparison per window. Anything else is read afresh, which is how a client
 /// that renames its own window — a character changed, the quarter-hour
 /// disconnection — is served again on the turn that follows.
-fn shorten(originals: &mut OriginalTitles, id: WindowId, title: &str) -> Result<bool> {
+fn shorten(id: WindowId, title: &str) -> Result<bool> {
     if matches_short_title(title).is_some() {
         return Ok(true);
     }
 
     // The login screen and the loader, which have no character to name. And
     // never a nickname the rule would not hand back: writing one no reader can
-    // find would take the character offline and lose the title for good.
+    // find would take the character offline.
     let Some(nickname) =
         extract_nickname(title).filter(|nickname| matches_short_title(nickname).is_some())
     else {
@@ -354,7 +335,6 @@ fn shorten(originals: &mut OriginalTitles, id: WindowId, title: &str) -> Result<
     };
 
     set_window_title(window_handle(id), nickname)?;
-    originals.insert(id, title.to_owned());
 
     Ok(true)
 }
@@ -362,24 +342,19 @@ fn shorten(originals: &mut OriginalTitles, id: WindowId, title: &str) -> Result<
 /// Puts back the title the client had written, and says whether the window
 /// still bears a short title.
 ///
-/// A window Multifus never touched, and one that has renamed itself since, are
-/// both left alone. A window an earlier launch renamed has no title to put back
-/// and stays short, which is why it answers `true`: nothing else can read a
-/// nickname in it.
-fn lengthen(originals: &mut OriginalTitles, id: WindowId, title: &str) -> Result<bool> {
-    let short = matches_short_title(title).is_some();
-
-    let Some(original) = originals.get(&id) else {
-        return Ok(short);
+/// A window that never was short is left alone. One whose suffix nobody has been
+/// seen writing is left short, which is a title left alone rather than one
+/// invented, and it answers `true`: nothing else can read a nickname in it.
+fn lengthen(id: WindowId, title: &str, suffix: Option<&str>) -> Result<bool> {
+    let Some(nickname) = matches_short_title(title) else {
+        return Ok(false);
     };
 
-    // The `?` leaves the forgetting below unreached, so a window that refuses
-    // keeps its entry and is served again next turn.
-    if short {
-        set_window_title(window_handle(id), original)?;
-    }
+    let Some(suffix) = suffix else {
+        return Ok(true);
+    };
 
-    originals.remove(&id);
+    set_window_title(window_handle(id), &format!("{nickname}{suffix}"))?;
 
     Ok(false)
 }

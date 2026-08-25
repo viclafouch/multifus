@@ -674,6 +674,24 @@ impl Multifus {
         self.settings.short_titles
     }
 
+    /// What a client was last seen writing after a nickname, and what a short
+    /// title is put back from.
+    #[must_use]
+    pub fn client_title_suffix(&self) -> Option<String> {
+        self.settings.client_title_suffix.clone()
+    }
+
+    /// Takes in what the boundary just saw a client write. Written to disk only
+    /// when it is news, this running every turn the réglage is ticked.
+    pub fn learn_title_suffix(&mut self, suffix: String) {
+        if self.settings.client_title_suffix.as_deref() == Some(suffix.as_str()) {
+            return;
+        }
+
+        self.settings.client_title_suffix = Some(suffix);
+        self.save();
+    }
+
     pub fn set_short_titles(&mut self, short: bool) {
         self.settings.short_titles = short;
 

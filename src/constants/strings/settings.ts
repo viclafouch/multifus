@@ -19,7 +19,7 @@ export const SETTINGS_STRINGS = {
       ? 'N’afficher que le pseudo dans la barre de titre'
       : 'N’afficher que le pseudo dans la barre des tâches',
     shortTitlesDescription: IS_APPLE
-      ? 'Chaque fenêtre Dofus ne porte plus que le nom du personnage, dans sa barre de titre et dans Mission Control. Le pseudo n’apparaît qu’une fois le personnage choisi, et décocher rend leur titre aux fenêtres renommées depuis l’ouverture de Multifus.'
-      : 'Chaque fenêtre Dofus ne porte plus que le nom du personnage, dans la barre des tâches comme au Alt+Tab. Le pseudo n’apparaît qu’une fois le personnage choisi, et décocher rend leur titre aux fenêtres renommées depuis l’ouverture de Multifus.'
+      ? 'Chaque fenêtre Dofus ne porte plus que le nom du personnage, dans sa barre de titre et dans Mission Control. Le pseudo n’apparaît qu’une fois le personnage choisi, et les titres reviennent dès que vous décochez, comme en quittant Multifus.'
+      : 'Chaque fenêtre Dofus ne porte plus que le nom du personnage, dans la barre des tâches comme au Alt+Tab. Le pseudo n’apparaît qu’une fois le personnage choisi, et les titres reviennent dès que vous décochez, comme en quittant Multifus.'
   }
 } as const

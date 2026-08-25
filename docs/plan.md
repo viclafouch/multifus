@@ -248,7 +248,8 @@ troisième ligne, et ce qu'il refuse de faire est dans
 | L'attente après un clic      | **Aucune.** La commande sonne le balayage au lieu d'attendre son tour    |
 | L'échec                      | Une ligne de journal, et un nouvel essai au tour suivant                 |
 | Relancer multifus            | **Relit les titres courts** sans rien avoir retenu, voir plus bas        |
-| Quitter multifus             | **Ne rend rien.** Le client réécrit son titre, voir perimetre.md         |
+| Quitter multifus             | **Rend les titres**, sur `RunEvent::Exit`. Le réglage, lui, ne bouge pas |
+| Une fin brutale              | Laisse les fenêtres courtes, que le lancement suivant lit et rend        |
 | Un raccourci                 | Aucun. Le réglage se pose une fois                                       |
 
 ### Ce que le code fait
@@ -290,11 +291,31 @@ test que `is_client_window`, et sur macOS `game_window` essaie tous les titres
 **`tick` appelle `apply_short_titles` avant le balayage.** Dans l'autre ordre, un
 lancement réglage coché ne verrait personne pendant son premier tour.
 
-**Ce que la table garde, c'est seulement quoi remettre.** `OriginalTitles` est un
-`WindowId → titre d'origine`, et la perdre ne coûte que la restauration. Elle
-n'est jamais tenue pendant une écriture : elle est sortie du mutex, travaillée à
-part, puis remise, parce que les raccourcis lisent ce même mutex depuis le fil
-principal et qu'une écriture attend un client que multifus ne commande pas.
+**Ce qui remet un titre est une seule chaîne, apprise.** `Settings` garde
+`client_title_suffix`, ce qu'un client a été vu écrire après un pseudo,
+` - Dofus Retro v1.48.21`. Un titre se remet en recollant le pseudo devant, et
+c'est tout : il n'y a ni table des fenêtres renommées, ni verrou autour d'elle,
+ni cycle de vie à tenir.
+
+**Une table a été essayée d'abord, et c'était le bug.** Coché, on ferme multifus,
+on le rouvre, on décoche : la table était vide, et plus rien ne rendait leur
+titre aux fenêtres. Une fenêtre raccourcie survit au lancement qui l'a
+raccourcie, donc ce qui la remet doit y survivre aussi. Le suffixe est appris de
+n'importe quel titre écrit par un client, coché ou non, et écrit sur le disque
+seulement quand il change.
+
+**Jamais deviné.** Tant que rien n'a été vu, une fenêtre courte le reste : un
+titre laissé tel quel vaut mieux qu'un titre inventé, et `perimetre.md` l'écrit.
+
+**Quitter rend les titres.** `RunEvent::Exit` passe par
+`runtime::give_titles_back`, qui appelle la frontière comme un décochage.
+Le réglage ne bouge pas, donc le lancement suivant raccourcit à nouveau ; ce que
+ça laisse, c'est un bureau tel qu'on l'a trouvé. Ça tourne sur le fil principal
+et le processus s'arrête de toute façon, donc un client planté peut ralentir la
+fermeture — borné par le délai de chaque écriture sur Windows, par celui de
+l'accessibilité sur macOS. Une fin que ce chemin ne voit pas, une coupure de
+courant, ne coûte rien d'irréparable : le suffixe rend le titre au lancement
+suivant.
 
 | Système | Écrire un titre                              | Où ça se voit                   |
 | ------- | -------------------------------------------- | ------------------------------- |
@@ -347,7 +368,7 @@ que par qui l'a coché.
 
 ### Vérification de l'étape
 
-`cargo test` compte 151 cas sur le PC, `vitest` 206, `tsc`, `oxlint` et `clippy`
+`cargo test` compte 153 cas sur le PC, `vitest` 206, `tsc`, `oxlint` et `clippy`
 passent. Les cinq cas neufs de `platform::window` verrouillent ce qui compte :
 une fenêtre laissée courte par le lancement d'avant porte toujours son personnage
 sans que rien ne s'en souvienne, un titre que le client a écrit se lit comme il

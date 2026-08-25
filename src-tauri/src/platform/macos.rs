@@ -16,9 +16,7 @@
 //! Nothing here is generic over the system, and nothing here knows about the
 //! roster. The core stays pure.
 
-use std::collections::HashSet;
 use std::ffi::c_void;
-use std::mem::take;
 use std::panic::catch_unwind;
 use std::panic::AssertUnwindSafe;
 use std::ptr;
@@ -27,9 +25,6 @@ use std::sync::atomic::AtomicBool;
 use std::sync::atomic::Ordering;
 use std::sync::mpsc;
 use std::sync::Arc;
-use std::sync::Mutex;
-use std::sync::MutexGuard;
-use std::sync::PoisonError;
 use std::thread;
 use std::thread::JoinHandle;
 use std::time::Duration;
@@ -86,8 +81,9 @@ use crate::platform::notification::NotificationSink;
 use crate::platform::notification::NotificationWatcher;
 use crate::platform::paste::PasteSender;
 use crate::platform::window::matches_short_title;
+use crate::platform::window::title_suffix;
 use crate::platform::window::GameWindow;
-use crate::platform::window::OriginalTitles;
+use crate::platform::window::ShortTitleReport;
 use crate::platform::window::WindowId;
 use crate::platform::window::WindowManager;
 use crate::platform::Authorization;
@@ -625,18 +621,18 @@ type ClientElement = (WindowId, CFRetained<AXUIElement>);
 ///
 /// A [`WindowId`] here carries the pid of the client process.
 ///
-/// **What is remembered here is only what to put back.** Reading a nickname out
-/// of a title Multifus wrote goes through no memory at all, see
-/// [`GameWindow::from_client_title`].
+/// **Nothing is remembered here.** Reading a nickname out of a title Multifus
+/// wrote goes through no memory, see [`GameWindow::from_client_title`], and
+/// putting one back goes through one string the core keeps across launches, see
+/// [`title_suffix`].
 #[derive(Debug, Default)]
 pub struct AccessibilityWindowManager {
-    original_titles: Mutex<OriginalTitles>,
     /// A window of a client bore a short title as of the last sweep.
     ///
     /// Read off the screen and never off the réglage, which is what keeps
     /// unticking from taking a roster offline: a window Multifus cannot put back
-    /// — one an earlier launch renamed, one a client refuses to rename — is one
-    /// this rule stays the only reader of.
+    /// — one a client refuses to rename — is one this rule stays the only reader
+    /// of.
     short: AtomicBool,
 }
 
@@ -644,13 +640,6 @@ impl AccessibilityWindowManager {
     #[must_use]
     pub fn new() -> Self {
         Self::default()
-    }
-
-    /// The table, taken even if a previous holder panicked.
-    fn original_titles(&self) -> MutexGuard<'_, OriginalTitles> {
-        self.original_titles
-            .lock()
-            .unwrap_or_else(PoisonError::into_inner)
     }
 
     /// Whether the sweep may read a bare title as a nickname.
@@ -793,42 +782,27 @@ impl WindowManager for AccessibilityWindowManager {
         set_size(&game_window, area.size)
     }
 
-    fn apply_short_titles(&self, short: bool) -> Result<()> {
+    fn apply_short_titles(&self, short: bool, suffix: Option<&str>) -> Result<Option<String>> {
         // Nothing asked for, and no short title on screen as of last turn: the
         // state every launch starts on, and there is nothing to walk for.
         if !short && !self.shortens() {
-            return Ok(());
+            return Ok(None);
         }
 
         if !accessibility_authorization().is_granted() {
             return Err(PlatformError::AuthorizationDenied);
         }
 
-        let clients = client_elements();
+        let written = write_titles(&client_elements(), short, suffix);
 
-        // Taken out rather than held: an accessibility write waits on a client
-        // Multifus does not control, and the shortcuts read this same mutex from
-        // the main thread. An empty table in between costs nothing, no nickname
-        // being read through it.
-        let mut originals = take(&mut *self.original_titles());
-        let written = write_titles(&mut originals, &clients, short);
-
-        *self.original_titles() = originals;
-
-        match written {
-            Ok(short_left) => {
-                self.short.store(short_left, Ordering::Relaxed);
-
-                Ok(())
-            }
+        match &written {
+            Ok(report) => self.short.store(report.on_screen, Ordering::Relaxed),
             // A write Multifus did not see go through leaves a screen it has not
             // confirmed, so it keeps reading short titles until it has.
-            Err(error) => {
-                self.short.store(true, Ordering::Relaxed);
-
-                Err(error)
-            }
+            Err(_) => self.short.store(true, Ordering::Relaxed),
         }
+
+        written.map(|report| report.suffix)
     }
 }
 
@@ -849,113 +823,100 @@ fn client_elements() -> Vec<ClientElement> {
 }
 
 /// Cuts every game window down to its nickname, or puts back what the clients
-/// had written, and says whether any window still bears a short title.
+/// had written, and tallies what the turn saw.
 ///
 /// One refusal never stops the clients that come after it, and the first one is
-/// what comes back.
+/// what comes back. The game window is asked for once and handed on, so the walk
+/// of a client's windows happens here and not twice below.
 fn write_titles(
-    originals: &mut OriginalTitles,
     clients: &[ClientElement],
     short: bool,
-) -> Result<bool> {
+    suffix: Option<&str>,
+) -> Result<ShortTitleReport> {
+    let mut report = ShortTitleReport::default();
     let mut failure = None;
-    let mut short_left = false;
 
     for (id, element) in clients {
+        let named = match game_window_element(*id, element, true) {
+            Ok(named) => named,
+            Err(error) => {
+                report.on_screen = true;
+                failure = failure.or(Some(error));
+
+                continue;
+            }
+        };
+
+        let Some((window, title)) = named else {
+            continue;
+        };
+
+        // Learned whether or not this window is renamed: any title a client
+        // wrote teaches what it writes after a nickname.
+        report.suffix = report
+            .suffix
+            .take()
+            .or_else(|| title_suffix(&title).map(str::to_owned));
+
         let written = if short {
-            shorten(originals, *id, element)
+            shorten(&window, &title)
         } else {
-            lengthen(originals, *id, element)
+            lengthen(&window, &title, suffix)
         };
 
         match written {
-            Ok(left) => short_left |= left,
+            Ok(on_screen) => report.on_screen |= on_screen,
             Err(error) => {
-                short_left = true;
+                report.on_screen = true;
                 failure = failure.or(Some(error));
             }
         }
     }
 
-    // A client that has quit has no title left to put back. One that refused
-    // keeps its entry and is served again next turn.
-    let running: HashSet<WindowId> = clients.iter().map(|(id, _)| *id).collect();
-
-    originals.retain(|id, _| running.contains(id));
-
-    failure.map_or(Ok(short_left), Err)
+    failure.map_or(Ok(report), Err)
 }
 
-/// Puts the bare nickname in the title bar of a client's window, once, and says
-/// whether that client bears one now.
+/// Puts the bare nickname in the title bar of a client's game window, once, and
+/// says whether that window bears one now.
 ///
 /// A title Multifus has already written is left alone, so the sweep costs one
-/// comparison per window. Anything else is read afresh, which is how a client
+/// comparison per client. Anything else is read afresh, which is how a client
 /// that renames its own window — a character changed, the quarter-hour
 /// disconnection — is served again on the turn that follows.
-fn shorten(
-    originals: &mut OriginalTitles,
-    id: WindowId,
-    application: &AXUIElement,
-) -> Result<bool> {
-    // Short titles included: a window already cut down is the one this turn has
-    // nothing left to do to.
-    let Some((window, title)) = game_window_element(id, application, true)? else {
-        return Ok(false);
-    };
-
-    if matches_short_title(&title).is_some() {
+fn shorten(window: &AXUIElement, title: &str) -> Result<bool> {
+    if matches_short_title(title).is_some() {
         return Ok(true);
     }
 
     // Never a nickname the rule would not hand back: writing one no reader can
-    // find would take the character offline and lose the title for good.
+    // find would take the character offline.
     let Some(nickname) =
-        extract_nickname(&title).filter(|nickname| matches_short_title(nickname).is_some())
+        extract_nickname(title).filter(|nickname| matches_short_title(nickname).is_some())
     else {
         return Ok(false);
     };
 
-    set_title(&window, nickname)?;
-    originals.insert(id, title);
+    set_title(window, nickname)?;
 
     Ok(true)
 }
 
-/// Puts back the title the client had written, and says whether that client
+/// Puts back the title the client had written, and says whether that window
 /// still bears a short title.
 ///
-/// A client Multifus never touched, and one that has renamed its window since,
-/// are both left alone. A window an earlier launch renamed has no title to put
-/// back and stays short, which is why it answers `true`: nothing else can read a
-/// nickname in it.
-fn lengthen(
-    originals: &mut OriginalTitles,
-    id: WindowId,
-    application: &AXUIElement,
-) -> Result<bool> {
-    let Some((window, title)) = game_window_element(id, application, true)? else {
-        originals.remove(&id);
-
+/// A window that never was short is left alone. One whose suffix nobody has been
+/// seen writing is left short, which is a title left alone rather than one
+/// invented, and it answers `true`: nothing else can read a nickname in it.
+fn lengthen(window: &AXUIElement, title: &str, suffix: Option<&str>) -> Result<bool> {
+    let Some(nickname) = matches_short_title(title) else {
         return Ok(false);
     };
 
-    // The client has written its own title back, so there is nothing to put
-    // there and the entry has stopped meaning anything.
-    if matches_short_title(&title).is_none() {
-        originals.remove(&id);
-
-        return Ok(false);
-    }
-
-    let Some(original) = originals.get(&id) else {
+    let Some(suffix) = suffix else {
         return Ok(true);
     };
 
-    // The `?` leaves the forgetting below unreached, so a client that refuses
-    // keeps its entry and is served again next turn.
-    set_title(&window, original)?;
-    originals.remove(&id);
+    set_title(window, &format!("{nickname}{suffix}"))?;
 
     Ok(false)
 }
