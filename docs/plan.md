@@ -318,7 +318,20 @@ autant : renommer depuis le clic gèlerait la fenêtre le temps que six clients
 répondent. Dracoon, lui, renomme dans le handler de sa case, et c'est ce qu'on ne
 peut pas copier.
 
-**`runs_dofus` est passé en dernier des tests de `titled_window`.** Il ouvre le
+**Le titre se lit en dernier, après le processus.** `GetWindowText` sur la
+fenêtre d'un autre processus lit une légende en cache et n'attend jamais ; sur
+une fenêtre du processus appelant, c'est un vrai `WM_GETTEXT` qui attend le fil
+principal. La fenêtre de multifus est visible exactement pendant qu'on coche la
+case, donc la lire là ferait attendre le tour qu'on vient de sonner sur le fil
+qui l'a sonné.
+
+**Un tour macOS lit maintenant le titre de toutes les fenêtres d'un client**, là
+où `shorten` s'arrêtait à la première : c'est le prix de `game_window_element`,
+qui départage au lieu de prendre ce qui vient. Deux passes d'aller-retour AX par
+client et par seconde quand le réglage est coché.
+
+**`runs_dofus` est passé avant la lecture du titre, et après les deux tests
+gratuits.** Il ouvre le
 processus derrière une fenêtre, et `EnumWindows` en présente plusieurs centaines
 à chaque tour, trois fois par seconde depuis ce chantier. Visible, non possédée,
 titrée, et alors seulement le processus : il ne reste qu'une poignée de fenêtres

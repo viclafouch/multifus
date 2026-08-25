@@ -503,16 +503,17 @@ unsafe extern "system" fn collect_client_window(handle: HWND, lparam: LPARAM) ->
 /// loader; both are left where they are. The title is not read beyond being
 /// there, which is what separates this from [`GameWindow::from_title`].
 fn is_client_window(handle: HWND) -> bool {
-    // The cheap questions first, for the reason on [`titled_window`].
+    // The cheap questions first, and the title only once the process is known,
+    // both for the reasons on [`titled_window`].
     if !unsafe { IsWindowVisible(handle) }.as_bool() || !is_unowned(handle) {
         return false;
     }
 
-    if window_title(handle).trim().is_empty() {
+    if !runs_dofus(handle) {
         return false;
     }
 
-    runs_dofus(handle)
+    !window_title(handle).trim().is_empty()
 }
 
 /// A visible window a Dofus client draws for itself, and the title it bears,
@@ -522,13 +523,24 @@ fn is_client_window(handle: HWND) -> bool {
 /// reads as a short title, and without it that dialog would walk into the roster
 /// as a character. It is the same test [`is_client_window`] makes.
 ///
-/// **`runs_dofus` comes last, and that is a measure and not a style.** It opens
-/// the process behind the window, and the desktop hands this callback every
-/// top-level window there is, three times a second. Asking the three cheap
-/// questions first leaves it a handful of windows to look up instead of every
-/// one on the screen.
+/// **The order of the three tests is a measure and not a style.** `EnumWindows`
+/// hands this callback every top-level window there is, three times a second, so
+/// the two that cost nothing come first and leave `runs_dofus` a handful of
+/// processes to open instead of every one on the screen.
+///
+/// **And the title is read last, after the process is known.** For a window of
+/// another process `GetWindowText` reads a cached caption and never waits, which
+/// is what Microsoft designed it for; for a window of the *calling* process it
+/// is a real `WM_GETTEXT` and it waits on the main thread. Multifus's own window
+/// is visible exactly while somebody is ticking the réglage, so reading its
+/// title here would hang the very turn [`crate::app::runtime::wake`] just rang
+/// on the thread that rang it.
 fn titled_window(handle: HWND) -> Option<TitledWindow> {
     if !unsafe { IsWindowVisible(handle) }.as_bool() || !is_unowned(handle) {
+        return None;
+    }
+
+    if !runs_dofus(handle) {
         return None;
     }
 
@@ -536,7 +548,7 @@ fn titled_window(handle: HWND) -> Option<TitledWindow> {
 
     // A client's own untitled window is a splash or a loader, and no caller has
     // anything to do with one: neither a nickname to read nor a title to write.
-    if title.trim().is_empty() || !runs_dofus(handle) {
+    if title.trim().is_empty() {
         return None;
     }
 

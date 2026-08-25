@@ -336,10 +336,9 @@ fn client_window_element(application: &AXUIElement) -> Result<Option<CFRetained<
 /// veille would lose every window the réglage renamed.
 ///
 /// **The title a client wrote comes first, the short one only if no window has
-/// one.** A palette titled `Erreur` reads as a short title, and answering with
-/// it would minimize, focus and rename the wrong window. `AXMainWindow` leads
-/// the list, but macOS takes it away while the window is in the Dock, so being
-/// first is not something to lean on.
+/// one, and only if it is the only one.** A palette titled `Erreur` reads as a
+/// short title, and answering with it would minimize, focus and rename the wrong
+/// window.
 fn game_window_element(
     id: WindowId,
     application: &AXUIElement,
@@ -365,9 +364,22 @@ fn game_window_element(
         return Ok(None);
     }
 
-    Ok(titled
+    // One short title answers, several answer nothing. `AXMainWindow` leads the
+    // list, but macOS takes it away while the window is in the Dock, so first is
+    // not a rank to lean on: a client showing a palette named in one word would
+    // have that palette focused, minimized and renamed. Doing nothing costs a
+    // turn, doing the wrong thing costs the window.
+    let mut short_titled = titled
         .into_iter()
-        .find(|(_, title)| matches_short_title(title).is_some()))
+        .filter(|(_, title)| matches_short_title(title).is_some());
+
+    let only = short_titled.next();
+
+    if short_titled.next().is_some() {
+        return Ok(None);
+    }
+
+    Ok(only)
 }
 
 /// The game window of one client process, `None` when no title carries a
