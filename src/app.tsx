@@ -4,6 +4,7 @@ import type { ConfigProblem } from '@/@types/system'
 import { ConfigNotice } from '@/components/config-notice'
 import { JournalPanel } from '@/components/journal-panel'
 import { NavRail } from '@/components/nav-rail'
+import { TooltipProvider } from '@/components/ui/tooltip'
 import { useMultifus } from '@/hooks/use-multifus'
 import { useTrayNavigation } from '@/hooks/use-tray-navigation'
 import { dismissConfigProblem, revealQuarantinedConfig } from '@/lib/multifus'
@@ -33,7 +34,7 @@ export const App = () => {
   }
 
   return (
-    <>
+    <TooltipProvider>
       <Backdrop />
       <div className="relative flex h-screen flex-col">
         <div className="flex min-h-0 flex-1">
@@ -64,7 +65,7 @@ export const App = () => {
         </div>
         <JournalPanel snapshot={snapshot} />
       </div>
-    </>
+    </TooltipProvider>
   )
 }
 

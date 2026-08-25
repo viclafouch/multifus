@@ -24,7 +24,7 @@ Ce principe arbitre tous les compromis. Une fonctionnalité qui exige d'ouvrir l
 
 **Agrandissement au lancement.** Un client qui s'ouvre remplit l'écran tout seul, une seule fois, dès l'écran de connexion et sans attendre qu'un personnage soit choisi. Réglage décoché par défaut : multifus ne déplace aucune fenêtre sans qu'on le lui ait demandé. Une fois coché, il ne s'applique qu'aux clients ouverts ensuite, et jamais à ceux qui sont déjà là.
 
-**Titre court.** Une fenêtre de client ne porte plus que le pseudo du personnage, `Alpha` au lieu de `Alpha - Dofus Retro v1.48.21`. Six clients deviennent lisibles d'un coup d'œil dans la barre des tâches de Windows, dans la barre de titre de macOS. Réglage décoché par défaut, et le pseudo n'apparaît qu'une fois le personnage choisi, l'écran de connexion n'en portant aucun.
+**Titre court, sur Windows.** Une fenêtre de client ne porte plus que le pseudo du personnage, `Alpha` au lieu de `Alpha - Dofus Retro v1.48.21`. Six clients deviennent lisibles d'un coup d'œil dans la barre des tâches et au Alt+Tab. Réglage décoché par défaut, et le pseudo n'apparaît qu'une fois le personnage choisi, l'écran de connexion n'en portant aucun. Sur macOS, l'interrupteur est grisé et dit `Windows uniquement` : le refus est plus bas.
 
 Deux gestes rendent leur titre aux fenêtres, et les deux marchent : décocher, et quitter multifus. Quitter n'est pas décocher, le réglage reste coché et le lancement suivant raccourcit à nouveau ; ce que ça laisse, c'est un bureau tel qu'on l'a trouvé. Une fin que multifus ne voit pas venir, une coupure de courant, laisse les fenêtres courtes, et le lancement suivant sait toujours les lire et les rendre.
 
@@ -62,11 +62,13 @@ Tous restent inertes tant qu'une fenêtre Dofus n'est pas au premier plan. Sans 
 
 **Passer au premier plan en agrandissant.** Agrandir n'est pas focus. Un client qui s'ouvre pendant qu'on joue dans une autre fenêtre remplit son écran là où il est et ne prend rien. C'est pour ça que Windows n'emploie pas `ShowWindow`, dont le `SW_MAXIMIZE` active.
 
+**Le titre court sur macOS.** Le client Retro est le launcher Electron d'Ankama, `com.dofus.d1elauncher`, et Chromium possède la barre de titre de sa fenêtre. `AXUIElementSetAttributeValue` sur `AXTitle` répond `kAXErrorSuccess` et ne change rien : ni la barre de titre, ni Mission Control. Mesuré le 25 août 2026 sur un client en jeu, et le détail est dans [macos.md](./macos.md). Aucune API publique ne renomme la fenêtre d'un autre processus sur ce système, donc il n'y a pas de seconde porte à essayer. L'interrupteur reste visible et grisé plutôt que caché : un réglage qui disparaît d'un système se lit comme un oubli, un réglage grisé qui dit `Windows uniquement` se lit comme une décision.
+
 **Renommer une fenêtre qui n'a pas encore de personnage.** L'écran de connexion et l'écran de sélection ne portent aucun pseudo, et un titre court n'y aurait rien à mettre. Contrairement à l'agrandissement, qui part dès l'ouverture du client, celui-ci attend l'entrée en jeu. C'est aussi ce qui le rend sûr : la fenêtre renommée est celle d'un client qui répond, jamais celle d'un client en train de charger.
 
 **Inventer un titre que personne n'a écrit.** Décocher rend son titre à une fenêtre courte, et le fait à partir de ce qu'un client a été vu écrire après un pseudo, ` - Dofus Retro v1.48.21`, appris et jamais deviné. Tant que multifus n'a rien vu de tel, il laisse la fenêtre courte : un titre laissé tel quel vaut mieux qu'un titre inventé, et le client réécrira le sien au changement de personnage.
 
-**Renommer autre chose que le titre.** Ni l'icône de la fenêtre, que Dracoon change par personnage, ni l'ordre des boutons de la barre des tâches, que l'[ADR 0003](./adr/0003-abandon-ordre-initiative.md) a déjà refusé. Un titre suffit à distinguer six clients, et c'est la seule chose que les deux systèmes savent écrire.
+**Renommer autre chose que le titre.** Ni l'icône de la fenêtre, que Dracoon change par personnage, ni l'ordre des boutons de la barre des tâches, que l'[ADR 0003](./adr/0003-abandon-ordre-initiative.md) a déjà refusé. Un titre suffit à distinguer six clients, et c'est déjà la seule chose que Windows accepte de laisser écrire.
 
 **Toute forme d'automatisation du jeu, à une exception écrite.** multifus ne lit pas la mémoire du client, ne modifie aucun fichier, ne joue à la place de personne et n'empêche pas la déconnexion pour inactivité. Les outils de type macro sont interdits par Ankama et restent hors de ce projet.
 
@@ -112,7 +114,7 @@ multifus vise **macOS et Windows**. Ni iOS, ni Android, ni Linux, que Tauri sait
 | Écran tenu éveillé                     | `PowerSetRequest`                  | `IOPMAssertionCreateWithName`                              |
 | Collage d’une réponse                  | `SendInput`, `Control+V`           | `CGEventPost`, `Super+V`                                   |
 | Agrandissement d’une fenêtre           | `SetWindowPos` sur le `rcWork`     | `AXPosition` et `AXSize` sur le `visibleFrame`             |
-| Titre court                            | `WM_SETTEXT`, barre des tâches     | `AXTitle`, barre de titre et Mission Control               |
+| Titre court                            | `WM_SETTEXT`, barre des tâches     | refusé, le client ignore l'écriture `AXTitle`              |
 
 Le détail et les mesures sont dans [ADR 0002](./adr/0002-notifications-macos-via-accessibility.md).
 

@@ -5,6 +5,8 @@ import { Note } from '@/components/layout/note'
 import { Panel } from '@/components/layout/panel'
 import { Screen } from '@/components/layout/screen'
 import { Switch } from '@/components/ui/switch'
+import { UnavailableSwitch } from '@/components/unavailable-switch'
+import { IS_APPLE } from '@/constants/keyboard'
 import { strings } from '@/constants/strings'
 import {
   setMaximizeOnLaunch,
@@ -62,13 +64,20 @@ export const SettingsScreen = ({
           description={strings.settings.shortTitlesDescription}
           icon={<Tag className="size-glyph" strokeWidth={1.75} aria-hidden />}
         >
-          <Switch
-            checked={shortTitles}
-            aria-label={strings.settings.shortTitlesLabel}
-            onCheckedChange={(short) => {
-              run(setShortTitles(short))
-            }}
-          />
+          {IS_APPLE ? (
+            <UnavailableSwitch
+              label={strings.settings.shortTitlesLabel}
+              reason={strings.settings.shortTitlesWindowsOnly}
+            />
+          ) : (
+            <Switch
+              checked={shortTitles}
+              aria-label={strings.settings.shortTitlesLabel}
+              onCheckedChange={(short) => {
+                run(setShortTitles(short))
+              }}
+            />
+          )}
         </FieldRow>
       </Panel>
       <Note>{strings.settings.startupNote}</Note>

@@ -80,10 +80,7 @@ use crate::platform::notification::NotificationReport;
 use crate::platform::notification::NotificationSink;
 use crate::platform::notification::NotificationWatcher;
 use crate::platform::paste::PasteSender;
-use crate::platform::window::matches_short_title;
-use crate::platform::window::title_suffix;
 use crate::platform::window::GameWindow;
-use crate::platform::window::ShortTitleReport;
 use crate::platform::window::WindowId;
 use crate::platform::window::WindowManager;
 use crate::platform::Authorization;
@@ -328,54 +325,23 @@ fn client_window_element(application: &AXUIElement) -> Result<Option<CFRetained<
 /// what carries `AXMinimized`, an application does not, and it is also what a
 /// title is written to.
 ///
-/// A title Multifus cut down to the bare nickname counts, or the focus and the
-/// veille would lose every window the réglage renamed.
-///
-/// **The title a client wrote comes first, the short one only if no window has
-/// one, and only if it is the only one.** A palette titled `Erreur` reads as a
-/// short title, and answering with it would minimize, focus and rename the wrong
-/// window.
+/// Every title read here is one a client wrote: nothing on this system renames a
+/// window, see the refusal in `docs/perimetre.md`.
 fn game_window_element(
     id: WindowId,
     application: &AXUIElement,
-    short: bool,
 ) -> Result<Option<(CFRetained<AXUIElement>, String)>> {
-    let mut titled = Vec::new();
-
     for window in windows_of(application)? {
-        if let Some(title) = string_attribute(&window, AX_TITLE)? {
-            titled.push((window, title));
+        let Some(title) = string_attribute(&window, AX_TITLE)? else {
+            continue;
+        };
+
+        if GameWindow::from_title(id, &title).is_some() {
+            return Ok(Some((window, title)));
         }
     }
 
-    let written_by_the_client = titled
-        .iter()
-        .position(|(_, title)| GameWindow::from_title(id, title).is_some());
-
-    if let Some(found) = written_by_the_client {
-        return Ok(Some(titled.swap_remove(found)));
-    }
-
-    if !short {
-        return Ok(None);
-    }
-
-    // One short title answers, several answer nothing. `AXMainWindow` leads the
-    // list, but macOS takes it away while the window is in the Dock, so first is
-    // not a rank to lean on: a client showing a palette named in one word would
-    // have that palette focused, minimized and renamed. Doing nothing costs a
-    // turn, doing the wrong thing costs the window.
-    let mut short_titled = titled
-        .into_iter()
-        .filter(|(_, title)| matches_short_title(title).is_some());
-
-    let only = short_titled.next();
-
-    if short_titled.next().is_some() {
-        return Ok(None);
-    }
-
-    Ok(only)
+    Ok(None)
 }
 
 /// The game window of one client process, `None` when no title carries a
@@ -384,7 +350,7 @@ fn game_window_element(
 /// That `None` is what a client sitting on the login screen looks like: a live
 /// process, with windows, and nothing in the title to work with. The filtering
 /// is on the title, never on the size.
-fn game_window(application: &NSRunningApplication, short: bool) -> Result<Option<GameWindow>> {
+fn game_window(application: &NSRunningApplication) -> Result<Option<GameWindow>> {
     let Some(id) = client_id(application) else {
         return Ok(None);
     };
@@ -393,17 +359,8 @@ fn game_window(application: &NSRunningApplication, short: bool) -> Result<Option
     // application, and the call is valid for any pid anyway.
     let element = unsafe { AXUIElement::new_application(application.processIdentifier()) };
 
-    let titles = window_titles(&element)?;
-
-    // The title a client wrote first, for the reason on [`game_window_element`].
-    for title in &titles {
-        if let Some(window) = GameWindow::from_title(id, title) {
-            return Ok(Some(window));
-        }
-    }
-
-    for title in &titles {
-        if let Some(window) = GameWindow::from_client_title(id, title, short) {
+    for title in window_titles(&element)? {
+        if let Some(window) = GameWindow::from_title(id, &title) {
             return Ok(Some(window));
         }
     }
@@ -614,37 +571,19 @@ fn on_main_thread<T: Send>(work: impl FnOnce(MainThreadMarker) -> T + Send) -> O
     done
 }
 
-/// A running client, and the accessibility object that leads to its windows.
-type ClientElement = (WindowId, CFRetained<AXUIElement>);
-
 /// Reads windows and changes focus through the macOS Accessibility API.
 ///
 /// A [`WindowId`] here carries the pid of the client process.
 ///
-/// **Nothing is remembered here.** Reading a nickname out of a title Multifus
-/// wrote goes through no memory, see [`GameWindow::from_client_title`], and
-/// putting one back goes through one string the core keeps across launches, see
-/// [`title_suffix`].
+/// **Nothing is remembered here**, and nothing is written either: every title
+/// read is one a client wrote for itself.
 #[derive(Debug, Default)]
-pub struct AccessibilityWindowManager {
-    /// A window of a client bore a short title as of the last sweep.
-    ///
-    /// Read off the screen and never off the réglage, which is what keeps
-    /// unticking from taking a roster offline: a window Multifus cannot put back
-    /// — one a client refuses to rename — is one this rule stays the only reader
-    /// of.
-    short: AtomicBool,
-}
+pub struct AccessibilityWindowManager;
 
 impl AccessibilityWindowManager {
     #[must_use]
     pub fn new() -> Self {
-        Self::default()
-    }
-
-    /// Whether the sweep may read a bare title as a nickname.
-    fn shortens(&self) -> bool {
-        self.short.load(Ordering::Relaxed)
+        Self
     }
 }
 
@@ -663,10 +602,9 @@ impl WindowManager for AccessibilityWindowManager {
         }
 
         let mut windows = Vec::new();
-        let short = self.shortens();
 
         for application in dofus_applications() {
-            if let Some(window) = game_window(&application, short)? {
+            if let Some(window) = game_window(&application)? {
                 windows.push(window);
             }
         }
@@ -684,7 +622,7 @@ impl WindowManager for AccessibilityWindowManager {
         // Nothing else on the desktop has to be looked at.
         for application in dofus_applications() {
             if application.isActive() {
-                return game_window(&application, self.shortens());
+                return game_window(&application);
             }
         }
 
@@ -696,7 +634,7 @@ impl WindowManager for AccessibilityWindowManager {
 
         // No game window on a live client is the login screen, and a client that
         // has left the game is one this token no longer designates.
-        let Some((game_window, _)) = game_window_element(window, &element, self.shortens())? else {
+        let Some((game_window, _)) = game_window_element(window, &element)? else {
             return Err(PlatformError::WindowGone);
         };
 
@@ -711,7 +649,7 @@ impl WindowManager for AccessibilityWindowManager {
         // Out of the Dock before anything else. Activating a client whose window
         // is minimized brings its menu bar to the front and leaves the window
         // exactly where it was, which is the whole trap this answers.
-        if let Some((game_window, _)) = game_window_element(window, &element, self.shortens())? {
+        if let Some((game_window, _)) = game_window_element(window, &element)? {
             restore(&game_window)?;
         }
 
@@ -782,168 +720,10 @@ impl WindowManager for AccessibilityWindowManager {
         set_size(&game_window, area.size)
     }
 
-    fn apply_short_titles(&self, short: bool, suffix: Option<&str>) -> Result<Option<String>> {
-        // Nothing asked for, and no short title on screen as of last turn: the
-        // state every launch starts on, and there is nothing to walk for.
-        if !short && !self.shortens() {
-            return Ok(None);
-        }
-
-        if !accessibility_authorization().is_granted() {
-            return Err(PlatformError::AuthorizationDenied);
-        }
-
-        let written = write_titles(&client_elements(), short, suffix);
-
-        match &written {
-            Ok(report) => self.short.store(report.on_screen, Ordering::Relaxed),
-            // A write Multifus did not see go through leaves a screen it has not
-            // confirmed, so it keeps reading short titles until it has.
-            Err(_) => self.short.store(true, Ordering::Relaxed),
-        }
-
-        written.map(|report| report.suffix)
-    }
-}
-
-/// The clients that are running, each with the object that leads to its windows.
-fn client_elements() -> Vec<ClientElement> {
-    dofus_applications()
-        .iter()
-        .filter_map(|application| {
-            let id = client_id(application)?;
-
-            // SAFETY: the pid is the one the system just reported for a running
-            // application, and the call is valid for any pid anyway.
-            let element = unsafe { AXUIElement::new_application(application.processIdentifier()) };
-
-            Some((id, element))
-        })
-        .collect()
-}
-
-/// Cuts every game window down to its nickname, or puts back what the clients
-/// had written, and tallies what the turn saw.
-///
-/// One refusal never stops the clients that come after it, and the first one is
-/// what comes back. The game window is asked for once and handed on, so the walk
-/// of a client's windows happens here and not twice below.
-fn write_titles(
-    clients: &[ClientElement],
-    short: bool,
-    suffix: Option<&str>,
-) -> Result<ShortTitleReport> {
-    let mut report = ShortTitleReport::default();
-    let mut failure = None;
-
-    for (id, element) in clients {
-        let named = match game_window_element(*id, element, true) {
-            Ok(named) => named,
-            Err(error) => {
-                report.on_screen = true;
-                failure = failure.or(Some(error));
-
-                continue;
-            }
-        };
-
-        let Some((window, title)) = named else {
-            continue;
-        };
-
-        // Learned whether or not this window is renamed: any title a client
-        // wrote teaches what it writes after a nickname.
-        report.suffix = report
-            .suffix
-            .take()
-            .or_else(|| title_suffix(&title).map(str::to_owned));
-
-        let written = if short {
-            shorten(&window, &title)
-        } else {
-            lengthen(&window, &title, suffix)
-        };
-
-        match written {
-            Ok(on_screen) => report.on_screen |= on_screen,
-            Err(error) => {
-                report.on_screen = true;
-                failure = failure.or(Some(error));
-            }
-        }
-    }
-
-    failure.map_or(Ok(report), Err)
-}
-
-/// Puts the bare nickname in the title bar of a client's game window, once, and
-/// says whether that window bears one now.
-///
-/// A title Multifus has already written is left alone, so the sweep costs one
-/// comparison per client. Anything else is read afresh, which is how a client
-/// that renames its own window — a character changed, the quarter-hour
-/// disconnection — is served again on the turn that follows.
-fn shorten(window: &AXUIElement, title: &str) -> Result<bool> {
-    if matches_short_title(title).is_some() {
-        return Ok(true);
-    }
-
-    // Never a nickname the rule would not hand back: writing one no reader can
-    // find would take the character offline.
-    let Some(nickname) =
-        extract_nickname(title).filter(|nickname| matches_short_title(nickname).is_some())
-    else {
-        return Ok(false);
-    };
-
-    set_title(window, nickname)?;
-
-    Ok(true)
-}
-
-/// Puts back the title the client had written, and says whether that window
-/// still bears a short title.
-///
-/// A window that never was short is left alone. One whose suffix nobody has been
-/// seen writing is left short, which is a title left alone rather than one
-/// invented, and it answers `true`: nothing else can read a nickname in it.
-fn lengthen(window: &AXUIElement, title: &str, suffix: Option<&str>) -> Result<bool> {
-    let Some(nickname) = matches_short_title(title) else {
-        return Ok(false);
-    };
-
-    let Some(suffix) = suffix else {
-        return Ok(true);
-    };
-
-    set_title(window, &format!("{nickname}{suffix}"))?;
-
-    Ok(false)
-}
-
-/// Writes a window's title through Accessibility.
-///
-/// `AXTitle` is read-only on most applications, and a client that turns the
-/// write down answers here rather than silently doing nothing: the journal is
-/// what says so, and the réglage stays honest about it.
-///
-/// Only `InvalidUIElement` reads as a window that has gone. `CannotComplete` is
-/// what a client too busy to answer returns, and calling that a dead window
-/// would put a false line in the journal.
-fn set_title(window: &AXUIElement, title: &str) -> Result<()> {
-    let name = CFString::from_str(AX_TITLE);
-    let value = CFString::from_str(title);
-
-    // SAFETY: `AXTitle` holds a string, which is what is passed.
-    let status = unsafe { window.set_attribute_value(&name, &value) };
-
-    match status {
-        AXError::InvalidUIElement => Err(PlatformError::WindowGone),
-        AXError::CannotComplete => Err(PlatformError::system(
-            "renaming a window",
-            "the client did not answer in time",
-        )),
-        other => ax_result(other, "renaming a window"),
+    /// Never on macOS: the client takes the `AXTitle` write, answers success and
+    /// keeps its title. A refusal rather than a gap, see `docs/perimetre.md`.
+    fn apply_short_titles(&self, _short: bool, _suffix: Option<&str>) -> Result<Option<String>> {
+        Ok(None)
     }
 }
 

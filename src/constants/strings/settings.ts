@@ -15,11 +15,9 @@ export const SETTINGS_STRINGS = {
     maximizeLabel: 'Agrandir les fenêtres au lancement',
     maximizeDescription:
       'Un client qui s’ouvre remplit l’écran dès la connexion, une seule fois : le réduire ensuite le laisse réduit. Les fenêtres déjà ouvertes ne bougent pas.',
-    shortTitlesLabel: IS_APPLE
-      ? 'N’afficher que le pseudo dans la barre de titre'
-      : 'N’afficher que le pseudo dans la barre des tâches',
-    shortTitlesDescription: IS_APPLE
-      ? 'Chaque fenêtre Dofus ne porte plus que le nom du personnage, dans sa barre de titre et dans Mission Control. Le pseudo n’apparaît qu’une fois le personnage choisi, et les titres reviennent dès que vous décochez, comme en quittant Multifus.'
-      : 'Chaque fenêtre Dofus ne porte plus que le nom du personnage, dans la barre des tâches comme au Alt+Tab. Le pseudo n’apparaît qu’une fois le personnage choisi, et les titres reviennent dès que vous décochez, comme en quittant Multifus.'
+    shortTitlesLabel: 'N’afficher que le pseudo dans la barre des tâches',
+    shortTitlesDescription:
+      'La barre des tâches ne montre plus que le nom du personnage, « Elyandra » au lieu de « Elyandra - Dofus Retro ». Six clients ouverts, six pseudos lisibles d’un coup d’œil.',
+    shortTitlesWindowsOnly: 'Windows uniquement'
   }
 } as const

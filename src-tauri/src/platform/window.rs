@@ -165,9 +165,8 @@ pub fn title_suffix(title: &str) -> Option<&str> {
 
 /// What one sweep of [`WindowManager::apply_short_titles`] found out.
 ///
-/// The implementations' own tally, and the shape of it is the same on both
-/// systems because the two questions are: does the boundary still have to read
-/// short titles, and did a client teach it what it writes after a nickname.
+/// Windows's own tally, and its two questions: does the boundary still have to
+/// read short titles, and did a client teach it what it writes after a nickname.
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
 pub struct ShortTitleReport {
     /// A window still bears a short title, so the sweep has to keep reading them.
@@ -194,8 +193,8 @@ pub trait WindowManager: Send + Sync {
     /// Every game window open right now, one per character connected.
     ///
     /// Clients on the login screen are left out, see [`GameWindow::from_title`].
-    /// A window Multifus has cut down to a short title still belongs here, see
-    /// [`GameWindow::from_client_title`].
+    /// A window Multifus has cut down to a short title still belongs here, which
+    /// only Windows can produce, see [`GameWindow::from_client_title`].
     ///
     /// Returns [`PlatformError::AuthorizationDenied`] rather than an empty list
     /// when the authorization is missing, so that the caller can tell "nobody is
@@ -275,6 +274,8 @@ pub trait WindowManager: Send + Sync {
     /// `suffix` is what a client was last seen writing after a nickname, and it
     /// is what a title is put back from, see [`title_suffix`]. What comes back
     /// is what this turn saw one write, for the caller to keep across launches.
+    /// Windows alone writes anything here, macOS having refused, see
+    /// `docs/perimetre.md`.
     fn apply_short_titles(&self, short: bool, suffix: Option<&str>) -> Result<Option<String>>;
 }
 

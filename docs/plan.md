@@ -3,8 +3,10 @@
 **Le chantier en cours est l'écran Paramètres et ses deux réglages**, plus bas :
 l'agrandissement au lancement, puis le titre court.
 Il ne porte qu'un chantier à la fois, sur les deux systèmes ensemble : une
-fonctionnalité neuve arrive des deux côtés ou n'arrive pas. Ce document redescend
-à sa liste quand le chantier est fini.
+fonctionnalité neuve arrive des deux côtés, ou le côté qui la refuse écrit
+pourquoi dans [perimetre.md](./perimetre.md). C'est ce que le titre court vient
+de faire, plus bas, et c'est le premier. Ce document redescend à sa liste quand
+le chantier est fini.
 
 Les réponses rapides ont été livrées le 25 août 2026, vues marcher sur les deux
 systèmes. Ce qui en reste est archivé : le geste et ses bords dans l'[ADR
@@ -235,6 +237,12 @@ qui la ramène au seul `Alpha`. Il vit dans le même écran Paramètres, sur une
 troisième ligne, et ce qu'il refuse de faire est dans
 [perimetre.md](./perimetre.md).
 
+**C'est le premier réglage qui n'existe que sur un système.** macOS a été essayé,
+mesuré et refusé le 25 août 2026 : le client Retro prend l'écriture `AXTitle`,
+répond succès et ne change rien. Le détail de la mesure est dans
+[macos.md](./macos.md), le refus dans [perimetre.md](./perimetre.md). Sur Mac,
+l'interrupteur est grisé et dit `Windows uniquement` au survol.
+
 ### Ce qui est tranché, et qui ne se rejoue pas
 
 | Question                     | Réponse                                                                     |
@@ -251,6 +259,7 @@ troisième ligne, et ce qu'il refuse de faire est dans
 | Quitter multifus             | **Rend les titres**, sur `RunEvent::Exit`. Le réglage, lui, ne bouge pas    |
 | Une fin brutale              | Laisse les fenêtres courtes, que le lancement suivant lit et rend           |
 | Un raccourci                 | Aucun. Le réglage se pose une fois                                          |
+| macOS                        | **Refusé.** Le client ignore l'écriture, et l'interrupteur y est grisé      |
 
 ### Ce que le code fait
 
@@ -283,8 +292,7 @@ vrai, faute d'écran confirmé.
 **Une fenêtre possédée reste dehors.** Un titre court étant un mot, une boîte de
 dialogue du client titrée `Erreur` en est un aussi : sans le filtre `GW_OWNER`,
 elle entrait au roster comme un personnage. `titled_window` fait donc le même
-test que `is_client_window`, et sur macOS `game_window` essaie tous les titres
-écrits par le client avant de retomber sur la lecture courte.
+test que `is_client_window`.
 
 **`tick` appelle `apply_short_titles` avant le balayage.** Dans l'autre ordre, un
 lancement réglage coché ne verrait personne pendant son premier tour.
@@ -310,15 +318,15 @@ titre laissé tel quel vaut mieux qu'un titre inventé, et `perimetre.md` l'écr
 Le réglage ne bouge pas, donc le lancement suivant raccourcit à nouveau ; ce que
 ça laisse, c'est un bureau tel qu'on l'a trouvé. Ça tourne sur le fil principal
 et le processus s'arrête de toute façon, donc un client planté peut ralentir la
-fermeture — borné par le délai de chaque écriture sur Windows, par celui de
-l'accessibilité sur macOS. Une fin que ce chemin ne voit pas, une coupure de
-courant, ne coûte rien d'irréparable : le suffixe rend le titre au lancement
+fermeture, borné par le délai de chaque écriture. Sur macOS, ce chemin ne rend
+rien puisque rien n'a été renommé. Une fin que ce chemin ne voit pas, une coupure
+de courant, ne coûte rien d'irréparable : le suffixe rend le titre au lancement
 suivant.
 
-| Système | Écrire un titre                              | Où ça se voit                   |
-| ------- | -------------------------------------------- | ------------------------------- |
-| Windows | `WM_SETTEXT` par `SendMessageTimeoutW`       | Barre des tâches, Alt+Tab       |
-| macOS   | `AXTitle` par `AXUIElementSetAttributeValue` | Barre de titre, Mission Control |
+| Système | Écrire un titre                                | Où ça se voit             |
+| ------- | ---------------------------------------------- | ------------------------- |
+| Windows | `WM_SETTEXT` par `SendMessageTimeoutW`         | Barre des tâches, Alt+Tab |
+| macOS   | **Rien.** `apply_short_titles` rend `Ok(None)` | Nulle part                |
 
 **Jamais `SetWindowTextW`.** Il envoie `WM_SETTEXT` et attend la boucle de
 messages du client sans délai maximal, ce qui est exactement le gel que
@@ -344,10 +352,10 @@ principal. La fenêtre de multifus est visible exactement pendant qu'on coche la
 case, donc la lire là ferait attendre le tour qu'on vient de sonner sur le fil
 qui l'a sonné.
 
-**Un tour macOS lit maintenant le titre de toutes les fenêtres d'un client**, là
-où `shorten` s'arrêtait à la première : c'est le prix de `game_window_element`,
-qui départage au lieu de prendre ce qui vient. Deux passes d'aller-retour AX par
-client et par seconde quand le réglage est coché.
+**Un tour macOS coûte exactement ce qu'il coûtait avant le chantier.** Aucune
+fenêtre n'y étant renommée, aucune ne porte de titre court : `game_window` et
+`game_window_element` s'arrêtent au premier titre qu'un client a écrit, et ne
+connaissent plus la seconde porte.
 
 **`runs_dofus` est passé avant la lecture du titre, et après les deux tests
 gratuits.** Il ouvre le
@@ -366,8 +374,9 @@ que par qui l'a coché.
 
 ### Vérification de l'étape
 
-`cargo test` compte 153 cas sur le PC, `vitest` 206, `tsc`, `oxlint` et `clippy`
-passent. Les cinq cas neufs de `platform::window` verrouillent ce qui compte :
+`cargo test` compte 153 cas sur le PC et 161 sur le Mac, `vitest` 206, `tsc`,
+`oxlint` et `clippy` passent. Les cinq cas de `platform::window` verrouillent ce
+qui compte, côté Windows :
 une fenêtre laissée courte par le lancement d'avant porte toujours son personnage
 sans que rien ne s'en souvienne, un titre que le client a écrit se lit comme il
 s'est toujours lu, rien ne se lit comme un titre court tant que personne ne l'a
@@ -379,18 +388,20 @@ première version : c'est le réveil du balayage, plus haut. Et le tour complet
 coché, client ouvert, multifus fermé, multifus rouvert, décoché rend bien son
 titre à la fenêtre, ce qui est exactement ce que la table ne savait pas faire.
 
-**Tout le reste n'a été vu sur aucun des deux systèmes.** Ce qui demande une
-soirée : six clients connectés, la barre des tâches qui montre six pseudos ; un
-personnage changé sans quitter le client, le titre qui suit ; une mule laissée
-inactive un quart d'heure, qui doit repasser hors ligne comme avant ; quitter
-multifus, qui doit rendre les six titres ; et surtout les quatre raccourcis,
-l'AutoFocus, la barre système et le relais, qui doivent se comporter exactement
-comme réglage décoché.
+**Vu refusé sur le Mac le 25 août 2026**, avec un client en jeu. Cocher, décocher,
+recocher : la barre de titre ne bouge pas d'un caractère, et le journal reste
+muet, ce qui était le seul cas que le code n'avait pas prévu. Il attendait une
+erreur d'accessibilité et il reçoit un succès. La mesure qui tranche est dans
+[macos.md](./macos.md), le refus dans [perimetre.md](./perimetre.md), et la
+moitié macOS de `apply_short_titles` est partie avec.
 
-**`AXTitle` est en lecture seule sur beaucoup d'applications**, et rien ne dit
-encore que le client Retro accepte l'écriture. S'il la refuse, le journal le
-dira, ligne par ligne, et c'est ce qui tranchera si la moitié macOS reste ou si
-`perimetre.md` gagne un refus de plus.
+**Tout le reste n'a été vu sur aucun des deux systèmes.** Ce qui demande une
+soirée, sur le PC : six clients connectés, la barre des tâches qui montre six
+pseudos ; un personnage changé sans quitter le client, le titre qui suit ; une
+mule laissée inactive un quart d'heure, qui doit repasser hors ligne comme avant ;
+quitter multifus, qui doit rendre les six titres ; et surtout les quatre
+raccourcis, l'AutoFocus, la barre système et le relais, qui doivent se comporter
+exactement comme réglage décoché.
 
 ---
 

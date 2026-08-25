@@ -295,8 +295,8 @@ pub fn on_run_event(app: &AppHandle, event: RunEvent) {
 /// Quitting is not unticking, so the réglage stays as the user left it and the
 /// next launch shortens again; what this leaves behind is a desktop as it was
 /// found. It runs on the main thread, and the process is ending anyway, so a
-/// client that has wedged can slow the quit down — bounded on Windows by the
-/// timeout of each write, and on macOS by accessibility's own.
+/// client that has wedged can slow the quit down, bounded by the timeout of each
+/// write. Nothing to put back on macOS, which never renamed anything.
 ///
 /// A quit this never sees, a crash or a kill, costs nothing that cannot be
 /// repaired: the title is put back from the suffix on the launch that follows.
