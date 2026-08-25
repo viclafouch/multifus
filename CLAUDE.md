@@ -13,6 +13,8 @@ Gestionnaire de fenêtres Dofus Retro en multicompte, macOS et Windows. À lire 
   archives à relire quand un comportement surprend, jamais un travail à
   reprendre.
 
+Parle-moi en joueur : ce qui change se raconte par ce que je vois à l'écran, la fenêtre avant et la fenêtre après. Le vocabulaire du code, des fichiers et des API reste dans le code et dans `docs/`.
+
 On lance multifus et on l'oublie : une fonctionnalité qui oblige à ouvrir la fenêtre pour être utile doit avoir un raccourci clavier, ou ne pas exister.
 
 Ne démarre jamais le serveur de dev (e.g: `npm run tauri dev`). L'utilisateur le fait lui-même.
