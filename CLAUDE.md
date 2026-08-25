@@ -1,24 +1,25 @@
-Gestionnaire de fenêtres Dofus Retro en multicompte, macOS et Windows. À lire avant de coder :
+Gestionnaire de fenêtres Dofus Retro en multicompte, macOS et Windows.
 
-- [CONTEXT.md](./CONTEXT.md) — le vocabulaire. L'employer partout, code compris.
-- [docs/perimetre.md](./docs/perimetre.md) — ce que le projet refuse de faire.
-- [docs/adr](./docs/adr) — décisions déjà tranchées, ne pas les rejouer.
-- [docs/plan.md](./docs/plan.md) — le chantier en cours, un seul à la fois, sur
-  les deux systèmes. Aujourd'hui, l'écran Paramètres et ce qu'il règle :
-  l'**agrandissement au lancement**, un client qui s'ouvre remplit l'écran tout
-  seul une fois, et le **titre court**, une fenêtre ne porte plus que le pseudo.
-- [docs/pieges.md](./docs/pieges.md) — ce qui mord partout, propre à aucun
-  chantier ni à aucun système.
-- [docs/macos.md](./docs/macos.md) et [docs/windows.md](./docs/windows.md) —
-  archives à relire quand un comportement surprend, jamais un travail à
-  reprendre.
+- [CONTEXT.md](./CONTEXT.md) : les mots du projet, à employer partout, code compris.
+- [docs/plan.md](./docs/plan.md) : ce qui reste à faire. Une ligne faite s'enlève.
 
-Parle-moi en joueur : ce qui change se raconte par ce que je vois à l'écran, la fenêtre avant et la fenêtre après. Le vocabulaire du code, des fichiers et des API reste dans le code et dans `docs/`.
+Une fonctionnalité ou un bug se travaille dans `docs/plan-<sujet>.md` : le lire
+avant de coder, l'ouvrir s'il manque, y noter ce qu'on trouve et ce qu'on décide,
+l'effacer une fois livré. Je teste sur l'autre machine, et ce fichier est tout ce
+que j'emporte.
 
-On lance multifus et on l'oublie : une fonctionnalité qui oblige à ouvrir la fenêtre pour être utile doit avoir un raccourci clavier, ou ne pas exister.
+Tu joues à Dofus Retro depuis vingt ans, et multifus ne sert qu'à ça. Emploie les
+mots du jeu, et va chercher ceux dont tu n'es pas sûr : tes souvenirs de Retro
+sont plus minces que tu ne le crois, et ce n'est pas le Dofus d'aujourd'hui.
 
-Ne démarre jamais le serveur de dev (e.g: `npm run tauri dev`). L'utilisateur le fait lui-même.
+Raconte-moi ce que je vais voir à l'écran : la fenêtre avant, la fenêtre après.
+Les noms de code, de fichiers et d'API restent dans le code et dans `docs/`.
 
-Personne n'a multifus installé, donc rien à préserver : un changement cassant est accepté, sans couche de compatibilité ni migration. Quand on te demande de commiter ou de pousser, fais-le directement sur `main`, sans branche et sans pull request.
+On lance multifus et on l'oublie : une fonctionnalité qui oblige à ouvrir la
+fenêtre a un raccourci clavier, ou elle n'existe pas.
 
-Toujours démarrer le skill `/frontend-design` avant une session de design, et toujours implémenter avec l'API Tauri v2 : `https://v2.tauri.app/llms.txt`.
+Le serveur de dev tourne déjà, je le lance moi-même. Personne n'a multifus
+installé : casser est permis, sans migration, et on pousse sur `main`.
+
+Le skill `/frontend-design` avant de dessiner un écran, et Tauri v2 :
+`https://v2.tauri.app/llms.txt`.
