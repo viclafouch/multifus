@@ -4,7 +4,7 @@ const SCREEN_LABELS = {
   characters: 'Personnages',
   shortcuts: 'Raccourcis',
   autoFocus: 'AutoFocus',
-  relay: 'Relais',
+  relay: 'Messages privés',
   settings: 'Paramètres',
   about: 'À propos'
 } as const satisfies Record<ScreenName, string>
@@ -22,7 +22,7 @@ export const NAV_RAIL_STRINGS = {
         ? '1 personnage connecté'
         : `${count} personnages connectés`
     },
-    listening: 'À l’écoute des notifications',
+    listening: 'À l’écoute du jeu',
     notListening: 'Écoute interrompue',
     denied: 'Autorisation manquante'
   }

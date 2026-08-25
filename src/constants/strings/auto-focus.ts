@@ -4,31 +4,31 @@ import { IS_APPLE } from '@/constants/keyboard'
 const KIND_LABELS = {
   combat: {
     label: 'Combat',
-    description: 'C’est au tour de ce personnage de jouer.'
+    description: 'C’est à votre tour de jouer.'
   },
   trade: {
     label: 'Échange',
-    description: 'Quelqu’un propose un échange.'
+    description: 'Quelqu’un vous propose un échange.'
   },
   group: {
     label: 'Groupe',
-    description: 'Invitation à rejoindre un groupe ou une guilde.'
+    description: 'On vous invite dans un groupe ou une guilde.'
   },
   private_message: {
     label: 'Message privé',
-    description: 'Un message privé arrive.'
+    description: 'Quelqu’un vous écrit en privé.'
   },
   challenge: {
     label: 'Défi',
-    description: 'Quelqu’un lance un défi en duel.'
+    description: 'Quelqu’un vous lance un défi en duel.'
   },
   craft: {
     label: 'Craft',
-    description: 'Appel à un artisan, invitation à un atelier, objets prêts.'
+    description: 'On vous appelle pour un craft, ou vos objets sont prêts.'
   },
   perceptor: {
     label: 'Percepteur',
-    description: 'Un percepteur est attaqué.'
+    description: 'Votre percepteur est attaqué.'
   }
 } as const satisfies Record<
   NotificationKind,
@@ -38,13 +38,14 @@ const KIND_LABELS = {
 export const AUTO_FOCUS_STRINGS = {
   autoFocus: {
     title: 'AutoFocus',
-    subtitle: 'Réglages valables pour tout le roster.',
-    masterLabel: 'AutoFocus',
-    masterDescription: 'Ramène la fenêtre qui reçoit une notification.',
-    minimizedLabel: 'Fenêtres réduites',
+    subtitle:
+      'Six personnages en combat, et vous passez votre temps à chercher qui doit jouer. Multifus met la bonne fenêtre devant vous dès que le jeu l’appelle.',
+    masterLabel: 'Activer l’AutoFocus',
+    masterDescription: 'La fenêtre appelée passe devant, sans y toucher.',
+    minimizedLabel: 'Aller chercher les fenêtres réduites',
     minimizedDescription: IS_APPLE
-      ? 'Rouvre de force celles rangées dans le Dock.'
-      : 'Rouvre de force celles rangées dans la barre des tâches.',
+      ? 'Une fenêtre rangée dans le Dock revient devant vous elle aussi.'
+      : 'Une fenêtre rangée dans la barre des tâches revient devant vous elle aussi.',
     kinds: KIND_LABELS
   }
 } as const

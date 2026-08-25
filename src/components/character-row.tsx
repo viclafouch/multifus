@@ -1,5 +1,6 @@
 import React from 'react'
 import { GripVertical, Mars, Venus } from 'lucide-react'
+import { useSortable } from '@dnd-kit/react/sortable'
 import type { Character, Gender } from '@/@types/roster'
 import { Lamp } from '@/components/lamp'
 import { RemoveButton } from '@/components/remove-button'
@@ -11,10 +12,6 @@ import { characterState, characterStateLine } from '@/helpers/wording'
 const STAGGER_MS = 38
 
 type RowActions = Readonly<{
-  handleMove: (nickname: string, delta: number) => void
-  handleDragStart: (nickname: string) => void
-  handleDragOver: (nickname: string) => void
-  handleDragEnd: () => void
   handleToggleAsleep: (nickname: string) => void
   handleSetGender: (nickname: string, gender: Gender | null) => void
   handleRemove: (nickname: string) => void
@@ -24,7 +21,6 @@ type CharacterRowProps = Readonly<{
   character: Character
   rank: number | null
   index: number
-  isDragging: boolean
   actions: RowActions
 }>
 
@@ -32,62 +28,32 @@ export const CharacterRow = ({
   character,
   rank,
   index,
-  isDragging,
   actions
 }: CharacterRowProps) => {
   const { nickname, gender, asleep, online } = character
-
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
-    if (event.key === 'ArrowUp') {
-      event.preventDefault()
-      actions.handleMove(nickname, -1)
-    }
-
-    if (event.key === 'ArrowDown') {
-      event.preventDefault()
-      actions.handleMove(nickname, 1)
-    }
-  }
-
-  const handleDragStart = (event: React.DragEvent<HTMLLIElement>) => {
-    const row = event.currentTarget
-    const { left, top } = row.getBoundingClientRect()
-
-    event.dataTransfer.setDragImage(
-      row,
-      event.clientX - left,
-      event.clientY - top
-    )
-    event.dataTransfer.effectAllowed = 'move'
-    event.dataTransfer.setData('text/plain', nickname)
-
-    actions.handleDragStart(nickname)
-  }
-
-  const handleDragOver = (event: React.DragEvent<HTMLLIElement>) => {
-    event.preventDefault()
-    event.dataTransfer.dropEffect = 'move'
-    actions.handleDragOver(nickname)
-  }
+  const { ref, handleRef, isDragging } = useSortable({ id: nickname, index })
+  const [isEntering, setIsEntering] = React.useState(true)
 
   return (
     <li
-      draggable
+      ref={ref}
+      data-entering={isEntering ? '' : undefined}
       data-dragging={isDragging ? '' : undefined}
       data-offline={online ? undefined : ''}
       style={{ animationDelay: `${index * STAGGER_MS}ms` }}
-      onDragStart={handleDragStart}
-      onDragOver={handleDragOver}
-      onDragEnd={actions.handleDragEnd}
-      onDrop={handleDrop}
-      className="rise transition-row group relative flex h-row items-center gap-3 rounded-lg border border-transparent px-2 hover:border-border hover:bg-card/70 data-dragging:border-primary/35 data-dragging:bg-card data-dragging:shadow-lg data-offline:dimmed"
+      onAnimationEnd={(event) => {
+        if (event.target === event.currentTarget) {
+          setIsEntering(false)
+        }
+      }}
+      className="transition-row group relative flex h-row items-center gap-3 rounded-lg border border-transparent px-2 hover:border-border hover:bg-card/70 data-dragging:border-primary/35 data-dragging:bg-card data-dragging:shadow-lg data-entering:rise data-offline:dimmed"
     >
       <Button
+        ref={handleRef}
         variant="ghost"
         size="icon-xs"
         aria-label={strings.characters.handle(nickname)}
-        onKeyDown={handleKeyDown}
-        className="cursor-grab text-muted-foreground/30 group-hover:text-muted-foreground/70 active:cursor-grabbing"
+        className="cursor-grab touch-none text-muted-foreground/30 group-hover:text-muted-foreground/70 active:cursor-grabbing"
       >
         <GripVertical strokeWidth={1.75} />
       </Button>
@@ -100,7 +66,7 @@ export const CharacterRow = ({
           : String(rank).padStart(2, '0')}
       </span>
       <Lamp state={characterState(character)} />
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <p className="selectable truncate text-row font-medium group-data-offline:text-muted-foreground">
           {nickname}
         </p>
@@ -174,8 +140,4 @@ const GenderButton = ({
       <Icon strokeWidth={2} />
     </Button>
   )
-}
-
-const handleDrop = (event: React.DragEvent<HTMLLIElement>) => {
-  event.preventDefault()
 }

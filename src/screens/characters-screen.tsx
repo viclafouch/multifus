@@ -1,4 +1,5 @@
 import { Mars, RefreshCw, Venus } from 'lucide-react'
+import { DragDropProvider } from '@dnd-kit/react'
 import type { Character, Gender } from '@/@types/roster'
 import type { Snapshot } from '@/@types/snapshot'
 import { CharacterRow } from '@/components/character-row'
@@ -9,6 +10,7 @@ import { Screen } from '@/components/layout/screen'
 import { Button } from '@/components/ui/button'
 import { strings } from '@/constants/strings'
 import { useCycleOrder } from '@/hooks/use-cycle-order'
+import { DRAG_ACCESSIBILITY, DRAG_MODIFIERS } from '@/lib/drag'
 import {
   refresh,
   removeCharacter,
@@ -29,10 +31,6 @@ export const CharactersScreen = ({
   const cycle = useCycleOrder({ characters, run })
 
   const actions = {
-    handleMove: cycle.handleMove,
-    handleDragStart: cycle.handleDragStart,
-    handleDragOver: cycle.handleDragOver,
-    handleDragEnd: cycle.handleDragEnd,
     handleToggleAsleep: (nickname: string) => {
       run(toggleAsleep(nickname))
     },
@@ -81,22 +79,30 @@ export const CharactersScreen = ({
           run(setGenderAsleep(gender, asleep))
         }}
       />
-      <Panel className="p-1.5">
-        <ol>
-          {cycle.rows.map((character, index) => {
-            return (
-              <CharacterRow
-                key={character.nickname}
-                character={character}
-                rank={rankOf(cycle.rows, character)}
-                index={index}
-                isDragging={cycle.dragged === character.nickname}
-                actions={actions}
-              />
-            )
-          })}
-        </ol>
-      </Panel>
+      <DragDropProvider
+        modifiers={DRAG_MODIFIERS}
+        plugins={(defaults) => {
+          return [...defaults, DRAG_ACCESSIBILITY]
+        }}
+        onDragStart={cycle.handleDragStart}
+        onDragEnd={cycle.handleDragEnd}
+      >
+        <Panel className="p-1.5">
+          <ol>
+            {cycle.rows.map((character, index) => {
+              return (
+                <CharacterRow
+                  key={character.nickname}
+                  character={character}
+                  rank={rankOf(cycle.rows, character)}
+                  index={index}
+                  actions={actions}
+                />
+              )
+            })}
+          </ol>
+        </Panel>
+      </DragDropProvider>
       {hasGender ? null : <Note>{strings.characters.noGenderYet}</Note>}
     </Screen>
   )

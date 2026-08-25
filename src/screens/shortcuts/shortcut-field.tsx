@@ -8,7 +8,7 @@ import { KeyCap } from '@/screens/shortcuts/key-cap'
 
 type ShortcutFieldProps = Readonly<{
   accelerator: string | null
-  statusLine: TonedLine
+  statusLine: TonedLine | null
   editLabel: string
   editing: Readonly<{
     isActive: boolean
@@ -78,7 +78,7 @@ export const ShortcutField = ({
         variant="outline"
         aria-label={editLabel}
         data-editing={editing.isActive ? '' : undefined}
-        data-error={hint.tone === 'bad' ? '' : undefined}
+        data-error={hint?.tone === 'bad' ? '' : undefined}
         onClick={editing.handleOpen}
         onKeyDown={editing.isActive ? handleKeyDown : undefined}
         onBlur={editing.isActive ? stop : undefined}
@@ -96,20 +96,22 @@ export const ShortcutField = ({
           })
         )}
       </Button>
-      <p
-        data-tone={hint.tone}
-        role={hint.tone === 'bad' ? 'alert' : undefined}
-        className="max-w-60 text-right text-mini text-muted-foreground/75 data-[tone=bad]:text-destructive"
-      >
-        {hint.text}
-      </p>
+      {hint === null ? null : (
+        <p
+          data-tone={hint.tone}
+          role={hint.tone === 'bad' ? 'alert' : undefined}
+          className="max-w-60 text-right text-mini text-muted-foreground/75 data-[tone=bad]:text-destructive"
+        >
+          {hint.text}
+        </p>
+      )}
     </div>
   )
 }
 
 type FieldHintParams = {
   readonly isEditing: boolean
-  readonly statusLine: TonedLine
+  readonly statusLine: TonedLine | null
   readonly rejected: CaptureRejection | null
 }
 
@@ -117,7 +119,7 @@ const fieldHint = ({
   isEditing,
   statusLine,
   rejected
-}: FieldHintParams): TonedLine => {
+}: FieldHintParams): TonedLine | null => {
   if (rejected !== null) {
     return { tone: 'bad', text: strings.shortcuts.rejected[rejected] }
   }

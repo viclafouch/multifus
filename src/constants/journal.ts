@@ -132,25 +132,27 @@ export const PLAIN_LINES = {
   clientMaximized:
     'Un client Dofus vient d’ouvrir : sa fenêtre a été agrandie à l’écran.',
   updateUpToDate: 'Aucune version plus récente.',
-  relayPaired: 'Relais apparié à un robot Telegram.',
-  relayUnpaired: 'Robot Telegram délié, jeton effacé du trousseau.',
+  relayPaired: 'Robot Telegram relié.',
+  relayUnpaired: 'Robot Telegram retiré, son code effacé du trousseau.',
   relayTestSent: 'Message d’essai envoyé sur le téléphone.',
   reset: 'Configuration remise à zéro.',
   quit: 'Multifus a été quitté depuis la barre système.'
 } as const satisfies Record<WithoutPayload<JournalEvent>, string>
 
 export const RELAY_STOP_LINES = {
-  shortcut: 'Relais coupé : un raccourci a été frappé depuis le jeu.',
-  tray: 'Relais coupé depuis la barre système.',
-  window: 'Relais coupé depuis la fenêtre.',
+  shortcut:
+    'Envoi sur le téléphone coupé : un raccourci a été frappé depuis le jeu.',
+  tray: 'Envoi sur le téléphone coupé depuis la barre système.',
+  window: 'Envoi sur le téléphone coupé depuis la fenêtre.',
   noRelayedCharacter:
-    'Relais coupé : le dernier personnage relayé a été décoché.',
-  noLongerPaired: 'Relais coupé : il n’y a plus de robot où écrire.'
+    'Envoi sur le téléphone coupé : le dernier personnage relayé a été décoché.',
+  noLongerPaired:
+    'Envoi sur le téléphone coupé : il n’y a plus de robot où écrire.'
 } as const satisfies Record<RelayStop, string>
 
 export const NOTICE_LINES = {
-  enabled: 'Avis envoyé : le relais est activé.',
-  disabled: 'Avis envoyé : le relais est désactivé.',
+  enabled: 'Avis envoyé : les messages privés partent sur le téléphone.',
+  disabled: 'Avis envoyé : les messages privés ne partent plus.',
   disconnected: 'Avis envoyé : un personnage relayé s’est déconnecté.',
   both: 'Avis envoyé : une déconnexion, et plus personne de relayé connecté.'
 } as const satisfies Record<NoticeCase, string>

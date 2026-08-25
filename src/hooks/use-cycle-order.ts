@@ -1,8 +1,10 @@
 import React from 'react'
+import type { DragEndEvent } from '@dnd-kit/react'
+import { isSortable } from '@dnd-kit/react/sortable'
 import type { Character } from '@/@types/roster'
 import type { Snapshot } from '@/@types/snapshot'
 import { moved } from '@/helpers/array'
-import { arrange } from '@/helpers/cycle'
+import { arrange, matchIsArranged, nicknamesOf } from '@/helpers/cycle'
 import { reorder } from '@/lib/multifus'
 
 type UseCycleOrderParams = {
@@ -12,62 +14,46 @@ type UseCycleOrderParams = {
 
 export const useCycleOrder = ({ characters, run }: UseCycleOrderParams) => {
   const [order, setOrder] = React.useState<readonly string[] | null>(null)
-  const [dragged, setDragged] = React.useState<string | null>(null)
+  const [isDragging, setIsDragging] = React.useState(false)
   const [known, setKnown] = React.useState(characters)
 
   if (known !== characters) {
     setKnown(characters)
 
-    if (dragged === null) {
+    if (!isDragging && matchIsArranged({ characters, order })) {
       setOrder(null)
     }
   }
 
   const rows = arrange({ characters, order })
 
-  const commit = (next: readonly string[]) => {
-    setOrder(next)
-    run(reorder(next))
-  }
-
   return {
     rows,
-    dragged,
-    handleMove: (nickname: string, delta: number) => {
-      const next = moved({ list: nicknamesOf(rows), item: nickname, delta })
-
-      if (next !== null) {
-        commit(next)
-      }
-    },
-    handleDragStart: (nickname: string) => {
-      setDragged(nickname)
+    handleDragStart: () => {
+      setIsDragging(true)
       setOrder(nicknamesOf(rows))
     },
-    handleDragOver: (nickname: string) => {
-      if (dragged === null || dragged === nickname) {
+    handleDragEnd: ({ operation, canceled }: DragEndEvent) => {
+      setIsDragging(false)
+
+      const { source } = operation
+
+      if (canceled || !isSortable(source)) {
         return
       }
 
-      setOrder((current) => {
-        const list = current ?? nicknamesOf(characters)
-        const delta = list.indexOf(nickname) - list.indexOf(dragged)
-
-        return moved({ list, item: dragged, delta }) ?? list
+      const next = moved({
+        list: nicknamesOf(rows),
+        item: String(source.id),
+        delta: source.index - source.initialIndex
       })
-    },
-    handleDragEnd: () => {
-      setDragged(null)
 
-      if (order !== null) {
-        run(reorder(order))
+      if (next === null) {
+        return
       }
+
+      setOrder(next)
+      run(reorder(next))
     }
   }
-}
-
-const nicknamesOf = (characters: readonly Character[]) => {
-  return characters.map((character) => {
-    return character.nickname
-  })
 }

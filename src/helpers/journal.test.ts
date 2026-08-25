@@ -105,13 +105,13 @@ const BINDINGS = [
 ] as const satisfies readonly BoundCombination[]
 
 const BINDINGS_LINE =
-  'Raccourcis : Suivant Control+Shift+ArrowRight · Précédent non attribué · Veille pas encore posé · Bascule Control+Shift+KeyX illisible (touche inconnue) · Réponse rapide 1 Control+Shift+KeyP.'
+  'Raccourcis : Fenêtre suivante Control+Shift+ArrowRight · Fenêtre précédente non attribué · Mettre de côté pas encore posé · Inverser hommes et femmes Control+Shift+KeyX illisible (touche inconnue) · Réponse rapide 1 Control+Shift+KeyP.'
 
 const ROSTER_CASES = {
   slept: [
     {
       event: { kind: 'roster', change: { kind: 'slept', nickname: NICKNAME } },
-      line: 'Alpha mis en veille.'
+      line: 'Alpha mis de côté.'
     }
   ],
   woke: [
@@ -126,14 +126,14 @@ const ROSTER_CASES = {
         kind: 'roster',
         change: { kind: 'genderAsleep', gender: 'male', asleep: true }
       },
-      line: 'Tous les hommes connectés sont en veille.'
+      line: 'Tous les hommes connectés sont de côté.'
     },
     {
       event: {
         kind: 'roster',
         change: { kind: 'genderAsleep', gender: 'female', asleep: false }
       },
-      line: 'Tous les femmes connectés sont réveillés.'
+      line: 'Tous les femmes connectés sont dans le défilement.'
     }
   ],
   genderAssigned: [
@@ -286,7 +286,7 @@ const SHORTCUT_CASES = {
         action: 'next',
         outcome: { outcome: 'focused', nickname: NICKNAME }
       },
-      line: 'Suivant : Alpha au premier plan.'
+      line: 'Fenêtre suivante : Alpha au premier plan.'
     }
   ],
   slept: [
@@ -296,7 +296,7 @@ const SHORTCUT_CASES = {
         action: 'toggleAsleep',
         outcome: { outcome: 'slept', nickname: NICKNAME }
       },
-      line: 'Veille : Alpha mis en veille.'
+      line: 'Mettre de côté : Alpha mis de côté.'
     }
   ],
   woke: [
@@ -306,7 +306,7 @@ const SHORTCUT_CASES = {
         action: 'toggleAsleep',
         outcome: { outcome: 'woke', nickname: NICKNAME }
       },
-      line: 'Veille : Alpha remis dans le défilement.'
+      line: 'Mettre de côté : Alpha remis dans le défilement.'
     }
   ],
   swapped: [
@@ -316,7 +316,7 @@ const SHORTCUT_CASES = {
         action: 'swap',
         outcome: { outcome: 'swapped', awake: 'male' }
       },
-      line: 'Bascule : les hommes sont réveillés, les femmes en veille.'
+      line: 'Inverser hommes et femmes : les hommes sont dans le défilement, les femmes de côté.'
     },
     {
       event: {
@@ -324,7 +324,7 @@ const SHORTCUT_CASES = {
         action: 'swap',
         outcome: { outcome: 'swapped', awake: 'female' }
       },
-      line: 'Bascule : les femmes sont réveillées, les hommes en veille.'
+      line: 'Inverser hommes et femmes : les femmes sont dans le défilement, les hommes de côté.'
     }
   ],
   outsideGame: [
@@ -334,7 +334,7 @@ const SHORTCUT_CASES = {
         action: 'next',
         outcome: { outcome: 'outsideGame' }
       },
-      line: 'Suivant : ignoré, aucune fenêtre Dofus au premier plan.'
+      line: 'Fenêtre suivante : ignoré, aucune fenêtre Dofus au premier plan.'
     }
   ],
   notInRoster: [
@@ -344,7 +344,7 @@ const SHORTCUT_CASES = {
         action: 'previous',
         outcome: { outcome: 'notInRoster', nickname: NICKNAME }
       },
-      line: 'Précédent : Alpha n’est pas encore dans le roster.'
+      line: 'Fenêtre précédente : Alpha n’est pas encore dans le roster.'
     }
   ],
   nobodyInCycle: [
@@ -354,7 +354,7 @@ const SHORTCUT_CASES = {
         action: 'next',
         outcome: { outcome: 'nobodyInCycle' }
       },
-      line: 'Suivant : personne dans le défilement.'
+      line: 'Fenêtre suivante : personne dans le défilement.'
     }
   ],
   noGender: [
@@ -364,7 +364,7 @@ const SHORTCUT_CASES = {
         action: 'swap',
         outcome: { outcome: 'noGender' }
       },
-      line: 'Bascule : aucun personnage connecté n’a de sexe assigné.'
+      line: 'Inverser hommes et femmes : aucun personnage connecté n’a de sexe assigné.'
     }
   ],
   noWindow: [
@@ -374,7 +374,7 @@ const SHORTCUT_CASES = {
         action: 'next',
         outcome: { outcome: 'noWindow', nickname: NICKNAME }
       },
-      line: 'Suivant : la fenêtre de Alpha a disparu.'
+      line: 'Fenêtre suivante : la fenêtre de Alpha a disparu.'
     }
   ],
   focusFailed: [
@@ -384,7 +384,7 @@ const SHORTCUT_CASES = {
         action: 'next',
         outcome: { outcome: 'focusFailed', nickname: NICKNAME, detail: DETAIL }
       },
-      line: `Suivant : le système a refusé de ramener Alpha au premier plan (${DETAIL}).`
+      line: `Fenêtre suivante : le système a refusé de ramener Alpha au premier plan (${DETAIL}).`
     }
   ],
   foregroundUnknown: [
@@ -394,7 +394,7 @@ const SHORTCUT_CASES = {
         action: 'previous',
         outcome: { outcome: 'foregroundUnknown', detail: DETAIL }
       },
-      line: `Précédent : impossible de savoir quelle fenêtre est au premier plan (${DETAIL}).`
+      line: `Fenêtre précédente : impossible de savoir quelle fenêtre est au premier plan (${DETAIL}).`
     }
   ]
 } as const satisfies Record<
@@ -591,7 +591,7 @@ const RELAY_FAILURE_CASES = {
         kind: 'relayFailed',
         reason: { reason: 'keychain', detail: DETAIL }
       },
-      line: `Relais : le trousseau du système a refusé le jeton (${DETAIL}).`
+      line: `Messages privés : le trousseau du système a refusé le code du robot (${DETAIL}).`
     }
   ],
   telegram: [
@@ -600,7 +600,7 @@ const RELAY_FAILURE_CASES = {
         kind: 'relayFailed',
         reason: { reason: 'telegram', detail: DETAIL }
       },
-      line: `Relais : Telegram a refusé la requête (${DETAIL}).`
+      line: `Messages privés : Telegram a refusé la requête (${DETAIL}).`
     }
   ],
   network: [
@@ -609,7 +609,7 @@ const RELAY_FAILURE_CASES = {
         kind: 'relayFailed',
         reason: { reason: 'network', detail: DETAIL }
       },
-      line: `Relais : Telegram n’a pas répondu (${DETAIL}).`
+      line: `Messages privés : Telegram n’a pas répondu (${DETAIL}).`
     }
   ]
 } as const satisfies Record<
@@ -754,7 +754,7 @@ const JOURNAL_CASES = {
           }
         ]
       },
-      line: 'Raccourcis : Suivant Control+Shift+ArrowRight en doublon avec Précédent, donc inerte · Bascule aucune combinaison refusé (déjà prise).'
+      line: 'Raccourcis : Fenêtre suivante Control+Shift+ArrowRight en doublon avec Fenêtre précédente, donc inerte · Inverser hommes et femmes aucune combinaison refusé (déjà prise).'
     },
     {
       event: {
@@ -770,7 +770,7 @@ const JOURNAL_CASES = {
           }
         ]
       },
-      line: 'Raccourcis : Réponse rapide 2 Control+Shift+KeyP en doublon avec Suivant, donc inerte.'
+      line: 'Raccourcis : Réponse rapide 2 Control+Shift+KeyP en doublon avec Fenêtre suivante, donc inerte.'
     }
   ],
   shortcutsFailed: [
@@ -907,11 +907,11 @@ const JOURNAL_CASES = {
   relayEnabled: [
     {
       event: { kind: 'relayEnabled', surface: 'tray' },
-      line: 'Relais activé depuis la barre système.'
+      line: 'Envoi des messages privés activé depuis la barre système.'
     },
     {
       event: { kind: 'relayEnabled', surface: 'window' },
-      line: 'Relais activé depuis la fenêtre.'
+      line: 'Envoi des messages privés activé depuis la fenêtre.'
     }
   ],
   relayTestSent: [
@@ -950,7 +950,7 @@ const JOURNAL_CASES = {
   displayAwake: [
     {
       event: { kind: 'displayAwake', held: true },
-      line: 'Écran tenu éveillé : le relais a quelque chose à écouter.'
+      line: 'Écran tenu éveillé : il y a des messages privés à écouter.'
     },
     {
       event: { kind: 'displayAwake', held: false },

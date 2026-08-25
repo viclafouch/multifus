@@ -6,7 +6,7 @@ use serde::Serialize;
 use crate::domain::NotificationKind;
 use crate::domain::Roster;
 
-#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Settings {
     pub roster: Roster,
@@ -18,6 +18,28 @@ pub struct Settings {
     pub short_titles: bool,
     pub client_title_suffix: Option<String>,
     pub start_at_login: bool,
+}
+
+const FIRST_QUICK_REPLY: &str = "Bon jeu à toi !";
+
+impl Default for Settings {
+    fn default() -> Self {
+        let mut quick_reply = QuickReply::new(QuickReplyId::default());
+
+        quick_reply.set_text(FIRST_QUICK_REPLY);
+
+        Self {
+            roster: Roster::default(),
+            shortcuts: Shortcuts::default(),
+            quick_replies: vec![quick_reply],
+            auto_focus: AutoFocus::default(),
+            relay: Relay::default(),
+            maximize_on_launch: false,
+            short_titles: false,
+            client_title_suffix: None,
+            start_at_login: false,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -362,8 +384,12 @@ mod tests {
     }
 
     #[test]
-    fn a_first_launch_has_no_quick_reply_at_all() {
-        assert!(Settings::default().quick_replies.is_empty());
+    fn a_first_launch_offers_one_quick_reply_to_start_from() {
+        let quick_replies = Settings::default().quick_replies;
+
+        assert_eq!(quick_replies.len(), 1);
+        assert_eq!(quick_replies[0].text, FIRST_QUICK_REPLY);
+        assert!(quick_replies[0].shortcut.is_none());
     }
 
     #[test]
@@ -444,6 +470,6 @@ mod tests {
         assert_eq!(settings.auto_focus, AutoFocus::default());
         assert_eq!(settings.relay, Relay::default());
         assert!(settings.roster.is_empty());
-        assert!(settings.quick_replies.is_empty());
+        assert_eq!(settings.quick_replies, Settings::default().quick_replies);
     }
 }

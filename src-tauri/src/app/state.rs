@@ -1543,7 +1543,7 @@ mod tests {
 
         let bindings = state.bindings();
 
-        assert_eq!(bindings.len(), 5);
+        assert_eq!(bindings.len(), 6);
         assert_eq!(
             bindings.first().map(|(binding, _)| *binding),
             Some(Binding::Action {
@@ -1565,7 +1565,11 @@ mod tests {
         state.remove_quick_reply(id);
 
         assert_eq!(state.quick_reply_text(id), None);
-        assert!(state.snapshot().quick_replies.is_empty());
+        assert!(state
+            .snapshot()
+            .quick_replies
+            .iter()
+            .all(|quick_reply| quick_reply.id != id));
     }
 
     #[test]

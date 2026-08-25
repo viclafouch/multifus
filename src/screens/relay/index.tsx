@@ -3,7 +3,6 @@ import type { RelayStatus } from '@/@types/relay'
 import type { Character } from '@/@types/roster'
 import type { Snapshot } from '@/@types/snapshot'
 import { FieldRow } from '@/components/layout/field-row'
-import { Note } from '@/components/layout/note'
 import { Panel } from '@/components/layout/panel'
 import { PanelHeader } from '@/components/layout/panel-header'
 import { Screen } from '@/components/layout/screen'
@@ -73,7 +72,6 @@ export const RelayScreen = ({ relay, characters, run }: RelayScreenProps) => {
           />
         </FieldRow>
       </Panel>
-      <Note>{strings.relay.bodyNote}</Note>
       <div className="mt-3">
         <LinkButton link="faq" label={strings.relay.help} />
       </div>

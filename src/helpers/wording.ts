@@ -120,12 +120,12 @@ const shorten = (text: string) => {
 export const shortcutStatusLine = (
   status: ShortcutStatus,
   quickReplies: readonly QuickReply[]
-): TonedLine => {
+): TonedLine | null => {
   const answers = strings.shortcuts.status
 
   switch (status.kind) {
     case 'registered': {
-      return { tone: 'calm', text: answers.registered }
+      return null
     }
     case 'unbound': {
       return { tone: 'calm', text: answers.unbound }
@@ -172,7 +172,7 @@ export const characterState = (character: Character): LampState => {
 const CHARACTER_STATE_LINES = {
   offline: strings.characters.offline,
   asleep: strings.characters.asleep,
-  live: strings.characters.inCycle
+  live: strings.characters.online
 } as const satisfies Record<LampState, string>
 
 export const characterStateLine = (character: Character) => {

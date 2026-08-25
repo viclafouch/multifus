@@ -18,7 +18,7 @@ export type QuickReplyRowActions = Readonly<{
 
 type QuickReplyRowProps = Readonly<{
   quickReply: QuickReply
-  statusLine: TonedLine
+  statusLine: TonedLine | null
   editing: Binding | null
   actions: QuickReplyRowActions
 }>

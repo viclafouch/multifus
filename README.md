@@ -8,8 +8,8 @@ Une notification arrive dans le jeu, Multifus met devant vous la fenêtre du per
 
 - [x] Ramener une fenêtre au premier plan sur sept événements : combat, échange, groupe, craft, message privé, défi, percepteur
 - [x] Deux raccourcis pour passer au personnage suivant ou précédent, dans l'ordre que vous rangez vous-même
-- [x] Un raccourci pour mettre un personnage en veille : il sort du défilement, et une notification le ramène quand même
-- [x] Un sexe par personnage, et un raccourci qui endort un sexe pendant qu'il réveille l'autre
+- [x] Un raccourci pour mettre un personnage de côté : il sort du défilement, et une notification le ramène quand même
+- [x] Un sexe par personnage, et un raccourci qui met tous vos hommes de côté pendant qu'il remet vos femmes dans le défilement
 - [x] Des réponses rapides : une combinaison colle un texte tout prêt dans le chat, la touche Entrée reste la vôtre
 - [x] Vos messages privés sur votre téléphone par Telegram, tant que vous êtes loin du clavier
 - [x] Un client qui s'ouvre remplit l'écran tout seul, une seule fois

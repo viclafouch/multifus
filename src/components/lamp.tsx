@@ -14,7 +14,7 @@ export const Lamp = ({ state, className }: LampProps) => {
       data-state={state}
       className={cn(
         'size-lamp shrink-0 rounded-full transition-colors duration-300',
-        'data-[state=live]:lamp-live data-[state=live]:bg-primary',
+        'data-[state=live]:lamp-live data-[state=live]:bg-live',
         'data-[state=asleep]:border data-[state=asleep]:border-muted-foreground/55 data-[state=asleep]:bg-transparent',
         'data-[state=offline]:bg-muted-foreground/20',
         className

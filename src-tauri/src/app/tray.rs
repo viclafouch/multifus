@@ -35,19 +35,19 @@ use crate::platform::WindowManager;
 const MENU_CHARACTERS: &str = "Personnages";
 const MENU_SHORTCUTS: &str = "Raccourcis";
 const MENU_AUTO_FOCUS_SCREEN: &str = "AutoFocus";
-const MENU_RELAY: &str = "Relais";
+const MENU_RELAY: &str = "Messages privés";
 const MENU_SETTINGS: &str = "Paramètres";
 const MENU_ABOUT: &str = "À propos";
 const MENU_QUIT: &str = "Quitter Multifus";
 const MENU_NOBODY: &str = "Aucun personnage connecté";
-const MENU_ASLEEP: &str = " (en veille)";
+const MENU_ASLEEP: &str = " (de côté)";
 const MENU_AUTO_FOCUS_ON: &str = "Activer l'AutoFocus";
 const MENU_AUTO_FOCUS_OFF: &str = "Désactiver l'AutoFocus";
-const MENU_WAKE_MINIMIZED: &str = "Réveiller les fenêtres réduites";
-const MENU_LEAVE_MINIMIZED: &str = "Ignorer les fenêtres réduites";
-const MENU_RELAY_SETUP: &str = "Configurer le relais…";
-const MENU_RELAY_ON: &str = "Activer le relais";
-const MENU_RELAY_OFF: &str = "Désactiver le relais";
+const MENU_WAKE_MINIMIZED: &str = "Aller chercher les fenêtres réduites";
+const MENU_LEAVE_MINIMIZED: &str = "Laisser les fenêtres réduites";
+const MENU_RELAY_SETUP: &str = "Configurer les messages privés…";
+const MENU_RELAY_ON: &str = "Recevoir mes messages privés";
+const MENU_RELAY_OFF: &str = "Ne plus les recevoir";
 const MENU_DENIED: &str = "Autorisation manquante";
 const MENU_JOURNAL: &str = "Montrer le journal";
 
@@ -519,9 +519,9 @@ mod tests {
         assert_eq!(
             labels,
             [
-                "Configurer le relais…",
-                "Activer le relais",
-                "Désactiver le relais"
+                "Configurer les messages privés…",
+                "Recevoir mes messages privés",
+                "Ne plus les recevoir"
             ]
         );
     }

@@ -72,13 +72,13 @@ const PAIRING_CASES = {
 
 type StatusCase = {
   readonly status: ShortcutStatus
-  readonly answer: TonedLine
+  readonly answer: TonedLine | null
 }
 
 const STATUS_CASES = {
   registered: {
     status: { kind: 'registered' },
-    answer: { tone: 'calm', text: strings.shortcuts.status.registered }
+    answer: null
   },
   unbound: {
     status: { kind: 'unbound' },
@@ -163,9 +163,9 @@ describe('shortcutStatusLine', () => {
       binding: { kind: 'action', action: 'swap' }
     } as const
 
-    const { text } = shortcutStatusLine(status, QUICK_REPLIES)
+    const written = shortcutStatusLine(status, QUICK_REPLIES)
 
-    expect(text).toContain(strings.shortcuts.actions.swap.label)
+    expect(written?.text).toContain(strings.shortcuts.actions.swap.label)
   })
 
   it('nomme par son texte la quickReply qui tient déjà la combinaison', () => {
@@ -174,9 +174,9 @@ describe('shortcutStatusLine', () => {
       binding: { kind: 'quickReply', id: 1 }
     } as const
 
-    const { text } = shortcutStatusLine(status, QUICK_REPLIES)
+    const written = shortcutStatusLine(status, QUICK_REPLIES)
 
-    expect(text).toContain('la réponse « prix libre »')
+    expect(written?.text).toContain('la réponse « prix libre »')
   })
 
   it('nomme une quickReply sans texte sans prétendre la citer', () => {
@@ -185,9 +185,9 @@ describe('shortcutStatusLine', () => {
       binding: { kind: 'quickReply', id: 2 }
     } as const
 
-    const { text } = shortcutStatusLine(status, QUICK_REPLIES)
+    const written = shortcutStatusLine(status, QUICK_REPLIES)
 
-    expect(text).toContain(strings.shortcuts.quickReplies.unnamed)
+    expect(written?.text).toContain(strings.shortcuts.quickReplies.unnamed)
   })
 })
 
@@ -230,13 +230,13 @@ describe('authorizationLine', () => {
 })
 
 describe('characterStateLine', () => {
-  it('dit le défilement pour un personnage connecté et réveillé', () => {
+  it('dit le défilement pour un personnage connecté et dedans', () => {
     const line = characterStateLine(ONLINE_CHARACTER)
 
-    expect(line).toBe(strings.characters.inCycle)
+    expect(line).toBe(strings.characters.online)
   })
 
-  it('dit la veille pour un personnage connecté et endormi', () => {
+  it('dit le côté pour un personnage connecté et mis de côté', () => {
     const character = { ...ONLINE_CHARACTER, asleep: true }
 
     const line = characterStateLine(character)
@@ -244,7 +244,7 @@ describe('characterStateLine', () => {
     expect(line).toBe(strings.characters.asleep)
   })
 
-  it('dit hors ligne avant la veille pour un personnage déconnecté', () => {
+  it('dit la déconnexion avant le côté pour un personnage déconnecté', () => {
     const character = { ...ONLINE_CHARACTER, asleep: true, online: false }
 
     const line = characterStateLine(character)

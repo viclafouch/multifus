@@ -36,8 +36,8 @@ const DISCONNECTED: &str = "s’est déconnecté.";
 const NOBODY_LEFT: &str = "Plus aucun personnage relayé n’est connecté.";
 const TEST_LINE: &str = "Message d’essai.";
 const TEST_PROOF: &str = "Un vrai message privé arrivera sous cette forme.";
-const RELAY_ON: &str = "Relais activé.";
-const RELAY_OFF: &str = "Relais désactivé.";
+const RELAY_ON: &str = "Vos messages privés arrivent ici.";
+const RELAY_OFF: &str = "Vos messages privés n’arrivent plus ici.";
 const NOBODY_YET: &str = "Aucun personnage relayé n’est connecté pour l’instant.";
 
 const QUEUE_CAPACITY: usize = 64;
@@ -617,9 +617,12 @@ mod tests {
     fn moving_the_switch_says_so_and_says_nothing_else() {
         assert_eq!(
             text_of(&Message::Enabled { none_online: false }),
-            "Multifus\nRelais activé."
+            "Multifus\nVos messages privés arrivent ici."
         );
-        assert_eq!(text_of(&Message::Disabled), "Multifus\nRelais désactivé.");
+        assert_eq!(
+            text_of(&Message::Disabled),
+            "Multifus\nVos messages privés n’arrivent plus ici."
+        );
     }
 
     #[test]
@@ -628,7 +631,7 @@ mod tests {
 
         assert_eq!(
             text_of(&enabled),
-            "Multifus\nRelais activé.\nAucun personnage relayé n’est connecté pour l’instant."
+            "Multifus\nVos messages privés arrivent ici.\nAucun personnage relayé n’est connecté pour l’instant."
         );
         assert_eq!(
             written(&enabled),

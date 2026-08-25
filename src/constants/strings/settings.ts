@@ -3,19 +3,19 @@ import { IS_APPLE } from '@/constants/keyboard'
 export const SETTINGS_STRINGS = {
   settings: {
     title: 'Paramètres',
-    subtitle: 'Ce que Multifus fait tout seul, une fois réglé.',
-    startupLabel: 'Démarrer avec la session',
+    subtitle: 'Ce que Multifus fait tout seul pendant que vous jouez.',
+    startupLabel: 'Lancer Multifus avec l’ordinateur',
     startupDescription:
-      'Multifus s’ouvre en même temps que votre session, pour n’avoir à y penser qu’une fois.',
+      'Multifus est déjà là quand vous ouvrez vos clients Dofus Retro.',
     startupNote: IS_APPLE
-      ? 'Fermer la fenêtre ne quitte plus Multifus : il continue dans la barre système, en haut à droite de l’écran, et c’est de là qu’on le quitte.'
-      : 'Fermer la fenêtre ne quitte plus Multifus : il continue dans la barre système, à côté de l’horloge, et c’est de là qu’on le quitte.',
-    maximizeLabel: 'Agrandir les fenêtres au lancement',
+      ? 'La croix ne quitte pas Multifus : il continue son travail derrière son icône, en haut à droite de l’écran. C’est de là qu’on le quitte.'
+      : 'La croix ne quitte pas Multifus : il continue son travail derrière son icône, à côté de l’horloge. C’est de là qu’on le quitte.',
+    maximizeLabel: 'Fenêtres Dofus Retro en plein écran',
     maximizeDescription:
-      'Un client qui s’ouvre remplit l’écran dès la connexion, une seule fois : le réduire ensuite le laisse réduit. Les fenêtres déjà ouvertes ne bougent pas.',
-    shortTitlesLabel: 'N’afficher que le pseudo dans la barre des tâches',
+      'Un client Dofus Retro s’ouvre toujours en petit. Multifus le met en plein écran.',
+    shortTitlesLabel: 'Seulement le pseudo dans la barre des tâches',
     shortTitlesDescription:
-      'La barre des tâches ne montre plus que le nom du personnage, « Elyandra » au lieu de « Elyandra - Dofus Retro ». Six clients ouverts, six pseudos lisibles d’un coup d’œil.',
+      'Vous lisez « Elyandra » au lieu de « Elyandra - Dofus Retro ». Six clients ouverts, six pseudos d’un coup d’œil.',
     shortTitlesWindowsOnly: 'Windows uniquement'
   }
 } as const

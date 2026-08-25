@@ -12,7 +12,7 @@ Les mots de Multifus, et rien d'autre. On en parle en français, on les écrit e
 
 **Roster** (`Roster`) : l'ensemble des personnages connus de Multifus, connectés ou non.
 
-**Connecté** (`online`) : se dit d'un personnage dont une fenêtre porte le pseudo en ce moment.
+**Connecté** (`online`) : se dit d'un personnage dont une fenêtre porte le pseudo en ce moment. Dofus Retro déconnecte tout seul un personnage qui ne fait rien, au bout d'un quart d'heure ou deux : sa fenêtre revient à l'écran de connexion, Multifus le voit repasser déconnecté, et le relais se tait pour lui. Personne n'a rien fait, et c'est le jeu qui décide.
 
 **Fenêtre** (`GameWindow`) : l'incarnation d'un personnage à l'écran, un processus client par personnage.
 
@@ -20,9 +20,11 @@ Les mots de Multifus, et rien d'autre. On en parle en français, on les écrit e
 
 **Défilement** (`cycle`) : le parcours des fenêtres au raccourci, dans un ordre choisi par l'utilisateur.
 
-**En veille** (`asleep`) : état d'un personnage retiré du défilement.
+**Tirage** (`drag`) : l'action de prendre une ligne par sa poignée, et de la porter plus haut ou plus bas pour changer l'ordre du défilement.
 
-**Bascule** (`swap`) : l'action d'endormir tous les personnages d'un sexe et de réveiller ceux de l'autre.
+**De côté** (`asleep`) : état d'un personnage retiré du défilement.
+
+**Inversion** (`swap`) : l'action de mettre de côté tous les personnages d'un sexe et de remettre ceux de l'autre dans le défilement.
 
 **Notification de jeu** (`GameNotification`) : une notification système émise par un client Dofus. Son titre porte le pseudo du destinataire, son corps décrit l'événement.
 
@@ -34,14 +36,14 @@ Les mots de Multifus, et rien d'autre. On en parle en français, on les écrit e
 
 **Collage** (`paste`) : le geste qui pose une réponse rapide là où l'utilisateur est en train d'écrire dans le jeu.
 
-**Relais** (`Relay`) : le mécanisme qui envoie sur le téléphone de l'utilisateur les messages privés reçus pendant son absence.
+**Messages privés** (`Relay`) : le mécanisme qui envoie sur le téléphone de l'utilisateur les messages privés reçus pendant son absence. Le code dit `relay`, l'écran dit toujours les messages privés.
 
-**Relayé** (`relayed`) : attribut d'un personnage dont le relais transporte les messages privés.
+**Relayé** (`relayed`) : attribut d'un personnage dont les messages privés partent sur le téléphone.
 
-**Robot** (`bot`) : le compte Telegram par lequel le relais écrit.
+**Robot** (`bot`) : le compte Telegram par lequel Multifus écrit. L'écran l'appelle par son code, jamais par son jeton.
 
-**Salon** (`chat`) : la conversation Telegram où le relais écrit, désignée par son identifiant.
+**Salon** (`chat`) : la conversation Telegram où Multifus écrit, désignée par son identifiant.
 
-**Avis** (`relayNoticeSent`) : ce que le relais dit de lui-même et jamais du jeu, par exemple qu'il a cessé d'écouter.
+**Avis** (`relayNoticeSent`) : ce que Multifus dit de lui-même et jamais du jeu, par exemple qu'il a cessé d'écouter.
 
-**Écran tenu éveillé** (`displayAwake`) : l'état de la machine que le relais maintient pour ne pas devenir sourd, ni extinction de l'écran, ni verrouillage de session.
+**Écran tenu éveillé** (`displayAwake`) : l'état de la machine que Multifus maintient pour ne pas devenir sourd, ni extinction de l'écran, ni verrouillage de session.

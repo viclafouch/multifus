@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Character } from '@/@types/roster'
-import { arrange } from '@/helpers/cycle'
+import { arrange, matchIsArranged, nicknamesOf } from '@/helpers/cycle'
 
 const ALPHA = {
   nickname: 'Alpha',
@@ -51,5 +51,43 @@ describe('arrange', () => {
     const arranged = arrange({ characters: ROSTER, order: [] })
 
     expect(arranged).toStrictEqual([ALPHA, BETA, GAMMA])
+  })
+})
+
+describe('nicknamesOf', () => {
+  it('rend les pseudos dans l’ordre du roster', () => {
+    expect(nicknamesOf(ROSTER)).toStrictEqual(['Alpha', 'Beta', 'Gamma'])
+  })
+})
+
+describe('matchIsArranged', () => {
+  it('dit oui quand aucun ordre n’est en cours', () => {
+    expect(matchIsArranged({ characters: ROSTER, order: null })).toBe(true)
+  })
+
+  it('dit oui quand le roster suit déjà l’ordre', () => {
+    const order = ['Alpha', 'Beta', 'Gamma']
+
+    expect(matchIsArranged({ characters: ROSTER, order })).toBe(true)
+  })
+
+  it('dit non quand le roster arrive dans un autre ordre', () => {
+    const order = ['Gamma', 'Alpha', 'Beta']
+
+    expect(matchIsArranged({ characters: ROSTER, order })).toBe(false)
+  })
+
+  it('ignore un pseudo que l’ordre nomme et que le roster n’a plus', () => {
+    const order = ['Alpha', 'Delta', 'Beta', 'Gamma']
+
+    expect(matchIsArranged({ characters: ROSTER, order })).toBe(true)
+  })
+
+  it('ignore un personnage arrivé depuis', () => {
+    const order = ['Alpha', 'Gamma']
+
+    expect(matchIsArranged({ characters: [ALPHA, GAMMA, BETA], order })).toBe(
+      true
+    )
   })
 })

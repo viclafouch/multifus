@@ -139,16 +139,16 @@ const authorizationRequestedLine = (
 const relayFailedLine = (reason: RelayFailure) => {
   switch (reason.reason) {
     case 'keychain': {
-      return `Relais : le trousseau du système a refusé le jeton (${reason.detail}).`
+      return `Messages privés : le trousseau du système a refusé le code du robot (${reason.detail}).`
     }
     case 'telegram': {
-      return `Relais : Telegram a refusé la requête (${reason.detail}).`
+      return `Messages privés : Telegram a refusé la requête (${reason.detail}).`
     }
     case 'network': {
-      return `Relais : Telegram n’a pas répondu (${reason.detail}).`
+      return `Messages privés : Telegram n’a pas répondu (${reason.detail}).`
     }
     default: {
-      return 'Relais : échec.'
+      return 'Messages privés : échec.'
     }
   }
 }
@@ -190,13 +190,13 @@ const genderPluralLabel = (gender: Gender) => {
 const rosterLine = (change: RosterChange) => {
   switch (change.kind) {
     case 'slept': {
-      return `${change.nickname} mis en veille.`
+      return `${change.nickname} mis de côté.`
     }
     case 'woke': {
       return `${change.nickname} remis dans le défilement.`
     }
     case 'genderAsleep': {
-      const what = change.asleep ? 'en veille' : 'réveillés'
+      const what = change.asleep ? 'de côté' : 'dans le défilement'
 
       return `Tous ${genderPluralLabel(change.gender)} connectés sont ${what}.`
     }
@@ -371,15 +371,15 @@ const shortcutLine = ({ action, outcome }: ShortcutLineParams) => {
       return `${label} : ${outcome.nickname} au premier plan.`
     }
     case 'slept': {
-      return `${label} : ${outcome.nickname} mis en veille.`
+      return `${label} : ${outcome.nickname} mis de côté.`
     }
     case 'woke': {
       return `${label} : ${outcome.nickname} remis dans le défilement.`
     }
     case 'swapped': {
       return outcome.awake === 'male'
-        ? `${label} : les hommes sont réveillés, les femmes en veille.`
-        : `${label} : les femmes sont réveillées, les hommes en veille.`
+        ? `${label} : les hommes sont dans le défilement, les femmes de côté.`
+        : `${label} : les femmes sont dans le défilement, les hommes de côté.`
     }
     case 'outsideGame': {
       return `${label} : ignoré, aucune fenêtre Dofus au premier plan.`
@@ -581,7 +581,7 @@ const runLine = (event: EventOf<RunEventKind>) => {
 
 const displayAwakeLine = (held: boolean) => {
   return held
-    ? 'Écran tenu éveillé : le relais a quelque chose à écouter.'
+    ? 'Écran tenu éveillé : il y a des messages privés à écouter.'
     : 'Écran relâché : plus aucun personnage relayé n’est connecté.'
 }
 
@@ -609,7 +609,7 @@ const actionLine = (event: EventOf<ActionEventKind>) => {
       return trayLine(event)
     }
     case 'relayEnabled': {
-      return `Relais activé depuis ${surfaceLabel(event.surface)}.`
+      return `Envoi des messages privés activé depuis ${surfaceLabel(event.surface)}.`
     }
     case 'relayDisabled': {
       return RELAY_STOP_LINES[event.reason]

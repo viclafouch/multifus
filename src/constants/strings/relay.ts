@@ -5,53 +5,45 @@ import type {
 } from '@/@types/relay'
 
 const networkLine = (detail: string) => {
-  return `Telegram n’a pas répondu, vérifiez votre connexion (${detail}).`
+  return `Telegram n’a pas répondu. Vérifiez votre connexion (${detail}).`
 }
 
 const STATE_LINES = {
   active: {
     badge: 'En marche',
-    title: 'Le relais transporte vos messages privés',
-    body: 'Ils arrivent sur votre téléphone. Un raccourci de défilement le coupe aussi, dès que vous revenez au clavier.'
+    body: 'Vous ne raterez rien tant que Dofus Retro vous garde connecté. Un raccourci frappé dans le jeu coupe l’envoi, puisque vous voilà revenu.'
   },
   ready: {
     badge: 'À l’arrêt',
-    title: 'Le relais ne transporte rien',
-    body: 'Tout est prêt. Activez-le avant de quitter votre bureau, ici ou depuis la barre système.'
+    body: 'Tout est prêt. Mettez l’interrupteur en marche avant de vous lever, ici ou depuis l’icône de Multifus.'
   },
   incomplete: {
-    badge: 'Incomplet',
-    title: 'Le relais ne peut pas démarrer',
-    body: 'Il n’a personne à écouter. Cochez un personnage plus bas, ou ouvrez un client Dofus pour en faire apparaître un.'
+    badge: 'Aucun personnage connecté',
+    body: 'Multifus n’a personne à écouter. Cochez un personnage plus bas, ou connectez-en un dans Dofus Retro.'
   }
-} as const satisfies Record<
-  RelayLiveState,
-  { badge: string; title: string; body: string }
->
+} as const satisfies Record<RelayLiveState, { badge: string; body: string }>
 
 const FAILURE_LINES = {
   keychain: (detail: string) => {
-    return `Multifus n’a pas pu lire le jeton dans le trousseau du système (${detail}).`
+    return `Multifus n’a pas retrouvé le code de votre robot (${detail}).`
   },
   telegram: (detail: string) => {
-    return `Telegram a refusé la requête (${detail}).`
+    return `Telegram a refusé la demande (${detail}).`
   },
   network: networkLine
 } as const satisfies Record<RelayFailure['reason'], (detail: string) => string>
 
 const PROBLEM_LINES = {
-  tokenBlank: 'Collez d’abord le jeton que BotFather vous a envoyé.',
+  tokenBlank: 'Collez d’abord le code que BotFather vous a envoyé.',
   tokenRefused: (detail: string) => {
-    return `Telegram ne reconnaît pas ce jeton, recopiez-le en entier (${detail}).`
+    return `Telegram ne reconnaît pas ce code. Recopiez-le en entier (${detail}).`
   },
   noChat:
-    'Le jeton est bon : il ne manque que l’étape 4, votre message au robot.',
+    'Le code est bon. Il ne manque que l’étape 4, votre « salut » au robot.',
   keychain: (detail: string) => {
-    return `Le trousseau n’a pas gardé le jeton, rien n’est enregistré (${detail}).`
+    return `Le code n’a pas pu être enregistré, rien n’est gardé (${detail}).`
   },
-  network: (detail: string) => {
-    return `Telegram n’a pas répondu, vérifiez votre connexion (${detail}).`
-  }
+  network: networkLine
 } as const satisfies Record<
   PairingProblem['kind'],
   string | ((detail: string) => string)
@@ -59,74 +51,72 @@ const PROBLEM_LINES = {
 
 export const RELAY_STRINGS = {
   relay: {
-    title: 'Relais',
+    title: 'Messages privés',
     subtitle:
-      'Vos messages privés arrivent sur votre téléphone pendant que vous êtes ailleurs.',
-    guideTitle: 'Mettre le relais en place',
+      'Un joueur vous écrit pendant que vous êtes ailleurs ? Son message arrive sur votre téléphone, dans Telegram. Telegram, parce que c’est gratuit et que c’est la seule messagerie qu’un logiciel peut faire parler aussi simplement.',
+    guideTitle: 'Relier votre téléphone',
     guideIntro:
-      'Une seule fois, ici même. Les messages, eux, arriveront sur votre téléphone.',
+      'Installez Telegram sur votre téléphone, puis suivez ces cinq étapes ici. Après, on n’y revient plus.',
     steps: {
       web: {
-        title: 'Ouvrez Telegram dans votre navigateur',
-        body: 'Connectez-vous en scannant le code affiché avec votre téléphone.',
+        title: 'Ouvrez Telegram sur cet ordinateur',
+        body: 'Scannez le code affiché avec Telegram, sur votre téléphone.',
         action: 'Ouvrir Telegram Web'
       },
       create: {
         title: 'Demandez un robot à BotFather',
-        body: 'Écrivez-lui /newbot et suivez ses questions. Il répond en anglais.',
+        body: 'Écrivez-lui /newbot et répondez à ses questions, il parle anglais. Ce robot sera le contact qui vous écrira.',
         action: 'Ouvrir BotFather'
       },
       paste: {
-        title: 'Copiez son jeton, collez-le ci-dessous',
-        body: 'Un clic sur le jeton dans Telegram suffit à le copier.'
+        title: 'Copiez le code du robot, collez-le ci-dessous',
+        body: 'BotFather finit par une longue suite de chiffres et de lettres. Un clic dessus la copie.'
       },
       write: {
         title: 'Écrivez « salut » à votre robot',
-        body: 'Un robot ne peut pas écrire le premier : sans ça, il ne peut pas vous joindre.'
+        body: 'Un robot ne parle jamais le premier. Sans ce message, il n’a pas le droit de vous écrire.'
       },
       connect: {
         title: 'Cliquez sur Connecter',
-        body: 'Multifus écrit à votre robot pour confirmer que la liaison tient.'
+        body: 'Multifus écrit à votre robot. Si le message arrive sur votre téléphone, c’est gagné.'
       }
     },
-    help: 'Les robots Telegram, expliqués',
-    tokenLabel: 'Jeton du robot',
-    tokenPlaceholder: 'Collez ici le jeton donné par BotFather',
+    help: 'À quoi sert un robot Telegram ?',
+    tokenLabel: 'Code du robot',
+    tokenPlaceholder: 'Collez ici le code donné par BotFather',
     connect: 'Connecter',
     connecting: 'Connexion…',
     botTitle: 'Robot Telegram relié',
     botBody:
-      'Le jeton est rangé dans le trousseau du système, Multifus ne l’affiche nulle part. Un robot relié ne met pas le relais en marche, l’interrupteur du dessus s’en charge.',
-    switchLabel: 'Activer le relais',
-    unpair: 'Délier le robot',
-    unpairing: 'Déliement…',
+      'C’est lui qui vous écrit dans Telegram. Le retirer coupe tout, et il faudra refaire les cinq étapes.',
+    switchLabel: 'Recevoir mes messages privés sur mon téléphone',
+    unpair: 'Retirer ce robot',
+    unpairing: 'Retrait…',
     state: STATE_LINES,
     testTitle: 'Message d’essai',
     testBody:
-      'Un message part sur votre téléphone par le vrai chemin d’envoi, que le relais soit en marche ou à l’arrêt.',
+      'Envoyez-vous un message maintenant, pour voir ce que ça donne dans Telegram.',
     testAction: 'Envoyer un essai',
     testing: 'Envoi…',
-    testSent: 'Message d’essai parti. Regardez votre téléphone.',
+    testSent: 'C’est parti. Regardez votre téléphone.',
     testTooSoon:
       'Un essai vient de partir. Attendez une trentaine de secondes avant le suivant.',
     failure: FAILURE_LINES,
     problem: PROBLEM_LINES,
-    bodyLabel: 'Envoyer le texte du message',
+    bodyLabel: 'Recevoir ce que le joueur a écrit',
     bodyDescription:
-      'Décoché, vous recevez le pseudo et le type, jamais ce qui a été écrit.',
-    bodyNote:
-      'Coché, le texte passe par Telegram, dont les conversations ne sont pas chiffrées de bout en bout.',
+      'Coché, vous lisez son message dans Telegram. Décoché, vous savez seulement lequel de vos personnages a reçu un message privé.',
     charactersTitle: 'Personnages relayés',
     charactersBody:
-      'On relaie son principal, pas ses mules. La veille n’y change rien.',
+      'Cochez ceux dont vous voulez les messages privés, en général celui avec qui vous jouez vraiment. Un personnage déconnecté reste coché, et Multifus le reprend dès qu’il se reconnecte.',
     characterToggle: (nickname: string) => {
       return `Relayer ${nickname}`
     },
     emptyBody:
-      'Ouvrez un client Dofus : le personnage apparaît ici, déjà coché.',
-    screenSaverTitle: 'Votre économiseur d’écran peut rendre le relais muet',
+      'Connectez un personnage dans Dofus Retro : il arrive ici, déjà coché.',
+    screenSaverTitle: 'Votre écran de veille peut tout arrêter',
     screenSaverBody: (delay: string) => {
-      return `Multifus garde l’écran allumé, mais l’économiseur démarre après ${delay} et verrouille la session, ce qui coupe la lecture des notifications. Réglez-le sur Jamais dans les réglages du système.`
+      return `Multifus garde l’écran allumé, mais votre écran de veille démarre après ${delay} et verrouille l’ordinateur. Multifus n’entend plus le jeu, et vous ne recevez plus rien. Réglez-le sur Jamais.`
     }
   }
 } as const

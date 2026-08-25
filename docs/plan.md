@@ -30,4 +30,4 @@ versions déjà installées.
 - [ ] Un client qui s'ouvre pendant qu'on joue ailleurs prend le premier plan sur Windows, et pas sur macOS
 - [ ] Windows, six clients connectés : six pseudos dans la barre des tâches, et quitter Multifus rend les six titres
 - [ ] Windows, un personnage changé sans quitter le client : le titre court suit
-- [ ] Une mule laissée inactive un quart d'heure repasse hors ligne comme avant
+- [ ] Une mule laissée inactive un quart d'heure repasse déconnectée comme avant

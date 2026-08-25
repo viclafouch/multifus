@@ -1,5 +1,11 @@
 import type { Character } from '@/@types/roster'
 
+export const nicknamesOf = (characters: readonly Character[]) => {
+  return characters.map((character) => {
+    return character.nickname
+  })
+}
+
 type ArrangeParams = {
   readonly characters: readonly Character[]
   readonly order: readonly string[] | null
@@ -30,4 +36,32 @@ export const arrange = ({
   })
 
   return [...ordered, ...rest]
+}
+
+type MatchIsArrangedParams = {
+  readonly characters: readonly Character[]
+  readonly order: readonly string[] | null
+}
+
+export const matchIsArranged = ({
+  characters,
+  order
+}: MatchIsArrangedParams) => {
+  if (order === null) {
+    return true
+  }
+
+  const known = nicknamesOf(characters)
+
+  const wanted = order.filter((nickname) => {
+    return known.includes(nickname)
+  })
+
+  const actual = known.filter((nickname) => {
+    return order.includes(nickname)
+  })
+
+  return wanted.every((nickname, index) => {
+    return nickname === actual[index]
+  })
 }

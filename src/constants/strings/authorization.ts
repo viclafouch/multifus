@@ -2,10 +2,10 @@ import { IS_APPLE } from '@/constants/keyboard'
 
 export const AUTHORIZATION_STRINGS = {
   authorization: {
-    title: 'Autorisation requise',
+    title: 'Multifus attend votre feu vert',
     body: IS_APPLE
-      ? 'Multifus a besoin de l’accès à l’Accessibilité pour lire le titre des fenêtres Dofus, les amener au premier plan et entendre les notifications du jeu.'
-      : 'Multifus a besoin de l’accès aux notifications pour entendre les événements du jeu et amener la bonne fenêtre au premier plan.',
+      ? 'Sans l’autorisation Accessibilité, Multifus ne peut pas lire le pseudo dans le titre de vos fenêtres Dofus Retro, les mettre devant vous, ni entendre le jeu vous appeler.'
+      : 'Sans l’accès aux notifications, Multifus ne peut pas entendre le jeu vous appeler, ni mettre la bonne fenêtre Dofus Retro devant vous.',
     patience: IS_APPLE
       ? 'macOS n’accorde jamais cette autorisation dans la seconde. Cochez Multifus dans Réglages Système, puis revenez : cet écran disparaîtra tout seul.'
       : 'Autorisez Multifus dans les réglages du système, puis revenez : cet écran disparaîtra tout seul.',

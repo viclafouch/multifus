@@ -14,7 +14,7 @@ use crate::app::view::PairingProblem;
 use crate::app::view::PairingView;
 
 const PAIRED_MESSAGE: &str =
-    "Multifus\nVotre robot est relié.\nLe relais n’est pas encore en marche.";
+    "Multifus\nVotre robot est relié.\nVous ne recevez pas encore vos messages privés.";
 
 pub fn pair(app: &AppHandle, token: String) {
     let Some(token) = BotToken::new(token) else {

@@ -19,20 +19,19 @@ export const StatePanel = ({ relay, run }: StatePanelProps) => {
   const failure = relay.switch.kind === 'failed' ? relay.switch.reason : null
 
   return (
-    <Panel
-      data-relay={state}
-      className={`${TONES} transition-row group mb-3 data-relay:panel-toned`}
-    >
+    <Panel data-relay={state} className={`${TONES} transition-row group mb-3`}>
       <section className="flex items-start gap-5 px-4 py-3.5">
         <div className="flex min-w-0 flex-1 flex-col items-start gap-1.5">
           <p className="toned flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-micro font-medium tracking-micro uppercase">
             <span
               aria-hidden
-              className="size-lamp shrink-0 rounded-full bg-current group-data-[relay=active]:tone-breath"
+              className="size-lamp shrink-0 rounded-full bg-current"
             />
             {lines.badge}
           </p>
-          <h2 className="text-pretty text-row font-medium">{lines.title}</h2>
+          <h2 className="text-pretty text-row font-medium">
+            {strings.relay.switchLabel}
+          </h2>
           <p className="max-w-prose text-pretty text-note text-muted-foreground">
             {lines.body}
           </p>

@@ -54,7 +54,8 @@ export default defineConfig({
         'src/app.tsx',
         'src/components/**',
         'src/hooks/**',
-        'src/screens/**'
+        'src/screens/**',
+        'src/lib/drag.ts'
       ],
       rules: {
         'typescript/prefer-readonly-parameter-types': 'off'
