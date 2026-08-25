@@ -300,6 +300,24 @@ fn window_titles(application: &AXUIElement) -> Result<Vec<String>> {
     Ok(titles)
 }
 
+/// The window a client draws for itself, login screen included, `None` while it
+/// has only put up a splash.
+///
+/// The title is not read beyond being there, which is what separates this from
+/// [`game_window_element`].
+fn client_window_element(application: &AXUIElement) -> Result<Option<CFRetained<AXUIElement>>> {
+    for window in windows_of(application)? {
+        let titled =
+            string_attribute(&window, AX_TITLE)?.is_some_and(|title| !title.trim().is_empty());
+
+        if titled {
+            return Ok(Some(window));
+        }
+    }
+
+    Ok(None)
+}
+
 /// The window of a client that carries a nickname, `None` for a client sitting
 /// on the login screen.
 ///
@@ -651,9 +669,9 @@ impl WindowManager for AccessibilityWindowManager {
             // application, and the call is valid for any pid anyway.
             let element = unsafe { AXUIElement::new_application(pid) };
 
-            // A client whose window is not drawn yet must not be counted, or it
+            // A client that has drawn nothing yet must not be counted, or it
             // would be known before there was anything to fill.
-            if !windows_of(&element)?.is_empty() {
+            if client_window_element(&element)?.is_some() {
                 clients.push(WindowId::from_raw(raw));
             }
         }
@@ -664,7 +682,7 @@ impl WindowManager for AccessibilityWindowManager {
     fn maximize(&self, window: WindowId) -> Result<()> {
         let (_, element) = live_application(window)?;
 
-        let Some(game_window) = windows_of(&element)?.into_iter().next() else {
+        let Some(game_window) = client_window_element(&element)? else {
             return Err(PlatformError::WindowGone);
         };
 

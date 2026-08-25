@@ -112,7 +112,12 @@ pub fn start(app: AppHandle) {
 /// One turn of the scan: look at the windows, keep the listening in step with
 /// the authorization, and tell the interface if anything moved.
 fn tick(app: &AppHandle) {
-    if scan(app) {
+    let changed = scan(app);
+    // This thread and never a command: filling a window waits on the client's
+    // own message pump, and a command runs on the main thread.
+    let maximized = maximize_new_clients(app);
+
+    if changed || maximized {
         emit_snapshot(app);
     }
 }
@@ -123,71 +128,63 @@ fn tick(app: &AppHandle) {
 /// computed under it and a Telegram message has no business being there.
 fn scan(app: &AppHandle) -> bool {
     let change = refresh_windows(app);
-    let maximized = maximize_new_clients(app);
     let listening_changed = follow_authorization(app);
 
     relay::run::announce(app, &change);
 
     let display_changed = relay::run::follow_display(app);
 
-    change.changed || maximized || listening_changed || display_changed
+    change.changed || listening_changed || display_changed
 }
 
 /// Fills the screen with the clients that have just opened, and says whether it
 /// wrote a line about it.
 ///
-/// It asks the boundary itself rather than reading the roster: a client on the
-/// login screen has opened and has no character, and that is exactly the moment
-/// the window has to grow.
-///
-/// The lock is never held across the two calls: macOS hops to the main thread
-/// there, which is where every command takes this very mutex.
+/// The lock is never held across the two boundary calls: macOS hops to the main
+/// thread there, which is where every command takes this very mutex.
 fn maximize_new_clients(app: &AppHandle) -> bool {
     if !lock(app).maximizes_on_launch() {
-        // Nothing was being watched while the switch was off, so the turn that
-        // follows it going back on is a first turn and fills nothing.
-        lock(app).forget_clients();
+        lock(app).forget_client_windows();
 
         return false;
     }
 
-    let clients = match app.state::<PlatformWindowManager>().client_windows() {
-        Ok(clients) => clients,
-        Err(error) => return forget_clients(app, &error),
+    let client_windows = match app.state::<PlatformWindowManager>().client_windows() {
+        Ok(client_windows) => client_windows,
+        Err(PlatformError::AuthorizationDenied) => return false,
+        Err(error) => {
+            return lock(app).log_unless_repeated(JournalEvent::ClientMaximizeFailed {
+                detail: error.to_string(),
+            })
+        }
     };
 
-    let appeared = lock(app).take_appeared_clients(&clients);
+    let appeared = lock(app).take_appeared_client_windows(&client_windows);
     let mut written = false;
 
-    for client in appeared {
-        let event = match app.state::<PlatformWindowManager>().maximize(client) {
-            Ok(()) => JournalEvent::ClientMaximized,
-            Err(error) => JournalEvent::ClientMaximizeFailed {
-                detail: error.to_string(),
-            },
-        };
+    for window in appeared {
+        let filled = app.state::<PlatformWindowManager>().maximize(window);
+        let mut state = lock(app);
 
-        lock(app).log(event);
+        match filled {
+            // Remembered only once it worked. A client still loading turns the
+            // write down, and the turn that follows has to try again rather than
+            // leave that window small for the evening.
+            Ok(()) => {
+                state.remember_client_window(window);
+                state.log(JournalEvent::ClientMaximized);
+            }
+            Err(error) => {
+                state.log_unless_repeated(JournalEvent::ClientMaximizeFailed {
+                    detail: error.to_string(),
+                });
+            }
+        }
+
         written = true;
     }
 
     written
-}
-
-/// The system would not say which clients are open, so the next turn starts
-/// over. A refusal must never end in filling a window that was already there.
-fn forget_clients(app: &AppHandle, error: &PlatformError) -> bool {
-    let mut state = lock(app);
-
-    state.forget_clients();
-
-    if matches!(error, PlatformError::AuthorizationDenied) {
-        return false;
-    }
-
-    state.log_unless_repeated(JournalEvent::ClientMaximizeFailed {
-        detail: error.to_string(),
-    })
 }
 
 /// Asks the boundary which game windows exist and takes the answer in.

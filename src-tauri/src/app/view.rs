@@ -72,7 +72,6 @@ pub struct Snapshot {
     /// Multifus is asked to start with the session. What the user wants, not
     /// what the system currently holds, see [`crate::app::autostart`].
     pub start_at_login: bool,
-    /// A game window is filled to the screen the first time Multifus sees it.
     pub maximize_on_launch: bool,
     pub authorization: AuthorizationView,
     pub config: ConfigView,

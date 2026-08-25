@@ -111,8 +111,6 @@ export type JournalEvent =
   | { readonly kind: 'authorization'; readonly granted: boolean }
   | { readonly kind: 'characterOffline'; readonly nickname: string }
   | { readonly kind: 'characterOnline'; readonly nickname: string }
-  /** No pseudo: a client is filled to the screen on sight, and the login screen
-   * carries none. */
   | { readonly kind: 'clientMaximized' }
   | { readonly kind: 'clientMaximizeFailed'; readonly detail: string }
   | { readonly kind: 'configNotSetAside'; readonly detail: string }

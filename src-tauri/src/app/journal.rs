@@ -413,7 +413,10 @@ pub enum RosterChange {
 pub enum SettingChange {
     /// The master switch, which suspends the seven kinds without forgetting
     /// them.
-    AutoFocusEnabled { enabled: bool, from: Surface },
+    AutoFocusEnabled {
+        enabled: bool,
+        from: Surface,
+    },
 
     /// One of the seven. The window only: the menu has no room for seven lines
     /// and perimetre.md refuses them per character.
@@ -426,15 +429,21 @@ pub enum SettingChange {
     },
 
     /// Whether the AutoFocus reaches into the Dock.
-    WakesMinimized { wakes: bool, from: Surface },
+    WakesMinimized {
+        wakes: bool,
+        from: Surface,
+    },
 
-    /// Whether a game window is filled to the screen when it first appears.
-    MaximizeOnLaunch { maximize: bool },
+    MaximizeOnLaunch {
+        maximize: bool,
+    },
 
     /// Whether the text of a private message goes out with it, ADR 0008. The
     /// window only: one does not decide the privacy of a message in passing,
     /// which is why this one is not in the menu of the system tray.
-    RelayBody { send_body: bool },
+    RelayBody {
+        send_body: bool,
+    },
 }
 
 /// Why the relay could not do what was asked.

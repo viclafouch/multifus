@@ -97,14 +97,10 @@ pub struct Multifus {
     /// Where each connected character's window is. Refilled by every scan, since
     /// a [`WindowId`] means nothing once its window is gone.
     windows: HashMap<String, WindowId>,
-    /// Every client window Multifus has already seen, which is what makes a new
-    /// one new. Never the roster's windows: a client on the login screen has
-    /// opened and has no character.
-    ///
-    /// It grows and is never pruned within a run, and `None` means Multifus has
-    /// not been looking. On a first turn every window is unknown, and none of
-    /// them was just launched.
-    seen_clients: Option<HashSet<WindowId>>,
+    /// Every window of a Dofus client Multifus has already seen, which is what
+    /// makes a new one new. `None` means it has not been looking, and the turn
+    /// that follows finds nothing new.
+    seen_client_windows: Option<HashSet<WindowId>>,
     /// The system lets Multifus read window titles and hear the banners.
     ///
     /// `None` until the first scan has asked. Three states and not two, so that
@@ -219,7 +215,7 @@ impl Multifus {
             settings,
             shortcut_statuses: HashMap::new(),
             windows: HashMap::new(),
-            seen_clients: None,
+            seen_client_windows: None,
             granted: None,
             listening: false,
             problem,
@@ -658,7 +654,6 @@ impl Multifus {
         self.save();
     }
 
-    /// Whether a game window is filled to the screen when it first appears.
     #[must_use]
     pub fn maximizes_on_launch(&self) -> bool {
         self.settings.maximize_on_launch
@@ -1061,27 +1056,34 @@ impl Multifus {
         self.scan_change(changed, relayed_gone)
     }
 
-    /// The client windows this turn sees and no earlier turn did, in the order
-    /// the system gave them. Empty on a first turn, when everything is unknown
-    /// and nothing has just been launched.
-    pub fn take_appeared_clients(&mut self, clients: &[WindowId]) -> Vec<WindowId> {
-        let Some(seen) = self.seen_clients.as_mut() else {
-            self.seen_clients = Some(clients.iter().copied().collect());
+    /// The client windows this turn sees and that have not been filled yet, in
+    /// the order the system gave them. Empty on a first turn, when everything is
+    /// unknown and nothing has just been launched.
+    pub fn take_appeared_client_windows(&mut self, windows: &[WindowId]) -> Vec<WindowId> {
+        let Some(seen) = self.seen_client_windows.as_ref() else {
+            self.seen_client_windows = Some(windows.iter().copied().collect());
 
             return Vec::new();
         };
 
-        clients
+        windows
             .iter()
             .copied()
-            .filter(|client| seen.insert(*client))
+            .filter(|window| !seen.contains(window))
             .collect()
     }
 
-    /// Stops knowing which clients are open, so that the next turn is a first
-    /// one. What the switch turned off and a refused system both leave behind.
-    pub fn forget_clients(&mut self) {
-        self.seen_clients = None;
+    /// Remembers a window that was filled, so that it is never filled twice.
+    pub fn remember_client_window(&mut self, window: WindowId) {
+        if let Some(seen) = self.seen_client_windows.as_mut() {
+            seen.insert(window);
+        }
+    }
+
+    /// Stops knowing which client windows are open, so that the next turn is a
+    /// first one.
+    pub fn forget_client_windows(&mut self) {
+        self.seen_client_windows = None;
     }
 
     /// Where a character's window is, if Multifus can still see one.
@@ -1982,8 +1984,8 @@ mod tests {
         assert_eq!(state.quick_reply_text(id).as_deref(), Some("de rien"));
     }
 
-    /// The tokens the boundary hands out for the clients that are open.
-    fn clients(raws: &[u64]) -> Vec<WindowId> {
+    /// The tokens the boundary hands out for the windows that are open.
+    fn open(raws: &[u64]) -> Vec<WindowId> {
         raws.iter().copied().map(WindowId::from_raw).collect()
     }
 
@@ -1992,63 +1994,88 @@ mod tests {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
 
-        assert_eq!(state.take_appeared_clients(&clients(&[1, 2])), Vec::new());
+        assert_eq!(
+            state.take_appeared_client_windows(&open(&[1, 2])),
+            Vec::new()
+        );
     }
 
     #[test]
     fn a_client_opened_after_the_first_turn_is_the_only_one_that_appears() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
-        state.take_appeared_clients(&clients(&[1]));
+        state.take_appeared_client_windows(&open(&[1]));
 
         assert_eq!(
-            state.take_appeared_clients(&clients(&[1, 2])),
-            clients(&[2])
+            state.take_appeared_client_windows(&open(&[1, 2])),
+            open(&[2])
         );
     }
 
     #[test]
-    fn a_client_that_stays_open_never_appears_twice() {
+    fn a_window_that_has_been_filled_never_appears_again() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
-        state.take_appeared_clients(&clients(&[1]));
-        state.take_appeared_clients(&clients(&[1, 2]));
+        state.take_appeared_client_windows(&open(&[1]));
+        state.take_appeared_client_windows(&open(&[1, 2]));
 
-        assert_eq!(state.take_appeared_clients(&clients(&[1, 2])), Vec::new());
+        state.remember_client_window(WindowId::from_raw(2));
+
+        assert_eq!(
+            state.take_appeared_client_windows(&open(&[1, 2])),
+            Vec::new()
+        );
     }
 
     #[test]
-    fn a_client_that_flickers_out_of_sight_does_not_appear_again() {
-        // Whatever takes a window out of the list for one turn, the client was
-        // not launched a second time when it comes back.
+    fn a_window_the_system_refused_to_fill_is_offered_again() {
+        // A client still loading turns the write down. Burning it there would
+        // leave that window small for the whole evening.
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
-        state.take_appeared_clients(&clients(&[1]));
-        state.take_appeared_clients(&clients(&[]));
+        state.take_appeared_client_windows(&open(&[1]));
 
-        assert_eq!(state.take_appeared_clients(&clients(&[1])), Vec::new());
+        assert_eq!(
+            state.take_appeared_client_windows(&open(&[1, 2])),
+            open(&[2])
+        );
+        assert_eq!(
+            state.take_appeared_client_windows(&open(&[1, 2])),
+            open(&[2])
+        );
     }
 
     #[test]
-    fn forgetting_the_clients_makes_the_next_turn_a_first_one() {
-        // What the switch turned off and a refused system leave behind: nothing
-        // that is already open may be filled when the looking starts again.
+    fn a_window_that_flickers_out_of_sight_does_not_appear_again() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
-        state.take_appeared_clients(&clients(&[1]));
+        state.take_appeared_client_windows(&open(&[1]));
+        state.take_appeared_client_windows(&open(&[]));
 
-        state.forget_clients();
-
-        assert_eq!(state.take_appeared_clients(&clients(&[1, 2])), Vec::new());
+        assert_eq!(state.take_appeared_client_windows(&open(&[1])), Vec::new());
     }
 
     #[test]
-    fn a_turn_that_finds_no_client_leaves_the_next_one_to_appear() {
+    fn forgetting_the_client_windows_makes_the_next_turn_a_first_one() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
-        state.take_appeared_clients(&clients(&[]));
+        state.take_appeared_client_windows(&open(&[1]));
 
-        assert_eq!(state.take_appeared_clients(&clients(&[1])), clients(&[1]));
+        state.forget_client_windows();
+
+        assert_eq!(
+            state.take_appeared_client_windows(&open(&[1, 2])),
+            Vec::new()
+        );
+    }
+
+    #[test]
+    fn a_turn_that_finds_no_window_leaves_the_next_one_to_appear() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.take_appeared_client_windows(&open(&[]));
+
+        assert_eq!(state.take_appeared_client_windows(&open(&[1])), open(&[1]));
     }
 
     #[test]

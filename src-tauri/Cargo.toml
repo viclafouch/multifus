@@ -71,8 +71,7 @@ windows = { version = "0.62", features = [
 [target.'cfg(target_os = "macos")'.dependencies]
 libc = "0.2"
 objc2 = "0.6"
-# Already in the lock file as an indirect dependency. The hop to the main thread
-# `NSScreen` demands, and nothing else in the crate, see `platform::macos`.
+# The hop to the main thread `NSScreen` demands, and nothing else in the crate.
 dispatch2 = "0.3"
 objc2-app-kit = { version = "0.3", default-features = false, features = [
   "std",

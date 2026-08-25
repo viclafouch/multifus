@@ -52,7 +52,7 @@ Tous restent inertes tant qu'une fenêtre Dofus n'est pas au premier plan. Sans 
 
 **La mise à jour silencieuse.** multifus cherche une version plus récente au démarrage et la propose, dans la barre système et dans l'écran À propos. Il ne l'installe jamais tout seul : installer relance l'application, ce qui en pleine soirée revient à couper le gestionnaire de fenêtres de tous les clients d'un coup. La proposer sans l'imposer est le seul comportement compatible avec le principe directeur.
 
-**Le plein écran de macOS.** Agrandir remplit la zone utile de l'écran, comme le fait le bouton du système, et n'emploie jamais `AXFullScreen`. Un client rangé dans un bureau à lui ferait changer de bureau à chaque raccourci du défilement et à chaque notification, ce qui coûterait plus cher que la place gagnée.
+**Le plein écran de macOS.** Agrandir remplit la zone utile de l'écran, comme le fait le bouton du système, et n'emploie jamais `AXFullScreen`. La barre des menus et le Dock restent donc visibles, ce qui a été demandé une fois puis laissé tel quel le 25 août 2026 : un client rangé dans un bureau à lui ferait changer de bureau à chaque raccourci du défilement et à chaque notification, ce qui coûterait plus cher que la place gagnée.
 
 **Rejouer l'agrandissement.** Une fenêtre est agrandie la première fois que multifus la voit, jamais une seconde. Remise en petit à la main, elle reste en petit : forcer serait un gestionnaire de fenêtres qui se dispute avec l'utilisateur. La déconnexion du quart d'heure et le retour à l'écran des personnages ne la rendent pas neuve.
 

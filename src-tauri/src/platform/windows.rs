@@ -81,12 +81,14 @@ use windows::Win32::UI::WindowsAndMessaging::MSG;
 use windows::Win32::UI::WindowsAndMessaging::PM_REMOVE;
 use windows::Win32::UI::WindowsAndMessaging::SPI_GETSCREENSAVEACTIVE;
 use windows::Win32::UI::WindowsAndMessaging::SPI_GETSCREENSAVETIMEOUT;
+use windows::Win32::UI::WindowsAndMessaging::SWP_ASYNCWINDOWPOS;
 use windows::Win32::UI::WindowsAndMessaging::SWP_NOACTIVATE;
 use windows::Win32::UI::WindowsAndMessaging::SWP_NOOWNERZORDER;
 use windows::Win32::UI::WindowsAndMessaging::SWP_NOZORDER;
 use windows::Win32::UI::WindowsAndMessaging::SW_RESTORE;
 use windows::Win32::UI::WindowsAndMessaging::SYSTEM_PARAMETERS_INFO_ACTION;
 use windows::Win32::UI::WindowsAndMessaging::SYSTEM_PARAMETERS_INFO_UPDATE_FLAGS;
+use windows::Win32::UI::WindowsAndMessaging::WNDENUMPROC;
 use windows::UI::Notifications::KnownNotificationBindings;
 use windows::UI::Notifications::Management::UserNotificationListener;
 use windows::UI::Notifications::Management::UserNotificationListenerAccessStatus;
@@ -154,11 +156,9 @@ impl WindowManager for Win32WindowManager {
     }
 
     fn game_windows(&self) -> Result<Vec<GameWindow>> {
-        let mut windows: Vec<GameWindow> = Vec::new();
-        let sink = std::ptr::from_mut(&mut windows) as isize;
+        let mut windows = Vec::new();
 
-        unsafe { EnumWindows(Some(collect_game_window), LPARAM(sink)) }
-            .map_err(|error| PlatformError::system("EnumWindows", error.to_string()))?;
+        enumerate(Some(collect_game_window), &mut windows)?;
 
         Ok(windows)
     }
@@ -198,13 +198,11 @@ impl WindowManager for Win32WindowManager {
     }
 
     fn client_windows(&self) -> Result<Vec<WindowId>> {
-        let mut clients: Vec<WindowId> = Vec::new();
-        let sink = std::ptr::from_mut(&mut clients) as isize;
+        let mut windows = Vec::new();
 
-        unsafe { EnumWindows(Some(collect_client_window), LPARAM(sink)) }
-            .map_err(|error| PlatformError::system("EnumWindows", error.to_string()))?;
+        enumerate(Some(collect_client_window), &mut windows)?;
 
-        Ok(clients)
+        Ok(windows)
     }
 
     fn maximize(&self, window: WindowId) -> Result<()> {
@@ -213,7 +211,8 @@ impl WindowManager for Win32WindowManager {
 
         // Never `ShowWindow(SW_MAXIMIZE)`, whose value is `SW_SHOWMAXIMIZED`:
         // it activates, and a client opening while one plays elsewhere would
-        // take the foreground three seconds later.
+        // take the foreground three seconds later. `ASYNCWINDOWPOS` because the
+        // call otherwise waits on the message pump of a client that is loading.
         unsafe {
             SetWindowPos(
                 handle,
@@ -222,7 +221,7 @@ impl WindowManager for Win32WindowManager {
                 work.top,
                 work.right - work.left,
                 work.bottom - work.top,
-                SWP_NOACTIVATE | SWP_NOZORDER | SWP_NOOWNERZORDER,
+                SWP_NOACTIVATE | SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_ASYNCWINDOWPOS,
             )
         }
         .map_err(|error| PlatformError::system("SetWindowPos", error.to_string()))
@@ -302,21 +301,37 @@ unsafe extern "system" fn collect_game_window(handle: HWND, lparam: LPARAM) -> B
     CONTINUE_ENUMERATION
 }
 
+/// Walks the desktop, the callback filling `into`. The two collectors below are
+/// the only ones, and each one owns the type it pushes.
+fn enumerate<T>(collect: WNDENUMPROC, into: &mut Vec<T>) -> Result<()> {
+    let sink = std::ptr::from_mut(into) as isize;
+
+    unsafe { EnumWindows(collect, LPARAM(sink)) }
+        .map_err(|error| PlatformError::system("EnumWindows", error.to_string()))
+}
+
 /// Collects the client windows of the desktop, one call per window.
 unsafe extern "system" fn collect_client_window(handle: HWND, lparam: LPARAM) -> BOOL {
-    let clients = unsafe { &mut *(lparam.0 as *mut Vec<WindowId>) };
+    let windows = unsafe { &mut *(lparam.0 as *mut Vec<WindowId>) };
 
     if is_client_window(handle) {
-        clients.push(window_id(handle));
+        windows.push(window_id(handle));
     }
 
     CONTINUE_ENUMERATION
 }
 
 /// Whether a Dofus client draws this window for itself, login screen included.
-/// An owned window is one of its dialogs and is left where it is.
+///
+/// An owned window is one of its dialogs, and an untitled one is a splash or a
+/// loader; both are left where they are. The title is not read beyond being
+/// there, which is what separates this from [`game_window`].
 fn is_client_window(handle: HWND) -> bool {
     if !unsafe { IsWindowVisible(handle) }.as_bool() || !runs_dofus(handle) {
+        return false;
+    }
+
+    if window_title(handle).trim().is_empty() {
         return false;
     }
 

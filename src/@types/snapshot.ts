@@ -41,7 +41,6 @@ export type Snapshot = {
   readonly wakesMinimized: boolean
   /** What the user asked for, not what the system currently holds. */
   readonly startAtLogin: boolean
-  /** A game window is filled to the screen the first time Multifus sees it. */
   readonly maximizeOnLaunch: boolean
   readonly authorization: Authorization
   readonly config: ConfigStatus
