@@ -1,18 +1,3 @@
-# Exactly what the project asks for by hand before calling a step done.
-#
-# It lives in its own file because two workflows need it and need it identical:
-# `ci` on every push, and `release` before it signs anything. Recopied into both,
-# it would drift, and the copy that drifted would be the one guarding the
-# release.
-#
-# Two runners, because Multifus is one application on two systems and a green
-# `ci` has to say something about both. `platform::macos` and `platform::windows`
-# are each compiled by one of them and by no other, so a single runner would let
-# half the boundary rot untouched.
-#
-# `fail-fast` is off: one system failing is not a reason to stop asking the
-# other, and knowing whether a failure is shared or local is most of the
-# diagnosis.
 name: checks
 
 on:
@@ -46,10 +31,6 @@ jobs:
 
       - run: npm ci
 
-      # `lint:fix` is the command of the done-gate, and it writes. Here the two
-      # halves are asked as questions instead: `lint` for the rules, type-aware
-      # so it covers what the compiler would say, and `format:check` for the
-      # shape. Unformatted code fails rather than being quietly repaired.
       - run: npm run lint
 
       - run: npm run format:check

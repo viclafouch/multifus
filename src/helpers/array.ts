@@ -1,12 +1,9 @@
-/** Moving things around in a list, with no word of the domain in it. */
-
 type MovedParams = {
   readonly list: readonly string[]
   readonly item: string
   readonly delta: number
 }
 
-/** The same list with one item moved, or `null` when it cannot move. */
 export const moved = ({
   list,
   item,

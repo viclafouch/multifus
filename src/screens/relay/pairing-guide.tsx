@@ -11,10 +11,6 @@ type PairingGuideProps = Readonly<{
   run: (action: Promise<Snapshot>) => void
 }>
 
-/**
- * The whole setup, in the order it is done, for somebody who has never opened
- * Telegram. Five numbered steps, two of which say why and not only what.
- */
 export const PairingGuide = ({ relay, run }: PairingGuideProps) => {
   const { steps } = strings.relay
 

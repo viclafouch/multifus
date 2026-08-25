@@ -7,10 +7,6 @@ type ScreenSaverWarningProps = Readonly<{
   seconds: number
 }>
 
-/**
- * The one hole the hold on the display does not close: a screen saver locks the
- * session, and a locked session draws no banner for the relay to read.
- */
 export const ScreenSaverWarning = ({ seconds }: ScreenSaverWarningProps) => {
   return (
     <Panel className="mb-3">

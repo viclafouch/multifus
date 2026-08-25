@@ -1,9 +1,3 @@
-/**
- * The keyboard vocabulary, in the exact spelling the global shortcut plugin
- * parses, plus the label each token is drawn with.
- */
-
-/** The modifiers, in the order they are written and drawn. */
 export const MODIFIERS = [
   'Control',
   'Alt',
@@ -13,13 +7,11 @@ export const MODIFIERS = [
 
 export type Modifier = (typeof MODIFIERS)[number]
 
-/** Why a key press did not make a combination. */
 export type CaptureRejection =
   | 'noModifier'
   | 'pasteCombination'
   | 'unsupportedKey'
 
-/** A key the parser of the plugin accepts, spelled as `KeyboardEvent.code`. */
 export const KEYS: ReadonlySet<string> = new Set([
   ...Array.from({ length: 26 }, (_, index) => {
     return `Key${String.fromCodePoint(65 + index)}`
@@ -73,10 +65,6 @@ export const KEYS: ReadonlySet<string> = new Set([
   'Tab'
 ])
 
-/**
- * The combinations proposed at the first launch are written with the short arrow
- * names, `Right` rather than `ArrowRight`, and the plugin takes both.
- */
 export const ALIASES = new Map<string, string>([
   ['Cmd', 'Super'],
   ['Command', 'Super'],
@@ -90,16 +78,10 @@ export const ALIASES = new Map<string, string>([
   ['Up', 'ArrowUp']
 ])
 
-/** Whether the keyboard in front of the user has a Command key on it. */
 export const IS_APPLE = navigator.userAgent.includes('Mac')
 
-/**
- * The combination this system pastes with, the one a quick reply lays down itself.
- * Bound to anything, it would fire on its own paste. See ADR 0012.
- */
 export const PASTE_COMBINATION = IS_APPLE ? 'Super+KeyV' : 'Control+KeyV'
 
-/** The tokens whose label is not their own name, this keyboard being read. */
 export const KEY_LABELS = new Map<string, string>([
   ['Alt', IS_APPLE ? '⌥' : 'Alt'],
   ['ArrowDown', '↓'],

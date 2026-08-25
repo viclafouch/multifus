@@ -9,10 +9,6 @@ type RelayedListProps = Readonly<{
   run: (action: Promise<Snapshot>) => void
 }>
 
-/**
- * One line per character, one tick each, which is the whole of what ADR 0011
- * reopened. An offline character is ticked like any other.
- */
 export const RelayedList = ({ characters, run }: RelayedListProps) => {
   return (
     <ul className="flex flex-col">

@@ -14,10 +14,6 @@ import {
   updateLine
 } from '@/helpers/wording'
 
-/**
- * The quick replies live in `constants/strings`, so a case names the one it expects
- * instead of recopying it: what these functions decide is the branch.
- */
 type UpdateCase = {
   readonly update: UpdateStatus
   readonly line: string
@@ -133,10 +129,8 @@ describe('updateLine', () => {
   it.each(Object.values(UPDATE_CASES))(
     'met en mots la mise à jour $update.kind',
     ({ update, line }) => {
-      // #when
       const written = updateLine(update)
 
-      // #then
       expect(written).toBe(line)
     }
   )
@@ -146,10 +140,8 @@ describe('pairingProblemLine', () => {
   it.each(Object.values(PAIRING_CASES))(
     'met en mots l’échec d’appariement $problem.kind',
     ({ problem, line }) => {
-      // #when
       const written = pairingProblemLine(problem)
 
-      // #then
       expect(written).toBe(line)
     }
   )
@@ -159,134 +151,104 @@ describe('shortcutStatusLine', () => {
   it.each(Object.values(STATUS_CASES))(
     'met en mots le statut $status.kind, avec le ton qui va avec',
     ({ status, answer }) => {
-      // #when
       const written = shortcutStatusLine(status, QUICK_REPLIES)
 
-      // #then
       expect(written).toStrictEqual(answer)
     }
   )
 
   it('nomme l’action qui tient déjà la combinaison', () => {
-    // #given
     const status = {
       kind: 'duplicate',
       binding: { kind: 'action', action: 'swap' }
     } as const
 
-    // #when
     const { text } = shortcutStatusLine(status, QUICK_REPLIES)
 
-    // #then
     expect(text).toContain(strings.shortcuts.actions.swap.label)
   })
 
   it('nomme par son texte la quickReply qui tient déjà la combinaison', () => {
-    // #given
     const status = {
       kind: 'duplicate',
       binding: { kind: 'quickReply', id: 1 }
     } as const
 
-    // #when
     const { text } = shortcutStatusLine(status, QUICK_REPLIES)
 
-    // #then
     expect(text).toContain('la réponse « prix libre »')
   })
 
   it('nomme une quickReply sans texte sans prétendre la citer', () => {
-    // #given
     const status = {
       kind: 'duplicate',
       binding: { kind: 'quickReply', id: 2 }
     } as const
 
-    // #when
     const { text } = shortcutStatusLine(status, QUICK_REPLIES)
 
-    // #then
     expect(text).toContain(strings.shortcuts.quickReplies.unnamed)
   })
 })
 
 describe('bindingLabel', () => {
   it('coupe un texte trop long sur un caractère et non au milieu d’un', () => {
-    // #given
     const quickReplies = [
       { ...QUICK_REPLIES[0], text: 'é'.repeat(60) }
     ] as const satisfies readonly QuickReply[]
 
-    // #when
     const label = bindingLabel({ kind: 'quickReply', id: 1 }, quickReplies)
 
-    // #then
     expect(label).toBe(`la réponse « ${'é'.repeat(30)}… »`)
   })
 
   it('nomme une quickReply que le tableau ne porte plus', () => {
-    // #when
     const label = bindingLabel({ kind: 'quickReply', id: 404 }, QUICK_REPLIES)
 
-    // #then
     expect(label).toBe(strings.shortcuts.quickReplies.unnamed)
   })
 })
 
 describe('authorizationLine', () => {
   it('dit l’écoute active quand le système entend', () => {
-    // #when
     const line = authorizationLine({ granted: true, listening: true })
 
-    // #then
     expect(line).toBe(strings.status.listening)
   })
 
   it('dit l’écoute arrêtée quand elle ne tourne pas', () => {
-    // #when
     const line = authorizationLine({ granted: true, listening: false })
 
-    // #then
     expect(line).toBe(strings.status.notListening)
   })
 
   it('dit l’autorisation manquante avant tout le reste', () => {
-    // #when
     const line = authorizationLine({ granted: false, listening: true })
 
-    // #then
     expect(line).toBe(strings.status.denied)
   })
 })
 
 describe('characterStateLine', () => {
   it('dit le défilement pour un personnage connecté et réveillé', () => {
-    // #when
     const line = characterStateLine(ONLINE_CHARACTER)
 
-    // #then
     expect(line).toBe(strings.characters.inCycle)
   })
 
   it('dit la veille pour un personnage connecté et endormi', () => {
-    // #given
     const character = { ...ONLINE_CHARACTER, asleep: true }
 
-    // #when
     const line = characterStateLine(character)
 
-    // #then
     expect(line).toBe(strings.characters.asleep)
   })
 
   it('dit hors ligne avant la veille pour un personnage déconnecté', () => {
-    // #given
     const character = { ...ONLINE_CHARACTER, asleep: true, online: false }
 
-    // #when
     const line = characterStateLine(character)
 
-    // #then
     expect(line).toBe(strings.characters.offline)
   })
 })

@@ -1,18 +1,9 @@
-/**
- * The journal as it crosses the bridge: structured events, put into words in
- * `helpers/journal.ts` and nowhere else.
- */
-
 import type { NotificationKind } from '@/@types/notification'
 import type { NoticeCase, RelayFailure, RelayStop } from '@/@types/relay'
 import type { Gender } from '@/@types/roster'
 import type { BoundCombination, ShortcutAction } from '@/@types/shortcuts'
 import type { Launch, Surface, Work } from '@/@types/system'
 
-/**
- * What became of a game notification. `kindUnknown` is a wording no pattern
- * covers, `bodyUnread` a body Multifus never got to read: two different repairs.
- */
 export type NotificationOutcome =
   | { readonly outcome: 'bodyUnread' }
   | { readonly outcome: 'focusFailed'; readonly detail: string }
@@ -22,13 +13,11 @@ export type NotificationOutcome =
   | { readonly outcome: 'leftMinimized' }
   | { readonly outcome: 'noWindow' }
 
-/** What became of a character clicked in the system tray. */
 export type TrayOutcome =
   | { readonly outcome: 'focusFailed'; readonly detail: string }
   | { readonly outcome: 'focused' }
   | { readonly outcome: 'noWindow' }
 
-/** What became of a shortcut that fired. */
 export type ShortcutOutcome =
   | {
       readonly outcome: 'focusFailed'
@@ -46,10 +35,6 @@ export type ShortcutOutcome =
   | { readonly outcome: 'swapped'; readonly awake: Gender }
   | { readonly outcome: 'woke'; readonly nickname: string }
 
-/**
- * Why a quick reply did not reach the chat, or did and cost the clipboard. Six
- * places to repair it in, and the last one follows a paste that worked.
- */
 export type QuickReplyFailure =
   | { readonly reason: 'clipboardNotGivenBack'; readonly detail: string }
   | { readonly reason: 'clipboardRefused'; readonly detail: string }
@@ -58,7 +43,6 @@ export type QuickReplyFailure =
   | { readonly reason: 'outsideGame' }
   | { readonly reason: 'pasteRefused'; readonly detail: string }
 
-/** What the user did to the roster from the window. */
 export type RosterChange =
   | {
       readonly kind: 'genderAsleep'
@@ -80,10 +64,6 @@ export type RosterChange =
   | { readonly kind: 'slept'; readonly nickname: string }
   | { readonly kind: 'woke'; readonly nickname: string }
 
-/**
- * What the user changed, and from where when there are two doors. `from` says
- * whether the window had to be opened, the measure of the whole project.
- */
 export type SettingChange =
   | {
       readonly kind: 'autoFocusEnabled'
@@ -104,10 +84,6 @@ export type SettingChange =
       readonly from: Surface
     }
 
-/**
- * One thing worth knowing about when nothing comes to the front. No event
- * carries a word of what a notification said, see ADR 0006 and `app::journal`.
- */
 export type JournalEvent =
   | { readonly kind: 'authorization'; readonly granted: boolean }
   | { readonly kind: 'characterOffline'; readonly nickname: string }
@@ -124,8 +100,6 @@ export type JournalEvent =
   | { readonly kind: 'openFailed'; readonly detail: string }
   | { readonly kind: 'panicked'; readonly work: Work }
   | { readonly kind: 'quickReplyFailed'; readonly reason: QuickReplyFailure }
-  /** The first forty characters of the line, and the one place this file holds
-   * words somebody typed. See ADR 0012. */
   | { readonly kind: 'quickReplyPasted'; readonly excerpt: string }
   | { readonly kind: 'quit' }
   | { readonly kind: 'relayDisabled'; readonly reason: RelayStop }
@@ -157,13 +131,11 @@ export type JournalEvent =
   | {
       readonly kind: 'authorizationRequested'
       readonly granted: boolean
-      /** What the system said when it would not even answer the question. */
       readonly failure: string | null
     }
   | {
       readonly kind: 'configLoadFailed'
       readonly detail: string
-      /** Where the file went, `null` when nothing was moved. */
       readonly quarantined: string | null
     }
   | {
@@ -191,7 +163,6 @@ export type JournalEvent =
 
 export type JournalEntry = {
   readonly id: number
-  /** Milliseconds since the epoch. Formatted where the language lives. */
   readonly at: number
   readonly event: JournalEvent
 }

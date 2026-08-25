@@ -50,29 +50,10 @@ Avoid over-simplification that could:
 - Magic numbers replaced with named constants
 - No comments - code should speak for itself
 
-### Comment Length
+### Comments
 
-**One or two lines, never more.** This applies to every comment and every doc
-comment: modules, types, fields, functions, tests, and inline notes.
-
-**Scope: code written from now on.** Comments already in the repo are not a
-backlog — leave them. Bring a block into line when you are editing it anyway,
-never as a pass of its own.
-
-A comment carries the _why_ that the code cannot say, in a sentence. It is not
-the place for the reasoning that led there, the alternatives that were rejected,
-or the failure that would follow: those belong to `docs/adr` and `docs/plan.md`,
-and a comment points at them instead of repeating them.
-
-**FORBIDDEN:**
-
-- Paragraphs, and doc comments split into several of them
-- Restating an ADR or a plan section in the code
-- Explaining an assertion the test name already states
-- `SAFETY:` notes longer than the invariant they name
-
-If two lines are not enough, the fix is a better name or a line in the plan, not
-a third line.
+None, in any language of the repository. The one exception, one line long, is in
+[comments.md](./comments.md).
 
 ### Unicode
 

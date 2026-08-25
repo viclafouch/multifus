@@ -1,21 +1,3 @@
-//! The macOS side of the boundary.
-//!
-//! Windows and their titles come from the Accessibility API, `AXTitle` on the
-//! main window of the processes whose bundle is `com.dofus.d1elauncher`, and
-//! focus activates a process by its pid, one client being one process.
-//! Notifications come from an `AXObserver` posted on
-//! `com.apple.notificationcenterui`, whose banner text carries the title and the
-//! body, see ADR 0002. Both need the same and only authorization, Accessibility,
-//! which is why [`accessibility_authorization`] is shared by the two
-//! implementations. The third one, [`PowerAssertionDisplayKeeper`], needs none.
-//!
-//! The SQLite database of the notification centre is not an option and is not to
-//! be brought back to the table: it is written 5.1 seconds after the banner is
-//! drawn, which ADR 0002 measured and rejected.
-//!
-//! Nothing here is generic over the system, and nothing here knows about the
-//! roster. The core stays pure.
-
 use std::ffi::c_void;
 use std::panic::catch_unwind;
 use std::panic::AssertUnwindSafe;
@@ -85,17 +67,10 @@ use crate::platform::window::WindowId;
 use crate::platform::window::WindowManager;
 use crate::platform::Authorization;
 
-/// The bundle of a Dofus Retro client. One process per character on this system,
-/// which is what lets a [`WindowId`] carry a pid.
 const DOFUS_BUNDLE_ID: &str = "com.dofus.d1elauncher";
 
-/// The process that draws the notification banners, and the one the observer is
-/// posted on.
 const NOTIFICATION_CENTRE_BUNDLE_ID: &str = "com.apple.notificationcenterui";
 
-// The Accessibility attribute and notification names. `objc2-application-services`
-// exposes the functions but not these constants, so they are spelled out here as
-// the framework headers spell them.
 const AX_TITLE: &str = "AXTitle";
 const AX_MAIN_WINDOW: &str = "AXMainWindow";
 const AX_MINIMIZED: &str = "AXMinimized";
@@ -109,23 +84,12 @@ const AX_FRONTMOST: &str = "AXFrontmost";
 const AX_STATIC_TEXT_ROLE: &str = "AXStaticText";
 const AX_CREATED_NOTIFICATION: &str = "AXCreated";
 
-/// How deep the banner walk goes before giving up.
-///
-/// The tree recorded by the prototype needs four levels; eight leaves room for a
-/// future macOS to add a wrapper without opening the door to walking the whole
-/// notification centre on the observer's thread.
 const MAX_BANNER_DEPTH: usize = 8;
 
-/// How many texts the banner walk reads before stopping.
 const MAX_BANNER_TEXTS: usize = 4;
 
-/// How long the watcher thread runs its loop before looking at its stop flag.
 const STOP_CHECK_SECONDS: f64 = 0.25;
 
-/// The one authorization of this system, read without asking the user anything.
-///
-/// Reading window titles, changing the focus and hearing the banners all hang on
-/// Accessibility, so both implementations of this module answer with this.
 fn accessibility_authorization() -> Authorization {
     // SAFETY: no argument, and the call has no invariant to uphold.
     if unsafe { AXIsProcessTrusted() } {
@@ -135,12 +99,6 @@ fn accessibility_authorization() -> Authorization {
     }
 }
 
-/// Asks for that authorization, which opens the system dialog.
-///
-/// macOS grants nothing before the user has acted in the settings pane, so the
-/// answer right after asking is almost always `Denied`. The caller is meant to
-/// show its explanation screen and look again later, not to treat this as a
-/// failure.
 fn request_accessibility_authorization() -> Authorization {
     // SAFETY: both are constants of the framework, alive for the whole process.
     let prompt = unsafe { kAXTrustedCheckOptionPrompt };
@@ -150,8 +108,7 @@ fn request_accessibility_authorization() -> Authorization {
 
     let options = CFDictionary::from_slices(&[prompt], &[yes]);
 
-    // SAFETY: the dictionary holds the key the function documents, associated
-    // with the boolean it expects.
+    // SAFETY: the dictionary holds the key the function documents, with its boolean.
     if unsafe { AXIsProcessTrustedWithOptions(Some(options.as_opaque())) } {
         Authorization::Granted
     } else {
@@ -159,11 +116,6 @@ fn request_accessibility_authorization() -> Authorization {
     }
 }
 
-/// Turns an `AXError` into the boundary's own error.
-///
-/// A revoked authorization is the one case that is not a system failure: the
-/// user can take Accessibility away at any time from the settings, and every
-/// call starts returning `kAXErrorAPIDisabled` on the spot.
 fn ax_result(status: AXError, operation: &'static str) -> Result<()> {
     match status {
         AXError::Success => Ok(()),
@@ -175,13 +127,6 @@ fn ax_result(status: AXError, operation: &'static str) -> Result<()> {
     }
 }
 
-/// Reads one attribute of an accessibility object.
-///
-/// `Ok(None)` covers every ordinary absence: the attribute does not exist on
-/// this object, it holds no value right now, the client does not implement the
-/// Accessibility API, or it has gone away between two calls. None of these is
-/// worth an error to an application whose job is to keep running unattended.
-/// Only a revoked authorization and a genuine system failure come back as one.
 fn attribute(element: &AXUIElement, name: &str) -> Result<Option<CFRetained<CFType>>> {
     let name = CFString::from_str(name);
     let mut value: *const CFType = ptr::null();
@@ -195,8 +140,7 @@ fn attribute(element: &AXUIElement, name: &str) -> Result<Option<CFRetained<CFTy
                 return Ok(None);
             };
 
-            // SAFETY: `AXUIElementCopyAttributeValue` follows the Create rule,
-            // so this reference is ours to own.
+            // SAFETY: the Create rule applies, so this reference is ours to own.
             Ok(Some(unsafe { CFRetained::from_raw(value) }))
         }
         AXError::NoValue
@@ -208,37 +152,22 @@ fn attribute(element: &AXUIElement, name: &str) -> Result<Option<CFRetained<CFTy
     }
 }
 
-/// Reads an attribute that holds a string.
-///
-/// A value of another type reads as an absence, like every other ordinary absence
-/// [`attribute`] folds into `Ok(None)`. That is the honest answer rather than a
-/// swallowed failure: Multifus wants a title, and an attribute that is not a
-/// string is not a title. Only the walk of a banner cares about the difference,
-/// and what it needs to report is a system that refused, which arrives as an
-/// error above.
 fn string_attribute(element: &AXUIElement, name: &str) -> Result<Option<String>> {
     Ok(attribute(element, name)?
         .and_then(|value| value.downcast::<CFString>().ok())
         .map(|text| text.to_string()))
 }
 
-/// Reads an attribute that holds a boolean.
 fn bool_attribute(element: &AXUIElement, name: &str) -> Result<Option<bool>> {
     Ok(attribute(element, name)?
         .and_then(|value| value.downcast::<CFBoolean>().ok())
         .map(|flag| flag.value()))
 }
 
-/// Reads an attribute that holds a single accessibility object.
 fn element_attribute(element: &AXUIElement, name: &str) -> Result<Option<CFRetained<AXUIElement>>> {
     Ok(attribute(element, name)?.and_then(|value| value.downcast::<AXUIElement>().ok()))
 }
 
-/// Reads an attribute that holds a list of accessibility objects.
-///
-/// Anything in the list that is not an accessibility object is dropped rather
-/// than reported: the Accessibility API is free to hand back whatever it likes,
-/// and Multifus only ever wants the elements.
 fn element_array_attribute(
     element: &AXUIElement,
     name: &str,
@@ -251,8 +180,7 @@ fn element_array_attribute(
         return Ok(Vec::new());
     };
 
-    // SAFETY: the accessibility attributes that hold arrays hold CF types, and
-    // the elements are only read through `downcast`, which checks their type.
+    // SAFETY: those attributes hold CF types, and `downcast` checks each element.
     let array = unsafe { array.cast_unchecked::<CFType>() };
 
     Ok(array
@@ -262,21 +190,12 @@ fn element_array_attribute(
         .collect())
 }
 
-/// Every Dofus client currently running, one per character connected.
 fn dofus_applications() -> Vec<Retained<NSRunningApplication>> {
     let bundle = NSString::from_str(DOFUS_BUNDLE_ID);
 
     NSRunningApplication::runningApplicationsWithBundleIdentifier(&bundle).to_vec()
 }
 
-/// A client's windows, its main window first.
-///
-/// The main window is the one the plan asks for. The others follow as a safety
-/// net for a client that has not designated a main one yet, and for one whose
-/// window is minimized: macOS drops `AXMainWindow` while a window sits in the
-/// Dock, and the window is still in `AXWindows`. Since a window only becomes a
-/// [`GameWindow`] through its title, the extra entries can add one that would
-/// have been missed but can never let a wrong one through.
 fn windows_of(application: &AXUIElement) -> Result<Vec<CFRetained<AXUIElement>>> {
     let mut windows = Vec::new();
 
@@ -289,7 +208,6 @@ fn windows_of(application: &AXUIElement) -> Result<Vec<CFRetained<AXUIElement>>>
     Ok(windows)
 }
 
-/// The titles of those windows, in the same order.
 fn window_titles(application: &AXUIElement) -> Result<Vec<String>> {
     let mut titles = Vec::new();
 
@@ -300,11 +218,6 @@ fn window_titles(application: &AXUIElement) -> Result<Vec<String>> {
     Ok(titles)
 }
 
-/// The window a client draws for itself, login screen included, `None` while it
-/// has only put up a splash.
-///
-/// The title is not read beyond being there, which is what separates this from
-/// [`game_window_element`].
 fn client_window_element(application: &AXUIElement) -> Result<Option<CFRetained<AXUIElement>>> {
     for window in windows_of(application)? {
         let titled =
@@ -318,15 +231,6 @@ fn client_window_element(application: &AXUIElement) -> Result<Option<CFRetained<
     Ok(None)
 }
 
-/// The window of a client that carries a nickname, and the title it bears,
-/// `None` for a client sitting on the login screen.
-///
-/// The one place that needs the window itself rather than its title: a window is
-/// what carries `AXMinimized`, an application does not, and it is also what a
-/// title is written to.
-///
-/// Every title read here is one a client wrote: nothing on this system renames a
-/// window, see the refusal in `docs/perimetre.md`.
 fn game_window_element(
     id: WindowId,
     application: &AXUIElement,
@@ -344,19 +248,12 @@ fn game_window_element(
     Ok(None)
 }
 
-/// The game window of one client process, `None` when no title carries a
-/// nickname.
-///
-/// That `None` is what a client sitting on the login screen looks like: a live
-/// process, with windows, and nothing in the title to work with. The filtering
-/// is on the title, never on the size.
 fn game_window(application: &NSRunningApplication) -> Result<Option<GameWindow>> {
     let Some(id) = client_id(application) else {
         return Ok(None);
     };
 
-    // SAFETY: the pid is the one the system just reported for a running
-    // application, and the call is valid for any pid anyway.
+    // SAFETY: the call is valid for any pid, and this one is of a running application.
     let element = unsafe { AXUIElement::new_application(application.processIdentifier()) };
 
     for title in window_titles(&element)? {
@@ -368,17 +265,12 @@ fn game_window(application: &NSRunningApplication) -> Result<Option<GameWindow>>
     Ok(None)
 }
 
-/// The token a client process answers to, `None` for a pid that does not fit one.
 fn client_id(application: &NSRunningApplication) -> Option<WindowId> {
     u64::try_from(application.processIdentifier())
         .ok()
         .map(WindowId::from_raw)
 }
 
-/// Brings a client to the front through Accessibility.
-///
-/// The second door of [`AccessibilityWindowManager::focus`], see the comment
-/// there.
 fn set_frontmost(application: &AXUIElement) -> Result<()> {
     let name = CFString::from_str(AX_FRONTMOST);
 
@@ -399,11 +291,6 @@ fn set_frontmost(application: &AXUIElement) -> Result<()> {
     }
 }
 
-/// The live client a window token designates, and its accessibility object.
-///
-/// [`PlatformError::WindowGone`] covers the three ways a token can designate
-/// nothing any more: a raw value that is not a pid, an application the system no
-/// longer knows, and one that has quit since the scan saw it.
 fn live_application(
     window: WindowId,
 ) -> Result<(Retained<NSRunningApplication>, CFRetained<AXUIElement>)> {
@@ -418,19 +305,12 @@ fn live_application(
         return Err(PlatformError::WindowGone);
     }
 
-    // SAFETY: the pid belongs to an application the system just reported as
-    // running.
+    // SAFETY: the pid belongs to an application the system just reported as running.
     let element = unsafe { AXUIElement::new_application(pid) };
 
     Ok((application, element))
 }
 
-/// Takes a window out of the Dock, and only one that is in it.
-///
-/// Read before write on purpose. Writing `AXMinimized` on a window that is not
-/// minimized is a call with nothing to do, and a refusal there would turn an
-/// ordinary focus into a failure for no gain. Reading one attribute is the
-/// 0,05 ms the plan measured.
 fn restore(window: &AXUIElement) -> Result<()> {
     if bool_attribute(window, AX_MINIMIZED)? != Some(true) {
         return Ok(());
@@ -455,7 +335,6 @@ fn restore(window: &AXUIElement) -> Result<()> {
     }
 }
 
-/// Reads an attribute that holds a point, which crosses wrapped in an `AXValue`.
 fn point_attribute(element: &AXUIElement, name: &str) -> Result<Option<CGPoint>> {
     let Some(value) = attribute(element, name)? else {
         return Ok(None);
@@ -511,13 +390,9 @@ fn set_window_value(
     }
 }
 
-/// The work area of the screen a window sits on, in the flipped coordinates the
-/// Accessibility API reads and writes.
 fn work_area(position: CGPoint) -> Option<CGRect> {
     on_main_thread(move |marker| {
         let screens = NSScreen::screens(marker);
-        // AppKit places every screen relative to the first, so its height is
-        // what the two coordinate systems are flipped around.
         let flip = screens.firstObject()?.frame().size.height;
 
         let screen = screens
@@ -530,8 +405,6 @@ fn work_area(position: CGPoint) -> Option<CGRect> {
     .flatten()
 }
 
-/// A Cocoa rectangle in the flipped coordinates the Accessibility API uses,
-/// where the origin is the top left corner and y grows downwards.
 fn flipped(frame: CGRect, flip: CGFloat) -> CGRect {
     CGRect::new(
         CGPoint::new(frame.origin.x, flip - frame.max().y),
@@ -539,19 +412,12 @@ fn flipped(frame: CGRect, flip: CGFloat) -> CGRect {
     )
 }
 
-/// Whether a screen holds this corner, both far edges excluded so that two
-/// screens side by side never both answer yes. Flipped coordinates on both
-/// sides, or a window flush against the top of a screen would land on the one
-/// above it.
 fn holds(frame: CGRect, corner: CGPoint) -> bool {
     let (min, max) = (frame.min(), frame.max());
 
     corner.x >= min.x && corner.x < max.x && corner.y >= min.y && corner.y < max.y
 }
 
-/// Runs a piece of AppKit on the main thread, `NSScreen` being main thread only
-/// and the window scan a thread of its own. `None` when the work panicked, which
-/// must not cross back through the dispatch queue.
 fn on_main_thread<T: Send>(work: impl FnOnce(MainThreadMarker) -> T + Send) -> Option<T> {
     if let Some(marker) = MainThreadMarker::new() {
         return Some(work(marker));
@@ -571,12 +437,6 @@ fn on_main_thread<T: Send>(work: impl FnOnce(MainThreadMarker) -> T + Send) -> O
     done
 }
 
-/// Reads windows and changes focus through the macOS Accessibility API.
-///
-/// A [`WindowId`] here carries the pid of the client process.
-///
-/// **Nothing is remembered here**, and nothing is written either: every title
-/// read is one a client wrote for itself.
 #[derive(Debug, Default)]
 pub struct AccessibilityWindowManager;
 
@@ -617,9 +477,6 @@ impl WindowManager for AccessibilityWindowManager {
             return Err(PlatformError::AuthorizationDenied);
         }
 
-        // Only one application is active at a time, so asking the Dofus clients
-        // whether they are is enough to know whether the user is in the game.
-        // Nothing else on the desktop has to be looked at.
         for application in dofus_applications() {
             if application.isActive() {
                 return game_window(&application);
@@ -632,38 +489,24 @@ impl WindowManager for AccessibilityWindowManager {
     fn is_minimized(&self, window: WindowId) -> Result<bool> {
         let (_, element) = live_application(window)?;
 
-        // No game window on a live client is the login screen, and a client that
-        // has left the game is one this token no longer designates.
         let Some((game_window, _)) = game_window_element(window, &element)? else {
             return Err(PlatformError::WindowGone);
         };
 
-        // A window the system says nothing about is a window on screen. Only
-        // `AXMinimized` reading true puts it in the Dock.
         Ok(bool_attribute(&game_window, AX_MINIMIZED)? == Some(true))
     }
 
     fn focus(&self, window: WindowId) -> Result<()> {
         let (application, element) = live_application(window)?;
 
-        // Out of the Dock before anything else. Activating a client whose window
-        // is minimized brings its menu bar to the front and leaves the window
-        // exactly where it was, which is the whole trap this answers.
         if let Some((game_window, _)) = game_window_element(window, &element)? {
             restore(&game_window)?;
         }
 
-        // `ActivateAllWindows` without `ActivateIgnoringOtherApps`, which macOS
-        // deprecated: the client owns one window and asking to ignore the other
-        // applications is exactly what the system now refuses.
         if application.activateWithOptions(NSApplicationActivationOptions::ActivateAllWindows) {
             return Ok(());
         }
 
-        // Cooperative activation lets the system turn down a request coming from
-        // an application that is not in front, which Multifus never is. Setting
-        // `AXFrontmost` asks for the same thing through the authorization
-        // Multifus already holds. Same process, same intent, second door.
         set_frontmost(&element)
     }
 
@@ -680,12 +523,9 @@ impl WindowManager for AccessibilityWindowManager {
                 continue;
             };
 
-            // SAFETY: the pid is the one the system just reported for a running
-            // application, and the call is valid for any pid anyway.
+            // SAFETY: the call is valid for any pid, and this one is of a running application.
             let element = unsafe { AXUIElement::new_application(pid) };
 
-            // A client that has drawn nothing yet must not be counted, or it
-            // would be known before there was anything to fill.
             if client_window_element(&element)?.is_some() {
                 clients.push(WindowId::from_raw(raw));
             }
@@ -701,7 +541,6 @@ impl WindowManager for AccessibilityWindowManager {
             return Err(PlatformError::WindowGone);
         };
 
-        // Its own position first: it is what says which screen to fill.
         let Some(position) = point_attribute(&game_window, AX_POSITION)? else {
             return Err(PlatformError::system(
                 "maximizing a window",
@@ -720,25 +559,16 @@ impl WindowManager for AccessibilityWindowManager {
         set_size(&game_window, area.size)
     }
 
-    /// Never on macOS: the client takes the `AXTitle` write, answers success and
-    /// keeps its title. A refusal rather than a gap, see `docs/perimetre.md`.
     fn apply_short_titles(&self, _short: bool, _suffix: Option<&str>) -> Result<Option<String>> {
         Ok(None)
     }
 }
 
-/// Hears game notifications by reading the banner the system draws, the only
-/// route fast enough on macOS, see ADR 0002.
 #[derive(Debug, Default)]
 pub struct BannerNotificationWatcher {
     listening: Option<Listening>,
 }
 
-/// The thread that owns the observer, and the flag that asks it to stop.
-///
-/// Everything the Accessibility API hands out lives on that thread and never
-/// leaves it, which is what makes the watcher `Send + Sync` without a single
-/// unsafe promise about Core Foundation objects.
 #[derive(Debug)]
 struct Listening {
     running: Arc<AtomicBool>,
@@ -754,8 +584,6 @@ impl BannerNotificationWatcher {
 
 impl NotificationWatcher for BannerNotificationWatcher {
     fn authorization(&self) -> Result<Authorization> {
-        // The same Accessibility trust as the window manager: one authorization
-        // for the whole application on this system.
         Ok(accessibility_authorization())
     }
 
@@ -785,9 +613,6 @@ impl NotificationWatcher for BannerNotificationWatcher {
                 PlatformError::system("starting the banner watcher", error.to_string())
             })?;
 
-        // The thread reports how the setup went before it starts running, so
-        // that a denied authorization or a missing notification centre comes
-        // back to the caller instead of dying silently in the background.
         let outcome = ready_receiver.recv().unwrap_or_else(|_| {
             Err(PlatformError::system(
                 "starting the banner watcher",
@@ -802,9 +627,6 @@ impl NotificationWatcher for BannerNotificationWatcher {
                 Ok(())
             }
             Err(error) => {
-                // The thread's own report is what `error` already carries, so the
-                // join has nothing left to add: it is waited on to make sure the
-                // observer is gone, not to be asked how it went.
                 drop(thread.join());
 
                 Err(error)
@@ -819,31 +641,22 @@ impl NotificationWatcher for BannerNotificationWatcher {
 
         listening.running.store(false, Ordering::Relaxed);
 
-        // Joining is what makes the promise of the interface true: once `stop`
-        // returns, the observer is gone and the sink will not be called again.
         listening.thread.join().map_err(|_| {
             PlatformError::system("stopping the banner watcher", "the watcher thread panicked")
         })
     }
 
     fn dismiss(&self, _nickname: &str) -> Result<()> {
-        // macOS has no public API to take a banner off the screen, see ADR 0002.
-        // Doing nothing and saying so went well keeps the caller free of any
-        // `cfg`, which is the whole point of this boundary.
         Ok(())
     }
 }
 
 impl Drop for BannerNotificationWatcher {
     fn drop(&mut self) {
-        // No observer survives the application. A failure here reaches nobody and
-        // that is not a swallowed one: this runs as the process is ending, so
-        // there is no journal left to read and no reader left to read it.
         drop(self.stop());
     }
 }
 
-/// The pid of the process that draws the banners.
 fn notification_centre_pid() -> Result<pid_t> {
     let bundle = NSString::from_str(NOTIFICATION_CENTRE_BUNDLE_ID);
 
@@ -858,24 +671,12 @@ fn notification_centre_pid() -> Result<pid_t> {
         })
 }
 
-/// The body of the watcher thread: post the observer, run a loop, take it down.
-///
-/// The loop wakes every [`STOP_CHECK_SECONDS`] only to read the stop flag. That
-/// is not polling the notifications, which stay pushed by the observer; it is
-/// the price of never touching this thread's run loop from another one.
-///
-/// An authorization revoked while this runs simply silences the observer: the
-/// thread keeps waiting, and the caller learns of the revocation from
-/// [`NotificationWatcher::authorization`], which is where the interface says to
-/// look. Nothing here panics on the system for it.
 fn watch(
     pid: pid_t,
     sink: NotificationSink,
     running: &AtomicBool,
     ready: &mpsc::Sender<Result<()>>,
 ) {
-    // The observer is declared after the sink, so it is dropped before it, and
-    // the pointer the callback reads can never outlive what it points at.
     let refcon: *mut c_void = ptr::from_ref(&sink).cast_mut().cast();
 
     let observer = match create_observer(pid, refcon) {
@@ -913,12 +714,10 @@ fn watch(
     run_loop.remove_source(Some(&source), mode);
 }
 
-/// Creates the observer and registers it for the creation of banner elements.
 fn create_observer(pid: pid_t, refcon: *mut c_void) -> Result<CFRetained<AXObserver>> {
     let mut observer: *mut AXObserver = ptr::null_mut();
 
-    // SAFETY: `on_banner_created` has the signature the API documents, and
-    // `observer` is a live pointer for the duration of the call.
+    // SAFETY: the callback has the signature the API documents, and `observer` is live.
     let status =
         unsafe { AXObserver::create(pid, Some(on_banner_created), NonNull::from(&mut observer)) };
 
@@ -934,8 +733,7 @@ fn create_observer(pid: pid_t, refcon: *mut c_void) -> Result<CFRetained<AXObser
     // SAFETY: `AXObserverCreate` follows the Create rule, so this is ours.
     let observer = unsafe { CFRetained::from_raw(observer) };
 
-    // SAFETY: the pid is the notification centre's, which the system just
-    // reported as running.
+    // SAFETY: the pid is the notification centre's, just reported as running.
     let application = unsafe { AXUIElement::new_application(pid) };
     let notification = CFString::from_str(AX_CREATED_NOTIFICATION);
 
@@ -947,12 +745,6 @@ fn create_observer(pid: pid_t, refcon: *mut c_void) -> Result<CFRetained<AXObser
     Ok(observer)
 }
 
-/// Called by the system on the watcher thread, every time the notification
-/// centre builds a new element.
-///
-/// Most of them are not banners, and most banners are not Dofus ones. They all
-/// die here: only a notification whose title carries a nickname reaches the sink,
-/// and through it the core.
 unsafe extern "C-unwind" fn on_banner_created(
     _observer: NonNull<AXObserver>,
     element: NonNull<AXUIElement>,
@@ -963,18 +755,12 @@ unsafe extern "C-unwind" fn on_banner_created(
         return;
     }
 
-    // SAFETY: `refcon` is the sink `watch` registered, and the observer that
-    // carries it is dropped before that sink is.
+    // SAFETY: `refcon` is the sink `watch` registered, dropped after the observer.
     let sink: &NotificationSink = unsafe { &*refcon.cast::<NotificationSink>() };
 
     // SAFETY: the system hands a live element to its callback.
     let element: &AXUIElement = unsafe { element.as_ref() };
 
-    // A panic must not cross back into the C callback, and the sink is code
-    // Multifus does not own. Reading and reporting are caught separately so that
-    // a panic in the reading still reaches the journal: swallowed together, a
-    // notification would be lost without a line, which is the one thing the two
-    // variants of `NotificationReport` exist to prevent.
     let read = catch_unwind(AssertUnwindSafe(|| read_banner(element)));
 
     let report = match read {
@@ -984,8 +770,6 @@ unsafe extern "C-unwind" fn on_banner_created(
         }),
     };
 
-    // Nothing is left to say if this one panics: saying it would go through the
-    // very sink that just failed.
     drop(catch_unwind(AssertUnwindSafe(|| {
         if let Some(report) = report {
             sink(report);
@@ -993,15 +777,9 @@ unsafe extern "C-unwind" fn on_banner_created(
     })));
 }
 
-/// What one walk of a notification element came back with.
 #[derive(Debug, Default)]
 struct Walk {
-    /// The texts the element shows, in the order they were met.
     texts: Vec<String>,
-    /// What the system refused during the walk, if it refused anything.
-    ///
-    /// The first refusal and not the last: it is the one closest to what was
-    /// being read, and the ones after it are usually the same refusal again.
     refusal: Option<String>,
 }
 
@@ -1013,30 +791,6 @@ impl Walk {
     }
 }
 
-/// Reads a banner, if that element is one, and says so when it cannot.
-///
-/// The tree the prototype recorded, where the first text is the title and the
-/// second the body:
-///
-/// ```text
-/// window "Notification Center"
-/// └─ group 1 → group 1 → scroll area 1 → group 1
-///    ├─ static text  "Pseudo - Dofus Retro v1.48.21"
-///    └─ static text  "de Untel : a ton tour de jouer"
-/// ```
-///
-/// The title is taken as the first text that carries a nickname rather than as
-/// the first text outright, so that a macOS which one day slips an application
-/// name above it does not break the reading. A text that carries no nickname is
-/// no risk: no banner from anything but Dofus can produce one.
-///
-/// **`None` means nothing worth saying, never « nothing happened ».** The
-/// observer fires for every element the notification centre builds, and almost
-/// none of them are game notifications: those die here in silence, as they must,
-/// or the journal would be unreadable. A walk the system *refused* is the
-/// opposite case and comes back as [`NotificationReport::Unreadable`], because a
-/// banner drawn and not read used to produce no line at all, and an empty journal
-/// already meant that no banner had been drawn.
 fn read_banner(element: &AXUIElement) -> Option<NotificationReport> {
     let mut walk = Walk::default();
 
@@ -1061,16 +815,6 @@ fn read_banner(element: &AXUIElement) -> Option<NotificationReport> {
     )))
 }
 
-/// Walks a banner and collects the text it shows.
-///
-/// Bounded in depth and in count because it runs on the observer's thread, where
-/// nothing is allowed to take long.
-///
-/// Every refusal is kept rather than dropped. What reaches here as an error is
-/// already narrow: [`attribute`] answers `Ok(None)` for every ordinary absence,
-/// an attribute this element does not have, a client that does not implement the
-/// API, an element that has gone. So a refusal here is a revoked authorization or
-/// a genuine system failure, and both are worth exactly one line.
 fn collect_static_texts(element: &AXUIElement, depth: usize, walk: &mut Walk) {
     if depth > MAX_BANNER_DEPTH || walk.texts.len() >= MAX_BANNER_TEXTS {
         return;
@@ -1080,7 +824,6 @@ fn collect_static_texts(element: &AXUIElement, depth: usize, walk: &mut Walk) {
         Ok(Some(role)) if role == AX_STATIC_TEXT_ROLE => {
             match string_attribute(element, AX_VALUE) {
                 Ok(Some(text)) => walk.texts.push(text),
-                // A text element showing nothing. Ordinary, and not a refusal.
                 Ok(None) => {}
                 Err(error) => walk.note(&error),
             }
@@ -1105,8 +848,6 @@ fn collect_static_texts(element: &AXUIElement, depth: usize, walk: &mut Walk) {
     }
 }
 
-// The IOKit spellings. `kIOReturnSuccess` is zero, and the framework writes an
-// assertion level on as 255 rather than 1.
 type IOReturn = i32;
 type IOPMAssertionID = u32;
 type IOPMAssertionLevel = u32;
@@ -1114,20 +855,13 @@ type IOPMAssertionLevel = u32;
 const IO_RETURN_SUCCESS: IOReturn = 0;
 const IO_PM_ASSERTION_LEVEL_ON: IOPMAssertionLevel = 255;
 
-/// The assertion Multifus takes. Not `PreventUserIdleSystemSleep`, which lets the
-/// display go dark and the banners with it.
 const PREVENT_USER_IDLE_DISPLAY_SLEEP: &str = "PreventUserIdleDisplaySleep";
 
-/// What `pmset -g assertions` shows next to the pid of Multifus.
 const ASSERTION_NAME: &str = "Multifus relay";
 
-// The screen saver delay, filed per host, which is what `defaults -currentHost`
-// reaches and what `CFPreferencesCopyAppValue` would miss.
 const SCREEN_SAVER_DOMAIN: &str = "com.apple.screensaver";
 const SCREEN_SAVER_IDLE_TIME: &str = "idleTime";
 
-// Declared here rather than brought in with a crate: the step is measured at
-// three crates, and a fourth for two functions would not be one of them.
 #[link(name = "IOKit", kind = "framework")]
 extern "C" {
     fn IOPMAssertionCreateWithName(
@@ -1140,10 +874,8 @@ extern "C" {
     fn IOPMAssertionRelease(assertion_id: IOPMAssertionID) -> IOReturn;
 }
 
-/// Keeps the display awake through an IOKit energy assertion.
 #[derive(Debug, Default)]
 pub struct PowerAssertionDisplayKeeper {
-    /// The assertion currently held, `None` when the machine may sleep.
     held: Option<IOPMAssertionID>,
 }
 
@@ -1185,8 +917,7 @@ impl DisplayKeeper for PowerAssertionDisplayKeeper {
             return Ok(());
         };
 
-        // SAFETY: the token comes from a call that reported success, and taking
-        // it out of the field is what stops it being released twice.
+        // SAFETY: the token comes from a successful call, and moving it out avoids a double free.
         let status = unsafe { IOPMAssertionRelease(id) };
 
         if status != IO_RETURN_SUCCESS {
@@ -1210,23 +941,14 @@ impl DisplayKeeper for PowerAssertionDisplayKeeper {
 
 impl Drop for PowerAssertionDisplayKeeper {
     fn drop(&mut self) {
-        // No hold survives the keeper, and a failure here reaches nobody: the
-        // assertion dies with the process whatever the system answered.
         drop(self.release());
     }
 }
 
-/// `kVK_ANSI_V`, a position on the keyboard and not a letter: the combination is
-/// the same key on an AZERTY layout.
 const PASTE_KEY: CGKeyCode = 9;
 
-/// How long the key stays down. Measured with it on 24 August 2026.
 const PRESS_TO_RELEASE: Duration = Duration::from_millis(10);
 
-/// Lays `Super+V` on the system through Core Graphics.
-///
-/// Measured against a real client on 24 August 2026, and the four answers are in
-/// `docs/plan.md`, temps 1.
 #[derive(Debug, Default)]
 pub struct CoreGraphicsPasteSender;
 
@@ -1239,14 +961,10 @@ impl CoreGraphicsPasteSender {
 
 impl PasteSender for CoreGraphicsPasteSender {
     fn send_paste_combination(&self) -> Result<()> {
-        // Read rather than left to fail silently: a post the system refuses does
-        // nothing at all, and reads exactly like a game that will not paste.
         if !accessibility_authorization().is_granted() {
             return Err(PlatformError::AuthorizationDenied);
         }
 
-        // A private source, so the event carries the flags set below and not the
-        // modifiers the user is holding down at that moment.
         let source = CGEventSource::new(CGEventSourceStateID::Private);
         let source = source.as_deref();
 
@@ -1264,8 +982,6 @@ impl PasteSender for CoreGraphicsPasteSender {
     }
 }
 
-/// One half of the combination. `CGEventPost` itself answers nothing, so this is
-/// the only place the system can turn the paste down.
 fn keyboard_event(source: Option<&CGEventSource>, key_down: bool) -> Result<CFRetained<CGEvent>> {
     CGEvent::new_keyboard_event(source, PASTE_KEY, key_down).ok_or_else(|| {
         PlatformError::system(
@@ -1275,8 +991,6 @@ fn keyboard_event(source: Option<&CGEventSource>, key_down: bool) -> Result<CFRe
     })
 }
 
-/// Reads the screen saver delay of this machine. Every way the answer can be
-/// missing is [`ScreenSaverDelay::Unknown`], and zero is the screen saver off.
 fn screen_saver_delay() -> ScreenSaverDelay {
     let key = CFString::from_str(SCREEN_SAVER_IDLE_TIME);
     let domain = CFString::from_str(SCREEN_SAVER_DOMAIN);
@@ -1317,7 +1031,6 @@ mod tests {
 
     #[test]
     fn dismissing_a_notification_is_a_silent_success() {
-        // macOS cannot do it and the caller must not have to know, see ADR 0002.
         let watcher = BannerNotificationWatcher::new();
 
         assert_eq!(watcher.dismiss("Alpha"), Ok(()));
@@ -1325,8 +1038,6 @@ mod tests {
 
     #[test]
     fn the_two_implementations_answer_the_same_authorization() {
-        // One authorization on this system, shared by both. This asserts they
-        // agree, not what the answer is, which depends on the machine.
         let manager = AccessibilityWindowManager::new();
         let watcher = BannerNotificationWatcher::new();
 
@@ -1348,7 +1059,6 @@ mod tests {
 
     #[test]
     fn holding_twice_and_letting_go_twice_are_both_harmless() {
-        // The caller asks after every scan and keeps no boolean of its own.
         let mut keeper = PowerAssertionDisplayKeeper::new();
 
         assert_eq!(keeper.keep_awake(), Ok(()));
@@ -1369,8 +1079,6 @@ mod tests {
 
     #[test]
     fn enumerating_without_the_authorization_is_not_an_empty_roster() {
-        // The caller must be able to tell "nobody is connected" from "Multifus
-        // is not allowed to look", so the refusal has to be an error.
         let manager = AccessibilityWindowManager::new();
 
         if manager.authorization() == Ok(Authorization::Denied) {

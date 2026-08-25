@@ -22,13 +22,6 @@ type CharactersScreenProps = Readonly<{
   run: (action: Promise<Snapshot>) => void
 }>
 
-/**
- * The board itself: who is connected, in what order the cycle walks them, and
- * who is out of it.
- *
- * The order of this list is the cycle order, which is why it is dragged rather
- * than configured.
- */
 export const CharactersScreen = ({
   characters,
   run
@@ -113,19 +106,6 @@ type GroupedActionsProps = Readonly<{
   onSet: (gender: Gender, asleep: boolean) => void
 }>
 
-/**
- * The grouped actions of ADR 0004.
- *
- * They are actions and not a group state, and that distinction is the whole
- * design of this strip. Each gender gets both verbs, always, with a label that
- * never moves: a click pushes the veille onto every connected character of that
- * gender, exactly as if each line had been clicked.
- *
- * A single button per gender whose verb flipped with the state of the group
- * would read the aggregate and break on the case the ADR describes: put four men
- * to sleep, wake one from its own row, and the button turns back into
- * « Endormir » with no click left that wakes the other three.
- */
 const GroupedActions = ({ onSet }: GroupedActionsProps) => {
   return (
     <div className="mb-3 flex items-center gap-2.5">
@@ -180,7 +160,6 @@ const GroupedAction = ({ gender, onSet }: GroupedActionProps) => {
   )
 }
 
-/** Its place in the cycle, counting only the characters the cycle stops on. */
 const rankOf = (rows: readonly Character[], character: Character) => {
   if (!character.online || character.asleep) {
     return null

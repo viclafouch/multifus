@@ -1,11 +1,3 @@
-//! Reading and writing the configuration file.
-//!
-//! The store knows one path and does two things with it, [`ConfigStore::load`]
-//! and [`ConfigStore::save`]. It is built either from a directory, which is what
-//! the tests do, or from the application, which is what Multifus does: the path
-//! comes from Tauri's own resolver and never from a string assembled here, so no
-//! machine of anyone's ends up in the source.
-
 use std::fs;
 use std::io;
 use std::io::Write;
@@ -21,30 +13,18 @@ use crate::config::error::ConfigError;
 use crate::config::error::Result;
 use crate::config::settings::Settings;
 
-/// The name of the file inside the system's configuration directory.
 pub const FILE_NAME: &str = "config.json";
 
-/// The file a half-written configuration goes to. It is renamed over the real
-/// one once it is complete, see [`ConfigStore::save`].
 const TEMPORARY_SUFFIX: &str = ".writing";
 
-/// How many names a quarantine tries before giving up, in the improbable case
-/// where several configurations turn out to be unreadable within one second.
 const QUARANTINE_ATTEMPTS: u32 = 100;
 
-/// The configuration file, wherever it lives.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ConfigStore {
     path: PathBuf,
 }
 
 impl ConfigStore {
-    /// The store of a running Multifus: `config.json` in the configuration
-    /// directory the system gives this application.
-    ///
-    /// The directory is `app_config_dir`, which Tauri builds from the bundle
-    /// identifier, and it does not necessarily exist yet. [`ConfigStore::save`]
-    /// creates it, [`ConfigStore::load`] does not need it.
     pub fn for_app<R: Runtime, M: Manager<R>>(app: &M) -> Result<Self> {
         let directory = app
             .path()
@@ -56,43 +36,21 @@ impl ConfigStore {
         Ok(Self::in_directory(directory))
     }
 
-    /// The store for `config.json` inside this directory.
     #[must_use]
     pub fn in_directory(directory: impl AsRef<Path>) -> Self {
         Self::at(directory.as_ref().join(FILE_NAME))
     }
 
-    /// The store for one exact file.
     #[must_use]
     pub fn at(path: impl Into<PathBuf>) -> Self {
         Self { path: path.into() }
     }
 
-    /// Where the configuration is read from and written to.
     #[must_use]
     pub fn path(&self) -> &Path {
         &self.path
     }
 
-    /// Reads the configuration, and always comes back with a usable one.
-    ///
-    /// There is no `Result` here because Multifus starts either way. What can be
-    /// read is read, what cannot be read is replaced by the defaults, and
-    /// [`Loaded::failure`] carries the reason so the interface can say it out
-    /// loud one day rather than have it swallowed.
-    ///
-    /// Three outcomes:
-    ///
-    /// - no file at all, the first launch of someone who has never opened
-    ///   Multifus: the defaults, and no failure, since nothing failed;
-    /// - a file that is not a configuration, truncated by an old crash or
-    ///   hand-edited into invalid JSON: the defaults, the failure, and the file
-    ///   is renamed out of the way rather than overwritten by the first save,
-    ///   see [`Loaded::quarantined`]. Rewriting it in silence would erase a
-    ///   roster the user typed by hand;
-    /// - a file that cannot be read at all, no permission for instance: the
-    ///   defaults and the failure, and nothing is moved. The bytes are still
-    ///   there and may well be perfectly good, so they are left alone.
     #[must_use]
     pub fn load(&self) -> Loaded {
         let bytes = match fs::read(&self.path) {
@@ -126,18 +84,6 @@ impl ConfigStore {
         }
     }
 
-    /// Writes the configuration, without ever leaving less than a whole one
-    /// behind.
-    ///
-    /// The bytes go to a neighbouring file, get flushed to the disk, and only
-    /// then does a rename put them in place. A rename within a directory is the
-    /// one step the two systems perform atomically, so an interruption leaves
-    /// either the previous configuration or the new one, never the empty file
-    /// that a truncate-then-write would leave. The leftover of an interrupted
-    /// save is a stray temporary file, which the next save overwrites.
-    ///
-    /// Multifus is the only writer of this file, so no two saves race for the
-    /// temporary name.
     pub fn save(&self, settings: &Settings) -> Result<()> {
         if let Some(directory) = self.path.parent() {
             fs::create_dir_all(directory).map_err(|error| {
@@ -149,8 +95,6 @@ impl ConfigStore {
             serde_json::to_string_pretty(settings).map_err(|error| ConfigError::Encoding {
                 detail: error.to_string(),
             })?;
-        // The file is meant to be readable, and openable in an editor that
-        // expects a last line like any other.
         json.push('\n');
 
         let temporary = self.temporary_path();
@@ -174,17 +118,6 @@ impl ConfigStore {
         Ok(())
     }
 
-    /// Moves an unreadable configuration aside and returns where it went.
-    ///
-    /// Renaming rather than copying, so that the file is gone from the path the
-    /// next save writes to, and so that nothing is read twice.
-    ///
-    /// **A failure here is reported on its own**, in [`Loaded::quarantine_failure`],
-    /// and it used to be swallowed by an `.ok()`. Two different facts hide behind
-    /// one `None`: nothing needed moving, and the move was refused. The second one
-    /// leaves the unreadable file exactly where the next save writes, which is the
-    /// one thing this whole mechanism exists to prevent, and it costs a roster
-    /// somebody typed by hand.
     fn quarantine(&self) -> Result<PathBuf> {
         let target = self.quarantine_path().ok_or_else(|| ConfigError::Encoding {
             detail: format!(
@@ -198,14 +131,6 @@ impl ConfigStore {
         Ok(target)
     }
 
-    /// A free name next to the configuration, `config.invalid-1754300000.json`
-    /// and so on. Never one that exists, so a quarantine never erases an older
-    /// one.
-    ///
-    /// `None` when every candidate is taken, which the caller turns into a
-    /// failure. It used to fall back to the first candidate instead, which exists
-    /// by definition at that point: the rename then overwrote an older
-    /// quarantine, doing exactly what this method's own promise forbids.
     fn quarantine_path(&self) -> Option<PathBuf> {
         let stem = self
             .path
@@ -235,8 +160,6 @@ impl ConfigStore {
             .find(|candidate| !candidate.exists())
     }
 
-    /// The neighbouring file a save writes to before renaming it into place. In
-    /// the same directory, since a rename is only atomic within one filesystem.
     fn temporary_path(&self) -> PathBuf {
         let mut name = self.path.as_os_str().to_owned();
         name.push(TEMPORARY_SUFFIX);
@@ -245,8 +168,6 @@ impl ConfigStore {
     }
 }
 
-/// Writes the whole content and waits for the disk to have it, so that the
-/// rename that follows swaps in bytes that are really there.
 fn write_whole_file(path: &Path, bytes: &[u8]) -> Result<()> {
     let mut file =
         fs::File::create(path).map_err(|error| ConfigError::io("opening", path, &error))?;
@@ -258,29 +179,15 @@ fn write_whole_file(path: &Path, bytes: &[u8]) -> Result<()> {
         .map_err(|error| ConfigError::io("flushing", path, &error))
 }
 
-/// The outcome of a load: a configuration to run on, and what it cost to get it.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Loaded {
-    /// Always usable. The defaults when there was nothing to read, or nothing
-    /// readable.
     pub settings: Settings,
-    /// Why the stored configuration was not used. `None` on a first launch too:
-    /// having no file yet is not a failure.
     pub failure: Option<ConfigError>,
-    /// Where an unreadable file was set aside, so the interface can point at it
-    /// instead of leaving the user to wonder what became of their roster.
     pub quarantined: Option<PathBuf>,
-    /// Why it could not be set aside, when that is what happened.
-    ///
-    /// A field of its own rather than an absent `quarantined`, because the two
-    /// mean opposite things to the user: nothing was moved because nothing had to
-    /// be, or the unreadable file is still sitting where the next save will write
-    /// over it. Only the second one is worth interrupting somebody for.
     pub quarantine_failure: Option<ConfigError>,
 }
 
 impl Loaded {
-    /// Nothing on disk yet.
     fn first_launch() -> Self {
         Self {
             settings: Settings::default(),
@@ -290,7 +197,6 @@ impl Loaded {
         }
     }
 
-    /// A configuration read as it was written.
     fn read(settings: Settings) -> Self {
         Self {
             settings,
@@ -300,7 +206,6 @@ impl Loaded {
         }
     }
 
-    /// The defaults, and the reason the file was not used.
     fn failed(failure: ConfigError) -> Self {
         Self {
             settings: Settings::default(),
@@ -310,7 +215,6 @@ impl Loaded {
         }
     }
 
-    /// Whether the configuration on screen is the one that was stored.
     #[must_use]
     pub fn is_intact(&self) -> bool {
         self.failure.is_none()
@@ -333,7 +237,6 @@ mod tests {
     use crate::domain::NotificationKind;
     use crate::domain::Roster;
 
-    /// A store on a directory that disappears with the test.
     fn store() -> (TempDir, ConfigStore) {
         let directory = TempDir::new().expect("a temporary directory");
         let store = ConfigStore::in_directory(directory.path());
@@ -341,8 +244,6 @@ mod tests {
         (directory, store)
     }
 
-    /// A configuration where every field has been moved away from its default,
-    /// so that a round trip that drops one of them fails the test.
     fn a_settled_configuration() -> Settings {
         let mut auto_focus = AutoFocus::all(true);
         auto_focus.set(NotificationKind::PrivateMessage, false);
@@ -380,9 +281,6 @@ mod tests {
         }
     }
 
-    /// The same configuration as it comes back from a file: everyone awake and,
-    /// until the first window scan, nobody connected. Anything else in it that
-    /// changes on the way through is a bug this helper does not hide.
     fn as_stored(settings: &Settings) -> Settings {
         let characters = settings
             .roster
@@ -457,8 +355,6 @@ mod tests {
 
     #[test]
     fn the_veille_never_reaches_the_file() {
-        // ADR 0004. The sexes are kept, the veille is not, so a character put
-        // aside weeks ago cannot silently vanish from the cycle today.
         let (_directory, store) = store();
         let settings = Settings {
             roster: Roster::from_characters(vec![
@@ -481,7 +377,6 @@ mod tests {
 
         for character in roster.characters() {
             assert!(!character.asleep, "{} came back asleep", character.nickname);
-            // Nobody is connected until the first window scan says so.
             assert!(!character.online, "{} came back online", character.nickname);
         }
 
@@ -492,8 +387,6 @@ mod tests {
 
     #[test]
     fn a_file_written_before_the_relay_existed_comes_back_with_everybody_relayed() {
-        // Written as bytes on purpose: built from `Settings` it would carry
-        // today's fields and prove nothing about yesterday's file.
         let (_directory, store) = store();
         let written = r#"{
           "roster": {
@@ -554,7 +447,6 @@ mod tests {
             "the corrupt file is moved, not left"
         );
 
-        // And Multifus keeps working: the next save writes a clean file.
         store
             .save(&loaded.settings)
             .expect("the configuration is written after a recovery");
@@ -563,8 +455,6 @@ mod tests {
 
     #[test]
     fn a_truncated_file_is_treated_the_same_way() {
-        // What an interrupted write used to leave behind before the save became
-        // a rename, and what a full disk still leaves behind elsewhere.
         let (_directory, store) = store();
         store
             .save(&a_settled_configuration())
@@ -586,7 +476,6 @@ mod tests {
     #[test]
     fn a_file_from_another_program_is_not_mistaken_for_a_configuration() {
         let (_directory, store) = store();
-        // Valid JSON, no field in common. Nothing here says Multifus.
         fs::write(store.path(), "[1, 2, 3]").expect("the foreign file is written");
 
         let loaded = store.load();
@@ -598,24 +487,15 @@ mod tests {
         assert!(loaded.quarantined.is_some());
     }
 
-    /// Unix only: `set_readonly` on a directory is what stops a rename inside it
-    /// there, and does nothing of the sort on Windows. The behaviour under test
-    /// is the store's and is the same on both, only the way to provoke it is not.
     #[cfg(unix)]
     #[test]
     fn a_file_that_cannot_be_set_aside_says_so_instead_of_looking_untouched() {
         use std::os::unix::fs::PermissionsExt;
 
-        // The failure that used to hide behind an `.ok()`. What a read-only
-        // volume, a synced folder or a tightened permission looks like: the file
-        // is readable, unreadable as a configuration, and cannot be moved out of
-        // the way of the next save.
         let (directory, store) = store();
         let garbage = "{ this is not json";
         fs::write(store.path(), garbage).expect("the corrupt file is written");
 
-        // The modes are spelled out rather than set through `set_readonly`, which
-        // hands out world write access on the way back.
         let readable_only = fs::Permissions::from_mode(0o500);
         let writable_again = fs::Permissions::from_mode(0o700);
 
@@ -623,8 +503,6 @@ mod tests {
 
         let loaded = store.load();
 
-        // Put it back before asserting, so that a failure here still leaves a
-        // directory the temporary one can delete.
         fs::set_permissions(directory.path(), writable_again).expect("the directory is unlocked");
 
         assert!(matches!(
@@ -682,8 +560,6 @@ mod tests {
         let settings = a_settled_configuration();
         store.save(&settings).expect("the configuration is written");
 
-        // What a save killed halfway through leaves: a partial temporary file,
-        // and the previous configuration still whole at its own path.
         let temporary = store.temporary_path();
         fs::write(&temporary, "{ half a configu").expect("the leftover is written");
 
@@ -697,8 +573,6 @@ mod tests {
 
     #[test]
     fn saving_creates_the_configuration_directory_when_it_is_missing() {
-        // `app_config_dir` names a directory, it does not create it, and on a
-        // first launch it usually does not exist.
         let (directory, _) = store();
         let store = ConfigStore::in_directory(directory.path().join("multifus").join("nested"));
 

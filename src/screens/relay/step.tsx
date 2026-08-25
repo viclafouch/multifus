@@ -5,15 +5,10 @@ type StepProps = Readonly<{
   rank: number
   title: string
   body: string
-  /** The page the step opens, for the two that open one. */
   link?: RelayLink
   action?: string
 }>
 
-/**
- * One step of the setup: its rank, what to do, and why when the why surprises.
- * The rank is set the way the roster sets a cycle rank, mono and zero-padded.
- */
 export const Step = ({ rank, title, body, link, action }: StepProps) => {
   return (
     <li className="flex items-center gap-3.5 px-4 py-2">

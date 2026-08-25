@@ -1,5 +1,3 @@
-/** The words of the À propos screen: identity, update, legal notice, reset. */
-
 export const ABOUT_STRINGS = {
   about: {
     title: 'À propos',
@@ -8,8 +6,6 @@ export const ABOUT_STRINGS = {
     updateTitle: 'Mise à jour',
     updateChecking: 'Vérification en cours…',
     updateUpToDate: 'Cette version est la dernière publiée.',
-    // The restart is said here rather than in a confirmation dialog: it is the
-    // one consequence worth knowing before clicking.
     updateAvailable: (version: string) => {
       return `La version ${version} est disponible. Multifus se relancera une fois installée, sans toucher aux clients Dofus.`
     },

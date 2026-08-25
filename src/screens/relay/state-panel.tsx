@@ -5,8 +5,6 @@ import { Switch } from '@/components/ui/switch'
 import { strings } from '@/constants/strings'
 import { setRelayActive } from '@/lib/multifus'
 
-/** One class per state, so the panel names its state once and everything under
- * it reads the tone from there. */
 const TONES =
   'data-[relay=active]:tone-live data-[relay=ready]:tone-idle data-[relay=incomplete]:tone-blocked'
 
@@ -15,10 +13,6 @@ type StatePanelProps = Readonly<{
   run: (action: Promise<Snapshot>) => void
 }>
 
-/**
- * The switch, and the state it is in. First card of the screen, because it is
- * the only question somebody about to leave the desk is actually asking.
- */
 export const StatePanel = ({ relay, run }: StatePanelProps) => {
   const state = liveState(relay)
   const lines = strings.relay.state[state]
@@ -27,8 +21,6 @@ export const StatePanel = ({ relay, run }: StatePanelProps) => {
   return (
     <Panel
       data-relay={state}
-      // `data-relay:` on the tint and not a bare class: `Panel` brings its own
-      // `bg-card` and `border-border`, and only the attribute outweighs them.
       className={`${TONES} transition-row group mb-3 data-relay:panel-toned`}
     >
       <section className="flex items-start gap-5 px-4 py-3.5">
@@ -45,8 +37,6 @@ export const StatePanel = ({ relay, run }: StatePanelProps) => {
             {lines.body}
           </p>
         </div>
-        {/* Never disabled, even with nobody ticked: the badge and the line above
-            already say why it will not take, which a grey switch cannot. */}
         <Switch
           checked={relay.active}
           aria-label={strings.relay.switchLabel}
@@ -58,8 +48,6 @@ export const StatePanel = ({ relay, run }: StatePanelProps) => {
           }}
         />
       </section>
-      {/* The card above says « à l'arrêt, tout est prêt », which a refused
-          keychain turns into a lie. This is the only place that can deny it. */}
       {failure === null ? null : (
         <p
           id="relay-switch"
@@ -73,8 +61,6 @@ export const StatePanel = ({ relay, run }: StatePanelProps) => {
   )
 }
 
-/** Three states and not two: a relay that cannot start and one that is merely
- * stopped are repaired in two different places. */
 const liveState = ({ active, ready }: RelayStatus): RelayLiveState => {
   if (active) {
     return 'active'

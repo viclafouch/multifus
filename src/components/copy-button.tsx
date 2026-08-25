@@ -8,13 +8,6 @@ type CopyButtonProps = Readonly<{
   copiedLabel: string
 }>
 
-/**
- * A quiet icon button that puts text on the clipboard.
- *
- * It confirms by becoming a tick in the one accent colour of this window, for a
- * couple of seconds, and by nothing else: a drawer that raises a banner every
- * time something is copied is a drawer one stops opening.
- */
 export const CopyButton = ({ text, label, copiedLabel }: CopyButtonProps) => {
   const { hasCopied, copy } = useCopy()
 

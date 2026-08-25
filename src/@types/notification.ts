@@ -1,6 +1,3 @@
-/** What the game notifications are made of, on the way to the AutoFocus. */
-
-/** The seven event categories Multifus recognises, in table order. */
 export type NotificationKind =
   | 'challenge'
   | 'combat'

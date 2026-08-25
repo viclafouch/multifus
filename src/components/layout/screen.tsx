@@ -6,10 +6,6 @@ type ScreenProps = Readonly<{
   children: React.ReactNode
 }>
 
-/**
- * The frame every screen sits in, and the one place Fraunces speaks.
- * The header does not scroll away, so the screen one is on is never in doubt.
- */
 export const Screen = ({ title, subtitle, children }: ScreenProps) => {
   return (
     <section className="flex min-h-full flex-col">

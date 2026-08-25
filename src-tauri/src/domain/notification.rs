@@ -1,9 +1,3 @@
-//! Game notifications: who they are for, and what kind of event they carry.
-//!
-//! The title pattern and the whole `NOTIF_TYPES` table are ported as is from
-//! Dracoon, where they have been verified on macOS and on Windows. They are not
-//! to be reinvented nor improved here.
-
 use std::sync::LazyLock;
 
 use regex::Regex;
@@ -11,31 +5,19 @@ use regex::RegexSet;
 use serde::Deserialize;
 use serde::Serialize;
 
-/// The category of a game event Multifus recognises.
-///
-/// The order of the variants is the order of the table below, which is the
-/// order the patterns are tried in. It matters, see [`classify`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum NotificationKind {
-    /// It is this character's turn to play.
     Combat,
-    /// Somebody offers a trade.
     Trade,
-    /// Invitation to a group or to a guild.
     Group,
-    /// A private message.
     PrivateMessage,
-    /// Somebody challenges this character to a duel.
     Challenge,
-    /// Craft: workshop invitation, call for a craftsman, items ready.
     Craft,
-    /// The perceptor is under attack.
     Perceptor,
 }
 
 impl NotificationKind {
-    /// Every kind, in the order the patterns are tried.
     pub const ALL: [Self; 7] = [
         Self::Combat,
         Self::Trade,
@@ -47,8 +29,6 @@ impl NotificationKind {
     ];
 }
 
-/// A system notification emitted by a Dofus client. Its title carries the
-/// nickname of the character it is meant for, its body describes the event.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct GameNotification {
     pub title: String,
@@ -64,43 +44,25 @@ impl GameNotification {
         }
     }
 
-    /// The nickname of the character this notification is for, read in the
-    /// title. `None` when the title is not a Dofus one.
     #[must_use]
     pub fn nickname(&self) -> Option<&str> {
         extract_nickname(&self.title)
     }
 
-    /// The kind of event, read in the body. `None` when no pattern matches.
     #[must_use]
     pub fn kind(&self) -> Option<NotificationKind> {
         classify(&self.body)
     }
 
-    /// There is nothing in the body to classify.
-    ///
-    /// A wording no pattern covers and a body that was never read both leave
-    /// [`GameNotification::kind`] at `None`, and they are repaired in two
-    /// different files: the first by adding a pattern to the table below, the
-    /// second in the walk of `platform::macos`. This is what tells them apart,
-    /// and the journal says which one it was.
     #[must_use]
     pub fn matches_blank_body(&self) -> bool {
         self.body.trim().is_empty()
     }
 }
 
-/// Ported from Dracoon, valid on both systems. A window title looks like
-/// `Nickname - Dofus Retro v1.48.21`, and a notification title uses the same
-/// shape.
 static TITLE_PATTERN: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"(?i)^(.+?)\s*-\s*Dofus").expect("the title pattern is valid"));
 
-/// Reads the nickname at the head of a window or notification title.
-///
-/// Returns `None` when the title does not come from a Dofus client, and also
-/// when the captured nickname is blank, which Dracoon treats as no nickname at
-/// all since its callers test the result for truthiness.
 #[must_use]
 pub fn extract_nickname(title: &str) -> Option<&str> {
     let nickname = TITLE_PATTERN.captures(title)?.get(1)?.as_str().trim();
@@ -112,66 +74,54 @@ pub fn extract_nickname(title: &str) -> Option<&str> {
     }
 }
 
-/// The `NOTIF_TYPES` table of Dracoon, ported pattern for pattern.
-///
-/// One entry per kind, holding every pattern of that kind in French, English
-/// and Spanish. A body belongs to a kind as soon as one of its patterns matches.
-/// Every pattern is case insensitive, as `re.IGNORECASE` was on the Python side.
-///
-/// The order of the entries is part of the data. The private message patterns
-/// only test the head of the body, so a combat body such as
-/// `de Untel : c'est à ton tour de jouer` matches both combat and private
-/// message, and combat wins by coming first.
-// Formatting is left alone so the table stays readable next to the Python one.
 #[rustfmt::skip]
 const NOTIF_TYPES: [(NotificationKind, &[&str]); 7] = [
     (NotificationKind::Combat, &[
-        r"de jouer",         // FR
-        r"turn to play",     // EN
-        r"Le toca jugar a",  // ES
+        r"de jouer",
+        r"turn to play",
+        r"Le toca jugar a",
     ]),
     (NotificationKind::Trade, &[
-        r"te propose de faire un échange",      // FR
-        r"offers a trade",                      // EN
-        r"te propone realizar un intercambio",  // ES
+        r"te propose de faire un échange",
+        r"offers a trade",
+        r"te propone realizar un intercambio",
     ]),
     (NotificationKind::Group, &[
-        r"t['']invite .+rejoindre son groupe",  // FR group
-        r"t['']invite .+rejoindre sa guilde",   // FR guild
-        r"You are invited to join .+'s group",  // EN group
-        r"invites you to join the .+guild",     // EN guild
-        r"te invita a unirte a su grupo",       // ES group
-        r"te invita a unirte a su gremio",      // ES guild
+        r"t['']invite .+rejoindre son groupe",
+        r"t['']invite .+rejoindre sa guilde",
+        r"You are invited to join .+'s group",
+        r"invites you to join the .+guild",
+        r"te invita a unirte a su grupo",
+        r"te invita a unirte a su gremio",
     ]),
     (NotificationKind::PrivateMessage, &[
-        r"^de ",     // FR
-        r"^from ",   // EN
-        r"^desde ",  // ES
+        r"^de ",
+        r"^from ",
+        r"^desde ",
     ]),
     (NotificationKind::Challenge, &[
-        r"te défie",       // FR
-        r"challenges you", // EN
-        r"te desafía",     // ES
+        r"te défie",
+        r"challenges you",
+        r"te desafía",
     ]),
     (NotificationKind::Craft, &[
-        r"fait appel à tes talents d.artisan",  // FR craftsman
-        r"rejoindre son atelier",               // FR workshop
-        r"tous les objets ont été fabriqués",   // FR items ready
-        r"is crying out for your skills",           // EN craftsman
-        r"You are invited to join .+'s workshop",   // EN workshop
-        r"All items have been created!",            // EN items ready
-        r"solicita tus talentos de artesano",       // ES craftsman
-        r"te invita a pasarte por su taller",       // ES workshop
-        r"¡Todos los objetos han sido fabricados!", // ES items ready
+        r"fait appel à tes talents d.artisan",
+        r"rejoindre son atelier",
+        r"tous les objets ont été fabriqués",
+        r"is crying out for your skills",
+        r"You are invited to join .+'s workshop",
+        r"All items have been created!",
+        r"solicita tus talentos de artesano",
+        r"te invita a pasarte por su taller",
+        r"¡Todos los objetos han sido fabricados!",
     ]),
     (NotificationKind::Perceptor, &[
-        r"percepteur.+est attaqué en",              // FR
-        r"The perceptor .+is attacked in",          // EN
-        r"El recaudador .+está siendo atacado en",  // ES
+        r"percepteur.+est attaqué en",
+        r"The perceptor .+is attacked in",
+        r"El recaudador .+está siendo atacado en",
     ]),
 ];
 
-/// The table above compiled once, one set of patterns per kind.
 static MATCHERS: LazyLock<Vec<(NotificationKind, RegexSet)>> = LazyLock::new(|| {
     NOTIF_TYPES
         .iter()
@@ -184,11 +134,6 @@ static MATCHERS: LazyLock<Vec<(NotificationKind, RegexSet)>> = LazyLock::new(|| 
         .collect()
 });
 
-/// Reads the kind of event out of a notification body.
-///
-/// The kinds are tried in table order and the first one whose patterns match
-/// wins, as in Dracoon. `None` means no pattern matched, and Multifus focuses
-/// nothing.
 #[must_use]
 pub fn classify(body: &str) -> Option<NotificationKind> {
     MATCHERS
@@ -214,7 +159,6 @@ mod tests {
 
     #[test]
     fn a_nickname_keeps_the_characters_dofus_allows() {
-        // The dash inside a nickname is kept, only the one before `Dofus` splits.
         assert_eq!(
             extract_nickname("Alpha-Bravo - Dofus Retro"),
             Some("Alpha-Bravo")
@@ -232,14 +176,6 @@ mod tests {
 
     #[test]
     fn a_client_disconnected_for_inactivity_invents_nobody() {
-        // Measured on a real client left idle: the window stays, the dialog says
-        // « Tu es resté trop longtemps inactif », and the title loses the
-        // nickname without gaining one of its own. A title such as
-        // `Connexion - Dofus Retro` would have put a character named
-        // « Connexion » in the roster, and it is not what happens.
-        //
-        // The version moves on its own, so the shape is what is asserted: no
-        // dash before `Dofus`, therefore no nickname.
         assert_eq!(extract_nickname("Dofus Retro v1.48.21"), None);
         assert_eq!(extract_nickname("Dofus Retro v9.99.99"), None);
     }
@@ -406,7 +342,6 @@ mod tests {
 
     #[test]
     fn combat_wins_over_the_private_message_it_also_looks_like() {
-        // Both `de jouer` and `^de ` match this body. The table order decides.
         assert_eq!(
             classify("de Untel : a ton tour de jouer"),
             Some(NotificationKind::Combat)

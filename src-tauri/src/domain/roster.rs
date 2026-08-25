@@ -1,18 +1,9 @@
-//! The roster and everything it can do: cycle, veille, swap.
-//!
-//! Every function here is pure logic over the in-memory roster. Nothing in this
-//! file talks to a window, a notification, or the system.
-
 use serde::Deserialize;
 use serde::Serialize;
 
 use super::character::Character;
 use super::character::Gender;
 
-/// Every character Multifus knows about, connected or not.
-///
-/// The order of the characters is the cycle order, the one the user rearranges
-/// by drag and drop.
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Roster {
     characters: Vec<Character>,
@@ -31,7 +22,6 @@ impl Roster {
         Self { characters }
     }
 
-    /// The characters, in cycle order.
     #[must_use]
     pub fn characters(&self) -> &[Character] {
         &self.characters
@@ -67,8 +57,6 @@ impl Roster {
             .find(|character| character.nickname == nickname)
     }
 
-    /// Appends a character at the end of the cycle. Returns `false` and changes
-    /// nothing when the nickname is already known.
     pub fn add(&mut self, character: Character) -> bool {
         if self.get(&character.nickname).is_some() {
             return false;
@@ -79,16 +67,12 @@ impl Roster {
         true
     }
 
-    /// Removes a character from the roster, which only ever happens on an
-    /// explicit user action.
     pub fn remove(&mut self, nickname: &str) -> Option<Character> {
         let index = self.position(nickname)?;
 
         Some(self.characters.remove(index))
     }
 
-    /// Marks whether a window currently bears this nickname. Returns `false`
-    /// when the nickname is unknown.
     pub fn set_online(&mut self, nickname: &str, online: bool) -> bool {
         match self.get_mut(nickname) {
             Some(character) => {
@@ -100,14 +84,6 @@ impl Roster {
         }
     }
 
-    /// Rewrites the cycle order, which is what the drag and drop of the
-    /// interface produces.
-    ///
-    /// `order` is a list of nicknames. The characters it names take that order,
-    /// and everyone it does not name keeps their relative order at the end. So a
-    /// stale list, one built before a scan discovered a new character, moves what
-    /// the user dragged and loses nobody. A nickname that is not in the roster is
-    /// ignored, and a nickname listed twice only counts once.
     pub fn reorder(&mut self, order: &[String]) {
         let mut ordered = Vec::with_capacity(self.characters.len());
 
@@ -136,20 +112,12 @@ impl Roster {
         self.characters = ordered;
     }
 
-    /// The characters the cycle stops on, in order.
     pub fn in_cycle(&self) -> impl DoubleEndedIterator<Item = &Character> {
         self.characters
             .iter()
             .filter(|character| character.is_in_cycle())
     }
 
-    /// The next character in the cycle after `current`, wrapping around and
-    /// skipping the asleep and the offline ones.
-    ///
-    /// Returns `None` when nobody is in the cycle. Returns `current` itself
-    /// when it is the only one left. An unknown `current` starts the search at
-    /// the head of the roster, so a shortcut fired from a window Multifus does
-    /// not know about still goes somewhere sensible.
     #[must_use]
     pub fn next_in_cycle(&self, current: &str) -> Option<&Character> {
         match self.position(current) {
@@ -158,8 +126,6 @@ impl Roster {
         }
     }
 
-    /// The previous character in the cycle before `current`. Mirror of
-    /// [`Roster::next_in_cycle`].
     #[must_use]
     pub fn previous_in_cycle(&self, current: &str) -> Option<&Character> {
         match self.position(current) {
@@ -168,9 +134,6 @@ impl Roster {
         }
     }
 
-    /// Walks the roster away from `index`, wrapping, and stops on the first
-    /// character in the cycle. `index` itself is visited last, so a lone awake
-    /// character is returned rather than nothing.
     fn scan_from(&self, index: usize, direction: Direction) -> Option<&Character> {
         let len = self.characters.len();
 
@@ -183,9 +146,6 @@ impl Roster {
             .find(|character| character.is_in_cycle())
     }
 
-    /// Puts an awake character to sleep, or wakes an asleep one up. Returns the
-    /// new state, or `None` when the nickname is unknown or the character is
-    /// offline, since an offline character is not sleepable.
     pub fn toggle_asleep(&mut self, nickname: &str) -> Option<bool> {
         let character = self.get_mut(nickname)?;
 
@@ -198,9 +158,6 @@ impl Roster {
         Some(character.asleep)
     }
 
-    /// Pushes the same veille state on every online character of one gender,
-    /// exactly as if each line had been clicked. Returns how many characters
-    /// changed state.
     pub fn set_asleep_for_gender(&mut self, gender: Gender, asleep: bool) -> usize {
         let mut changed = 0;
 
@@ -219,22 +176,11 @@ impl Roster {
         changed
     }
 
-    /// Puts one gender asleep and wakes the other one up.
-    ///
-    /// Characters with no gender assigned are left alone, so are the offline
-    /// ones. See [`Roster::swap`] for the shortcut that picks the side itself.
     pub fn swap_to(&mut self, awake: Gender) {
         self.set_asleep_for_gender(awake, false);
         self.set_asleep_for_gender(awake.other(), true);
     }
 
-    /// Swaps from the gender currently awake to the other one, and returns the
-    /// gender now awake.
-    ///
-    /// The awake side is the one with at least one awake online character, males
-    /// first when both qualify. Returns `None` when no online character has a
-    /// gender, in which case there is nothing to swap and the roster is left
-    /// untouched.
     pub fn swap(&mut self) -> Option<Gender> {
         let has_gender = self
             .characters
@@ -256,7 +202,6 @@ impl Roster {
         Some(awake)
     }
 
-    /// Whether at least one online character of this gender is awake.
     #[must_use]
     pub fn has_awake(&self, gender: Gender) -> bool {
         self.characters
@@ -264,8 +209,6 @@ impl Roster {
             .any(|character| character.gender == Some(gender) && character.is_in_cycle())
     }
 
-    /// Puts a character in or out of the relay. Returns `false` when the nickname
-    /// is unknown. No online guard, unlike `toggle_asleep`: this choice is kept.
     pub fn set_relayed(&mut self, nickname: &str, relayed: bool) -> bool {
         match self.get_mut(nickname) {
             Some(character) => {
@@ -277,27 +220,21 @@ impl Roster {
         }
     }
 
-    /// The characters the relay carries, in roster order.
     pub fn relayed(&self) -> impl DoubleEndedIterator<Item = &Character> {
         self.characters.iter().filter(|character| character.relayed)
     }
 
-    /// Whether anybody at all is ticked. The relay refuses to switch on when this
-    /// is false, which is the one guard against the trap of ADR 0011.
     #[must_use]
     pub fn has_relayed(&self) -> bool {
         self.relayed().next().is_some()
     }
 
-    /// Whether the relay still has something to hear right now. What the display
-    /// awake follows, rather than the switch.
     #[must_use]
     pub fn has_relayed_online(&self) -> bool {
         self.characters.iter().any(Character::is_relayed_online)
     }
 }
 
-/// Which way [`Roster::scan_from`] walks the roster.
 #[derive(Debug, Clone, Copy)]
 enum Direction {
     Forward,
@@ -555,8 +492,6 @@ mod tests {
 
     #[test]
     fn reordering_keeps_everyone_the_order_forgot() {
-        // What a list built just before a scan discovered someone looks like.
-        // The drag is honoured and nobody falls out of the roster.
         let mut roster = roster(vec![
             Character::new("Alpha").with_gender(Gender::Male).asleep(),
             Character::new("Bravo"),
@@ -572,7 +507,6 @@ mod tests {
             .collect::<Vec<_>>();
 
         assert_eq!(order, vec!["Bravo", "Alpha", "Charlie"]);
-        // The characters are moved, not rebuilt: what they carry survives.
         assert!(roster.get("Alpha").unwrap().asleep);
         assert_eq!(roster.get("Alpha").unwrap().gender, Some(Gender::Male));
     }
@@ -622,7 +556,6 @@ mod tests {
 
     #[test]
     fn an_offline_character_can_still_be_ticked_and_unticked() {
-        // Unlike `toggle_asleep`, which refuses an offline character.
         let mut roster = roster(vec![Character::new("Alpha").offline()]);
 
         assert!(roster.set_relayed("Alpha", false));
@@ -631,7 +564,6 @@ mod tests {
 
     #[test]
     fn the_relay_stops_having_anything_to_hear_when_the_last_one_disconnects() {
-        // The quarter of an hour, seen from the roster.
         let mut roster = roster(vec![
             Character::new("Alpha"),
             Character::new("Bravo").not_relayed(),

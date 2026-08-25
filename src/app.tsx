@@ -16,13 +16,6 @@ import { RelayScreen } from '@/screens/relay'
 import { SettingsScreen } from '@/screens/settings-screen'
 import { ShortcutsScreen } from '@/screens/shortcuts'
 
-/**
- * The window: a rail on the left, a screen in the middle, a journal underneath.
- *
- * It is meant to be a board one consults, not a panel one visits. Everything
- * that says whether Multifus is working is visible without a click; the settings
- * are further down the rail because they are set once and then forgotten.
- */
 export const App = () => {
   const { snapshot, run } = useMultifus()
   const [screen, setScreen] = React.useState<ScreenName>('characters')
@@ -129,9 +122,6 @@ const CurrentScreen = ({ screen, snapshot, run }: CurrentScreenProps) => {
     )
   }
 
-  // The roster is the only screen that needs the system's permission, so it is
-  // the only one the explanation replaces. The other three are set up while
-  // macOS thinks about it.
   return snapshot.authorization.granted ? (
     <CharactersScreen characters={snapshot.characters} run={run} />
   ) : (
@@ -139,10 +129,6 @@ const CurrentScreen = ({ screen, snapshot, run }: CurrentScreenProps) => {
   )
 }
 
-/**
- * Atmosphere, and nothing else: one warm light from the top left and a film of
- * grain over the whole window. Both sit behind everything and take no clicks.
- */
 const Backdrop = () => {
   return (
     <div aria-hidden className="pointer-events-none fixed inset-0 -z-10">
@@ -156,5 +142,4 @@ const quarantinedPath = (problem: ConfigProblem) => {
   return problem.kind === 'malformed' ? problem.quarantined : null
 }
 
-/** The Rust side journals what the system refused to open. Nothing to add. */
 const ignoreOpenFailure = () => {}

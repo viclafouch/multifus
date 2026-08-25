@@ -1,11 +1,5 @@
-/** What a combination fires, compared. The words it is worth are in `wording.ts`. */
-
 import type { Binding } from '@/@types/shortcuts'
 
-/**
- * Whether two bindings name the same thing, the family included. One capture at
- * a time for the whole screen hangs on this, whichever family is capturing.
- */
 export const matchIsSameBinding = (binding: Binding | null, other: Binding) => {
   if (binding === null) {
     return false

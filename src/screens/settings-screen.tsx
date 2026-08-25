@@ -21,7 +21,6 @@ type SettingsScreenProps = Readonly<{
   run: (action: Promise<Snapshot>) => void
 }>
 
-/** What Multifus does without being asked, set once and then forgotten. */
 export const SettingsScreen = ({
   startAtLogin,
   maximizeOnLaunch,

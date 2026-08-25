@@ -1,12 +1,3 @@
-//! Multifus: a multi-account window manager for Dofus Retro.
-//!
-//! Four modules, and the dependency runs one way through them. [`domain`] is the
-//! business core and is pure: no system call, no Tauri, no file. [`platform`] is
-//! the boundary with the operating system, windows and notifications, one
-//! implementation per system. [`config`] is the file that survives a restart.
-//! [`app`] is where the three meet Tauri, and it is the only one that knows the
-//! interface exists.
-
 pub mod app;
 pub mod config;
 pub mod domain;
@@ -16,59 +7,19 @@ use tauri_plugin_autostart::MacosLauncher;
 
 use crate::app::main_window;
 
-/// Builds Multifus and hands it to the event loop.
-///
-/// No mobile entry point: this application targets macOS and Windows and
-/// nothing else, see perimetre.md.
-///
-/// Nothing prevents the exit, and the one thing that answers it does not delay
-/// it by choice: the window is never destroyed, only hidden, so the « last
-/// window closed » exit this application would have to prevent never happens,
-/// and preventing it anyway would take `Cmd+Q` away from a macOS user for no
-/// gain. What ends Multifus is the Quit item of the system tray, or the system's
-/// own quit, and both are meant to. On the way out, the clients are handed their
-/// titles back, see [`app::runtime::on_run_event`].
-///
-/// The run loop is given a callback, which is why this builds and runs in two
-/// steps rather than calling `run` on the builder. It answers two events, the
-/// Dock icon being clicked and the process ending, see
-/// [`app::runtime::on_run_event`].
 pub fn run() {
     tauri::Builder::default()
-        // First, so that everything the setup below writes is already on disk.
-        // Nothing of it is exposed to the webview: the capability grants no
-        // `log:` permission, because the journal is Multifus's own account of
-        // what it did and not a channel React can write into. See
-        // `app::journal_file`.
         .plugin(app::journal_file::plugin())
-        // Read from Rust only, for the one line of the journal that says which
-        // operating system this was. No permission granted either.
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_opener::init())
-        // No shortcut is declared here and no handler either: which combinations
-        // to lay down is read from the configuration, and each one carries its
-        // own handler so that a key press already knows which action it is. See
-        // `app::shortcuts`.
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
-        // The one argument Multifus is ever started with, and the only thing
-        // that tells a session start apart from a launch by hand. What each of
-        // the two shows is `app::main_window`'s to say; the launcher that
-        // carries the argument is `app::autostart`.
         .plugin(tauri_plugin_autostart::init(
             MacosLauncher::LaunchAgent,
             Some(vec![main_window::FROM_SESSION_ARG]),
         ))
-        // Nothing of the updater is exposed to the webview: the check and the
-        // install are commands of Multifus, so the window and the system tray
-        // read the one state that travels in the snapshot. See `app::update`.
         .plugin(tauri_plugin_updater::Builder::new().build())
         .setup(|tauri_app| {
-            // The one failure that stops Multifus here: no configuration
-            // directory at all means there is nowhere to ever write. Everything
-            // else a load can hit comes back inside the snapshot instead, so
-            // that the user reads why their roster is empty rather than
-            // wondering.
             app::setup(tauri_app.handle())?;
 
             Ok(())

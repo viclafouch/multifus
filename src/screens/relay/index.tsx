@@ -24,10 +24,6 @@ type RelayScreenProps = Readonly<{
   run: (action: Promise<Snapshot>) => void
 }>
 
-/**
- * Where the relay is set up, the one screen a feature needs opened once. The
- * cards come in the order of the questions: the switch, the bot, the essai.
- */
 export const RelayScreen = ({ relay, characters, run }: RelayScreenProps) => {
   return (
     <Screen title={strings.relay.title} subtitle={strings.relay.subtitle}>

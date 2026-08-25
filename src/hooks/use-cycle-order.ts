@@ -10,22 +10,14 @@ type UseCycleOrderParams = {
   readonly run: (action: Promise<Snapshot>) => void
 }
 
-/**
- * The cycle order while it is being rearranged: the roster the Rust side stored,
- * except while a row is dragged, when a local copy follows the pointer.
- */
 export const useCycleOrder = ({ characters, run }: UseCycleOrderParams) => {
   const [order, setOrder] = React.useState<readonly string[] | null>(null)
   const [dragged, setDragged] = React.useState<string | null>(null)
   const [known, setKnown] = React.useState(characters)
 
-  // A new roster drops the local copy during render and not in an effect: an
-  // effect would clear it a frame later and the list would visibly jump back.
   if (known !== characters) {
     setKnown(characters)
 
-    // A scan landing mid-drag keeps the copy: pulling a row out from under the
-    // pointer is worse than being one scan behind.
     if (dragged === null) {
       setOrder(null)
     }

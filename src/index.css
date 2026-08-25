@@ -2,14 +2,6 @@
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
 
-/* Three faces, three jobs.
-   Inter carries the dense interface, where 12 and 13 pixels have to stay legible
-   in a small window. IBM Plex Mono carries everything technical, the cycle ranks,
-   the key caps, the journal and the file paths, so that a column of figures reads
-   as a column. Fraunces speaks only where there is room to breathe, the screen
-   titles and the empty states: it is the one warm, hand-cut voice in an otherwise
-   instrumental board, and it is what keeps Multifus from looking like a settings
-   dialog. */
 @import '@fontsource-variable/inter';
 @import '@fontsource-variable/fraunces/wght.css';
 @import '@fontsource/ibm-plex-mono/400.css';
@@ -61,9 +53,6 @@
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
 
-  /* The type scale of this window, and the whole of it. Nine steps, named after
-     what they carry rather than after a size, so that a screen picks a role and
-     not a pixel count. Anything that needs a tenth step needs a reason first. */
   --text-micro: 0.6rem;
   --text-micro--line-height: 1.1;
   --text-mini: 0.65625rem;
@@ -83,8 +72,6 @@
   --text-title: 1.6875rem;
   --text-title--line-height: 1;
 
-  /* The fixed pieces of the layout. They are measurements of this window, not
-     of a scale, which is why they are named after the thing they measure. */
   --spacing-rail: 196px;
   --spacing-row: 54px;
   --spacing-journal: 184px;
@@ -95,23 +82,12 @@
   --spacing-glyph: 15px;
   --spacing-mark: 18px;
 
-  /* Wide for the uppercase micro labels, tight for the display titles. */
   --tracking-micro: 0.12em;
   --tracking-title: -0.012em;
 
-  /* A centred blurb wants to break earlier than a left-aligned paragraph. */
   --container-blurb: 46ch;
 }
 
-/* Multifus never shows a light theme: it lives on a desktop next to game clients
-   at night. The palette therefore sits on `:root` once, and `.dark` stays on the
-   document only so that the `dark:` variants shadcn ships keep applying.
-
-   The hue is a warm near-black rather than a neutral grey, and every accent is
-   the same ochre. That ochre is rationed on purpose: it means one thing, this
-   character is connected and in the cycle. Anything asleep, offline or off loses
-   its colour entirely, so the board can be read at a glance from across a
-   desk. */
 :root {
   --background: oklch(0.158 0.008 66);
   --foreground: oklch(0.932 0.006 84);
@@ -146,9 +122,6 @@
   --sidebar-border: oklch(0.85 0.02 80 / 11%);
   --sidebar-ring: oklch(0.796 0.142 71 / 55%);
 
-  /* The three states of the relay, and the one place this window spends a colour
-     that is not the ochre. It earns the exception: this is the panel one glances
-     at on the way out of the room, and « à l'arrêt » has to be unmissable. */
   --relay-live: oklch(0.79 0.16 152);
   --relay-idle: oklch(0.79 0.16 58);
   --relay-blocked: oklch(0.7 0.19 25);
@@ -162,9 +135,6 @@
   html {
     @apply font-sans;
 
-    /* Fraunces is a variable face with a soft and a wonky axis. Softened and
-       slightly wonky is what gives it its hand-cut warmth; left at the defaults
-       it reads like any other transitional serif. */
     font-variation-settings:
       'SOFT' 24,
       'WONK' 1;
@@ -173,9 +143,6 @@
   body {
     @apply overflow-hidden bg-background text-foreground antialiased;
 
-    /* A desktop window, not a document: nothing here is meant to be selected by
-       dragging across it, and an accidental selection while reordering the
-       roster is only ever noise. Text that is worth copying opts back in. */
     user-select: none;
   }
 
@@ -183,8 +150,6 @@
     @apply bg-primary/25;
   }
 
-  /* A thin scrollbar, so a list that overflows says so without taking a column
-     of the window with it. */
   ::-webkit-scrollbar {
     width: 9px;
     height: 9px;
@@ -207,10 +172,6 @@
   user-select: text;
 }
 
-/* The atmosphere: a very faint film of grain over the whole window, and one warm
-   light coming from the top left. Both are decoration and neither is ever
-   interactive; together they stop a flat dark rectangle from reading as an
-   unfinished page. */
 @utility grain {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
   opacity: 0.035;
@@ -225,30 +186,22 @@
   );
 }
 
-/* The relief of a key cap, one hairline under it. */
 @utility keycap {
   box-shadow: 0 1px 0 0 var(--border);
 }
 
-/* A roster row lights up on hover, dims when its client is gone, and lifts while
-   it is dragged. Only those three properties move: transitioning everything
-   would drag the layout along with them. */
 @utility transition-row {
   transition-property: background-color, border-color, opacity, box-shadow;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 0.2s;
 }
 
-/* The seven AutoFocus rows fade when the master is off. Only the opacity moves:
-   they stay live, since they are what the AutoFocus comes back to. */
 @utility transition-suspend {
   transition-property: opacity;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 0.2s;
 }
 
-/* The lamp of a connected, awake character. It breathes, slowly, because a board
-   whose lights are all dead still is a board one stops looking at. */
 @keyframes lamp-breath {
   0%,
   100% {
@@ -273,15 +226,6 @@
   animation: lamp-breath 3.4s ease-in-out infinite;
 }
 
-/* The roster comes in from just below, one row after the other. It is the only
-   orchestrated moment in the application, and it is there so that opening the
-   window feels like a board powering up rather than a page repainting. Each row
-   sets its own delay inline, since only the row knows its rank.
-
-   The animation ends on the opacity the row asks for and not on 1: an offline
-   row is dimmed by its own opacity, and a keyframe that always landed on full
-   strength lit it up for the length of the animation before snapping it back to
-   grey on the last frame. */
 @keyframes rise {
   from {
     opacity: 0;
@@ -300,8 +244,6 @@
   animation: rise 0.3s cubic-bezier(0.4, 0, 0.2, 1) backwards;
 }
 
-/* The state of the relay, in colour. The panel names its state once, in a data
-   attribute, and these three set the tone every piece below reads from. */
 @utility tone-live {
   --tone: var(--relay-live);
 }
@@ -314,22 +256,17 @@
   --tone: var(--relay-blocked);
 }
 
-/* The badge that carries the state: the colour full strength on the text, weak
-   on the border, weaker still behind it. */
 @utility toned {
   color: var(--tone);
   border-color: color-mix(in oklch, var(--tone), transparent 55%);
   background-color: color-mix(in oklch, var(--tone), transparent 86%);
 }
 
-/* And the panel around it, tinted just enough to be read from the doorway. */
 @utility panel-toned {
   border-color: color-mix(in oklch, var(--tone), transparent 74%);
   background-color: color-mix(in oklch, var(--tone), transparent 94%);
 }
 
-/* The dot of a relay that is running. It breathes like the lamps of the roster,
-   since a state that is live is the one thing worth moving on this screen. */
 @keyframes tone-breath {
   0%,
   100% {
@@ -345,7 +282,6 @@
   animation: tone-breath 3.4s ease-in-out infinite;
 }
 
-/* A row that is still there but out of service: offline for the roster. */
 @utility dimmed {
   --rise-opacity: 0.55;
 

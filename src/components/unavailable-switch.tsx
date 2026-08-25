@@ -10,11 +10,6 @@ type UnavailableSwitchProps = Readonly<{
   reason: string
 }>
 
-/**
- * A réglage this system cannot offer: greyed, and saying why on hover.
- * Never on, which is what the screen shows whatever the configuration says.
- * The switch takes no pointer, or WebKit would swallow the hover it sits on.
- */
 export const UnavailableSwitch = ({
   label,
   reason

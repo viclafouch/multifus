@@ -1,5 +1,3 @@
-/** The words of the Paramètres screen: what Multifus does without being asked. */
-
 import { IS_APPLE } from '@/constants/keyboard'
 
 export const SETTINGS_STRINGS = {

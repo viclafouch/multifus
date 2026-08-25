@@ -4,15 +4,10 @@ import { IconTile } from '@/components/layout/icon-tile'
 type FieldRowProps = Readonly<{
   label: string
   description: string
-  /** A glyph in a bordered tile, for a list whose rows need telling apart. */
   icon?: React.ReactNode
   children: React.ReactNode
 }>
 
-/**
- * One setting: what it is on the left, what it is set to on the right.
- * The description says what the setting gives when it is on, in one line.
- */
 export const FieldRow = ({
   label,
   description,

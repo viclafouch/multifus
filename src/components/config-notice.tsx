@@ -11,14 +11,6 @@ type ConfigNoticeProps = Readonly<{
   onDismiss: () => void
 }>
 
-/**
- * What Multifus says when its configuration file did not come back.
- *
- * The failure mode this replaces is the worst one the application has: a roster
- * that opens empty, weeks of assigned genders gone, and nothing on screen to say
- * why. So the band sits above every screen, it names the file, and when the file
- * was set aside it offers to show where it went.
- */
 export const ConfigNotice = ({
   problem,
   quarantined,

@@ -1,9 +1,5 @@
 import { cn } from '@/lib/utils'
 
-/**
- * Three states and one colour: the ochre goes to `live` alone, `asleep` is a
- * hollow ring and `offline` a dead dot.
- */
 export type LampState = 'asleep' | 'live' | 'offline'
 
 type LampProps = Readonly<{
@@ -11,10 +7,6 @@ type LampProps = Readonly<{
   className?: string
 }>
 
-/**
- * The status light of this window, on a character or on the relay. It carries no
- * label: whatever it sits next to spells the state out right beside it.
- */
 export const Lamp = ({ state, className }: LampProps) => {
   return (
     <span

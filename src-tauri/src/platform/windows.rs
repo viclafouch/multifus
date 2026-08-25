@@ -1,9 +1,3 @@
-//! The Windows side of the boundary.
-//!
-//! Windows and their titles come from `EnumWindows`, focus from
-//! `SetForegroundWindow` behind an `AttachThreadInput` attach, and toasts from
-//! the WinRT `UserNotificationListener`, which also lets one be removed.
-
 use std::collections::HashMap;
 use std::collections::HashSet;
 use std::ffi::c_void;
@@ -111,50 +105,22 @@ use crate::platform::window::WindowId;
 use crate::platform::window::WindowManager;
 use crate::platform::Authorization;
 
-/// The executable a Dofus Retro client runs under, read off a real one.
-///
-/// Compared by file name and never by path, which the installation moves.
 const DOFUS_EXECUTABLE: &str = "Dofus Retro.exe";
 
-/// Room for a process path, long paths included.
 const PROCESS_PATH_UNITS: usize = 1024;
 
-/// What an `EnumWindows` callback returns to be handed the next window.
 const CONTINUE_ENUMERATION: BOOL = BOOL(1);
 
-/// How long the watcher waits between two reads of the notification centre.
-///
-/// Shorter than the roster sweep on purpose: polling is the only route here, so
-/// the whole delay of the AutoFocus is this number. See lot B of the plan.
 const POLL_INTERVAL: Duration = Duration::from_millis(500);
 
-/// How long the watcher sleeps between two turns at its message queue.
 const PUMP_INTERVAL: Duration = Duration::from_millis(25);
 
-/// How long a title change waits on a client that is not answering.
 const TITLE_TIMEOUT_MS: u32 = 100;
 
-/// A visible window of a Dofus client, and the title it bears right now.
 type TitledWindow = (WindowId, String);
 
-/// Reads windows and changes focus through the Win32 window API.
-///
-/// A [`WindowId`] here carries an `HWND`, and a client can own several windows,
-/// unlike macOS where one process is one client. Only the ones whose title
-/// yields a nickname become a [`GameWindow`], which settles the difference.
-///
-/// **Nothing is remembered here.** Reading a nickname out of a title Multifus
-/// wrote goes through no memory, see [`GameWindow::from_client_title`], and
-/// putting one back goes through one string the core keeps across launches, see
-/// [`title_suffix`].
 #[derive(Debug, Default)]
 pub struct Win32WindowManager {
-    /// A window of the desktop bore a short title as of the last sweep.
-    ///
-    /// Read off the screen and never off the réglage, which is what keeps
-    /// unticking from taking a roster offline: a window Multifus cannot put back
-    /// — one a client refuses to rename — is one this rule stays the only reader
-    /// of.
     short: AtomicBool,
 }
 
@@ -164,7 +130,6 @@ impl Win32WindowManager {
         Self::default()
     }
 
-    /// Whether the sweep may read a bare title as a nickname.
     fn shortens(&self) -> bool {
         self.short.load(Ordering::Relaxed)
     }
@@ -172,8 +137,6 @@ impl Win32WindowManager {
 
 impl WindowManager for Win32WindowManager {
     fn authorization(&self) -> Result<Authorization> {
-        // Reading a title and changing the focus need no authorization here. The
-        // method stays on the interface because macOS does need one.
         Ok(Authorization::Granted)
     }
 
@@ -195,8 +158,6 @@ impl WindowManager for Win32WindowManager {
     }
 
     fn foreground_game_window(&self) -> Result<Option<GameWindow>> {
-        // The one window the system says is in front, put through the same
-        // filter, so a shortcut costs no sweep.
         let Some((id, title)) = titled_window(unsafe { GetForegroundWindow() }) else {
             return Ok(None);
         };
@@ -214,8 +175,6 @@ impl WindowManager for Win32WindowManager {
         let handle = live_game_window(window)?;
         let _attached = AttachedInput::new(handle);
 
-        // Restoring belongs inside the attach: a window pulled out of the
-        // taskbar and left behind has not been brought to the front.
         if unsafe { IsIconic(handle) }.as_bool() {
             let _ = unsafe { ShowWindow(handle, SW_RESTORE) };
         }
@@ -243,16 +202,12 @@ impl WindowManager for Win32WindowManager {
     fn maximize(&self, window: WindowId) -> Result<()> {
         let handle = live_game_window(window)?;
 
-        // Posted to the client's own thread: `ShowWindow` would wait on the
-        // message pump of a client that is precisely in the middle of loading.
         let _ = unsafe { ShowWindowAsync(handle, SW_MAXIMIZE) };
 
         Ok(())
     }
 
     fn apply_short_titles(&self, short: bool, suffix: Option<&str>) -> Result<Option<String>> {
-        // Nothing asked for, and no short title on the desktop as of last turn:
-        // the state every launch starts on, and there is nothing to sweep for.
         if !short && !self.shortens() {
             return Ok(None);
         }
@@ -265,8 +220,6 @@ impl WindowManager for Win32WindowManager {
 
         match &written {
             Ok(report) => self.short.store(report.on_screen, Ordering::Relaxed),
-            // A write Multifus did not see go through leaves a desktop it has
-            // not confirmed, so it keeps reading short titles until it has.
             Err(_) => self.short.store(true, Ordering::Relaxed),
         }
 
@@ -274,11 +227,6 @@ impl WindowManager for Win32WindowManager {
     }
 }
 
-/// Cuts every game window down to its nickname, or puts back what the clients
-/// had written, and tallies what the turn saw.
-///
-/// One refusal never stops the windows that come after it, and the first one is
-/// what comes back.
 fn write_titles(
     windows: &[TitledWindow],
     short: bool,
@@ -288,8 +236,6 @@ fn write_titles(
     let mut failure = None;
 
     for (id, title) in windows {
-        // Learned whether or not this window is renamed: any title a client
-        // wrote teaches what it writes after a nickname.
         report.suffix = report
             .suffix
             .take()
@@ -313,21 +259,11 @@ fn write_titles(
     failure.map_or(Ok(report), Err)
 }
 
-/// Puts the bare nickname in a window's title bar, once, and says whether the
-/// window bears one now.
-///
-/// A title Multifus has already written is left alone, so the sweep costs one
-/// comparison per window. Anything else is read afresh, which is how a client
-/// that renames its own window — a character changed, the quarter-hour
-/// disconnection — is served again on the turn that follows.
 fn shorten(id: WindowId, title: &str) -> Result<bool> {
     if matches_short_title(title).is_some() {
         return Ok(true);
     }
 
-    // The login screen and the loader, which have no character to name. And
-    // never a nickname the rule would not hand back: writing one no reader can
-    // find would take the character offline.
     let Some(nickname) =
         extract_nickname(title).filter(|nickname| matches_short_title(nickname).is_some())
     else {
@@ -339,12 +275,6 @@ fn shorten(id: WindowId, title: &str) -> Result<bool> {
     Ok(true)
 }
 
-/// Puts back the title the client had written, and says whether the window
-/// still bears a short title.
-///
-/// A window that never was short is left alone. One whose suffix nobody has been
-/// seen writing is left short, which is a title left alone rather than one
-/// invented, and it answers `true`: nothing else can read a nickname in it.
 fn lengthen(id: WindowId, title: &str, suffix: Option<&str>) -> Result<bool> {
     let Some(nickname) = matches_short_title(title) else {
         return Ok(false);
@@ -359,13 +289,6 @@ fn lengthen(id: WindowId, title: &str, suffix: Option<&str>) -> Result<bool> {
     Ok(false)
 }
 
-/// Writes a window's title, without ever waiting on a client that is not
-/// answering.
-///
-/// Never `SetWindowTextW`: it sends `WM_SETTEXT` and waits on the client's own
-/// message pump with no ceiling, which is the freeze `ShowWindowAsync` was
-/// chosen to avoid for the maximizing. Posting is not an option either, the
-/// system only marshals the text across processes for a message that is sent.
 fn set_window_title(handle: HWND, title: &str) -> Result<()> {
     let text: Vec<u16> = title.encode_utf16().chain(once(0)).collect();
 
@@ -385,8 +308,6 @@ fn set_window_title(handle: HWND, title: &str) -> Result<()> {
         return Ok(());
     }
 
-    // A client closed between the sweep and the write answers here, and it is
-    // the ordinary case rather than a failure the journal has to shout about.
     if unsafe { GetLastError() } == ERROR_INVALID_WINDOW_HANDLE {
         return Err(PlatformError::WindowGone);
     }
@@ -397,20 +318,12 @@ fn set_window_title(handle: HWND, title: &str) -> Result<()> {
     ))
 }
 
-/// Ties Multifus's input queue to the ones a focus call has to convince,
-/// `SetForegroundWindow` refusing a caller that is not already in front.
-///
-/// Never an injected Alt keystroke, which is Dracoon's way and sends a stray
-/// key into the game.
 struct AttachedInput {
     current: u32,
     attached: Vec<u32>,
 }
 
 impl AttachedInput {
-    /// The foreground thread **and** the target's own, and the second is not a
-    /// belt: measured, attaching to the foreground alone leaves the focus where
-    /// it was as soon as no keystroke of Multifus is what asked for it.
     fn new(target: HWND) -> Self {
         let current = unsafe { GetCurrentThreadId() };
         let foreground = unsafe { GetWindowThreadProcessId(GetForegroundWindow(), None) };
@@ -433,15 +346,12 @@ impl AttachedInput {
 
 impl Drop for AttachedInput {
     fn drop(&mut self) {
-        // Input queues left tied are paid for on the whole desktop and not in
-        // Multifus, so the detach leaves whatever the focus call did.
         for thread in &self.attached {
             let _ = unsafe { AttachThreadInput(self.current, *thread, false) };
         }
     }
 }
 
-/// Collects the titled windows of the desktop, one call per window.
 unsafe extern "system" fn collect_titled_window(handle: HWND, lparam: LPARAM) -> BOOL {
     let windows = unsafe { &mut *(lparam.0 as *mut Vec<TitledWindow>) };
 
@@ -452,8 +362,6 @@ unsafe extern "system" fn collect_titled_window(handle: HWND, lparam: LPARAM) ->
     CONTINUE_ENUMERATION
 }
 
-/// Walks the desktop, the callback filling `into`. The two collectors below are
-/// the only ones, and each one owns the type it pushes.
 fn enumerate<T>(collect: WNDENUMPROC, into: &mut Vec<T>) -> Result<()> {
     let sink = std::ptr::from_mut(into) as isize;
 
@@ -461,7 +369,6 @@ fn enumerate<T>(collect: WNDENUMPROC, into: &mut Vec<T>) -> Result<()> {
         .map_err(|error| PlatformError::system("EnumWindows", error.to_string()))
 }
 
-/// Collects the client windows of the desktop, one call per window.
 unsafe extern "system" fn collect_client_window(handle: HWND, lparam: LPARAM) -> BOOL {
     let windows = unsafe { &mut *(lparam.0 as *mut Vec<WindowId>) };
 
@@ -472,14 +379,7 @@ unsafe extern "system" fn collect_client_window(handle: HWND, lparam: LPARAM) ->
     CONTINUE_ENUMERATION
 }
 
-/// Whether a Dofus client draws this window for itself, login screen included.
-///
-/// An owned window is one of its dialogs, and an untitled one is a splash or a
-/// loader; both are left where they are. The title is not read beyond being
-/// there, which is what separates this from [`GameWindow::from_title`].
 fn is_client_window(handle: HWND) -> bool {
-    // The cheap questions first, and the title only once the process is known,
-    // both for the reasons on [`titled_window`].
     if !unsafe { IsWindowVisible(handle) }.as_bool() || !is_unowned(handle) {
         return false;
     }
@@ -491,25 +391,6 @@ fn is_client_window(handle: HWND) -> bool {
     !window_title(handle).trim().is_empty()
 }
 
-/// A visible window a Dofus client draws for itself, and the title it bears,
-/// `None` for anything else on the desktop.
-///
-/// The owner test is not decoration: a dialog of the client titled `Erreur`
-/// reads as a short title, and without it that dialog would walk into the roster
-/// as a character. It is the same test [`is_client_window`] makes.
-///
-/// **The order of the three tests is a measure and not a style.** `EnumWindows`
-/// hands this callback every top-level window there is, three times a second, so
-/// the two that cost nothing come first and leave `runs_dofus` a handful of
-/// processes to open instead of every one on the screen.
-///
-/// **And the title is read last, after the process is known.** For a window of
-/// another process `GetWindowText` reads a cached caption and never waits, which
-/// is what Microsoft designed it for; for a window of the *calling* process it
-/// is a real `WM_GETTEXT` and it waits on the main thread. Multifus's own window
-/// is visible exactly while somebody is ticking the réglage, so reading its
-/// title here would hang the very turn [`crate::app::runtime::wake`] just rang
-/// on the thread that rang it.
 fn titled_window(handle: HWND) -> Option<TitledWindow> {
     if !unsafe { IsWindowVisible(handle) }.as_bool() || !is_unowned(handle) {
         return None;
@@ -521,8 +402,6 @@ fn titled_window(handle: HWND) -> Option<TitledWindow> {
 
     let title = window_title(handle);
 
-    // A client's own untitled window is a splash or a loader, and no caller has
-    // anything to do with one: neither a nickname to read nor a title to write.
     if title.trim().is_empty() {
         return None;
     }
@@ -530,18 +409,13 @@ fn titled_window(handle: HWND) -> Option<TitledWindow> {
     Some((window_id(handle), title))
 }
 
-/// Whether a window is one a client draws for itself rather than one of its
-/// dialogs. A window with no owner answers either an error or a null handle.
 fn is_unowned(handle: HWND) -> bool {
     unsafe { GetWindow(handle, GW_OWNER) }.map_or(true, |owner| owner.is_invalid())
 }
 
-/// The handle behind a token, once it is known to still be a client's.
 fn live_game_window(window: WindowId) -> Result<HWND> {
     let handle = window_handle(window);
 
-    // Windows recycles handles, so `IsWindow` alone can answer for a window that
-    // is no longer the one this token was minted for. The executable settles it.
     if !unsafe { IsWindow(Some(handle)) }.as_bool() || !runs_dofus(handle) {
         return Err(PlatformError::WindowGone);
     }
@@ -549,15 +423,10 @@ fn live_game_window(window: WindowId) -> Result<HWND> {
     Ok(handle)
 }
 
-/// Whether a Dofus client owns this window.
-///
-/// The filter is on the process and never on the title alone: a browser tab
-/// named `Something - Dofus Retro` would otherwise enter the roster.
 fn runs_dofus(handle: HWND) -> bool {
     executable_name(handle).is_some_and(|name| name.eq_ignore_ascii_case(DOFUS_EXECUTABLE))
 }
 
-/// The file name of the executable behind a window, without its path.
 fn executable_name(handle: HWND) -> Option<String> {
     let mut process_id = 0_u32;
     unsafe { GetWindowThreadProcessId(handle, Some(&mut process_id)) };
@@ -585,7 +454,6 @@ fn executable_name(handle: HWND) -> Option<String> {
         .map(str::to_owned)
 }
 
-/// The title of a window, sized by what the system says it holds.
 fn window_title(handle: HWND) -> String {
     let length = unsafe { GetWindowTextLengthW(handle) };
 
@@ -607,8 +475,6 @@ fn window_handle(window: WindowId) -> HWND {
     HWND(window.raw() as usize as *mut c_void)
 }
 
-/// Hears game notifications through the WinRT `UserNotificationListener`, the
-/// official route, independent of whether banners are displayed.
 #[derive(Debug, Default)]
 pub struct UserNotificationWatcher {
     listening: Option<Listening>,
@@ -628,8 +494,6 @@ impl NotificationWatcher for UserNotificationWatcher {
     }
 
     fn request_authorization(&self) -> Result<Authorization> {
-        // Awaited on the spot. The system grants this to a plain executable
-        // without ever showing a dialog, which the measurements recorded.
         Ok(granted(
             listener()?
                 .RequestAccessAsync()
@@ -655,8 +519,6 @@ impl NotificationWatcher for UserNotificationWatcher {
                 PlatformError::system("starting the toast watcher", error.to_string())
             })?;
 
-        // The thread says how the setup went before it starts polling, so that a
-        // denied access comes back to the caller instead of dying in silence.
         let outcome = ready_receiver.recv().unwrap_or_else(|_| {
             Err(PlatformError::system(
                 "starting the toast watcher",
@@ -685,16 +547,12 @@ impl NotificationWatcher for UserNotificationWatcher {
 
         listening.running.store(false, Ordering::Relaxed);
 
-        // Joining is what makes the promise of the interface true: once `stop`
-        // returns, the sink will not be called again.
         listening.thread.join().map_err(|_| {
             PlatformError::system("stopping the toast watcher", "the watcher thread panicked")
         })
     }
 
     fn dismiss(&self, nickname: &str) -> Result<()> {
-        // Queued rather than done here: the listener belongs to the watcher's
-        // apartment, and this is called from whichever thread focused a window.
         table(&self.toasts).to_dismiss.push(nickname.to_owned());
 
         Ok(())
@@ -703,23 +561,16 @@ impl NotificationWatcher for UserNotificationWatcher {
 
 impl Drop for UserNotificationWatcher {
     fn drop(&mut self) {
-        // No watcher thread survives the application. A failure here reaches
-        // nobody, and that is not a swallowed one: the process is ending.
         drop(self.stop());
     }
 }
 
-/// A watcher thread and the flag that stops it.
 #[derive(Debug)]
 struct Listening {
     running: Arc<AtomicBool>,
     thread: JoinHandle<()>,
 }
 
-/// What the watcher remembers of the toasts the platform still holds.
-///
-/// Shared between the polling thread and whoever calls `dismiss`, so it carries
-/// the pending dismissals rather than a second lock for them.
 #[derive(Debug, Default)]
 struct ToastTable {
     reported: HashSet<u32>,
@@ -728,8 +579,6 @@ struct ToastTable {
 }
 
 impl ToastTable {
-    /// Forgets every toast the platform has let go, without which the table
-    /// grows for a whole evening of play.
     fn retain(&mut self, live: &HashSet<u32>) {
         self.reported.retain(|id| live.contains(id));
 
@@ -741,22 +590,15 @@ impl ToastTable {
     }
 }
 
-/// A poisoned table is still a usable one: the watcher would rather keep
-/// listening with a table it cannot trust than stop hearing the game.
 fn table(toasts: &Mutex<ToastTable>) -> MutexGuard<'_, ToastTable> {
     toasts.lock().unwrap_or_else(PoisonError::into_inner)
 }
 
-/// The listener of this session, which any thread may ask for.
 fn listener() -> Result<UserNotificationListener> {
     UserNotificationListener::Current()
         .map_err(|error| PlatformError::system("UserNotificationListener", error.to_string()))
 }
 
-/// The three values of the system, read as the two the boundary has.
-///
-/// `Denied` and `Unspecified` are not repaired the same way, the first being
-/// unaskable again, but neither lets Multifus hear anything.
 fn granted(status: windows::core::Result<UserNotificationListenerAccessStatus>) -> Authorization {
     if status.is_ok_and(|status| status == UserNotificationListenerAccessStatus::Allowed) {
         Authorization::Granted
@@ -765,15 +607,12 @@ fn granted(status: windows::core::Result<UserNotificationListenerAccessStatus>) 
     }
 }
 
-/// Sets the apartment up, then polls until the flag says to stop.
 fn watch(
     sink: &NotificationSink,
     running: &AtomicBool,
     toasts: &Mutex<ToastTable>,
     ready: &mpsc::Sender<Result<()>>,
 ) {
-    // The listener answers a thread that is not in a single-threaded apartment
-    // with a COM error, and that is the trap which cost Dracoon dearly.
     let apartment = unsafe { CoInitializeEx(None, COINIT_APARTMENTTHREADED) };
 
     if apartment.is_err() {
@@ -810,8 +649,6 @@ fn watch(
     }
 }
 
-/// Waits out the interval, pumping, and looks at the stop flag far more often
-/// than the poll needs so that `stop` does not sit through a whole one.
 fn wait(running: &AtomicBool) {
     let deadline = Instant::now() + POLL_INTERVAL;
 
@@ -822,10 +659,6 @@ fn wait(running: &AtomicBool) {
     }
 }
 
-/// Serves the apartment's message queue.
-///
-/// An apartment that never pumps stops being served, and the watcher then hears
-/// its first toast and no other. Measured: the probe pumped and kept hearing.
 fn pump() {
     let mut message = MSG::default();
 
@@ -837,7 +670,6 @@ fn pump() {
     }
 }
 
-/// Reads what the platform holds and reports the toasts not seen before.
 fn poll(
     listener: &UserNotificationListener,
     sink: &NotificationSink,
@@ -884,11 +716,7 @@ fn poll(
         table.retain(&live);
     }
 
-    // Outside the lock: the sink focuses a window, and the core answers a focus
-    // by dismissing, which would want this very table back.
     for notification in fresh {
-        // A panic in the core would otherwise take this thread with it, and the
-        // watcher would go quiet for the rest of the evening without saying so.
         drop(catch_unwind(AssertUnwindSafe(|| {
             sink(NotificationReport::Heard(notification));
         })));
@@ -897,7 +725,6 @@ fn poll(
     Ok(())
 }
 
-/// Takes off the screen the toasts of the characters `dismiss` named.
 fn dismiss_queued(listener: &UserNotificationListener, toasts: &Mutex<ToastTable>) {
     let queued: Vec<u32> = {
         let mut table = table(toasts);
@@ -911,16 +738,10 @@ fn dismiss_queued(listener: &UserNotificationListener, toasts: &Mutex<ToastTable
     };
 
     for id in queued {
-        // Never `ClearNotifications`, which wipes every application's, including
-        // the ones Multifus has never read.
         drop(listener.RemoveNotification(id));
     }
 }
 
-/// Reads a toast as the title and body pair the core expects.
-///
-/// The first text element is the title, the ones after it make the body, which
-/// the measurements saw on a real private message.
 fn read(toast: &UserNotification) -> Option<GameNotification> {
     let elements = toast
         .Notification()
@@ -940,28 +761,18 @@ fn read(toast: &UserNotification) -> Option<GameNotification> {
     Some(GameNotification::new(title, body.join("\n")))
 }
 
-/// What `powercfg /requests` shows next to Multifus, the twin of the name
-/// `pmset -g assertions` shows on macOS.
 const POWER_REQUEST_REASON: &str = "Multifus relay";
 
-/// The only version a `REASON_CONTEXT` has. Written here rather than pulled from
-/// `Win32_System_SystemServices`, a whole feature for one zero.
 const REASON_CONTEXT_VERSION: u32 = 0;
 
-/// The update flags of a read of the system settings, which changes nothing.
 const READ_ONLY: SYSTEM_PARAMETERS_INFO_UPDATE_FLAGS = SYSTEM_PARAMETERS_INFO_UPDATE_FLAGS(0);
 
-/// Keeps the display awake through a power request, the twin of the macOS
-/// assertion: the request belongs to the process and not to the thread that
-/// raised it, unlike `SetThreadExecutionState`.
 #[derive(Debug, Default)]
 pub struct PowerRequestDisplayKeeper {
-    /// The request currently raised, `None` when the machine may sleep.
     held: Option<HANDLE>,
 }
 
-// SAFETY: a power request belongs to the process, so any thread may raise, clear
-// or close it, and the relay calls this keeper from whichever thread it runs on.
+// SAFETY: a power request belongs to the process, so any thread may raise or clear it.
 unsafe impl Send for PowerRequestDisplayKeeper {}
 // SAFETY: same reason, and the shared methods only read a boolean.
 unsafe impl Sync for PowerRequestDisplayKeeper {}
@@ -1003,9 +814,7 @@ impl DisplayKeeper for PowerRequestDisplayKeeper {
             return Ok(());
         };
 
-        // SAFETY: the handle comes from a call that reported success, and taking
-        // it out of the field is what stops it being cleared twice. Closing it
-        // frees the request whatever the clear answered, so nothing is reported.
+        // SAFETY: the handle comes from a successful call, and moving it out avoids a double close.
         let _ = unsafe { PowerClearRequest(request, PowerRequestDisplayRequired) };
         let _ = unsafe { CloseHandle(request) };
 
@@ -1023,20 +832,12 @@ impl DisplayKeeper for PowerRequestDisplayKeeper {
 
 impl Drop for PowerRequestDisplayKeeper {
     fn drop(&mut self) {
-        // No hold survives the keeper, and a failure here reaches nobody: the
-        // request dies with the process whatever the system answered.
         drop(self.release());
     }
 }
 
-/// How many events one paste puts into the input stream: `Control` and `V`, down
-/// then up.
 const PASTE_EVENTS: usize = 4;
 
-/// Lays `Control+V` on the system through `SendInput`.
-///
-/// Never measured on a real client, unlike the macOS half. The four questions of
-/// `docs/plan.md`, temps 1, are entire on this system.
 #[derive(Debug, Default)]
 pub struct SendInputPasteSender;
 
@@ -1056,8 +857,7 @@ impl PasteSender for SendInputPasteSender {
             key_event(VK_CONTROL, false),
         ];
 
-        // SAFETY: the slice is alive for the call and the size is that of the
-        // structure the system expects.
+        // SAFETY: the slice is alive for the call, and sized as the structure expects.
         let sent = unsafe {
             SendInput(
                 &events,
@@ -1076,7 +876,6 @@ impl PasteSender for SendInputPasteSender {
     }
 }
 
-/// One half of one key of the combination.
 fn key_event(key: VIRTUAL_KEY, key_down: bool) -> INPUT {
     INPUT {
         r#type: INPUT_KEYBOARD,
@@ -1094,8 +893,6 @@ fn key_event(key: VIRTUAL_KEY, key_down: bool) -> INPUT {
     }
 }
 
-/// Mints the request a hold is raised on, named so that `powercfg /requests`
-/// says which application is keeping the display on.
 fn power_request() -> Result<HANDLE> {
     let mut reason: Vec<u16> = POWER_REQUEST_REASON.encode_utf16().chain(once(0)).collect();
     let context = REASON_CONTEXT {
@@ -1106,14 +903,11 @@ fn power_request() -> Result<HANDLE> {
         },
     };
 
-    // SAFETY: the reason string is alive for the call, which is all the system
-    // reads of it.
+    // SAFETY: the reason string is alive for the call, which is all the system reads.
     unsafe { PowerCreateRequest(&context) }
         .map_err(|error| PlatformError::system("holding the display awake", error.to_string()))
 }
 
-/// Reads what the screen saver of this machine is set to. Whether it starts at
-/// all is asked first, a timeout alone not telling a delay from `Never`.
 fn screen_saver_delay() -> ScreenSaverDelay {
     let Some(active) = system_parameter(SPI_GETSCREENSAVEACTIVE) else {
         return ScreenSaverDelay::Unknown;
@@ -1130,12 +924,10 @@ fn screen_saver_delay() -> ScreenSaverDelay {
     }
 }
 
-/// Reads one setting of the system, `None` when it refuses to answer.
 fn system_parameter(action: SYSTEM_PARAMETERS_INFO_ACTION) -> Option<u32> {
     let mut value = 0_u32;
 
-    // SAFETY: the pointer is to a live four-byte value, which is what both the
-    // screen saver actions write.
+    // SAFETY: the pointer is to a live four-byte value, what both actions write.
     unsafe {
         SystemParametersInfoW(
             action,

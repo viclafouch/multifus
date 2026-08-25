@@ -1,5 +1,3 @@
-/** The words of the banner shown when the file on disk is not what is on screen. */
-
 export const CONFIG_NOTICE_STRINGS = {
   config: {
     unreadableTitle: 'Configuration illisible',
@@ -11,7 +9,6 @@ export const CONFIG_NOTICE_STRINGS = {
     notSavedTitle: 'Configuration non enregistrée',
     notSavedBody:
       'La dernière écriture a échoué. Ce qui est à l’écran est correct, ce qui est sur le disque ne l’est pas encore.',
-    // The one problem of the four where doing nothing loses something.
     notSetAsideTitle: 'Configuration illisible et toujours en place',
     notSetAsideBody:
       'Le fichier de configuration n’était pas exploitable, et Multifus n’a pas réussi à le déplacer. Le prochain enregistrement l’écrasera. Copiez-le ailleurs si son contenu compte.',

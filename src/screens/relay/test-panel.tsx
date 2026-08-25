@@ -12,10 +12,6 @@ type TestPanelProps = Readonly<{
   run: (action: Promise<Snapshot>) => void
 }>
 
-/**
- * The one thing this screen can prove rather than claim. Third card, since it is
- * read once when the relay is set up and never again.
- */
 export const TestPanel = ({ test, run }: TestPanelProps) => {
   const isWorking = test.kind === 'working'
   const line = testLine(test)
@@ -41,9 +37,6 @@ export const TestPanel = ({ test, run }: TestPanelProps) => {
       </SectionRow>
       {line === null ? null : (
         <p
-          // Not remounted: every outcome but « trop tôt » is reached through
-          // `working`, where this node is gone, so a key would only break the
-          // one text change a live region announces reliably.
           id="relay-test"
           role={test.kind === 'failed' ? 'alert' : 'status'}
           data-failed={test.kind === 'failed' ? '' : undefined}
@@ -56,7 +49,6 @@ export const TestPanel = ({ test, run }: TestPanelProps) => {
   )
 }
 
-/** What the last test had to say, `null` when none was ever asked for. */
 const testLine = (test: TestStatus) => {
   if (test.kind === 'sent') {
     return strings.relay.testSent

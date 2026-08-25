@@ -1,21 +1,3 @@
-//! What Multifus does on its own, without anyone opening the window.
-//!
-//! Two things run outside the commands. A scan asks the boundary which game
-//! windows exist, which is how a character enters the roster and how a lamp goes
-//! out. And the notification listening, once the system allows it, turns a game
-//! notification into a focus.
-//!
-//! The scan polls, and that is a deliberate cost. Neither system pushes an event
-//! when a client opens or closes a window, so the choice is between asking every
-//! few seconds and not knowing. [`SCAN_INTERVAL`] is the price of the lamps being
-//! right, and of the shortcuts having a fresh window to aim at whether or not
-//! the interface is open.
-//!
-//! The AutoFocus path below has been run against two real Retro clients and it
-//! works, see the plan. Nothing here assumes it keeps working: what it does is
-//! journal every step it goes through, so that the day it does not fire, the
-//! interface can say where it stopped.
-
 use std::panic::catch_unwind;
 use std::panic::AssertUnwindSafe;
 use std::sync::Condvar;
@@ -55,49 +37,22 @@ use crate::platform::PlatformWindowManager;
 use crate::platform::WindowId;
 use crate::platform::WindowManager;
 
-/// How often the game windows are looked at.
-///
-/// A second, and not three: `SW_MAXIMIZE` takes the foreground, so a client that
-/// has just opened has to be filled while it is still the one in front.
 const SCAN_INTERVAL: Duration = Duration::from_secs(1);
 
-/// The scan thread's own alarm clock: it sleeps on this between two turns, and
-/// a réglage that has just changed rings it rather than waiting the interval out.
-///
-/// The work stays on that thread and never moves to the command that rang: a
-/// title is written by waiting on the client's own message pump, and a command
-/// runs on the main thread, where it would freeze the window.
 static NEXT_TURN: LazyLock<(Mutex<bool>, Condvar)> =
     LazyLock::new(|| (Mutex::new(false), Condvar::new()));
 
-/// The macOS settings pane that grants Accessibility.
 #[cfg(target_os = "macos")]
 const AUTHORIZATION_SETTINGS_URL: &str =
     "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility";
 
-/// The Windows pane for notification access.
 #[cfg(target_os = "windows")]
 const AUTHORIZATION_SETTINGS_URL: &str = "ms-settings:privacy-notifications";
 
-/// The event the interface listens to. One event, one payload, the whole
-/// dashboard, see [`crate::app::view::Snapshot`].
 pub const SNAPSHOT_EVENT: &str = "multifus://snapshot";
 
-/// The event that asks the window to show one screen rather than another.
-///
-/// Separate from the snapshot on purpose: which screen is on show is not state
-/// Multifus keeps, it is a request made once. Putting it in the snapshot would
-/// make every emission re-assert a screen the user may have left since.
 pub const NAVIGATE_EVENT: &str = "multifus://navigate";
 
-/// Starts the scan, on its own thread, for the life of the process.
-///
-/// **It survives its own failures.** A panic inside one turn used to end the
-/// thread, and nothing else: no character ever came online again, no lamp ever
-/// went out, the listening was never started, and not one line said so. Every
-/// Accessibility call of `platform::macos` is inside that turn, so this is not a
-/// theoretical shape. The turn is therefore caught, written down and tried again
-/// on the next turn.
 pub fn start(app: AppHandle) {
     let spawned = thread::Builder::new()
         .name("multifus-window-scan".to_owned())
@@ -114,18 +69,12 @@ pub fn start(app: AppHandle) {
         });
 
     if let Err(error) = spawned {
-        // Without this thread nobody is ever connected and AutoFocus never
-        // starts. It has to be said rather than swallowed.
         lock(&app).log(JournalEvent::ScanFailed {
             detail: error.to_string(),
         });
     }
 }
 
-/// Sleeps until the next turn is due, or until somebody asks for one now.
-///
-/// A spurious wake-up costs one early turn, which for a poller is nothing, so
-/// the flag is read once rather than looped on.
 fn wait_for_next_turn() {
     let (asked, alarm) = &*NEXT_TURN;
     let mut guard = asked.lock().unwrap_or_else(PoisonError::into_inner);
@@ -141,11 +90,6 @@ fn wait_for_next_turn() {
     *guard = false;
 }
 
-/// Asks the scan for a turn now, and hands the main thread straight back.
-///
-/// What this is for is the réglage one has just ticked: waiting the interval out
-/// showed a second of nothing happening, which reads as an application that did
-/// not hear the click.
 pub fn wake() {
     let (asked, alarm) = &*NEXT_TURN;
 
@@ -154,17 +98,7 @@ pub fn wake() {
     alarm.notify_one();
 }
 
-/// One turn of the scan: look at the windows, keep the listening in step with
-/// the authorization, and tell the interface if anything moved.
 fn tick(app: &AppHandle) {
-    // Before the sweep, and that is not cosmetic: it is what tells the boundary
-    // whether a bare title is one of its own, and the sweep right after is what
-    // reads them. The other way round, a launch with the réglage ticked would
-    // find nobody connected for its first turn.
-    //
-    // This thread and never a command: filling a window and renaming one both
-    // wait on the client's own message pump, and a command runs on the main
-    // thread.
     let renamed = apply_short_titles(app);
     let changed = scan(app);
     let maximized = maximize_new_clients(app);
@@ -174,10 +108,6 @@ fn tick(app: &AppHandle) {
     }
 }
 
-/// One look at the system, and whether anything moved.
-///
-/// The relay is served with the lock back in its holder: the transitions are
-/// computed under it and a Telegram message has no business being there.
 fn scan(app: &AppHandle) -> bool {
     let change = refresh_windows(app);
     let listening_changed = follow_authorization(app);
@@ -189,11 +119,6 @@ fn scan(app: &AppHandle) -> bool {
     change.changed || listening_changed || display_changed
 }
 
-/// Fills the screen with the clients that have just opened, and says whether it
-/// wrote a line about it.
-///
-/// The lock is never held across the two boundary calls: macOS hops to the main
-/// thread there, which is where every command takes this very mutex.
 fn maximize_new_clients(app: &AppHandle) -> bool {
     if !lock(app).maximizes_on_launch() {
         lock(app).forget_client_windows();
@@ -218,8 +143,6 @@ fn maximize_new_clients(app: &AppHandle) -> bool {
         let filled = app.state::<PlatformWindowManager>().maximize(window);
         let mut state = lock(app);
 
-        // Remembered once the boundary took the ask, and macOS is the only side
-        // left that can refuse it: a Windows ask is posted and never turned down.
         written |= match filled {
             Ok(()) => {
                 state.remember_client_window(window);
@@ -236,17 +159,6 @@ fn maximize_new_clients(app: &AppHandle) -> bool {
     written
 }
 
-/// Puts the bare nickname in the title bar of the game windows, or puts back
-/// the title the client wrote, and says whether it wrote a line about it.
-///
-/// Asked on every turn and not only when the réglage moves: a client rewrites
-/// its own title when the character changes and when the quarter-hour
-/// disconnection strikes, and neither is an event Multifus can subscribe to.
-/// The boundary compares before it writes, so a turn that has nothing to do
-/// costs one comparison per window.
-///
-/// The lock is taken and given back around the boundary call, never held across
-/// it: writing a title waits on a client that Multifus does not control.
 fn apply_short_titles(app: &AppHandle) -> bool {
     let (short, suffix) = {
         let state = lock(app);
@@ -264,8 +176,6 @@ fn apply_short_titles(app: &AppHandle) -> bool {
 
             false
         }
-        // A client closed between the sweep and the write is the ordinary case
-        // and reads as one, exactly as it does for the AutoFocus.
         Ok(None) | Err(PlatformError::AuthorizationDenied) | Err(PlatformError::WindowGone) => {
             false
         }
@@ -275,11 +185,6 @@ fn apply_short_titles(app: &AppHandle) -> bool {
     }
 }
 
-/// The one callback of the run loop.
-///
-/// Two things reach it. The Dock icon being clicked, which is
-/// [`main_window::show_on_dock_click`]'s to answer, and the process ending,
-/// which is the last moment a client can be handed its title back.
 pub fn on_run_event(app: &AppHandle, event: RunEvent) {
     if matches!(event, RunEvent::Exit) {
         give_titles_back(app);
@@ -290,17 +195,6 @@ pub fn on_run_event(app: &AppHandle, event: RunEvent) {
     main_window::show_on_dock_click(app, event);
 }
 
-/// Puts every renamed window's title back on the way out.
-///
-/// Quitting is not unticking, so the réglage stays as the user left it and the
-/// next launch shortens again; what this leaves behind is a desktop as it was
-/// found. It runs on the main thread, and the process is ending anyway, so a
-/// client that has wedged can slow the quit down, bounded by the timeout of each
-/// write. Nothing to put back on macOS, which never renamed anything.
-///
-/// A quit this never sees, a crash or a kill, costs nothing that cannot be
-/// repaired: the title is put back from the suffix on the launch that follows.
-/// Nothing is journalled, the file being on its way out too.
 fn give_titles_back(app: &AppHandle) {
     let suffix = lock(app).client_title_suffix();
 
@@ -310,7 +204,6 @@ fn give_titles_back(app: &AppHandle) {
     );
 }
 
-/// Asks the boundary which game windows exist and takes the answer in./// Asks the boundary which game windows exist and takes the answer in.
 fn refresh_windows(app: &AppHandle) -> ScanChange {
     let outcome = app.state::<PlatformWindowManager>().game_windows();
 
@@ -318,10 +211,6 @@ fn refresh_windows(app: &AppHandle) -> ScanChange {
 
     match outcome {
         Ok(windows) => state.apply_windows(&windows),
-        // Not an empty roster: Multifus is not allowed to look, which is a
-        // different thing from nobody being connected, and the interface has a
-        // screen for it. It is also the second of the four cases of ADR 0010,
-        // so the relayed characters that leave here are said out loud too.
         Err(PlatformError::AuthorizationDenied) => state.apply_denied(),
         Err(error) => {
             state.log_unless_repeated(JournalEvent::ScanFailed {
@@ -336,12 +225,6 @@ fn refresh_windows(app: &AppHandle) -> ScanChange {
     }
 }
 
-/// Starts the banner listening once the system allows it, and takes it down when
-/// the authorization goes away.
-///
-/// macOS grants Accessibility long after it was asked for, and takes it back
-/// whenever the user says so. Neither moment is an event Multifus can subscribe
-/// to, so it is looked at here, every turn.
 fn follow_authorization(app: &AppHandle) -> bool {
     let (granted, listening) = {
         let state = lock(app);
@@ -356,10 +239,6 @@ fn follow_authorization(app: &AppHandle) -> bool {
     }
 }
 
-/// Posts the observer and reports how it went.
-///
-/// The lock on the state is deliberately not held across `start`, which waits on
-/// the watcher thread's own report. See the rule on [`crate::app::state`].
 fn start_listening(app: &AppHandle) -> bool {
     let outcome = {
         let sink_app = app.clone();
@@ -383,7 +262,6 @@ fn start_listening(app: &AppHandle) -> bool {
     }
 }
 
-/// Takes the observer down. Once this returns, the sink will not be called again.
 fn stop_listening(app: &AppHandle) -> bool {
     let outcome = watcher(app).stop();
 
@@ -398,7 +276,6 @@ fn stop_listening(app: &AppHandle) -> bool {
     state.set_listening(false)
 }
 
-/// The watcher has something to say, on its own thread.
 fn on_report(app: &AppHandle, report: NotificationReport) {
     match report {
         NotificationReport::Heard(notification) => on_notification(app, notification),
@@ -406,30 +283,17 @@ fn on_report(app: &AppHandle, report: NotificationReport) {
     }
 }
 
-/// A game notification just arrived, on the watcher's own thread.
-///
-/// Everything that can be decided without the system is decided under the lock,
-/// and the focus itself is asked for once the lock is back. The watcher is never
-/// touched from here: its `stop` joins this very thread, and reaching for it
-/// would be the one deadlock this application can build.
 fn on_notification(app: &AppHandle, notification: GameNotification) {
     let Some(nickname) = notification.nickname().map(str::to_owned) else {
         return;
     };
 
-    // A path of its own, and taken first. The relay needs no window, so the case
-    // where the client has just gone is the one where it serves most; going
-    // through `Decision` would swallow exactly those. See `docs/macos.md`.
     relay::run::offer(app, &notification, &nickname);
 
     let kind = notification.kind();
     let decision = lock(app).decide(&nickname, kind);
 
     let outcome = match decision {
-        // A body Multifus never read reaches `decide` looking exactly like one
-        // whose wording it does not know, and only this side can tell them apart.
-        // They are two different failures repaired in two different files, see
-        // [`Outcome::BodyUnread`].
         Decision::Ignored(Outcome::KindUnknown) if notification.matches_blank_body() => {
             Outcome::BodyUnread
         }
@@ -451,12 +315,6 @@ fn on_notification(app: &AppHandle, notification: GameNotification) {
     emit_snapshot(app);
 }
 
-/// Something was notified and the system would not let Multifus read it.
-///
-/// An authorization taken away refuses every element the notification centre
-/// builds, until the scan takes the listening down a turn or two later, so the
-/// same refusal would otherwise be written a dozen times and flush the journal of
-/// what led to it. The snapshot only goes out when a line was actually written.
 fn on_unreadable(app: &AppHandle, detail: String) {
     let written = lock(app).log_unless_repeated(JournalEvent::NotificationUnreadable { detail });
 
@@ -465,12 +323,6 @@ fn on_unreadable(app: &AppHandle, detail: String) {
     }
 }
 
-/// Takes the toasts of a character off the screen, its window being in front.
-///
-/// `try_lock` and not [`watcher`]: this runs on the watcher's own thread, and
-/// `start` and `stop` hold that mutex across a join of this very thread. A
-/// dismissal skipped while the listening is being rebuilt costs nothing, since
-/// what would be dismissed is going away with it.
 fn dismiss(app: &AppHandle, nickname: &str) {
     let state = app.state::<WatcherState>();
 
@@ -480,12 +332,9 @@ fn dismiss(app: &AppHandle, nickname: &str) {
         Err(TryLockError::WouldBlock) => return,
     };
 
-    // macOS has no API for this and answers `Ok` without doing anything, which
-    // is what keeps this call site free of any `cfg`.
     drop(watcher.dismiss(nickname));
 }
 
-/// Brings the window forward and says what came of it.
 fn focus(app: &AppHandle, window: WindowId) -> Outcome {
     match app.state::<PlatformWindowManager>().focus(window) {
         Ok(()) => Outcome::Focused,
@@ -493,10 +342,6 @@ fn focus(app: &AppHandle, window: WindowId) -> Outcome {
     }
 }
 
-/// The same, for a user who asked that a window put in the Dock stay there.
-///
-/// One extra call to the system, paid only by those who switched the réveil des
-/// réduites off. Everyone else never asks the question.
 fn focus_unless_minimized(app: &AppHandle, window: WindowId) -> Outcome {
     match app.state::<PlatformWindowManager>().is_minimized(window) {
         Ok(true) => Outcome::LeftMinimized,
@@ -505,10 +350,6 @@ fn focus_unless_minimized(app: &AppHandle, window: WindowId) -> Outcome {
     }
 }
 
-/// What the journal says when the system would not do it.
-///
-/// A client closed between the scan and the notification is the ordinary case
-/// and is not a failure, which is why it does not read as one.
 fn refused(error: &PlatformError) -> Outcome {
     match error {
         PlatformError::WindowGone => Outcome::NoWindow,
@@ -518,28 +359,17 @@ fn refused(error: &PlatformError) -> Outcome {
     }
 }
 
-/// Asks the system for the authorization, which opens its dialog.
-///
-/// macOS grants nothing in the second that follows, so the answer here is almost
-/// always still a refusal. The scan is what notices the grant, whenever it comes,
-/// which is why the screen behind this button has to hold rather than blink.
 pub fn request_authorization(app: &AppHandle) {
     let asked = app.state::<PlatformWindowManager>().request_authorization();
 
     let (granted, failure) = match asked {
         Ok(authorization) => (authorization.is_granted(), None),
-        // Collapsed into a plain refusal, this looked exactly like the system
-        // saying no, and the button wrote nothing at all when the answer had not
-        // changed. macOS answers this way when a framework constant is missing.
         Err(error) => (false, Some(error.to_string())),
     };
 
     {
         let mut state = lock(app);
 
-        // Written every time, refusal included: macOS grants nothing in the
-        // second that follows the dialog, so the fact worth keeping is that the
-        // button was pressed at all. `set_granted` only writes a change.
         state.log(JournalEvent::AuthorizationRequested { granted, failure });
         state.set_granted(granted);
     }
@@ -547,22 +377,10 @@ pub fn request_authorization(app: &AppHandle) {
     follow_authorization(app);
 }
 
-/// Asks the window to show one screen, without saying anything about the rest.
-///
-/// Nothing is written when this does not arrive, and that is deliberate: the
-/// window is brought forward in the same breath, so the user is looking at the
-/// screen it landed on. A request that went missing costs one click on the rail
-/// and is visible on the spot, which a journal line would not make any clearer.
 pub fn navigate(app: &AppHandle, screen: Screen) {
     drop(app.emit(NAVIGATE_EVENT, screen));
 }
 
-/// Sends the user to the settings pane that grants the authorization.
-///
-/// The system dialog only offers to open it, and only the first time it is
-/// asked. Reaching the right pane in one click is the difference between an
-/// explanation and a dead end, which is why both the window and the system tray
-/// offer it.
 pub fn open_authorization_settings(app: &AppHandle) {
     let opened = app
         .opener()
@@ -573,37 +391,14 @@ pub fn open_authorization_settings(app: &AppHandle) {
             detail: error.to_string(),
         });
 
-        // Nothing comes back from here, so the journal line has to be sent
-        // rather than wait for a passing snapshot.
         emit_snapshot(app);
     }
 }
 
-/// Looks at the system now rather than at the next turn of the scan. No
-/// snapshot: whoever asked for this is emitting one of their own.
 pub fn refresh(app: &AppHandle) {
     scan(app);
 }
 
-/// Sends the whole dashboard to the interface and to the system tray, and hands it
-/// back for whoever asked.
-///
-/// **Every path that changes anything ends here**, the commands included, which
-/// is why it returns the snapshot rather than only sending it: a command that
-/// built its own answer instead would leave the system tray behind, and that is
-/// exactly the bug this shape prevents. The two surfaces draw the same roster
-/// and they are refreshed together or not at all.
-///
-/// Calling it on a change the menu does not show costs one comparison, since
-/// [`tray::refresh`] does nothing when the lines have not moved.
-///
-/// The lock is taken and given back before [`tray::refresh`] runs, and that is
-/// not incidental: the menu setters block on the main thread, which is where
-/// every command takes this lock. See the note on [`crate::app::tray`].
-/// The failure of this emission is the one thing the window can never show, since
-/// the journal travels inside the very payload that did not arrive: the board
-/// stays frozen on an older roster and looks like a Multifus that has stopped.
-/// It is in the file, and that is the plainest argument for the file.
 pub fn emit_snapshot(app: &AppHandle) -> Snapshot {
     let snapshot = lock(app).snapshot();
 
@@ -618,8 +413,6 @@ pub fn emit_snapshot(app: &AppHandle) -> Snapshot {
     snapshot
 }
 
-/// The watcher, taken even if a previous holder panicked. See the note on
-/// [`crate::app::state::lock`].
 fn watcher(app: &AppHandle) -> MutexGuard<'_, PlatformNotificationWatcher> {
     app.state::<WatcherState>()
         .inner()

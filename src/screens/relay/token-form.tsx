@@ -13,7 +13,6 @@ type TokenFormProps = Readonly<{
   run: (action: Promise<Snapshot>) => void
 }>
 
-/** The field and the button, under the steps that explain what goes in it. */
 export const TokenForm = ({ relay, run }: TokenFormProps) => {
   const [token, setToken] = React.useState('')
   const isWorking = relay.pairing.kind === 'working'

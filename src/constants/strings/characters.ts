@@ -1,8 +1,5 @@
-/** The words of the Personnages screen. */
-
 import type { Gender } from '@/@types/roster'
 
-/** The three tables the grouped actions read, one label per sex. */
 const GROUP_LABELS = {
   male: 'Hommes',
   female: 'Femmes'
@@ -30,8 +27,6 @@ export const CHARACTERS_STRINGS = {
     handle: (nickname: string) => {
       return `Déplacer ${nickname} dans le défilement`
     },
-    // The switch is on when the character is in the cycle, so the label names the
-    // cycle and not the veille, which would read as the opposite of the truth.
     cycleToggle: (nickname: string) => {
       return `Défilement de ${nickname}`
     },

@@ -1,5 +1,3 @@
-/** The six articles of the rail, in the order one walks them. */
-
 import type { LucideIcon } from 'lucide-react'
 import {
   Info,
@@ -18,7 +16,6 @@ export type NavItem = {
   readonly Icon: LucideIcon
 }
 
-/** A seventh screen on the Rust side fails to compile here, and not in the rail. */
 export const NAV_ITEMS = [
   { name: 'characters', label: strings.nav.characters, Icon: Users },
   { name: 'shortcuts', label: strings.nav.shortcuts, Icon: Keyboard },

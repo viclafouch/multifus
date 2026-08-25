@@ -11,17 +11,11 @@ import { QuickReplyRow } from '@/screens/shortcuts/quick-reply-row'
 
 type QuickRepliesPanelProps = Readonly<{
   quickReplies: readonly QuickReply[]
-  /** The one capture in flight for the whole screen, `null` when there is none.
-   * It can belong to an action, which is why it is a `Binding` and not an id. */
   editing: Binding | null
   handleAdd: () => void
   actions: QuickReplyRowActions
 }>
 
-/**
- * The second panel of this screen: a ready-made line, filed under a combination.
- * No `EmptyState` when there is none, that component replaces a whole screen.
- */
 export const QuickRepliesPanel = ({
   quickReplies,
   editing,

@@ -25,7 +25,6 @@ type FactProps = Readonly<{
   value: string
 }>
 
-/** One line of the identity card at the top of the screen. */
 const Fact = ({ label, value }: FactProps) => {
   return (
     <div className="flex gap-6">
@@ -42,14 +41,6 @@ type UpdateSectionProps = Readonly<{
   run: (action: Promise<Snapshot>) => void
 }>
 
-/**
- * Where Multifus is with the version that is out, and the one click that takes it.
- *
- * It sits directly under the version it comments on, and it says its state in
- * words rather than in a badge. The button never goes dead while a request is in
- * flight: it says it is busy, and a second click costs one more request and
- * nothing else.
- */
 const UpdateSection = ({ update, run }: UpdateSectionProps) => {
   const isChecking = update.kind === 'checking'
   const hasUpdate = update.kind === 'available' || update.kind === 'installing'
@@ -90,15 +81,6 @@ type AboutScreenProps = Readonly<{
   run: (action: Promise<Snapshot>) => void
 }>
 
-/**
- * How Multifus sits on this machine: which version, where its file is, and how
- * to wipe it. What it does on its own is the Paramètres screen.
- *
- * Dracoon opens on a modal warning that cannot be dismissed for thirty seconds.
- * perimetre.md drops it: the notice lives here, on a screen one visits, and it
- * blocks nothing. The reset is the opposite case, it is the only thing that can
- * lose work, so that one does ask first and says exactly what will be lost.
- */
 export const AboutScreen = ({
   version,
   config,

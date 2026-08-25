@@ -13,45 +13,18 @@ import {
 } from '@/helpers/journal'
 import { revealJournal } from '@/lib/multifus'
 
-/**
- * How far from the foot of the journal still counts as being at the foot, in
- * pixels. A line and a half, so that a fractional scroll position or a resize
- * does not read as somebody having deliberately scrolled up.
- */
 const FOLLOW_MARGIN = 28
 
 type JournalPanelProps = Readonly<{
   snapshot: Snapshot
 }>
 
-/**
- * The drawer at the foot of the window, shut by default.
- *
- * It exists for one day: the one where a notification arrives and nothing comes
- * to the front. Every step Multifus goes through is written here, so the answer
- * is a scroll away instead of a rebuild with a print statement in it.
- *
- * It draws what the Rust side holds in memory and not the whole journal, which
- * lives in a file and goes weeks further back. Two buttons for that reason: the
- * clipboard hands over these lines with everything needed to read them, and the
- * other one opens the file.
- *
- * It takes the whole snapshot rather than the entries alone, because the copy is
- * only worth something with the version, the system, the authorization and the
- * four combinations in front of it.
- */
 export const JournalPanel = ({ snapshot }: JournalPanelProps) => {
   const entries = snapshot.journal
   const [isOpen, setIsOpen] = React.useState(false)
   const list = React.useRef<HTMLOListElement>(null)
-  // Whether the reader is still at the foot of the journal. Kept in a ref
-  // because nothing on screen depends on it, so changing it must not re-render.
   const isFollowing = React.useRef(true)
 
-  // Scrolling a node the browser owns is what an effect is for. It only pins to
-  // the bottom while the reader is already there: the day this journal earns its
-  // keep, somebody is scrolled up reading the lines that led to the failure, and
-  // a scan writing a new line every three seconds must not yank them back down.
   React.useEffect(() => {
     const element = list.current
 
@@ -70,8 +43,6 @@ export const JournalPanel = ({ snapshot }: JournalPanelProps) => {
   }
 
   const handleToggle = () => {
-    // Opening the drawer always lands on the newest line, whatever the reader
-    // had scrolled to before shutting it.
     isFollowing.current = true
     setIsOpen((current) => {
       return !current
@@ -147,7 +118,6 @@ type JournalLineProps = Readonly<{
   entry: JournalEntry
 }>
 
-/** The Rust side journals what the system refused to open. Nothing to add. */
 const ignoreRevealFailure = () => {}
 
 const JournalLine = ({ entry }: JournalLineProps) => {

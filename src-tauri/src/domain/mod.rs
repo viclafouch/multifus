@@ -1,8 +1,3 @@
-//! The business core of Multifus: roster, cycle, veille, swap, notifications.
-//!
-//! Everything here is pure. No system call, no Tauri, no platform crate. The
-//! module compiles and is tested on its own.
-
 pub mod character;
 pub mod notification;
 pub mod roster;

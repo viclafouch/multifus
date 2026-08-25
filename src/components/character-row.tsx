@@ -8,7 +8,6 @@ import { Switch } from '@/components/ui/switch'
 import { strings } from '@/constants/strings'
 import { characterState, characterStateLine } from '@/helpers/wording'
 
-/** How long each row waits before rising, so the list powers up in sequence. */
 const STAGGER_MS = 38
 
 type RowActions = Readonly<{
@@ -23,23 +22,12 @@ type RowActions = Readonly<{
 
 type CharacterRowProps = Readonly<{
   character: Character
-  /** Its place in the cycle, or `null` when the cycle does not stop on it. */
   rank: number | null
-  /** Its place in the list, which only sets the entrance delay. */
   index: number
   isDragging: boolean
   actions: RowActions
 }>
 
-/**
- * One character of the roster.
- *
- * The row is dragged to change the cycle order, and the grip is a real button so
- * that the arrow keys do the same thing without a mouse. A character that is
- * offline keeps its place, greyed, and is the only one that can be removed: a
- * connected one would walk straight back in on the next scan, minus the gender
- * that had been assigned to it.
- */
 export const CharacterRow = ({
   character,
   rank,
@@ -65,10 +53,6 @@ export const CharacterRow = ({
     const row = event.currentTarget
     const { left, top } = row.getBoundingClientRect()
 
-    // Nothing here used to say what to drag, and left to its own heuristic the
-    // webview lifts a slab of the whole interface instead of this one row. The
-    // row names itself, and the grab point is kept under the pointer so the
-    // ghost sits exactly where the row was rather than jumping to a corner.
     event.dataTransfer.setDragImage(
       row,
       event.clientX - left,
@@ -82,8 +66,6 @@ export const CharacterRow = ({
 
   const handleDragOver = (event: React.DragEvent<HTMLLIElement>) => {
     event.preventDefault()
-    // The counterpart of the `effectAllowed` set on the source: without it the
-    // pointer keeps the refusal cursor over a row that does accept the drop.
     event.dataTransfer.dropEffect = 'move'
     actions.handleDragOver(nickname)
   }
@@ -169,11 +151,6 @@ type GenderButtonProps = Readonly<{
   onSetGender: (nickname: string, gender: Gender | null) => void
 }>
 
-/**
- * Half of the gender toggle. Clicking the one already on takes the gender back
- * off, since a gender assigned by mistake has to be undoable and there is no
- * third button for it.
- */
 const GenderButton = ({
   nickname,
   gender,
@@ -199,7 +176,6 @@ const GenderButton = ({
   )
 }
 
-/** The row is a drop target, and a drop target has to say so. */
 const handleDrop = (event: React.DragEvent<HTMLLIElement>) => {
   event.preventDefault()
 }

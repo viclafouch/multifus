@@ -1,33 +1,3 @@
-//! The system tray icon, and the roster it shows without opening the window.
-//!
-//! Multifus is meant to be launched and forgotten, so the window is not the
-//! application: closing it leaves the icon behind, and quitting is a menu item.
-//! The menu lists the connected characters in cycle order with their veille, and
-//! clicking one brings its window to the front. Only the connected ones are
-//! there: a system tray is a place one jumps from, and an item for a character
-//! whose client is closed would be an item that cannot do anything.
-//!
-//! **This module writes French, and it is the only one on this side that does.**
-//! The rule everywhere else is that the Rust side never holds a sentence for the
-//! user, because the journal crosses the bridge as structured events and the
-//! interface owns the wording. A menu of the system is a third surface, one React
-//! cannot draw at all: an `NSMenu` is built here or nowhere. So the words live at
-//! the top of this file, in one block, and `src/lib/strings.ts` stays the one
-//! place that holds the words of the *window*.
-//!
-//! **The lock of [`crate::app::state`] is never held while touching this icon.**
-//! Every setter of a tray or of a menu goes through Tauri's
-//! `run_item_main_thread!`, which posts the work to the main thread and then
-//! blocks on a channel with no timeout; the main thread is where every command
-//! takes that lock. It is the same shape as the global shortcut plugin, and the
-//! same rule is what keeps it safe.
-//!
-//! **Nothing the system asks for is done on the thread it asks on.** A menu event
-//! arrives on the main thread, and focusing a client is an Accessibility round
-//! trip that a hung game would hold until the system's messaging timeout. So a
-//! character click is queued and answered on the worker below, exactly as a
-//! shortcut is.
-
 use std::panic::catch_unwind;
 use std::panic::AssertUnwindSafe;
 use std::sync::mpsc;
@@ -62,10 +32,6 @@ use crate::platform::PlatformError;
 use crate::platform::PlatformWindowManager;
 use crate::platform::WindowManager;
 
-// The words of the menu. See the note at the top of this module for why they are
-// here and not in the strings file of the interface.
-// The five screens carry the names the rail gives them, so that the menu and the
-// window call the same place by the same word.
 const MENU_CHARACTERS: &str = "Personnages";
 const MENU_SHORTCUTS: &str = "Raccourcis";
 const MENU_AUTO_FOCUS_SCREEN: &str = "AutoFocus";
@@ -75,131 +41,75 @@ const MENU_ABOUT: &str = "À propos";
 const MENU_QUIT: &str = "Quitter Multifus";
 const MENU_NOBODY: &str = "Aucun personnage connecté";
 const MENU_ASLEEP: &str = " (en veille)";
-// The two settings say the verb rather than wear a tick. A ticked noun sat next
-// to the four screen names and read like one of them: « AutoFocus » looked like
-// somewhere to go, not something to switch. A line that starts with a verb can
-// only be an action, and the verb it starts with says which way it will go.
 const MENU_AUTO_FOCUS_ON: &str = "Activer l'AutoFocus";
 const MENU_AUTO_FOCUS_OFF: &str = "Désactiver l'AutoFocus";
-// The one setting worth a line here that is not about kinds: it is switched
-// while playing, or rather while not playing, which is exactly what this menu is
-// for. « Ignorer » is what the click will do, as the rule of this menu asks.
 const MENU_WAKE_MINIMIZED: &str = "Réveiller les fenêtres réduites";
 const MENU_LEAVE_MINIMIZED: &str = "Ignorer les fenêtres réduites";
-// Three labels and not two verbs: an « Activer le relais » that fails is what
-// this step exists to avoid. The ellipsis says the first one opens something.
 const MENU_RELAY_SETUP: &str = "Configurer le relais…";
 const MENU_RELAY_ON: &str = "Activer le relais";
 const MENU_RELAY_OFF: &str = "Désactiver le relais";
 const MENU_DENIED: &str = "Autorisation manquante";
-// The journal is reachable from here and not from the window alone, and that is
-// the rule of the project rather than a convenience: what is only useful with the
-// window open needs a way in that does not need the window. « La fenêtre de
-// Multifus n'est pas revenue » is one of the lines this journal can hold, and a
-// journal reachable only through the window is a journal for the good days.
 const MENU_JOURNAL: &str = "Montrer le journal";
 
-/// The line that names the version that is out. Only ever there when a check
-/// has found one, since a menu item that says « nothing new » is an item that
-/// has never been worth a click.
 fn update_label(version: &str) -> String {
     format!("Installer la mise à jour {version}")
 }
 
-// Each system calls its own pane by its own name, exactly as the window does.
 #[cfg(target_os = "macos")]
 const MENU_OPEN_SETTINGS: &str = "Ouvrir Réglages Système";
 #[cfg(not(target_os = "macos"))]
 const MENU_OPEN_SETTINGS: &str = "Ouvrir les réglages du système";
 
-/// The one icon Multifus puts in the system tray.
 const TRAY_ID: &str = "multifus";
 
-/// What every screen item's identifier starts with. The screen follows, as its
-/// own serialised name.
 const SCREEN_PREFIX: &str = "multifus://screen/";
 
-/// The item that ends the process. The only way out once the window no longer
-/// quits.
 const QUIT_ID: &str = "multifus://quit";
 
-/// The item shown when nobody is connected, which answers rather than does.
 const NOBODY_ID: &str = "multifus://nobody";
 
-/// The tick that suspends the AutoFocus without forgetting the seven kinds.
 const AUTO_FOCUS_ID: &str = "multifus://auto-focus";
 
-/// The one that says whether the AutoFocus reaches into the Dock.
 const WAKE_MINIMIZED_ID: &str = "multifus://wake-minimized";
 
-/// The item that replaces Multifus with the version that is out and restarts it.
 const UPDATE_ID: &str = "multifus://update";
 
-/// The item that shows the journal file in the file browser of the system.
 const JOURNAL_ID: &str = "multifus://journal";
 
-/// The switch of the relay, and the one door it has.
 const RELAY_ID: &str = "multifus://relay";
 
-/// The line that says Multifus is not allowed to work, and the one that leads
-/// to the pane where that is fixed.
 const DENIED_ID: &str = "multifus://denied";
 const OPEN_SETTINGS_ID: &str = "multifus://open-settings";
 
-/// What every character item's identifier starts with.
-///
-/// The nickname follows, whatever it contains: the prefix is what gets stripped
-/// back off, so nothing about the shape of a pseudo is assumed here.
 const CHARACTER_PREFIX: &str = "multifus://character/";
 
-/// The queue a clicked character travels on, from the main thread to the worker.
 type TrayQueue = Sender<String>;
 
-/// The menu as it is on screen right now, `None` when nobody knows.
-///
-/// What makes [`refresh`] free to be called from anywhere. `None` is not an
-/// empty menu: it is the state before the first build and after a failed one,
-/// and it always rebuilds.
 type ShownMenu = Mutex<Option<Contents>>;
 
-/// Everything the menu draws, and the whole of what it is compared on.
-///
-/// A field that does not travel here is a change the menu would sleep through,
-/// which is the one mistake this type exists to make impossible.
 #[derive(Debug, Clone, PartialEq, Eq)]
 struct Contents {
     entries: Vec<Entry>,
     auto_focus: bool,
     wakes_minimized: bool,
     granted: bool,
-    /// The version a check found, `None` when there is nothing to offer.
     update: Option<String>,
-    /// Which of its three things the relay item says. One field and not three
-    /// booleans, which would let « unpaired and running » be written down.
     relay: RelayItem,
 }
 
-/// The three things the relay item can say. The first two are read off the
-/// configuration and never off the keychain, ADR 0009.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum RelayItem {
-    /// No bot paired here, or nobody ticked. One label and one click for the
-    /// two, towards the one screen where both are repaired.
     NotReady,
-    /// Ready, and off.
     Off,
-    /// Running.
     On,
 }
 
-/// One line of the menu: the character it aims at, and what it says.
 #[derive(Debug, Clone, PartialEq, Eq)]
 struct Entry {
     nickname: String,
     label: String,
 }
 
-/// The tooltip, which is what the icon says without being clicked.
 fn tooltip(connected: usize) -> String {
     match connected {
         0 => "Multifus, aucun personnage connecté".to_owned(),
@@ -208,10 +118,6 @@ fn tooltip(connected: usize) -> String {
     }
 }
 
-/// Everything the menu should say right now.
-///
-/// Read in one pass under the lock, so the tick and the lines can never come
-/// from two different moments.
 fn contents(app: &AppHandle) -> Contents {
     let state = lock(app);
 
@@ -225,7 +131,6 @@ fn contents(app: &AppHandle) -> Contents {
     }
 }
 
-/// Which of its three things the relay item says right now.
 fn relay_item(state: &Multifus) -> RelayItem {
     match (state.is_relay_active(), state.is_relay_ready()) {
         (true, _) => RelayItem::On,
@@ -234,7 +139,6 @@ fn relay_item(state: &Multifus) -> RelayItem {
     }
 }
 
-/// What that item is labelled, and every label starts with a verb.
 fn relay_label(item: RelayItem) -> &'static str {
     match item {
         RelayItem::NotReady => MENU_RELAY_SETUP,
@@ -243,7 +147,6 @@ fn relay_label(item: RelayItem) -> &'static str {
     }
 }
 
-/// What the menu should say about the connected characters.
 fn entries(connected: &[CharacterView]) -> Vec<Entry> {
     connected
         .iter()
@@ -258,26 +161,16 @@ fn entries(connected: &[CharacterView]) -> Vec<Entry> {
         .collect()
 }
 
-/// The template macOS recolours: pure black, the shape carried by the alpha
-/// channel alone. See « Ce qui mord » in the plan for what it must be.
 #[cfg(target_os = "macos")]
 fn tray_image() -> Image<'static> {
     tauri::include_image!("./icons/tray.png")
 }
 
-/// The logo, since Windows recolours nothing and the template would be a black
-/// glyph on a dark taskbar. `npm run tauri icon` regenerates it with the rest.
 #[cfg(target_os = "windows")]
 fn tray_image() -> Image<'static> {
     tauri::include_image!("./icons/32x32.png")
 }
 
-/// Puts the icon in the system tray and starts the thread that answers it.
-///
-/// A failure here costs the icon and nothing else: the window, the shortcuts and
-/// the AutoFocus are untouched, so it is written down and Multifus carries on.
-/// What it does cost is the way to quit, which is why the close of the window is
-/// only intercepted when [`is_present`] says there is an icon to fall back on.
 pub fn setup(app: &AppHandle) {
     app.manage::<ShownMenu>(Mutex::new(None));
 
@@ -285,10 +178,6 @@ pub fn setup(app: &AppHandle) {
 
     let built = tauri::tray::TrayIconBuilder::with_id(TRAY_ID)
         .icon(tray_image())
-        // macOS recolours a template image itself, white on a dark menu bar and
-        // black on a light one. Without this the glyph goes up as it is drawn
-        // and disappears into one of the two. Windows recolours nothing, so the
-        // flag is macOS's alone and [`tray_image`] is what changes.
         .icon_as_template(cfg!(target_os = "macos"))
         .tooltip(tooltip(0))
         .on_menu_event(on_menu_event)
@@ -302,36 +191,18 @@ pub fn setup(app: &AppHandle) {
     }
 }
 
-/// There is an icon in the system tray, so closing the window is not losing Multifus.
 #[must_use]
 pub fn is_present(app: &AppHandle) -> bool {
     app.tray_by_id(TRAY_ID).is_some()
 }
 
-/// Makes the menu match the roster, and does nothing when it already does.
-///
-/// **Idempotent, and that is what lets it be called from anywhere.** Every path
-/// that emits a snapshot ends here, settings changes included, so the rule of
-/// the project stays a single line: what changes the roster emits a snapshot.
-/// The cost of that generosity is one comparison, since a menu whose lines have
-/// not moved is not rebuilt.
-///
-/// A menu the user has open at that moment is not disturbed: the system keeps
-/// tracking the one it is showing, and the new one takes over at the next click.
-/// The worst that costs is a click on a character that has just gone, which the
-/// worker answers with the same « fenêtre disparue » as anything else would.
 pub fn refresh(app: &AppHandle) {
     let Some(icon) = app.tray_by_id(TRAY_ID) else {
         return;
     };
 
-    // The lock is taken and given back here, before a single menu call. See the
-    // note at the top of this module.
     let wanted = contents(app);
 
-    // And this one is given back too, for the same reason: holding it across a
-    // menu setter would let a background thread waiting on the main thread meet
-    // a main thread waiting on this.
     {
         let mut shown = shown_menu(app);
 
@@ -348,23 +219,15 @@ pub fn refresh(app: &AppHandle) {
     });
 
     if built.is_err() {
-        // What is on screen is now unknown rather than what was just asked for,
-        // so the next call has to try again instead of finding itself in step.
         *shown_menu(app) = None;
     }
 
     report(app, built);
 }
 
-/// The menu as it stands: who is connected, then the two things a system tray icon
-/// is for.
 fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> {
     let menu = Menu::new(app)?;
 
-    // A refused authorization comes first, because nothing below it works. The
-    // window would say the same thing, but the whole point of this icon is not
-    // having to open the window: Multifus gone deaf has to be readable from the
-    // system tray, with the way to fix it right underneath.
     if !contents.granted {
         menu.append(&MenuItem::with_id(
             app,
@@ -384,8 +247,6 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
     }
 
     if contents.entries.is_empty() {
-        // Not an empty menu: an icon whose menu says nothing reads as broken,
-        // and « nobody is connected » is the answer being looked for.
         menu.append(&MenuItem::with_id(
             app,
             NOBODY_ID,
@@ -407,10 +268,6 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
 
     menu.append(&PredefinedMenuItem::separator(app)?)?;
 
-    // The one setting worth reaching without opening the window: an evening
-    // where the focus has to stop moving is called off from here in one click.
-    // It suspends the seven kinds rather than clearing them, so turning it back
-    // on gives back exactly what was there.
     menu.append(&MenuItem::with_id(
         app,
         AUTO_FOCUS_ID,
@@ -419,10 +276,6 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
         None::<&str>,
     )?)?;
 
-    // Under the master and not next to the screens: it is a setting of the
-    // AutoFocus, not a fifth place to go. Left live while the AutoFocus is off,
-    // exactly as the seven kinds are on the screen, since it says what will
-    // happen when it comes back rather than what is happening now.
     menu.append(&MenuItem::with_id(
         app,
         WAKE_MINIMIZED_ID,
@@ -435,8 +288,6 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
         None::<&str>,
     )?)?;
 
-    // The switch of the relay, here and nowhere else: the four combinations are
-    // taken, and one switches the relay on while standing up.
     menu.append(&MenuItem::with_id(
         app,
         RELAY_ID,
@@ -445,9 +296,6 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
         None::<&str>,
     )?)?;
 
-    // Five lines rather than one « Ouvrir », because opening the window is never
-    // the thing one wants: going to one of its screens is. The rail is three
-    // clicks away otherwise, and this icon exists to save exactly those.
     menu.append(&PredefinedMenuItem::separator(app)?)?;
 
     for screen in Screen::ALL {
@@ -460,10 +308,6 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
         )?)?;
     }
 
-    // With the five screens, because it is the same gesture: going to look at
-    // something. It is here rather than in the window alone because the day it is
-    // wanted is a day something is wrong, and the window is one of the things
-    // that can be wrong.
     menu.append(&MenuItem::with_id(
         app,
         JOURNAL_ID,
@@ -474,9 +318,6 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
 
     menu.append(&PredefinedMenuItem::separator(app)?)?;
 
-    // Next to the way out rather than at the top, and for the same reason it is
-    // offered here at all: installing restarts Multifus, so it sits with the
-    // other item that ends the process and not among the ones that do not.
     if let Some(version) = &contents.update {
         menu.append(&MenuItem::with_id(
             app,
@@ -498,22 +339,12 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
     Ok(menu)
 }
 
-/// An item was clicked, on the main thread.
-///
-/// Showing the window and ending the process are both cheap and both belong to
-/// this thread, so they happen here. A character is a system call into a game
-/// client, so it is queued.
 fn on_menu_event(app: &AppHandle, event: MenuEvent) {
     let id = event.id().as_ref();
 
     if id == QUIT_ID {
-        // Written before the process ends, and the last line of a run that ended
-        // on purpose. Its absence at the end of a run is a fact of its own, which
-        // only a journal that outlives the process can hold.
         lock(app).log(JournalEvent::Quit);
 
-        // The only way out. `exit` carries a code, which is how the run loop
-        // tells this apart from a window the user merely closed.
         app.exit(0);
 
         return;
@@ -530,8 +361,6 @@ fn on_menu_event(app: &AppHandle, event: MenuEvent) {
             return;
         };
 
-        // The window comes forward first, so that the screen it lands on is the
-        // one that was asked for rather than the one it was left on.
         runtime::navigate(app, screen);
         main_window::show(app);
 
@@ -539,9 +368,6 @@ fn on_menu_event(app: &AppHandle, event: MenuEvent) {
     }
 
     if id == UPDATE_ID {
-        // The download is asked for and not waited on: what comes back through
-        // the snapshot is the menu losing this line, and then Multifus
-        // restarting on its own. See `app::update`.
         update::install(app);
 
         return;
@@ -554,9 +380,6 @@ fn on_menu_event(app: &AppHandle, event: MenuEvent) {
     }
 
     if id == AUTO_FOCUS_ID {
-        // The tick the system has already drawn is not the truth. The state
-        // flips, and what the menu shows next comes back through the snapshot,
-        // like every other surface.
         lock(app).toggle_auto_focus();
 
         runtime::emit_snapshot(app);
@@ -573,11 +396,7 @@ fn on_menu_event(app: &AppHandle, event: MenuEvent) {
     }
 
     if id == RELAY_ID {
-        // The live state and never the label, which comes from a snapshot and
-        // can be a few seconds old.
         if lock(app).is_relay_ready() {
-            // Returns straight away and reads the keychain elsewhere, exactly as
-            // `update::install` does two items above.
             relay::run::toggle(app);
         } else {
             runtime::navigate(app, Screen::Relay);
@@ -588,17 +407,10 @@ fn on_menu_event(app: &AppHandle, event: MenuEvent) {
     }
 
     if let Some(nickname) = id.strip_prefix(CHARACTER_PREFIX) {
-        // Nothing is written on a send that fails, because there is nothing left
-        // to write: the worker never came up, which `start_worker` wrote down, or
-        // it died, which it no longer does since each click is caught. Same note
-        // as on `crate::app::shortcuts::fire`, including why the state lock is not
-        // the obstacle here: this very function takes it three items above.
         drop(app.state::<TrayQueue>().send(nickname.to_owned()));
     }
 }
 
-/// What a setting's line says: the verb that undoes it when it is on, the verb
-/// that does it when it is off.
 fn switch_label(on: bool, undo: &'static str, redo: &'static str) -> &'static str {
     if on {
         undo
@@ -607,7 +419,6 @@ fn switch_label(on: bool, undo: &'static str, redo: &'static str) -> &'static st
     }
 }
 
-/// The stable name a screen travels under, in the menu and on the bridge.
 fn screen_id(screen: Screen) -> &'static str {
     match screen {
         Screen::Characters => "characters",
@@ -619,14 +430,12 @@ fn screen_id(screen: Screen) -> &'static str {
     }
 }
 
-/// The screen a clicked item names, `None` for one this version does not know.
 fn screen_of(name: &str) -> Option<Screen> {
     Screen::ALL
         .into_iter()
         .find(|screen| screen_id(*screen) == name)
 }
 
-/// What the menu calls each screen.
 fn screen_label(screen: Screen) -> &'static str {
     match screen {
         Screen::Characters => MENU_CHARACTERS,
@@ -638,12 +447,6 @@ fn screen_label(screen: Screen) -> &'static str {
     }
 }
 
-/// Starts the thread that answers a clicked character, for the life of the
-/// process.
-///
-/// One click cannot cost the menu. Focusing goes into a game client through
-/// Accessibility, and a panic there used to end this thread for good: the menu
-/// kept opening, kept listing everybody, and no item did anything ever again.
 fn start_worker(app: &AppHandle) {
     let (queue, nicknames) = mpsc::channel::<String>();
 
@@ -662,8 +465,6 @@ fn start_worker(app: &AppHandle) {
         });
 
     if let Err(error) = spawned {
-        // Without this thread every item of the menu is dead. It has to be said
-        // rather than swallowed.
         lock(app).log(JournalEvent::TrayFailed {
             detail: error.to_string(),
         });
@@ -672,13 +473,10 @@ fn start_worker(app: &AppHandle) {
     app.manage::<TrayQueue>(queue);
 }
 
-/// Brings a character's window to the front, on the worker thread.
 fn focus(app: &AppHandle, nickname: &str) {
     let window = lock(app).window_of(nickname);
 
     let outcome = match window {
-        // The menu was built from a roster this character has left since. A
-        // click on a stale item lands here, and says so.
         None => TrayOutcome::NoWindow,
         Some(window) => match app.state::<PlatformWindowManager>().focus(window) {
             Ok(()) => TrayOutcome::Focused,
@@ -695,7 +493,6 @@ fn focus(app: &AppHandle, nickname: &str) {
     });
 }
 
-/// Writes down what the system refused, and swallows nothing.
 fn report<T>(app: &AppHandle, outcome: tauri::Result<T>) {
     if let Err(error) = outcome {
         lock(app).log_unless_repeated(JournalEvent::TrayFailed {
@@ -704,8 +501,6 @@ fn report<T>(app: &AppHandle, outcome: tauri::Result<T>) {
     }
 }
 
-/// What the menu shows, taken even if a previous holder panicked. See the note
-/// on [`crate::app::state::lock`].
 fn shown_menu(app: &AppHandle) -> MutexGuard<'_, Option<Contents>> {
     app.state::<ShownMenu>()
         .inner()
@@ -719,8 +514,6 @@ mod tests {
 
     #[test]
     fn the_relay_item_says_a_different_thing_for_each_of_its_three_states() {
-        // A state missing from `Contents` is a change the menu sleeps through,
-        // and three labels that differ is what proves this one travels.
         let labels = [RelayItem::NotReady, RelayItem::Off, RelayItem::On].map(relay_label);
 
         assert_eq!(
@@ -735,8 +528,6 @@ mod tests {
 
     #[test]
     fn a_running_relay_is_never_offered_as_something_to_switch_on() {
-        // The live state outranks the configuration, so a relay switched on and
-        // then unticked still offers to be switched off.
         let mut contents = Contents {
             entries: Vec::new(),
             auto_focus: true,

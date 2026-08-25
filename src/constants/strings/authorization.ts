@@ -1,5 +1,3 @@
-/** The words of the screen shown while the system says no. */
-
 import { IS_APPLE } from '@/constants/keyboard'
 
 export const AUTHORIZATION_STRINGS = {

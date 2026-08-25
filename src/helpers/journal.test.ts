@@ -30,7 +30,6 @@ import {
   journalTranscript
 } from '@/helpers/journal'
 
-/** One event of the union, picked by its kind, as the module under test does. */
 type EventOf<Kind extends JournalEvent['kind']> = Extract<
   JournalEvent,
   { readonly kind: Kind }
@@ -41,15 +40,10 @@ type Case<Kind extends JournalEvent['kind']> = {
   readonly line: string
 }
 
-/**
- * One case at least per kind of the union, derived and never listed: an event
- * added on the Rust side and forgotten fails to compile here too.
- */
 type JournalCases = {
   readonly [Kind in JournalEvent['kind']]: readonly Case<Kind>[]
 }
 
-/** What the system said, for the events whose line is a phrase and a reason. */
 const DETAIL = 'le système n’a pas répondu'
 
 const NICKNAME = 'Alpha'
@@ -82,7 +76,6 @@ const QUICK_REPLIES = [
   }
 ] as const satisfies readonly QuickReply[]
 
-/** The set as the Rust side lays it down: the four actions, then the quick replies. */
 const BINDINGS = [
   {
     binding: { kind: 'action', action: 'next' },
@@ -499,7 +492,6 @@ const TRAY_CASES = {
   readonly Case<'trayFocus'>[]
 >
 
-/** The seven outcomes, plus the notification no pattern gave a type to. */
 const NOTIFICATION_CASES = {
   focused: [
     {
@@ -592,7 +584,6 @@ const NOTIFICATION_CASES = {
   readonly Case<'notification'>[]
 >
 
-/** Three failures told apart because they are repaired in three places. */
 const RELAY_FAILURE_CASES = {
   keychain: [
     {
@@ -626,7 +617,6 @@ const RELAY_FAILURE_CASES = {
   readonly Case<'relayFailed'>[]
 >
 
-/** Every avis of ADR 0010, keyed so a sixth one fails to compile here. */
 const NOTICE_CASES = {
   enabled: [
     {
@@ -977,7 +967,6 @@ const JOURNAL_CASES = {
   quit: [{ event: { kind: 'quit' }, line: PLAIN_LINES.quit }]
 } as const satisfies JournalCases
 
-/** The three events whose tone is decided by an outcome, minus that outcome. */
 const NOTIFIED = {
   kind: 'notification',
   nickname: NICKNAME,
@@ -994,7 +983,6 @@ const CLICKED = {
   nickname: NICKNAME
 } as const satisfies Omit<EventOf<'trayFocus'>, 'outcome'>
 
-/** Two moments of the same day, UTC, which the config of vitest pins. */
 const MORNING = Date.UTC(2026, 0, 15, 9, 5, 3)
 const NOON = Date.UTC(2026, 0, 15, 12, 30, 0)
 
@@ -1033,10 +1021,8 @@ describe('journalLine', () => {
   it.each(Object.values(JOURNAL_CASES).flat())(
     '$event.kind se lit « $line »',
     ({ event, line }) => {
-      // #when
       const written = journalLine(event)
 
-      // #then
       expect(written).toBe(line)
     }
   )
@@ -1044,220 +1030,171 @@ describe('journalLine', () => {
 
 describe('journalTone', () => {
   it('salue une autorisation accordée', () => {
-    // #when
     const tone = journalTone({ kind: 'authorization', granted: true })
 
-    // #then
     expect(tone).toBe('good')
   })
 
   it('avertit sur une autorisation refusée', () => {
-    // #when
     const tone = journalTone({ kind: 'authorization', granted: false })
 
-    // #then
     expect(tone).toBe('warning')
   })
 
   it('salue une demande d’autorisation qui a abouti', () => {
-    // #given
     const event = {
       kind: 'authorizationRequested',
       granted: true,
       failure: null
     } as const
 
-    // #when
     const tone = journalTone(event)
 
-    // #then
     expect(tone).toBe('good')
   })
 
   it('ne compte pas comme une faute un refus dans la seconde qui suit', () => {
-    // #given
     const event = {
       kind: 'authorizationRequested',
       granted: false,
       failure: null
     } as const
 
-    // #when
     const tone = journalTone(event)
 
-    // #then
     expect(tone).toBe('neutral')
   })
 
   it('avertit quand le système n’a pas pu répondre à la demande', () => {
-    // #given
     const event = {
       kind: 'authorizationRequested',
       granted: false,
       failure: DETAIL
     } as const
 
-    // #when
     const tone = journalTone(event)
 
-    // #then
     expect(tone).toBe('warning')
   })
 
   it('salue une notification qui a ramené une fenêtre', () => {
-    // #given
     const event = {
       ...NOTIFIED,
       outcome: { outcome: 'focused' }
     } as const
 
-    // #when
     const tone = journalTone(event)
 
-    // #then
     expect(tone).toBe('good')
   })
 
   it('reste neutre sur une notification qui n’a rien fait', () => {
-    // #given
     const event = {
       ...NOTIFIED,
       outcome: { outcome: 'kindDisabled' }
     } as const
 
-    // #when
     const tone = journalTone(event)
 
-    // #then
     expect(tone).toBe('neutral')
   })
 
   it('salue un raccourci qui a ramené une fenêtre', () => {
-    // #given
     const event = {
       ...FIRED,
       outcome: { outcome: 'focused', nickname: NICKNAME }
     } as const
 
-    // #when
     const tone = journalTone(event)
 
-    // #then
     expect(tone).toBe('good')
   })
 
   it('reste neutre sur un raccourci frappé hors du jeu', () => {
-    // #given
     const event = { ...FIRED, outcome: { outcome: 'outsideGame' } } as const
 
-    // #when
     const tone = journalTone(event)
 
-    // #then
     expect(tone).toBe('neutral')
   })
 
   it('avertit sur un raccourci dont le focus a été refusé', () => {
-    // #given
     const event = {
       ...FIRED,
       outcome: { outcome: 'focusFailed', nickname: NICKNAME, detail: DETAIL }
     } as const
 
-    // #when
     const tone = journalTone(event)
 
-    // #then
     expect(tone).toBe('warning')
   })
 
   it('salue un clic de la barre système qui a abouti', () => {
-    // #given
     const event = { ...CLICKED, outcome: { outcome: 'focused' } } as const
 
-    // #when
     const tone = journalTone(event)
 
-    // #then
     expect(tone).toBe('good')
   })
 
   it('avertit sur un clic de la barre système que le système a refusé', () => {
-    // #given
     const event = {
       ...CLICKED,
       outcome: { outcome: 'focusFailed', detail: DETAIL }
     } as const
 
-    // #when
     const tone = journalTone(event)
 
-    // #then
     expect(tone).toBe('warning')
   })
 
   it('avertit dès qu’une seule combinaison n’est pas sur le système', () => {
-    // #when
     const tone = journalTone({ kind: 'shortcutsBound', bindings: BINDINGS })
 
-    // #then
     expect(tone).toBe('warning')
   })
 
   it('reste neutre quand chaque combinaison est posée ou vide', () => {
-    // #given
     const bindings = BINDINGS.filter((binding) => {
       return binding.status.kind !== 'invalid'
     })
 
-    // #when
     const tone = journalTone({ kind: 'shortcutsBound', bindings })
 
-    // #then
     expect(tone).toBe('neutral')
   })
 
   it('lit dans la table le ton d’une écoute qui a démarré', () => {
-    // #when
     const tone = journalTone({ kind: 'listening' })
 
-    // #then
     expect(tone).toBe('good')
   })
 
   it('lit dans la table le ton d’une lecture des fenêtres impossible', () => {
-    // #when
     const tone = journalTone({ kind: 'scanFailed', detail: DETAIL })
 
-    // #then
     expect(tone).toBe('warning')
   })
 })
 
 describe('journalTime', () => {
   it('écrit l’heure, les minutes et les secondes sur deux chiffres', () => {
-    // #when
     const time = journalTime(MORNING)
 
-    // #then
     expect(time).toBe('09:05:03')
   })
 
   it('écrit minuit comme une heure ordinaire', () => {
-    // #when
     const time = journalTime(Date.UTC(2026, 0, 15))
 
-    // #then
     expect(time).toBe('00:00:00')
   })
 })
 
 describe('journalTranscript', () => {
   it('porte un en-tête qui se lit seul, puis une entrée par ligne', () => {
-    // #when
     const transcript = journalTranscript(SNAPSHOT)
 
-    // #then
     expect(transcript).toBe(
       [
         'Multifus 0.1.0 sur macOS 26.0 (arm64)',
@@ -1276,35 +1213,28 @@ describe('journalTranscript', () => {
   })
 
   it('dit l’autorisation refusée et l’écoute arrêtée', () => {
-    // #given
     const authorization = { granted: false, listening: false }
 
-    // #when
     const transcript = journalTranscript({ ...SNAPSHOT, authorization })
 
-    // #then
     expect(transcript).toContain('Autorisation : refusée, écoute arrêtée')
   })
 
   it('dit l’AutoFocus suspendu et le réveil des réduites inactif', () => {
-    // #when
     const transcript = journalTranscript({
       ...SNAPSHOT,
       autoFocusEnabled: false,
       wakesMinimized: false
     })
 
-    // #then
     expect(transcript).toContain(
       'AutoFocus : suspendu, réveil des réduites inactif'
     )
   })
 
   it('ne promet aucune période quand rien n’est en mémoire', () => {
-    // #when
     const transcript = journalTranscript({ ...SNAPSHOT, journal: [] })
 
-    // #then
     expect(transcript).toContain('Entrées en mémoire : 0, aucune entrée')
   })
 })

@@ -24,11 +24,6 @@ type ShortcutsScreenProps = Readonly<{
   run: (action: Promise<Snapshot>) => void
 }>
 
-/**
- * The four combinations of perimetre.md and the quick replies of ADR 0012, captured
- * here and reported as the system left them. One capture at a time for the whole
- * screen: two fields listening at once would both answer the same key press.
- */
 export const ShortcutsScreen = ({
   shortcuts,
   quickReplies,

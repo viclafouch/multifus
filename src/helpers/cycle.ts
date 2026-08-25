@@ -1,5 +1,3 @@
-/** The cycle order, as the interface draws it. */
-
 import type { Character } from '@/@types/roster'
 
 type ArrangeParams = {
@@ -7,7 +5,6 @@ type ArrangeParams = {
   readonly order: readonly string[] | null
 }
 
-/** The roster as it is drawn: the stored order, or the one being dragged. */
 export const arrange = ({
   characters,
   order

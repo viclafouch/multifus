@@ -8,10 +8,6 @@ type EmptyStateProps = Readonly<{
   children: React.ReactNode
 }>
 
-/**
- * The dashed panel a screen shows instead of its content. Two screens need it
- * identical: the roster nobody has filled, and the one the system hides.
- */
 export const EmptyState = ({
   title,
   body,

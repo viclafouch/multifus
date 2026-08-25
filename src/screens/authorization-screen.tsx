@@ -10,17 +10,6 @@ type AuthorizationScreenProps = Readonly<{
   run: (action: Promise<Snapshot>) => void
 }>
 
-/**
- * What stands in for the roster while the system will not let Multifus look.
- *
- * It has to hold rather than blink. macOS never grants Accessibility in the
- * second that follows the request, so the ordinary state right after asking is
- * still a refusal. This is a screen, it stays, and it leaves on its own the
- * moment the scan finds the authorization granted.
- *
- * Only the characters screen is replaced. The shortcuts, the switches and the
- * about screen work without any authorization at all.
- */
 export const AuthorizationScreen = ({ run }: AuthorizationScreenProps) => {
   return (
     <Screen title={strings.characters.title}>
@@ -57,5 +46,4 @@ export const AuthorizationScreen = ({ run }: AuthorizationScreenProps) => {
   )
 }
 
-/** The Rust side journals what the system refused to open. Nothing to add. */
 const ignoreOpenFailure = () => {}

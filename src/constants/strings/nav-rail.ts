@@ -1,8 +1,5 @@
-/** The words of the rail: the name, the six screens, and the line under them. */
-
 import type { ScreenName } from '@/@types/snapshot'
 
-/** A seventh screen on the Rust side fails to compile here, and not in the rail. */
 const SCREEN_LABELS = {
   characters: 'Personnages',
   shortcuts: 'Raccourcis',

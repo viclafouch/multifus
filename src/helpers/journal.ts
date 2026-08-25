@@ -1,8 +1,3 @@
-/**
- * The journal put into words, which is the only place its events become French.
- * Pure: it reads the tables of `constants/journal.ts` and never the bridge.
- */
-
 import type {
   JournalEntry,
   JournalEvent,
@@ -39,7 +34,6 @@ import {
 import { strings } from '@/constants/strings'
 import { updateLine } from '@/helpers/wording'
 
-/** How a moment of the day is written in the journal. */
 export const journalTime = (milliseconds: number) => {
   return new Date(milliseconds).toLocaleTimeString('fr-FR', {
     hour: '2-digit',
@@ -48,10 +42,6 @@ export const journalTime = (milliseconds: number) => {
   })
 }
 
-/**
- * The same moment with its date, for the head of a transcript. A transcript
- * pasted elsewhere has to say which day it was.
- */
 const journalMoment = (milliseconds: number) => {
   return new Date(milliseconds).toLocaleString('fr-FR', {
     dateStyle: 'short',
@@ -59,17 +49,11 @@ const journalMoment = (milliseconds: number) => {
   })
 }
 
-/**
- * Only the four events whose tone depends on their payload are read by hand,
- * and two of them read a table of their own.
- */
 export const journalTone = (event: JournalEvent): JournalTone => {
   if (event.kind === 'authorization') {
     return event.granted ? 'good' : 'warning'
   }
 
-  // Being refused a second after asking is what macOS always answers, so it is
-  // the ordinary state and not a fault.
   if (event.kind === 'authorizationRequested') {
     if (event.failure !== null) {
       return 'warning'
@@ -105,7 +89,6 @@ export const journalTone = (event: JournalEvent): JournalTone => {
   return TONES[event.kind]
 }
 
-/** The kinds each of the two tables of stock phrases answers for. */
 type DetailedEventKind = keyof typeof DETAILED_LINES
 type PlainEventKind = keyof typeof PLAIN_LINES
 
@@ -121,10 +104,6 @@ const isPlain = (
   return event.kind in PLAIN_LINES
 }
 
-/**
- * The first line of every run, and the one that makes the rest readable: a
- * transcript is read against a release, a system, and a way of starting.
- */
 const startedLine = (event: Extract<JournalEvent, { kind: 'started' }>) => {
   const how =
     event.launch === 'session'
@@ -157,10 +136,6 @@ const authorizationRequestedLine = (
     : 'Autorisation demandée : pas encore accordée, ce qui est normal dans la seconde qui suit.'
 }
 
-/**
- * What the relay could not do, put into words. Each line names the place it is
- * repaired in, and they are three different places.
- */
 const relayFailedLine = (reason: RelayFailure) => {
   switch (reason.reason) {
     case 'keychain': {
@@ -178,10 +153,6 @@ const relayFailedLine = (reason: RelayFailure) => {
   }
 }
 
-/**
- * Why a quick reply did not reach the chat, put into words. Each line names the place
- * it is repaired in, and they are six different places.
- */
 const quickReplyFailedLine = (reason: QuickReplyFailure) => {
   switch (reason.reason) {
     case 'outsideGame': {
@@ -208,20 +179,14 @@ const quickReplyFailedLine = (reason: QuickReplyFailure) => {
   }
 }
 
-/** Where the user acted, for the settings and the switch that have two doors. */
 const surfaceLabel = (surface: Surface) => {
   return surface === 'tray' ? 'la barre système' : 'la fenêtre'
 }
 
-/** How a sex is named when a whole one of them is meant. */
 const genderPluralLabel = (gender: Gender) => {
   return gender === 'male' ? 'les hommes' : 'les femmes'
 }
 
-/**
- * What the user did to the roster, put into words. These lines exist so that the
- * journal reads on its own: a `Suivant` finding nobody is explained by them.
- */
 const rosterLine = (change: RosterChange) => {
   switch (change.kind) {
     case 'slept': {
@@ -263,7 +228,6 @@ const rosterLine = (change: RosterChange) => {
   }
 }
 
-/** A setting the user moved, put into words. */
 const settingLine = (change: SettingChange) => {
   switch (change.kind) {
     case 'autoFocusEnabled': {
@@ -303,10 +267,6 @@ const settingLine = (change: SettingChange) => {
   }
 }
 
-/**
- * Every combination as the system left it, on one line, the quick replies after the
- * four actions. Written as they are stored, next to a configuration file.
- */
 const shortcutsBoundLine = (bindings: readonly BoundCombination[]) => {
   const parts = bindings.map((bound) => {
     return `${journalBindingLabel(bound.binding)} ${boundCombinationLabel(bound)}`
@@ -315,10 +275,6 @@ const shortcutsBoundLine = (bindings: readonly BoundCombination[]) => {
   return `Raccourcis : ${parts.join(' · ')}.`
 }
 
-/**
- * What a combination fires, named for a reader of the file. Never the
- * `bindingLabel` of `wording.ts`, which quotes a quick reply: this file holds no text.
- */
 const journalBindingLabel = (binding: Binding) => {
   return binding.kind === 'action'
     ? strings.shortcuts.actions[binding.action].label
@@ -326,8 +282,6 @@ const journalBindingLabel = (binding: Binding) => {
 }
 
 const boundCombinationLabel = ({ accelerator, status }: BoundCombination) => {
-  // `null` is a combination the user cleared, which the status reports as
-  // `unbound`. Naming it here as well keeps every branch readable on its own.
   const combination = accelerator ?? 'aucune combinaison'
 
   switch (status.kind) {
@@ -355,7 +309,6 @@ const boundCombinationLabel = ({ accelerator, status }: BoundCombination) => {
   }
 }
 
-/** Everything laid on the system, in the order the Rust side lays it down. */
 const boundCombinations = (snapshot: Snapshot): readonly BoundCombination[] => {
   const actions = snapshot.shortcuts.map(({ action, accelerator, status }) => {
     return { binding: { kind: 'action', action }, accelerator, status } as const
@@ -374,26 +327,16 @@ const boundCombinations = (snapshot: Snapshot): readonly BoundCombination[] => {
   return [...actions, ...quickReplies]
 }
 
-/**
- * The stretch of time the entries in memory cover, with the date: it says how
- * far back these lines reach before the file has to be opened.
- */
 const journalPeriod = (entries: readonly JournalEntry[]) => {
   if (entries.length === 0) {
     return 'aucune entrée'
   }
 
-  // Through a variable on purpose: the formatter rewrites the index in place
-  // into `entries.at(-1)`, which the `lib` of this project does not have.
   const lastIndex = entries.length - 1
 
   return `${journalMoment(entries[0].at)} → ${journalMoment(entries[lastIndex].at)}`
 }
 
-/**
- * The journal as plain text, a header and then one entry per line, oldest first.
- * The header is not decoration, see `docs/macos.md`, « Le journal ».
- */
 export const journalTranscript = (snapshot: Snapshot) => {
   const { journal } = snapshot
 
@@ -409,8 +352,6 @@ export const journalTranscript = (snapshot: Snapshot) => {
     `Configuration : ${snapshot.config.path}`,
     `Mise à jour : ${updateLine(snapshot.update)}`,
     `Entrées en mémoire : ${journal.length}, ${journalPeriod(journal)}`,
-    // The drawer holds a window, the file holds the weeks. Without this line
-    // somebody hands over ten minutes and believes they handed over the month.
     'Le fichier du journal sur le disque va plus loin en arrière que ces lignes.',
     '',
     ...lines
@@ -422,10 +363,6 @@ type ShortcutLineParams = {
   readonly outcome: ShortcutOutcome
 }
 
-/**
- * A shortcut that fired, put into words. Every line names the action first,
- * since the question asked here is always about one combination.
- */
 const shortcutLine = ({ action, outcome }: ShortcutLineParams) => {
   const { label } = strings.shortcuts.actions[action]
 
@@ -476,10 +413,6 @@ type TrayLineParams = {
   readonly outcome: TrayOutcome
 }
 
-/**
- * A character clicked in the system tray, put into words. Named after where the
- * click came from, since a shortcut asks the system for the same thing.
- */
 const trayLine = ({ nickname, outcome }: TrayLineParams) => {
   switch (outcome.outcome) {
     case 'focused': {
@@ -529,8 +462,6 @@ const notificationLine = ({
     case 'leftMinimized': {
       return `${subject} : fenêtre réduite, laissée où elle est.`
     }
-    // Told apart from `kindUnknown` on purpose: an unknown wording is repaired by
-    // adding a pattern, a body nobody read is repaired in the reading itself.
     case 'bodyUnread': {
       return `${subject} : corps de la notification illisible, rien n’a été fait.`
     }
@@ -543,25 +474,16 @@ const notificationLine = ({
   }
 }
 
-/** One event of the union, picked by its kind. */
 type EventOf<Kind extends JournalEvent['kind']> = Extract<
   JournalEvent,
   { readonly kind: Kind }
 >
 
-/**
- * The kinds the two tables of stock phrases did not take: the ones whose line is
- * built from a payload rather than looked up.
- */
 type ComposedEventKind = Exclude<
   JournalEvent['kind'],
   DetailedEventKind | PlainEventKind
 >
 
-/**
- * Of those, the ones Multifus reports about itself. Listed by hand, its other
- * half derived below, so an event forgotten here fails to compile there.
- */
 type RunEventKind =
   | 'authorization'
   | 'characterOffline'
@@ -578,10 +500,8 @@ type RunEventKind =
   | 'started'
   | 'updateAvailable'
 
-/** And the ones the user caused, which is everything left. */
 type ActionEventKind = Exclude<ComposedEventKind, RunEventKind>
 
-/** The kinds {@link runLine} answers for, at runtime this time. */
 const RUN_KINDS = new Set<ComposedEventKind>([
   'authorization',
   'characterOffline',
@@ -605,10 +525,6 @@ const isRunEvent = (
   return RUN_KINDS.has(event.kind)
 }
 
-/**
- * What Multifus observed on its own, put into words. Two functions and not one
- * because the Rust side keeps adding events, see `docs/macos.md`.
- */
 const runLine = (event: EventOf<RunEventKind>) => {
   switch (event.kind) {
     case 'started': {
@@ -663,17 +579,12 @@ const runLine = (event: EventOf<RunEventKind>) => {
   }
 }
 
-/**
- * Whether the machine is being kept awake for the relay. The hold falling is
- * normally the quart d'heure and not somebody switching off, see CONTEXT.md.
- */
 const displayAwakeLine = (held: boolean) => {
   return held
     ? 'Écran tenu éveillé : le relais a quelque chose à écouter.'
     : 'Écran relâché : plus aucun personnage relayé n’est connecté.'
 }
 
-/** What the user did, put into words. The other half of {@link runLine}. */
 const actionLine = (event: EventOf<ActionEventKind>) => {
   switch (event.kind) {
     case 'authorizationRequested': {
@@ -709,7 +620,6 @@ const actionLine = (event: EventOf<ActionEventKind>) => {
   }
 }
 
-/** A journal event, put into words. */
 export const journalLine = (event: JournalEvent) => {
   if (isDetailed(event)) {
     return `${DETAILED_LINES[event.kind]} : ${event.detail}`

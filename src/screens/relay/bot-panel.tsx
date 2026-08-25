@@ -11,10 +11,6 @@ type BotPanelProps = Readonly<{
   run: (action: Promise<Snapshot>) => void
 }>
 
-/**
- * The bot, second card and under the switch. No field, the token never comes
- * back out and there could not be one, see ADR 0009.
- */
 export const BotPanel = ({ isWorking, run }: BotPanelProps) => {
   return (
     <Panel className="mb-3">

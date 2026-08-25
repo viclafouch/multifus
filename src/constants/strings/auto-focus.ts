@@ -1,9 +1,6 @@
-/** The words of the AutoFocus screen, and the seven kinds it switches. */
-
 import type { NotificationKind } from '@/@types/notification'
 import { IS_APPLE } from '@/constants/keyboard'
 
-/** An eighth kind on the Rust side fails to compile here, and not in the screen. */
 const KIND_LABELS = {
   combat: {
     label: 'Combat',
