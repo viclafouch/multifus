@@ -47,6 +47,31 @@ du relais, c'est le refus écrit dans [perimetre.md](./perimetre.md). Le sommeil
 n'étant pas un arrêt du processus, le relais est en revanche toujours actif au
 réveil et reprend seul, jeton et file compris.
 
+## Le collage
+
+**Le presse-papiers rendu trop tôt ne colle rien du tout.** Le client lit le
+presse-papiers quand il traite l'événement et non quand il le reçoit. Mesuré sur
+le Mac : à 10 ms le champ de chat reste vide, et il ne porte même pas l'ancien
+contenu. La constante est `GIVE_BACK_AFTER` dans `app::quick_replies`, à 150,
+trois fois le plancher du Mac et quinze fois celui de Windows.
+
+**Une réponse rapide posée sur la combinaison de collage se déclenche
+elle-même.** Refusée à la capture, et la combinaison s'écrit à trois endroits qui
+doivent dire la même chose : `PASTE_COMBINATION` dans `constants/keyboard.ts`,
+`PASTE_KEY` dans `platform::macos`, `VK_V` dans `platform::windows`. Elle traverse
+deux langages et un `cfg`, donc aucune constante ne peut les tenir ensemble.
+
+**Ne pas accorder `clipboard-manager:allow-read-text` à la capacité.** Le
+presse-papiers est lu depuis Rust, où la capacité ne s'applique pas. La fenêtre
+n'a jamais lu le presse-papiers et n'a aucune raison de commencer : la capacité
+n'accorde que `allow-write-text`, pour le bouton de copie du journal.
+
+**Un `let ... else` qui prend le verrou n'interbloque pas.** Les temporaires de
+l'initialisation meurent avant que la branche `else` s'exécute, donc
+`let Some(x) = lock(app).lire() else { lock(app).ecrire() }` est correct. Vérifié
+plutôt que supposé, parce que la réponse inverse aurait figé le fil des raccourcis
+sans un mot.
+
 ## La configuration
 
 **`Character` n'a pas de `#[serde(default)]` de structure, et `Settings` en a

@@ -4,8 +4,7 @@ Gestionnaire de fenêtres Dofus Retro en multicompte, macOS et Windows. À lire 
 - [docs/perimetre.md](./docs/perimetre.md) — ce que le projet refuse de faire.
 - [docs/adr](./docs/adr) — décisions déjà tranchées, ne pas les rejouer.
 - [docs/plan.md](./docs/plan.md) — le chantier en cours, un seul à la fois, sur
-  les deux systèmes. Aujourd'hui, les **réponses rapides** : un texte tout prêt
-  que le raccourci colle là où l'on écrit dans le jeu.
+  les deux systèmes. Aucun aujourd'hui : il ne porte que ce qui attend.
 - [docs/pieges.md](./docs/pieges.md) — ce qui mord partout, propre à aucun
   chantier ni à aucun système.
 - [docs/macos.md](./docs/macos.md) et [docs/windows.md](./docs/windows.md) —

@@ -71,6 +71,24 @@ jamais le chemin, que l'installation déplace. Un client rend une fenêtre et un
 seule. Le titre est en `v1.49.0` et `TITLE_PATTERN`, écrit contre `v1.48.21`, mord
 sans retouche.
 
+### Le collage des réponses rapides, mesuré le 25 août 2026
+
+Contre un client v1.49.1, avec un binaire jetable supprimé depuis. **Les quatre
+réponses tombent du bon côté et rien du code n'a bougé** ; celles du Mac sont dans
+[macos.md](./macos.md) et aucune ne se transporte.
+
+| #   | Question                                     | Réponse                                                                             |
+| --- | -------------------------------------------- | ----------------------------------------------------------------------------------- |
+| 1   | La combinaison arrive-t-elle dans le chat ?  | **Oui.** `Control+V` par `SendInput`, code virtuel, les quatre événements d'un bloc |
+| 2   | Faut-il relâcher les modificateurs d'abord ? | **Non.** `Control` et `Shift` tenus, le texte arrive quand même                     |
+| 3   | Le délai avant de rendre le presse-papiers   | **10 ms suffisent déjà**, contre 50 sur le Mac                                      |
+| 4   | Le chat doit-il déjà avoir le focus ?        | **Non.** Le champ non cliqué, le texte arrive                                       |
+
+La seconde était celle qui devait mordre : `SendInput` écrit dans le flux du
+clavier, là où macOS pose ses événements sur une source privée qui tient les
+modificateurs physiques à l'écart. Le client s'en moque. Trois replis avaient été
+écrits pour rien, l'écart entre les événements, le scancode et `Shift+Inser`.
+
 ---
 
 ## Lot A — Les fenêtres
@@ -390,3 +408,10 @@ se relit depuis le Mac.**
 mise à jour et réclame `TAURI_SIGNING_PRIVATE_KEY`. La clé privée est sur le Mac,
 dans `~/.tauri/multifus.key`, et **ne se régénère pas**. Le MSI et le NSIS sont
 écrits avant cette étape et existent malgré le code de sortie 1.
+
+**Une frappe posée vers un processus élevé n'arrive jamais, et rien ne le dit.**
+UIPI l'avale, et `SendInput` rend quand même le compte de ses événements, la
+documentation le disant elle-même : ni le retour ni `GetLastError` ne signalent ce
+refus. Un client lancé en administrateur sous un Multifus ordinaire se lit donc
+comme un jeu qui refuse le collage. Le doute se lève en comparant l'élévation des
+deux processus, jamais en relisant le code du collage.

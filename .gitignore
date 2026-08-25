@@ -12,9 +12,6 @@ dist
 dist-ssr
 *.local
 
-# Le binaire jetable de la mesure des phrases, temps 1 du plan.
-probes/*/target
-
 # Editor directories and files
 .vscode
 .idea
