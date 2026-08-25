@@ -336,7 +336,7 @@ pub enum JournalEvent {
     RelayTestSent,
 
     /// The display is held awake, or let go. Written on the change and never on
-    /// the state, which at one scan every three seconds would flush this journal.
+    /// the state, which at one scan a second would flush this journal.
     DisplayAwake { held: bool },
 
     /// The hold could not be raised or released. Not a relay failure: messages

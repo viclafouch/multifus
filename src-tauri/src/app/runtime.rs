@@ -52,10 +52,9 @@ use crate::platform::WindowManager;
 
 /// How often the game windows are looked at.
 ///
-/// Slow enough that an unattended Multifus costs nothing, quick enough that a
-/// client one has just opened shows up before one has finished looking at the
-/// window.
-const SCAN_INTERVAL: Duration = Duration::from_secs(3);
+/// A second, and not three: `SW_MAXIMIZE` takes the foreground, so a client that
+/// has just opened has to be filled while it is still the one in front.
+const SCAN_INTERVAL: Duration = Duration::from_secs(1);
 
 /// The macOS settings pane that grants Accessibility.
 #[cfg(target_os = "macos")]
@@ -84,7 +83,7 @@ pub const NAVIGATE_EVENT: &str = "multifus://navigate";
 /// went out, the listening was never started, and not one line said so. Every
 /// Accessibility call of `platform::macos` is inside that turn, so this is not a
 /// theoretical shape. The turn is therefore caught, written down and tried again
-/// three seconds later.
+/// on the next turn.
 pub fn start(app: AppHandle) {
     let spawned = thread::Builder::new()
         .name("multifus-window-scan".to_owned())
@@ -166,22 +165,19 @@ fn maximize_new_clients(app: &AppHandle) -> bool {
         let filled = app.state::<PlatformWindowManager>().maximize(window);
         let mut state = lock(app);
 
-        match filled {
-            // Remembered only once it worked. A client still loading turns the
-            // write down, and the turn that follows has to try again rather than
-            // leave that window small for the evening.
+        // Remembered once the boundary took the ask, and macOS is the only side
+        // left that can refuse it: a Windows ask is posted and never turned down.
+        written |= match filled {
             Ok(()) => {
                 state.remember_client_window(window);
                 state.log(JournalEvent::ClientMaximized);
-            }
-            Err(error) => {
-                state.log_unless_repeated(JournalEvent::ClientMaximizeFailed {
-                    detail: error.to_string(),
-                });
-            }
-        }
 
-        written = true;
+                true
+            }
+            Err(error) => state.log_unless_repeated(JournalEvent::ClientMaximizeFailed {
+                detail: error.to_string(),
+            }),
+        };
     }
 
     written

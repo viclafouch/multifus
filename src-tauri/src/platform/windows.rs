@@ -29,11 +29,6 @@ use windows::Win32::Foundation::CloseHandle;
 use windows::Win32::Foundation::HANDLE;
 use windows::Win32::Foundation::HWND;
 use windows::Win32::Foundation::LPARAM;
-use windows::Win32::Foundation::RECT;
-use windows::Win32::Graphics::Gdi::GetMonitorInfoW;
-use windows::Win32::Graphics::Gdi::MonitorFromWindow;
-use windows::Win32::Graphics::Gdi::MONITORINFO;
-use windows::Win32::Graphics::Gdi::MONITOR_DEFAULTTONEAREST;
 use windows::Win32::System::Com::CoInitializeEx;
 use windows::Win32::System::Com::COINIT_APARTMENTTHREADED;
 use windows::Win32::System::Power::PowerClearRequest;
@@ -72,8 +67,8 @@ use windows::Win32::UI::WindowsAndMessaging::IsWindow;
 use windows::Win32::UI::WindowsAndMessaging::IsWindowVisible;
 use windows::Win32::UI::WindowsAndMessaging::PeekMessageW;
 use windows::Win32::UI::WindowsAndMessaging::SetForegroundWindow;
-use windows::Win32::UI::WindowsAndMessaging::SetWindowPos;
 use windows::Win32::UI::WindowsAndMessaging::ShowWindow;
+use windows::Win32::UI::WindowsAndMessaging::ShowWindowAsync;
 use windows::Win32::UI::WindowsAndMessaging::SystemParametersInfoW;
 use windows::Win32::UI::WindowsAndMessaging::TranslateMessage;
 use windows::Win32::UI::WindowsAndMessaging::GW_OWNER;
@@ -81,10 +76,7 @@ use windows::Win32::UI::WindowsAndMessaging::MSG;
 use windows::Win32::UI::WindowsAndMessaging::PM_REMOVE;
 use windows::Win32::UI::WindowsAndMessaging::SPI_GETSCREENSAVEACTIVE;
 use windows::Win32::UI::WindowsAndMessaging::SPI_GETSCREENSAVETIMEOUT;
-use windows::Win32::UI::WindowsAndMessaging::SWP_ASYNCWINDOWPOS;
-use windows::Win32::UI::WindowsAndMessaging::SWP_NOACTIVATE;
-use windows::Win32::UI::WindowsAndMessaging::SWP_NOOWNERZORDER;
-use windows::Win32::UI::WindowsAndMessaging::SWP_NOZORDER;
+use windows::Win32::UI::WindowsAndMessaging::SW_MAXIMIZE;
 use windows::Win32::UI::WindowsAndMessaging::SW_RESTORE;
 use windows::Win32::UI::WindowsAndMessaging::SYSTEM_PARAMETERS_INFO_ACTION;
 use windows::Win32::UI::WindowsAndMessaging::SYSTEM_PARAMETERS_INFO_UPDATE_FLAGS;
@@ -207,42 +199,12 @@ impl WindowManager for Win32WindowManager {
 
     fn maximize(&self, window: WindowId) -> Result<()> {
         let handle = live_game_window(window)?;
-        let work = work_area(handle)?;
 
-        // Never `ShowWindow(SW_MAXIMIZE)`, whose value is `SW_SHOWMAXIMIZED`:
-        // it activates, and a client opening while one plays elsewhere would
-        // take the foreground three seconds later. `ASYNCWINDOWPOS` because the
-        // call otherwise waits on the message pump of a client that is loading.
-        unsafe {
-            SetWindowPos(
-                handle,
-                None,
-                work.left,
-                work.top,
-                work.right - work.left,
-                work.bottom - work.top,
-                SWP_NOACTIVATE | SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_ASYNCWINDOWPOS,
-            )
-        }
-        .map_err(|error| PlatformError::system("SetWindowPos", error.to_string()))
-    }
-}
+        // Posted to the client's own thread: `ShowWindow` would wait on the
+        // message pump of a client that is precisely in the middle of loading.
+        let _ = unsafe { ShowWindowAsync(handle, SW_MAXIMIZE) };
 
-/// The work area of the screen a window sits on, taskbar left out.
-fn work_area(handle: HWND) -> Result<RECT> {
-    let monitor = unsafe { MonitorFromWindow(handle, MONITOR_DEFAULTTONEAREST) };
-    let mut info = MONITORINFO {
-        cbSize: size_of::<MONITORINFO>() as u32,
-        ..MONITORINFO::default()
-    };
-
-    if unsafe { GetMonitorInfoW(monitor, &raw mut info) }.as_bool() {
-        Ok(info.rcWork)
-    } else {
-        Err(PlatformError::system(
-            "GetMonitorInfoW",
-            "the system named no screen for this window",
-        ))
+        Ok(())
     }
 }
 

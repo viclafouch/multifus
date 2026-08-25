@@ -81,21 +81,21 @@ mentions légales, remise à zéro.
 
 ### Ce qui est tranché, et qui ne se rejoue pas
 
-| Question                          | Réponse                                                                        |
-| --------------------------------- | ------------------------------------------------------------------------------ |
-| Le déclencheur                    | Une fenêtre de client titrée qu'aucun tour d'avant n'avait remplie              |
-| L'écran de connexion              | **Compte.** La fenêtre grandit à l'ouverture du client, pas à l'entrée en jeu   |
-| Une fenêtre sans titre            | Laissée : c'est un écran de chargement, pas encore le client                    |
-| Le premier tour d'un lancement    | **N'agrandit rien.** Ce qui est déjà ouvert n'a pas été lancé                   |
-| Le réglage qu'on vient de cocher  | N'agrandit rien non plus : le tour qui suit est un premier tour                 |
-| Un agrandissement qui échoue      | **Retenté au tour suivant.** On ne retient qu'une fenêtre effectivement remplie |
-| Deux fois la même fenêtre         | Jamais, une fois remplie. Réduite à la main ensuite, elle reste réduite         |
-| Le premier lancement de multifus  | **Décoché.** Rien ne déplace une fenêtre sans qu'on l'ait demandé               |
-| Le plein écran de macOS           | Refusé, il rangerait le client dans un bureau à lui                             |
-| Le focus                          | Jamais demandé : agrandir n'est pas passer au premier plan                      |
-| Le fil                            | Celui du balayage, jamais une commande, qui tourne sur le fil principal         |
-| L'échec                           | Une ligne de journal, avec ce que le système a répondu                          |
-| Un raccourci                      | Aucun. Le réglage se pose une fois et agit sans que la fenêtre soit ouverte     |
+| Question                         | Réponse                                                                          |
+| -------------------------------- | -------------------------------------------------------------------------------- |
+| Le déclencheur                   | Une fenêtre de client titrée qu'aucun tour d'avant n'avait remplie               |
+| L'écran de connexion             | **Compte.** La fenêtre grandit à l'ouverture du client, pas à l'entrée en jeu    |
+| Une fenêtre sans titre           | Laissée : c'est un écran de chargement, pas encore le client                     |
+| Le premier tour d'un lancement   | **N'agrandit rien.** Ce qui est déjà ouvert n'a pas été lancé                    |
+| Le réglage qu'on vient de cocher | N'agrandit rien non plus : le tour qui suit est un premier tour                  |
+| Un agrandissement qui échoue     | **Retenté au tour suivant.** On ne retient qu'une fenêtre effectivement remplie  |
+| Deux fois la même fenêtre        | Jamais, une fois remplie. Réduite à la main ensuite, elle reste réduite          |
+| Le premier lancement de multifus | **Décoché.** Rien ne déplace une fenêtre sans qu'on l'ait demandé                |
+| Le plein écran de macOS          | Refusé, il rangerait le client dans un bureau à lui                              |
+| Le focus                         | **Pris sur Windows**, seul `SW_MAXIMIZE` y agrandissant vraiment. Rien sur macOS |
+| Le fil                           | Celui du balayage, jamais une commande, qui tourne sur le fil principal          |
+| L'échec                          | Une ligne de journal, avec ce que le système a répondu                           |
+| Un raccourci                     | Aucun. Le réglage se pose une fois et agit sans que la fenêtre soit ouverte      |
 
 ### Ce que le code fait
 
@@ -117,23 +117,26 @@ de client remplies depuis le début du run et non celles du seul tour d'avant.
 suit est alors un premier tour qui n'agrandit rien : c'est ce que laisse derrière
 lui le réglage décoché.
 
-**Une fenêtre n'entre dans cet ensemble qu'une fois remplie.** Un client encore
-en train de charger refuse l'écriture, et la retenir à la vue au lieu du succès
-laissait cette fenêtre petite pour toute la soirée. Elle est donc reproposée au
-tour suivant, et un client fermé entre-temps disparaît de la liste tout seul :
-c'est ce qui borne les tentatives sans compteur.
+**Une fenêtre n'entre dans cet ensemble qu'une fois la demande passée.** Sur
+macOS, un client encore en train de charger refuse l'écriture d'accessibilité, et
+la retenir à la vue au lieu du succès laissait cette fenêtre petite pour toute la
+soirée : elle est reproposée au tour suivant, et un client fermé entre-temps
+disparaît de la liste tout seul, ce qui borne les tentatives sans compteur.
+Windows ne refuse plus rien, la demande y étant postée au client, et c'est tant
+mieux : `SW_MAXIMIZE` activant la fenêtre, un tour qui la repropose serait un vol
+du premier plan toutes les secondes jusqu'au bout de la soirée.
 
 **La frontière.** `WindowManager` gagne deux verbes, `client_windows` et
 `maximize`.
 
 | Système | Lister                               | Agrandir                       |
 | ------- | ------------------------------------ | ------------------------------ |
-| Windows | `EnumWindows`, sans fenêtre possédée | `SetWindowPos` sur le `rcWork` |
+| Windows | `EnumWindows`, sans fenêtre possédée | `ShowWindowAsync(SW_MAXIMIZE)` |
 | macOS   | Un pid par client qui dessine déjà   | `AXPosition` puis `AXSize`     |
 
-Ce que ça a coûté : zéro crate des deux côtés. Windows gagne le trait
-`Win32_Graphics_Gdi`, macOS une arête vers `dispatch2`, qui était déjà dans
-`Cargo.lock`.
+Ce que ça a coûté : zéro crate des deux côtés, et pas un trait de plus sur
+Windows, où `ShowWindow` était déjà là pour l'AutoFocus. macOS gagne une arête
+vers `dispatch2`, qui était déjà dans `Cargo.lock`.
 
 **Les deux moitiés exigent un titre, et ne le lisent pas.** C'est ce qui sépare
 `client_windows` de `game_windows` : la seconde y cherche un pseudo, la première
@@ -142,24 +145,23 @@ chargement, et la remplir sur macOS brûlerait le pid du client avant que sa vra
 fenêtre existe. Sur Windows s'ajoute `GW_OWNER` : une fenêtre possédée est une
 boîte de dialogue et reste où elle est.
 
-Les deux posent le cadre de la fenêtre sur la zone utile de son écran, et
-n'activent rien. Cette zone est le `rcWork` du `MONITORINFO` de
-`MonitorFromWindow` sur Windows, le `visibleFrame` du `NSScreen` sur macOS. Sur
-macOS il faut en plus lire la position de la fenêtre pour savoir de quel écran il
-s'agit : les deux systèmes de coordonnées y sont retournés l'un par rapport à
-l'autre, et c'est la hauteur du premier écran qui sert de charnière. Tout se
-compare dans le repère retourné, jamais à cheval sur les deux.
+Les deux remplissent l'écran où la fenêtre est déjà. Sur Windows le système
+choisit lui-même cet écran et sa zone utile, c'est tout ce que `SW_MAXIMIZE`
+fait ; sur macOS c'est le `visibleFrame` du `NSScreen`, posé à la main, et il
+faut en plus lire la position de la fenêtre pour savoir de quel écran il s'agit :
+les deux systèmes de coordonnées y sont retournés l'un par rapport à l'autre, et
+c'est la hauteur du premier écran qui sert de charnière. Tout se compare dans le
+repère retourné, jamais à cheval sur les deux.
 
 **La position avant la taille.** AppKit garde une fenêtre dans l'écran où elle
 est ; agrandir une fenêtre encore posée dans le coin d'un autre écran la ferait
 rogner sur celui-là.
 
-**Sur le fil du balayage, jamais sur une commande.** Poser un cadre attend la
-boucle de messages du client, qui est justement en train de charger : sur Windows
-`SetWindowPos` est synchrone sans `SWP_ASYNCWINDOWPOS`, sur macOS une écriture
-d'accessibilité attend le délai de la messagerie. Une commande Tauri tourne sur
-le fil principal, donc `maximize_new_clients` est appelé depuis `tick` et non
-depuis `scan`, que `commands::refresh` et `commands::reset` traversent.
+**Sur le fil du balayage, jamais sur une commande.** Sur macOS, agrandir attend
+la boucle de messages du client, qui est justement en train de charger : une
+écriture d'accessibilité y attend le délai de la messagerie. Une commande Tauri
+tourne sur le fil principal, donc `maximize_new_clients` est appelé depuis `tick`
+et non depuis `scan`, que `commands::refresh` et `commands::reset` traversent.
 
 **Le journal gagne deux événements**, `ClientMaximized` et
 `ClientMaximizeFailed`, qui porte ce que le système a répondu. Ni l'un ni l'autre
@@ -211,12 +213,13 @@ avec trois clients déjà ouverts, qui ne doit rien bouger ; une fenêtre remise
 petit à la main, qui doit rester en petit ; une mule laissée inactive un quart
 d'heure et reconnectée, qui doit rester comme on l'avait laissée ; le réglage
 coché en cours de soirée, qui ne doit rien bouger de ce qui est déjà ouvert ; un
-client qui s'ouvre pendant qu'on joue ailleurs, qui ne doit **pas** voler le
-premier plan ; et sur deux écrans, la fenêtre qui doit remplir celui où elle est.
+client qui s'ouvre pendant qu'on joue ailleurs, qui **prend** le premier plan sur
+Windows et pas sur macOS ; et sur deux écrans, la fenêtre qui doit remplir celui
+où elle est.
 
 **Sur le PC, rien n'a été vu marcher**, et toute cette liste s'y rejoue. Deux
-points n'ont pas d'équivalent sur le Mac : le vol du premier plan, là où
-`SW_MAXIMIZE` mordait et que `SWP_NOACTIVATE` doit empêcher ; et les boîtes de
+points n'ont pas d'équivalent sur le Mac : le premier plan, que `SW_MAXIMIZE`
+prend et qui doit rester supportable à une seconde de balayage ; et les boîtes de
 dialogue du client, qui ne doivent pas se retrouver à remplir l'écran.
 
 ---
@@ -243,17 +246,29 @@ agrandi. Le `WindowId` est un pid sur macOS, où le cas ne se présente pas dans
 soirée. C'est le bon échange : une fenêtre oubliée une fois, contre un
 gestionnaire qui se dispute avec l'utilisateur.
 
-**`SW_MAXIMIZE` vaut `SW_SHOWMAXIMIZED`, et les deux activent la fenêtre.** C'est
-le même 3 dans les deux constantes, et `ShowWindow` le documente : « Activates
-the window and displays it as a maximized window ». Un client ouvert pendant
-qu'on joue ailleurs aurait donc volé le premier plan trois secondes plus tard, ce
-que macOS ne fait pas. D'où `SetWindowPos` avec `SWP_NOACTIVATE`, qui pose le
-cadre et rien d'autre. Ne pas revenir à `ShowWindow` pour « faire plus simple ».
+**`SW_MAXIMIZE` active la fenêtre, et c'est accepté.** Il vaut
+`SW_SHOWMAXIMIZED`, le même 3, et `ShowWindow` le documente : « Activates the
+window and displays it as a maximized window ». C'est pourtant le seul appel qui
+agrandit vraiment. Poser le cadre sur le `rcWork` avec `SWP_NOACTIVATE` ne volait
+rien, mais laissait une fenêtre à l'état normal qui remplissait l'écran, bouton
+Agrandir compris : ni le bouton Restaurer, ni la taille d'avant qu'un clic dessus
+redonne. Allumer `WS_MAXIMIZE` à la main pour rattraper ça n'a pas été gardé,
+Dracoon obtenant la même chose avec la ligne simple. Le premier plan pris est le
+prix, et `SCAN_INTERVAL` descend à une seconde pour qu'il le soit tant que le
+client qu'on vient de lancer est encore devant.
 
-**`SetWindowPos` est synchrone par défaut.** Il envoie `WM_WINDOWPOSCHANGING` et
+**`ShowWindow` est synchrone, `ShowWindowAsync` ne l'est pas.** Le premier
 attend, sans délai maximal, que le client traite ses messages, ce qu'un client en
-train de charger ne fait pas. `SWP_ASYNCWINDOWPOS` poste au lieu d'envoyer. Sans
-lui, le fil du balayage se fige derrière un client occupé.
+train de charger ne fait pas : le fil du balayage se figerait derrière lui, et
+avec lui le roster et le relais. Le second poste la demande au fil du client et
+rend la main. `IsHungAppWindow` avait été essayé comme garde et jeté : il ne dit
+vrai qu'après les cinq secondes du système, donc il laisse passer exactement les
+deux ou trois secondes d'une connexion.
+
+**Rien ne relit l'état après coup.** `IsZoomed` juste après la demande la
+dirait fausse, puisqu'elle n'est pas encore traitée, et une fenêtre reproposée
+tour après tour volerait le premier plan à chaque fois. Une demande postée ne se
+refuse pas : elle est donc retenue à l'envoi, comme Dracoon la retient à la vue.
 
 **`NSScreen` n'existe que sur le fil principal.** `platform::macos::on_main_thread`
 y saute, et le balayage est un fil à lui. **Le verrou de `Multifus` ne se tient
