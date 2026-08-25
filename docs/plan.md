@@ -237,20 +237,20 @@ troisième ligne, et ce qu'il refuse de faire est dans
 
 ### Ce qui est tranché, et qui ne se rejoue pas
 
-| Question                     | Réponse                                                                  |
-| ---------------------------- | ------------------------------------------------------------------------ |
-| Le déclencheur               | Un titre de fenêtre qui porte un pseudo, donc l'entrée en jeu            |
-| L'écran de connexion         | **Laissé.** Aucun pseudo à mettre, et le client charge encore            |
-| Rejouer                      | **Oui, à chaque tour.** Un client qui réécrit son titre est resservi     |
-| Décocher le réglage          | Chaque fenêtre retrouve le titre que Dofus lui avait écrit               |
-| Le reste des fonctionnalités | **Inchangé.** La frontière garde le titre d'origine et continue d'y lire |
-| Le fil                       | Celui du balayage, comme l'agrandissement, et jamais une commande        |
-| L'attente après un clic      | **Aucune.** La commande sonne le balayage au lieu d'attendre son tour    |
-| L'échec                      | Une ligne de journal, et un nouvel essai au tour suivant                 |
-| Relancer multifus            | **Relit les titres courts** sans rien avoir retenu, voir plus bas        |
-| Quitter multifus             | **Rend les titres**, sur `RunEvent::Exit`. Le réglage, lui, ne bouge pas |
-| Une fin brutale              | Laisse les fenêtres courtes, que le lancement suivant lit et rend        |
-| Un raccourci                 | Aucun. Le réglage se pose une fois                                       |
+| Question                     | Réponse                                                                     |
+| ---------------------------- | --------------------------------------------------------------------------- |
+| Le déclencheur               | Un titre de fenêtre qui porte un pseudo, donc l'entrée en jeu               |
+| L'écran de connexion         | **Laissé.** Aucun pseudo à mettre, et le client charge encore               |
+| Rejouer                      | **Oui, à chaque tour.** Un client qui réécrit son titre est resservi        |
+| Décocher le réglage          | Chaque fenêtre retrouve le titre que Dofus lui avait écrit                  |
+| Le reste des fonctionnalités | **Inchangé.** Un titre court se relit, sans que rien ait eu à s'en souvenir |
+| Le fil                       | Celui du balayage, comme l'agrandissement, et jamais une commande           |
+| L'attente après un clic      | **Aucune.** La commande sonne le balayage au lieu d'attendre son tour       |
+| L'échec                      | Une ligne de journal, et un nouvel essai au tour suivant                    |
+| Relancer multifus            | **Relit les titres courts** sans rien avoir retenu, voir plus bas           |
+| Quitter multifus             | **Rend les titres**, sur `RunEvent::Exit`. Le réglage, lui, ne bouge pas    |
+| Une fin brutale              | Laisse les fenêtres courtes, que le lancement suivant lit et rend           |
+| Un raccourci                 | Aucun. Le réglage se pose une fois                                          |
 
 ### Ce que le code fait
 
@@ -261,23 +261,21 @@ décision qui porte tout le reste. Une table `fenêtre → pseudo` tenue en mém
 paraissait suffire, et elle est vide au lancement suivant : six fenêtres laissées
 titrées `Alpha` n'auraient plus appartenu à personne, roster vide, barre système
 vide, raccourcis morts, jusqu'à ce que chaque client réécrive son titre de
-lui-même. La règle est donc lue dans le titre : **un client écrit `Dofus` dans
-tous les titres qu'il produit** — fenêtre de jeu, écran de connexion, chargement
-— donc une fenêtre titrée d'un processus Dofus sans `Dofus` dedans est une
-fenêtre que multifus a raccourcie. C'est `matches_short_title`, et
-`GameWindow::from_client_title` la pose derrière `from_title`.
+lui-même. La règle se lit donc dans le titre, et c'est
+`matches_short_title`, que `GameWindow::from_client_title` pose derrière
+`from_title`.
 
-**La règle est « un pseudo Dofus est un seul mot ».** Tous les titres qu'un
-client écrit portent une espace, `Dofus Retro` comme
-`Pseudo - Dofus Retro v1.48.21`. Chercher le mot `Dofus` paraissait plus simple
-et était faux : un personnage nommé `Dofusito` serait passé hors ligne au moment
-même où l'on coche, et sa fenêtre serait restée renommée pour toujours.
+**Cette règle est « un pseudo Dofus est un seul mot ».** Tous les titres qu'un
+client écrit portent une espace, `Dofus Retro` sur l'écran de connexion comme
+`Pseudo - Dofus Retro v1.48.21` en jeu. Chercher le mot `Dofus` avait été essayé
+d'abord, plus simple et faux : un personnage nommé `Dofusito` serait passé hors
+ligne au moment même où l'on coche, et sa fenêtre serait restée renommée pour
+toujours.
 
 **Cette seconde porte ne s'ouvre que si une fenêtre courte est à l'écran**, et
 c'est lu sur l'écran et jamais sur le réglage. Le drapeau posé depuis le réglage
 faisait disparaître tout le roster dans un cas précis : coché, on quitte, on
-relance — les titres sont relus, mais la table est vide —, puis on décoche, et
-plus rien ne savait lire ces fenêtres-là. Il est donc posé à la fin de la
+relance, puis on décoche, et plus rien ne savait lire ces fenêtres-là. Il est donc posé à la fin de la
 tournée, d'après ce qu'elle a vu : une fenêtre qu'on n'a pas pu rendre reste une
 fenêtre dont cette règle est le seul lecteur. Une écriture refusée le pose à
 vrai, faute d'écran confirmé.
@@ -375,17 +373,19 @@ sans que rien ne s'en souvienne, un titre que le client a écrit se lit comme il
 s'est toujours lu, rien ne se lit comme un titre court tant que personne ne l'a
 demandé, et un personnage nommé `Dofusito` est un personnage comme un autre.
 
-**Vu marcher sur le PC le 25 août 2026**, et une seule chose : cocher la case
-pose le pseudo dans la barre des tâches sur-le-champ, sans l'attente d'une
-seconde qu'avait la première version. C'est le réveil du balayage, plus haut.
+**Vu marcher sur le PC le 25 août 2026**, avec un client. Cocher pose le pseudo
+dans la barre des tâches sur-le-champ, sans l'attente d'une seconde qu'avait la
+première version : c'est le réveil du balayage, plus haut. Et le tour complet
+coché, client ouvert, multifus fermé, multifus rouvert, décoché rend bien son
+titre à la fenêtre, ce qui est exactement ce que la table ne savait pas faire.
 
-**Tout le reste n'a été vu sur aucun des deux systèmes.** Ce qui demande
-une soirée : six clients connectés, la barre des tâches qui montre six pseudos ;
-le réglage décoché, les titres d'origine qui reviennent ; un personnage changé
-sans quitter le client, le titre qui suit ; une mule laissée inactive un quart
-d'heure, qui doit repasser hors ligne comme avant ; et surtout les quatre
-raccourcis, l'AutoFocus, la barre système et le relais, qui doivent se comporter
-exactement comme réglage décoché.
+**Tout le reste n'a été vu sur aucun des deux systèmes.** Ce qui demande une
+soirée : six clients connectés, la barre des tâches qui montre six pseudos ; un
+personnage changé sans quitter le client, le titre qui suit ; une mule laissée
+inactive un quart d'heure, qui doit repasser hors ligne comme avant ; quitter
+multifus, qui doit rendre les six titres ; et surtout les quatre raccourcis,
+l'AutoFocus, la barre système et le relais, qui doivent se comporter exactement
+comme réglage décoché.
 
 **`AXTitle` est en lecture seule sur beaucoup d'applications**, et rien ne dit
 encore que le client Retro accepte l'écriture. S'il la refuse, le journal le
@@ -396,19 +396,11 @@ dira, ligne par ligne, et c'est ce qui tranchera si la moitié macOS reste ou si
 
 ## Ce qui mord, ici
 
-**Une fenêtre manquée un seul tour perd son titre d'origine.** Le `retain` de
-`write_titles` élague sur ce que la tournée a vu, et `runs_dofus` fait un
-`OpenProcess` qui peut échouer une fois pour rien ; côté macOS c'est
-`dofus_applications()`. La fenêtre reste alors courte pour de bon. Depuis que la
-lecture est sans mémoire, ça ne coûte plus qu'un titre non rendu et plus jamais
-un personnage hors ligne, et c'est ce qui rend le compromis tenable.
-
 **Trois `EnumWindows` par seconde quand tout est coché**, contre deux avant :
 `apply_short_titles`, `game_windows`, `client_windows`. La première ne reprend sa
-sortie anticipée que quand plus aucune fenêtre courte n'est à l'écran : décocher
-après un relancement laisse des fenêtres que multifus ne sait plus rendre, donc
-le troisième balayage dure jusqu'à ce que le client réécrive son titre. En
-échange, `runs_dofus` est passé en dernier des quatre tests de `titled_window` :
+sortie anticipée que quand plus aucune fenêtre courte n'est à l'écran, ce qui
+demande un tour de plus après un décochage, et davantage si le suffixe n'a jamais
+été appris. En échange, `runs_dofus` est passé en dernier des quatre tests de `titled_window` :
 il ouvre le processus derrière la fenêtre, et le bureau en présente plusieurs
 centaines à chaque tour.
 
