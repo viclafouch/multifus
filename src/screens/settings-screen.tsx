@@ -1,7 +1,6 @@
-import { Maximize2, Power, Tag } from 'lucide-react'
+import { Activity, Maximize2, Power, Tag } from 'lucide-react'
 import type { Snapshot } from '@/@types/snapshot'
 import { FieldRow } from '@/components/layout/field-row'
-import { Note } from '@/components/layout/note'
 import { Panel } from '@/components/layout/panel'
 import { Screen } from '@/components/layout/screen'
 import { Switch } from '@/components/ui/switch'
@@ -78,8 +77,20 @@ export const SettingsScreen = ({
             />
           )}
         </FieldRow>
+        <FieldRow
+          label={strings.settings.backgroundLabel}
+          description={strings.settings.backgroundDescription}
+          icon={
+            <Activity className="size-glyph" strokeWidth={1.75} aria-hidden />
+          }
+        >
+          <UnavailableSwitch
+            checked
+            label={strings.settings.backgroundLabel}
+            reason={strings.settings.backgroundLocked}
+          />
+        </FieldRow>
       </Panel>
-      <Note>{strings.settings.startupNote}</Note>
     </Screen>
   )
 }

@@ -8,18 +8,20 @@ import {
 type UnavailableSwitchProps = Readonly<{
   label: string
   reason: string
+  checked?: boolean
 }>
 
 export const UnavailableSwitch = ({
   label,
-  reason
+  reason,
+  checked = false
 }: UnavailableSwitchProps) => {
   return (
     <Tooltip>
       <TooltipTrigger
         render={<span />}
         role="switch"
-        aria-checked={false}
+        aria-checked={checked}
         aria-disabled
         aria-label={label}
         tabIndex={0}
@@ -27,7 +29,7 @@ export const UnavailableSwitch = ({
       >
         <Switch
           aria-hidden
-          checked={false}
+          checked={checked}
           disabled
           className="pointer-events-none"
         />
