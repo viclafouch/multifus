@@ -102,7 +102,7 @@ export const SettingsScreen = ({
             <WindowsOnly />
           </FieldRow>
         ) : null}
-        {taskbarCombines ? (
+        {IS_APPLE || taskbarCombines ? (
           <FieldRow
             label={strings.settings.ungroupLabel}
             description={strings.settings.ungroupDescription}
@@ -110,13 +110,17 @@ export const SettingsScreen = ({
               <Rows3 className="size-glyph" strokeWidth={1.75} aria-hidden />
             }
           >
-            <Switch
-              checked={ungroupTaskbar}
-              aria-label={strings.settings.ungroupLabel}
-              onCheckedChange={(ungroup) => {
-                run(setUngroupTaskbar(ungroup))
-              }}
-            />
+            {IS_APPLE ? (
+              <WindowsOnly />
+            ) : (
+              <Switch
+                checked={ungroupTaskbar}
+                aria-label={strings.settings.ungroupLabel}
+                onCheckedChange={(ungroup) => {
+                  run(setUngroupTaskbar(ungroup))
+                }}
+              />
+            )}
           </FieldRow>
         ) : null}
         <FieldRow
