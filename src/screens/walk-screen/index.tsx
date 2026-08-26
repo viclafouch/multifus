@@ -22,9 +22,9 @@ export const WalkScreen = ({ walk, shortcuts, run }: WalkScreenProps) => {
 
   return (
     <Screen title={strings.walk.title} subtitle={strings.walk.subtitle}>
+      {IS_APPLE ? <Note className="mb-4">{strings.maximize.note}</Note> : null}
       <StatePanel walk={walk} accelerator={accelerator} run={run} />
       <BannerPanel place={walk.banner} run={run} />
-      {IS_APPLE ? <Note>{strings.maximize.note}</Note> : null}
     </Screen>
   )
 }

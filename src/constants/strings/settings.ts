@@ -12,10 +12,10 @@ export const SETTINGS_STRINGS = {
       ? 'La croix ne quitte pas Multifus : son icône reste en haut à droite de l’écran.'
       : 'La croix ne quitte pas Multifus : son icône reste à côté de l’horloge.',
     backgroundLocked: 'Multifus doit rester en arrière-plan pour fonctionner.',
-    maximizeLabel: 'Agrandir les fenêtres Dofus Retro à leur ouverture',
+    maximizeLabel: 'Agrandir les clients à leur ouverture',
     maximizeDescription: IS_APPLE
-      ? 'Un client Dofus Retro s’ouvre toujours en petit. Multifus l’étend à toute la zone de travail de son écran, Dock et barre des menus en place.'
-      : 'Un client Dofus Retro s’ouvre toujours en petit. Multifus l’étend à toute la zone de travail de son écran, barre des tâches en place.',
+      ? 'La fenêtre couvre l’écran, Dock et barre des menus en place.'
+      : 'La fenêtre couvre l’écran, barre des tâches en place.',
     shortTitlesLabel: 'Seulement le pseudo dans la barre des tâches',
     shortTitlesDescription:
       'Vous lisez « Elyandra » au lieu de « Elyandra - Dofus Retro ».',

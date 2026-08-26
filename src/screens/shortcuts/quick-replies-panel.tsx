@@ -56,7 +56,7 @@ export const QuickRepliesPanel = ({
           </ul>
         )}
       </Panel>
-      <Note>{words.clipboard}</Note>
+      <Note className="mt-4">{words.clipboard}</Note>
     </>
   )
 }

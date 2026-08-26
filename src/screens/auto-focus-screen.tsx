@@ -3,6 +3,7 @@ import type { AutoFocusSwitch } from '@/@types/notification'
 import type { Snapshot } from '@/@types/snapshot'
 import { FieldRow } from '@/components/layout/field-row'
 import { Panel } from '@/components/layout/panel'
+import { PanelHeader } from '@/components/layout/panel-header'
 import { Screen } from '@/components/layout/screen'
 import { Switch } from '@/components/ui/switch'
 import { NOTIFICATION_ICONS } from '@/constants/notification'
@@ -69,6 +70,10 @@ export const AutoFocusScreen = ({
         data-suspended={isEnabled ? undefined : ''}
         className="transition-suspend data-suspended:opacity-55"
       >
+        <PanelHeader
+          title={strings.autoFocus.kindsTitle}
+          description={strings.autoFocus.kindsDescription}
+        />
         {switches.map((entry) => {
           const { label, description } = strings.autoFocus.kinds[entry.kind]
           const Icon = NOTIFICATION_ICONS[entry.kind]

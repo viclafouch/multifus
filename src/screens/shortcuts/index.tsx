@@ -63,7 +63,7 @@ export const ShortcutsScreen = ({
           handleClose
         }}
       />
-      <Note>{strings.shortcuts.silent}</Note>
+      <Note className="mt-4">{strings.shortcuts.silent}</Note>
       <QuickRepliesPanel
         quickReplies={quickReplies}
         editing={editing}

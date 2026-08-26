@@ -47,6 +47,7 @@ export const SettingsScreen = ({
 
   return (
     <Screen title={strings.settings.title} subtitle={strings.settings.subtitle}>
+      {IS_APPLE ? <Note className="mb-4">{strings.maximize.note}</Note> : null}
       <Panel>
         <FieldRow
           label={strings.settings.startupLabel}
@@ -76,9 +77,6 @@ export const SettingsScreen = ({
             }}
           />
         </FieldRow>
-      </Panel>
-      {IS_APPLE ? <Note>{strings.maximize.note}</Note> : null}
-      <Panel className="mt-5">
         <FieldRow
           label={strings.settings.shortTitlesLabel}
           description={strings.settings.shortTitlesDescription}

@@ -39,13 +39,16 @@ export const AUTO_FOCUS_STRINGS = {
   autoFocus: {
     title: 'AutoFocus',
     subtitle:
-      'Six personnages en combat, et vous passez votre temps à chercher qui doit jouer. Multifus met la bonne fenêtre devant vous dès que le jeu l’appelle.',
+      'Vous jouez plusieurs personnages à la fois. Multifus affiche celui dont c’est le tour, vous n’avez rien à cliquer.',
     masterLabel: 'Activer l’AutoFocus',
-    masterDescription: 'La fenêtre appelée passe devant, sans y toucher.',
+    masterDescription: 'Le bon personnage s’affiche tout seul.',
     minimizedLabel: 'Aller chercher les fenêtres réduites',
     minimizedDescription: IS_APPLE
-      ? 'Une fenêtre rangée dans le Dock revient devant vous elle aussi.'
-      : 'Une fenêtre rangée dans la barre des tâches revient devant vous elle aussi.',
+      ? 'Même un personnage rangé dans le Dock revient devant vous.'
+      : 'Même un personnage rangé dans la barre des tâches revient devant vous.',
+    kindsTitle: 'Quand Multifus change de fenêtre',
+    kindsDescription:
+      'À ces moments, le personnage concerné passe devant. Cela vaut pour tous vos personnages.',
     kinds: KIND_LABELS
   }
 } as const
