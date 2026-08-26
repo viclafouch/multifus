@@ -71,6 +71,10 @@ windows = { version = "0.62", features = [
   "Win32_UI_WindowsAndMessaging",
 ] }
 
+# The window of the icon test registers a class, and a class carries a brush.
+[target.'cfg(target_os = "windows")'.dev-dependencies]
+windows = { version = "0.62", features = ["Win32_Graphics_Gdi"] }
+
 # The macOS side of the boundary, and nothing else in the crate, talks to these.
 # Feature sets are cut to what `platform::macos` calls, so that the Windows
 # build never sees them and the macOS build stays small.

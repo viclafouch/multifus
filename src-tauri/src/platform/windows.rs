@@ -1644,10 +1644,161 @@ fn system_parameter(action: SYSTEM_PARAMETERS_INFO_ACTION) -> Option<u32> {
 mod tests {
     use std::sync::Mutex;
 
+    use windows::core::PCWSTR;
+    use windows::Win32::UI::WindowsAndMessaging::CreateWindowExW;
+    use windows::Win32::UI::WindowsAndMessaging::DefWindowProcW;
+    use windows::Win32::UI::WindowsAndMessaging::DestroyWindow;
+    use windows::Win32::UI::WindowsAndMessaging::LoadIconW;
+    use windows::Win32::UI::WindowsAndMessaging::RegisterClassW;
+    use windows::Win32::UI::WindowsAndMessaging::UnregisterClassW;
+    use windows::Win32::UI::WindowsAndMessaging::IDI_APPLICATION;
+    use windows::Win32::UI::WindowsAndMessaging::WINDOW_EX_STYLE;
+    use windows::Win32::UI::WindowsAndMessaging::WM_GETICON;
+    use windows::Win32::UI::WindowsAndMessaging::WNDCLASSW;
+    use windows::Win32::UI::WindowsAndMessaging::WS_OVERLAPPEDWINDOW;
+
     use super::*;
 
     const CLICKED: u64 = 41;
     const ELSEWHERE: u64 = 42;
+
+    const PAINTED_CLASS: PCWSTR = w!("MultifusPaintedWindow");
+
+    struct PaintedWindow {
+        handle: HWND,
+        class_icon: usize,
+    }
+
+    impl PaintedWindow {
+        fn open() -> Self {
+            // SAFETY: the class icon is a system one, and the class name is ours alone.
+            let class_icon = unsafe { LoadIconW(None, IDI_APPLICATION) }.expect("a system icon");
+            let class = WNDCLASSW {
+                lpfnWndProc: Some(answer_like_any_window),
+                lpszClassName: PAINTED_CLASS,
+                hIcon: class_icon,
+                ..WNDCLASSW::default()
+            };
+
+            // SAFETY: the class lives for the call, and the window is destroyed on drop.
+            let handle = unsafe {
+                RegisterClassW(&class);
+
+                CreateWindowExW(
+                    WINDOW_EX_STYLE::default(),
+                    PAINTED_CLASS,
+                    PAINTED_CLASS,
+                    WS_OVERLAPPEDWINDOW,
+                    0,
+                    0,
+                    16,
+                    16,
+                    None,
+                    None,
+                    None,
+                    None,
+                )
+            }
+            .expect("a window of our own");
+
+            Self {
+                handle,
+                class_icon: class_icon.0 as usize,
+            }
+        }
+
+        fn id(&self) -> WindowId {
+            WindowId::from_raw(self.handle.0 as usize as u64)
+        }
+
+        fn worn(&self, slot: IconSlot) -> usize {
+            let mut answer = 0_usize;
+
+            // SAFETY: the window is alive, and `WM_GETICON` only reads what it wears.
+            unsafe {
+                SendMessageTimeoutW(
+                    self.handle,
+                    WM_GETICON,
+                    WPARAM(slot.message() as usize),
+                    LPARAM(0),
+                    SMTO_ABORTIFHUNG,
+                    ICON_TIMEOUT_MS,
+                    Some(&mut answer),
+                );
+            }
+
+            answer
+        }
+    }
+
+    impl Drop for PaintedWindow {
+        fn drop(&mut self) {
+            // SAFETY: both handles are ours, and nothing reads them after this.
+            unsafe {
+                let _ = DestroyWindow(self.handle);
+                let _ = UnregisterClassW(PAINTED_CLASS, None);
+            }
+        }
+    }
+
+    extern "system" fn answer_like_any_window(
+        handle: HWND,
+        message: u32,
+        wide: WPARAM,
+        long: LPARAM,
+    ) -> LRESULT {
+        // SAFETY: the window is one of ours, and the default handler owns every message we skip.
+        unsafe { DefWindowProcW(handle, message, wide, long) }
+    }
+
+    fn portrait() -> &'static [u8] {
+        include_bytes!("../../icons/portraits/iop_m.ico").as_slice()
+    }
+
+    #[test]
+    fn a_window_given_its_icon_back_wears_the_one_its_class_holds() {
+        let window = PaintedWindow::open();
+        let manager = Win32WindowManager::new(false);
+
+        for slot in [IconSlot::Small, IconSlot::Big] {
+            let held = class_icon(window.handle, slot);
+
+            manager
+                .paint_slot(window.handle, window.id(), slot, Some(portrait()))
+                .expect("a portrait the window takes");
+
+            let painted = window.worn(slot);
+
+            assert_ne!(painted, NO_ICON, "{slot:?} wears the portrait");
+            assert_ne!(painted, held, "{slot:?} left the icon of its class");
+
+            manager
+                .paint_slot(window.handle, window.id(), slot, None)
+                .expect("an icon the window takes back");
+
+            assert_eq!(
+                window.worn(slot),
+                held,
+                "{slot:?} wears the icon of its class again, and not nothing"
+            );
+        }
+    }
+
+    #[test]
+    fn a_window_reads_the_icon_of_its_class_in_both_slots() {
+        let window = PaintedWindow::open();
+
+        assert_eq!(
+            class_icon(window.handle, IconSlot::Big),
+            window.class_icon,
+            "the big slot reads the icon the class was registered with"
+        );
+        assert_ne!(
+            class_icon(window.handle, IconSlot::Small),
+            NO_ICON,
+            "a class with no small icon still holds the one the system drew for it"
+        );
+    }
 
     type Reported = Arc<Mutex<Vec<WindowId>>>;
 

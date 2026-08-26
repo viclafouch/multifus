@@ -88,7 +88,17 @@ s'efface au retour du client. On ne l'efface pas quand un personnage passe
 déconnecté : Retro déconnecte tout seul au bout d'un quart d'heure, la fenêtre
 reste à l'écran de connexion et garde sa tête de classe.
 
-## À vérifier sur l'autre machine
+## Ce que les tests tiennent
+
+Un test ouvre une fenêtre à lui, de sa propre classe et de sa propre icône, lui
+pose un portrait, le lui reprend, et vérifie qu'elle porte à nouveau l'icône de
+sa classe et pas rien. Il tombe sur l'ancien `WM_SETICON` à `NULL`, vérifié.
+
+Windows dérive la petite icône d'une classe qui n'en donne qu'une grande : les
+deux emplacements ne portent pas le même handle, et le test lit chaque
+emplacement pour lui-même.
+
+## À vérifier sur la machine Windows
 
 - [ ] Une tête de classe posée, la classe remise à vide : l'icône de Dofus Retro
       revient dans la barre des tâches, tout de suite
