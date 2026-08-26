@@ -188,14 +188,28 @@ export const characterStateLine = (character: Character) => {
   return CHARACTER_STATE_LINES[characterState(character)]
 }
 
-export const characterSubLine = (character: Character) => {
-  const state = characterStateLine(character)
+export const characterPresence = (character: Character): LampState => {
+  return character.online ? 'live' : 'offline'
+}
 
+const characterPresenceLine = (character: Character) => {
+  return CHARACTER_STATE_LINES[characterPresence(character)]
+}
+
+const classPrefixed = (character: Character, line: string) => {
   if (character.class === null) {
-    return state
+    return line
   }
 
-  return `${strings.characters.classes[character.class]} · ${state}`
+  return `${strings.characters.classes[character.class]} · ${line}`
+}
+
+export const characterSubLine = (character: Character) => {
+  return classPrefixed(character, characterStateLine(character))
+}
+
+export const characterPresenceSubLine = (character: Character) => {
+  return classPrefixed(character, characterPresenceLine(character))
 }
 
 const MISSING_GENDER_NAMED = 2

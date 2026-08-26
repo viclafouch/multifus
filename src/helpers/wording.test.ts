@@ -8,6 +8,7 @@ import type { TonedLine } from '@/helpers/wording'
 import {
   authorizationLine,
   bindingLabel,
+  characterPresenceSubLine,
   characterStateLine,
   characterSubLine,
   missingGenderLine,
@@ -245,6 +246,32 @@ describe('characterSubLine', () => {
     const line = characterSubLine(character)
 
     expect(line).toBe(`Iop · ${strings.characters.online}`)
+  })
+})
+
+describe('characterPresenceSubLine', () => {
+  it('dit la classe avant l’état', () => {
+    const character = { ...ONLINE_CHARACTER, class: 'iop' } as const
+
+    const line = characterPresenceSubLine(character)
+
+    expect(line).toBe(`Iop · ${strings.characters.online}`)
+  })
+
+  it('tait le côté d’un personnage connecté et mis de côté', () => {
+    const character = { ...ONLINE_CHARACTER, asleep: true }
+
+    const line = characterPresenceSubLine(character)
+
+    expect(line).toBe(strings.characters.online)
+  })
+
+  it('dit la déconnexion d’un personnage déconnecté', () => {
+    const character = { ...ONLINE_CHARACTER, asleep: true, online: false }
+
+    const line = characterPresenceSubLine(character)
+
+    expect(line).toBe(strings.characters.offline)
   })
 })
 
