@@ -80,6 +80,8 @@ export const CHARACTERS_STRINGS = {
       return `${label} — homme ou femme ?`
     },
     classDialogBack: 'Changer de classe',
+    classDialogWindowKeepsIcon:
+      'Sur macOS, la tête reste ici : le client garde son logo Dofus.',
     classGenderLabel: (label: string, gender: Gender) => {
       return gender === 'male' ? `${label} homme` : `${label} femme`
     },

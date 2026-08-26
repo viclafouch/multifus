@@ -8,13 +8,13 @@ import {
 type UnavailableSwitchProps = Readonly<{
   label: string
   reason: string
-  checked?: boolean
+  checked: boolean
 }>
 
 export const UnavailableSwitch = ({
   label,
   reason,
-  checked = false
+  checked
 }: UnavailableSwitchProps) => {
   return (
     <Tooltip>

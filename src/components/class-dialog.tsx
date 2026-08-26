@@ -14,6 +14,7 @@ import {
   DialogTitle
 } from '@/components/ui/dialog'
 import { CLASSES, CLASS_PORTRAITS } from '@/constants/classes'
+import { IS_APPLE } from '@/constants/keyboard'
 import { strings } from '@/constants/strings'
 import { portraitFor } from '@/helpers/portrait'
 import { characterState } from '@/helpers/wording'
@@ -193,6 +194,11 @@ const ClassStep = ({ character, onPickClass, onSetGender }: ClassStepProps) => {
           })}
         </div>
       </div>
+      {IS_APPLE ? (
+        <p className="border-t border-border/60 pt-3.5 text-note text-muted-foreground">
+          {words.classDialogWindowKeepsIcon}
+        </p>
+      ) : null}
     </>
   )
 }

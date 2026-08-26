@@ -1,10 +1,18 @@
-import { Activity, Maximize2, Power, Rows3, Tag } from 'lucide-react'
+import {
+  Activity,
+  Maximize2,
+  Power,
+  Rows3,
+  SquareUserRound,
+  Type
+} from 'lucide-react'
 import type { Snapshot } from '@/@types/snapshot'
 import { FieldRow } from '@/components/layout/field-row'
 import { Panel } from '@/components/layout/panel'
 import { Screen } from '@/components/layout/screen'
 import { Switch } from '@/components/ui/switch'
 import { UnavailableSwitch } from '@/components/unavailable-switch'
+import { WindowsOnly } from '@/components/windows-only'
 import { IS_APPLE } from '@/constants/keyboard'
 import { strings } from '@/constants/strings'
 import {
@@ -65,13 +73,10 @@ export const SettingsScreen = ({
         <FieldRow
           label={strings.settings.shortTitlesLabel}
           description={strings.settings.shortTitlesDescription}
-          icon={<Tag className="size-glyph" strokeWidth={1.75} aria-hidden />}
+          icon={<Type className="size-glyph" strokeWidth={1.75} aria-hidden />}
         >
           {IS_APPLE ? (
-            <UnavailableSwitch
-              label={strings.settings.shortTitlesLabel}
-              reason={strings.settings.shortTitlesWindowsOnly}
-            />
+            <WindowsOnly />
           ) : (
             <Switch
               checked={shortTitles}
@@ -82,6 +87,21 @@ export const SettingsScreen = ({
             />
           )}
         </FieldRow>
+        {IS_APPLE ? (
+          <FieldRow
+            label={strings.settings.portraitLabel}
+            description={strings.settings.portraitDescription}
+            icon={
+              <SquareUserRound
+                className="size-glyph"
+                strokeWidth={1.75}
+                aria-hidden
+              />
+            }
+          >
+            <WindowsOnly />
+          </FieldRow>
+        ) : null}
         {taskbarCombines ? (
           <FieldRow
             label={strings.settings.ungroupLabel}
