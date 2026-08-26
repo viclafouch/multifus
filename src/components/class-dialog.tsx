@@ -46,12 +46,10 @@ export const ClassDialog = ({
   const words = strings.characters
   const [asked, setAsked] = React.useState<Class | null>(null)
 
-  const handleOpenChange = (isNowOpen: boolean) => {
+  const handleCloseComplete = (isNowOpen: boolean) => {
     if (!isNowOpen) {
       setAsked(null)
     }
-
-    onOpenChange(isNowOpen)
   }
 
   const handlePickClass = (candidate: Class | null) => {
@@ -62,7 +60,7 @@ export const ClassDialog = ({
     }
 
     onSetClass(candidate)
-    handleOpenChange(false)
+    onOpenChange(false)
   }
 
   const handlePickGender = (candidate: Gender) => {
@@ -70,11 +68,15 @@ export const ClassDialog = ({
       onSetPortrait({ class: asked, gender: candidate })
     }
 
-    handleOpenChange(false)
+    onOpenChange(false)
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={onOpenChange}
+      onOpenChangeComplete={handleCloseComplete}
+    >
       <DialogContent showCloseButton={false} className="gap-5 sm:max-w-md">
         <DialogHeader className="flex-row items-center gap-3">
           <CharacterMedallion
