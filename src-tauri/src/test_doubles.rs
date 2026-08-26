@@ -1,6 +1,7 @@
 use std::sync::Arc;
 use std::sync::Mutex;
 use std::sync::PoisonError;
+use std::time::Instant;
 
 use tempfile::TempDir;
 
@@ -15,6 +16,7 @@ use crate::config::ConfigStore;
 use crate::config::Loaded;
 use crate::config::Settings;
 use crate::platform::Authorization;
+use crate::platform::ClickGate;
 use crate::platform::GameWindow;
 use crate::platform::PlatformError;
 use crate::platform::Result;
@@ -49,6 +51,7 @@ pub struct Desktop {
     pub foreground: Option<GameWindow>,
     pub minimized: Vec<WindowId>,
     pub under_click: Option<WindowId>,
+    pub tells_arrival: Option<Arc<ClickGate>>,
     pub taskbar_combines: bool,
     pub short_titles: ShortTitleReport,
     pub authorization: Authorization,
@@ -66,6 +69,7 @@ impl Default for Desktop {
             foreground: None,
             minimized: Vec::new(),
             under_click: None,
+            tells_arrival: None,
             taskbar_combines: true,
             short_titles: ShortTitleReport::default(),
             authorization: Authorization::Granted,
@@ -81,6 +85,7 @@ impl Default for Desktop {
 pub struct FakeWindowManager {
     desktop: Mutex<Desktop>,
     asked: Mutex<Vec<Asked>>,
+    asked_at: Mutex<Vec<Instant>>,
 }
 
 impl FakeWindowManager {
@@ -89,6 +94,7 @@ impl FakeWindowManager {
         Arc::new(Self {
             desktop: Mutex::new(desktop),
             asked: Mutex::default(),
+            asked_at: Mutex::default(),
         })
     }
 
@@ -104,6 +110,15 @@ impl FakeWindowManager {
             .clone()
     }
 
+    #[must_use]
+    pub fn first_asked_at(&self) -> Option<Instant> {
+        self.asked_at
+            .lock()
+            .unwrap_or_else(PoisonError::into_inner)
+            .first()
+            .copied()
+    }
+
     fn desktop(&self) -> Desktop {
         self.desktop
             .lock()
@@ -116,6 +131,10 @@ impl FakeWindowManager {
             .lock()
             .unwrap_or_else(PoisonError::into_inner)
             .push(asked);
+        self.asked_at
+            .lock()
+            .unwrap_or_else(PoisonError::into_inner)
+            .push(Instant::now());
     }
 }
 
@@ -162,7 +181,13 @@ impl WindowManager for FakeWindowManager {
     }
 
     fn focus_fast(&self, window: WindowId) -> Result<()> {
-        self.focus(window)
+        self.focus(window)?;
+
+        if let Some(gate) = self.desktop().tells_arrival {
+            gate.note_foreground(window);
+        }
+
+        Ok(())
     }
 
     fn client_windows(&self) -> Result<Vec<WindowId>> {

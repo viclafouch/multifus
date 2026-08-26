@@ -43,6 +43,8 @@ keyring = "4"
 
 [dev-dependencies]
 tempfile = "3"
+# The mock store of the crate `keyring` stands on, so no test opens a real keychain.
+keyring-core = "1"
 
 # The Windows side of the boundary, and nothing else in the crate, talks to this.
 # Features land lot by lot, so that nothing compiles before it is called: lots A,

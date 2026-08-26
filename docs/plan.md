@@ -16,15 +16,6 @@ La paire de clés de l'updater existe déjà, dans `~/.tauri/multifus.key` et so
 `tauri.conf.json`. En régénérer une rendrait insignables les mises à jour des
 versions déjà installées.
 
-## Ajouter le Déplacement
-
-- [ ] Le Déplacement sur macOS : les clics sont lus, la bannière n'est pas vérifiée, et rien n'est essayé en jeu. Détail dans [plan-deplacement.md](./plan-deplacement.md)
-
-## Finir les tests
-
-- [ ] `answer` dans `shortcuts.rs` et `switch` dans `walk.rs` prennent encore l'`AppHandle` entier : ce qu'ils décident est testé, leur enchaînement ne l'est pas, et l'ordre du `SETTLE`, du `focus_fast` et de l'`await_arrival` reste à la main
-- [ ] Vérifier à la main que « Tout réinitialiser » vide bien le trousseau : le code le fait, aucun test ne le prouve
-
 ## Vérifier sur une vraie soirée
 
 - [ ] Windows, deux clients ouverts : le roster les voit, les quatre raccourcis et l'AutoFocus répondent
@@ -41,4 +32,4 @@ versions déjà installées.
 - [ ] Windows, une tête de classe posée puis Multifus tué au `Ctrl+C` : au démarrage suivant, la classe remise à vide rend l'icône de Dofus Retro
 - [ ] Windows, un personnage changé sans quitter le client : le titre court suit
 - [ ] Un personnage laissé inactif un quart d'heure repasse déconnecté comme avant
-- [ ] Windows, les Réglages : les six lignes sont là, la modale de classe ne dit rien de macOS, et le reste est dans [plan-tete-de-classe.md](./plan-tete-de-classe.md)
+- [ ] Le robot relié puis « Tout réinitialiser » : l'écran des messages privés redemande un jeton, et le trousseau du système ne garde plus le sien

@@ -96,7 +96,34 @@ pub fn is_stored() -> Result<bool> {
 
 #[cfg(test)]
 mod tests {
+    use std::sync::LazyLock;
+
     use super::*;
+
+    static MOCK_KEYCHAIN: LazyLock<()> = LazyLock::new(|| {
+        // The platform store poses itself on the first entry, so it goes first and the mock replaces it.
+        let _ = Entry::store_status();
+
+        keyring_core::set_default_store(keyring_core::mock::Store::new().expect("a mock keychain"));
+    });
+
+    #[test]
+    fn the_bot_token_is_put_away_read_back_and_taken_out_for_good() {
+        LazyLock::force(&MOCK_KEYCHAIN);
+
+        let token = BotToken::new("123456:abcdef").expect("a token");
+
+        erase().expect("a keychain that holds nothing is emptied all the same");
+        store(&token).expect("the keychain takes the token");
+
+        assert!(is_stored().expect("the keychain answers"));
+        assert_eq!(read().expect("the keychain answers"), Some(token));
+
+        erase().expect("the keychain gives the token up");
+
+        assert_eq!(read().expect("the keychain answers"), None);
+        assert!(!is_stored().expect("the keychain answers"));
+    }
 
     #[test]
     fn a_blank_token_is_an_absence_not_a_token() {

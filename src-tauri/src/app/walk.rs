@@ -17,8 +17,10 @@ use crate::app::journal::JournalEvent;
 use crate::app::journal::WalkFrom;
 use crate::app::journal::WalkIdle;
 use crate::app::journal::Work;
+use crate::app::state::hold;
 use crate::app::state::lock;
 use crate::app::state::windows;
+use crate::app::state::AppState;
 use crate::app::view::BannerCharacter;
 use crate::platform::ClickGate;
 use crate::platform::ClickReport;
@@ -199,7 +201,7 @@ fn sink_of(gate: Arc<ClickGate>, steps: Sender<WalkStep>) -> ClickSink {
 
 fn take(app: &AppHandle, step: WalkStep) {
     match step {
-        WalkStep::Clicked { clicked } => switch(app, clicked),
+        WalkStep::Clicked { clicked } => on_click(app, clicked),
         WalkStep::Foreground { window } => {
             banner::follow_foreground(app, app.state::<Walk>().watches(window));
         }
@@ -252,24 +254,57 @@ fn aim(windows: &dyn WindowManager, walk: &Walk, clicked: ClickedAt) -> Aim {
     Aim::Next(target)
 }
 
-fn switch(app: &AppHandle, clicked: ClickedAt) {
-    let asked_at = Instant::now();
+trait Banner {
+    fn step(&self, arrived: Option<BannerCharacter>);
+}
+
+struct AppBanner<'a>(&'a AppHandle);
+
+impl Banner for AppBanner<'_> {
+    fn step(&self, arrived: Option<BannerCharacter>) {
+        banner::step(self.0, arrived);
+    }
+}
+
+struct Switch<'a> {
+    windows: &'a dyn WindowManager,
+    walk: &'a Walk,
+    state: &'a AppState,
+    banner: &'a dyn Banner,
+}
+
+fn on_click(app: &AppHandle, clicked: ClickedAt) {
     let walk = app.state::<Walk>();
 
-    let target = match aim(windows(app), &walk, clicked) {
+    switch_over(
+        &Switch {
+            windows: windows(app),
+            walk: walk.inner(),
+            state: app.state::<AppState>().inner(),
+            banner: &AppBanner(app),
+        },
+        clicked,
+    );
+}
+
+fn switch_over(switch: &Switch, clicked: ClickedAt) {
+    let asked_at = Instant::now();
+    let gate = &switch.walk.gate;
+
+    let target = match aim(switch.windows, switch.walk, clicked) {
         Aim::Elsewhere | Aim::AlreadyThere => {
-            walk.gate.open();
+            gate.open();
 
             return;
         }
         Aim::NobodyInCycle => {
-            walk.gate.open();
+            gate.open();
 
-            lock(app).log_unless_repeated(JournalEvent::WalkIdle {
+            hold(switch.state).log_unless_repeated(JournalEvent::WalkIdle {
                 reason: WalkIdle::NobodyInCycle,
             });
 
-            banner::step(app, None);
+            switch.banner.step(None);
 
             return;
         }
@@ -278,15 +313,15 @@ fn switch(app: &AppHandle, clicked: ClickedAt) {
 
     thread::sleep(SETTLE.saturating_sub(asked_at.elapsed()));
 
-    walk.gate.expect(target);
+    gate.expect(target);
 
-    let asked = windows(app).focus_fast(target);
-    let landed = asked.is_ok() && walk.gate.await_arrival(SWITCH_CEILING);
+    let asked = switch.windows.focus_fast(target);
+    let landed = asked.is_ok() && gate.await_arrival(SWITCH_CEILING);
 
-    walk.gate.open();
+    gate.open();
 
     let arrived = {
-        let mut state = lock(app);
+        let mut state = hold(switch.state);
 
         if let Some(said) = switch_said(asked.err().as_ref(), landed) {
             state.log_unless_repeated(said);
@@ -295,20 +330,97 @@ fn switch(app: &AppHandle, clicked: ClickedAt) {
         state.banner_character_of(target)
     };
 
-    banner::step(app, arrived);
+    switch.banner.step(arrived);
 }
 
 #[cfg(test)]
 mod tests {
     use std::sync::mpsc::Receiver;
 
+    use tempfile::TempDir;
+
     use super::*;
+    use crate::config::Settings;
+    use crate::domain::Character;
+    use crate::domain::Class;
+    use crate::domain::Gender;
+    use crate::domain::Roster;
     use crate::platform::ScreenPoint;
+    use crate::test_doubles::app_state;
+    use crate::test_doubles::directory;
+    use crate::test_doubles::game_window;
+    use crate::test_doubles::journalled;
+    use crate::test_doubles::Asked;
     use crate::test_doubles::Desktop;
     use crate::test_doubles::FakeWindowManager;
 
+    #[derive(Debug, Default)]
+    struct FakeBanner {
+        steps: Mutex<Vec<Option<BannerCharacter>>>,
+    }
+
+    impl FakeBanner {
+        fn steps(&self) -> Vec<Option<BannerCharacter>> {
+            self.steps
+                .lock()
+                .unwrap_or_else(PoisonError::into_inner)
+                .clone()
+        }
+    }
+
+    impl Banner for FakeBanner {
+        fn step(&self, arrived: Option<BannerCharacter>) {
+            self.steps
+                .lock()
+                .unwrap_or_else(PoisonError::into_inner)
+                .push(arrived);
+        }
+    }
+
     fn id(raw: u64) -> WindowId {
         WindowId::from_raw(raw)
+    }
+
+    fn bravo() -> BannerCharacter {
+        BannerCharacter {
+            nickname: "Bravo".to_owned(),
+            class: Some(Class::Cra),
+            gender: Some(Gender::Female),
+        }
+    }
+
+    fn two_in_the_cycle(directory: &TempDir) -> AppState {
+        let state = app_state(
+            directory,
+            Settings {
+                roster: Roster::from_characters(vec![
+                    Character::new("Alpha")
+                        .with_class(Class::Iop)
+                        .with_gender(Gender::Male),
+                    Character::new("Bravo")
+                        .with_class(Class::Cra)
+                        .with_gender(Gender::Female),
+                ]),
+                ..Settings::default()
+            },
+        );
+
+        hold(&state).apply_windows(&[game_window(1, "Alpha"), game_window(2, "Bravo")]);
+
+        state
+    }
+
+    fn walked(journal: &[JournalEvent]) -> Vec<JournalEvent> {
+        journal
+            .iter()
+            .filter(|event| {
+                matches!(
+                    event,
+                    JournalEvent::WalkIdle { .. } | JournalEvent::WalkSwitchFailed { .. }
+                )
+            })
+            .cloned()
+            .collect()
     }
 
     fn clicked_at(raw: u64) -> ClickedAt {
@@ -467,6 +579,185 @@ mod tests {
             Some(JournalEvent::WalkSwitchFailed {
                 detail: "focusing failed: the system said no".to_owned(),
             })
+        );
+    }
+
+    #[test]
+    fn a_click_carries_the_player_to_the_next_window_once_the_game_has_had_it() {
+        let directory = directory();
+        let state = two_in_the_cycle(&directory);
+        let (walk, _taken) = walk(hold(&state).walk_plan());
+        let windows = FakeWindowManager::showing(Desktop {
+            under_click: Some(id(1)),
+            tells_arrival: Some(Arc::clone(&walk.gate)),
+            ..Desktop::default()
+        });
+        let shown = FakeBanner::default();
+
+        walk.gate.close();
+
+        let began_at = Instant::now();
+
+        switch_over(
+            &Switch {
+                windows: windows.as_ref(),
+                walk: &walk,
+                state: &state,
+                banner: &shown,
+            },
+            clicked_at(1),
+        );
+
+        assert_eq!(windows.asked(), vec![Asked::Focused(id(2))]);
+        assert!(
+            windows.first_asked_at().expect("a window was asked for") >= began_at + SETTLE,
+            "the game keeps the click for the whole settle before the window is moved"
+        );
+        assert_eq!(
+            walked(&journalled(&state)),
+            Vec::new(),
+            "the window came forward, so the switch has nothing to say"
+        );
+        assert_eq!(shown.steps(), vec![Some(bravo())]);
+        assert!(
+            !walk.gate.is_switching(),
+            "the door is open again for the next click"
+        );
+    }
+
+    #[test]
+    fn a_switch_the_system_never_finishes_is_awaited_up_to_the_ceiling_and_no_further() {
+        let directory = directory();
+        let state = two_in_the_cycle(&directory);
+        let (walk, _taken) = walk(hold(&state).walk_plan());
+        let windows = FakeWindowManager::showing(Desktop {
+            under_click: Some(id(1)),
+            ..Desktop::default()
+        });
+        let shown = FakeBanner::default();
+
+        walk.gate.close();
+
+        let began_at = Instant::now();
+
+        switch_over(
+            &Switch {
+                windows: windows.as_ref(),
+                walk: &walk,
+                state: &state,
+                banner: &shown,
+            },
+            clicked_at(1),
+        );
+
+        assert_eq!(
+            walked(&journalled(&state)),
+            vec![JournalEvent::WalkIdle {
+                reason: WalkIdle::TooSlow,
+            }],
+            "the system took the click and never brought the window forward"
+        );
+        assert!(began_at.elapsed() >= SETTLE + SWITCH_CEILING);
+        assert_eq!(shown.steps(), vec![Some(bravo())]);
+        assert!(!walk.gate.is_switching());
+    }
+
+    #[test]
+    fn a_switch_the_system_refuses_is_not_waited_for() {
+        let directory = directory();
+        let state = two_in_the_cycle(&directory);
+        let (walk, _taken) = walk(hold(&state).walk_plan());
+        let windows = FakeWindowManager::showing(Desktop {
+            under_click: Some(id(1)),
+            tells_arrival: Some(Arc::clone(&walk.gate)),
+            focus_refusal: Some(PlatformError::system("focusing", "the system said no")),
+            ..Desktop::default()
+        });
+        let shown = FakeBanner::default();
+
+        walk.gate.close();
+
+        let began_at = Instant::now();
+
+        switch_over(
+            &Switch {
+                windows: windows.as_ref(),
+                walk: &walk,
+                state: &state,
+                banner: &shown,
+            },
+            clicked_at(1),
+        );
+
+        assert_eq!(
+            walked(&journalled(&state)),
+            vec![JournalEvent::WalkSwitchFailed {
+                detail: "focusing failed: the system said no".to_owned(),
+            }]
+        );
+        assert!(
+            began_at.elapsed() < SETTLE + SWITCH_CEILING,
+            "a switch the system would not even take is not awaited"
+        );
+        assert!(!walk.gate.is_switching());
+    }
+
+    #[test]
+    fn a_click_that_walks_nowhere_opens_the_door_it_closed() {
+        let directory = directory();
+        let state = app_state(&directory, Settings::default());
+        let (last_of_the_cycle, _taken) = walk(plan_of(&[1], &[(1, 1)]));
+        let (nobody_in_the_cycle, _left) = walk(plan_of(&[1], &[]));
+        let windows = FakeWindowManager::showing(Desktop {
+            under_click: Some(id(1)),
+            ..Desktop::default()
+        });
+        let shown = FakeBanner::default();
+
+        last_of_the_cycle.gate.close();
+        nobody_in_the_cycle.gate.close();
+
+        switch_over(
+            &Switch {
+                windows: windows.as_ref(),
+                walk: &last_of_the_cycle,
+                state: &state,
+                banner: &shown,
+            },
+            clicked_at(1),
+        );
+
+        assert!(!last_of_the_cycle.gate.is_switching());
+        assert_eq!(windows.asked(), Vec::new());
+        assert_eq!(
+            shown.steps(),
+            Vec::new(),
+            "the player stays where they are, and the banner with them"
+        );
+        assert_eq!(walked(&journalled(&state)), Vec::new());
+
+        switch_over(
+            &Switch {
+                windows: windows.as_ref(),
+                walk: &nobody_in_the_cycle,
+                state: &state,
+                banner: &shown,
+            },
+            clicked_at(1),
+        );
+
+        assert!(!nobody_in_the_cycle.gate.is_switching());
+        assert_eq!(windows.asked(), Vec::new());
+        assert_eq!(
+            shown.steps(),
+            vec![None],
+            "there is nobody to name, so the banner shows nobody"
+        );
+        assert_eq!(
+            walked(&journalled(&state)),
+            vec![JournalEvent::WalkIdle {
+                reason: WalkIdle::NobodyInCycle,
+            }]
         );
     }
 

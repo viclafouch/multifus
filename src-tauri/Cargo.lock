@@ -2401,6 +2401,7 @@ dependencies = [
  "block2",
  "dispatch2",
  "keyring",
+ "keyring-core",
  "libc",
  "log",
  "objc2",
