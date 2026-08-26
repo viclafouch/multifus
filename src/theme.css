@@ -74,6 +74,7 @@
   --spacing-field: 132px;
   --spacing-empty: 300px;
   --spacing-glyph: 15px;
+  --spacing-sigil: 38px;
   --spacing-mark: 18px;
 
   --tracking-micro: 0.12em;
@@ -115,6 +116,9 @@
   --sidebar-accent-foreground: oklch(0.945 0.006 84);
   --sidebar-border: oklch(0.85 0.02 80 / 11%);
   --sidebar-ring: oklch(0.796 0.142 71 / 55%);
+
+  --male: oklch(0.66 0.13 212);
+  --female: oklch(0.6 0.17 348);
 
   --live: oklch(0.79 0.16 152);
   --idle: oklch(0.79 0.16 58);

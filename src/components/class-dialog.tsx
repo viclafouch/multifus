@@ -3,6 +3,7 @@ import { Ban, ChevronLeft, X } from 'lucide-react'
 import type { Character, Class, Gender, Portrait } from '@/@types/roster'
 import { CharacterMedallion } from '@/components/character-medallion'
 import { ClassVignette } from '@/components/class-vignette'
+import { GenderSigil } from '@/components/gender-sigil'
 import { Legend } from '@/components/layout/legend'
 import { Button } from '@/components/ui/button'
 import {
@@ -130,6 +131,33 @@ const ClassStep = ({ character, onPickClass, onSetGender }: ClassStepProps) => {
   return (
     <>
       <div className="flex flex-col gap-2">
+        <Legend>{words.classDialogGender}</Legend>
+        <ul className="flex gap-2">
+          {GENDERS.map((candidate) => {
+            return (
+              <li key={candidate}>
+                <Button
+                  variant="ghost"
+                  aria-pressed={gender === candidate}
+                  className="h-auto flex-col gap-1.5 rounded-lg px-3 py-2 aria-pressed:bg-muted/70"
+                  onClick={() => {
+                    onSetGender(gender === candidate ? null : candidate)
+                  }}
+                >
+                  <GenderSigil
+                    gender={candidate}
+                    className="opacity-60 saturate-50 group-hover/button:opacity-100 group-aria-pressed/button:sigil-lit group-aria-pressed/button:opacity-100 group-aria-pressed/button:saturate-100"
+                  />
+                  <span className="text-mini text-muted-foreground group-aria-pressed/button:text-foreground">
+                    {words.genders[candidate]}
+                  </span>
+                </Button>
+              </li>
+            )
+          })}
+        </ul>
+      </div>
+      <div className="flex flex-col gap-2">
         <Legend>{words.classDialogClasses}</Legend>
         <ul className="grid grid-cols-4 gap-1.5">
           {CLASSES.map((candidate) => {
@@ -172,27 +200,6 @@ const ClassStep = ({ character, onPickClass, onSetGender }: ClassStepProps) => {
           </li>
         </ul>
       </div>
-      <div className="flex flex-col gap-2">
-        <Legend>{words.classDialogGender}</Legend>
-        <div className="flex w-fit items-center rounded-md border border-border/60 p-0.5">
-          {GENDERS.map((candidate) => {
-            return (
-              <Button
-                key={candidate}
-                variant="ghost"
-                size="xs"
-                aria-pressed={gender === candidate}
-                className="px-3 aria-pressed:bg-primary/15 aria-pressed:text-primary"
-                onClick={() => {
-                  onSetGender(gender === candidate ? null : candidate)
-                }}
-              >
-                {words.genders[candidate]}
-              </Button>
-            )
-          })}
-        </div>
-      </div>
       {IS_APPLE ? (
         <p className="border-t border-border/60 pt-3.5 text-note text-muted-foreground">
           {words.classDialogWindowKeepsIcon}
@@ -223,7 +230,7 @@ const GenderStep = ({ asked, onPickGender, onGoBack }: GenderStepProps) => {
                   words.classes[asked],
                   candidate
                 )}
-                className="h-auto flex-col gap-2 rounded-xl p-3 hover:bg-primary/10"
+                className="h-auto flex-col gap-2 rounded-xl p-3 hover:bg-muted/60"
                 onClick={() => {
                   onPickGender(candidate)
                 }}
@@ -233,9 +240,10 @@ const GenderStep = ({ asked, onPickGender, onGoBack }: GenderStepProps) => {
                   src={CLASS_PORTRAITS[asked][candidate]}
                   className="size-face rounded-lg object-cover"
                 />
-                <span className="text-row font-medium">
-                  {words.genders[candidate]}
-                </span>
+                <GenderSigil
+                  gender={candidate}
+                  className="opacity-75 saturate-75 group-hover/button:sigil-lit group-hover/button:opacity-100 group-hover/button:saturate-100"
+                />
               </Button>
             </li>
           )

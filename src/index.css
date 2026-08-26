@@ -70,6 +70,30 @@
   );
 }
 
+@utility sign-male {
+  --sign: var(--male);
+}
+
+@utility sign-female {
+  --sign: var(--female);
+}
+
+@utility sigil {
+  background-image: radial-gradient(
+    circle at 34% 24%,
+    color-mix(in oklch, var(--sign), black 20%),
+    color-mix(in oklch, var(--sign), black 58%) 78%
+  );
+  border-color: color-mix(in oklch, var(--sign), white 28%);
+  color: color-mix(in oklch, var(--sign), white 92%);
+}
+
+@utility sigil-lit {
+  box-shadow:
+    0 0 0 2px color-mix(in oklch, var(--sign), transparent 72%),
+    0 0 12px -2px color-mix(in oklch, var(--sign), transparent 42%);
+}
+
 @utility keycap {
   box-shadow: 0 1px 0 0 var(--border);
 }
