@@ -6,7 +6,7 @@
     "module": "ESNext",
     "skipLibCheck": true,
 
-    /* Path aliases — resolved relative to this file (baseUrl was removed in TS 7) */
+    /* Path aliases, resolved relative to this file (baseUrl was removed in TS 7) */
     "paths": {
       "@/*": ["./src/*"]
     },

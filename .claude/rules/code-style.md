@@ -12,7 +12,7 @@ Analyze recently modified code and apply refinements. Focus on code touched in t
 
 Never change what the code does - only how it does it. All original features, outputs, and behaviors must remain intact.
 
-**Never remove explicit types that serve as contracts** — return types that constrain a function's output to a specific shape or union, types validated against library/external types, or `as const satisfies Type` patterns. If an explicit type would catch a bug at compile time that inference alone would miss, it must stay.
+**Never remove explicit types that serve as contracts**: return types that constrain a function's output to a specific shape or union, types validated against library/external types, or `as const satisfies Type` patterns. If an explicit type would catch a bug at compile time that inference alone would miss, it must stay.
 
 ### 2. Clarity Over Brevity
 
@@ -91,18 +91,18 @@ None, in any language of the repository. The one exception, one line long, is in
 
 ### Arrow Functions
 
-- **Always use block body with explicit `return`** — never use implicit returns
+- **Always use block body with explicit `return`**, never use implicit returns
 - **Never remove curly braces** from arrow functions
 - This applies to all arrow functions: callbacks, handlers, `.map()`, `.filter()`, etc.
 
 ### Oxlint Disables
 
-- **NEVER disable a rule at the file level** (`/* oxlint-disable rule-name */`) — only per-line (`// oxlint-disable-next-line rule-name`)
-- **Exception : `no-console`** — seule règle autorisée en disable global fichier (`/* oxlint-disable no-console */`)
+- **NEVER disable a rule at the file level** (`/* oxlint-disable rule-name */`), only per-line (`// oxlint-disable-next-line rule-name`)
+- **Exception : `no-console`**, seule règle autorisée en disable global fichier (`/* oxlint-disable no-console */`)
 - Always include a description explaining why: `// oxlint-disable-next-line rule-name -- reason`
 - Before disabling, ask: can the rule be satisfied by fixing the code? If yes, fix it
 - A disable is only justified when the rule conflicts with a library API, a specific pattern that cannot be avoided, or a known oxlint false positive
-- If the same rule is disabled on many lines in a file, that is a code smell — reconsider the approach
+- If the same rule is disabled on many lines in a file, that is a code smell, reconsider the approach
 
 ### Code Structure
 
@@ -141,7 +141,7 @@ Before creating a constant or helper, search if it already exists.
 
 ### Extract & Reuse (CRITICAL)
 
-Before writing ANY function, component, type, or constant inside a feature file, ask: **"Could this be reused elsewhere?"** If yes (or even maybe), extract it immediately — not later.
+Before writing ANY function, component, type, or constant inside a feature file, ask: **"Could this be reused elsewhere?"** If yes (or even maybe), extract it immediately, not later.
 
 **What to extract:**
 
@@ -152,8 +152,8 @@ Before writing ANY function, component, type, or constant inside a feature file,
 
 **When writing new code:**
 
-- Scan existing helpers, components, and hooks FIRST — the function you need may already exist
-- If you define something locally and realize it's generic, extract it in the same task — don't leave it for later
+- Scan existing helpers, components, and hooks FIRST, the function you need may already exist
+- If you define something locally and realize it's generic, extract it in the same task, don't leave it for later
 - If a sub-component is defined locally in a file, ask whether another file could benefit from it
 
 **Red flags (things that should NOT live in feature/page files):**

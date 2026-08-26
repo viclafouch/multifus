@@ -14,7 +14,7 @@ TypeScript's inference is extremely powerful. Let it do its job.
 - NO type annotations on variables initialized with a value
 - NO type annotations on parameters with default values
 - NO type annotations on function expressions or arrow functions
-- NO return type annotations on functions — trust inference by default
+- NO return type annotations on functions: trust inference by default
 
 **Explicit types ARE required when inference is too loose:**
 
@@ -27,17 +27,17 @@ TypeScript's inference is extremely powerful. Let it do its job.
 
 **Rule of thumb:** if removing a type annotation would let invalid values pass silently at compile time, the annotation is necessary. If it just repeats what TypeScript already knows, remove it.
 
-### Type Safety — Single Source of Truth (CRITICAL)
+### Type Safety, Single Source of Truth (CRITICAL)
 
-**NEVER hand-write a type when it can be derived from an existing source.** This applies universally — any library, ORM, internal code, constants, or schema.
+**NEVER hand-write a type when it can be derived from an existing source.** This applies universally, to any library, ORM, internal code, constants, or schema.
 
 **Derivation techniques (use the first one that fits):**
 
-- `typeof myConstant` — derive from a runtime value
-- `ExistingType['field']` — indexed access to pick a field type
-- `ReturnType<typeof fn>` / `Awaited<ReturnType<typeof fn>>` — derive from function output
-- `Pick<T, 'a' | 'b'>` / `Omit<T, 'c'>` — subset of an existing type
-- `T & { extra: string }` — extend an existing type with additional fields
+- `typeof myConstant` : derive from a runtime value
+- `ExistingType['field']` : indexed access to pick a field type
+- `ReturnType<typeof fn>` / `Awaited<ReturnType<typeof fn>>` : derive from function output
+- `Pick<T, 'a' | 'b'>` / `Omit<T, 'c'>` : subset of an existing type
+- `T & { extra: string }` : extend an existing type with additional fields
 
 **A hand-written type is ONLY justified when:**
 
@@ -51,11 +51,11 @@ TypeScript's inference is extremely powerful. Let it do its job.
 - Copying field types from one type into another instead of intersecting/extending
 - Re-declaring a union that already exists on another type → use `Row['field']`
 
-**NEVER use `string` when a stricter type exists** in a library or the codebase — always use the library's own types to constrain values (route paths, query keys, event names, etc.). Extend or intersect library types instead of rewriting them with loose primitives.
+**NEVER use `string` when a stricter type exists** in a library or the codebase. Always use the library's own types to constrain values (route paths, query keys, event names, etc.). Extend or intersect library types instead of rewriting them with loose primitives.
 
 ### Constants Pattern (CRITICAL)
 
-- **Arrays/Objects MUST use `as const satisfies Type`** — both parts are required. `as const` alone is NOT enough because it skips type validation. Always define a dedicated type and validate with `satisfies`.
+- **Arrays/Objects MUST use `as const satisfies Type`**, both parts are required. `as const` alone is NOT enough because it skips type validation. Always define a dedicated type and validate with `satisfies`.
   - WRONG: `const ITEMS = [...] as const`
   - CORRECT: `const ITEMS = [...] as const satisfies readonly ItemType[]`
 - Primitives: simple assignment, no annotations

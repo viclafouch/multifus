@@ -6,7 +6,7 @@ paths: ['src/**/*.{ts,tsx}']
 
 ### React
 
-- Use `React.useState`, `React.useEffect`, etc. — never destructure React imports.
+- Use `React.useState`, `React.useEffect`, etc. Never destructure React imports.
 - **NEVER use `useCallback` or `useMemo`** unless you have a proven performance problem. These are premature optimizations that add complexity without benefit in 99% of cases. Only valid uses:
   - Passing callbacks to heavily memoized child components (`React.memo`)
   - Expensive computations that are measurably slow (profile first)
@@ -69,9 +69,9 @@ paths: ['src/**/*.{ts,tsx}']
 
 ### Attribute-Driven Styling
 
-- **Never use dynamic classes for state** — use `aria-*` or `data-*` attributes on the element, then style with Tailwind modifiers (`aria-selected:bg-primary`, `data-active:bg-accent`)
-- **Tailwind `data-*` shorthand** — use `data-foo:` instead of `data-[foo]:` for boolean data attributes. Use bracket syntax `data-[foo=value]:` only when matching a specific value
-- Avoid `cn("bg-muted", isActive && "bg-primary")` — prefer setting an attribute and letting CSS handle the rest
+- **Never use dynamic classes for state**: use `aria-*` or `data-*` attributes on the element, then style with Tailwind modifiers (`aria-selected:bg-primary`, `data-active:bg-accent`)
+- **Tailwind `data-*` shorthand**: use `data-foo:` instead of `data-[foo]:` for boolean data attributes. Use bracket syntax `data-[foo=value]:` only when matching a specific value
+- Avoid `cn("bg-muted", isActive && "bg-primary")`, prefer setting an attribute and letting CSS handle the rest
 - **Exceptions**: variant props (size, color), layout changes without a semantic attribute, third-party constraints
 
 ### Hover & Interaction Consistency

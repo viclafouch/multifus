@@ -86,7 +86,7 @@ export const CHARACTERS_STRINGS = {
     classDialogGender: 'Sexe',
     classDialogClasses: 'Classe',
     classDialogWhich: (label: string) => {
-      return `${label} — homme ou femme ?`
+      return `${label} : homme ou femme ?`
     },
     classDialogBack: 'Changer de classe',
     classDialogWindowKeepsIcon:
