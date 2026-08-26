@@ -567,6 +567,8 @@ impl WindowManager for AccessibilityWindowManager {
         Ok(())
     }
 
+    fn forget_closed_windows(&self) {}
+
     fn taskbar_combines(&self) -> Result<bool> {
         Ok(false)
     }

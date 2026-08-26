@@ -197,6 +197,8 @@ fn follow_taskbar(app: &AppHandle) -> bool {
 }
 
 fn apply_window_icons(app: &AppHandle) -> bool {
+    app.state::<PlatformWindowManager>().forget_closed_windows();
+
     let looks = {
         let mut state = lock(app);
 
@@ -254,12 +256,24 @@ const GROUP_PREFIX: &str = "multifus.window.";
 pub fn on_run_event(app: &AppHandle, event: RunEvent) {
     if matches!(event, RunEvent::Exit) {
         give_titles_back(app);
+        give_icons_back(app);
         give_groups_back(app);
 
         return;
     }
 
     main_window::show_on_dock_click(app, event);
+}
+
+fn give_icons_back(app: &AppHandle) {
+    let painted = lock(app).portrait_windows();
+
+    for window in painted {
+        drop(
+            app.state::<PlatformWindowManager>()
+                .set_window_icon(window, None),
+        );
+    }
 }
 
 fn give_groups_back(app: &AppHandle) {

@@ -576,7 +576,7 @@ impl Multifus {
                 let window = *self.windows.get(&character.nickname)?;
                 let look = WindowLook {
                     portrait: character.portrait(),
-                    ungrouped: self.settings.ungroup_taskbar,
+                    ungrouped: self.settings.ungroup_taskbar && self.taskbar_combines,
                 };
 
                 (self.painted_windows.get(&window) != Some(&look)).then_some((window, look))
@@ -607,6 +607,15 @@ impl Multifus {
         self.painted_windows
             .get(&window)
             .is_some_and(|look| look.ungrouped)
+    }
+
+    #[must_use]
+    pub fn portrait_windows(&self) -> Vec<WindowId> {
+        self.painted_windows
+            .iter()
+            .filter(|(_, look)| look.portrait.is_some())
+            .map(|(window, _)| *window)
+            .collect()
     }
 
     #[must_use]
@@ -1945,6 +1954,39 @@ mod tests {
                     ungrouped: false,
                 }
             )]
+        );
+    }
+
+    #[test]
+    fn a_taskbar_that_never_combines_leaves_the_windows_in_their_group() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha")]);
+        state.set_ungroup_taskbar(true);
+
+        assert_eq!(
+            state.looks_to_paint(),
+            vec![(
+                WindowId::from_raw(1),
+                WindowLook {
+                    portrait: None,
+                    ungrouped: true,
+                }
+            )]
+        );
+
+        state.set_taskbar_combines(false);
+
+        assert_eq!(
+            state.looks_to_paint(),
+            vec![(
+                WindowId::from_raw(1),
+                WindowLook {
+                    portrait: None,
+                    ungrouped: false,
+                }
+            )],
+            "a taskbar that never combines has nothing to ungroup"
         );
     }
 

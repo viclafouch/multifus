@@ -156,8 +156,9 @@ const GroupedAction = ({ gender, missing, onSet }: GroupedActionProps) => {
 
   const buttons = (
     <div
+      aria-hidden={isComplete ? undefined : true}
       data-incomplete={isComplete ? undefined : ''}
-      className="flex items-center gap-1.5 rounded-md border border-border/70 bg-card/40 py-1 pr-1 pl-2 data-incomplete:opacity-55"
+      className="flex items-center gap-1.5 rounded-md border border-border/70 bg-card/40 py-1 pr-1 pl-2 data-incomplete:pointer-events-none data-incomplete:opacity-55"
     >
       <Icon
         aria-hidden
@@ -170,7 +171,7 @@ const GroupedAction = ({ gender, missing, onSet }: GroupedActionProps) => {
       <Button
         variant="ghost"
         size="xs"
-        aria-disabled={!isComplete}
+        tabIndex={isComplete ? undefined : -1}
         aria-label={strings.characters.sleepGroupLabel[gender]}
         onClick={() => {
           onSet(gender, true)
@@ -181,7 +182,7 @@ const GroupedAction = ({ gender, missing, onSet }: GroupedActionProps) => {
       <Button
         variant="ghost"
         size="xs"
-        aria-disabled={!isComplete}
+        tabIndex={isComplete ? undefined : -1}
         aria-label={strings.characters.wakeGroupLabel[gender]}
         onClick={() => {
           onSet(gender, false)
@@ -198,7 +199,13 @@ const GroupedAction = ({ gender, missing, onSet }: GroupedActionProps) => {
 
   return (
     <Tooltip>
-      <TooltipTrigger render={<div />} tabIndex={0} className="outline-none">
+      <TooltipTrigger
+        render={<div />}
+        aria-disabled
+        aria-label={strings.characters.groupLabel[gender]}
+        tabIndex={0}
+        className="cursor-not-allowed rounded-md outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+      >
         {buttons}
       </TooltipTrigger>
       <TooltipContent>{missingGenderLine(missing)}</TooltipContent>

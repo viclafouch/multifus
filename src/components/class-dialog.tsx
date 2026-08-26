@@ -160,7 +160,6 @@ const ClassStep = ({ character, onPickClass, onSetGender }: ClassStepProps) => {
           <li>
             <ClassVignette
               label={words.noClass}
-              isCurrent={false}
               ariaLabel={words.noClassLabel(nickname)}
               onPick={() => {
                 onPickClass(null)

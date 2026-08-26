@@ -95,9 +95,13 @@ classe, le portrait se déduit.
 remplace la lampe ; à 16 px dans la barre des tâches, le carré garde les épaules
 du personnage et 27 % de pixels en plus.
 
-**On ne restaure pas l'icône en partant, on restaure le regroupement.** L'icône
-meurt avec le client et rend service jusque-là. Le regroupement est une
-modification du bureau de quelqu'un : on la lui rend.
+**On restaure l'icône et le regroupement en partant.** Le premier jet disait
+l'inverse, sur une idée fausse : « l'icône meurt avec le client ». Elle meurt
+avec Multifus. Un `HICON` appartient au processus qui l'a créé, et Windows
+détruit ses objets USER quand il se termine : quitter Multifus laissait chaque
+fenêtre Dofus pointer sur un handle mort, et le bouton de la barre des tâches
+vidé au premier rafraîchissement d'Explorer. On rend donc les deux, comme on
+rend déjà les titres : la fenêtre retrouve l'icône de sa classe, et son groupe.
 
 **Le rang chiffré reste.** C'est le seul endroit qui dit quel coup de raccourci
 tombe où, et les trous (`·`) sont l'information.
@@ -255,6 +259,12 @@ Multifus se bloquait sur lui-même au premier tour dès qu'un client était ouve
 fenêtre grise et « ne répond pas ». La liste se lit dans un `let` avant la
 boucle, comme `maximize_new_clients` le faisait déjà.
 
+**Le dégroupage suit la barre des tâches, pas seulement le réglage.** Allumer
+« un bouton par personnage » puis basculer Windows sur « Ne jamais combiner »
+faisait disparaître la ligne des Réglages pendant que Multifus continuait de
+tamponner un identifiant par fenêtre, sans plus aucun moyen de l'éteindre. La
+comptabilité croise donc les deux : pas de barre qui combine, rien à dégrouper.
+
 **Le réglage Windows de regroupement se relit à chaque tour.** Le lire une fois
 au démarrage laissait la ligne des Réglages absente pour qui bascule
 « Ne jamais combiner » en « Toujours combiner » sans relancer Multifus. Une
@@ -314,5 +324,5 @@ portraits, ce qui n'arrivera pas : les classes de Retro sont douze.
       n'apparaît pas dans Réglages
 - [ ] Sur une barre qui combine, allumer le réglage donne un bouton par client,
       et quitter Multifus les regroupe
-- [ ] Quitter Multifus laisse les icônes en place sur les clients ouverts
+- [ ] Quitter Multifus rend aux clients ouverts leur icône Dofus et leur groupe
 - [ ] macOS : la modale et le médaillon marchent, la fenêtre ne change pas

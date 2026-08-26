@@ -4,17 +4,17 @@ import { Button } from '@/components/ui/button'
 type ClassVignetteProps = Readonly<{
   label: string
   ariaLabel: string
-  isCurrent: boolean
   onPick: () => void
   children: React.ReactNode
+  isCurrent?: boolean
 }>
 
 export const ClassVignette = ({
   label,
   ariaLabel,
-  isCurrent,
   onPick,
-  children
+  children,
+  isCurrent
 }: ClassVignetteProps) => {
   return (
     <Button

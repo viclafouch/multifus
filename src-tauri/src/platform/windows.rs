@@ -247,24 +247,6 @@ impl Win32WindowManager {
 
         std::mem::replace(slot.of(painted), icon)
     }
-
-    fn forget_dead_windows(&self) {
-        let mut icons = self.icons.lock().unwrap_or_else(PoisonError::into_inner);
-        let dead = icons
-            .keys()
-            .copied()
-            .filter(|window| !is_live_window(*window))
-            .collect::<Vec<_>>();
-
-        for window in dead {
-            let Some(painted) = icons.remove(&window) else {
-                continue;
-            };
-
-            destroy_icon(painted.small);
-            destroy_icon(painted.big);
-        }
-    }
 }
 
 impl WindowManager for Win32WindowManager {
@@ -361,12 +343,28 @@ impl WindowManager for Win32WindowManager {
     fn set_window_icon(&self, window: WindowId, icon: Option<&[u8]>) -> Result<()> {
         let handle = live_game_window(window)?;
 
-        self.forget_dead_windows();
-
         let small = self.paint_slot(handle, window, IconSlot::Small, icon);
         let big = self.paint_slot(handle, window, IconSlot::Big, icon);
 
         small.and(big)
+    }
+
+    fn forget_closed_windows(&self) {
+        let mut icons = self.icons.lock().unwrap_or_else(PoisonError::into_inner);
+        let closed = icons
+            .keys()
+            .copied()
+            .filter(|window| !is_live_window(*window))
+            .collect::<Vec<_>>();
+
+        for window in closed {
+            let Some(painted) = icons.remove(&window) else {
+                continue;
+            };
+
+            destroy_icon(painted.small);
+            destroy_icon(painted.big);
+        }
     }
 
     fn taskbar_combines(&self) -> Result<bool> {

@@ -148,6 +148,8 @@ pub trait WindowManager: Send + Sync {
 
     fn set_window_icon(&self, window: WindowId, icon: Option<&[u8]>) -> Result<()>;
 
+    fn forget_closed_windows(&self);
+
     fn taskbar_combines(&self) -> Result<bool>;
 
     fn set_window_group(&self, window: WindowId, group: Option<&str>) -> Result<()>;
