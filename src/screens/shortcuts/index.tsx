@@ -1,22 +1,20 @@
 import React from 'react'
 import type { Binding, QuickReply, ShortcutBinding } from '@/@types/shortcuts'
 import type { Snapshot } from '@/@types/snapshot'
-import { FieldRow } from '@/components/layout/field-row'
 import { Note } from '@/components/layout/note'
-import { Panel } from '@/components/layout/panel'
 import { Screen } from '@/components/layout/screen'
 import { strings } from '@/constants/strings'
-import { matchIsSameBinding } from '@/helpers/binding'
-import { shortcutStatusLine } from '@/helpers/wording'
+import { useShortcutUndo } from '@/hooks/use-shortcut-undo'
 import {
   addQuickReply,
   removeQuickReply,
+  resetShortcuts,
   setQuickReplyShortcut,
   setQuickReplyText,
   setShortcut
 } from '@/lib/multifus'
+import { ActionsPanel } from '@/screens/shortcuts/actions-panel'
 import { QuickRepliesPanel } from '@/screens/shortcuts/quick-replies-panel'
-import { ShortcutField } from '@/screens/shortcuts/shortcut-field'
 
 type ShortcutsScreenProps = Readonly<{
   shortcuts: readonly ShortcutBinding[]
@@ -31,6 +29,10 @@ export const ShortcutsScreen = ({
 }: ShortcutsScreenProps) => {
   const [editing, setEditing] = React.useState<Binding | null>(null)
 
+  const undo = useShortcutUndo((action, accelerator) => {
+    run(setShortcut(action, accelerator))
+  })
+
   const handleClose = () => {
     setEditing(null)
   }
@@ -40,40 +42,27 @@ export const ShortcutsScreen = ({
       title={strings.shortcuts.title}
       subtitle={strings.shortcuts.subtitle}
     >
-      <Panel>
-        {shortcuts.map((shortcut) => {
-          const { label, description } =
-            strings.shortcuts.actions[shortcut.action]
-
-          return (
-            <FieldRow
-              key={shortcut.action}
-              label={label}
-              description={description}
-            >
-              <ShortcutField
-                accelerator={shortcut.accelerator}
-                statusLine={shortcutStatusLine(shortcut.status, quickReplies)}
-                editLabel={strings.shortcuts.edit(label)}
-                editing={{
-                  isActive: matchIsSameBinding(editing, {
-                    kind: 'action',
-                    action: shortcut.action
-                  }),
-                  handleOpen: () => {
-                    setEditing({ kind: 'action', action: shortcut.action })
-                  },
-                  handleClose,
-                  handleCapture: (accelerator) => {
-                    setEditing(null)
-                    run(setShortcut(shortcut.action, accelerator))
-                  }
-                }}
-              />
-            </FieldRow>
-          )
-        })}
-      </Panel>
+      <ActionsPanel
+        shortcuts={shortcuts}
+        quickReplies={quickReplies}
+        editing={editing}
+        undoFor={undo.undoFor}
+        actions={{
+          handleCapture: (shortcut, accelerator) => {
+            setEditing(null)
+            undo.remember([shortcut])
+            run(setShortcut(shortcut.action, accelerator))
+          },
+          handleDefaults: () => {
+            undo.forgetAll()
+            run(resetShortcuts())
+          },
+          handleOpen: (action) => {
+            setEditing({ kind: 'action', action })
+          },
+          handleClose
+        }}
+      />
       <Note>{strings.shortcuts.silent}</Note>
       <QuickRepliesPanel
         quickReplies={quickReplies}

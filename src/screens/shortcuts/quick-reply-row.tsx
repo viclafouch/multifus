@@ -66,10 +66,18 @@ export const QuickReplyRow = ({
         onKeyDown={handleKeyDown}
         className="h-8 text-note"
       />
+      <RemoveButton
+        label={words.remove}
+        onRemove={() => {
+          actions.handleRemove(quickReply.id)
+        }}
+        className="mt-1"
+      />
       <ShortcutField
         accelerator={quickReply.accelerator}
         statusLine={statusLine}
         editLabel={words.edit}
+        undo={null}
         editing={{
           isActive: matchIsSameBinding(editing, {
             kind: 'quickReply',
@@ -83,13 +91,6 @@ export const QuickReplyRow = ({
             actions.handleShortcut(quickReply.id, accelerator)
           }
         }}
-      />
-      <RemoveButton
-        label={words.remove}
-        onRemove={() => {
-          actions.handleRemove(quickReply.id)
-        }}
-        className="mt-1"
       />
     </li>
   )

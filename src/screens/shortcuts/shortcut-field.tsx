@@ -4,12 +4,15 @@ import type { CaptureRejection } from '@/constants/keyboard'
 import { strings } from '@/constants/strings'
 import { acceleratorParts, capture, heldModifiers } from '@/helpers/accelerator'
 import type { TonedLine } from '@/helpers/wording'
+import type { ShortcutUndo } from '@/hooks/use-shortcut-undo'
 import { KeyCap } from '@/screens/shortcuts/key-cap'
+import { ShortcutUndoButton } from '@/screens/shortcuts/shortcut-undo-button'
 
 type ShortcutFieldProps = Readonly<{
   accelerator: string | null
   statusLine: TonedLine | null
   editLabel: string
+  undo: ShortcutUndo | null
   editing: Readonly<{
     isActive: boolean
     handleOpen: () => void
@@ -22,6 +25,7 @@ export const ShortcutField = ({
   accelerator,
   statusLine,
   editLabel,
+  undo,
   editing
 }: ShortcutFieldProps) => {
   const [held, setHeld] = React.useState<readonly string[]>([])
@@ -72,6 +76,8 @@ export const ShortcutField = ({
     rejected
   })
 
+  const offer = editing.isActive ? null : undo
+
   return (
     <div className="flex flex-col items-end gap-1">
       <Button
@@ -105,6 +111,7 @@ export const ShortcutField = ({
           {hint.text}
         </p>
       )}
+      {offer === null ? null : <ShortcutUndoButton undo={offer} />}
     </div>
   )
 }

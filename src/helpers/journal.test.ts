@@ -52,18 +52,26 @@ const SHORTCUTS = [
   {
     action: 'next',
     accelerator: 'Control+Shift+ArrowRight',
-    status: { kind: 'registered' }
+    status: { kind: 'registered' },
+    isDefault: true
   },
-  { action: 'previous', accelerator: null, status: { kind: 'unbound' } },
+  {
+    action: 'previous',
+    accelerator: null,
+    status: { kind: 'unbound' },
+    isDefault: false
+  },
   {
     action: 'toggleAsleep',
     accelerator: 'Control+Shift+KeyS',
-    status: { kind: 'pending' }
+    status: { kind: 'pending' },
+    isDefault: false
   },
   {
     action: 'swap',
     accelerator: 'Control+Shift+KeyX',
-    status: { kind: 'invalid', detail: 'touche inconnue' }
+    status: { kind: 'invalid', detail: 'touche inconnue' },
+    isDefault: false
   }
 ] as const satisfies readonly ShortcutBinding[]
 

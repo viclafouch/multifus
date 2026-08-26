@@ -69,6 +69,10 @@ export const setShortcut = async (
   return invoke<Snapshot>('set_shortcut', { action, accelerator })
 }
 
+export const resetShortcuts = async () => {
+  return invoke<Snapshot>('reset_shortcuts')
+}
+
 export const addQuickReply = async () => {
   return invoke<Snapshot>('add_quick_reply')
 }

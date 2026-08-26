@@ -1,6 +1,11 @@
 import type { PairingProblem } from '@/@types/relay'
 import type { Character } from '@/@types/roster'
-import type { Binding, QuickReply, ShortcutStatus } from '@/@types/shortcuts'
+import type {
+  Binding,
+  QuickReply,
+  ShortcutAction,
+  ShortcutStatus
+} from '@/@types/shortcuts'
 import type {
   Authorization,
   ConfigProblem,
@@ -115,6 +120,10 @@ const shorten = (text: string) => {
   }
 
   return `${letters.slice(0, QUICK_REPLY_LABEL_LENGTH).join('')}…`
+}
+
+export const shortcutUndoLabel = (action: ShortcutAction) => {
+  return strings.shortcuts.undoLabel(strings.shortcuts.actions[action].label)
 }
 
 export const shortcutStatusLine = (

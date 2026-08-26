@@ -42,6 +42,7 @@ use crate::config::QuickReply;
 use crate::config::QuickReplyId;
 use crate::config::Settings;
 use crate::config::Shortcut;
+use crate::config::Shortcuts;
 use crate::domain::Character;
 use crate::domain::Gender;
 use crate::domain::NotificationKind;
@@ -150,6 +151,8 @@ impl Multifus {
 
     #[must_use]
     pub fn snapshot(&self) -> Snapshot {
+        let defaults = Shortcuts::default();
+
         Snapshot {
             version: self.version.clone(),
             system: self.system.clone(),
@@ -169,6 +172,7 @@ impl Multifus {
                     action,
                     accelerator: self.accelerator(action),
                     status: self.status_of(Binding::Action { action }),
+                    is_default: self.shortcut(action) == shortcut_in(&defaults, action),
                 })
                 .collect(),
             quick_replies: self
@@ -346,12 +350,7 @@ impl Multifus {
 
     #[must_use]
     fn shortcut(&self, action: ShortcutAction) -> Option<&Shortcut> {
-        match action {
-            ShortcutAction::Next => self.settings.shortcuts.next.as_ref(),
-            ShortcutAction::Previous => self.settings.shortcuts.previous.as_ref(),
-            ShortcutAction::ToggleAsleep => self.settings.shortcuts.toggle_asleep.as_ref(),
-            ShortcutAction::Swap => self.settings.shortcuts.swap.as_ref(),
-        }
+        shortcut_in(&self.settings.shortcuts, action)
     }
 
     #[must_use]
@@ -398,6 +397,12 @@ impl Multifus {
         };
 
         *slot = shortcut;
+
+        self.save();
+    }
+
+    pub fn reset_shortcuts(&mut self) {
+        self.settings.shortcuts = Shortcuts::default();
 
         self.save();
     }
@@ -1000,6 +1005,15 @@ fn accelerator_of(shortcut: Option<&Shortcut>) -> Option<String> {
     shortcut.map(|shortcut| shortcut.as_str().to_owned())
 }
 
+fn shortcut_in(shortcuts: &Shortcuts, action: ShortcutAction) -> Option<&Shortcut> {
+    match action {
+        ShortcutAction::Next => shortcuts.next.as_ref(),
+        ShortcutAction::Previous => shortcuts.previous.as_ref(),
+        ShortcutAction::ToggleAsleep => shortcuts.toggle_asleep.as_ref(),
+        ShortcutAction::Swap => shortcuts.swap.as_ref(),
+    }
+}
+
 fn nickname_of(character: Option<&Character>) -> Option<String> {
     character.map(|character| character.nickname.clone())
 }
@@ -1552,6 +1566,25 @@ mod tests {
         );
         assert_eq!(
             bindings.last().cloned(),
+            Some((Binding::QuickReply { id }, Some("Alt+P".to_owned())))
+        );
+    }
+
+    #[test]
+    fn the_four_actions_take_back_their_first_day_keys_and_leave_the_rest_alone() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        let id = state.add_quick_reply();
+        state.set_quick_reply_shortcut(id, Some("Alt+P".to_owned()));
+        state.set_shortcut(ShortcutAction::Next, Some("Alt+N".to_owned()));
+        state.set_shortcut(ShortcutAction::Swap, None);
+
+        state.reset_shortcuts();
+
+        assert_eq!(state.settings.shortcuts, Shortcuts::default());
+        assert!(state.accelerator(ShortcutAction::Swap).is_some());
+        assert_eq!(
+            state.bindings().last().cloned(),
             Some((Binding::QuickReply { id }, Some("Alt+P".to_owned())))
         );
     }

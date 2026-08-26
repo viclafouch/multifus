@@ -36,6 +36,7 @@ pub fn run() {
             app::commands::reorder,
             app::commands::remove_character,
             app::commands::set_shortcut,
+            app::commands::reset_shortcuts,
             app::commands::add_quick_reply,
             app::commands::set_quick_reply_text,
             app::commands::set_quick_reply_shortcut,

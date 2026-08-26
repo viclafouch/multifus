@@ -72,9 +72,15 @@ export const SHORTCUTS_STRINGS = {
       'Changez de personnage sans lâcher la souris. Ces touches ne répondent que quand Dofus Retro est devant vous.',
     silent:
       'Un autre logiciel peut déjà utiliser les mêmes touches. Multifus les accepte, mais rien ne se passera dans le jeu. En cas de doute, essayez le raccourci depuis Dofus Retro et regardez le journal, en bas.',
+    defaults: 'Remettre les touches d’origine',
     capture: 'Appuyez sur vos touches',
     captureHint: 'Échap pour annuler, Retour arrière pour effacer.',
     empty: 'Aucune',
+    undo: 'Remettre',
+    undoNone: 'Remettre : aucune touche',
+    undoLabel: (label: string) => {
+      return `Remettre les touches d’avant pour ${label}`
+    },
     edit: (label: string) => {
       return `Modifier le raccourci ${label}`
     },

@@ -212,6 +212,7 @@ pub struct ShortcutView {
     pub action: ShortcutAction,
     pub accelerator: Option<String>,
     pub status: ShortcutStatus,
+    pub is_default: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]

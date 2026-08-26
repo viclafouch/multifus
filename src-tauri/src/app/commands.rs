@@ -90,6 +90,15 @@ pub fn set_shortcut(
 }
 
 #[tauri::command]
+pub fn reset_shortcuts(app: AppHandle) -> Snapshot {
+    lock(&app).reset_shortcuts();
+
+    shortcuts::apply(&app);
+
+    runtime::emit_snapshot(&app)
+}
+
+#[tauri::command]
 pub fn add_quick_reply(app: AppHandle) -> Snapshot {
     lock(&app).add_quick_reply();
 

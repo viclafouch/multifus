@@ -18,6 +18,7 @@ export type ShortcutBinding = {
   readonly action: ShortcutAction
   readonly accelerator: string | null
   readonly status: ShortcutStatus
+  readonly isDefault: boolean
 }
 
 export type QuickReply = {
