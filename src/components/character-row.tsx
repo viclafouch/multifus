@@ -1,19 +1,22 @@
 import React from 'react'
-import { GripVertical, Mars, Venus } from 'lucide-react'
+import { GripVertical } from 'lucide-react'
 import { useSortable } from '@dnd-kit/react/sortable'
-import type { Character, Gender } from '@/@types/roster'
-import { Lamp } from '@/components/lamp'
+import type { Character, Class, Gender } from '@/@types/roster'
+import { CharacterMedallion } from '@/components/character-medallion'
+import { ClassDialog } from '@/components/class-dialog'
 import { RemoveButton } from '@/components/remove-button'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { strings } from '@/constants/strings'
-import { characterState, characterStateLine } from '@/helpers/wording'
+import { portraitFor } from '@/helpers/portrait'
+import { characterState, characterSubLine } from '@/helpers/wording'
 
 const STAGGER_MS = 38
 
 type RowActions = Readonly<{
   handleToggleAsleep: (nickname: string) => void
   handleSetGender: (nickname: string, gender: Gender | null) => void
+  handleSetClass: (nickname: string, characterClass: Class | null) => void
   handleRemove: (nickname: string) => void
 }>
 
@@ -30,9 +33,10 @@ export const CharacterRow = ({
   index,
   actions
 }: CharacterRowProps) => {
-  const { nickname, gender, asleep, online } = character
+  const { nickname, asleep, online } = character
   const { ref, handleRef, isDragging } = useSortable({ id: nickname, index })
   const [isEntering, setIsEntering] = React.useState(true)
+  const [isDialogOpen, setIsDialogOpen] = React.useState(false)
 
   return (
     <li
@@ -65,28 +69,27 @@ export const CharacterRow = ({
           ? strings.characters.rankNone
           : String(rank).padStart(2, '0')}
       </span>
-      <Lamp state={characterState(character)} />
+      <Button
+        variant="ghost"
+        aria-label={strings.characters.classDialog(nickname)}
+        className="size-fit shrink-0 rounded-full border-0 p-0 transition hover:bg-transparent hover:brightness-110"
+        onClick={() => {
+          setIsDialogOpen(true)
+        }}
+      >
+        <CharacterMedallion
+          nickname={nickname}
+          portrait={portraitFor(character)}
+          state={characterState(character)}
+        />
+      </Button>
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <p className="selectable truncate text-row font-medium group-data-offline:text-muted-foreground">
           {nickname}
         </p>
         <p className="text-micro font-medium tracking-micro text-muted-foreground/65 uppercase">
-          {characterStateLine(character)}
+          {characterSubLine(character)}
         </p>
-      </div>
-      <div className="flex shrink-0 items-center rounded-md border border-border/60 p-0.5">
-        <GenderButton
-          nickname={nickname}
-          gender="male"
-          current={gender}
-          onSetGender={actions.handleSetGender}
-        />
-        <GenderButton
-          nickname={nickname}
-          gender="female"
-          current={gender}
-          onSetGender={actions.handleSetGender}
-        />
       </div>
       <Switch
         checked={online && !asleep}
@@ -106,38 +109,18 @@ export const CharacterRow = ({
           />
         )}
       </span>
+      <ClassDialog
+        character={character}
+        isOpen={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        onSetGender={(gender) => {
+          actions.handleSetGender(nickname, gender)
+        }}
+        onSetClass={(characterClass) => {
+          actions.handleSetClass(nickname, characterClass)
+          setIsDialogOpen(false)
+        }}
+      />
     </li>
-  )
-}
-
-type GenderButtonProps = Readonly<{
-  nickname: string
-  gender: Gender
-  current: Gender | null
-  onSetGender: (nickname: string, gender: Gender | null) => void
-}>
-
-const GenderButton = ({
-  nickname,
-  gender,
-  current,
-  onSetGender
-}: GenderButtonProps) => {
-  const isActive = current === gender
-  const Icon = gender === 'male' ? Mars : Venus
-
-  return (
-    <Button
-      variant="ghost"
-      size="icon-xs"
-      aria-pressed={isActive}
-      aria-label={strings.characters.genderLabel(nickname, gender)}
-      onClick={() => {
-        onSetGender(nickname, isActive ? null : gender)
-      }}
-      className="text-muted-foreground/40 aria-pressed:bg-primary/15 aria-pressed:text-primary"
-    >
-      <Icon strokeWidth={2} />
-    </Button>
   )
 }

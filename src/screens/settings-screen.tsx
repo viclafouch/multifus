@@ -1,4 +1,4 @@
-import { Activity, Maximize2, Power, Tag } from 'lucide-react'
+import { Activity, Maximize2, Power, Rows3, Tag } from 'lucide-react'
 import type { Snapshot } from '@/@types/snapshot'
 import { FieldRow } from '@/components/layout/field-row'
 import { Panel } from '@/components/layout/panel'
@@ -10,13 +10,16 @@ import { strings } from '@/constants/strings'
 import {
   setMaximizeOnLaunch,
   setShortTitles,
-  setStartAtLogin
+  setStartAtLogin,
+  setUngroupTaskbar
 } from '@/lib/multifus'
 
 type SettingsScreenProps = Readonly<{
   startAtLogin: boolean
   maximizeOnLaunch: boolean
   shortTitles: boolean
+  ungroupTaskbar: boolean
+  taskbarCombines: boolean
   run: (action: Promise<Snapshot>) => void
 }>
 
@@ -24,6 +27,8 @@ export const SettingsScreen = ({
   startAtLogin,
   maximizeOnLaunch,
   shortTitles,
+  ungroupTaskbar,
+  taskbarCombines,
   run
 }: SettingsScreenProps) => {
   return (
@@ -77,6 +82,23 @@ export const SettingsScreen = ({
             />
           )}
         </FieldRow>
+        {taskbarCombines ? (
+          <FieldRow
+            label={strings.settings.ungroupLabel}
+            description={strings.settings.ungroupDescription}
+            icon={
+              <Rows3 className="size-glyph" strokeWidth={1.75} aria-hidden />
+            }
+          >
+            <Switch
+              checked={ungroupTaskbar}
+              aria-label={strings.settings.ungroupLabel}
+              onCheckedChange={(ungroup) => {
+                run(setUngroupTaskbar(ungroup))
+              }}
+            />
+          </FieldRow>
+        ) : null}
         <FieldRow
           label={strings.settings.backgroundLabel}
           description={strings.settings.backgroundDescription}

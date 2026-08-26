@@ -5,6 +5,7 @@ import { arrange, matchIsArranged, nicknamesOf } from '@/helpers/cycle'
 const ALPHA = {
   nickname: 'Alpha',
   gender: 'male',
+  class: 'iop',
   asleep: false,
   online: true,
   relayed: true

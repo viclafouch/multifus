@@ -3,7 +3,9 @@ pub mod notification;
 pub mod roster;
 
 pub use character::Character;
+pub use character::Class;
 pub use character::Gender;
+pub use character::Portrait;
 pub use notification::classify;
 pub use notification::extract_nickname;
 pub use notification::GameNotification;

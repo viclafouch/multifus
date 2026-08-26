@@ -81,6 +81,46 @@ pub fn title_suffix(title: &str) -> Option<&str> {
     title.trim().strip_prefix(nickname)
 }
 
+const ICON_DIRECTORY_HEADER: usize = 6;
+
+const ICON_DIRECTORY_ENTRY: usize = 16;
+
+const ICON_DIRECTORY_KIND: [u8; 4] = [0, 0, 1, 0];
+
+const ICON_WIDEST_SIDE: u32 = 256;
+
+#[must_use]
+pub fn icon_image(icon: &[u8], side: u32) -> Option<&[u8]> {
+    if icon.get(..ICON_DIRECTORY_KIND.len()) != Some(ICON_DIRECTORY_KIND.as_slice()) {
+        return None;
+    }
+
+    let count = usize::from(u16::from_le_bytes([*icon.get(4)?, *icon.get(5)?]));
+
+    (0..count)
+        .filter_map(|index| {
+            let start = ICON_DIRECTORY_HEADER + index * ICON_DIRECTORY_ENTRY;
+            let entry = icon.get(start..start + ICON_DIRECTORY_ENTRY)?;
+            let width = match entry[0] {
+                0 => ICON_WIDEST_SIDE,
+                width => u32::from(width),
+            };
+            let length = read_u32(entry, 8)? as usize;
+            let offset = read_u32(entry, 12)? as usize;
+            let image = icon.get(offset..offset.checked_add(length)?)?;
+
+            Some((width, image))
+        })
+        .min_by_key(|(width, _)| width.abs_diff(side))
+        .map(|(_, image)| image)
+}
+
+fn read_u32(entry: &[u8], at: usize) -> Option<u32> {
+    let bytes = entry.get(at..at + size_of::<u32>())?;
+
+    Some(u32::from_le_bytes(bytes.try_into().ok()?))
+}
+
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
 pub struct ShortTitleReport {
     pub on_screen: bool,
@@ -105,6 +145,12 @@ pub trait WindowManager: Send + Sync {
     fn maximize(&self, window: WindowId) -> Result<()>;
 
     fn apply_short_titles(&self, short: bool, suffix: Option<&str>) -> Result<Option<String>>;
+
+    fn set_window_icon(&self, window: WindowId, icon: Option<&[u8]>) -> Result<()>;
+
+    fn taskbar_combines(&self) -> Result<bool>;
+
+    fn set_window_group(&self, window: WindowId, group: Option<&str>) -> Result<()>;
 }
 
 #[cfg(test)]
@@ -189,6 +235,57 @@ mod tests {
     fn a_title_with_no_nickname_teaches_nothing() {
         assert_eq!(title_suffix("Dofus Retro"), None);
         assert_eq!(title_suffix(""), None);
+    }
+
+    fn icon_of(sides: &[u8]) -> Vec<u8> {
+        let mut icon = vec![0, 0, 1, 0];
+        icon.extend((sides.len() as u16).to_le_bytes());
+
+        let mut images = Vec::new();
+
+        for side in sides {
+            let length = usize::from(*side);
+            let offset = ICON_DIRECTORY_HEADER + sides.len() * ICON_DIRECTORY_ENTRY + images.len();
+
+            icon.extend([*side, *side, 0, 0]);
+            icon.extend(1_u16.to_le_bytes());
+            icon.extend(32_u16.to_le_bytes());
+            icon.extend((length as u32).to_le_bytes());
+            icon.extend((offset as u32).to_le_bytes());
+
+            images.extend(std::iter::repeat_n(*side, length));
+        }
+
+        icon.extend(images);
+
+        icon
+    }
+
+    #[test]
+    fn an_icon_gives_the_image_closest_to_the_size_the_system_asks_for() {
+        let icon = icon_of(&[16, 32, 48]);
+
+        assert_eq!(icon_image(&icon, 16).map(|image| image[0]), Some(16));
+        assert_eq!(icon_image(&icon, 32).map(|image| image[0]), Some(32));
+        assert_eq!(icon_image(&icon, 64).map(|image| image[0]), Some(48));
+        assert_eq!(icon_image(&icon, 16).map(<[u8]>::len), Some(16));
+    }
+
+    #[test]
+    fn what_is_not_an_icon_gives_no_image() {
+        assert_eq!(icon_image(&[], 16), None);
+        assert_eq!(icon_image(&[0, 0, 2, 0, 1, 0], 16), None);
+        assert_eq!(icon_image(&[0, 0, 1, 0, 1, 0], 16), None);
+    }
+
+    #[test]
+    fn an_icon_pointing_outside_itself_gives_no_image() {
+        let mut icon = icon_of(&[16]);
+        let length = icon.len();
+
+        icon.truncate(length - 1);
+
+        assert_eq!(icon_image(&icon, 16), None);
     }
 
     #[test]

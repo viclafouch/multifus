@@ -7,6 +7,7 @@ use serde::Serialize;
 use crate::app::journal_file;
 use crate::app::view::BindingView;
 use crate::app::view::ShortcutAction;
+use crate::domain::Class;
 use crate::domain::Gender;
 use crate::domain::NotificationKind;
 
@@ -119,6 +120,10 @@ pub enum JournalEvent {
     },
 
     ShortTitlesFailed {
+        detail: String,
+    },
+
+    WindowIconFailed {
         detail: String,
     },
 
@@ -244,6 +249,11 @@ pub enum RosterChange {
         gender: Option<Gender>,
     },
 
+    ClassAssigned {
+        nickname: String,
+        class: Option<Class>,
+    },
+
     Reordered {
         order: Vec<String>,
     },
@@ -286,6 +296,10 @@ pub enum SettingChange {
 
     ShortTitles {
         short: bool,
+    },
+
+    UngroupTaskbar {
+        ungroup: bool,
     },
 
     RelayBody {

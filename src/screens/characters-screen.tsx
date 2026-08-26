@@ -1,19 +1,25 @@
 import { Mars, RefreshCw, Venus } from 'lucide-react'
 import { DragDropProvider } from '@dnd-kit/react'
-import type { Character, Gender } from '@/@types/roster'
+import type { Character, Class, Gender } from '@/@types/roster'
 import type { Snapshot } from '@/@types/snapshot'
 import { CharacterRow } from '@/components/character-row'
 import { EmptyState } from '@/components/layout/empty-state'
-import { Note } from '@/components/layout/note'
 import { Panel } from '@/components/layout/panel'
 import { Screen } from '@/components/layout/screen'
 import { Button } from '@/components/ui/button'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger
+} from '@/components/ui/tooltip'
 import { strings } from '@/constants/strings'
+import { missingGenderLine } from '@/helpers/wording'
 import { useCycleOrder } from '@/hooks/use-cycle-order'
 import { DRAG_ACCESSIBILITY, DRAG_MODIFIERS } from '@/lib/drag'
 import {
   refresh,
   removeCharacter,
+  setClass,
   setGender,
   setGenderAsleep,
   toggleAsleep
@@ -37,14 +43,21 @@ export const CharactersScreen = ({
     handleSetGender: (nickname: string, gender: Gender | null) => {
       run(setGender(nickname, gender))
     },
+    handleSetClass: (nickname: string, characterClass: Class | null) => {
+      run(setClass(nickname, characterClass))
+    },
     handleRemove: (nickname: string) => {
       run(removeCharacter(nickname))
     }
   }
 
-  const hasGender = characters.some((character) => {
-    return character.gender !== null
-  })
+  const missing = characters
+    .filter((character) => {
+      return character.online && character.gender === null
+    })
+    .map((character) => {
+      return character.nickname
+    })
 
   if (characters.length === 0) {
     return (
@@ -75,6 +88,7 @@ export const CharactersScreen = ({
       subtitle={strings.characters.subtitle}
     >
       <GroupedActions
+        missing={missing}
         onSet={(gender, asleep) => {
           run(setGenderAsleep(gender, asleep))
         }}
@@ -103,37 +117,42 @@ export const CharactersScreen = ({
           </ol>
         </Panel>
       </DragDropProvider>
-      {hasGender ? null : <Note>{strings.characters.noGenderYet}</Note>}
     </Screen>
   )
 }
 
 type GroupedActionsProps = Readonly<{
+  missing: readonly string[]
   onSet: (gender: Gender, asleep: boolean) => void
 }>
 
-const GroupedActions = ({ onSet }: GroupedActionsProps) => {
+const GroupedActions = ({ missing, onSet }: GroupedActionsProps) => {
   return (
     <div className="mb-3 flex items-center gap-2.5">
       <span className="text-mini font-medium tracking-micro text-muted-foreground/70 uppercase">
         {strings.characters.groupedActions}
       </span>
-      <GroupedAction gender="male" onSet={onSet} />
-      <GroupedAction gender="female" onSet={onSet} />
+      <GroupedAction gender="male" missing={missing} onSet={onSet} />
+      <GroupedAction gender="female" missing={missing} onSet={onSet} />
     </div>
   )
 }
 
 type GroupedActionProps = Readonly<{
   gender: Gender
+  missing: readonly string[]
   onSet: (gender: Gender, asleep: boolean) => void
 }>
 
-const GroupedAction = ({ gender, onSet }: GroupedActionProps) => {
+const GroupedAction = ({ gender, missing, onSet }: GroupedActionProps) => {
   const Icon = gender === 'male' ? Mars : Venus
+  const isComplete = missing.length === 0
 
-  return (
-    <div className="flex items-center gap-1.5 rounded-md border border-border/70 bg-card/40 py-1 pr-1 pl-2">
+  const buttons = (
+    <div
+      data-incomplete={isComplete ? undefined : ''}
+      className="flex items-center gap-1.5 rounded-md border border-border/70 bg-card/40 py-1 pr-1 pl-2 data-incomplete:cursor-not-allowed data-incomplete:opacity-55"
+    >
       <Icon
         aria-hidden
         className="size-3.5 text-muted-foreground"
@@ -145,6 +164,7 @@ const GroupedAction = ({ gender, onSet }: GroupedActionProps) => {
       <Button
         variant="ghost"
         size="xs"
+        disabled={!isComplete}
         aria-label={strings.characters.sleepGroupLabel[gender]}
         onClick={() => {
           onSet(gender, true)
@@ -155,6 +175,7 @@ const GroupedAction = ({ gender, onSet }: GroupedActionProps) => {
       <Button
         variant="ghost"
         size="xs"
+        disabled={!isComplete}
         aria-label={strings.characters.wakeGroupLabel[gender]}
         onClick={() => {
           onSet(gender, false)
@@ -163,6 +184,19 @@ const GroupedAction = ({ gender, onSet }: GroupedActionProps) => {
         {strings.characters.wakeGroup}
       </Button>
     </div>
+  )
+
+  if (isComplete) {
+    return buttons
+  }
+
+  return (
+    <Tooltip>
+      <TooltipTrigger render={<div />} tabIndex={0} className="outline-none">
+        {buttons}
+      </TooltipTrigger>
+      <TooltipContent>{missingGenderLine(missing)}</TooltipContent>
+    </Tooltip>
   )
 }
 

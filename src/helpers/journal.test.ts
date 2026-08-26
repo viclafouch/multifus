@@ -144,6 +144,22 @@ const ROSTER_CASES = {
       line: 'Tous les femmes connectés sont dans le défilement.'
     }
   ],
+  classAssigned: [
+    {
+      event: {
+        kind: 'roster',
+        change: { kind: 'classAssigned', nickname: NICKNAME, class: 'cra' }
+      },
+      line: 'Alpha est assigné comme Crâ.'
+    },
+    {
+      event: {
+        kind: 'roster',
+        change: { kind: 'classAssigned', nickname: NICKNAME, class: null }
+      },
+      line: 'Classe retirée à Alpha.'
+    }
+  ],
   genderAssigned: [
     {
       event: {
@@ -257,6 +273,22 @@ const SETTING_CASES = {
         change: { kind: 'maximizeOnLaunch', maximize: false }
       },
       line: 'Agrandissement des fenêtres au lancement désactivé.'
+    }
+  ],
+  ungroupTaskbar: [
+    {
+      event: {
+        kind: 'setting',
+        change: { kind: 'ungroupTaskbar', ungroup: true }
+      },
+      line: 'Un bouton par personnage dans la barre des tâches activé.'
+    },
+    {
+      event: {
+        kind: 'setting',
+        change: { kind: 'ungroupTaskbar', ungroup: false }
+      },
+      line: 'Un bouton par personnage dans la barre des tâches désactivé.'
     }
   ],
   shortTitles: [
@@ -835,6 +867,12 @@ const JOURNAL_CASES = {
       line: `${DETAILED_LINES.shortTitlesFailed} : ${DETAIL}`
     }
   ],
+  windowIconFailed: [
+    {
+      event: { kind: 'windowIconFailed', detail: DETAIL },
+      line: `${DETAILED_LINES.windowIconFailed} : ${DETAIL}`
+    }
+  ],
   clientMaximizeFailed: [
     {
       event: { kind: 'clientMaximizeFailed', detail: DETAIL },
@@ -1006,6 +1044,8 @@ const SNAPSHOT = {
   startAtLogin: false,
   maximizeOnLaunch: false,
   shortTitles: false,
+  ungroupTaskbar: false,
+  taskbarCombines: true,
   authorization: { granted: true, listening: true },
   config: { path: '/tmp/multifus/config.json', problem: null },
   update: { kind: 'upToDate' },

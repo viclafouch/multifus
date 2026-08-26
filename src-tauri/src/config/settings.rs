@@ -16,6 +16,7 @@ pub struct Settings {
     pub relay: Relay,
     pub maximize_on_launch: bool,
     pub short_titles: bool,
+    pub ungroup_taskbar: bool,
     pub client_title_suffix: Option<String>,
     pub start_at_login: bool,
 }
@@ -36,6 +37,7 @@ impl Default for Settings {
             relay: Relay::default(),
             maximize_on_launch: false,
             short_titles: false,
+            ungroup_taskbar: false,
             client_title_suffix: None,
             start_at_login: false,
         }
@@ -240,6 +242,7 @@ mod tests {
         assert!(!settings.start_at_login);
         assert!(!settings.maximize_on_launch);
         assert!(!settings.short_titles);
+        assert!(!settings.ungroup_taskbar);
         assert_eq!(settings.client_title_suffix, None);
     }
 
@@ -249,6 +252,7 @@ mod tests {
 
         assert!(!settings.maximize_on_launch);
         assert!(!settings.short_titles);
+        assert!(!settings.ungroup_taskbar);
     }
 
     #[test]

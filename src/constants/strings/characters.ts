@@ -1,4 +1,24 @@
-import type { Gender } from '@/@types/roster'
+import type { Class, Gender } from '@/@types/roster'
+
+const CLASS_LABELS = {
+  feca: 'Féca',
+  osamodas: 'Osamodas',
+  enutrof: 'Enutrof',
+  sram: 'Sram',
+  xelor: 'Xélor',
+  ecaflip: 'Ecaflip',
+  eniripsa: 'Eniripsa',
+  iop: 'Iop',
+  cra: 'Crâ',
+  sadida: 'Sadida',
+  sacrieur: 'Sacrieur',
+  pandawa: 'Pandawa'
+} as const satisfies Record<Class, string>
+
+const GENDER_LABELS = {
+  male: 'Homme',
+  female: 'Femme'
+} as const satisfies Record<Gender, string>
 
 const GROUP_LABELS = {
   male: 'Hommes',
@@ -45,13 +65,25 @@ export const CHARACTERS_STRINGS = {
     cycleToggle: (nickname: string) => {
       return `Défilement de ${nickname}`
     },
-    genderLabel: (nickname: string, gender: Gender) => {
-      return gender === 'male'
-        ? `Marquer ${nickname} comme homme`
-        : `Marquer ${nickname} comme femme`
-    },
     remove: (nickname: string) => {
       return `Retirer ${nickname} du roster`
+    },
+    classes: CLASS_LABELS,
+    genders: GENDER_LABELS,
+    classDialog: (nickname: string) => {
+      return `Classe et sexe de ${nickname}`
+    },
+    classDialogClose: 'Fermer sans rien changer',
+    classDialogGender: 'Sexe',
+    classDialogClasses: 'Classe',
+    classDialogNeedsGender:
+      'Choisissez un sexe : un portrait est le produit des deux réponses.',
+    noClass: 'Aucune',
+    noClassLabel: (nickname: string) => {
+      return `Retirer la classe de ${nickname}`
+    },
+    classLabel: (nickname: string, label: string) => {
+      return `Marquer ${nickname} comme ${label}`
     },
     groupedActions: 'Actions groupées',
     groupLabel: GROUP_LABELS,
@@ -59,8 +91,9 @@ export const CHARACTERS_STRINGS = {
     wakeGroup: 'Remettre',
     sleepGroupLabel: SLEEP_GROUP_LABELS,
     wakeGroupLabel: WAKE_GROUP_LABELS,
-    noGenderYet:
-      'Marquez vos personnages homme ou femme pour mettre tous vos hommes, ou toutes vos femmes, de côté d’un seul clic.',
+    missingGender: (names: string, alone: boolean) => {
+      return alone ? `${names} n’a pas de sexe.` : `${names} n’ont pas de sexe.`
+    },
     emptyTitle: 'Votre roster est vide',
     emptyBody:
       'Connectez un personnage dans Dofus Retro. Il arrive ici tout seul, et il y reste même une fois le client fermé.',

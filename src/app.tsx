@@ -106,6 +106,8 @@ const CurrentScreen = ({ screen, snapshot, run }: CurrentScreenProps) => {
         startAtLogin={snapshot.startAtLogin}
         maximizeOnLaunch={snapshot.maximizeOnLaunch}
         shortTitles={snapshot.shortTitles}
+        ungroupTaskbar={snapshot.ungroupTaskbar}
+        taskbarCombines={snapshot.taskbarCombines}
         run={run}
       />
     )

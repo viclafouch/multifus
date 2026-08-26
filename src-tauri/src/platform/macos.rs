@@ -562,6 +562,18 @@ impl WindowManager for AccessibilityWindowManager {
     fn apply_short_titles(&self, _short: bool, _suffix: Option<&str>) -> Result<Option<String>> {
         Ok(None)
     }
+
+    fn set_window_icon(&self, _window: WindowId, _icon: Option<&[u8]>) -> Result<()> {
+        Ok(())
+    }
+
+    fn taskbar_combines(&self) -> Result<bool> {
+        Ok(false)
+    }
+
+    fn set_window_group(&self, _window: WindowId, _group: Option<&str>) -> Result<()> {
+        Ok(())
+    }
 }
 
 #[derive(Debug, Default)]

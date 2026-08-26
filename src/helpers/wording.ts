@@ -187,3 +187,32 @@ const CHARACTER_STATE_LINES = {
 export const characterStateLine = (character: Character) => {
   return CHARACTER_STATE_LINES[characterState(character)]
 }
+
+export const characterSubLine = (character: Character) => {
+  const state = characterStateLine(character)
+
+  if (character.class === null) {
+    return state
+  }
+
+  return `${strings.characters.classes[character.class]} · ${state}`
+}
+
+const MISSING_GENDER_NAMED = 2
+
+const NAMES = new Intl.ListFormat('fr-FR', {
+  style: 'long',
+  type: 'conjunction'
+})
+
+export const missingGenderLine = (nicknames: readonly string[]) => {
+  const named = nicknames.slice(0, MISSING_GENDER_NAMED)
+  const rest = nicknames.length - named.length
+  const others = rest > 1 ? `${rest} autres` : `${rest} autre`
+  const parts = rest === 0 ? named : [...named, others]
+
+  return strings.characters.missingGender(
+    NAMES.format(parts),
+    nicknames.length === 1
+  )
+}

@@ -1,6 +1,6 @@
 import type { NotificationKind } from '@/@types/notification'
 import type { NoticeCase, RelayFailure, RelayStop } from '@/@types/relay'
-import type { Gender } from '@/@types/roster'
+import type { Class, Gender } from '@/@types/roster'
 import type { BoundCombination, ShortcutAction } from '@/@types/shortcuts'
 import type { Launch, Surface, Work } from '@/@types/system'
 
@@ -55,6 +55,11 @@ export type RosterChange =
       readonly gender: Gender | null
     }
   | {
+      readonly kind: 'classAssigned'
+      readonly nickname: string
+      readonly class: Class | null
+    }
+  | {
       readonly kind: 'relayed'
       readonly nickname: string
       readonly relayed: boolean
@@ -77,6 +82,7 @@ export type SettingChange =
     }
   | { readonly kind: 'maximizeOnLaunch'; readonly maximize: boolean }
   | { readonly kind: 'shortTitles'; readonly short: boolean }
+  | { readonly kind: 'ungroupTaskbar'; readonly ungroup: boolean }
   | { readonly kind: 'relayBody'; readonly sendBody: boolean }
   | {
       readonly kind: 'wakesMinimized'
@@ -91,6 +97,7 @@ export type JournalEvent =
   | { readonly kind: 'clientMaximized' }
   | { readonly kind: 'clientMaximizeFailed'; readonly detail: string }
   | { readonly kind: 'shortTitlesFailed'; readonly detail: string }
+  | { readonly kind: 'windowIconFailed'; readonly detail: string }
   | { readonly kind: 'configNotSetAside'; readonly detail: string }
   | { readonly kind: 'displayAwake'; readonly held: boolean }
   | { readonly kind: 'displayAwakeFailed'; readonly detail: string }

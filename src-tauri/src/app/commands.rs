@@ -14,6 +14,7 @@ use crate::app::update;
 use crate::app::view::ShortcutAction;
 use crate::app::view::Snapshot;
 use crate::config::QuickReplyId;
+use crate::domain::Class;
 use crate::domain::Gender;
 use crate::domain::NotificationKind;
 
@@ -44,6 +45,15 @@ pub fn open_authorization_settings(app: AppHandle) {
 #[tauri::command]
 pub fn set_gender(app: AppHandle, nickname: String, gender: Option<Gender>) -> Snapshot {
     lock(&app).set_gender(&nickname, gender);
+
+    runtime::emit_snapshot(&app)
+}
+
+#[tauri::command]
+pub fn set_class(app: AppHandle, nickname: String, class: Option<Class>) -> Snapshot {
+    lock(&app).set_class(&nickname, class);
+
+    runtime::wake();
 
     runtime::emit_snapshot(&app)
 }
@@ -174,6 +184,15 @@ pub fn set_maximize_on_launch(app: AppHandle, maximize: bool) -> Snapshot {
 #[tauri::command]
 pub fn set_short_titles(app: AppHandle, short: bool) -> Snapshot {
     lock(&app).set_short_titles(short);
+
+    runtime::wake();
+
+    runtime::emit_snapshot(&app)
+}
+
+#[tauri::command]
+pub fn set_ungroup_taskbar(app: AppHandle, ungroup: bool) -> Snapshot {
+    lock(&app).set_ungroup_taskbar(ungroup);
 
     runtime::wake();
 

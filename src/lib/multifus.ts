@@ -2,7 +2,7 @@ import { invoke } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event'
 import type { NotificationKind } from '@/@types/notification'
 import type { RelayLink } from '@/@types/relay'
-import type { Gender } from '@/@types/roster'
+import type { Class, Gender } from '@/@types/roster'
 import type { QuickReplyId, ShortcutAction } from '@/@types/shortcuts'
 import type { ScreenName, Snapshot } from '@/@types/snapshot'
 
@@ -44,6 +44,13 @@ export const openAuthorizationSettings = async () => {
 
 export const setGender = async (nickname: string, gender: Gender | null) => {
   return invoke<Snapshot>('set_gender', { nickname, gender })
+}
+
+export const setClass = async (
+  nickname: string,
+  characterClass: Class | null
+) => {
+  return invoke<Snapshot>('set_class', { nickname, class: characterClass })
 }
 
 export const toggleAsleep = async (nickname: string) => {
@@ -117,6 +124,10 @@ export const setMaximizeOnLaunch = async (maximize: boolean) => {
 
 export const setShortTitles = async (short: boolean) => {
   return invoke<Snapshot>('set_short_titles', { short })
+}
+
+export const setUngroupTaskbar = async (ungroup: boolean) => {
+  return invoke<Snapshot>('set_ungroup_taskbar', { ungroup })
 }
 
 export const setRelayed = async (nickname: string, relayed: boolean) => {

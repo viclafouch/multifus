@@ -19,11 +19,13 @@ use crate::app::journal::JournalEvent;
 use crate::app::journal::Outcome;
 use crate::app::journal::Work;
 use crate::app::main_window;
+use crate::app::portraits;
 use crate::app::relay;
 use crate::app::state::lock;
 use crate::app::state::Decision;
 use crate::app::state::ScanChange;
 use crate::app::state::WatcherState;
+use crate::app::state::WindowLook;
 use crate::app::tray;
 use crate::app::view::Screen;
 use crate::app::view::Snapshot;
@@ -102,8 +104,10 @@ fn tick(app: &AppHandle) {
     let renamed = apply_short_titles(app);
     let changed = scan(app);
     let maximized = maximize_new_clients(app);
+    let painted = apply_window_icons(app);
+    let regrouped = follow_taskbar(app);
 
-    if changed || maximized || renamed {
+    if changed || maximized || renamed || painted || regrouped {
         emit_snapshot(app);
     }
 }
@@ -185,14 +189,80 @@ fn apply_short_titles(app: &AppHandle) -> bool {
     }
 }
 
+fn follow_taskbar(app: &AppHandle) -> bool {
+    match app.state::<PlatformWindowManager>().taskbar_combines() {
+        Ok(combines) => lock(app).set_taskbar_combines(combines),
+        Err(_) => false,
+    }
+}
+
+fn apply_window_icons(app: &AppHandle) -> bool {
+    lock(app).forget_closed_windows();
+
+    let mut written = false;
+
+    for (window, look) in lock(app).looks_to_paint() {
+        let painted = paint_window(app, window, look);
+        let mut state = lock(app);
+
+        match painted {
+            Ok(()) => state.remember_painted(window, look),
+            Err(PlatformError::AuthorizationDenied | PlatformError::WindowGone) => {}
+            Err(error) => {
+                written |= state.log_unless_repeated(JournalEvent::WindowIconFailed {
+                    detail: error.to_string(),
+                });
+            }
+        }
+    }
+
+    written
+}
+
+fn paint_window(app: &AppHandle, window: WindowId, look: WindowLook) -> Result<(), PlatformError> {
+    let manager = app.state::<PlatformWindowManager>();
+
+    let (wore_portrait, was_ungrouped) = {
+        let state = lock(app);
+
+        (state.wore_portrait(window), state.was_ungrouped(window))
+    };
+
+    if look.portrait.is_some() || wore_portrait {
+        manager.set_window_icon(window, look.portrait.map(portraits::icon_of))?;
+    }
+
+    if look.ungrouped || was_ungrouped {
+        manager.set_window_group(window, look.ungrouped.then(|| group_of(window)).as_deref())?;
+    }
+
+    Ok(())
+}
+
+fn group_of(window: WindowId) -> String {
+    format!("{GROUP_PREFIX}{}", window.raw())
+}
+
+const GROUP_PREFIX: &str = "multifus.window.";
+
 pub fn on_run_event(app: &AppHandle, event: RunEvent) {
     if matches!(event, RunEvent::Exit) {
         give_titles_back(app);
+        give_groups_back(app);
 
         return;
     }
 
     main_window::show_on_dock_click(app, event);
+}
+
+fn give_groups_back(app: &AppHandle) {
+    for window in lock(app).ungrouped_windows() {
+        drop(
+            app.state::<PlatformWindowManager>()
+                .set_window_group(window, None),
+        );
+    }
 }
 
 fn give_titles_back(app: &AppHandle) {

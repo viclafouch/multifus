@@ -18,6 +18,9 @@ export const SETTINGS_STRINGS = {
     shortTitlesLabel: 'Seulement le pseudo dans la barre des tâches',
     shortTitlesDescription:
       'Vous lisez « Elyandra » au lieu de « Elyandra - Dofus Retro ».',
-    shortTitlesWindowsOnly: 'Windows uniquement'
+    shortTitlesWindowsOnly: 'Windows uniquement',
+    ungroupLabel: 'Un bouton par personnage dans la barre des tâches',
+    ungroupDescription:
+      'Vos clients cessent de se ranger sous un seul bouton : chacun garde le sien, avec le portrait de sa classe.'
   }
 } as const

@@ -44,8 +44,10 @@ use crate::config::Settings;
 use crate::config::Shortcut;
 use crate::config::Shortcuts;
 use crate::domain::Character;
+use crate::domain::Class;
 use crate::domain::Gender;
 use crate::domain::NotificationKind;
+use crate::domain::Portrait;
 use crate::platform::GameWindow;
 use crate::platform::PlatformNotificationWatcher;
 use crate::platform::WindowId;
@@ -66,6 +68,8 @@ pub struct Multifus {
     shortcut_statuses: HashMap<Binding, ShortcutStatus>,
     windows: HashMap<String, WindowId>,
     seen_client_windows: Option<HashSet<WindowId>>,
+    painted_windows: HashMap<WindowId, WindowLook>,
+    taskbar_combines: bool,
     granted: Option<bool>,
     listening: bool,
     problem: Option<ConfigProblem>,
@@ -89,6 +93,7 @@ pub struct MultifusParams {
     pub system: String,
     pub launch: Launch,
     pub screen_saver: ScreenSaverView,
+    pub taskbar_combines: bool,
 }
 
 impl Multifus {
@@ -101,6 +106,7 @@ impl Multifus {
             system,
             launch,
             screen_saver,
+            taskbar_combines,
         } = params;
 
         let Loaded {
@@ -133,6 +139,8 @@ impl Multifus {
             shortcut_statuses: HashMap::new(),
             windows: HashMap::new(),
             seen_client_windows: None,
+            painted_windows: HashMap::new(),
+            taskbar_combines,
             granted: None,
             listening: false,
             problem,
@@ -166,6 +174,8 @@ impl Multifus {
             start_at_login: self.settings.start_at_login,
             maximize_on_launch: self.settings.maximize_on_launch,
             short_titles: self.settings.short_titles,
+            ungroup_taskbar: self.settings.ungroup_taskbar,
+            taskbar_combines: self.taskbar_combines,
             shortcuts: ShortcutAction::ALL
                 .into_iter()
                 .map(|action| ShortcutView {
@@ -278,6 +288,22 @@ impl Multifus {
             change: RosterChange::GenderAssigned {
                 nickname: nickname.to_owned(),
                 gender,
+            },
+        });
+        self.save();
+    }
+
+    pub fn set_class(&mut self, nickname: &str, class: Option<Class>) {
+        let Some(character) = self.settings.roster.get_mut(nickname) else {
+            return;
+        };
+
+        character.class = class;
+
+        self.log(JournalEvent::Roster {
+            change: RosterChange::ClassAssigned {
+                nickname: nickname.to_owned(),
+                class,
             },
         });
         self.save();
@@ -516,6 +542,80 @@ impl Multifus {
             change: SettingChange::ShortTitles { short },
         });
         self.save();
+    }
+
+    pub fn set_taskbar_combines(&mut self, combines: bool) -> bool {
+        let changed = self.taskbar_combines != combines;
+
+        self.taskbar_combines = combines;
+
+        changed
+    }
+
+    #[must_use]
+    pub fn ungroups_taskbar(&self) -> bool {
+        self.settings.ungroup_taskbar
+    }
+
+    pub fn set_ungroup_taskbar(&mut self, ungroup: bool) {
+        self.settings.ungroup_taskbar = ungroup;
+
+        self.log(JournalEvent::Setting {
+            change: SettingChange::UngroupTaskbar { ungroup },
+        });
+        self.save();
+    }
+
+    #[must_use]
+    pub fn looks_to_paint(&self) -> Vec<(WindowId, WindowLook)> {
+        self.settings
+            .roster
+            .characters()
+            .iter()
+            .filter_map(|character| {
+                let window = *self.windows.get(&character.nickname)?;
+                let look = WindowLook {
+                    portrait: character.portrait(),
+                    ungrouped: self.settings.ungroup_taskbar,
+                };
+
+                (self.painted_windows.get(&window) != Some(&look)).then_some((window, look))
+            })
+            .collect()
+    }
+
+    pub fn remember_painted(&mut self, window: WindowId, look: WindowLook) {
+        self.painted_windows.insert(window, look);
+    }
+
+    pub fn forget_closed_windows(&mut self) {
+        let live = self.windows.values().copied().collect::<HashSet<_>>();
+
+        self.painted_windows
+            .retain(|window, _| live.contains(window));
+    }
+
+    #[must_use]
+    pub fn wore_portrait(&self, window: WindowId) -> bool {
+        self.painted_windows
+            .get(&window)
+            .is_some_and(|look| look.portrait.is_some())
+    }
+
+    #[must_use]
+    pub fn was_ungrouped(&self, window: WindowId) -> bool {
+        self.painted_windows
+            .get(&window)
+            .is_some_and(|look| look.ungrouped)
+    }
+
+    #[must_use]
+    pub fn ungrouped_windows(&self) -> Vec<WindowId> {
+        self.painted_windows
+            .iter()
+            .filter(|(_, look)| look.ungrouped)
+            .map(|(window, _)| *window)
+            .collect()
     }
 
     pub fn set_auto_focus(&mut self, kind: NotificationKind, enabled: bool) {
@@ -1022,10 +1122,17 @@ fn view_of(character: &Character) -> CharacterView {
     CharacterView {
         nickname: character.nickname.clone(),
         gender: character.gender,
+        class: character.class,
         asleep: character.asleep,
         online: character.online,
         relayed: character.relayed,
     }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct WindowLook {
+    pub portrait: Option<Portrait>,
+    pub ungrouped: bool,
 }
 
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
@@ -1076,6 +1183,7 @@ mod tests {
             system: "test".to_owned(),
             launch: Launch::ByHand,
             screen_saver: ScreenSaverView::Never,
+            taskbar_combines: true,
         })
     }
 
@@ -1746,6 +1854,173 @@ mod tests {
             "{:?}",
             journalled(&state)
         );
+    }
+
+    #[test]
+    fn no_taskbar_is_ungrouped_until_somebody_asks_for_it() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        assert!(!state.ungroups_taskbar());
+
+        state.set_ungroup_taskbar(true);
+
+        assert!(state.ungroups_taskbar());
+        assert!(state.snapshot().ungroup_taskbar);
+        assert!(
+            journalled(&state).contains(&JournalEvent::Setting {
+                change: SettingChange::UngroupTaskbar { ungroup: true }
+            }),
+            "{:?}",
+            journalled(&state)
+        );
+    }
+
+    #[test]
+    fn a_taskbar_that_stops_combining_reaches_the_settings_screen() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        assert!(state.snapshot().taskbar_combines);
+        assert!(!state.set_taskbar_combines(true));
+
+        assert!(state.set_taskbar_combines(false));
+        assert!(!state.snapshot().taskbar_combines);
+    }
+
+    #[test]
+    fn a_class_is_written_on_a_character_and_taken_back() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha")]);
+
+        state.set_class("Alpha", Some(Class::Iop));
+
+        assert_eq!(state.snapshot().characters[0].class, Some(Class::Iop));
+
+        state.set_class("Alpha", None);
+
+        assert_eq!(state.snapshot().characters[0].class, None);
+        assert!(
+            journalled(&state).contains(&JournalEvent::Roster {
+                change: RosterChange::ClassAssigned {
+                    nickname: "Alpha".to_owned(),
+                    class: Some(Class::Iop)
+                }
+            }),
+            "{:?}",
+            journalled(&state)
+        );
+    }
+
+    #[test]
+    fn a_window_is_painted_once_and_repainted_when_its_portrait_changes() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha")]);
+
+        let bare = WindowLook {
+            portrait: None,
+            ungrouped: false,
+        };
+
+        assert_eq!(state.looks_to_paint(), vec![(WindowId::from_raw(1), bare)]);
+
+        state.remember_painted(WindowId::from_raw(1), bare);
+
+        assert_eq!(state.looks_to_paint(), Vec::new());
+
+        state.set_gender("Alpha", Some(Gender::Male));
+        state.set_class("Alpha", Some(Class::Iop));
+
+        assert_eq!(
+            state.looks_to_paint(),
+            vec![(
+                WindowId::from_raw(1),
+                WindowLook {
+                    portrait: Some(Portrait {
+                        class: Class::Iop,
+                        gender: Gender::Male
+                    }),
+                    ungrouped: false,
+                }
+            )]
+        );
+    }
+
+    #[test]
+    fn a_client_that_closes_is_painted_again_when_it_comes_back() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha")]);
+
+        let bare = WindowLook {
+            portrait: None,
+            ungrouped: false,
+        };
+
+        state.remember_painted(WindowId::from_raw(1), bare);
+        state.apply_windows(&[]);
+        state.forget_closed_windows();
+        state.apply_windows(&[window(1, "Alpha")]);
+
+        assert_eq!(state.looks_to_paint(), vec![(WindowId::from_raw(1), bare)]);
+    }
+
+    #[test]
+    fn a_window_that_never_wore_a_portrait_is_left_with_the_icon_the_client_gave_it() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        assert!(!state.wore_portrait(WindowId::from_raw(1)));
+
+        state.remember_painted(
+            WindowId::from_raw(1),
+            WindowLook {
+                portrait: None,
+                ungrouped: false,
+            },
+        );
+
+        assert!(!state.wore_portrait(WindowId::from_raw(1)));
+
+        state.remember_painted(
+            WindowId::from_raw(1),
+            WindowLook {
+                portrait: Some(Portrait {
+                    class: Class::Iop,
+                    gender: Gender::Male,
+                }),
+                ungrouped: false,
+            },
+        );
+
+        assert!(state.wore_portrait(WindowId::from_raw(1)));
+    }
+
+    #[test]
+    fn only_the_windows_multifus_took_out_of_their_group_are_given_back() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        state.remember_painted(
+            WindowId::from_raw(1),
+            WindowLook {
+                portrait: None,
+                ungrouped: true,
+            },
+        );
+        state.remember_painted(
+            WindowId::from_raw(2),
+            WindowLook {
+                portrait: None,
+                ungrouped: false,
+            },
+        );
+
+        assert_eq!(state.ungrouped_windows(), vec![WindowId::from_raw(1)]);
+        assert!(state.was_ungrouped(WindowId::from_raw(1)));
+        assert!(!state.was_ungrouped(WindowId::from_raw(2)));
     }
 
     #[test]

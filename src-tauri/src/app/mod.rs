@@ -3,6 +3,7 @@ pub mod commands;
 pub mod journal;
 pub mod journal_file;
 pub mod main_window;
+pub mod portraits;
 pub mod quick_replies;
 pub mod relay;
 pub mod runtime;
@@ -25,6 +26,7 @@ use crate::platform::PlatformDisplayKeeper;
 use crate::platform::PlatformNotificationWatcher;
 use crate::platform::PlatformPasteSender;
 use crate::platform::PlatformWindowManager;
+use crate::platform::WindowManager;
 
 pub use state::AppState;
 pub use state::Multifus;
@@ -38,6 +40,7 @@ pub fn setup(app: &AppHandle) -> Result<(), ConfigError> {
     let store = ConfigStore::for_app(app)?;
     let loaded = store.load();
     let keeper = PlatformDisplayKeeper::new();
+    let windows = PlatformWindowManager::new();
 
     app.manage::<AppState>(Mutex::new(Multifus::new(MultifusParams {
         store,
@@ -46,8 +49,9 @@ pub fn setup(app: &AppHandle) -> Result<(), ConfigError> {
         system: system(),
         launch: main_window::launch(),
         screen_saver: screen_saver(&keeper),
+        taskbar_combines: windows.taskbar_combines().unwrap_or(true),
     })));
-    app.manage(PlatformWindowManager::new());
+    app.manage(windows);
     app.manage(PlatformPasteSender::new());
     app.manage::<WatcherState>(Mutex::new(PlatformNotificationWatcher::new()));
 

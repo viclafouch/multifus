@@ -40,6 +40,7 @@
   --color-primary-foreground: var(--primary-foreground);
   --color-primary: var(--primary);
   --color-live: var(--live);
+  --color-idle: var(--idle);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
@@ -77,6 +78,8 @@
   --spacing-row: 54px;
   --spacing-journal: 184px;
   --spacing-lamp: 7px;
+  --spacing-medallion: 32px;
+  --spacing-vignette: 52px;
   --spacing-cap: 21px;
   --spacing-field: 132px;
   --spacing-empty: 300px;
@@ -210,6 +213,15 @@
   box-shadow:
     0 0 0 2px var(--halo-near),
     0 0 9px 1px var(--halo-far);
+}
+
+@utility medallion-live {
+  --halo-near: color-mix(in oklch, var(--live), transparent 82%);
+  --halo-far: color-mix(in oklch, var(--live), transparent 62%);
+
+  box-shadow:
+    0 0 0 1px var(--halo-near),
+    0 0 10px -1px var(--halo-far);
 }
 
 @keyframes rise {

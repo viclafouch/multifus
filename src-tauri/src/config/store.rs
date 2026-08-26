@@ -233,6 +233,7 @@ mod tests {
     use crate::config::settings::Shortcut;
     use crate::config::settings::Shortcuts;
     use crate::domain::Character;
+    use crate::domain::Class;
     use crate::domain::Gender;
     use crate::domain::NotificationKind;
     use crate::domain::Roster;
@@ -252,7 +253,9 @@ mod tests {
 
         Settings {
             roster: Roster::from_characters(vec![
-                Character::new("Alpha").with_gender(Gender::Male),
+                Character::new("Alpha")
+                    .with_gender(Gender::Male)
+                    .with_class(Class::Iop),
                 Character::new("Bravo")
                     .with_gender(Gender::Female)
                     .not_relayed(),
@@ -266,6 +269,7 @@ mod tests {
             },
             maximize_on_launch: true,
             short_titles: true,
+            ungroup_taskbar: true,
             client_title_suffix: Some(" - Dofus Retro v1.48.21".to_owned()),
             quick_replies: vec![QuickReply {
                 id: QuickReplyId::default().next(),

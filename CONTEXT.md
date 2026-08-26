@@ -10,6 +10,8 @@ Les mots de Multifus, et rien d'autre. On en parle en français, on les écrit e
 
 **Sexe** (`gender`) : homme ou femme, assigné à la main à un personnage.
 
+**Classe** (`Class`) : la classe Dofus d'un personnage, choisie à la main parmi les douze. Croisée avec le sexe, elle donne le portrait que porte la fenêtre.
+
 **Roster** (`Roster`) : l'ensemble des personnages connus de Multifus, connectés ou non.
 
 **Connecté** (`online`) : se dit d'un personnage dont une fenêtre porte le pseudo en ce moment. Dofus Retro déconnecte tout seul un personnage qui ne fait rien, au bout d'un quart d'heure ou deux : sa fenêtre revient à l'écran de connexion, Multifus le voit repasser déconnecté, et le relais se tait pour lui. Personne n'a rien fait, et c'est le jeu qui décide.

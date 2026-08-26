@@ -17,7 +17,9 @@ use std::thread::JoinHandle;
 use std::time::Duration;
 use std::time::Instant;
 
+use windows::core::w;
 use windows::core::BOOL;
+use windows::core::PCWSTR;
 use windows::core::PWSTR;
 use windows::Win32::Foundation::CloseHandle;
 use windows::Win32::Foundation::GetLastError;
@@ -26,12 +28,18 @@ use windows::Win32::Foundation::HANDLE;
 use windows::Win32::Foundation::HWND;
 use windows::Win32::Foundation::LPARAM;
 use windows::Win32::Foundation::WPARAM;
+use windows::Win32::Storage::EnhancedStorage::PKEY_AppUserModel_ID;
 use windows::Win32::System::Com::CoInitializeEx;
+use windows::Win32::System::Com::CoTaskMemAlloc;
+use windows::Win32::System::Com::StructuredStorage::PROPVARIANT;
 use windows::Win32::System::Com::COINIT_APARTMENTTHREADED;
 use windows::Win32::System::Power::PowerClearRequest;
 use windows::Win32::System::Power::PowerCreateRequest;
 use windows::Win32::System::Power::PowerRequestDisplayRequired;
 use windows::Win32::System::Power::PowerSetRequest;
+use windows::Win32::System::Registry::RegGetValueW;
+use windows::Win32::System::Registry::HKEY_CURRENT_USER;
+use windows::Win32::System::Registry::RRF_RT_REG_DWORD;
 use windows::Win32::System::Threading::AttachThreadInput;
 use windows::Win32::System::Threading::GetCurrentThreadId;
 use windows::Win32::System::Threading::OpenProcess;
@@ -41,6 +49,7 @@ use windows::Win32::System::Threading::PROCESS_NAME_WIN32;
 use windows::Win32::System::Threading::PROCESS_QUERY_LIMITED_INFORMATION;
 use windows::Win32::System::Threading::REASON_CONTEXT;
 use windows::Win32::System::Threading::REASON_CONTEXT_0;
+use windows::Win32::System::Variant::VT_LPWSTR;
 use windows::Win32::UI::Input::KeyboardAndMouse::SendInput;
 use windows::Win32::UI::Input::KeyboardAndMouse::INPUT;
 use windows::Win32::UI::Input::KeyboardAndMouse::INPUT_0;
@@ -51,10 +60,15 @@ use windows::Win32::UI::Input::KeyboardAndMouse::KEYEVENTF_KEYUP;
 use windows::Win32::UI::Input::KeyboardAndMouse::VIRTUAL_KEY;
 use windows::Win32::UI::Input::KeyboardAndMouse::VK_CONTROL;
 use windows::Win32::UI::Input::KeyboardAndMouse::VK_V;
+use windows::Win32::UI::Shell::PropertiesSystem::IPropertyStore;
+use windows::Win32::UI::Shell::PropertiesSystem::SHGetPropertyStoreForWindow;
 use windows::Win32::UI::WindowsAndMessaging::BringWindowToTop;
+use windows::Win32::UI::WindowsAndMessaging::CreateIconFromResourceEx;
+use windows::Win32::UI::WindowsAndMessaging::DestroyIcon;
 use windows::Win32::UI::WindowsAndMessaging::DispatchMessageW;
 use windows::Win32::UI::WindowsAndMessaging::EnumWindows;
 use windows::Win32::UI::WindowsAndMessaging::GetForegroundWindow;
+use windows::Win32::UI::WindowsAndMessaging::GetSystemMetrics;
 use windows::Win32::UI::WindowsAndMessaging::GetWindow;
 use windows::Win32::UI::WindowsAndMessaging::GetWindowTextLengthW;
 use windows::Win32::UI::WindowsAndMessaging::GetWindowTextW;
@@ -70,15 +84,22 @@ use windows::Win32::UI::WindowsAndMessaging::ShowWindowAsync;
 use windows::Win32::UI::WindowsAndMessaging::SystemParametersInfoW;
 use windows::Win32::UI::WindowsAndMessaging::TranslateMessage;
 use windows::Win32::UI::WindowsAndMessaging::GW_OWNER;
+use windows::Win32::UI::WindowsAndMessaging::HICON;
+use windows::Win32::UI::WindowsAndMessaging::ICON_BIG;
+use windows::Win32::UI::WindowsAndMessaging::ICON_SMALL;
+use windows::Win32::UI::WindowsAndMessaging::LR_DEFAULTCOLOR;
 use windows::Win32::UI::WindowsAndMessaging::MSG;
 use windows::Win32::UI::WindowsAndMessaging::PM_REMOVE;
 use windows::Win32::UI::WindowsAndMessaging::SMTO_ABORTIFHUNG;
+use windows::Win32::UI::WindowsAndMessaging::SM_CXICON;
+use windows::Win32::UI::WindowsAndMessaging::SM_CXSMICON;
 use windows::Win32::UI::WindowsAndMessaging::SPI_GETSCREENSAVEACTIVE;
 use windows::Win32::UI::WindowsAndMessaging::SPI_GETSCREENSAVETIMEOUT;
 use windows::Win32::UI::WindowsAndMessaging::SW_MAXIMIZE;
 use windows::Win32::UI::WindowsAndMessaging::SW_RESTORE;
 use windows::Win32::UI::WindowsAndMessaging::SYSTEM_PARAMETERS_INFO_ACTION;
 use windows::Win32::UI::WindowsAndMessaging::SYSTEM_PARAMETERS_INFO_UPDATE_FLAGS;
+use windows::Win32::UI::WindowsAndMessaging::WM_SETICON;
 use windows::Win32::UI::WindowsAndMessaging::WM_SETTEXT;
 use windows::Win32::UI::WindowsAndMessaging::WNDENUMPROC;
 use windows::UI::Notifications::KnownNotificationBindings;
@@ -97,6 +118,7 @@ use crate::platform::notification::NotificationReport;
 use crate::platform::notification::NotificationSink;
 use crate::platform::notification::NotificationWatcher;
 use crate::platform::paste::PasteSender;
+use crate::platform::window::icon_image;
 use crate::platform::window::matches_short_title;
 use crate::platform::window::title_suffix;
 use crate::platform::window::GameWindow;
@@ -117,11 +139,70 @@ const PUMP_INTERVAL: Duration = Duration::from_millis(25);
 
 const TITLE_TIMEOUT_MS: u32 = 100;
 
+const ICON_TIMEOUT_MS: u32 = 100;
+
+const ICON_SMALL_SIDE: u32 = 16;
+
+const ICON_BIG_SIDE: u32 = 32;
+
+const ICON_RESOURCE_VERSION: u32 = 0x0003_0000;
+
+const NO_ICON: usize = 0;
+
+const TASKBAR_ADVANCED_KEY: PCWSTR =
+    w!(r"Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced");
+
+const TASKBAR_GLOM_LEVEL: PCWSTR = w!("TaskbarGlomLevel");
+
+const NEVER_COMBINE: u32 = 2;
+
 type TitledWindow = (WindowId, String);
+
+#[derive(Debug, Clone, Copy, Default)]
+struct WindowIcons {
+    small: usize,
+    big: usize,
+}
+
+#[derive(Debug, Clone, Copy)]
+enum IconSlot {
+    Small,
+    Big,
+}
+
+impl IconSlot {
+    fn message(self) -> u32 {
+        match self {
+            Self::Small => ICON_SMALL,
+            Self::Big => ICON_BIG,
+        }
+    }
+
+    fn side(self) -> u32 {
+        let (metric, fallback) = match self {
+            Self::Small => (SM_CXSMICON, ICON_SMALL_SIDE),
+            Self::Big => (SM_CXICON, ICON_BIG_SIDE),
+        };
+
+        // SAFETY: the call reads a system metric and writes nothing of ours.
+        match u32::try_from(unsafe { GetSystemMetrics(metric) }) {
+            Ok(0) | Err(_) => fallback,
+            Ok(side) => side,
+        }
+    }
+
+    fn of(self, icons: &mut WindowIcons) -> &mut usize {
+        match self {
+            Self::Small => &mut icons.small,
+            Self::Big => &mut icons.big,
+        }
+    }
+}
 
 #[derive(Debug, Default)]
 pub struct Win32WindowManager {
     short: AtomicBool,
+    icons: Mutex<HashMap<WindowId, WindowIcons>>,
 }
 
 impl Win32WindowManager {
@@ -132,6 +213,57 @@ impl Win32WindowManager {
 
     fn shortens(&self) -> bool {
         self.short.load(Ordering::Relaxed)
+    }
+
+    fn paint_slot(
+        &self,
+        handle: HWND,
+        window: WindowId,
+        slot: IconSlot,
+        icon: Option<&[u8]>,
+    ) -> Result<()> {
+        let fresh = match icon {
+            Some(icon) => create_icon(icon, slot.side())?,
+            None => NO_ICON,
+        };
+
+        match write_icon(handle, slot.message(), fresh) {
+            Ok(()) => {
+                destroy_icon(self.remember_slot(window, slot, fresh));
+
+                Ok(())
+            }
+            Err(error) => {
+                destroy_icon(fresh);
+
+                Err(error)
+            }
+        }
+    }
+
+    fn remember_slot(&self, window: WindowId, slot: IconSlot, icon: usize) -> usize {
+        let mut icons = self.icons.lock().unwrap_or_else(PoisonError::into_inner);
+        let painted = icons.entry(window).or_default();
+
+        std::mem::replace(slot.of(painted), icon)
+    }
+
+    fn forget_dead_windows(&self) {
+        let mut icons = self.icons.lock().unwrap_or_else(PoisonError::into_inner);
+        let dead = icons
+            .keys()
+            .copied()
+            .filter(|window| !is_live_window(*window))
+            .collect::<Vec<_>>();
+
+        for window in dead {
+            let Some(painted) = icons.remove(&window) else {
+                continue;
+            };
+
+            destroy_icon(painted.small);
+            destroy_icon(painted.big);
+        }
     }
 }
 
@@ -225,6 +357,165 @@ impl WindowManager for Win32WindowManager {
 
         written.map(|report| report.suffix)
     }
+
+    fn set_window_icon(&self, window: WindowId, icon: Option<&[u8]>) -> Result<()> {
+        let handle = live_game_window(window)?;
+
+        self.forget_dead_windows();
+
+        let small = self.paint_slot(handle, window, IconSlot::Small, icon);
+        let big = self.paint_slot(handle, window, IconSlot::Big, icon);
+
+        small.and(big)
+    }
+
+    fn taskbar_combines(&self) -> Result<bool> {
+        Ok(taskbar_glom_level() != Some(NEVER_COMBINE))
+    }
+
+    fn set_window_group(&self, window: WindowId, group: Option<&str>) -> Result<()> {
+        let handle = live_game_window(window)?;
+
+        enter_apartment();
+
+        let store: IPropertyStore =
+            unsafe { SHGetPropertyStoreForWindow(handle) }.map_err(|error| {
+                PlatformError::system("SHGetPropertyStoreForWindow", error.to_string())
+            })?;
+
+        let value = application_id(group)?;
+
+        // SAFETY: the value outlives both calls, and the store copies what it keeps.
+        unsafe {
+            store
+                .SetValue(&PKEY_AppUserModel_ID, &value)
+                .and_then(|()| store.Commit())
+        }
+        .map_err(|error| PlatformError::system("PKEY_AppUserModel_ID", error.to_string()))
+    }
+}
+
+fn create_icon(icon: &[u8], side: u32) -> Result<usize> {
+    let image = icon_image(icon, side).ok_or_else(|| {
+        PlatformError::system("reading a portrait", "the icon holds no image to draw")
+    })?;
+    let side = i32::try_from(side).unwrap_or(i32::MAX);
+
+    // SAFETY: the slice is alive for the call, and holds the image bits the directory points at.
+    let created = unsafe {
+        CreateIconFromResourceEx(
+            image,
+            true,
+            ICON_RESOURCE_VERSION,
+            side,
+            side,
+            LR_DEFAULTCOLOR,
+        )
+    };
+
+    created
+        .map(|icon| icon.0 as usize)
+        .map_err(|error| PlatformError::system("CreateIconFromResourceEx", error.to_string()))
+}
+
+fn write_icon(handle: HWND, which: u32, icon: usize) -> Result<()> {
+    // SAFETY: the handle answered `IsWindow`, and the icon is one the process created.
+    let answered = unsafe {
+        SendMessageTimeoutW(
+            handle,
+            WM_SETICON,
+            WPARAM(which as usize),
+            LPARAM(icon as isize),
+            SMTO_ABORTIFHUNG,
+            ICON_TIMEOUT_MS,
+            None,
+        )
+    };
+
+    if answered.0 != 0 {
+        return Ok(());
+    }
+
+    if unsafe { GetLastError() } == ERROR_INVALID_WINDOW_HANDLE {
+        return Err(PlatformError::WindowGone);
+    }
+
+    Err(PlatformError::system(
+        "WM_SETICON",
+        "the client did not take the icon in time",
+    ))
+}
+
+fn destroy_icon(icon: usize) {
+    if icon == NO_ICON {
+        return;
+    }
+
+    // SAFETY: the handle comes from a `CreateIconFromResourceEx` that reported success.
+    let _ = unsafe { DestroyIcon(HICON(icon as *mut c_void)) };
+}
+
+fn application_id(group: Option<&str>) -> Result<PROPVARIANT> {
+    let Some(group) = group else {
+        return Ok(PROPVARIANT::default());
+    };
+
+    let name: Vec<u16> = group.encode_utf16().chain(once(0)).collect();
+
+    // SAFETY: the shell allocator owns the block from here, and `PropVariantClear` gives it back.
+    let room = unsafe { CoTaskMemAlloc(size_of_val(name.as_slice())) }.cast::<u16>();
+
+    if room.is_null() {
+        return Err(PlatformError::system(
+            "CoTaskMemAlloc",
+            "no room for an application identifier",
+        ));
+    }
+
+    let mut value = PROPVARIANT::default();
+
+    // SAFETY: the block is as long as the name and freshly ours, and `VT_LPWSTR` is its tag.
+    unsafe {
+        std::ptr::copy_nonoverlapping(name.as_ptr(), room, name.len());
+
+        let inner = &mut *value.Anonymous.Anonymous;
+
+        inner.vt = VT_LPWSTR;
+        inner.Anonymous.pwszVal = PWSTR(room);
+    }
+
+    Ok(value)
+}
+
+fn taskbar_glom_level() -> Option<u32> {
+    let mut level = 0_u32;
+    let mut length = u32::try_from(size_of::<u32>()).ok()?;
+
+    // SAFETY: the pointer is to a live four-byte value, which is what a DWORD value writes.
+    let read = unsafe {
+        RegGetValueW(
+            HKEY_CURRENT_USER,
+            TASKBAR_ADVANCED_KEY,
+            TASKBAR_GLOM_LEVEL,
+            RRF_RT_REG_DWORD,
+            None,
+            Some(std::ptr::from_mut(&mut level).cast()),
+            Some(&mut length),
+        )
+    };
+
+    read.is_ok().then_some(level)
+}
+
+fn enter_apartment() {
+    APARTMENT.with(|apartment| *apartment);
+}
+
+thread_local! {
+    static APARTMENT: () = {
+        // SAFETY: no argument crosses, and the apartment lasts as long as the thread.
+        let _ = unsafe { CoInitializeEx(None, COINIT_APARTMENTTHREADED) };
+    };
 }
 
 fn write_titles(
@@ -411,6 +702,10 @@ fn titled_window(handle: HWND) -> Option<TitledWindow> {
 
 fn is_unowned(handle: HWND) -> bool {
     unsafe { GetWindow(handle, GW_OWNER) }.map_or(true, |owner| owner.is_invalid())
+}
+
+fn is_live_window(window: WindowId) -> bool {
+    unsafe { IsWindow(Some(window_handle(window))) }.as_bool()
 }
 
 fn live_game_window(window: WindowId) -> Result<HWND> {

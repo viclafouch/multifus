@@ -9,6 +9,8 @@ import {
   authorizationLine,
   bindingLabel,
   characterStateLine,
+  characterSubLine,
+  missingGenderLine,
   pairingProblemLine,
   shortcutStatusLine,
   updateLine
@@ -120,6 +122,7 @@ const QUICK_REPLIES = [
 const ONLINE_CHARACTER = {
   nickname: 'Alpha',
   gender: 'male',
+  class: null,
   asleep: false,
   online: true,
   relayed: false
@@ -226,6 +229,48 @@ describe('authorizationLine', () => {
     const line = authorizationLine({ granted: false, listening: true })
 
     expect(line).toBe(strings.status.denied)
+  })
+})
+
+describe('characterSubLine', () => {
+  it('ne dit que l’état tant qu’aucune classe n’est choisie', () => {
+    const line = characterSubLine(ONLINE_CHARACTER)
+
+    expect(line).toBe(strings.characters.online)
+  })
+
+  it('dit la classe avant l’état une fois la classe choisie', () => {
+    const character = { ...ONLINE_CHARACTER, class: 'iop' } as const
+
+    const line = characterSubLine(character)
+
+    expect(line).toBe(`Iop · ${strings.characters.online}`)
+  })
+})
+
+describe('missingGenderLine', () => {
+  it('nomme un seul manquant au singulier', () => {
+    const line = missingGenderLine(['Chafoin'])
+
+    expect(line).toBe('Chafoin n’a pas de sexe.')
+  })
+
+  it('nomme deux manquants sans les compter', () => {
+    const line = missingGenderLine(['Chafoin', 'Bilou'])
+
+    expect(line).toBe('Chafoin et Bilou n’ont pas de sexe.')
+  })
+
+  it('nomme les deux premiers et compte le reste', () => {
+    const line = missingGenderLine(['Chafoin', 'Bilou', 'Nabur', 'Elyandra'])
+
+    expect(line).toBe('Chafoin, Bilou et 2 autres n’ont pas de sexe.')
+  })
+
+  it('accorde le reste au singulier', () => {
+    const line = missingGenderLine(['Chafoin', 'Bilou', 'Nabur'])
+
+    expect(line).toBe('Chafoin, Bilou et 1 autre n’ont pas de sexe.')
   })
 })
 

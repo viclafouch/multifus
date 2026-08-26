@@ -14,6 +14,7 @@ Une notification arrive dans le jeu, Multifus met devant vous la fenêtre du per
 - [x] Vos messages privés sur votre téléphone par Telegram, tant que vous êtes loin du clavier
 - [x] Un client qui s'ouvre remplit l'écran tout seul, une seule fois
 - [x] Une fenêtre de client titrée du seul pseudo, six clients lisibles d'un coup d'œil dans la barre des tâches (Windows)
+- [x] Une classe par personnage, et la fenêtre du client porte le portrait de sa classe dans la barre des tâches (Windows)
 - [x] Une icône de barre système qui liste les personnages connectés, un clic ramène la fenêtre
 - [x] Un démarrage à l'ouverture de session
 - [x] Un journal qui se copie d'un clic, pour le jour où rien ne se passe
@@ -35,7 +36,9 @@ Sur Windows, il demande l'**accès aux notifications**. La mise à jour 1709 est
 
 Dans les deux cas, les notifications en arrière-plan doivent être activées dans le jeu, par Options puis Général. Sur macOS, les bannières de Dofus doivent rester visibles dans les réglages du système, faute de quoi Multifus n'a rien à lire.
 
-Le titre court est le seul réglage réservé à un système : le client de macOS garde son titre quoi qu'on lui demande, et l'interrupteur y est grisé.
+Le portrait de classe et le bouton par personnage dans la barre des tâches sont réservés à Windows : on ne repeint pas le Dock d'une autre application. Le médaillon et la modale, eux, marchent partout.
+
+Le titre court est le seul autre réglage réservé à un système : le client de macOS garde son titre quoi qu'on lui demande, et l'interrupteur y est grisé.
 
 ## Installation
 
@@ -52,6 +55,8 @@ Dofus et Dofus Retro sont des marques déposées d'Ankama. Ce projet n'y est pas
 Construit avec [Tauri](https://v2.tauri.app), React et TypeScript pour l'interface, Rust pour la couche système. Prérequis : [Rust](https://www.rust-lang.org/tools/install), Node 24, et les [prérequis Tauri](https://tauri.app/start/prerequisites/) de votre système. Les commandes sont les scripts de `package.json`, et `npm install` pose les hooks git qui font passer `npm run lint` à chaque commit.
 
 Une release se prépare par `npm run release`, qui écrit le changelog et pose le tag, puis se déclenche en poussant ce tag : le workflow compile, signe, notarise et dépose un brouillon qu'il reste à publier.
+
+Les vingt-quatre portraits de `src/assets/portraits` appartiennent à Ankama. Ils sont repris d'un outil communautaire, et ils vivent dans un dossier qu'un `git rm` suffit à retirer. Leurs vingt-quatre `.ico` de `src-tauri/icons/portraits`, que Rust embarque, en ont été tirés une fois pour toutes.
 
 Les mots du projet sont dans [CONTEXT.md](./CONTEXT.md), ce qui reste à faire dans [docs/plan.md](./docs/plan.md).
 

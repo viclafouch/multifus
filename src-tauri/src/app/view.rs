@@ -4,6 +4,7 @@ use serde::Serialize;
 use crate::app::journal::JournalEntry;
 use crate::app::journal::RelayFailure;
 use crate::config::QuickReplyId;
+use crate::domain::Class;
 use crate::domain::Gender;
 use crate::domain::NotificationKind;
 use crate::platform::ScreenSaverDelay;
@@ -34,6 +35,8 @@ pub struct Snapshot {
     pub start_at_login: bool,
     pub maximize_on_launch: bool,
     pub short_titles: bool,
+    pub ungroup_taskbar: bool,
+    pub taskbar_combines: bool,
     pub authorization: AuthorizationView,
     pub config: ConfigView,
     pub update: UpdateView,
@@ -177,6 +180,7 @@ impl Screen {
 pub struct CharacterView {
     pub nickname: String,
     pub gender: Option<Gender>,
+    pub class: Option<Class>,
     pub asleep: bool,
     pub online: bool,
     pub relayed: bool,

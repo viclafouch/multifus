@@ -209,6 +209,13 @@ const rosterLine = (change: RosterChange) => {
 
       return `${change.nickname} est assigné comme ${sex}.`
     }
+    case 'classAssigned': {
+      if (change.class === null) {
+        return `Classe retirée à ${change.nickname}.`
+      }
+
+      return `${change.nickname} est assigné comme ${strings.characters.classes[change.class]}.`
+    }
     case 'reordered': {
       return change.order.length === 0
         ? 'Ordre du défilement modifié, roster vide.'
@@ -255,6 +262,11 @@ const settingLine = (change: SettingChange) => {
       const what = change.short ? 'activé' : 'désactivé'
 
       return `Pseudo seul dans le titre des fenêtres ${what}.`
+    }
+    case 'ungroupTaskbar': {
+      const what = change.ungroup ? 'activé' : 'désactivé'
+
+      return `Un bouton par personnage dans la barre des tâches ${what}.`
     }
     case 'relayBody': {
       const what = change.sendBody ? 'activé' : 'désactivé'
