@@ -51,6 +51,7 @@ use crate::config::QuickReplyId;
 use crate::config::Settings;
 use crate::config::Shortcut;
 use crate::config::Shortcuts;
+use crate::config::Traces;
 use crate::domain::Character;
 use crate::domain::Class;
 use crate::domain::Gender;
@@ -76,6 +77,7 @@ pub struct Multifus {
     settings: Settings,
     shortcut_statuses: HashMap<Binding, ShortcutStatus>,
     windows: HashMap<String, WindowId>,
+    windows_seen: HashMap<String, WindowId>,
     seen_client_windows: Option<HashSet<WindowId>>,
     painted_windows: HashMap<WindowId, WindowLook>,
     taskbar_combines: bool,
@@ -149,6 +151,7 @@ impl Multifus {
             settings,
             shortcut_statuses: HashMap::new(),
             windows: HashMap::new(),
+            windows_seen: HashMap::new(),
             seen_client_windows: None,
             painted_windows: HashMap::new(),
             taskbar_combines,
@@ -589,25 +592,50 @@ impl Multifus {
     }
 
     #[must_use]
-    pub fn looks_to_paint(&self) -> Vec<(WindowId, WindowLook)> {
-        self.settings
-            .roster
-            .characters()
+    pub fn looks_to_paint(&self) -> Vec<Painting> {
+        self.windows
             .iter()
-            .filter_map(|character| {
-                let window = *self.windows.get(&character.nickname)?;
-                let look = WindowLook {
-                    portrait: character.portrait(),
-                    ungrouped: self.settings.ungroup_taskbar && self.taskbar_combines,
-                };
+            .filter_map(|(nickname, window)| {
+                let look = self.look_wanted(nickname);
 
-                (self.painted_windows.get(&window) != Some(&look)).then_some((window, look))
+                (self.painted_windows.get(window) != Some(&look)).then(|| Painting {
+                    nickname: nickname.clone(),
+                    window: *window,
+                    look,
+                })
             })
             .collect()
     }
 
-    pub fn remember_painted(&mut self, window: WindowId, look: WindowLook) {
-        self.painted_windows.insert(window, look);
+    #[must_use]
+    fn look_wanted(&self, nickname: &str) -> WindowLook {
+        let Some(character) = self.settings.roster.get(nickname) else {
+            return WindowLook::default();
+        };
+
+        WindowLook {
+            portrait: character.portrait(),
+            ungrouped: self.settings.ungroup_taskbar && self.taskbar_combines,
+        }
+    }
+
+    pub fn remember_painted(&mut self, painting: &Painting) {
+        self.painted_windows.insert(painting.window, painting.look);
+
+        let portraits = trace_nickname(
+            &mut self.settings.traces.portraits,
+            &painting.nickname,
+            painting.look.portrait.is_some(),
+        );
+        let ungrouped = trace_nickname(
+            &mut self.settings.traces.ungrouped,
+            &painting.nickname,
+            painting.look.ungrouped,
+        );
+
+        if portraits || ungrouped {
+            self.save();
+        }
     }
 
     pub fn forget_closed_windows(&mut self) {
@@ -618,35 +646,65 @@ impl Multifus {
     }
 
     #[must_use]
-    pub fn wore_portrait(&self, window: WindowId) -> bool {
-        self.painted_windows
-            .get(&window)
-            .is_some_and(|look| look.portrait.is_some())
+    pub fn wore_portrait(&self, nickname: &str) -> bool {
+        self.settings.traces.portraits.contains(nickname)
     }
 
     #[must_use]
-    pub fn was_ungrouped(&self, window: WindowId) -> bool {
-        self.painted_windows
-            .get(&window)
-            .is_some_and(|look| look.ungrouped)
+    pub fn was_ungrouped(&self, nickname: &str) -> bool {
+        self.settings.traces.ungrouped.contains(nickname)
     }
 
     #[must_use]
-    pub fn portrait_windows(&self) -> Vec<WindowId> {
-        self.painted_windows
+    pub fn portraits_to_give_back(&self) -> Vec<TracedWindow> {
+        self.traced_windows(&self.settings.traces.portraits)
+    }
+
+    #[must_use]
+    pub fn groups_to_give_back(&self) -> Vec<TracedWindow> {
+        self.traced_windows(&self.settings.traces.ungrouped)
+    }
+
+    #[must_use]
+    fn traced_windows(&self, traced: &HashSet<String>) -> Vec<TracedWindow> {
+        self.windows_seen
             .iter()
-            .filter(|(_, look)| look.portrait.is_some())
-            .map(|(window, _)| *window)
+            .filter(|(nickname, _)| traced.contains(*nickname))
+            .map(|(nickname, window)| (nickname.clone(), *window))
             .collect()
     }
 
-    #[must_use]
-    pub fn ungrouped_windows(&self) -> Vec<WindowId> {
-        self.painted_windows
-            .iter()
-            .filter(|(_, look)| look.ungrouped)
-            .map(|(window, _)| *window)
-            .collect()
+    pub fn forget_portraits(&mut self, nicknames: &[String]) {
+        self.forget_traces(nicknames, |traces| &mut traces.portraits);
+    }
+
+    pub fn forget_groups(&mut self, nicknames: &[String]) {
+        self.forget_traces(nicknames, |traces| &mut traces.ungrouped);
+    }
+
+    fn forget_traces(
+        &mut self,
+        nicknames: &[String],
+        traced: impl Fn(&mut Traces) -> &mut HashSet<String>,
+    ) {
+        let mut forgotten = false;
+
+        for nickname in nicknames {
+            forgotten |= traced(&mut self.settings.traces).remove(nickname);
+        }
+
+        if forgotten {
+            self.save();
+        }
+    }
+
+    pub fn remember_short_titles(&mut self, on_screen: bool) {
+        if self.settings.traces.short_titles == on_screen {
+            return;
+        }
+
+        self.settings.traces.short_titles = on_screen;
+        self.save();
     }
 
     pub fn set_auto_focus(&mut self, kind: NotificationKind, enabled: bool) {
@@ -962,6 +1020,10 @@ impl Multifus {
             .map(|window| (window.nickname().to_owned(), window.id()))
             .collect();
 
+        for (nickname, window) in &self.windows {
+            self.windows_seen.insert(nickname.clone(), *window);
+        }
+
         for window in windows {
             if self.settings.roster.get(window.nickname()).is_none() {
                 self.settings.roster.add(Character::new(window.nickname()));
@@ -1241,10 +1303,27 @@ fn view_of(character: &Character) -> CharacterView {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub struct WindowLook {
     pub portrait: Option<Portrait>,
     pub ungrouped: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Painting {
+    pub nickname: String,
+    pub window: WindowId,
+    pub look: WindowLook,
+}
+
+pub type TracedWindow = (String, WindowId);
+
+fn trace_nickname(traced: &mut HashSet<String>, nickname: &str, posed: bool) -> bool {
+    if posed {
+        return traced.insert(nickname.to_owned());
+    }
+
+    traced.remove(nickname)
 }
 
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
@@ -1283,14 +1362,28 @@ mod tests {
     use super::*;
 
     fn multifus(directory: &TempDir) -> Multifus {
-        Multifus::new(MultifusParams {
-            store: ConfigStore::in_directory(directory.path()),
-            loaded: Loaded {
+        multifus_loaded(
+            directory,
+            Loaded {
                 settings: Settings::default(),
                 failure: None,
                 quarantined: None,
                 quarantine_failure: None,
             },
+        )
+    }
+
+    fn multifus_reloaded(directory: &TempDir) -> Multifus {
+        let store = ConfigStore::in_directory(directory.path());
+        let loaded = store.load();
+
+        multifus_loaded(directory, loaded)
+    }
+
+    fn multifus_loaded(directory: &TempDir, loaded: Loaded) -> Multifus {
+        Multifus::new(MultifusParams {
+            store: ConfigStore::in_directory(directory.path()),
+            loaded,
             version: "0.0.0".to_owned(),
             system: "test".to_owned(),
             launch: Launch::ByHand,
@@ -1317,6 +1410,14 @@ mod tests {
 
     fn raw(window: WindowId) -> u64 {
         window.raw()
+    }
+
+    fn painting(nickname: &str, pid: u64, look: WindowLook) -> Painting {
+        Painting {
+            nickname: nickname.to_owned(),
+            window: WindowId::from_raw(pid),
+            look,
+        }
     }
 
     #[test]
@@ -2179,14 +2280,11 @@ mod tests {
         let mut state = multifus(&directory);
         state.apply_windows(&[window(1, "Alpha")]);
 
-        let bare = WindowLook {
-            portrait: None,
-            ungrouped: false,
-        };
+        let bare = painting("Alpha", 1, WindowLook::default());
 
-        assert_eq!(state.looks_to_paint(), vec![(WindowId::from_raw(1), bare)]);
+        assert_eq!(state.looks_to_paint(), vec![bare.clone()]);
 
-        state.remember_painted(WindowId::from_raw(1), bare);
+        state.remember_painted(&bare);
 
         assert_eq!(state.looks_to_paint(), Vec::new());
 
@@ -2195,8 +2293,9 @@ mod tests {
 
         assert_eq!(
             state.looks_to_paint(),
-            vec![(
-                WindowId::from_raw(1),
+            vec![painting(
+                "Alpha",
+                1,
                 WindowLook {
                     portrait: Some(Portrait {
                         class: Class::Iop,
@@ -2217,8 +2316,9 @@ mod tests {
 
         assert_eq!(
             state.looks_to_paint(),
-            vec![(
-                WindowId::from_raw(1),
+            vec![painting(
+                "Alpha",
+                1,
                 WindowLook {
                     portrait: None,
                     ungrouped: true,
@@ -2230,13 +2330,7 @@ mod tests {
 
         assert_eq!(
             state.looks_to_paint(),
-            vec![(
-                WindowId::from_raw(1),
-                WindowLook {
-                    portrait: None,
-                    ungrouped: false,
-                }
-            )],
+            vec![painting("Alpha", 1, WindowLook::default())],
             "a taskbar that never combines has nothing to ungroup"
         );
     }
@@ -2247,38 +2341,33 @@ mod tests {
         let mut state = multifus(&directory);
         state.apply_windows(&[window(1, "Alpha")]);
 
-        let bare = WindowLook {
-            portrait: None,
-            ungrouped: false,
-        };
+        let bare = painting("Alpha", 1, WindowLook::default());
 
-        state.remember_painted(WindowId::from_raw(1), bare);
+        state.remember_painted(&bare);
         state.apply_windows(&[]);
         state.forget_closed_windows();
         state.apply_windows(&[window(1, "Alpha")]);
 
-        assert_eq!(state.looks_to_paint(), vec![(WindowId::from_raw(1), bare)]);
+        assert_eq!(state.looks_to_paint(), vec![bare]);
     }
 
     #[test]
     fn a_window_that_never_wore_a_portrait_is_left_with_the_icon_the_client_gave_it() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha")]);
 
-        assert!(!state.wore_portrait(WindowId::from_raw(1)));
+        let bare = painting("Alpha", 1, WindowLook::default());
 
-        state.remember_painted(
-            WindowId::from_raw(1),
-            WindowLook {
-                portrait: None,
-                ungrouped: false,
-            },
-        );
+        assert!(!state.wore_portrait("Alpha"));
 
-        assert!(!state.wore_portrait(WindowId::from_raw(1)));
+        state.remember_painted(&bare);
 
-        state.remember_painted(
-            WindowId::from_raw(1),
+        assert!(!state.wore_portrait("Alpha"));
+
+        let worn = painting(
+            "Alpha",
+            1,
             WindowLook {
                 portrait: Some(Portrait {
                     class: Class::Iop,
@@ -2288,32 +2377,138 @@ mod tests {
             },
         );
 
-        assert!(state.wore_portrait(WindowId::from_raw(1)));
+        state.remember_painted(&worn);
+
+        assert!(state.wore_portrait("Alpha"));
     }
 
     #[test]
     fn only_the_windows_multifus_took_out_of_their_group_are_given_back() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha"), window(2, "Bravo")]);
 
-        state.remember_painted(
-            WindowId::from_raw(1),
+        state.remember_painted(&painting(
+            "Alpha",
+            1,
             WindowLook {
                 portrait: None,
                 ungrouped: true,
             },
+        ));
+        state.remember_painted(&painting("Bravo", 2, WindowLook::default()));
+
+        assert_eq!(
+            state.groups_to_give_back(),
+            vec![("Alpha".to_owned(), WindowId::from_raw(1))]
         );
-        state.remember_painted(
-            WindowId::from_raw(2),
+        assert!(state.was_ungrouped("Alpha"));
+        assert!(!state.was_ungrouped("Bravo"));
+    }
+
+    #[test]
+    fn a_portrait_posed_by_a_multifus_that_died_is_given_back_at_the_next_start() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut died = multifus(&directory);
+        died.apply_windows(&[window(1, "Alpha")]);
+        died.set_gender("Alpha", Some(Gender::Male));
+        died.set_class("Alpha", Some(Class::Iop));
+        died.remember_painted(&painting(
+            "Alpha",
+            1,
             WindowLook {
-                portrait: None,
+                portrait: Some(Portrait {
+                    class: Class::Iop,
+                    gender: Gender::Male,
+                }),
+                ungrouped: false,
+            },
+        ));
+
+        let mut reborn = multifus_reloaded(&directory);
+        reborn.set_class("Alpha", None);
+        reborn.apply_windows(&[window(1, "Alpha")]);
+
+        let bare = painting("Alpha", 1, WindowLook::default());
+
+        assert_eq!(reborn.looks_to_paint(), vec![bare.clone()]);
+        assert!(
+            reborn.wore_portrait("Alpha"),
+            "the trace outlives the run that posed the portrait"
+        );
+
+        reborn.remember_painted(&bare);
+
+        assert!(
+            !reborn.wore_portrait("Alpha"),
+            "what is given back is no longer traced"
+        );
+    }
+
+    #[test]
+    fn a_window_of_a_character_left_out_of_the_roster_is_given_back_what_it_wore() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha")]);
+        state.set_gender("Alpha", Some(Gender::Male));
+        state.set_class("Alpha", Some(Class::Iop));
+
+        let worn = painting(
+            "Alpha",
+            1,
+            WindowLook {
+                portrait: Some(Portrait {
+                    class: Class::Iop,
+                    gender: Gender::Male,
+                }),
                 ungrouped: false,
             },
         );
 
-        assert_eq!(state.ungrouped_windows(), vec![WindowId::from_raw(1)]);
-        assert!(state.was_ungrouped(WindowId::from_raw(1)));
-        assert!(!state.was_ungrouped(WindowId::from_raw(2)));
+        state.remember_painted(&worn);
+        state.remove("Alpha");
+
+        assert_eq!(
+            state.portraits_to_give_back(),
+            vec![("Alpha".to_owned(), WindowId::from_raw(1))],
+            "a window left out of the roster is still owed its icon"
+        );
+
+        state.apply_windows(&[window(1, "Alpha")]);
+
+        assert_eq!(
+            state.looks_to_paint(),
+            vec![painting("Alpha", 1, WindowLook::default())]
+        );
+    }
+
+    #[test]
+    fn a_character_the_game_logged_out_is_still_owed_what_its_window_wears() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha")]);
+        state.set_gender("Alpha", Some(Gender::Male));
+        state.set_class("Alpha", Some(Class::Iop));
+        state.remember_painted(&painting(
+            "Alpha",
+            1,
+            WindowLook {
+                portrait: Some(Portrait {
+                    class: Class::Iop,
+                    gender: Gender::Male,
+                }),
+                ungrouped: false,
+            },
+        ));
+
+        state.apply_windows(&[]);
+        state.forget_closed_windows();
+
+        assert_eq!(
+            state.portraits_to_give_back(),
+            vec![("Alpha".to_owned(), WindowId::from_raw(1))],
+            "a window back on the login screen still wears its portrait"
+        );
     }
 
     #[test]

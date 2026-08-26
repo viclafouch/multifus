@@ -13,5 +13,6 @@ pub use settings::Relay;
 pub use settings::Settings;
 pub use settings::Shortcut;
 pub use settings::Shortcuts;
+pub use settings::Traces;
 pub use store::ConfigStore;
 pub use store::Loaded;

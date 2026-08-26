@@ -23,9 +23,10 @@ use crate::app::portraits;
 use crate::app::relay;
 use crate::app::state::lock;
 use crate::app::state::Decision;
+use crate::app::state::Painting;
 use crate::app::state::ScanChange;
+use crate::app::state::TracedWindow;
 use crate::app::state::WatcherState;
-use crate::app::state::WindowLook;
 use crate::app::tray;
 use crate::app::view::Screen;
 use crate::app::view::Snapshot;
@@ -178,14 +179,18 @@ fn apply_short_titles(app: &AppHandle) -> bool {
         .apply_short_titles(short, suffix.as_deref());
 
     match written {
-        Ok(Some(learned)) => {
-            lock(app).learn_title_suffix(learned);
+        Ok(report) => {
+            let mut state = lock(app);
+
+            state.remember_short_titles(report.on_screen);
+
+            if let Some(learned) = report.suffix {
+                state.learn_title_suffix(learned);
+            }
 
             false
         }
-        Ok(None) | Err(PlatformError::AuthorizationDenied) | Err(PlatformError::WindowGone) => {
-            false
-        }
+        Err(PlatformError::AuthorizationDenied) | Err(PlatformError::WindowGone) => false,
         Err(error) => lock(app).log_unless_repeated(JournalEvent::ShortTitlesFailed {
             detail: error.to_string(),
         }),
@@ -212,12 +217,12 @@ fn apply_window_icons(app: &AppHandle) -> bool {
 
     let mut written = false;
 
-    for (window, look) in looks {
-        let painted = paint_window(app, window, look);
+    for painting in looks {
+        let painted = paint_window(app, &painting);
         let mut state = lock(app);
 
         match painted {
-            Ok(()) => state.remember_painted(window, look),
+            Ok(()) => state.remember_painted(&painting),
             Err(PlatformError::AuthorizationDenied | PlatformError::WindowGone) => {}
             Err(error) => {
                 written |= state.log_unless_repeated(JournalEvent::WindowIconFailed {
@@ -230,21 +235,28 @@ fn apply_window_icons(app: &AppHandle) -> bool {
     written
 }
 
-fn paint_window(app: &AppHandle, window: WindowId, look: WindowLook) -> Result<(), PlatformError> {
+fn paint_window(app: &AppHandle, painting: &Painting) -> Result<(), PlatformError> {
     let manager = app.state::<PlatformWindowManager>();
 
     let (wore_portrait, was_ungrouped) = {
         let state = lock(app);
 
-        (state.wore_portrait(window), state.was_ungrouped(window))
+        (
+            state.wore_portrait(&painting.nickname),
+            state.was_ungrouped(&painting.nickname),
+        )
     };
+    let Painting { window, look, .. } = painting;
 
     if look.portrait.is_some() || wore_portrait {
-        manager.set_window_icon(window, look.portrait.map(portraits::icon_of))?;
+        manager.set_window_icon(*window, look.portrait.map(portraits::icon_of))?;
     }
 
     if look.ungrouped || was_ungrouped {
-        manager.set_window_group(window, look.ungrouped.then(|| group_of(window)).as_deref())?;
+        manager.set_window_group(
+            *window,
+            look.ungrouped.then(|| group_of(*window)).as_deref(),
+        )?;
     }
 
     Ok(())
@@ -269,34 +281,46 @@ pub fn on_run_event(app: &AppHandle, event: RunEvent) {
 }
 
 fn give_icons_back(app: &AppHandle) {
-    let painted = lock(app).portrait_windows();
+    let posed = lock(app).portraits_to_give_back();
+    let given = give_back(app, posed, |manager, window| {
+        manager.set_window_icon(window, None)
+    });
 
-    for window in painted {
-        drop(
-            app.state::<PlatformWindowManager>()
-                .set_window_icon(window, None),
-        );
-    }
+    lock(app).forget_portraits(&given);
 }
 
 fn give_groups_back(app: &AppHandle) {
-    let ungrouped = lock(app).ungrouped_windows();
+    let posed = lock(app).groups_to_give_back();
+    let given = give_back(app, posed, |manager, window| {
+        manager.set_window_group(window, None)
+    });
 
-    for window in ungrouped {
-        drop(
-            app.state::<PlatformWindowManager>()
-                .set_window_group(window, None),
-        );
-    }
+    lock(app).forget_groups(&given);
+}
+
+fn give_back(
+    app: &AppHandle,
+    posed: Vec<TracedWindow>,
+    hand: impl Fn(&PlatformWindowManager, WindowId) -> Result<(), PlatformError>,
+) -> Vec<String> {
+    let manager = app.state::<PlatformWindowManager>();
+
+    posed
+        .into_iter()
+        .filter(|(_, window)| hand(manager.inner(), *window).is_ok())
+        .map(|(nickname, _)| nickname)
+        .collect()
 }
 
 fn give_titles_back(app: &AppHandle) {
     let suffix = lock(app).client_title_suffix();
+    let given = app
+        .state::<PlatformWindowManager>()
+        .apply_short_titles(false, suffix.as_deref());
 
-    drop(
-        app.state::<PlatformWindowManager>()
-            .apply_short_titles(false, suffix.as_deref()),
-    );
+    if let Ok(report) = given {
+        lock(app).remember_short_titles(report.on_screen);
+    }
 }
 
 fn refresh_windows(app: &AppHandle) -> ScanChange {

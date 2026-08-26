@@ -146,7 +146,7 @@ pub trait WindowManager: Send + Sync {
 
     fn maximize(&self, window: WindowId) -> Result<()>;
 
-    fn apply_short_titles(&self, short: bool, suffix: Option<&str>) -> Result<Option<String>>;
+    fn apply_short_titles(&self, short: bool, suffix: Option<&str>) -> Result<ShortTitleReport>;
 
     fn set_window_icon(&self, window: WindowId, icon: Option<&[u8]>) -> Result<()>;
 

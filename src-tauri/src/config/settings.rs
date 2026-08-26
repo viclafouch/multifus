@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use std::fmt;
 
 use serde::Deserialize;
@@ -20,6 +21,15 @@ pub struct Settings {
     pub ungroup_taskbar: bool,
     pub client_title_suffix: Option<String>,
     pub start_at_login: bool,
+    pub traces: Traces,
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct Traces {
+    pub portraits: HashSet<String>,
+    pub ungrouped: HashSet<String>,
+    pub short_titles: bool,
 }
 
 const FIRST_QUICK_REPLY: &str = "Bon jeu à toi !";
@@ -42,6 +52,7 @@ impl Default for Settings {
             ungroup_taskbar: false,
             client_title_suffix: None,
             start_at_login: false,
+            traces: Traces::default(),
         }
     }
 }

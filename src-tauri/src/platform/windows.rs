@@ -76,6 +76,7 @@ use windows::Win32::UI::WindowsAndMessaging::DestroyIcon;
 use windows::Win32::UI::WindowsAndMessaging::DispatchMessageW;
 use windows::Win32::UI::WindowsAndMessaging::EnumWindows;
 use windows::Win32::UI::WindowsAndMessaging::GetAncestor;
+use windows::Win32::UI::WindowsAndMessaging::GetClassLongPtrW;
 use windows::Win32::UI::WindowsAndMessaging::GetForegroundWindow;
 use windows::Win32::UI::WindowsAndMessaging::GetMessageW;
 use windows::Win32::UI::WindowsAndMessaging::GetSystemMetrics;
@@ -100,6 +101,9 @@ use windows::Win32::UI::WindowsAndMessaging::WindowFromPoint;
 use windows::Win32::UI::WindowsAndMessaging::CHILDID_SELF;
 use windows::Win32::UI::WindowsAndMessaging::EVENT_SYSTEM_FOREGROUND;
 use windows::Win32::UI::WindowsAndMessaging::GA_ROOT;
+use windows::Win32::UI::WindowsAndMessaging::GCLP_HICON;
+use windows::Win32::UI::WindowsAndMessaging::GCLP_HICONSM;
+use windows::Win32::UI::WindowsAndMessaging::GET_CLASS_LONG_INDEX;
 use windows::Win32::UI::WindowsAndMessaging::GW_OWNER;
 use windows::Win32::UI::WindowsAndMessaging::HHOOK;
 use windows::Win32::UI::WindowsAndMessaging::HICON;
@@ -223,6 +227,13 @@ impl IconSlot {
         }
     }
 
+    fn class_index(self) -> GET_CLASS_LONG_INDEX {
+        match self {
+            Self::Small => GCLP_HICONSM,
+            Self::Big => GCLP_HICON,
+        }
+    }
+
     fn of(self, icons: &mut WindowIcons) -> &mut usize {
         match self {
             Self::Small => &mut icons.small,
@@ -239,8 +250,12 @@ pub struct Win32WindowManager {
 
 impl Win32WindowManager {
     #[must_use]
-    pub fn new() -> Self {
-        Self::default()
+    pub fn new(short_titles: bool) -> Self {
+        let manager = Self::default();
+
+        manager.short.store(short_titles, Ordering::Relaxed);
+
+        manager
     }
 
     fn shortens(&self) -> bool {
@@ -254,19 +269,23 @@ impl Win32WindowManager {
         slot: IconSlot,
         icon: Option<&[u8]>,
     ) -> Result<()> {
-        let fresh = match icon {
+        let ours = match icon {
             Some(icon) => create_icon(icon, slot.side())?,
             None => NO_ICON,
         };
+        let written = match ours {
+            NO_ICON => class_icon(handle, slot),
+            _ => ours,
+        };
 
-        match write_icon(handle, slot.message(), fresh) {
+        match write_icon(handle, slot.message(), written) {
             Ok(()) => {
-                destroy_icon(self.remember_slot(window, slot, fresh));
+                destroy_icon(self.remember_slot(window, slot, ours));
 
                 Ok(())
             }
             Err(error) => {
-                destroy_icon(fresh);
+                destroy_icon(ours);
 
                 Err(error)
             }
@@ -369,9 +388,9 @@ impl WindowManager for Win32WindowManager {
         Ok(())
     }
 
-    fn apply_short_titles(&self, short: bool, suffix: Option<&str>) -> Result<Option<String>> {
+    fn apply_short_titles(&self, short: bool, suffix: Option<&str>) -> Result<ShortTitleReport> {
         if !short && !self.shortens() {
-            return Ok(None);
+            return Ok(ShortTitleReport::default());
         }
 
         let mut windows: Vec<TitledWindow> = Vec::new();
@@ -385,7 +404,7 @@ impl WindowManager for Win32WindowManager {
             Err(_) => self.short.store(true, Ordering::Relaxed),
         }
 
-        written.map(|report| report.suffix)
+        written
     }
 
     fn set_window_icon(&self, window: WindowId, icon: Option<&[u8]>) -> Result<()> {
@@ -464,8 +483,13 @@ fn create_icon(icon: &[u8], side: u32) -> Result<usize> {
         .map_err(|error| PlatformError::system("CreateIconFromResourceEx", error.to_string()))
 }
 
+fn class_icon(handle: HWND, slot: IconSlot) -> usize {
+    // SAFETY: the handle answered `IsWindow`, and a class index only reads what the class holds.
+    unsafe { GetClassLongPtrW(handle, slot.class_index()) }
+}
+
 fn write_icon(handle: HWND, which: u32, icon: usize) -> Result<()> {
-    // SAFETY: the handle answered `IsWindow`, and the icon is one the process created.
+    // SAFETY: the handle answered `IsWindow`, and the icon outlives the window that takes it.
     let answered = unsafe {
         SendMessageTimeoutW(
             handle,

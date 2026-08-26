@@ -18,6 +18,8 @@ Les mots de Multifus, et rien d'autre. On en parle en français, on les écrit e
 
 **Fenêtre** (`GameWindow`) : l'incarnation d'un personnage à l'écran, un processus client par personnage.
 
+**Trace** (`Trace`) : ce que Multifus a posé sur une fenêtre du jeu et n'a pas encore repris — la tête de classe, le titre court, le bouton mis à part dans la barre des tâches. Elle s'écrit quand on pose, elle s'efface quand on rend. Multifus tué la retrouve au démarrage suivant, et rend ce qu'il n'avait pas rendu : quitté, il ne reste rien de lui à l'écran.
+
 **Focus** (`focus`) : l'action de faire passer une fenêtre au premier plan. Une fenêtre réduite en ressort.
 
 **Défilement** (`cycle`) : le parcours des fenêtres au raccourci, dans un ordre choisi par l'utilisateur.

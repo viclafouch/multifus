@@ -66,6 +66,7 @@ use crate::platform::notification::NotificationSink;
 use crate::platform::notification::NotificationWatcher;
 use crate::platform::paste::PasteSender;
 use crate::platform::window::GameWindow;
+use crate::platform::window::ShortTitleReport;
 use crate::platform::window::WindowId;
 use crate::platform::window::WindowManager;
 use crate::platform::Authorization;
@@ -445,7 +446,7 @@ pub struct AccessibilityWindowManager;
 
 impl AccessibilityWindowManager {
     #[must_use]
-    pub fn new() -> Self {
+    pub fn new(_short_titles: bool) -> Self {
         Self
     }
 }
@@ -575,8 +576,8 @@ impl WindowManager for AccessibilityWindowManager {
         set_size(&game_window, area.size)
     }
 
-    fn apply_short_titles(&self, _short: bool, _suffix: Option<&str>) -> Result<Option<String>> {
-        Ok(None)
+    fn apply_short_titles(&self, _short: bool, _suffix: Option<&str>) -> Result<ShortTitleReport> {
+        Ok(ShortTitleReport::default())
     }
 
     fn set_window_icon(&self, _window: WindowId, _icon: Option<&[u8]>) -> Result<()> {

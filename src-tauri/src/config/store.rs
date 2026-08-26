@@ -223,6 +223,8 @@ impl Loaded {
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashSet;
+
     use tempfile::TempDir;
 
     use super::*;
@@ -234,6 +236,7 @@ mod tests {
     use crate::config::settings::Relay;
     use crate::config::settings::Shortcut;
     use crate::config::settings::Shortcuts;
+    use crate::config::settings::Traces;
     use crate::domain::Character;
     use crate::domain::Class;
     use crate::domain::Gender;
@@ -289,6 +292,11 @@ mod tests {
                 screen: Some("DISPLAY2".to_owned()),
             },
             start_at_login: true,
+            traces: Traces {
+                portraits: HashSet::from(["Alpha".to_owned()]),
+                ungrouped: HashSet::new(),
+                short_titles: true,
+            },
         }
     }
 

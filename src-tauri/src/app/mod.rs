@@ -42,7 +42,7 @@ pub fn setup(app: &AppHandle) -> Result<(), ConfigError> {
     let store = ConfigStore::for_app(app)?;
     let loaded = store.load();
     let keeper = PlatformDisplayKeeper::new();
-    let windows = PlatformWindowManager::new();
+    let windows = PlatformWindowManager::new(loaded.settings.traces.short_titles);
 
     app.manage::<AppState>(Mutex::new(Multifus::new(MultifusParams {
         store,
