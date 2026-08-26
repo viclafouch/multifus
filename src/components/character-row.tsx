@@ -7,9 +7,18 @@ import { ClassDialog } from '@/components/class-dialog'
 import { RemoveButton } from '@/components/remove-button'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger
+} from '@/components/ui/tooltip'
 import { strings } from '@/constants/strings'
 import { portraitFor } from '@/helpers/portrait'
-import { characterState, characterSubLine } from '@/helpers/wording'
+import {
+  characterPortraitLabel,
+  characterState,
+  characterSubLine
+} from '@/helpers/wording'
 
 const STAGGER_MS = 38
 
@@ -38,6 +47,7 @@ export const CharacterRow = ({
   const { ref, handleRef, isDragging } = useSortable({ id: nickname, index })
   const [isEntering, setIsEntering] = React.useState(true)
   const [isDialogOpen, setIsDialogOpen] = React.useState(false)
+  const portraitLabel = characterPortraitLabel(character)
 
   return (
     <li
@@ -70,20 +80,22 @@ export const CharacterRow = ({
           ? strings.characters.rankNone
           : String(rank).padStart(2, '0')}
       </span>
-      <Button
-        variant="ghost"
-        aria-label={strings.characters.classDialog(nickname)}
-        className="size-fit shrink-0 rounded-full border-0 p-0.5"
-        onClick={() => {
-          setIsDialogOpen(true)
-        }}
-      >
-        <CharacterMedallion
-          nickname={nickname}
-          portrait={portraitFor(character)}
-          state={characterState(character)}
-        />
-      </Button>
+      <Tooltip>
+        <TooltipTrigger
+          render={<Button variant="ghost" />}
+          aria-label={portraitLabel}
+          className="group/portrait size-fit shrink-0 rounded-full border-0 p-0.5"
+          onClick={() => {
+            setIsDialogOpen(true)
+          }}
+        >
+          <CharacterMedallion
+            portrait={portraitFor(character)}
+            state={characterState(character)}
+          />
+        </TooltipTrigger>
+        <TooltipContent>{portraitLabel}</TooltipContent>
+      </Tooltip>
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <p className="selectable truncate text-row font-medium group-data-offline:text-muted-foreground">
           {nickname}

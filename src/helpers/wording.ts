@@ -196,16 +196,63 @@ const characterPresenceLine = (character: Character) => {
   return CHARACTER_STATE_LINES[characterPresence(character)]
 }
 
+const SEPARATOR = ' · '
+
+const prefixed = (prefix: string, line: string) => {
+  return `${prefix}${SEPARATOR}${line}`
+}
+
 const classPrefixed = (character: Character, line: string) => {
   if (character.class === null) {
     return line
   }
 
-  return `${strings.characters.classes[character.class]} · ${line}`
+  return prefixed(strings.characters.classes[character.class], line)
 }
 
+type MissingPart = 'class' | 'gender'
+
+const missingPart = (character: Character): MissingPart | null => {
+  if (character.class === null) {
+    return 'class'
+  }
+
+  if (character.gender === null) {
+    return 'gender'
+  }
+
+  return null
+}
+
+const MISSING_PART_LINES = {
+  class: strings.characters.classMissing,
+  gender: strings.characters.genderMissing
+} as const satisfies Record<MissingPart, string>
+
+const MISSING_PART_LABELS = {
+  class: strings.characters.classPick,
+  gender: strings.characters.genderPick
+} as const satisfies Record<MissingPart, (nickname: string) => string>
+
 export const characterSubLine = (character: Character) => {
-  return classPrefixed(character, characterStateLine(character))
+  const missing = missingPart(character)
+  const state = characterStateLine(character)
+
+  if (missing === null) {
+    return classPrefixed(character, state)
+  }
+
+  return prefixed(MISSING_PART_LINES[missing], state)
+}
+
+export const characterPortraitLabel = (character: Character) => {
+  const missing = missingPart(character)
+
+  if (missing === null) {
+    return strings.characters.portraitChange(character.nickname)
+  }
+
+  return MISSING_PART_LABELS[missing](character.nickname)
 }
 
 export const characterPresenceSubLine = (character: Character) => {

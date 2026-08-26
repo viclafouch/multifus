@@ -76,7 +76,6 @@ export const ClassDialog = ({
       <DialogContent showCloseButton={false} className="gap-5 sm:max-w-md">
         <DialogHeader className="flex-row items-center gap-3">
           <CharacterMedallion
-            nickname={nickname}
             portrait={portraitFor(character)}
             state={characterState(character)}
           />

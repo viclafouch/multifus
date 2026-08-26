@@ -23,7 +23,6 @@ export const RelayedList = ({ characters, run }: RelayedListProps) => {
             className="group flex items-center gap-3 border-b border-border/70 px-4 py-3 last:border-b-0 data-offline:dimmed"
           >
             <CharacterMedallion
-              nickname={character.nickname}
               portrait={portraitFor(character)}
               state={characterPresence(character)}
             />

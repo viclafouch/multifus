@@ -1,7 +1,7 @@
 # Déplacement
 
 Chaque clic gauche dans une fenêtre de jeu passe au personnage suivant du
-défilement. On clique pour déplacer son principal, la fenêtre de la mule prend
+défilement. On clique pour déplacer un personnage, la fenêtre du suivant prend
 sa place, on clique encore, et les deux ont bougé sans toucher au clavier.
 
 L'idée vient de Dracoon, son « Mode déplacement ». Ce plan reprend l'idée et

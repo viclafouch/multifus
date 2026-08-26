@@ -34,7 +34,6 @@ export const BannerPill = ({ step }: BannerPillProps) => {
             className="step flex min-w-0 items-center gap-2.5"
           >
             <CharacterMedallion
-              nickname={step.character.nickname}
               portrait={portraitFor(step.character)}
               state="live"
             />

@@ -2,7 +2,7 @@ export const WALK_STRINGS = {
   walk: {
     title: 'Déplacement',
     subtitle:
-      'Vous cliquez pour déplacer votre principal, la fenêtre de la mule prend sa place. Vous cliquez encore, et les deux ont bougé sans toucher au clavier.',
+      'Vous cliquez pour déplacer un personnage, la fenêtre du suivant prend sa place. Vous cliquez encore, et les deux ont bougé sans toucher au clavier.',
     switchLabel: 'Activer le Déplacement',
     switchDescription:
       'Chaque clic gauche dans une fenêtre Dofus Retro amène le personnage suivant du défilement devant vous.',

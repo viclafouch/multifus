@@ -1,15 +1,15 @@
 import type { LampState } from '@/components/lamp'
 import { cn } from '@/lib/utils'
 
+const PORTRAIT_UNKNOWN = '?'
+
 type CharacterMedallionProps = Readonly<{
-  nickname: string
   portrait: string | null
   state: LampState
   className?: string
 }>
 
 export const CharacterMedallion = ({
-  nickname,
   portrait,
   state,
   className
@@ -23,22 +23,23 @@ export const CharacterMedallion = ({
         'flex size-medallion shrink-0 items-center justify-center overflow-hidden rounded-full border-2 bg-card/60 transition-colors duration-300',
         'data-[state=live]:medallion-live data-[state=live]:border-live',
         'data-[state=asleep]:border-idle/70',
-        'data-[state=offline]:border-muted-foreground/25 data-[state=offline]:grayscale',
-        'data-empty:border-dashed',
+        'data-[state=offline]:border-muted-foreground/25',
+        'data-empty:border-dashed data-empty:bg-primary/12 data-empty:text-primary',
+        'group-hover/portrait:data-empty:bg-primary/25',
         className
       )}
     >
       {portrait === null ? (
-        <span className="font-display text-row font-medium text-muted-foreground/70">
-          {initialOf(nickname)}
+        <span className="font-display text-heading leading-none font-semibold">
+          {PORTRAIT_UNKNOWN}
         </span>
       ) : (
-        <img alt="" src={portrait} className="size-full object-cover" />
+        <img
+          alt=""
+          src={portrait}
+          className="size-full object-cover in-data-[state=offline]:grayscale"
+        />
       )}
     </span>
   )
-}
-
-const initialOf = (nickname: string) => {
-  return (Array.from(nickname)[0] ?? '').toUpperCase()
 }

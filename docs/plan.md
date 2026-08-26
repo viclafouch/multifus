@@ -35,5 +35,5 @@ versions déjà installées.
 - [ ] Windows, six clients connectés : six pseudos dans la barre des tâches, et quitter Multifus rend les six titres
 - [ ] Windows, une tête de classe posée puis Multifus tué au `Ctrl+C` : au démarrage suivant, la classe remise à vide rend l'icône de Dofus Retro
 - [ ] Windows, un personnage changé sans quitter le client : le titre court suit
-- [ ] Une mule laissée inactive un quart d'heure repasse déconnectée comme avant
+- [ ] Un personnage laissé inactif un quart d'heure repasse déconnecté comme avant
 - [ ] Windows, les Réglages : les titres courts gardent leur interrupteur, la ligne de la tête de classe n'existe pas, et la modale de classe ne dit rien de macOS

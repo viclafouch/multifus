@@ -8,6 +8,7 @@ import type { TonedLine } from '@/helpers/wording'
 import {
   authorizationLine,
   bindingLabel,
+  characterPortraitLabel,
   characterPresenceSubLine,
   characterStateLine,
   characterSubLine,
@@ -234,18 +235,62 @@ describe('authorizationLine', () => {
 })
 
 describe('characterSubLine', () => {
-  it('ne dit que l’état tant qu’aucune classe n’est choisie', () => {
+  it('réclame la classe tant qu’aucune n’est choisie', () => {
     const line = characterSubLine(ONLINE_CHARACTER)
 
-    expect(line).toBe(strings.characters.online)
+    expect(line).toBe(
+      `${strings.characters.classMissing} · ${strings.characters.online}`
+    )
   })
 
-  it('dit la classe avant l’état une fois la classe choisie', () => {
+  it('réclame le sexe d’une classe choisie sans lui', () => {
+    const character = {
+      ...ONLINE_CHARACTER,
+      class: 'iop',
+      gender: null
+    } as const
+
+    const line = characterSubLine(character)
+
+    expect(line).toBe(
+      `${strings.characters.genderMissing} · ${strings.characters.online}`
+    )
+  })
+
+  it('dit la classe avant l’état une fois le portrait complet', () => {
     const character = { ...ONLINE_CHARACTER, class: 'iop' } as const
 
     const line = characterSubLine(character)
 
     expect(line).toBe(`Iop · ${strings.characters.online}`)
+  })
+})
+
+describe('characterPortraitLabel', () => {
+  it('invite à choisir la classe tant qu’elle manque', () => {
+    const label = characterPortraitLabel(ONLINE_CHARACTER)
+
+    expect(label).toBe(strings.characters.classPick('Alpha'))
+  })
+
+  it('invite à choisir le sexe quand seule la classe est là', () => {
+    const character = {
+      ...ONLINE_CHARACTER,
+      class: 'iop',
+      gender: null
+    } as const
+
+    const label = characterPortraitLabel(character)
+
+    expect(label).toBe(strings.characters.genderPick('Alpha'))
+  })
+
+  it('propose de changer le portrait une fois complet', () => {
+    const character = { ...ONLINE_CHARACTER, class: 'iop' } as const
+
+    const label = characterPortraitLabel(character)
+
+    expect(label).toBe(strings.characters.portraitChange('Alpha'))
   })
 })
 

@@ -70,8 +70,16 @@ export const CHARACTERS_STRINGS = {
     },
     classes: CLASS_LABELS,
     genders: GENDER_LABELS,
-    classDialog: (nickname: string) => {
-      return `Classe et sexe de ${nickname}`
+    classMissing: 'Classe à choisir',
+    genderMissing: 'Sexe à choisir',
+    classPick: (nickname: string) => {
+      return `Choisir la classe de ${nickname}`
+    },
+    genderPick: (nickname: string) => {
+      return `Choisir le sexe de ${nickname}`
+    },
+    portraitChange: (nickname: string) => {
+      return `Changer la classe ou le sexe de ${nickname}`
     },
     classDialogClose: 'Fermer sans rien changer',
     classDialogGender: 'Sexe',

@@ -6,8 +6,6 @@ Les mots de Multifus, et rien d'autre. On en parle en français, on les écrit e
 
 **Pseudo** (`nickname`) : le nom d'un personnage, lu dans le titre de sa fenêtre.
 
-**Mule** : un personnage secondaire, ouvert pour accompagner le principal.
-
 **Sexe** (`gender`) : homme ou femme, assigné à la main à un personnage.
 
 **Classe** (`Class`) : la classe Dofus d'un personnage, choisie à la main parmi les douze. Croisée avec le sexe, elle donne le portrait que porte la fenêtre.

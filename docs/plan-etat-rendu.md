@@ -21,12 +21,12 @@ soit.
 
 ## Ce que Multifus pose hors de lui
 
-| Ce qu'on pose | Par quoi | Ce qui reste si Multifus meurt |
-| --- | --- | --- |
-| La tête de classe | `WM_SETICON` sur la fenêtre du jeu | l'image, jusqu'à la fermeture du client |
-| Le titre court | `WM_SETTEXT` | le titre raccourci |
-| Le bouton à part | `PKEY_AppUserModel_ID` sur la fenêtre | le bouton séparé |
-| La fenêtre agrandie | `ShowWindow` | agrandie, et c'est voulu : on ne la rend pas |
+| Ce qu'on pose       | Par quoi                              | Ce qui reste si Multifus meurt               |
+| ------------------- | ------------------------------------- | -------------------------------------------- |
+| La tête de classe   | `WM_SETICON` sur la fenêtre du jeu    | l'image, jusqu'à la fermeture du client      |
+| Le titre court      | `WM_SETTEXT`                          | le titre raccourci                           |
+| Le bouton à part    | `PKEY_AppUserModel_ID` sur la fenêtre | le bouton séparé                             |
+| La fenêtre agrandie | `ShowWindow`                          | agrandie, et c'est voulu : on ne la rend pas |
 
 Le reste meurt avec le processus, et n'a rien à rendre : les raccourcis, la
 bannière, l'écran tenu éveillé, la Porte du Déplacement, l'icône du menu.
@@ -112,8 +112,8 @@ emplacement pour lui-même.
       titres reprennent leur suffixe
 - [ ] Un client fermé et rouvert pendant que Multifus tourne : il retrouve sa
       tête de classe
-- [ ] Une mule laissée se déconnecter toute seule, Multifus toujours en vie : sa
-      fenêtre à l'écran de connexion reprend l'icône de Dofus Retro tout de
+- [ ] Un personnage laissé se déconnecter tout seul, Multifus toujours en vie :
+      sa fenêtre à l'écran de connexion reprend l'icône de Dofus Retro tout de
       suite, et sa tête de classe au retour du personnage
 - [ ] `config.json` ne porte plus aucune trace des fenêtres encore ouvertes une
       fois tout rendu
