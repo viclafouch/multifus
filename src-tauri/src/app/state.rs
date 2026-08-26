@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::collections::HashSet;
-use std::collections::VecDeque;
 use std::sync::Mutex;
 use std::sync::MutexGuard;
 use std::sync::PoisonError;
@@ -22,6 +21,9 @@ use crate::app::journal::Surface;
 use crate::app::journal::WalkFrom;
 use crate::app::view::AuthorizationView;
 use crate::app::view::AutoFocusView;
+use crate::app::view::BannerCharacter;
+use crate::app::view::BannerStep;
+use crate::app::view::BannerView;
 use crate::app::view::Binding;
 use crate::app::view::CharacterView;
 use crate::app::view::ConfigProblem;
@@ -37,9 +39,10 @@ use crate::app::view::Snapshot;
 use crate::app::view::SwitchView;
 use crate::app::view::TestView;
 use crate::app::view::UpdateView;
-use crate::app::view::WalkMeasure;
 use crate::app::view::WalkView;
 use crate::app::walk::WalkPlan;
+use crate::config::Banner;
+use crate::config::BannerCorner;
 use crate::config::ConfigError;
 use crate::config::ConfigStore;
 use crate::config::Loaded;
@@ -56,8 +59,6 @@ use crate::domain::Portrait;
 use crate::platform::GameWindow;
 use crate::platform::PlatformNotificationWatcher;
 use crate::platform::WindowId;
-use crate::platform::SWITCH_BUDGET_MS;
-use crate::platform::SWITCH_CEILING_MS;
 use crate::platform::WATCHES_CLICKS;
 
 pub type AppState = Mutex<Multifus>;
@@ -91,7 +92,7 @@ pub struct Multifus {
     last_start: u64,
     screen_saver: ScreenSaverView,
     walk_enabled: bool,
-    walk_measures: VecDeque<WalkMeasure>,
+    banner_character: Option<BannerCharacter>,
     journal: Journal,
 }
 
@@ -164,7 +165,7 @@ impl Multifus {
             last_start: 0,
             screen_saver,
             walk_enabled: false,
-            walk_measures: VecDeque::new(),
+            banner_character: None,
             journal,
         }
     }
@@ -229,9 +230,10 @@ impl Multifus {
             walk: WalkView {
                 enabled: self.walk_enabled,
                 supported: WATCHES_CLICKS,
-                budget: SWITCH_BUDGET_MS,
-                ceiling: SWITCH_CEILING_MS,
-                measures: self.walk_measures.iter().copied().collect(),
+                banner: BannerView {
+                    corner: self.settings.banner.corner,
+                    screen: self.settings.banner.screen.clone(),
+                },
             },
             relay: RelayView {
                 paired: self.settings.relay.chat_id.is_some(),
@@ -697,12 +699,49 @@ impl Multifus {
             .push(JournalEvent::WalkEnabled { enabled, from });
     }
 
-    pub fn remember_walk_measure(&mut self, measure: WalkMeasure) {
-        if self.walk_measures.len() == WALK_MEASURES_KEPT {
-            self.walk_measures.pop_front();
+    #[must_use]
+    pub fn banner_step(&self) -> BannerStep {
+        BannerStep {
+            corner: self.settings.banner.corner,
+            character: self.banner_character.clone(),
+            previewing: !self.walk_enabled,
         }
+    }
 
-        self.walk_measures.push_back(measure);
+    #[must_use]
+    pub fn banner_place(&self) -> Banner {
+        self.settings.banner.clone()
+    }
+
+    pub fn set_banner_corner(&mut self, corner: BannerCorner) {
+        self.settings.banner.corner = corner;
+
+        self.save();
+    }
+
+    pub fn set_banner_screen(&mut self, screen: Option<String>) {
+        self.settings.banner.screen = screen;
+
+        self.save();
+    }
+
+    pub fn set_banner_character(&mut self, character: Option<BannerCharacter>) {
+        self.banner_character = character;
+    }
+
+    #[must_use]
+    pub fn banner_character_of(&self, window: WindowId) -> Option<BannerCharacter> {
+        let nickname = self
+            .windows
+            .iter()
+            .find_map(|(nickname, held)| (*held == window).then_some(nickname))?;
+        let character = self.settings.roster.get(nickname)?;
+
+        Some(BannerCharacter {
+            nickname: character.nickname.clone(),
+            class: character.class,
+            gender: character.gender,
+        })
     }
 
     #[must_use]
@@ -1187,8 +1226,6 @@ fn shortcut_in(shortcuts: &Shortcuts, action: ShortcutAction) -> Option<&Shortcu
     }
 }
 
-const WALK_MEASURES_KEPT: usize = 12;
-
 fn nickname_of(character: Option<&Character>) -> Option<String> {
     character.map(|character| character.nickname.clone())
 }
@@ -1322,6 +1359,42 @@ mod tests {
     }
 
     #[test]
+    fn the_banner_names_the_character_behind_the_window_it_landed_on() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha"), window(2, "Bravo")]);
+        state.set_class("Bravo", Some(Class::Iop));
+        state.set_gender("Bravo", Some(Gender::Female));
+
+        let shown = state
+            .banner_character_of(WindowId::from_raw(2))
+            .expect("a character behind the window");
+
+        assert_eq!(shown.nickname, "Bravo");
+        assert_eq!(shown.class, Some(Class::Iop));
+        assert_eq!(shown.gender, Some(Gender::Female));
+        assert_eq!(state.banner_character_of(WindowId::from_raw(9)), None);
+    }
+
+    #[test]
+    fn the_banner_forgets_its_character_and_keeps_its_corner() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.set_banner_corner(BannerCorner::TopLeft);
+        state.set_banner_character(Some(BannerCharacter {
+            nickname: "Alpha".to_owned(),
+            class: None,
+            gender: None,
+        }));
+        state.set_banner_character(None);
+
+        let step = state.banner_step();
+
+        assert_eq!(step.character, None);
+        assert_eq!(step.corner, BannerCorner::TopLeft);
+    }
+
+    #[test]
     fn a_click_walks_the_cycle_the_next_shortcut_walks() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
@@ -1388,27 +1461,6 @@ mod tests {
         );
 
         assert!(!multifus(&directory).is_walk_enabled());
-    }
-
-    #[test]
-    fn only_the_last_switches_are_kept_to_be_shown() {
-        let directory = TempDir::new().expect("a temporary directory");
-        let mut state = multifus(&directory);
-
-        for milliseconds in 0..u64::try_from(WALK_MEASURES_KEPT + 3).unwrap_or_default() {
-            state.remember_walk_measure(WalkMeasure {
-                milliseconds,
-                landed: true,
-            });
-        }
-
-        let measures = state.snapshot().walk.measures;
-
-        assert_eq!(measures.len(), WALK_MEASURES_KEPT);
-        assert_eq!(
-            measures.first().map(|measure| measure.milliseconds),
-            Some(3)
-        );
     }
 
     #[test]

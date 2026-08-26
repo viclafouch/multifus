@@ -16,6 +16,15 @@ export default defineConfig({
     }
   },
 
+  build: {
+    rolldownOptions: {
+      input: {
+        main: path.resolve(import.meta.dirname, './index.html'),
+        banner: path.resolve(import.meta.dirname, './banner.html')
+      }
+    }
+  },
+
   clearScreen: false,
   server: {
     port: 1420,

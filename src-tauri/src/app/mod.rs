@@ -1,4 +1,5 @@
 pub mod autostart;
+pub mod banner;
 pub mod commands;
 pub mod journal;
 pub mod journal_file;
@@ -57,6 +58,8 @@ pub fn setup(app: &AppHandle) -> Result<(), ConfigError> {
     app.manage::<WatcherState>(Mutex::new(PlatformNotificationWatcher::new()));
 
     relay::run::setup(app, keeper);
+
+    banner::setup(app);
 
     walk::setup(app);
 

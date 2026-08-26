@@ -3,6 +3,7 @@ use serde::Serialize;
 
 use crate::app::journal::JournalEntry;
 use crate::app::journal::RelayFailure;
+use crate::config::BannerCorner;
 use crate::config::QuickReplyId;
 use crate::domain::Class;
 use crate::domain::Gender;
@@ -50,16 +51,39 @@ pub struct Snapshot {
 pub struct WalkView {
     pub enabled: bool,
     pub supported: bool,
-    pub budget: u64,
-    pub ceiling: u64,
-    pub measures: Vec<WalkMeasure>,
+    pub banner: BannerView,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct WalkMeasure {
-    pub milliseconds: u64,
-    pub landed: bool,
+pub struct BannerView {
+    pub corner: BannerCorner,
+    pub screen: Option<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct BannerScreenView {
+    pub name: Option<String>,
+    pub width: u32,
+    pub height: u32,
+    pub primary: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct BannerStep {
+    pub corner: BannerCorner,
+    pub character: Option<BannerCharacter>,
+    pub previewing: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct BannerCharacter {
+    pub nickname: String,
+    pub class: Option<Class>,
+    pub gender: Option<Gender>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]

@@ -227,6 +227,8 @@ mod tests {
 
     use super::*;
     use crate::config::settings::AutoFocus;
+    use crate::config::settings::Banner;
+    use crate::config::settings::BannerCorner;
     use crate::config::settings::QuickReply;
     use crate::config::settings::QuickReplyId;
     use crate::config::settings::Relay;
@@ -281,6 +283,10 @@ mod tests {
             relay: Relay {
                 chat_id: Some(-1_001_234_567_890),
                 send_body: true,
+            },
+            banner: Banner {
+                corner: BannerCorner::TopLeft,
+                screen: Some("DISPLAY2".to_owned()),
             },
             start_at_login: true,
         }

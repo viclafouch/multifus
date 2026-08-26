@@ -1070,6 +1070,12 @@ const JOURNAL_CASES = {
       line: `${DETAILED_LINES.walkSwitchFailed} : ${DETAIL}`
     }
   ],
+  bannerFailed: [
+    {
+      event: { kind: 'bannerFailed', detail: DETAIL },
+      line: `${DETAILED_LINES.bannerFailed} : ${DETAIL}`
+    }
+  ],
   reset: [{ event: { kind: 'reset' }, line: PLAIN_LINES.reset }],
   quit: [{ event: { kind: 'quit' }, line: PLAIN_LINES.quit }]
 } as const satisfies JournalCases
@@ -1123,12 +1129,7 @@ const SNAPSHOT = {
   walk: {
     enabled: false,
     supported: true,
-    budget: 60,
-    ceiling: 250,
-    measures: [
-      { milliseconds: 41, landed: true },
-      { milliseconds: 250, landed: false }
-    ]
+    banner: { corner: 'bottomRight', screen: null }
   },
   journal: [
     { id: 1, at: MORNING, event: { kind: 'listening' } },
@@ -1319,7 +1320,7 @@ describe('journalTranscript', () => {
         'Multifus 0.1.0 sur macOS 26.0 (arm64)',
         'Autorisation : accordée, écoute active',
         'AutoFocus : actif, réveil des réduites actif',
-        'Déplacement : éteint, budget 60 ms, dernières bascules 41 250✗ ms',
+        'Déplacement : éteint',
         BINDINGS_LINE,
         'Configuration : /tmp/multifus/config.json',
         `Mise à jour : ${strings.about.updateUpToDate}`,
@@ -1360,12 +1361,12 @@ describe('journalTranscript', () => {
     expect(transcript).toContain('Déplacement : indisponible sur ce système')
   })
 
-  it('ne promet aucune bascule tant qu’aucune n’a été mesurée', () => {
-    const walk = { ...SNAPSHOT.walk, enabled: true, measures: [] }
+  it('dit le Déplacement allumé', () => {
+    const walk = { ...SNAPSHOT.walk, enabled: true }
 
     const transcript = journalTranscript({ ...SNAPSHOT, walk })
 
-    expect(transcript).toContain('Déplacement : allumé, aucune bascule mesurée')
+    expect(transcript).toContain('Déplacement : allumé')
   })
 
   it('ne promet aucune période quand rien n’est en mémoire', () => {

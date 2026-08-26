@@ -7,17 +7,17 @@ use std::sync::Arc;
 use std::sync::Mutex;
 use std::sync::PoisonError;
 use std::thread;
-use std::time::Instant;
 
 use tauri::AppHandle;
 use tauri::Manager;
 
+use crate::app::banner;
 use crate::app::journal::JournalEvent;
 use crate::app::journal::WalkFrom;
 use crate::app::journal::WalkIdle;
 use crate::app::journal::Work;
 use crate::app::state::lock;
-use crate::app::view::WalkMeasure;
+use crate::app::view::BannerCharacter;
 use crate::platform::ClickGate;
 use crate::platform::ClickReport;
 use crate::platform::ClickSink;
@@ -27,6 +27,7 @@ use crate::platform::PlatformError;
 use crate::platform::PlatformWindowManager;
 use crate::platform::WindowId;
 use crate::platform::WindowManager;
+use crate::platform::SETTLE;
 use crate::platform::SWITCH_CEILING;
 
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
@@ -37,7 +38,8 @@ pub struct WalkPlan {
 
 #[derive(Debug)]
 enum WalkStep {
-    Clicked { window: WindowId, at: Instant },
+    Clicked { window: WindowId },
+    Foreground { window: WindowId },
     ListeningLost,
 }
 
@@ -49,6 +51,14 @@ pub struct Walk {
 }
 
 impl Walk {
+    fn watches(&self, window: WindowId) -> bool {
+        self.plan
+            .lock()
+            .unwrap_or_else(PoisonError::into_inner)
+            .watched
+            .contains(&window)
+    }
+
     fn next_after(&self, clicked: WindowId) -> Option<WindowId> {
         self.plan
             .lock()
@@ -111,7 +121,25 @@ pub fn set_enabled(app: &AppHandle, enabled: bool, from: WalkFrom) {
         app.state::<PlatformClickWatcher>().stop();
     }
 
+    let here = enabled.then(|| who_is_here(app)).flatten();
+
+    if enabled {
+        lock(app).set_banner_character(here.clone());
+    }
+
     lock(app).set_walk_enabled(enabled, from);
+
+    banner::follow_walk(app, enabled, here.is_some());
+}
+
+fn who_is_here(app: &AppHandle) -> Option<BannerCharacter> {
+    let found = app
+        .state::<PlatformWindowManager>()
+        .foreground_game_window()
+        .ok()
+        .flatten()?;
+
+    lock(app).banner_character_of(found.id())
 }
 
 pub fn toggle(app: &AppHandle, from: WalkFrom) {
@@ -158,7 +186,8 @@ fn listen(app: &AppHandle) -> Result<(), PlatformError> {
 fn sink_of(gate: Arc<ClickGate>, steps: Sender<WalkStep>) -> ClickSink {
     Arc::new(move |report| {
         let step = match report {
-            ClickReport::Clicked { window, at } => WalkStep::Clicked { window, at },
+            ClickReport::Clicked { window } => WalkStep::Clicked { window },
+            ClickReport::Foreground { window } => WalkStep::Foreground { window },
             ClickReport::ListeningLost => WalkStep::ListeningLost,
         };
 
@@ -170,7 +199,10 @@ fn sink_of(gate: Arc<ClickGate>, steps: Sender<WalkStep>) -> ClickSink {
 
 fn take(app: &AppHandle, step: WalkStep) {
     match step {
-        WalkStep::Clicked { window, at } => switch(app, window, at),
+        WalkStep::Clicked { window } => switch(app, window),
+        WalkStep::Foreground { window } => {
+            banner::follow_foreground(app, app.state::<Walk>().watches(window));
+        }
         WalkStep::ListeningLost => {
             lock(app).log(JournalEvent::WalkListeningLost);
 
@@ -179,7 +211,7 @@ fn take(app: &AppHandle, step: WalkStep) {
     }
 }
 
-fn switch(app: &AppHandle, clicked: WindowId, at: Instant) {
+fn switch(app: &AppHandle, clicked: WindowId) {
     let walk = app.state::<Walk>();
     let Some(target) = walk.next_after(clicked) else {
         walk.gate.open();
@@ -187,6 +219,8 @@ fn switch(app: &AppHandle, clicked: WindowId, at: Instant) {
         lock(app).log_unless_repeated(JournalEvent::WalkIdle {
             reason: WalkIdle::NobodyInCycle,
         });
+
+        banner::step(app, None);
 
         return;
     };
@@ -197,32 +231,34 @@ fn switch(app: &AppHandle, clicked: WindowId, at: Instant) {
         return;
     }
 
+    thread::sleep(SETTLE);
+
     walk.gate.expect(target);
 
     let asked = app.state::<PlatformWindowManager>().focus_fast(target);
     let landed = asked.is_ok() && walk.gate.await_arrival(SWITCH_CEILING);
-    let milliseconds = u64::try_from(at.elapsed().as_millis()).unwrap_or(u64::MAX);
 
     walk.gate.open();
 
-    let mut state = lock(app);
+    let arrived = {
+        let mut state = lock(app);
 
-    state.remember_walk_measure(WalkMeasure {
-        milliseconds,
-        landed,
-    });
+        match asked {
+            Err(error) => {
+                state.log_unless_repeated(JournalEvent::WalkSwitchFailed {
+                    detail: error.to_string(),
+                });
+            }
+            Ok(()) if !landed => {
+                state.log_unless_repeated(JournalEvent::WalkIdle {
+                    reason: WalkIdle::TooSlow,
+                });
+            }
+            Ok(()) => {}
+        }
 
-    match asked {
-        Err(error) => {
-            state.log_unless_repeated(JournalEvent::WalkSwitchFailed {
-                detail: error.to_string(),
-            });
-        }
-        Ok(()) if !landed => {
-            state.log_unless_repeated(JournalEvent::WalkIdle {
-                reason: WalkIdle::TooSlow,
-            });
-        }
-        Ok(()) => {}
-    }
+        state.banner_character_of(target)
+    };
+
+    banner::step(app, arrived);
 }

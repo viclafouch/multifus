@@ -383,18 +383,7 @@ const walkTranscriptLine = (walk: Snapshot['walk']) => {
     return 'indisponible sur ce système'
   }
 
-  const state = walk.enabled ? 'allumé' : 'éteint'
-  const measures = walk.measures
-    .map((measure) => {
-      return measure.landed
-        ? `${measure.milliseconds}`
-        : `${measure.milliseconds}✗`
-    })
-    .join(' ')
-
-  return measures === ''
-    ? `${state}, aucune bascule mesurée`
-    : `${state}, budget ${walk.budget} ms, dernières bascules ${measures} ms`
+  return walk.enabled ? 'allumé' : 'éteint'
 }
 
 type ShortcutLineParams = {

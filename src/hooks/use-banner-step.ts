@@ -1,19 +1,19 @@
 import React from 'react'
-import type { Snapshot } from '@/@types/snapshot'
-import * as multifus from '@/lib/multifus'
+import type { BannerStep } from '@/@types/walk'
+import { bannerStep, onBannerStep } from '@/lib/multifus'
 import { ignore } from '@/lib/utils'
 
-export const useMultifus = () => {
-  const [snapshot, setSnapshot] = React.useState<Snapshot | null>(null)
+export const useBannerStep = () => {
+  const [step, setStep] = React.useState<BannerStep | null>(null)
 
   React.useEffect(() => {
     let isLive = true
     let unlisten: (() => void) | null = null
 
     const subscribe = async () => {
-      const stop = await multifus.onSnapshot((next) => {
+      const stop = await onBannerStep((next) => {
         if (isLive) {
-          setSnapshot(next)
+          setStep(next)
         }
       })
 
@@ -23,10 +23,10 @@ export const useMultifus = () => {
         stop()
       }
 
-      const first = await multifus.snapshot()
+      const first = await bannerStep()
 
       if (isLive) {
-        setSnapshot((current) => {
+        setStep((current) => {
           return current ?? first
         })
       }
@@ -40,9 +40,5 @@ export const useMultifus = () => {
     }
   }, [])
 
-  const run = (action: Promise<Snapshot>) => {
-    action.then(setSnapshot, ignore)
-  }
-
-  return { snapshot, run }
+  return step
 }

@@ -20,6 +20,7 @@ pub enum Work {
     Shortcuts,
     Tray,
     Walk,
+    Banner,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -221,6 +222,10 @@ pub enum JournalEvent {
     },
 
     WalkSwitchFailed {
+        detail: String,
+    },
+
+    BannerFailed {
         detail: String,
     },
 

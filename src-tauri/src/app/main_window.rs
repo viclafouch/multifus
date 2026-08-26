@@ -60,6 +60,10 @@ pub fn hide_rather_than_quit(window: &Window<Wry>, event: &WindowEvent) {
         return;
     };
 
+    if window.label() != LABEL {
+        return;
+    }
+
     let app = window.app_handle();
 
     if !tray::is_present(app) {

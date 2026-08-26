@@ -12,9 +12,8 @@ import { UnavailableSwitch } from '@/components/unavailable-switch'
 import { WindowsOnly } from '@/components/windows-only'
 import { strings } from '@/constants/strings'
 import { acceleratorParts } from '@/helpers/accelerator'
-import { useSnapshotTicker } from '@/hooks/use-snapshot-ticker'
 import { setWalkEnabled } from '@/lib/multifus'
-import { MeasuresPanel } from '@/screens/walk-screen/measures-panel'
+import { BannerPanel } from '@/screens/walk-screen/banner-panel'
 
 type WalkScreenProps = Readonly<{
   walk: WalkStatus
@@ -23,8 +22,6 @@ type WalkScreenProps = Readonly<{
 }>
 
 export const WalkScreen = ({ walk, shortcuts, run }: WalkScreenProps) => {
-  useSnapshotTicker(walk.enabled, run)
-
   const accelerator =
     shortcuts.find((shortcut) => {
       return shortcut.action === 'walk'
@@ -69,7 +66,7 @@ export const WalkScreen = ({ walk, shortcuts, run }: WalkScreenProps) => {
           <ShortcutRecall accelerator={accelerator} />
         </FieldRow>
       </Panel>
-      <MeasuresPanel walk={walk} />
+      <BannerPanel place={walk.banner} run={run} />
       <Note>{strings.walk.startsOff}</Note>
       <Note>{strings.walk.privacy}</Note>
     </Screen>

@@ -18,7 +18,7 @@ versions déjà installées.
 
 ## Ajouter le Déplacement
 
-- [ ] Finir le Déplacement : la bannière et le côté macOS, dont le détail est dans [plan-deplacement.md](./plan-deplacement.md)
+- [ ] Finir le Déplacement : le côté macOS, dont le détail est dans [plan-deplacement.md](./plan-deplacement.md)
 
 ## Vérifier sur une vraie soirée
 

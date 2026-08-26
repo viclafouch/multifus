@@ -15,21 +15,17 @@ use crate::platform::window::WindowId;
 
 pub const WATCHES_CLICKS: bool = cfg!(target_os = "windows");
 
-#[cfg(target_os = "windows")]
-pub const SWITCH_BUDGET_MS: u64 = 60;
+pub const SETTLE: Duration = Duration::from_millis(95);
 
-#[cfg(not(target_os = "windows"))]
-pub const SWITCH_BUDGET_MS: u64 = 120;
-
-pub const SWITCH_CEILING_MS: u64 = 250;
-
-pub const SWITCH_CEILING: Duration = Duration::from_millis(SWITCH_CEILING_MS);
+pub const SWITCH_CEILING: Duration = Duration::from_millis(250);
 
 const NOTHING_AWAITED: u64 = 0;
 
 #[derive(Debug)]
 pub enum ClickReport {
-    Clicked { window: WindowId, at: Instant },
+    Clicked { window: WindowId },
+
+    Foreground { window: WindowId },
 
     ListeningLost,
 }

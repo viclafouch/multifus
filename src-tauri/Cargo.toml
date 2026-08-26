@@ -23,7 +23,7 @@ tauri-build = { version = "2", features = [] }
 [dependencies]
 # `tray-icon` is what step 8 stands on: without it the crate compiles and the
 # menu bar icon simply does not exist.
-tauri = { version = "2", features = ["tray-icon"] }
+tauri = { version = "2", features = ["tray-icon", "macos-private-api"] }
 tauri-plugin-opener = "2"
 tauri-plugin-global-shortcut = "2"
 serde = { version = "1", features = ["derive"] }

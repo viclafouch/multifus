@@ -14,6 +14,7 @@ pub struct Settings {
     pub quick_replies: Vec<QuickReply>,
     pub auto_focus: AutoFocus,
     pub relay: Relay,
+    pub banner: Banner,
     pub maximize_on_launch: bool,
     pub short_titles: bool,
     pub ungroup_taskbar: bool,
@@ -35,12 +36,42 @@ impl Default for Settings {
             quick_replies: vec![quick_reply],
             auto_focus: AutoFocus::default(),
             relay: Relay::default(),
+            banner: Banner::default(),
             maximize_on_launch: false,
             short_titles: false,
             ungroup_taskbar: false,
             client_title_suffix: None,
             start_at_login: false,
         }
+    }
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct Banner {
+    pub corner: BannerCorner,
+    pub screen: Option<String>,
+}
+
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum BannerCorner {
+    TopLeft,
+    TopRight,
+    BottomLeft,
+    #[default]
+    BottomRight,
+}
+
+impl BannerCorner {
+    #[must_use]
+    pub fn matches_left(self) -> bool {
+        matches!(self, Self::TopLeft | Self::BottomLeft)
+    }
+
+    #[must_use]
+    pub fn matches_top(self) -> bool {
+        matches!(self, Self::TopLeft | Self::TopRight)
     }
 }
 

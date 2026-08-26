@@ -1,0 +1,11 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "banner",
+  "description": "Capability for the banner window",
+  "windows": [
+    "banner"
+  ],
+  "permissions": [
+    "core:default"
+  ]
+}

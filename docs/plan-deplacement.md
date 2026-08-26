@@ -184,6 +184,14 @@ Windows d'abord, comme demandé. macOS compile et l'écran le dit, mais rien n'y
 - `src-tauri/src/config/settings.rs` : `ShortcutAction::Walk`,
   `Control+Shift+KeyD`. L'état allumé ne s'écrit pas.
 - `shortcuts.rs`, `tray.rs`, `journal.rs`, `view.rs`, `commands.rs`.
+- `src-tauri/src/app/banner.rs` : la fenêtre de la bannière, son coin, son
+  écran, l'aperçu, et le suivi du premier plan.
+- `banner.html`, `src/banner.tsx`, `src/banner.css`, `src/screens/banner-screen/`,
+  l'entrée `banner` de `vite.config.ts`, et `src-tauri/capabilities/banner.json`.
+- `src/theme.css` : les jetons du thème, sortis de `index.css` pour que les deux
+  pages les partagent.
+- Les quatre commandes `set_banner_corner`, `set_banner_screen`,
+  `banner_screens`, `banner_step`, et le panneau de placement de l'écran.
 - L'écran Déplacement, ses phrases, son entrée dans le rail, et les lignes du
   journal.
 
@@ -247,18 +255,167 @@ faces.
 
 ### L'écran
 
-Une règle graduée de 0 au plafond, la ligne du budget en or, et une barre par
-bascule gardée — verte sous le budget, ambre au-dessus, rouge si la fenêtre
-n'est jamais passée devant. La plus récente est la plus vive. On lit d'un
-coup d'œil si ça tient, sans lire un chiffre.
+Un interrupteur, le rappel du raccourci, et le placement de la bannière. Rien
+d'autre.
+
+La règle graduée des dernières bascules en millisecondes a servi à trouver la
+panne, et elle est partie avec : un joueur de Dofus ne règle rien avec un
+chiffre en millisecondes. Elle a coûté `WalkMeasure`, `walk_measures`, le budget
+et le plafond dans la vue, `helpers/walk.ts`, `switch-ruler.tsx`,
+`measures-panel.tsx` et `use-snapshot-ticker.ts`. L'écran ne redemande plus le
+tableau de bord une fois par seconde.
+
+## La bannière
+
+### Ce qu'elle coûte, et pourquoi elle ne coûte rien
+
+C'est la contrainte qui commande tout le reste : une fenêtre posée devant un
+client de jeu ne doit rien lui prendre. Sept décisions en découlent.
+
+1. **Elle n'existe que Déplacement allumé.** Elle se construit à l'allumage et
+   se ferme à l'extinction. Éteint, il n'y a ni processus WebView2, ni surface à
+   composer, ni mémoire tenue. La construction coûte deux cents millisecondes,
+   une fois, sur un geste volontaire.
+2. **Sa page n'a ni minuteur, ni sondage, ni `requestAnimationFrame`.** Elle se
+   dessine sur un événement, puis elle ne bouge plus. Un WebView2 qui ne
+   redessine pas ne consomme pas.
+3. **Une animation, deux cent vingt millisecondes**, sur `transform` et
+   `opacity` seuls : le compositeur la porte, ni disposition ni peinture. Elle
+   ne part qu'à la bascule, et ne boucle pas. Un filet d'or balayait sous la
+   pilule : il sautait, il est parti.
+4. **Pas de flou d'arrière-plan.** C'est la dépense chère : elle oblige le
+   gestionnaire de fenêtres à relire ce qu'il y a derrière à chaque image. Fond
+   plein, et une bordure d'or.
+5. **250 × 64 points**, la plus petite surface qui porte encore le message. Ni
+   grain, ni halo : les deux couvrent toute la surface et se mélangent.
+6. **`set_ignore_cursor_events(true)` et fenêtre non focalisable.** Windows ne
+   lui adresse aucun test de survol et aucune entrée. Elle est une image, pas
+   une fenêtre.
+7. **L'événement part après la bascule**, une fois la porte rouverte et la
+   mesure rangée. Il ne peut pas être sur le chemin du clic, même en théorie.
+
+### Où elle se pose
+
+Le coin et l'écran se choisissent dans l'écran Déplacement, sur un écran
+miniature : quatre coins cliquables, et un petit fuseau d'or qui va se poser
+dans celui qu'on désigne. Choisir montre la vraie bannière, à sa vraie place,
+pendant deux secondes et demie — même Déplacement éteint. On voit ce qu'on
+règle.
+
+Cet aperçu n'était pas au plan, et il touche à « elle disparaît avec lui » : une
+bannière qui paraît Déplacement éteint est exactement le malentendu qu'on
+répare. Elle dit donc **« Aperçu »** dans ce cas, jamais « Déplacement ». Le mot
+dit ce qu'elle est, et l'emplacement se règle en le voyant.
+
+Le coin se calcule sur la **zone de travail** de l'écran, pas sur sa taille :
+la bannière ne passe jamais sous la barre des tâches.
+
+Défaut : en bas à droite. Dans Retro, le haut-gauche porte le portrait et la
+vie, le haut-droite la mini-carte, le bas-gauche le chat.
+
+### Elle ne suit pas la souris, elle suit le jeu
+
+Elle ne se montre qu'au-dessus d'une fenêtre de jeu. Sur le bureau, dans un
+navigateur, dans la fenêtre de Multifus, elle s'efface. Le signal qu'elle porte
+ne vaut que là où le clic compte.
+
+Ça ne coûte pas un sondage : le `SetWinEventHook(EVENT_SYSTEM_FOREGROUND)` que
+la bascule emploie déjà rapporte chaque changement de premier plan, et le fil de
+la bascule montre ou cache. Elle n'est pas détruite pour autant — cachée
+suffit, et la rouvrir coûterait deux cents millisecondes à chaque va-et-vient.
+
+### Ce qu'elle porte
+
+Le pas de pieds en or — le Déplacement est allumé —, la tête de classe du
+personnage et son pseudo. Rien d'autre.
+
+À l'allumage elle porte déjà quelqu'un : `foreground_game_window()` dit qui est
+devant, une fois, sur un geste volontaire. Allumé au raccourci depuis le jeu,
+elle nomme le personnage sur lequel on est. Allumé depuis la fenêtre de
+Multifus, aucune fenêtre de jeu n'est devant : elle dit « Déplacement » et
+attend le premier clic. C'est vrai dans les deux cas.
+
+Quand plus personne n'est dans le défilement, elle oublie son personnage plutôt
+que de garder l'ancien : le journal et la bannière ne se contredisent pas.
+
+### Un bord connu
+
+Éteindre puis rallumer le Déplacement en moins de cinquante millisecondes peut
+laisser la bannière absente : Tauri tient encore le nom `banner` pendant que la
+fenêtre se ferme, et la reconstruction est refusée. Le journal le dit, et un
+nouvel aller-retour de l'interrupteur la ramène. Le corriger demanderait
+d'attendre l'événement `Destroyed` ; ça ne vaut pas la peine tant qu'on n'a pas
+vu le cas arriver pour de vrai.
+
+## Le clic coupé en deux
+
+Un personnage sur cinq ne bougeait pas. La cause n'est pas une course, c'est une
+faute de conception, et elle était lisible dans `verdict_of`.
+
+Un clic, c'est deux événements. La porte les jugeait séparément :
+
+1. Le relâchement sur A lance la bascule.
+2. L'enfoncement sur B tombe pendant qu'elle vole. **Il est mangé.**
+3. La bascule finit en cinq millisecondes.
+4. Le relâchement sur B, lui, trouve la porte ouverte et passe.
+5. Dofus reçoit un relâchement sans enfoncement : **aucun clic**. B ne bouge pas.
+6. Multifus compte ce relâchement et bascule quand même.
+
+Et pire : entre l'enfoncement et le relâchement, la fenêtre sous le curseur a
+changé. `WindowFromPoint` au relâchement nomme la fenêtre qui vient de passer
+devant, pas celle qu'on a pressée. Le clic était attribué à la mauvaise.
+
+**La règle, maintenant : le verdict se décide à l'enfoncement, et le
+relâchement le suit.** Le hook retient ce qu'il a décidé (`Press::Eaten` ou
+`Press::Ours(window)`) et le relâchement l'applique sans rejuger. Trois
+conséquences :
+
+- Dofus ne voit jamais la moitié d'un clic. Mangé, il l'est en entier.
+- La fenêtre retenue est celle où le bouton a été pressé.
+- Un clic parti trop tôt ne bascule plus non plus : on le perd, mais rien ne
+  bouge derrière notre dos.
+
+Cinq tests dans `platform/windows.rs` le tiennent, dont celui qui reproduit la
+panne : porte fermée à l'enfoncement, rouverte avant le relâchement.
+
+## Le temps qu'il faut au client pour prendre le clic
+
+Le hook a été instrumenté — chaque événement de bouton tracé, avec la fenêtre
+sous le curseur, le premier plan, la porte, le verdict — et il est **hors de
+cause**. Onze clics, onze bascules, aucun mangé, aucun raté, aucun double-clic,
+`premierplan` toujours égal à la fenêtre cliquée, bascules à 4-5 ms, `arrivee`
+vraie à chaque fois. Le jeu recevait un clic entier et valide, et ne bougeait
+pas.
+
+**Deux pistes essayées et rejetées :**
+
+- Le clic coupé en deux (l'enfoncement mangé, le relâchement passé). Réel,
+  corrigé, mais ce n'était pas la panne : le verdict se décide maintenant à
+  l'enfoncement et le relâchement le suit. Les cinq tests de `windows.rs` le
+  tiennent, et ça reste juste.
+- Poster un `WM_MOUSEMOVE` à la fenêtre visée après la bascule, pour lui dire où
+  le curseur est déjà. La trace montrait `bouges=0` sur tous les seconds clics —
+  la souris ne bougeait pas d'un pixel entre les deux. **Ça a empiré.** Retiré.
+
+**Ce qui reste, et ce qu'on fait :** on prenait le premier plan au client cinq
+millisecondes après son clic. Un client Flash traite le clic à l'image suivante,
+et il perd le premier plan avant d'y arriver. C'est la fenêtre qui vient de
+recevoir le clic qu'on faisait taire.
+
+`SETTLE = 95 ms`, le délai de Dracoon, attendu **avant** de demander le premier
+plan. Le clic a le temps d'aboutir. Le budget suit : `SETTLE + 60` sur Windows,
+`SETTLE + 120` ailleurs, plafond `SETTLE + 250` — la règle de l'écran garde son
+sens, elle mesure toujours du relâchement à la fenêtre devant.
+
+Le prix est celui que Dracoon paie : la porte reste fermée cent millisecondes,
+et un second clic parti pendant ce temps est mangé. On l'accepte pour zéro
+panne, et on redescendra le chiffre par essais une fois qu'on saura qu'il tient.
 
 ## Ce qui reste
 
-- [ ] La bannière : sa fenêtre, sa page, son entrée dans `vite.config.ts`, son
-      coin et son écran dans les réglages, l'événement après la bascule.
-      Rien n'a été écrit : le plan lui-même doute qu'elle tienne au-dessus d'un
-      client en plein écran sur macOS, et c'est la seule pièce que le mécanisme
-      n'attend pas pour marcher.
+- [ ] La bannière sur macOS : `transparent` demande `macOSPrivateApi`, activé,
+      mais rien n'est vérifié là-bas. Le plan doute qu'elle tienne au-dessus
+      d'un client en plein écran.
 - [ ] macOS : le `CGEventTap` sur `kCGEventLeftMouseUp`, l'observateur
       `NSWorkspace` pour le pid du premier plan et pour constater la bascule, le
       rebranchement sur `kCGEventTapDisabledByTimeout`.
@@ -282,5 +439,4 @@ coup d'œil si ça tient, sans lire un chiffre.
 - [ ] La ligne du menu de la barre dit le bon état et le bascule
 - [ ] `Control+Shift+KeyD` posé sur une réponse rapide est refusé par le nom du
       Déplacement
-- [ ] La règle de l'écran tient le budget de 60 ms
 - [ ] Fermer tous les clients, mode allumé : rien ne casse

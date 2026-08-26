@@ -2,6 +2,7 @@ use tauri::AppHandle;
 use tauri_plugin_opener::OpenerExt;
 
 use crate::app::autostart;
+use crate::app::banner;
 use crate::app::journal::JournalEvent;
 use crate::app::journal::RelayStop;
 use crate::app::journal::Surface;
@@ -12,9 +13,12 @@ use crate::app::runtime;
 use crate::app::shortcuts;
 use crate::app::state::lock;
 use crate::app::update;
+use crate::app::view::BannerScreenView;
+use crate::app::view::BannerStep;
 use crate::app::view::ShortcutAction;
 use crate::app::view::Snapshot;
 use crate::app::walk;
+use crate::config::BannerCorner;
 use crate::config::QuickReplyId;
 use crate::domain::Class;
 use crate::domain::Gender;
@@ -165,6 +169,34 @@ pub fn set_walk_enabled(app: AppHandle, enabled: bool) -> Snapshot {
     walk::set_enabled(&app, enabled, WalkFrom::Window);
 
     runtime::emit_snapshot(&app)
+}
+
+#[tauri::command]
+pub fn set_banner_corner(app: AppHandle, corner: BannerCorner) -> Snapshot {
+    lock(&app).set_banner_corner(corner);
+
+    banner::preview(&app);
+
+    runtime::emit_snapshot(&app)
+}
+
+#[tauri::command]
+pub fn set_banner_screen(app: AppHandle, screen: Option<String>) -> Snapshot {
+    lock(&app).set_banner_screen(screen);
+
+    banner::preview(&app);
+
+    runtime::emit_snapshot(&app)
+}
+
+#[tauri::command]
+pub fn banner_screens(app: AppHandle) -> Vec<BannerScreenView> {
+    banner::screens(&app)
+}
+
+#[tauri::command]
+pub fn banner_step(app: AppHandle) -> BannerStep {
+    lock(&app).banner_step()
 }
 
 #[tauri::command]

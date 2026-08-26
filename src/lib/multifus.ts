@@ -5,6 +5,7 @@ import type { RelayLink } from '@/@types/relay'
 import type { Class, Gender } from '@/@types/roster'
 import type { QuickReplyId, ShortcutAction } from '@/@types/shortcuts'
 import type { ScreenName, Snapshot } from '@/@types/snapshot'
+import type { BannerCorner, BannerScreen, BannerStep } from '@/@types/walk'
 
 const SNAPSHOT_EVENT = 'multifus://snapshot'
 
@@ -113,6 +114,32 @@ export const setAutoFocusEnabled = async (enabled: boolean) => {
 export const setWalkEnabled = async (enabled: boolean) => {
   return invoke<Snapshot>('set_walk_enabled', { enabled })
 }
+
+export const setBannerCorner = async (corner: BannerCorner) => {
+  return invoke<Snapshot>('set_banner_corner', { corner })
+}
+
+export const setBannerScreen = async (screen: string | null) => {
+  return invoke<Snapshot>('set_banner_screen', { screen })
+}
+
+export const bannerScreens = async () => {
+  return invoke<BannerScreen[]>('banner_screens')
+}
+
+export const bannerStep = async () => {
+  return invoke<BannerStep>('banner_step')
+}
+
+const BANNER_EVENT = 'multifus://banner'
+
+export const onBannerStep = async (handle: (step: BannerStep) => void) => {
+  return listen<BannerStep>(BANNER_EVENT, ({ payload }: BannerStepEvent) => {
+    handle(payload)
+  })
+}
+
+type BannerStepEvent = { readonly payload: BannerStep }
 
 export const setWakesMinimized = async (wakes: boolean) => {
   return invoke<Snapshot>('set_wakes_minimized', { wakes })

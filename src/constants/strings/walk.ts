@@ -16,20 +16,28 @@ export const WALK_STRINGS = {
       'Tant que le Déplacement est allumé, Multifus voit passer tous vos clics gauche pour savoir lesquels tombent sur une fenêtre du jeu. Rien n’en sort, rien ne s’écrit.',
     unavailable:
       'Le Déplacement n’existe que sur Windows pour l’instant. Sur macOS, l’interrupteur ne fait rien.',
-    measures: {
-      title: 'Dernières bascules',
-      legend: (count: number) => {
-        return count === 1 ? '1 mesure' : `${count} mesures`
+    banner: {
+      title: 'La bannière',
+      description:
+        'Au-dessus du jeu, elle rappelle sur qui vous êtes. Ailleurs — le bureau, un navigateur — elle s’efface. Déplacement éteint, elle n’existe pas : ni fenêtre, ni mémoire prise au jeu.',
+      waiting: 'Déplacement',
+      previewing: 'Aperçu',
+      cornerLegend: 'Le coin',
+      screenLegend: 'L’écran',
+      screenName: (rank: number) => {
+        return `Écran ${rank}`
       },
-      last: 'Dernière',
-      worst: 'La pire',
-      budget: 'budget',
-      unit: 'ms',
-      empty:
-        'Rien de mesuré. Allumez le Déplacement, cliquez dans une fenêtre du jeu, et le temps de la bascule s’écrit ici.',
-      lost: 'La fenêtre visée n’est jamais passée devant.',
-      reading:
-        'Du relâchement du bouton à la fenêtre suivante au premier plan. Sous le budget, un joueur qui enchaîne deux clics ne perd pas le second.'
+      screenSize: (width: number, height: number) => {
+        return `${width} × ${height}`
+      },
+      screenPrimary: 'principal',
+      hint: 'Désignez un coin : la bannière va s’y poser pour de vrai, deux secondes et demie.',
+      corners: {
+        topLeft: 'En haut à gauche',
+        topRight: 'En haut à droite',
+        bottomLeft: 'En bas à gauche',
+        bottomRight: 'En bas à droite'
+      }
     }
   }
 } as const

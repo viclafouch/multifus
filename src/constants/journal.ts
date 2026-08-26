@@ -46,6 +46,7 @@ export const TONES = {
   walkListeningLost: 'warning',
   walkListeningRefused: 'warning',
   walkSwitchFailed: 'warning',
+  bannerFailed: 'warning',
   clientMaximized: 'good',
   clientMaximizeFailed: 'warning',
   shortTitlesFailed: 'warning',
@@ -143,6 +144,7 @@ export const DETAILED_LINES = {
   walkListeningRefused:
     'Déplacement impossible à allumer, Multifus n’écoute pas les clics',
   walkSwitchFailed: 'Déplacement : la fenêtre suivante n’est pas passée devant',
+  bannerFailed: 'La bannière du Déplacement n’a pas suivi',
   saveFailed: 'Configuration non enregistrée',
   configNotSetAside:
     'Configuration illisible et impossible à déplacer, le prochain enregistrement l’écrasera',
@@ -194,5 +196,6 @@ export const WORK_LABELS = {
   scan: 'La lecture des fenêtres',
   shortcuts: 'La réponse à un raccourci',
   tray: 'La réponse à un clic dans la barre système',
-  walk: 'La bascule du Déplacement'
+  walk: 'La bascule du Déplacement',
+  banner: 'La bannière du Déplacement'
 } as const satisfies Record<Work, string>
