@@ -51,12 +51,14 @@ pub struct Shortcuts {
     pub previous: Option<Shortcut>,
     pub toggle_asleep: Option<Shortcut>,
     pub swap: Option<Shortcut>,
+    pub walk: Option<Shortcut>,
 }
 
 const DEFAULT_NEXT: &str = "Control+Shift+Right";
 const DEFAULT_PREVIOUS: &str = "Control+Shift+Left";
 const DEFAULT_TOGGLE_ASLEEP: &str = "Control+Shift+Down";
 const DEFAULT_SWAP: &str = "Control+Shift+Up";
+const DEFAULT_WALK: &str = "Control+Shift+KeyD";
 
 impl Default for Shortcuts {
     fn default() -> Self {
@@ -65,6 +67,7 @@ impl Default for Shortcuts {
             previous: Shortcut::new(DEFAULT_PREVIOUS),
             toggle_asleep: Shortcut::new(DEFAULT_TOGGLE_ASLEEP),
             swap: Shortcut::new(DEFAULT_SWAP),
+            walk: Shortcut::new(DEFAULT_WALK),
         }
     }
 }
@@ -327,27 +330,28 @@ mod tests {
     }
 
     #[test]
-    fn the_four_shortcuts_are_bound_by_default_and_all_differ() {
+    fn the_five_shortcuts_are_bound_by_default_and_all_differ() {
         let shortcuts = Shortcuts::default();
         let bound = [
             shortcuts.next.as_ref(),
             shortcuts.previous.as_ref(),
             shortcuts.toggle_asleep.as_ref(),
             shortcuts.swap.as_ref(),
+            shortcuts.walk.as_ref(),
         ]
         .into_iter()
         .flatten()
         .map(Shortcut::as_str)
         .collect::<Vec<_>>();
 
-        assert_eq!(bound.len(), 4);
+        assert_eq!(bound.len(), 5);
 
         let mut unique = bound.clone();
         unique.sort_unstable();
         unique.dedup();
         assert_eq!(
             unique.len(),
-            4,
+            5,
             "two actions share a combination: {bound:?}"
         );
     }
@@ -369,6 +373,7 @@ mod tests {
             previous: None,
             toggle_asleep: None,
             swap: None,
+            walk: None,
         };
 
         let json = serde_json::to_string(&shortcuts).expect("shortcuts serialise");

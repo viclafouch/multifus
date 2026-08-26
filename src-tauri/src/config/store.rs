@@ -266,6 +266,7 @@ mod tests {
                 previous: Shortcut::new("Alt+Left"),
                 toggle_asleep: None,
                 swap: Shortcut::new("Alt+Space"),
+                walk: Shortcut::new("Alt+KeyD"),
             },
             maximize_on_launch: true,
             short_titles: true,

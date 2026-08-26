@@ -8,6 +8,7 @@ import { NAV_RAIL_STRINGS } from '@/constants/strings/nav-rail'
 import { RELAY_STRINGS } from '@/constants/strings/relay'
 import { SETTINGS_STRINGS } from '@/constants/strings/settings'
 import { SHORTCUTS_STRINGS } from '@/constants/strings/shortcuts'
+import { WALK_STRINGS } from '@/constants/strings/walk'
 
 export const strings = {
   ...NAV_RAIL_STRINGS,
@@ -15,6 +16,7 @@ export const strings = {
   ...AUTHORIZATION_STRINGS,
   ...SHORTCUTS_STRINGS,
   ...AUTO_FOCUS_STRINGS,
+  ...WALK_STRINGS,
   ...RELAY_STRINGS,
   ...SETTINGS_STRINGS,
   ...ABOUT_STRINGS,

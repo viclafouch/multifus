@@ -41,7 +41,25 @@ pub struct Snapshot {
     pub config: ConfigView,
     pub update: UpdateView,
     pub relay: RelayView,
+    pub walk: WalkView,
     pub journal: Vec<JournalEntry>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct WalkView {
+    pub enabled: bool,
+    pub supported: bool,
+    pub budget: u64,
+    pub ceiling: u64,
+    pub measures: Vec<WalkMeasure>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct WalkMeasure {
+    pub milliseconds: u64,
+    pub landed: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -159,16 +177,18 @@ pub enum Screen {
     Characters,
     Shortcuts,
     AutoFocus,
+    Walk,
     Relay,
     Settings,
     About,
 }
 
 impl Screen {
-    pub const ALL: [Self; 6] = [
+    pub const ALL: [Self; 7] = [
         Self::Characters,
         Self::Shortcuts,
         Self::AutoFocus,
+        Self::Walk,
         Self::Relay,
         Self::Settings,
         Self::About,
@@ -193,10 +213,17 @@ pub enum ShortcutAction {
     Previous,
     ToggleAsleep,
     Swap,
+    Walk,
 }
 
 impl ShortcutAction {
-    pub const ALL: [Self; 4] = [Self::Next, Self::Previous, Self::ToggleAsleep, Self::Swap];
+    pub const ALL: [Self; 5] = [
+        Self::Next,
+        Self::Previous,
+        Self::ToggleAsleep,
+        Self::Swap,
+        Self::Walk,
+    ];
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize)]

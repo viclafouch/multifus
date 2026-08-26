@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::collections::HashSet;
+use std::collections::VecDeque;
 use std::sync::Mutex;
 use std::sync::MutexGuard;
 use std::sync::PoisonError;
@@ -18,6 +19,7 @@ use crate::app::journal::RosterChange;
 use crate::app::journal::SettingChange;
 use crate::app::journal::ShortcutOutcome;
 use crate::app::journal::Surface;
+use crate::app::journal::WalkFrom;
 use crate::app::view::AuthorizationView;
 use crate::app::view::AutoFocusView;
 use crate::app::view::Binding;
@@ -35,6 +37,9 @@ use crate::app::view::Snapshot;
 use crate::app::view::SwitchView;
 use crate::app::view::TestView;
 use crate::app::view::UpdateView;
+use crate::app::view::WalkMeasure;
+use crate::app::view::WalkView;
+use crate::app::walk::WalkPlan;
 use crate::config::ConfigError;
 use crate::config::ConfigStore;
 use crate::config::Loaded;
@@ -51,6 +56,9 @@ use crate::domain::Portrait;
 use crate::platform::GameWindow;
 use crate::platform::PlatformNotificationWatcher;
 use crate::platform::WindowId;
+use crate::platform::SWITCH_BUDGET_MS;
+use crate::platform::SWITCH_CEILING_MS;
+use crate::platform::WATCHES_CLICKS;
 
 pub type AppState = Mutex<Multifus>;
 
@@ -82,6 +90,8 @@ pub struct Multifus {
     switch: SwitchView,
     last_start: u64,
     screen_saver: ScreenSaverView,
+    walk_enabled: bool,
+    walk_measures: VecDeque<WalkMeasure>,
     journal: Journal,
 }
 
@@ -153,6 +163,8 @@ impl Multifus {
             switch: SwitchView::Idle,
             last_start: 0,
             screen_saver,
+            walk_enabled: false,
+            walk_measures: VecDeque::new(),
             journal,
         }
     }
@@ -214,6 +226,13 @@ impl Multifus {
                 problem: self.problem.clone(),
             },
             update: self.update.clone(),
+            walk: WalkView {
+                enabled: self.walk_enabled,
+                supported: WATCHES_CLICKS,
+                budget: SWITCH_BUDGET_MS,
+                ceiling: SWITCH_CEILING_MS,
+                measures: self.walk_measures.iter().copied().collect(),
+            },
             relay: RelayView {
                 paired: self.settings.relay.chat_id.is_some(),
                 send_body: self.settings.relay.send_body,
@@ -420,6 +439,7 @@ impl Multifus {
             ShortcutAction::Previous => &mut self.settings.shortcuts.previous,
             ShortcutAction::ToggleAsleep => &mut self.settings.shortcuts.toggle_asleep,
             ShortcutAction::Swap => &mut self.settings.shortcuts.swap,
+            ShortcutAction::Walk => &mut self.settings.shortcuts.walk,
         };
 
         *slot = shortcut;
@@ -660,6 +680,46 @@ impl Multifus {
             change: SettingChange::WakesMinimized { wakes, from },
         });
         self.save();
+    }
+
+    pub fn is_walk_enabled(&self) -> bool {
+        self.walk_enabled
+    }
+
+    pub fn set_walk_enabled(&mut self, enabled: bool, from: WalkFrom) {
+        if self.walk_enabled == enabled {
+            return;
+        }
+
+        self.walk_enabled = enabled;
+
+        self.journal
+            .push(JournalEvent::WalkEnabled { enabled, from });
+    }
+
+    pub fn remember_walk_measure(&mut self, measure: WalkMeasure) {
+        if self.walk_measures.len() == WALK_MEASURES_KEPT {
+            self.walk_measures.pop_front();
+        }
+
+        self.walk_measures.push_back(measure);
+    }
+
+    #[must_use]
+    pub fn walk_plan(&self) -> WalkPlan {
+        let watched = self.windows.values().copied().collect();
+
+        let next = self
+            .windows
+            .iter()
+            .filter_map(|(nickname, window)| {
+                let after = self.settings.roster.next_in_cycle(nickname)?;
+
+                Some((*window, *self.windows.get(&after.nickname)?))
+            })
+            .collect();
+
+        WalkPlan { watched, next }
     }
 
     pub fn toggle_auto_focus(&mut self) {
@@ -1043,6 +1103,9 @@ impl Multifus {
                 Some(awake) => ShortcutEffect::Settled(ShortcutOutcome::Swapped { awake }),
                 None => ShortcutEffect::Settled(ShortcutOutcome::NoGender),
             },
+            ShortcutAction::Walk => ShortcutEffect::Settled(ShortcutOutcome::Walk {
+                enabled: self.walk_enabled,
+            }),
         }
     }
 
@@ -1120,8 +1183,11 @@ fn shortcut_in(shortcuts: &Shortcuts, action: ShortcutAction) -> Option<&Shortcu
         ShortcutAction::Previous => shortcuts.previous.as_ref(),
         ShortcutAction::ToggleAsleep => shortcuts.toggle_asleep.as_ref(),
         ShortcutAction::Swap => shortcuts.swap.as_ref(),
+        ShortcutAction::Walk => shortcuts.walk.as_ref(),
     }
 }
+
+const WALK_MEASURES_KEPT: usize = 12;
 
 fn nickname_of(character: Option<&Character>) -> Option<String> {
     character.map(|character| character.nickname.clone())
@@ -1210,6 +1276,139 @@ mod tests {
         let title = format!("{nickname} - Dofus Retro v1.48.21");
 
         GameWindow::from_title(WindowId::from_raw(pid), &title).expect("a game window")
+    }
+
+    fn raw(window: WindowId) -> u64 {
+        window.raw()
+    }
+
+    #[test]
+    fn a_click_hands_the_walk_the_window_of_the_next_character() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha"), window(2, "Bravo"), window(3, "Charlie")]);
+
+        let plan = state.walk_plan();
+
+        assert_eq!(plan.watched.len(), 3);
+        assert_eq!(
+            plan.next.get(&WindowId::from_raw(1)).copied().map(raw),
+            Some(2)
+        );
+        assert_eq!(
+            plan.next.get(&WindowId::from_raw(3)).copied().map(raw),
+            Some(1)
+        );
+    }
+
+    #[test]
+    fn a_character_set_aside_is_stepped_over_and_still_answers_a_click() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha"), window(2, "Bravo"), window(3, "Charlie")]);
+        state.toggle_asleep("Bravo");
+
+        let plan = state.walk_plan();
+
+        assert_eq!(plan.watched.len(), 3);
+        assert_eq!(
+            plan.next.get(&WindowId::from_raw(1)).copied().map(raw),
+            Some(3)
+        );
+        assert_eq!(
+            plan.next.get(&WindowId::from_raw(2)).copied().map(raw),
+            Some(3)
+        );
+    }
+
+    #[test]
+    fn a_click_walks_the_cycle_the_next_shortcut_walks() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha"), window(2, "Bravo"), window(3, "Charlie")]);
+        state.toggle_asleep("Bravo");
+
+        let plan = state.walk_plan();
+
+        for (nickname, window) in [("Alpha", 1_u64), ("Bravo", 2), ("Charlie", 3)] {
+            let shortcut = state.decide_shortcut(ShortcutAction::Next, nickname);
+            let ShortcutEffect::Focus { window: aimed, .. } = shortcut else {
+                panic!("the next shortcut aims at a window");
+            };
+
+            assert_eq!(
+                plan.next.get(&WindowId::from_raw(window)).copied(),
+                Some(aimed)
+            );
+        }
+    }
+
+    #[test]
+    fn a_click_on_the_only_character_left_asks_for_no_switch_at_all() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha")]);
+
+        assert_eq!(
+            state.walk_plan().next.get(&WindowId::from_raw(1)).copied(),
+            Some(WindowId::from_raw(1))
+        );
+    }
+
+    #[test]
+    fn nobody_in_the_cycle_leaves_every_click_without_a_window_to_go_to() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha"), window(2, "Bravo")]);
+        state.toggle_asleep("Alpha");
+        state.toggle_asleep("Bravo");
+
+        let plan = state.walk_plan();
+
+        assert_eq!(plan.watched.len(), 2);
+        assert!(plan.next.is_empty());
+    }
+
+    #[test]
+    fn the_walk_never_survives_a_restart() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        assert!(!state.is_walk_enabled());
+
+        state.set_walk_enabled(true, WalkFrom::Shortcut);
+
+        assert!(state.is_walk_enabled());
+        assert_eq!(
+            journalled(&state),
+            vec![JournalEvent::WalkEnabled {
+                enabled: true,
+                from: WalkFrom::Shortcut
+            }]
+        );
+
+        assert!(!multifus(&directory).is_walk_enabled());
+    }
+
+    #[test]
+    fn only_the_last_switches_are_kept_to_be_shown() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        for milliseconds in 0..u64::try_from(WALK_MEASURES_KEPT + 3).unwrap_or_default() {
+            state.remember_walk_measure(WalkMeasure {
+                milliseconds,
+                landed: true,
+            });
+        }
+
+        let measures = state.snapshot().walk.measures;
+
+        assert_eq!(measures.len(), WALK_MEASURES_KEPT);
+        assert_eq!(
+            measures.first().map(|measure| measure.milliseconds),
+            Some(3)
+        );
     }
 
     #[test]
@@ -1666,7 +1865,7 @@ mod tests {
     }
 
     #[test]
-    fn the_four_actions_come_before_the_quick_replies() {
+    fn the_five_actions_come_before_the_quick_replies() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
         let id = state.add_quick_reply();
@@ -1674,7 +1873,7 @@ mod tests {
 
         let bindings = state.bindings();
 
-        assert_eq!(bindings.len(), 6);
+        assert_eq!(bindings.len(), 7);
         assert_eq!(
             bindings.first().map(|(binding, _)| *binding),
             Some(Binding::Action {
@@ -1688,7 +1887,7 @@ mod tests {
     }
 
     #[test]
-    fn the_four_actions_take_back_their_first_day_keys_and_leave_the_rest_alone() {
+    fn the_five_actions_take_back_their_first_day_keys_and_leave_the_rest_alone() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
         let id = state.add_quick_reply();

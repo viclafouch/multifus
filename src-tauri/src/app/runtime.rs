@@ -29,6 +29,7 @@ use crate::app::state::WindowLook;
 use crate::app::tray;
 use crate::app::view::Screen;
 use crate::app::view::Snapshot;
+use crate::app::walk;
 use crate::domain::GameNotification;
 use crate::platform::NotificationReport;
 use crate::platform::NotificationSink;
@@ -106,6 +107,8 @@ fn tick(app: &AppHandle) {
     let maximized = maximize_new_clients(app);
     let painted = apply_window_icons(app);
     let regrouped = follow_taskbar(app);
+
+    walk::refresh(app);
 
     if changed || maximized || renamed || painted || regrouped {
         emit_snapshot(app);

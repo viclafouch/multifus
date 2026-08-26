@@ -63,6 +63,7 @@ windows = { version = "0.62", features = [
   "Win32_System_Threading",
   # The paste combination of ADR 0012, and nothing else in the crate calls it.
   "Win32_UI_Input_KeyboardAndMouse",
+  "Win32_UI_Accessibility",
   # The window icon of the portraits, and the taskbar group it stands in.
   "Win32_Storage_EnhancedStorage",
   "Win32_UI_Shell",

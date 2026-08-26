@@ -12,6 +12,7 @@ pub mod state;
 pub mod tray;
 pub mod update;
 pub mod view;
+pub mod walk;
 
 use std::sync::Mutex;
 
@@ -56,6 +57,8 @@ pub fn setup(app: &AppHandle) -> Result<(), ConfigError> {
     app.manage::<WatcherState>(Mutex::new(PlatformNotificationWatcher::new()));
 
     relay::run::setup(app, keeper);
+
+    walk::setup(app);
 
     shortcuts::start(app);
     shortcuts::apply(app);

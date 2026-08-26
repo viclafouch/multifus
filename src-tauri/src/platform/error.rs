@@ -9,6 +9,8 @@ pub enum PlatformError {
 
     WindowGone,
 
+    Unsupported,
+
     System {
         operation: &'static str,
         detail: String,
@@ -32,6 +34,7 @@ impl fmt::Display for PlatformError {
                 write!(formatter, "the system authorization was not granted")
             }
             Self::WindowGone => write!(formatter, "the window does not exist any more"),
+            Self::Unsupported => write!(formatter, "this system does not do that"),
             Self::System { operation, detail } => write!(formatter, "{operation} failed: {detail}"),
         }
     }

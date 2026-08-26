@@ -1,3 +1,5 @@
+use std::cell::Cell;
+use std::cell::RefCell;
 use std::collections::HashMap;
 use std::collections::HashSet;
 use std::ffi::c_void;
@@ -27,6 +29,8 @@ use windows::Win32::Foundation::ERROR_INVALID_WINDOW_HANDLE;
 use windows::Win32::Foundation::HANDLE;
 use windows::Win32::Foundation::HWND;
 use windows::Win32::Foundation::LPARAM;
+use windows::Win32::Foundation::LRESULT;
+use windows::Win32::Foundation::POINT;
 use windows::Win32::Foundation::WPARAM;
 use windows::Win32::Storage::EnhancedStorage::PKEY_AppUserModel_ID;
 use windows::Win32::System::Com::CoInitializeEx;
@@ -50,6 +54,9 @@ use windows::Win32::System::Threading::PROCESS_QUERY_LIMITED_INFORMATION;
 use windows::Win32::System::Threading::REASON_CONTEXT;
 use windows::Win32::System::Threading::REASON_CONTEXT_0;
 use windows::Win32::System::Variant::VT_LPWSTR;
+use windows::Win32::UI::Accessibility::SetWinEventHook;
+use windows::Win32::UI::Accessibility::UnhookWinEvent;
+use windows::Win32::UI::Accessibility::HWINEVENTHOOK;
 use windows::Win32::UI::Input::KeyboardAndMouse::SendInput;
 use windows::Win32::UI::Input::KeyboardAndMouse::INPUT;
 use windows::Win32::UI::Input::KeyboardAndMouse::INPUT_0;
@@ -63,11 +70,14 @@ use windows::Win32::UI::Input::KeyboardAndMouse::VK_V;
 use windows::Win32::UI::Shell::PropertiesSystem::IPropertyStore;
 use windows::Win32::UI::Shell::PropertiesSystem::SHGetPropertyStoreForWindow;
 use windows::Win32::UI::WindowsAndMessaging::BringWindowToTop;
+use windows::Win32::UI::WindowsAndMessaging::CallNextHookEx;
 use windows::Win32::UI::WindowsAndMessaging::CreateIconFromResourceEx;
 use windows::Win32::UI::WindowsAndMessaging::DestroyIcon;
 use windows::Win32::UI::WindowsAndMessaging::DispatchMessageW;
 use windows::Win32::UI::WindowsAndMessaging::EnumWindows;
+use windows::Win32::UI::WindowsAndMessaging::GetAncestor;
 use windows::Win32::UI::WindowsAndMessaging::GetForegroundWindow;
+use windows::Win32::UI::WindowsAndMessaging::GetMessageW;
 use windows::Win32::UI::WindowsAndMessaging::GetSystemMetrics;
 use windows::Win32::UI::WindowsAndMessaging::GetWindow;
 use windows::Win32::UI::WindowsAndMessaging::GetWindowTextLengthW;
@@ -77,18 +87,29 @@ use windows::Win32::UI::WindowsAndMessaging::IsIconic;
 use windows::Win32::UI::WindowsAndMessaging::IsWindow;
 use windows::Win32::UI::WindowsAndMessaging::IsWindowVisible;
 use windows::Win32::UI::WindowsAndMessaging::PeekMessageW;
+use windows::Win32::UI::WindowsAndMessaging::PostThreadMessageW;
 use windows::Win32::UI::WindowsAndMessaging::SendMessageTimeoutW;
 use windows::Win32::UI::WindowsAndMessaging::SetForegroundWindow;
+use windows::Win32::UI::WindowsAndMessaging::SetWindowsHookExW;
 use windows::Win32::UI::WindowsAndMessaging::ShowWindow;
 use windows::Win32::UI::WindowsAndMessaging::ShowWindowAsync;
 use windows::Win32::UI::WindowsAndMessaging::SystemParametersInfoW;
 use windows::Win32::UI::WindowsAndMessaging::TranslateMessage;
+use windows::Win32::UI::WindowsAndMessaging::UnhookWindowsHookEx;
+use windows::Win32::UI::WindowsAndMessaging::WindowFromPoint;
+use windows::Win32::UI::WindowsAndMessaging::CHILDID_SELF;
+use windows::Win32::UI::WindowsAndMessaging::EVENT_SYSTEM_FOREGROUND;
+use windows::Win32::UI::WindowsAndMessaging::GA_ROOT;
 use windows::Win32::UI::WindowsAndMessaging::GW_OWNER;
+use windows::Win32::UI::WindowsAndMessaging::HHOOK;
 use windows::Win32::UI::WindowsAndMessaging::HICON;
 use windows::Win32::UI::WindowsAndMessaging::ICON_BIG;
 use windows::Win32::UI::WindowsAndMessaging::ICON_SMALL;
+use windows::Win32::UI::WindowsAndMessaging::LLMHF_INJECTED;
 use windows::Win32::UI::WindowsAndMessaging::LR_DEFAULTCOLOR;
 use windows::Win32::UI::WindowsAndMessaging::MSG;
+use windows::Win32::UI::WindowsAndMessaging::MSLLHOOKSTRUCT;
+use windows::Win32::UI::WindowsAndMessaging::OBJID_WINDOW;
 use windows::Win32::UI::WindowsAndMessaging::PM_REMOVE;
 use windows::Win32::UI::WindowsAndMessaging::SMTO_ABORTIFHUNG;
 use windows::Win32::UI::WindowsAndMessaging::SM_CXICON;
@@ -99,6 +120,13 @@ use windows::Win32::UI::WindowsAndMessaging::SW_MAXIMIZE;
 use windows::Win32::UI::WindowsAndMessaging::SW_RESTORE;
 use windows::Win32::UI::WindowsAndMessaging::SYSTEM_PARAMETERS_INFO_ACTION;
 use windows::Win32::UI::WindowsAndMessaging::SYSTEM_PARAMETERS_INFO_UPDATE_FLAGS;
+use windows::Win32::UI::WindowsAndMessaging::WH_MOUSE_LL;
+use windows::Win32::UI::WindowsAndMessaging::WINEVENT_OUTOFCONTEXT;
+use windows::Win32::UI::WindowsAndMessaging::WINEVENT_SKIPOWNPROCESS;
+use windows::Win32::UI::WindowsAndMessaging::WM_APP;
+use windows::Win32::UI::WindowsAndMessaging::WM_LBUTTONDOWN;
+use windows::Win32::UI::WindowsAndMessaging::WM_LBUTTONUP;
+use windows::Win32::UI::WindowsAndMessaging::WM_QUIT;
 use windows::Win32::UI::WindowsAndMessaging::WM_SETICON;
 use windows::Win32::UI::WindowsAndMessaging::WM_SETTEXT;
 use windows::Win32::UI::WindowsAndMessaging::WNDENUMPROC;
@@ -110,6 +138,10 @@ use windows::UI::Notifications::UserNotification;
 
 use crate::domain::extract_nickname;
 use crate::domain::GameNotification;
+use crate::platform::click::ClickGate;
+use crate::platform::click::ClickReport;
+use crate::platform::click::ClickSink;
+use crate::platform::click::ClickWatcher;
 use crate::platform::display::DisplayKeeper;
 use crate::platform::display::ScreenSaverDelay;
 use crate::platform::error::PlatformError;
@@ -305,6 +337,22 @@ impl WindowManager for Win32WindowManager {
         ))
     }
 
+    fn focus_fast(&self, window: WindowId) -> Result<()> {
+        let handle = window_handle(window);
+        let _attached = AttachedInput::new(handle);
+
+        let _ = unsafe { BringWindowToTop(handle) };
+
+        if unsafe { SetForegroundWindow(handle) }.as_bool() {
+            return Ok(());
+        }
+
+        Err(PlatformError::system(
+            "SetForegroundWindow",
+            "the system kept the focus where it was",
+        ))
+    }
+
     fn client_windows(&self) -> Result<Vec<WindowId>> {
         let mut windows = Vec::new();
 
@@ -486,23 +534,27 @@ fn application_id(group: Option<&str>) -> Result<PROPVARIANT> {
 }
 
 fn taskbar_glom_level() -> Option<u32> {
-    let mut level = 0_u32;
+    registry_dword(TASKBAR_ADVANCED_KEY, TASKBAR_GLOM_LEVEL)
+}
+
+fn registry_dword(key: PCWSTR, value: PCWSTR) -> Option<u32> {
+    let mut read_value = 0_u32;
     let mut length = u32::try_from(size_of::<u32>()).ok()?;
 
     // SAFETY: the pointer is to a live four-byte value, which is what a DWORD value writes.
     let read = unsafe {
         RegGetValueW(
             HKEY_CURRENT_USER,
-            TASKBAR_ADVANCED_KEY,
-            TASKBAR_GLOM_LEVEL,
+            key,
+            value,
             RRF_RT_REG_DWORD,
             None,
-            Some(std::ptr::from_mut(&mut level).cast()),
+            Some(std::ptr::from_mut(&mut read_value).cast()),
             Some(&mut length),
         )
     };
 
-    read.is_ok().then_some(level)
+    read.is_ok().then_some(read_value)
 }
 
 fn enter_apartment() {
@@ -766,6 +818,295 @@ fn window_id(handle: HWND) -> WindowId {
 
 fn window_handle(window: WindowId) -> HWND {
     HWND(window.raw() as usize as *mut c_void)
+}
+
+const DESKTOP_KEY: PCWSTR = w!("Control Panel\\Desktop");
+
+const LOW_LEVEL_HOOKS_TIMEOUT: PCWSTR = w!("LowLevelHooksTimeout");
+
+const DEFAULT_HOOKS_TIMEOUT_MS: u64 = 300;
+
+const REHOOK_MESSAGE: u32 = WM_APP + 1;
+
+const EAT_THE_CLICK: LRESULT = LRESULT(1);
+
+struct Watched {
+    gate: Arc<ClickGate>,
+    sink: ClickSink,
+}
+
+enum Verdict {
+    Pass,
+    Eat,
+}
+
+thread_local! {
+    static WATCHED: RefCell<Option<Watched>> = const { RefCell::new(None) };
+    static HOOK_BUDGET: Cell<Duration> =
+        const { Cell::new(Duration::from_millis(DEFAULT_HOOKS_TIMEOUT_MS)) };
+}
+
+#[derive(Debug, Default)]
+pub struct MouseHookClickWatcher {
+    hooked: Mutex<Option<Hooked>>,
+}
+
+#[derive(Debug)]
+struct Hooked {
+    thread: u32,
+    handle: JoinHandle<()>,
+}
+
+impl MouseHookClickWatcher {
+    #[must_use]
+    pub fn new() -> Self {
+        Self::default()
+    }
+}
+
+impl ClickWatcher for MouseHookClickWatcher {
+    fn start(&self, gate: Arc<ClickGate>, sink: ClickSink) -> Result<()> {
+        let mut hooked = self.hooked.lock().unwrap_or_else(PoisonError::into_inner);
+
+        if hooked.is_some() {
+            return Ok(());
+        }
+
+        let (told, listening) = mpsc::channel::<Result<u32>>();
+
+        let handle = thread::Builder::new()
+            .name("multifus-clicks".to_owned())
+            .spawn(move || {
+                listen(&gate, &sink, &told);
+            })
+            .map_err(|error| PlatformError::system("the click thread", error.to_string()))?;
+
+        match listening.recv() {
+            Ok(Ok(thread)) => {
+                *hooked = Some(Hooked { thread, handle });
+
+                Ok(())
+            }
+            Ok(Err(error)) => {
+                drop(handle.join());
+
+                Err(error)
+            }
+            Err(error) => Err(PlatformError::system("the click thread", error.to_string())),
+        }
+    }
+
+    fn stop(&self) {
+        let taken = self
+            .hooked
+            .lock()
+            .unwrap_or_else(PoisonError::into_inner)
+            .take();
+
+        let Some(hooked) = taken else {
+            return;
+        };
+
+        let _ = unsafe { PostThreadMessageW(hooked.thread, WM_QUIT, WPARAM(0), LPARAM(0)) };
+
+        drop(hooked.handle.join());
+    }
+}
+
+impl Drop for MouseHookClickWatcher {
+    fn drop(&mut self) {
+        self.stop();
+    }
+}
+
+fn listen(gate: &Arc<ClickGate>, sink: &ClickSink, told: &mpsc::Sender<Result<u32>>) {
+    HOOK_BUDGET.set(low_level_hooks_timeout());
+
+    WATCHED.with_borrow_mut(|watched| {
+        *watched = Some(Watched {
+            gate: Arc::clone(gate),
+            sink: Arc::clone(sink),
+        });
+    });
+
+    let mouse = match hook_mouse() {
+        Ok(mouse) => mouse,
+        Err(error) => {
+            drop(told.send(Err(error)));
+
+            return;
+        }
+    };
+
+    let foreground = hook_foreground();
+
+    drop(told.send(Ok(unsafe { GetCurrentThreadId() })));
+
+    if let Some(last) = pump_hooks(mouse, sink) {
+        let _ = unsafe { UnhookWindowsHookEx(last) };
+    }
+
+    if let Some(foreground) = foreground {
+        let _ = unsafe { UnhookWinEvent(foreground) };
+    }
+
+    WATCHED.with_borrow_mut(|watched| {
+        *watched = None;
+    });
+}
+
+fn pump_hooks(mouse: HHOOK, sink: &ClickSink) -> Option<HHOOK> {
+    let mut hook = mouse;
+    let mut message = MSG::default();
+
+    while unsafe { GetMessageW(&mut message, None, 0, 0) }.0 > 0 {
+        let _ = unsafe { TranslateMessage(&message) };
+        unsafe { DispatchMessageW(&message) };
+
+        if message.message != REHOOK_MESSAGE {
+            continue;
+        }
+
+        let _ = unsafe { UnhookWindowsHookEx(hook) };
+
+        let rehooked = hook_mouse();
+
+        let Ok(rehooked) = rehooked else {
+            (sink)(ClickReport::ListeningLost);
+
+            return None;
+        };
+
+        hook = rehooked;
+    }
+
+    Some(hook)
+}
+
+fn hook_mouse() -> Result<HHOOK> {
+    unsafe { SetWindowsHookExW(WH_MOUSE_LL, Some(on_mouse), None, 0) }
+        .map_err(|error| PlatformError::system("SetWindowsHookExW", error.to_string()))
+}
+
+fn hook_foreground() -> Option<HWINEVENTHOOK> {
+    let hook = unsafe {
+        SetWinEventHook(
+            EVENT_SYSTEM_FOREGROUND,
+            EVENT_SYSTEM_FOREGROUND,
+            None,
+            Some(on_foreground),
+            0,
+            0,
+            WINEVENT_OUTOFCONTEXT | WINEVENT_SKIPOWNPROCESS,
+        )
+    };
+
+    (!hook.0.is_null()).then_some(hook)
+}
+
+fn low_level_hooks_timeout() -> Duration {
+    let milliseconds = registry_dword(DESKTOP_KEY, LOW_LEVEL_HOOKS_TIMEOUT)
+        .map_or(DEFAULT_HOOKS_TIMEOUT_MS, u64::from);
+
+    Duration::from_millis(milliseconds)
+}
+
+unsafe extern "system" fn on_mouse(code: i32, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
+    let button = u32::try_from(wparam.0)
+        .ok()
+        .filter(|message| *message == WM_LBUTTONDOWN || *message == WM_LBUTTONUP);
+
+    if let Some(button) = button.filter(|_| code >= 0) {
+        let at = Instant::now();
+        let verdict = verdict_of(lparam, button, at);
+
+        rehook_if_overrun(at);
+
+        if matches!(verdict, Verdict::Eat) {
+            return EAT_THE_CLICK;
+        }
+    }
+
+    unsafe { CallNextHookEx(None, code, wparam, lparam) }
+}
+
+fn verdict_of(lparam: LPARAM, button: u32, at: Instant) -> Verdict {
+    // SAFETY: for a mouse message the system points lparam at one of these, alive for the call.
+    let event = unsafe { &*(lparam.0 as *const MSLLHOOKSTRUCT) };
+
+    if event.flags & LLMHF_INJECTED != 0 {
+        return Verdict::Pass;
+    }
+
+    let Some(window) = root_window_at(event.pt) else {
+        return Verdict::Pass;
+    };
+
+    WATCHED.with_borrow(|watched| {
+        let Some(watched) = watched.as_ref() else {
+            return Verdict::Pass;
+        };
+
+        if !watched.gate.watches(window) {
+            return Verdict::Pass;
+        }
+
+        if watched.gate.is_switching() {
+            return Verdict::Eat;
+        }
+
+        if button == WM_LBUTTONDOWN {
+            return Verdict::Pass;
+        }
+
+        watched.gate.close();
+
+        (watched.sink)(ClickReport::Clicked { window, at });
+
+        Verdict::Pass
+    })
+}
+
+fn root_window_at(point: POINT) -> Option<WindowId> {
+    let clicked = unsafe { WindowFromPoint(point) };
+
+    if clicked.is_invalid() {
+        return None;
+    }
+
+    let root = unsafe { GetAncestor(clicked, GA_ROOT) };
+
+    (!root.is_invalid()).then(|| window_id(root))
+}
+
+fn rehook_if_overrun(started: Instant) {
+    if started.elapsed() < HOOK_BUDGET.get() {
+        return;
+    }
+
+    let thread = unsafe { GetCurrentThreadId() };
+
+    let _ = unsafe { PostThreadMessageW(thread, REHOOK_MESSAGE, WPARAM(0), LPARAM(0)) };
+}
+
+unsafe extern "system" fn on_foreground(
+    _hook: HWINEVENTHOOK,
+    _event: u32,
+    handle: HWND,
+    object: i32,
+    child: i32,
+    _thread: u32,
+    _time: u32,
+) {
+    if object != OBJID_WINDOW.0 || !u32::try_from(child).is_ok_and(|child| child == CHILDID_SELF) {
+        return;
+    }
+
+    WATCHED.with_borrow(|watched| {
+        if let Some(watched) = watched.as_ref() {
+            watched.gate.note_foreground(window_id(handle));
+        }
+    });
 }
 
 #[derive(Debug, Default)]

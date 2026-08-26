@@ -19,6 +19,7 @@ pub enum Work {
     Scan,
     Shortcuts,
     Tray,
+    Walk,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -204,6 +205,25 @@ pub enum JournalEvent {
 
     RelayTestSent,
 
+    WalkEnabled {
+        enabled: bool,
+        from: WalkFrom,
+    },
+
+    WalkIdle {
+        reason: WalkIdle,
+    },
+
+    WalkListeningLost,
+
+    WalkListeningRefused {
+        detail: String,
+    },
+
+    WalkSwitchFailed {
+        detail: String,
+    },
+
     DisplayAwake {
         held: bool,
     },
@@ -374,6 +394,22 @@ pub enum Surface {
     Tray,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub enum WalkFrom {
+    Window,
+    Tray,
+    Shortcut,
+    ListeningLost,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub enum WalkIdle {
+    NobodyInCycle,
+    TooSlow,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 #[serde(tag = "outcome", rename_all = "camelCase")]
 pub enum Outcome {
@@ -418,6 +454,8 @@ pub enum ShortcutOutcome {
     NotInRoster { nickname: String },
 
     NobodyInCycle,
+
+    Walk { enabled: bool },
 
     NoGender,
 

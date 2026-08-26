@@ -1,9 +1,9 @@
 import { Undo2 } from 'lucide-react'
+import { KeyCap } from '@/components/key-cap'
 import { Button } from '@/components/ui/button'
 import { strings } from '@/constants/strings'
 import { acceleratorParts } from '@/helpers/accelerator'
 import type { ShortcutUndo } from '@/hooks/use-shortcut-undo'
-import { KeyCap } from '@/screens/shortcuts/key-cap'
 
 type ShortcutUndoButtonProps = Readonly<{
   undo: ShortcutUndo

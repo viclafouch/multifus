@@ -25,6 +25,9 @@ import {
   NOTICE_LINES,
   QUICK_REPLY_FAILURE_TONES,
   PLAIN_LINES,
+  WALK_FROM_LABELS,
+  WALK_IDLE_LINES,
+  WALK_IDLE_TONES,
   RELAY_STOP_LINES,
   SHORTCUT_TONES,
   TONES,
@@ -84,6 +87,10 @@ export const journalTone = (event: JournalEvent): JournalTone => {
 
   if (event.kind === 'trayFocus') {
     return TRAY_TONES[event.outcome.outcome]
+  }
+
+  if (event.kind === 'walkIdle') {
+    return WALK_IDLE_TONES[event.reason]
   }
 
   return TONES[event.kind]
@@ -360,6 +367,7 @@ export const journalTranscript = (snapshot: Snapshot) => {
     `Multifus ${snapshot.version} sur ${snapshot.system}`,
     `Autorisation : ${snapshot.authorization.granted ? 'accordée' : 'refusée'}, écoute ${snapshot.authorization.listening ? 'active' : 'arrêtée'}`,
     `AutoFocus : ${snapshot.autoFocusEnabled ? 'actif' : 'suspendu'}, réveil des réduites ${snapshot.wakesMinimized ? 'actif' : 'inactif'}`,
+    `Déplacement : ${walkTranscriptLine(snapshot.walk)}`,
     shortcutsBoundLine(boundCombinations(snapshot)),
     `Configuration : ${snapshot.config.path}`,
     `Mise à jour : ${updateLine(snapshot.update)}`,
@@ -368,6 +376,25 @@ export const journalTranscript = (snapshot: Snapshot) => {
     '',
     ...lines
   ].join('\n')
+}
+
+const walkTranscriptLine = (walk: Snapshot['walk']) => {
+  if (!walk.supported) {
+    return 'indisponible sur ce système'
+  }
+
+  const state = walk.enabled ? 'allumé' : 'éteint'
+  const measures = walk.measures
+    .map((measure) => {
+      return measure.landed
+        ? `${measure.milliseconds}`
+        : `${measure.milliseconds}✗`
+    })
+    .join(' ')
+
+  return measures === ''
+    ? `${state}, aucune bascule mesurée`
+    : `${state}, budget ${walk.budget} ms, dernières bascules ${measures} ms`
 }
 
 type ShortcutLineParams = {
@@ -401,6 +428,9 @@ const shortcutLine = ({ action, outcome }: ShortcutLineParams) => {
     }
     case 'nobodyInCycle': {
       return `${label} : personne dans le défilement.`
+    }
+    case 'walk': {
+      return outcome.enabled ? `${label} : allumé.` : `${label} : éteint.`
     }
     case 'noGender': {
       return `${label} : aucun personnage connecté n’a de sexe assigné.`
@@ -625,6 +655,14 @@ const actionLine = (event: EventOf<ActionEventKind>) => {
     }
     case 'relayDisabled': {
       return RELAY_STOP_LINES[event.reason]
+    }
+    case 'walkEnabled': {
+      const what = event.enabled ? 'allumé' : 'éteint'
+
+      return `Déplacement ${what} depuis ${WALK_FROM_LABELS[event.from]}.`
+    }
+    case 'walkIdle': {
+      return WALK_IDLE_LINES[event.reason]
     }
     default: {
       return ''

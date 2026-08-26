@@ -54,6 +54,9 @@ use objc2_foundation::NSString;
 
 use crate::domain::extract_nickname;
 use crate::domain::GameNotification;
+use crate::platform::click::ClickGate;
+use crate::platform::click::ClickSink;
+use crate::platform::click::ClickWatcher;
 use crate::platform::display::DisplayKeeper;
 use crate::platform::display::ScreenSaverDelay;
 use crate::platform::error::PlatformError;
@@ -510,6 +513,19 @@ impl WindowManager for AccessibilityWindowManager {
         set_frontmost(&element)
     }
 
+    fn focus_fast(&self, window: WindowId) -> Result<()> {
+        let (application, _) = live_application(window)?;
+
+        if application.activateWithOptions(NSApplicationActivationOptions::ActivateAllWindows) {
+            return Ok(());
+        }
+
+        Err(PlatformError::system(
+            "activateWithOptions",
+            "the system kept the focus where it was",
+        ))
+    }
+
     fn client_windows(&self) -> Result<Vec<WindowId>> {
         if !accessibility_authorization().is_granted() {
             return Err(PlatformError::AuthorizationDenied);
@@ -576,6 +592,24 @@ impl WindowManager for AccessibilityWindowManager {
     fn set_window_group(&self, _window: WindowId, _group: Option<&str>) -> Result<()> {
         Ok(())
     }
+}
+
+#[derive(Debug, Default)]
+pub struct UnwatchedClicks;
+
+impl UnwatchedClicks {
+    #[must_use]
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+impl ClickWatcher for UnwatchedClicks {
+    fn start(&self, _gate: Arc<ClickGate>, _sink: ClickSink) -> Result<()> {
+        Err(PlatformError::Unsupported)
+    }
+
+    fn stop(&self) {}
 }
 
 #[derive(Debug, Default)]

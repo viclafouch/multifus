@@ -18,6 +18,7 @@ use tauri::Wry;
 
 use crate::app::journal::JournalEvent;
 use crate::app::journal::TrayOutcome;
+use crate::app::journal::WalkFrom;
 use crate::app::journal::Work;
 use crate::app::journal_file;
 use crate::app::main_window;
@@ -28,13 +29,16 @@ use crate::app::state::Multifus;
 use crate::app::update;
 use crate::app::view::CharacterView;
 use crate::app::view::Screen;
+use crate::app::walk;
 use crate::platform::PlatformError;
 use crate::platform::PlatformWindowManager;
 use crate::platform::WindowManager;
+use crate::platform::WATCHES_CLICKS;
 
 const MENU_CHARACTERS: &str = "Personnages";
 const MENU_SHORTCUTS: &str = "Raccourcis";
 const MENU_AUTO_FOCUS_SCREEN: &str = "AutoFocus";
+const MENU_WALK_SCREEN: &str = "Déplacement";
 const MENU_RELAY: &str = "Messages privés";
 const MENU_SETTINGS: &str = "Paramètres";
 const MENU_ABOUT: &str = "À propos";
@@ -42,6 +46,8 @@ const MENU_QUIT: &str = "Quitter Multifus";
 const MENU_NOBODY: &str = "Aucun personnage connecté";
 const MENU_ASLEEP: &str = " (de côté)";
 const MENU_AUTO_FOCUS_ON: &str = "Activer l'AutoFocus";
+const MENU_WALK_ON: &str = "Activer le Déplacement";
+const MENU_WALK_OFF: &str = "Désactiver le Déplacement";
 const MENU_AUTO_FOCUS_OFF: &str = "Désactiver l'AutoFocus";
 const MENU_WAKE_MINIMIZED: &str = "Aller chercher les fenêtres réduites";
 const MENU_LEAVE_MINIMIZED: &str = "Laisser les fenêtres réduites";
@@ -70,6 +76,8 @@ const NOBODY_ID: &str = "multifus://nobody";
 
 const AUTO_FOCUS_ID: &str = "multifus://auto-focus";
 
+const WALK_ID: &str = "multifus://walk";
+
 const WAKE_MINIMIZED_ID: &str = "multifus://wake-minimized";
 
 const UPDATE_ID: &str = "multifus://update";
@@ -91,6 +99,7 @@ type ShownMenu = Mutex<Option<Contents>>;
 struct Contents {
     entries: Vec<Entry>,
     auto_focus: bool,
+    walk: Option<bool>,
     wakes_minimized: bool,
     granted: bool,
     update: Option<String>,
@@ -124,6 +133,7 @@ fn contents(app: &AppHandle) -> Contents {
     Contents {
         entries: entries(&state.connected()),
         auto_focus: state.is_auto_focus_enabled(),
+        walk: WATCHES_CLICKS.then(|| state.is_walk_enabled()),
         wakes_minimized: state.wakes_minimized(),
         granted: state.is_granted(),
         update: state.available_update(),
@@ -276,6 +286,16 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
         None::<&str>,
     )?)?;
 
+    if let Some(walking) = contents.walk {
+        menu.append(&MenuItem::with_id(
+            app,
+            WALK_ID,
+            switch_label(walking, MENU_WALK_OFF, MENU_WALK_ON),
+            true,
+            None::<&str>,
+        )?)?;
+    }
+
     menu.append(&MenuItem::with_id(
         app,
         WAKE_MINIMIZED_ID,
@@ -387,6 +407,14 @@ fn on_menu_event(app: &AppHandle, event: MenuEvent) {
         return;
     }
 
+    if id == WALK_ID {
+        walk::toggle(app, WalkFrom::Tray);
+
+        runtime::emit_snapshot(app);
+
+        return;
+    }
+
     if id == WAKE_MINIMIZED_ID {
         lock(app).toggle_wakes_minimized();
 
@@ -424,6 +452,7 @@ fn screen_id(screen: Screen) -> &'static str {
         Screen::Characters => "characters",
         Screen::Shortcuts => "shortcuts",
         Screen::AutoFocus => "autoFocus",
+        Screen::Walk => "walk",
         Screen::Relay => "relay",
         Screen::Settings => "settings",
         Screen::About => "about",
@@ -441,6 +470,7 @@ fn screen_label(screen: Screen) -> &'static str {
         Screen::Characters => MENU_CHARACTERS,
         Screen::Shortcuts => MENU_SHORTCUTS,
         Screen::AutoFocus => MENU_AUTO_FOCUS_SCREEN,
+        Screen::Walk => MENU_WALK_SCREEN,
         Screen::Relay => MENU_RELAY,
         Screen::Settings => MENU_SETTINGS,
         Screen::About => MENU_ABOUT,
@@ -531,6 +561,7 @@ mod tests {
         let mut contents = Contents {
             entries: Vec::new(),
             auto_focus: true,
+            walk: None,
             wakes_minimized: true,
             granted: true,
             update: None,

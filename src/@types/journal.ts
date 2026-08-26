@@ -3,6 +3,7 @@ import type { NoticeCase, RelayFailure, RelayStop } from '@/@types/relay'
 import type { Class, Gender } from '@/@types/roster'
 import type { BoundCombination, ShortcutAction } from '@/@types/shortcuts'
 import type { Launch, Surface, Work } from '@/@types/system'
+import type { WalkFrom, WalkIdle } from '@/@types/walk'
 
 export type NotificationOutcome =
   | { readonly outcome: 'bodyUnread' }
@@ -33,6 +34,7 @@ export type ShortcutOutcome =
   | { readonly outcome: 'outsideGame' }
   | { readonly outcome: 'slept'; readonly nickname: string }
   | { readonly outcome: 'swapped'; readonly awake: Gender }
+  | { readonly outcome: 'walk'; readonly enabled: boolean }
   | { readonly outcome: 'woke'; readonly nickname: string }
 
 export type QuickReplyFailure =
@@ -134,7 +136,16 @@ export type JournalEvent =
   | { readonly kind: 'updateAvailable'; readonly version: string }
   | { readonly kind: 'updateFailed'; readonly detail: string }
   | { readonly kind: 'updateUpToDate' }
+  | { readonly kind: 'walkIdle'; readonly reason: WalkIdle }
+  | { readonly kind: 'walkListeningRefused'; readonly detail: string }
+  | { readonly kind: 'walkListeningLost' }
+  | { readonly kind: 'walkSwitchFailed'; readonly detail: string }
   | { readonly kind: 'windowFailed'; readonly detail: string }
+  | {
+      readonly kind: 'walkEnabled'
+      readonly enabled: boolean
+      readonly from: WalkFrom
+    }
   | {
       readonly kind: 'authorizationRequested'
       readonly granted: boolean

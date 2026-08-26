@@ -1,3 +1,4 @@
+pub mod click;
 pub mod display;
 pub mod error;
 pub mod notification;
@@ -9,6 +10,14 @@ pub mod macos;
 #[cfg(target_os = "windows")]
 pub mod windows;
 
+pub use click::ClickGate;
+pub use click::ClickReport;
+pub use click::ClickSink;
+pub use click::ClickWatcher;
+pub use click::SWITCH_BUDGET_MS;
+pub use click::SWITCH_CEILING;
+pub use click::SWITCH_CEILING_MS;
+pub use click::WATCHES_CLICKS;
 pub use display::DisplayKeeper;
 pub use display::ScreenSaverDelay;
 pub use error::PlatformError;
@@ -53,3 +62,8 @@ pub type PlatformDisplayKeeper = windows::PowerRequestDisplayKeeper;
 pub type PlatformPasteSender = macos::CoreGraphicsPasteSender;
 #[cfg(target_os = "windows")]
 pub type PlatformPasteSender = windows::SendInputPasteSender;
+
+#[cfg(target_os = "macos")]
+pub type PlatformClickWatcher = macos::UnwatchedClicks;
+#[cfg(target_os = "windows")]
+pub type PlatformClickWatcher = windows::MouseHookClickWatcher;

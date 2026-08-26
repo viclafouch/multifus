@@ -16,6 +16,10 @@ La paire de clés de l'updater existe déjà, dans `~/.tauri/multifus.key` et so
 `tauri.conf.json`. En régénérer une rendrait insignables les mises à jour des
 versions déjà installées.
 
+## Ajouter le Déplacement
+
+- [ ] Finir le Déplacement : la bannière et le côté macOS, dont le détail est dans [plan-deplacement.md](./plan-deplacement.md)
+
 ## Vérifier sur une vraie soirée
 
 - [ ] Windows, deux clients ouverts : le roster les voit, les quatre raccourcis et l'AutoFocus répondent

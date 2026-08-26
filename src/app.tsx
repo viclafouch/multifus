@@ -15,6 +15,7 @@ import { CharactersScreen } from '@/screens/characters-screen'
 import { RelayScreen } from '@/screens/relay'
 import { SettingsScreen } from '@/screens/settings-screen'
 import { ShortcutsScreen } from '@/screens/shortcuts'
+import { WalkScreen } from '@/screens/walk-screen'
 
 export const App = () => {
   const { snapshot, run } = useMultifus()
@@ -85,6 +86,16 @@ const CurrentScreen = ({ screen, snapshot, run }: CurrentScreenProps) => {
         switches={snapshot.autoFocus}
         isEnabled={snapshot.autoFocusEnabled}
         wakesMinimized={snapshot.wakesMinimized}
+        run={run}
+      />
+    )
+  }
+
+  if (screen === 'walk') {
+    return (
+      <WalkScreen
+        walk={snapshot.walk}
+        shortcuts={snapshot.shortcuts}
         run={run}
       />
     )

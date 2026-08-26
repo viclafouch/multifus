@@ -4,6 +4,7 @@ import type { RelayStatus } from '@/@types/relay'
 import type { Character } from '@/@types/roster'
 import type { QuickReply, ShortcutBinding } from '@/@types/shortcuts'
 import type { Authorization, ConfigStatus, UpdateStatus } from '@/@types/system'
+import type { WalkStatus } from '@/@types/walk'
 
 export type ScreenName =
   | 'about'
@@ -12,6 +13,7 @@ export type ScreenName =
   | 'relay'
   | 'settings'
   | 'shortcuts'
+  | 'walk'
 
 export type Snapshot = {
   readonly version: string
@@ -31,5 +33,6 @@ export type Snapshot = {
   readonly config: ConfigStatus
   readonly update: UpdateStatus
   readonly relay: RelayStatus
+  readonly walk: WalkStatus
   readonly journal: readonly JournalEntry[]
 }

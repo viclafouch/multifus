@@ -22,6 +22,12 @@ Les mots de Multifus, et rien d'autre. On en parle en français, on les écrit e
 
 **Défilement** (`cycle`) : le parcours des fenêtres au raccourci, dans un ordre choisi par l'utilisateur.
 
+**Déplacement** (`Walk`) : le mécanisme qui passe au personnage suivant du défilement à chaque clic gauche dans une fenêtre de jeu. Il ne s'allume que d'un geste, jamais tout seul, et Multifus démarre toujours Déplacement éteint.
+
+**Bascule** (`switch`) : le passage du premier plan d'une fenêtre à la suivante. Elle est finie quand le système la donne pour finie, pas quand on l'a demandée.
+
+**Porte** (`ClickGate`) : ce qui décide, au moment du clic, si le clic compte. Fermée le temps d'une bascule, elle mange les clics qui arrivent trop tôt sur une fenêtre de jeu.
+
 **Tirage** (`drag`) : l'action de prendre une ligne par sa poignée, et de la porter plus haut ou plus bas pour changer l'ordre du défilement.
 
 **De côté** (`asleep`) : état d'un personnage retiré du défilement.

@@ -140,6 +140,8 @@ pub trait WindowManager: Send + Sync {
 
     fn focus(&self, window: WindowId) -> Result<()>;
 
+    fn focus_fast(&self, window: WindowId) -> Result<()>;
+
     fn client_windows(&self) -> Result<Vec<WindowId>>;
 
     fn maximize(&self, window: WindowId) -> Result<()>;

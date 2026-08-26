@@ -15,6 +15,7 @@ use crate::app::journal::JournalEvent;
 use crate::app::journal::QuickReplyFailure;
 use crate::app::journal::RelayStop;
 use crate::app::journal::ShortcutOutcome;
+use crate::app::journal::WalkFrom;
 use crate::app::journal::Work;
 use crate::app::quick_replies;
 use crate::app::relay;
@@ -25,6 +26,7 @@ use crate::app::view::Binding;
 use crate::app::view::BindingView;
 use crate::app::view::ShortcutAction;
 use crate::app::view::ShortcutStatus;
+use crate::app::walk;
 use crate::platform::GameWindow;
 use crate::platform::PlatformError;
 use crate::platform::PlatformWindowManager;
@@ -147,6 +149,19 @@ enum Refusal {
 }
 
 fn answer(app: &AppHandle, binding: Binding) {
+    if matches!(
+        binding,
+        Binding::Action {
+            action: ShortcutAction::Walk
+        }
+    ) {
+        walk::toggle(app, WalkFrom::Shortcut);
+
+        runtime::emit_snapshot(app);
+
+        return;
+    }
+
     let foreground = app
         .state::<PlatformWindowManager>()
         .foreground_game_window();

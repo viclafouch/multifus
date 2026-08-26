@@ -34,4 +34,4 @@ export type Launch = 'byHand' | 'session'
 
 export type Surface = 'tray' | 'window'
 
-export type Work = 'scan' | 'shortcuts' | 'tray'
+export type Work = 'scan' | 'shortcuts' | 'tray' | 'walk'

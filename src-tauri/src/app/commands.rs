@@ -5,6 +5,7 @@ use crate::app::autostart;
 use crate::app::journal::JournalEvent;
 use crate::app::journal::RelayStop;
 use crate::app::journal::Surface;
+use crate::app::journal::WalkFrom;
 use crate::app::journal_file;
 use crate::app::relay;
 use crate::app::runtime;
@@ -13,6 +14,7 @@ use crate::app::state::lock;
 use crate::app::update;
 use crate::app::view::ShortcutAction;
 use crate::app::view::Snapshot;
+use crate::app::walk;
 use crate::config::QuickReplyId;
 use crate::domain::Class;
 use crate::domain::Gender;
@@ -154,6 +156,13 @@ pub fn set_auto_focus(app: AppHandle, kind: NotificationKind, enabled: bool) -> 
 #[tauri::command]
 pub fn set_auto_focus_enabled(app: AppHandle, enabled: bool) -> Snapshot {
     lock(&app).set_auto_focus_enabled(enabled, Surface::Window);
+
+    runtime::emit_snapshot(&app)
+}
+
+#[tauri::command]
+pub fn set_walk_enabled(app: AppHandle, enabled: bool) -> Snapshot {
+    walk::set_enabled(&app, enabled, WalkFrom::Window);
 
     runtime::emit_snapshot(&app)
 }

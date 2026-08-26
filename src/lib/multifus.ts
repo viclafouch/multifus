@@ -110,6 +110,10 @@ export const setAutoFocusEnabled = async (enabled: boolean) => {
   return invoke<Snapshot>('set_auto_focus_enabled', { enabled })
 }
 
+export const setWalkEnabled = async (enabled: boolean) => {
+  return invoke<Snapshot>('set_walk_enabled', { enabled })
+}
+
 export const setWakesMinimized = async (wakes: boolean) => {
   return invoke<Snapshot>('set_wakes_minimized', { wakes })
 }

@@ -19,6 +19,11 @@ const ACTION_LABELS = {
     label: 'Inverser hommes et femmes',
     description:
       'Vos hommes sortent du défilement, vos femmes y entrent. Ou l’inverse.'
+  },
+  walk: {
+    label: 'Déplacement',
+    description:
+      'Allume ou éteint le Déplacement. Ce raccourci répond partout, jeu ou pas.'
   }
 } as const satisfies Record<
   ShortcutAction,

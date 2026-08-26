@@ -7,6 +7,7 @@ import type {
 import type { NoticeCase, RelayStop } from '@/@types/relay'
 import type { ShortcutBinding } from '@/@types/shortcuts'
 import type { Work } from '@/@types/system'
+import type { WalkFrom, WalkIdle } from '@/@types/walk'
 
 export type JournalTone = 'good' | 'neutral' | 'warning'
 
@@ -19,6 +20,7 @@ type PlainEventKind = Exclude<
   | 'shortcut'
   | 'shortcutsBound'
   | 'trayFocus'
+  | 'walkIdle'
 >
 
 export const TONES = {
@@ -40,6 +42,10 @@ export const TONES = {
   snapshotFailed: 'warning',
   trayFailed: 'warning',
   windowFailed: 'warning',
+  walkEnabled: 'neutral',
+  walkListeningLost: 'warning',
+  walkListeningRefused: 'warning',
+  walkSwitchFailed: 'warning',
   clientMaximized: 'good',
   clientMaximizeFailed: 'warning',
   shortTitlesFailed: 'warning',
@@ -73,11 +79,31 @@ export const QUICK_REPLY_FAILURE_TONES = {
   clipboardNotGivenBack: 'warning'
 } as const satisfies Record<QuickReplyFailure['reason'], JournalTone>
 
+export const WALK_IDLE_TONES = {
+  nobodyInCycle: 'neutral',
+  tooSlow: 'warning'
+} as const satisfies Record<WalkIdle, JournalTone>
+
+export const WALK_IDLE_LINES = {
+  nobodyInCycle:
+    'Déplacement : personne dans le défilement, le clic n’a nulle part où aller.',
+  tooSlow:
+    'Déplacement : la fenêtre suivante a mis plus de temps que prévu à passer devant.'
+} as const satisfies Record<WalkIdle, string>
+
+export const WALK_FROM_LABELS = {
+  window: 'la fenêtre',
+  tray: 'la barre système',
+  shortcut: 'un raccourci',
+  listeningLost: 'Multifus, qui n’écoutait plus les clics'
+} as const satisfies Record<WalkFrom, string>
+
 export const SHORTCUT_TONES = {
   focused: 'good',
   slept: 'good',
   woke: 'good',
   swapped: 'good',
+  walk: 'good',
   outsideGame: 'neutral',
   notInRoster: 'neutral',
   nobodyInCycle: 'neutral',
@@ -114,6 +140,9 @@ export const DETAILED_LINES = {
   clientMaximizeFailed: 'Agrandissement de la fenêtre d’un client impossible',
   shortTitlesFailed: 'Titre d’une fenêtre impossible à changer',
   windowIconFailed: 'Icône d’une fenêtre impossible à poser',
+  walkListeningRefused:
+    'Déplacement impossible à allumer, Multifus n’écoute pas les clics',
+  walkSwitchFailed: 'Déplacement : la fenêtre suivante n’est pas passée devant',
   saveFailed: 'Configuration non enregistrée',
   configNotSetAside:
     'Configuration illisible et impossible à déplacer, le prochain enregistrement l’écrasera',
@@ -137,6 +166,8 @@ export const PLAIN_LINES = {
   relayPaired: 'Robot Telegram relié.',
   relayUnpaired: 'Robot Telegram retiré, son code effacé du trousseau.',
   relayTestSent: 'Message d’essai envoyé sur le téléphone.',
+  walkListeningLost:
+    'Déplacement : Windows a cessé de transmettre les clics, et n’a pas repris.',
   reset: 'Configuration remise à zéro.',
   quit: 'Multifus a été quitté depuis la barre système.'
 } as const satisfies Record<WithoutPayload<JournalEvent>, string>
@@ -162,5 +193,6 @@ export const NOTICE_LINES = {
 export const WORK_LABELS = {
   scan: 'La lecture des fenêtres',
   shortcuts: 'La réponse à un raccourci',
-  tray: 'La réponse à un clic dans la barre système'
+  tray: 'La réponse à un clic dans la barre système',
+  walk: 'La bascule du Déplacement'
 } as const satisfies Record<Work, string>

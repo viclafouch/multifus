@@ -1,4 +1,9 @@
-export type ShortcutAction = 'next' | 'previous' | 'swap' | 'toggleAsleep'
+export type ShortcutAction =
+  | 'next'
+  | 'previous'
+  | 'swap'
+  | 'toggleAsleep'
+  | 'walk'
 
 export type QuickReplyId = number
 

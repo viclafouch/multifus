@@ -20,6 +20,7 @@ import {
   NOTICE_LINES,
   PLAIN_LINES,
   RELAY_STOP_LINES,
+  WALK_IDLE_LINES,
   WORK_LABELS
 } from '@/constants/journal'
 import { strings } from '@/constants/strings'
@@ -435,6 +436,24 @@ const SHORTCUT_CASES = {
         outcome: { outcome: 'foregroundUnknown', detail: DETAIL }
       },
       line: `Fenêtre précédente : impossible de savoir quelle fenêtre est au premier plan (${DETAIL}).`
+    }
+  ],
+  walk: [
+    {
+      event: {
+        kind: 'shortcut',
+        action: 'walk',
+        outcome: { outcome: 'walk', enabled: true }
+      },
+      line: 'Déplacement : allumé.'
+    },
+    {
+      event: {
+        kind: 'shortcut',
+        action: 'walk',
+        outcome: { outcome: 'walk', enabled: false }
+      },
+      line: 'Déplacement : éteint.'
     }
   ]
 } as const satisfies Record<
@@ -1009,6 +1028,48 @@ const JOURNAL_CASES = {
       line: `${DETAILED_LINES.displayAwakeFailed} : ${DETAIL}`
     }
   ],
+  walkEnabled: [
+    {
+      event: { kind: 'walkEnabled', enabled: true, from: 'shortcut' },
+      line: 'Déplacement allumé depuis un raccourci.'
+    },
+    {
+      event: { kind: 'walkEnabled', enabled: false, from: 'tray' },
+      line: 'Déplacement éteint depuis la barre système.'
+    },
+    {
+      event: { kind: 'walkEnabled', enabled: false, from: 'listeningLost' },
+      line: 'Déplacement éteint depuis Multifus, qui n’écoutait plus les clics.'
+    }
+  ],
+  walkIdle: [
+    {
+      event: { kind: 'walkIdle', reason: 'nobodyInCycle' },
+      line: WALK_IDLE_LINES.nobodyInCycle
+    },
+    {
+      event: { kind: 'walkIdle', reason: 'tooSlow' },
+      line: WALK_IDLE_LINES.tooSlow
+    }
+  ],
+  walkListeningLost: [
+    {
+      event: { kind: 'walkListeningLost' },
+      line: PLAIN_LINES.walkListeningLost
+    }
+  ],
+  walkListeningRefused: [
+    {
+      event: { kind: 'walkListeningRefused', detail: DETAIL },
+      line: `${DETAILED_LINES.walkListeningRefused} : ${DETAIL}`
+    }
+  ],
+  walkSwitchFailed: [
+    {
+      event: { kind: 'walkSwitchFailed', detail: DETAIL },
+      line: `${DETAILED_LINES.walkSwitchFailed} : ${DETAIL}`
+    }
+  ],
   reset: [{ event: { kind: 'reset' }, line: PLAIN_LINES.reset }],
   quit: [{ event: { kind: 'quit' }, line: PLAIN_LINES.quit }]
 } as const satisfies JournalCases
@@ -1058,6 +1119,16 @@ const SNAPSHOT = {
     pairing: { kind: 'idle' },
     switch: { kind: 'idle' },
     test: { kind: 'idle' }
+  },
+  walk: {
+    enabled: false,
+    supported: true,
+    budget: 60,
+    ceiling: 250,
+    measures: [
+      { milliseconds: 41, landed: true },
+      { milliseconds: 250, landed: false }
+    ]
   },
   journal: [
     { id: 1, at: MORNING, event: { kind: 'listening' } },
@@ -1248,6 +1319,7 @@ describe('journalTranscript', () => {
         'Multifus 0.1.0 sur macOS 26.0 (arm64)',
         'Autorisation : accordée, écoute active',
         'AutoFocus : actif, réveil des réduites actif',
+        'Déplacement : éteint, budget 60 ms, dernières bascules 41 250✗ ms',
         BINDINGS_LINE,
         'Configuration : /tmp/multifus/config.json',
         `Mise à jour : ${strings.about.updateUpToDate}`,
@@ -1278,6 +1350,22 @@ describe('journalTranscript', () => {
     expect(transcript).toContain(
       'AutoFocus : suspendu, réveil des réduites inactif'
     )
+  })
+
+  it('dit le Déplacement indisponible là où les clics ne sont pas lus', () => {
+    const walk = { ...SNAPSHOT.walk, supported: false }
+
+    const transcript = journalTranscript({ ...SNAPSHOT, walk })
+
+    expect(transcript).toContain('Déplacement : indisponible sur ce système')
+  })
+
+  it('ne promet aucune bascule tant qu’aucune n’a été mesurée', () => {
+    const walk = { ...SNAPSHOT.walk, enabled: true, measures: [] }
+
+    const transcript = journalTranscript({ ...SNAPSHOT, walk })
+
+    expect(transcript).toContain('Déplacement : allumé, aucune bascule mesurée')
   })
 
   it('ne promet aucune période quand rien n’est en mémoire', () => {

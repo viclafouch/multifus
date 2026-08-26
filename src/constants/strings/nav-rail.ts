@@ -4,6 +4,7 @@ const SCREEN_LABELS = {
   characters: 'Personnages',
   shortcuts: 'Raccourcis',
   autoFocus: 'AutoFocus',
+  walk: 'Déplacement',
   relay: 'Messages privés',
   settings: 'Paramètres',
   about: 'À propos'

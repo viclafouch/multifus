@@ -45,6 +45,7 @@ pub fn run() {
             app::commands::set_auto_focus,
             app::commands::set_auto_focus_enabled,
             app::commands::set_wakes_minimized,
+            app::commands::set_walk_enabled,
             app::commands::set_start_at_login,
             app::commands::set_maximize_on_launch,
             app::commands::set_short_titles,
