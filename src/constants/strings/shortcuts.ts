@@ -21,9 +21,9 @@ const ACTION_LABELS = {
       'Vos hommes sortent du défilement, vos femmes y entrent. Ou l’inverse.'
   },
   walk: {
-    label: 'Déplacement',
+    label: 'Déplacement rapide',
     description:
-      'Allume ou éteint le Déplacement. Ce raccourci répond partout, jeu ou pas.'
+      'Allume et éteint le Déplacement rapide, dans le jeu comme ailleurs.'
   }
 } as const satisfies Record<
   ShortcutAction,

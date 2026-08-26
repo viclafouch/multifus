@@ -372,7 +372,7 @@ export const journalTranscript = (snapshot: Snapshot) => {
     `Multifus ${snapshot.version} sur ${snapshot.system}`,
     `Autorisation : ${snapshot.authorization.granted ? 'accordée' : 'refusée'}, écoute ${snapshot.authorization.listening ? 'active' : 'arrêtée'}`,
     `AutoFocus : ${snapshot.autoFocusEnabled ? 'actif' : 'suspendu'}, réveil des réduites ${snapshot.wakesMinimized ? 'actif' : 'inactif'}`,
-    `Déplacement : ${snapshot.walk.enabled ? 'allumé' : 'éteint'}`,
+    `Déplacement rapide : ${snapshot.walk.enabled ? 'allumé' : 'éteint'}`,
     shortcutsBoundLine(boundCombinations(snapshot)),
     `Configuration : ${snapshot.config.path}`,
     `Mise à jour : ${updateLine(snapshot.update)}`,
@@ -645,7 +645,7 @@ const actionLine = (event: EventOf<ActionEventKind>) => {
     case 'walkEnabled': {
       const what = event.enabled ? 'allumé' : 'éteint'
 
-      return `Déplacement ${what} depuis ${WALK_FROM_LABELS[event.from]}.`
+      return `Déplacement rapide ${what} depuis ${WALK_FROM_LABELS[event.from]}.`
     }
     case 'walkIdle': {
       return WALK_IDLE_LINES[event.reason]

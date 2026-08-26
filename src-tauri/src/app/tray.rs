@@ -36,7 +36,7 @@ use crate::platform::PlatformError;
 const MENU_CHARACTERS: &str = "Personnages";
 const MENU_SHORTCUTS: &str = "Raccourcis";
 const MENU_AUTO_FOCUS_SCREEN: &str = "AutoFocus";
-const MENU_WALK_SCREEN: &str = "Déplacement";
+const MENU_WALK_SCREEN: &str = "Déplacement rapide";
 const MENU_RELAY: &str = "Messages privés";
 const MENU_SETTINGS: &str = "Paramètres";
 const MENU_ABOUT: &str = "À propos";
@@ -44,8 +44,8 @@ const MENU_QUIT: &str = "Quitter Multifus";
 const MENU_NOBODY: &str = "Aucun personnage connecté";
 const MENU_ASLEEP: &str = " (de côté)";
 const MENU_AUTO_FOCUS_ON: &str = "Activer l'AutoFocus";
-const MENU_WALK_ON: &str = "Activer le Déplacement";
-const MENU_WALK_OFF: &str = "Désactiver le Déplacement";
+const MENU_WALK_ON: &str = "Activer le Déplacement rapide";
+const MENU_WALK_OFF: &str = "Désactiver le Déplacement rapide";
 const MENU_AUTO_FOCUS_OFF: &str = "Désactiver l'AutoFocus";
 const MENU_WAKE_MINIMIZED: &str = "Aller chercher les fenêtres réduites";
 const MENU_LEAVE_MINIMIZED: &str = "Laisser les fenêtres réduites";
@@ -640,11 +640,11 @@ mod tests {
     fn a_switch_of_the_menu_offers_the_gesture_that_undoes_what_is_on() {
         assert_eq!(
             switch_label(true, MENU_WALK_OFF, MENU_WALK_ON),
-            "Désactiver le Déplacement"
+            "Désactiver le Déplacement rapide"
         );
         assert_eq!(
             switch_label(false, MENU_WALK_OFF, MENU_WALK_ON),
-            "Activer le Déplacement"
+            "Activer le Déplacement rapide"
         );
         assert_eq!(
             switch_label(true, MENU_LEAVE_MINIMIZED, MENU_WAKE_MINIMIZED),

@@ -27,6 +27,13 @@ const TELEVISION = bannerScreenOf({
   primary: false
 })
 
+const ULTRAWIDE = bannerScreenOf({
+  name: 'LG 34WN750',
+  width: 3440,
+  height: 1440,
+  primary: false
+})
+
 const walkShortcut = (accelerator: string | null): ShortcutBinding => {
   return {
     action: 'walk',
@@ -59,7 +66,7 @@ const show = async ({
     />
   )
 
-  await screen.findByText(strings.walk.banner.hint)
+  await screen.findByText(strings.walk.banner.description)
 }
 
 const keyCaps = () => {
@@ -78,8 +85,8 @@ const chipNamed = (rank: number) => {
   })
 }
 
-describe('l’écran du Déplacement', () => {
-  it('allume le Déplacement quand on bouge l’interrupteur', async () => {
+describe('l’écran du Déplacement rapide', () => {
+  it('l’allume quand on bouge l’interrupteur', async () => {
     await show({ enabled: false })
 
     fireEvent.click(
@@ -89,7 +96,7 @@ describe('l’écran du Déplacement', () => {
     expect(bridge.setWalkEnabled).toHaveBeenCalledWith(true)
   })
 
-  it('éteint le Déplacement quand on rebouge l’interrupteur', async () => {
+  it('l’éteint quand on rebouge l’interrupteur', async () => {
     await show({ enabled: true })
 
     fireEvent.click(
@@ -99,15 +106,24 @@ describe('l’écran du Déplacement', () => {
     expect(bridge.setWalkEnabled).toHaveBeenCalledWith(false)
   })
 
-  it('rappelle qu’il démarre toujours éteint, et qu’il ne garde rien', async () => {
-    await show()
+  it('dit qu’il est allumé, et ce que valent les clics', async () => {
+    await show({ enabled: true })
 
-    expect(screen.getByText(strings.walk.startsOff)).not.toBeNull()
-    expect(screen.getByText(strings.walk.privacy)).not.toBeNull()
+    expect(screen.getByText(strings.walk.state.on.badge)).not.toBeNull()
+    expect(screen.getByText(strings.walk.state.on.body)).not.toBeNull()
+    expect(screen.queryByText(strings.walk.state.off.badge)).toBeNull()
+  })
+
+  it('dit qu’il est éteint, et ce que valent les clics', async () => {
+    await show({ enabled: false })
+
+    expect(screen.getByText(strings.walk.state.off.badge)).not.toBeNull()
+    expect(screen.getByText(strings.walk.state.off.body)).not.toBeNull()
+    expect(screen.queryByText(strings.walk.state.on.badge)).toBeNull()
   })
 
   describe('le rappel du raccourci', () => {
-    it('dessine les touches du raccourci du Déplacement', async () => {
+    it('dessine les touches du raccourci', async () => {
       await show({ shortcuts: [walkShortcut('Control+Shift+KeyW')] })
 
       expect(keyCaps()).toStrictEqual(['Ctrl', 'Maj', 'W'])
@@ -120,7 +136,7 @@ describe('l’écran du Déplacement', () => {
       expect(keyCaps()).toStrictEqual([])
     })
 
-    it('dit qu’il n’y en a aucune quand le Déplacement n’est pas dans la liste', async () => {
+    it('dit qu’il n’y en a aucune quand il n’est pas dans la liste', async () => {
       await show({
         shortcuts: [
           {
@@ -137,6 +153,19 @@ describe('l’écran du Déplacement', () => {
   })
 
   describe('le coin de la bannière', () => {
+    it('dessine l’écran au format de celui qui porte la bannière', async () => {
+      await show({
+        screens: [ULTRAWIDE],
+        banner: { corner: 'topLeft', screen: ULTRAWIDE.name }
+      })
+
+      const monitor = screen.getByRole('group', {
+        name: strings.walk.banner.cornerLegend
+      })
+
+      expect(monitor.style.aspectRatio).toBe(`${3440 / 1440} / 1`)
+    })
+
     it('offre les quatre coins', async () => {
       await show()
 

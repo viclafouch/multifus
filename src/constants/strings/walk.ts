@@ -1,41 +1,56 @@
+import type { BannerCorner, WalkLiveState } from '@/@types/walk'
+
+type StateLines = {
+  readonly badge: string
+  readonly body: string
+}
+
+const STATE_LINES = {
+  on: {
+    badge: 'Allumé',
+    body: 'Cliquez pour déplacer, la fenêtre suivante arrive toute seule.'
+  },
+  off: {
+    badge: 'Éteint',
+    body: 'Vos clics vont au jeu, et à rien d’autre.'
+  }
+} as const satisfies Record<WalkLiveState, StateLines>
+
+const CORNER_LABELS = {
+  topLeft: 'En haut à gauche',
+  topRight: 'En haut à droite',
+  bottomLeft: 'En bas à gauche',
+  bottomRight: 'En bas à droite'
+} as const satisfies Record<BannerCorner, string>
+
+const BANNER_STRINGS = {
+  title: 'La bannière',
+  description:
+    'Elle s’affiche tant que le Déplacement rapide est allumé, et dit sur quel personnage vous venez d’arriver.',
+  waiting: 'Déplacement rapide',
+  previewing: 'Aperçu',
+  cornerLegend: 'Le coin',
+  screenLegend: 'L’écran',
+  screenName: (rank: number) => {
+    return `Écran ${rank}`
+  },
+  screenSize: (width: number, height: number) => {
+    return `${width} × ${height}`
+  },
+  screenPrimary: 'principal',
+  corners: CORNER_LABELS
+} as const
+
 export const WALK_STRINGS = {
   walk: {
-    title: 'Déplacement',
+    title: 'Déplacement rapide',
     subtitle:
-      'Vous cliquez pour déplacer un personnage, la fenêtre du suivant prend sa place. Vous cliquez encore, et les deux ont bougé sans toucher au clavier.',
-    switchLabel: 'Activer le Déplacement',
-    switchDescription:
-      'Chaque clic gauche dans une fenêtre Dofus Retro amène le personnage suivant du défilement devant vous.',
+      'Un clic déplace le personnage que vous avez devant vous, et la fenêtre du suivant prend sa place. Vous recliquez au même endroit, et toute la team change de map sans toucher au clavier.',
+    switchLabel: 'Déplacement rapide',
     shortcutLabel: 'Raccourci',
-    shortcutDescription:
-      'Il allume et éteint le Déplacement, où que vous soyez : dans le jeu comme dans Multifus.',
+    shortcutDescription: 'Allumez et éteignez sans quitter le jeu.',
     shortcutEmpty: 'Aucune',
-    startsOff:
-      'Multifus démarre toujours Déplacement éteint. Un mode qui change le sens de chaque clic ne se rallume pas tout seul.',
-    privacy:
-      'Tant que le Déplacement est allumé, Multifus voit passer tous vos clics gauche pour savoir lesquels tombent sur une fenêtre du jeu. Rien n’en sort, rien ne s’écrit.',
-    banner: {
-      title: 'La bannière',
-      description:
-        'Au-dessus du jeu, elle rappelle sur qui vous êtes. Ailleurs — le bureau, un navigateur — elle s’efface. Déplacement éteint, elle n’existe pas : ni fenêtre, ni mémoire prise au jeu.',
-      waiting: 'Déplacement',
-      previewing: 'Aperçu',
-      cornerLegend: 'Le coin',
-      screenLegend: 'L’écran',
-      screenName: (rank: number) => {
-        return `Écran ${rank}`
-      },
-      screenSize: (width: number, height: number) => {
-        return `${width} × ${height}`
-      },
-      screenPrimary: 'principal',
-      hint: 'Désignez un coin : la bannière va s’y poser pour de vrai, deux secondes et demie.',
-      corners: {
-        topLeft: 'En haut à gauche',
-        topRight: 'En haut à droite',
-        bottomLeft: 'En bas à gauche',
-        bottomRight: 'En bas à droite'
-      }
-    }
+    state: STATE_LINES,
+    banner: BANNER_STRINGS
   }
 } as const

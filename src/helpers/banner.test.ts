@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { BannerScreen } from '@/@types/walk'
-import { screenOf } from '@/helpers/banner'
+import { BANNER_SIZE, MONITOR_SIZE } from '@/constants/banner'
+import { monitorShape, screenOf } from '@/helpers/banner'
 
 const LAPTOP: BannerScreen = {
   name: 'DISPLAY1',
@@ -41,5 +42,49 @@ describe('screenOf', () => {
 
   it('gives nothing when the system reports no screen', () => {
     expect(screenOf([], 'DISPLAY1')).toBeNull()
+  })
+})
+
+const PORTRAIT: BannerScreen = {
+  name: 'DISPLAY3',
+  width: 1080,
+  height: 1920,
+  primary: false
+}
+
+describe('monitorShape', () => {
+  it('takes a widescreen when no screen has been read yet', () => {
+    expect(monitorShape(null).ratio).toBe(monitorShape(LAPTOP).ratio)
+  })
+
+  it('draws the screen at its own shape', () => {
+    expect(monitorShape(SIDE).ratio).toBe(2560 / 1440)
+  })
+
+  it('never draws a screen taller than the panel allows', () => {
+    const { drawnWidth, ratio } = monitorShape(PORTRAIT)
+
+    expect(drawnWidth / ratio).toBeLessThanOrEqual(MONITOR_SIZE.height)
+    expect(drawnWidth).toBeLessThan(MONITOR_SIZE.width)
+  })
+
+  it('draws the banner at the scale it will really have on that screen', () => {
+    const { drawnWidth, bannerWidth } = monitorShape(LAPTOP)
+
+    expect(bannerWidth / drawnWidth).toBeCloseTo(BANNER_SIZE.width / 1920)
+  })
+
+  it('keeps the banner readable on a screen too wide to scale it down', () => {
+    const television: BannerScreen = { ...SIDE, width: 3840, height: 2160 }
+
+    expect(monitorShape(television).bannerWidth).toBe(BANNER_SIZE.smallestDrawn)
+  })
+
+  it('keeps the banner’s own shape, whatever the screen', () => {
+    const { bannerWidth, bannerHeight } = monitorShape(PORTRAIT)
+
+    expect(bannerWidth / bannerHeight).toBeCloseTo(
+      BANNER_SIZE.width / BANNER_SIZE.height
+    )
   })
 })

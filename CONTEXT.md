@@ -22,19 +22,19 @@ Les mots de Multifus, et rien d'autre. On en parle en français, on les écrit e
 
 **Défilement** (`cycle`) : le parcours des fenêtres au raccourci, dans un ordre choisi par l'utilisateur.
 
-**Déplacement** (`Walk`) : le mécanisme qui passe au personnage suivant du défilement à chaque clic gauche dans une fenêtre de jeu. Il ne s'allume que d'un geste, jamais tout seul, et Multifus démarre toujours Déplacement éteint.
+**Déplacement rapide** (`Walk`) : le mécanisme qui passe au personnage suivant du défilement à chaque clic gauche dans une fenêtre de jeu. Un joueur emmène ainsi toute sa team d'une map à l'autre sans lâcher la souris. Il ne s'allume que d'un geste, jamais tout seul, et Multifus démarre toujours avec lui éteint. Son nom porte ses deux mots partout, jamais « déplacement » seul, qui se lirait comme le tirage d'une ligne du roster.
 
 **Bascule** (`switch`) : le passage du premier plan d'une fenêtre à la suivante. Elle est finie quand le système la donne pour finie, pas quand on l'a demandée.
 
 **Tour** (`Turn`) : un passage de Multifus sur les fenêtres du jeu, une fois par seconde. Il lit ce qui est à l'écran, pose ce qui manque, et reprend ce qui n'a plus lieu d'être.
 
-**Visée** (`Aim`) : ce qu'un clic gauche vaut au Déplacement. Le clic tombe hors du jeu, ou sur une fenêtre que le tour n'a pas donnée, ou personne n'est dans le défilement, ou le suivant est celui sur lequel on est déjà, ou bien il désigne la fenêtre où aller.
+**Visée** (`Aim`) : ce qu'un clic gauche vaut au Déplacement rapide. Le clic tombe hors du jeu, ou sur une fenêtre que le tour n'a pas donnée, ou personne n'est dans le défilement, ou le suivant est celui sur lequel on est déjà, ou bien il désigne la fenêtre où aller.
 
 **Porte** (`ClickGate`) : ce qui décide, au moment du clic, si le clic compte. Fermée le temps d'une bascule, elle mange les clics qui arrivent trop tôt sur une fenêtre de jeu.
 
 **Juge** (`ClickJudge`) : ce qui tient un clic pour un tout. Il décide à l'enfoncement du bouton, et le relâchement suit sa décision : mangé, un clic l'est en entier, et le jeu n'en voit jamais la moitié.
 
-**Bannière** (`banner`) : la petite fenêtre sans bord posée devant tout le reste, qui porte la tête de classe et le pseudo du personnage sur lequel on vient d'arriver. Elle n'existe que Déplacement allumé, ne se montre qu'au-dessus d'une fenêtre de jeu, et son coin se choisit dans l'écran Déplacement.
+**Bannière** (`banner`) : la petite fenêtre sans bord posée devant tout le reste, qui porte la tête de classe et le pseudo du personnage sur lequel on vient d'arriver. Elle n'existe que Déplacement rapide allumé, ne se montre qu'au-dessus d'une fenêtre de jeu, et son coin se choisit dans l'écran Déplacement rapide.
 
 **Tirage** (`drag`) : l'action de prendre une ligne par sa poignée, et de la porter plus haut ou plus bas pour changer l'ordre du défilement.
 
@@ -48,9 +48,9 @@ Les mots de Multifus, et rien d'autre. On en parle en français, on les écrit e
 
 **AutoFocus** (`AutoFocus`) : le mécanisme qui focus la fenêtre d'un personnage quand une notification de jeu le concerne.
 
-**Frappe** (`Press`) : un appui sur une combinaison, et ce que Multifus en fait. Elle ne vaut que dans le jeu, sauf celle du Déplacement, qui répond de partout.
+**Frappe** (`Press`) : un appui sur une combinaison, et ce que Multifus en fait. Elle ne vaut que dans le jeu, sauf celle du Déplacement rapide, qui répond de partout.
 
-**Mécanisme** (`Mechanisms`) : ce qu'une frappe met en marche sans toucher à une fenêtre : le Déplacement, les messages privés, la réponse rapide.
+**Mécanisme** (`Mechanisms`) : ce qu'une frappe met en marche sans toucher à une fenêtre : le Déplacement rapide, les messages privés, la réponse rapide.
 
 **Réponse rapide** (`QuickReply`) : un texte tout prêt d'une seule ligne, rangé sous une combinaison de touches.
 

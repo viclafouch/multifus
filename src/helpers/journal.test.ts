@@ -461,7 +461,7 @@ const SHORTCUT_CASES = {
         action: 'walk',
         outcome: { outcome: 'walk', enabled: true }
       },
-      line: 'Déplacement : allumé.'
+      line: 'Déplacement rapide : allumé.'
     },
     {
       event: {
@@ -469,7 +469,7 @@ const SHORTCUT_CASES = {
         action: 'walk',
         outcome: { outcome: 'walk', enabled: false }
       },
-      line: 'Déplacement : éteint.'
+      line: 'Déplacement rapide : éteint.'
     }
   ]
 } as const satisfies Record<
@@ -1047,15 +1047,15 @@ const JOURNAL_CASES = {
   walkEnabled: [
     {
       event: { kind: 'walkEnabled', enabled: true, from: 'shortcut' },
-      line: 'Déplacement allumé depuis un raccourci.'
+      line: 'Déplacement rapide allumé depuis un raccourci.'
     },
     {
       event: { kind: 'walkEnabled', enabled: false, from: 'tray' },
-      line: 'Déplacement éteint depuis la barre système.'
+      line: 'Déplacement rapide éteint depuis la barre système.'
     },
     {
       event: { kind: 'walkEnabled', enabled: false, from: 'listeningLost' },
-      line: 'Déplacement éteint depuis Multifus, qui n’écoutait plus les clics.'
+      line: 'Déplacement rapide éteint depuis Multifus, qui n’écoutait plus les clics.'
     }
   ],
   walkIdle: [
@@ -1342,7 +1342,7 @@ describe('journalTranscript', () => {
         'Multifus 0.1.0 sur macOS 26.0 (arm64)',
         'Autorisation : accordée, écoute active',
         'AutoFocus : actif, réveil des réduites actif',
-        'Déplacement : éteint',
+        'Déplacement rapide : éteint',
         BINDINGS_LINE,
         'Configuration : /tmp/multifus/config.json',
         `Mise à jour : ${strings.about.updateUpToDate}`,
@@ -1375,12 +1375,12 @@ describe('journalTranscript', () => {
     )
   })
 
-  it('dit le Déplacement allumé', () => {
+  it('dit le Déplacement rapide allumé', () => {
     const walk = { ...SNAPSHOT.walk, enabled: true }
 
     const transcript = journalTranscript({ ...SNAPSHOT, walk })
 
-    expect(transcript).toContain('Déplacement : allumé')
+    expect(transcript).toContain('Déplacement rapide : allumé')
   })
 
   it('ne promet aucune période quand rien n’est en mémoire', () => {

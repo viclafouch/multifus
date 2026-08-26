@@ -73,7 +73,7 @@ describe('la bannière', () => {
     expect(screen.queryByText(strings.walk.banner.waiting)).toBeNull()
   })
 
-  it('dit seulement Déplacement tant qu’on n’est arrivé sur personne', async () => {
+  it('dit seulement Déplacement rapide tant qu’on n’est arrivé sur personne', async () => {
     await posted(stepOf())
 
     expect(screen.getByText(strings.walk.banner.waiting)).not.toBeNull()
@@ -127,7 +127,7 @@ describe('la bannière', () => {
     expect(screen.queryByText('Alpha')).toBeNull()
   })
 
-  it('revient à Déplacement quand on quitte le jeu', async () => {
+  it('revient à Déplacement rapide quand on quitte le jeu', async () => {
     await posted(
       stepOf({ character: { nickname: 'Alpha', class: 'iop', gender: 'male' } })
     )

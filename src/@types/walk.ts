@@ -4,6 +4,8 @@ export type WalkFrom = 'listeningLost' | 'shortcut' | 'tray' | 'window'
 
 export type WalkIdle = 'nobodyInCycle' | 'tooSlow'
 
+export type WalkLiveState = 'off' | 'on'
+
 export type WalkStatus = {
   readonly enabled: boolean
   readonly banner: BannerPlace

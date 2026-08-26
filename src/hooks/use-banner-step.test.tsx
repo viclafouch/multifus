@@ -77,7 +77,7 @@ describe('useBannerStep', () => {
     expect(result.current).toStrictEqual(stepOf(null))
   })
 
-  it('suit le personnage sur lequel le Déplacement arrive', async () => {
+  it('suit le personnage sur lequel le Déplacement rapide arrive', async () => {
     const { result } = renderHook(() => {
       return useBannerStep()
     })

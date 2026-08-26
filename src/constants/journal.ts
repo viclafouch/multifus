@@ -88,9 +88,9 @@ export const WALK_IDLE_TONES = {
 
 export const WALK_IDLE_LINES = {
   nobodyInCycle:
-    'Déplacement : personne dans le défilement, le clic n’a nulle part où aller.',
+    'Déplacement rapide : personne dans le défilement, le clic n’a nulle part où aller.',
   tooSlow:
-    'Déplacement : la fenêtre suivante a mis plus de temps que prévu à passer devant.'
+    'Déplacement rapide : la fenêtre suivante a mis plus de temps que prévu à passer devant.'
 } as const satisfies Record<WalkIdle, string>
 
 export const WALK_FROM_LABELS = {
@@ -143,9 +143,10 @@ export const DETAILED_LINES = {
   shortTitlesFailed: 'Titre d’une fenêtre impossible à changer',
   windowIconFailed: 'Icône d’une fenêtre impossible à poser',
   walkListeningRefused:
-    'Déplacement impossible à allumer, Multifus n’écoute pas les clics',
-  walkSwitchFailed: 'Déplacement : la fenêtre suivante n’est pas passée devant',
-  bannerFailed: 'La bannière du Déplacement n’a pas suivi',
+    'Déplacement rapide impossible à allumer, Multifus n’écoute pas les clics',
+  walkSwitchFailed:
+    'Déplacement rapide : la fenêtre suivante n’est pas passée devant',
+  bannerFailed: 'La bannière du Déplacement rapide n’a pas suivi',
   saveFailed: 'Configuration non enregistrée',
   configNotSetAside:
     'Configuration illisible et impossible à déplacer, le prochain enregistrement l’écrasera',
@@ -170,9 +171,9 @@ export const PLAIN_LINES = {
   relayUnpaired: 'Robot Telegram retiré, son code effacé du trousseau.',
   relayTestSent: 'Message d’essai envoyé sur le téléphone.',
   walkListeningResumed:
-    'Déplacement : le système avait cessé de transmettre les clics, ils reviennent.',
+    'Déplacement rapide : le système avait cessé de transmettre les clics, ils reviennent.',
   walkListeningLost:
-    'Déplacement : le système a cessé de transmettre les clics, et n’a pas repris.',
+    'Déplacement rapide : le système a cessé de transmettre les clics, et n’a pas repris.',
   reset: 'Configuration remise à zéro.',
   quit: 'Multifus a été quitté depuis la barre système.'
 } as const satisfies Record<WithoutPayload<JournalEvent>, string>
@@ -199,6 +200,6 @@ export const WORK_LABELS = {
   scan: 'La lecture des fenêtres',
   shortcuts: 'La réponse à un raccourci',
   tray: 'La réponse à un clic dans la barre système',
-  walk: 'La bascule du Déplacement',
-  banner: 'La bannière du Déplacement'
+  walk: 'La bascule du Déplacement rapide',
+  banner: 'La bannière du Déplacement rapide'
 } as const satisfies Record<Work, string>
