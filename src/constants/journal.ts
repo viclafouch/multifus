@@ -43,6 +43,7 @@ export const TONES = {
   trayFailed: 'warning',
   windowFailed: 'warning',
   walkEnabled: 'neutral',
+  walkListeningResumed: 'good',
   walkListeningLost: 'warning',
   walkListeningRefused: 'warning',
   walkSwitchFailed: 'warning',
@@ -168,8 +169,10 @@ export const PLAIN_LINES = {
   relayPaired: 'Robot Telegram relié.',
   relayUnpaired: 'Robot Telegram retiré, son code effacé du trousseau.',
   relayTestSent: 'Message d’essai envoyé sur le téléphone.',
+  walkListeningResumed:
+    'Déplacement : le système avait cessé de transmettre les clics, ils reviennent.',
   walkListeningLost:
-    'Déplacement : Windows a cessé de transmettre les clics, et n’a pas repris.',
+    'Déplacement : le système a cessé de transmettre les clics, et n’a pas repris.',
   reset: 'Configuration remise à zéro.',
   quit: 'Multifus a été quitté depuis la barre système.'
 } as const satisfies Record<WithoutPayload<JournalEvent>, string>

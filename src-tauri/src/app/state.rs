@@ -60,7 +60,6 @@ use crate::domain::Portrait;
 use crate::platform::GameWindow;
 use crate::platform::PlatformNotificationWatcher;
 use crate::platform::WindowId;
-use crate::platform::WATCHES_CLICKS;
 
 pub type AppState = Mutex<Multifus>;
 
@@ -233,7 +232,6 @@ impl Multifus {
             update: self.update.clone(),
             walk: WalkView {
                 enabled: self.walk_enabled,
-                supported: WATCHES_CLICKS,
                 banner: BannerView {
                     corner: self.settings.banner.corner,
                     screen: self.settings.banner.screen.clone(),

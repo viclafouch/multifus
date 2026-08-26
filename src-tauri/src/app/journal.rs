@@ -215,6 +215,8 @@ pub enum JournalEvent {
         reason: WalkIdle,
     },
 
+    WalkListeningResumed,
+
     WalkListeningLost,
 
     WalkListeningRefused {

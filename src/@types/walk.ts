@@ -6,7 +6,6 @@ export type WalkIdle = 'nobodyInCycle' | 'tooSlow'
 
 export type WalkStatus = {
   readonly enabled: boolean
-  readonly supported: boolean
   readonly banner: BannerPlace
 }
 

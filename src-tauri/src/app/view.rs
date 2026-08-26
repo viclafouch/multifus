@@ -51,7 +51,6 @@ pub struct Snapshot {
 #[serde(rename_all = "camelCase")]
 pub struct WalkView {
     pub enabled: bool,
-    pub supported: bool,
     pub banner: BannerView,
 }
 

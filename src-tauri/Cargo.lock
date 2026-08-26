@@ -2398,6 +2398,7 @@ dependencies = [
 name = "multifus"
 version = "0.1.0"
 dependencies = [
+ "block2",
  "dispatch2",
  "keyring",
  "libc",

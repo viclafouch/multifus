@@ -83,12 +83,17 @@ libc = "0.2"
 objc2 = "0.6"
 # The hop to the main thread `NSScreen` demands, and nothing else in the crate.
 dispatch2 = "0.3"
+# What the foreground observer of the Walk takes its callback in.
+block2 = "0.6"
 objc2-app-kit = { version = "0.3", default-features = false, features = [
   "std",
   "libc",
+  "block2",
   "NSRunningApplication",
   # The work area a maximized window fills, which no Core Graphics call gives.
   "NSScreen",
+  # Who came to the front, which the Walk asks on every switch.
+  "NSWorkspace",
 ] }
 objc2-application-services = { version = "0.3", default-features = false, features = [
   "std",
@@ -112,6 +117,8 @@ objc2-core-foundation = { version = "0.3", default-features = false, features = 
   "std",
   "CFArray",
   "CFDictionary",
+  # The port the click tap listens on, and the source it gives the run loop.
+  "CFMachPort",
   "CFNumber",
   # The screen saver delay, which the display assertion does not cover.
   "CFPreferences",
@@ -120,7 +127,10 @@ objc2-core-foundation = { version = "0.3", default-features = false, features = 
 ] }
 objc2-foundation = { version = "0.3", default-features = false, features = [
   "std",
+  "block2",
   "NSArray",
+  # What the workspace posts when an application comes to the front.
+  "NSNotification",
   "NSString",
 ] }
 

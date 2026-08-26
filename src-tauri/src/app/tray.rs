@@ -33,7 +33,6 @@ use crate::app::walk;
 use crate::platform::PlatformError;
 use crate::platform::PlatformWindowManager;
 use crate::platform::WindowManager;
-use crate::platform::WATCHES_CLICKS;
 
 const MENU_CHARACTERS: &str = "Personnages";
 const MENU_SHORTCUTS: &str = "Raccourcis";
@@ -99,7 +98,7 @@ type ShownMenu = Mutex<Option<Contents>>;
 struct Contents {
     entries: Vec<Entry>,
     auto_focus: bool,
-    walk: Option<bool>,
+    walk: bool,
     wakes_minimized: bool,
     granted: bool,
     update: Option<String>,
@@ -133,7 +132,7 @@ fn contents(app: &AppHandle) -> Contents {
     Contents {
         entries: entries(&state.connected()),
         auto_focus: state.is_auto_focus_enabled(),
-        walk: WATCHES_CLICKS.then(|| state.is_walk_enabled()),
+        walk: state.is_walk_enabled(),
         wakes_minimized: state.wakes_minimized(),
         granted: state.is_granted(),
         update: state.available_update(),
@@ -286,15 +285,13 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
         None::<&str>,
     )?)?;
 
-    if let Some(walking) = contents.walk {
-        menu.append(&MenuItem::with_id(
-            app,
-            WALK_ID,
-            switch_label(walking, MENU_WALK_OFF, MENU_WALK_ON),
-            true,
-            None::<&str>,
-        )?)?;
-    }
+    menu.append(&MenuItem::with_id(
+        app,
+        WALK_ID,
+        switch_label(contents.walk, MENU_WALK_OFF, MENU_WALK_ON),
+        true,
+        None::<&str>,
+    )?)?;
 
     menu.append(&MenuItem::with_id(
         app,
@@ -561,7 +558,7 @@ mod tests {
         let mut contents = Contents {
             entries: Vec::new(),
             auto_focus: true,
-            walk: None,
+            walk: false,
             wakes_minimized: true,
             granted: true,
             update: None,

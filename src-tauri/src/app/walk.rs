@@ -7,6 +7,7 @@ use std::sync::Arc;
 use std::sync::Mutex;
 use std::sync::PoisonError;
 use std::thread;
+use std::time::Instant;
 
 use tauri::AppHandle;
 use tauri::Manager;
@@ -22,6 +23,7 @@ use crate::platform::ClickGate;
 use crate::platform::ClickReport;
 use crate::platform::ClickSink;
 use crate::platform::ClickWatcher;
+use crate::platform::ClickedAt;
 use crate::platform::PlatformClickWatcher;
 use crate::platform::PlatformError;
 use crate::platform::PlatformWindowManager;
@@ -38,8 +40,9 @@ pub struct WalkPlan {
 
 #[derive(Debug)]
 enum WalkStep {
-    Clicked { window: WindowId },
+    Clicked { clicked: ClickedAt },
     Foreground { window: WindowId },
+    ListeningResumed,
     ListeningLost,
 }
 
@@ -186,8 +189,9 @@ fn listen(app: &AppHandle) -> Result<(), PlatformError> {
 fn sink_of(gate: Arc<ClickGate>, steps: Sender<WalkStep>) -> ClickSink {
     Arc::new(move |report| {
         let step = match report {
-            ClickReport::Clicked { window } => WalkStep::Clicked { window },
+            ClickReport::Clicked { clicked } => WalkStep::Clicked { clicked },
             ClickReport::Foreground { window } => WalkStep::Foreground { window },
+            ClickReport::ListeningResumed => WalkStep::ListeningResumed,
             ClickReport::ListeningLost => WalkStep::ListeningLost,
         };
 
@@ -199,9 +203,12 @@ fn sink_of(gate: Arc<ClickGate>, steps: Sender<WalkStep>) -> ClickSink {
 
 fn take(app: &AppHandle, step: WalkStep) {
     match step {
-        WalkStep::Clicked { window } => switch(app, window),
+        WalkStep::Clicked { clicked } => switch(app, clicked),
         WalkStep::Foreground { window } => {
             banner::follow_foreground(app, app.state::<Walk>().watches(window));
+        }
+        WalkStep::ListeningResumed => {
+            lock(app).log(JournalEvent::WalkListeningResumed);
         }
         WalkStep::ListeningLost => {
             lock(app).log(JournalEvent::WalkListeningLost);
@@ -211,9 +218,27 @@ fn take(app: &AppHandle, step: WalkStep) {
     }
 }
 
-fn switch(app: &AppHandle, clicked: WindowId) {
+fn window_under(app: &AppHandle, clicked: ClickedAt) -> Option<WindowId> {
+    let under = app
+        .state::<PlatformWindowManager>()
+        .window_at(clicked.at)
+        .ok()
+        .flatten()?;
+
+    app.state::<Walk>().watches(under).then_some(under)
+}
+
+fn switch(app: &AppHandle, clicked: ClickedAt) {
+    let asked_at = Instant::now();
     let walk = app.state::<Walk>();
-    let Some(target) = walk.next_after(clicked) else {
+
+    let Some(under) = window_under(app, clicked) else {
+        walk.gate.open();
+
+        return;
+    };
+
+    let Some(target) = walk.next_after(under) else {
         walk.gate.open();
 
         lock(app).log_unless_repeated(JournalEvent::WalkIdle {
@@ -225,13 +250,13 @@ fn switch(app: &AppHandle, clicked: WindowId) {
         return;
     };
 
-    if target == clicked {
+    if target == under {
         walk.gate.open();
 
         return;
     }
 
-    thread::sleep(SETTLE);
+    thread::sleep(SETTLE.saturating_sub(asked_at.elapsed()));
 
     walk.gate.expect(target);
 

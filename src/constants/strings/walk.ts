@@ -14,8 +14,6 @@ export const WALK_STRINGS = {
       'Multifus démarre toujours Déplacement éteint. Un mode qui change le sens de chaque clic ne se rallume pas tout seul.',
     privacy:
       'Tant que le Déplacement est allumé, Multifus voit passer tous vos clics gauche pour savoir lesquels tombent sur une fenêtre du jeu. Rien n’en sort, rien ne s’écrit.',
-    unavailable:
-      'Le Déplacement n’existe que sur Windows pour l’instant. Sur macOS, l’interrupteur ne fait rien.',
     banner: {
       title: 'La bannière',
       description:

@@ -14,9 +14,9 @@ pub use click::ClickGate;
 pub use click::ClickReport;
 pub use click::ClickSink;
 pub use click::ClickWatcher;
+pub use click::ClickedAt;
 pub use click::SETTLE;
 pub use click::SWITCH_CEILING;
-pub use click::WATCHES_CLICKS;
 pub use display::DisplayKeeper;
 pub use display::ScreenSaverDelay;
 pub use error::PlatformError;
@@ -26,6 +26,7 @@ pub use notification::NotificationSink;
 pub use notification::NotificationWatcher;
 pub use paste::PasteSender;
 pub use window::GameWindow;
+pub use window::ScreenPoint;
 pub use window::WindowId;
 pub use window::WindowManager;
 
@@ -63,6 +64,6 @@ pub type PlatformPasteSender = macos::CoreGraphicsPasteSender;
 pub type PlatformPasteSender = windows::SendInputPasteSender;
 
 #[cfg(target_os = "macos")]
-pub type PlatformClickWatcher = macos::UnwatchedClicks;
+pub type PlatformClickWatcher = macos::MouseTapClickWatcher;
 #[cfg(target_os = "windows")]
 pub type PlatformClickWatcher = windows::MouseHookClickWatcher;

@@ -108,9 +108,23 @@ Trois dépenses sont interdites sur le chemin du clic :
 2. **L'accessibilité sur macOS.** Le `focus()` actuel lit les fenêtres du client
    visé avant d'activer l'application, et chaque lecture est un aller-retour
    synchrone vers un processus qui peut être occupé. Le Déplacement prend un
-   chemin court : `activateWithOptions` sur le pid en cache, pas un seul appel
-   d'accessibilité, et pas de réveil des fenêtres réduites — un personnage rangé
-   dans le Dock n'est pas un personnage qu'on déplace au clic.
+   chemin court : `activateWithOptions` sur le pid en cache, et pas la recherche
+   du titre de la fenêtre de jeu.
+
+   **Ce paragraphe a été rattrapé deux fois par la vraie machine.** D'abord,
+   depuis Sonoma, une application en arrière-plan ne peut plus s'activer :
+   `activateWithOptions` rendait faux à chaque clic et le journal disait « la
+   fenêtre suivante n'est pas passée devant ». `focus_fast` retombe donc sur
+   `AXFrontmost`, comme `focus()`, et c'est ce chemin-là qui sert. Ensuite, le
+   plan refusait de réveiller les fenêtres réduites : un personnage rangé dans le
+   Dock devenait un trou invisible dans le défilement, l'application passait
+   active sans que rien ne paraisse. `focus_fast` restaure donc la fenêtre du
+   client, comme le fait le raccourci « suivant ». Il lit `AXMainWindow` seul, et
+   ne retombe sur la recherche d'une fenêtre titrée que si l'application n'en
+   nomme aucune : c'est là, et nulle part ailleurs, que le chemin court reste
+   plus court que `focus()`. Sur Windows, `IsIconic` puis
+   `ShowWindowAsync(SW_RESTORE)` font la même chose pour presque rien.
+
 3. **La bannière.** Elle se redessine après la bascule, jamais avant.
 
 Sur Windows, `live_game_window` interroge le processus de la fenêtre à chaque
@@ -411,21 +425,115 @@ Le prix est celui que Dracoon paie : la porte reste fermée cent millisecondes,
 et un second clic parti pendant ce temps est mangé. On l'accepte pour zéro
 panne, et on redescendra le chiffre par essais une fois qu'on saura qu'il tient.
 
+**Redescendu sur macOS, à l'essai.** Deux clics à la vitesse d'un double clic ne
+déplaçaient que le premier personnage : le second tombait dans les cent
+millisecondes de porte fermée. `SETTLE` vaut donc 40 ms hors de Windows, et le
+temps déjà passé à demander qui est sous le curseur en fait partie plutôt que de
+s'y ajouter. Si un clic se perd — le personnage cliqué ne bouge pas du tout —,
+c'est que le client n'a pas eu le temps de le prendre, et le chiffre remonte.
+
+## macOS écoute les clics
+
+Le tap est livré, et l'interrupteur s'ouvre des deux côtés. Ce qui a été écrit,
+et ce que macOS a imposé de différent :
+
+- `MouseTapClickWatcher` en place de `UnwatchedClicks` : un `CGEventTap` de
+  session, posé en tête, sur l'enfoncement et le relâchement du bouton gauche,
+  sur son fil et son `CFRunLoop`. Il rend un pointeur nul pour manger un clic.
+- **Le verdict est devenu commun aux deux systèmes.** `ClickJudge`, `Verdict` et
+  `Press` vivent dans `platform/click.rs`, et les cinq tests du clic coupé en
+  deux avec eux : ils tournaient sur Windows seulement, ils tournent maintenant
+  partout, y compris sur la machine où le code s'écrit.
+- **La fenêtre cliquée est celle qui est devant.** Un tap ne dit pas quelle
+  fenêtre a reçu le clic. Le pid de l'application au premier plan est tenu dans
+  une valeur atomique par un observateur de `NSWorkspace`, et sur macOS
+  `WindowId` **est** le pid : le rappel compare sans rien traduire, et
+  `ClickGate` écarte tout ce qui n'est pas une fenêtre de jeu.
+- **La bascule se constate par le même observateur.** `didActivateApplication`
+  réveille la bascule et prévient la bannière. Pas de sondage, comme sur Windows.
+- **La coupure est rattrapée des deux causes.** `kCGEventTapDisabledByTimeout` et
+  `kCGEventTapDisabledByUserInput` réactivent le tap. Si le système le refuse
+  encore, le Déplacement s'éteint tout seul, comme sur Windows.
+- **Une coupure rattrapée pose enfin sa ligne au journal**, sur les deux
+  systèmes : `ClickReport::ListeningResumed`, puis `WalkListeningResumed`. Le
+  plan le réclamait, et rien ne le disait jusqu'ici.
+- **L'extinction ne traîne pas.** Le fil du tap dort dans son run loop ; éteindre
+  l'arrête depuis l'autre fil plutôt que d'attendre le prochain quart de seconde.
+- Sans l'autorisation d'accessibilité, `start` refuse et le journal le dit :
+  l'interrupteur reste éteint plutôt que d'être allumé et sourd.
+- `walk.supported` a disparu de la vue, avec `WATCHES_CLICKS`, la mention
+  « Windows uniquement » de l'écran et la ligne « indisponible sur ce système »
+  du transcript. Les deux systèmes écoutent.
+
+### Le clic se confirme après coup
+
+Le plan pariait que le premier plan suffisait à nommer la fenêtre cliquée sur
+macOS. **Faux, et ça se voit tout de suite** : un clic sur le Dock, sur la barre
+des menus, ou sur une fenêtre posée à côté du jeu partait pendant que le jeu
+était encore devant. Multifus comptait le clic et ramenait Dofus par-dessus
+l'application qu'on venait d'ouvrir. `kCGEventTargetUnixProcessID` a été essayé :
+il ne dit rien d'utile pour un tap de session.
+
+Le jugement se fait donc **en deux étages**, et le second n'est plus dans le
+rappel :
+
+1. **Le rappel**, en microsecondes, décide seulement s'il faut manger : porte
+   fermée et premier plan dans le défilement. Il rapporte le clic avec **le point
+   où le bouton a été pressé**.
+2. **Le fil de la bascule** demande au système ce qu'il y a sous ce point,
+   `client_at`. Ce n'est pas la fenêtre du défilement : rien ne bouge, et la
+   porte se rouvre.
+
+Le point vient de l'événement, pas du curseur : bouger la souris juste après le
+clic ne change rien à la réponse.
+
+- **macOS** : `AXUIElementCopyElementAtPosition` sur l'élément système, puis le
+  pid de l'élément trouvé. **Sans délai d'attente** : `set_messaging_timeout` sur
+  l'élément système vaut pour tout le processus, le scan compris, et un scan à
+  plusieurs clients dépasse 50 ms. Le prix est qu'un client muet retient la
+  bascule ; le fil du Déplacement est seul à attendre.
+- **Windows** : `WindowFromPoint` sur le même point, ce que le hook faisait déjà.
+  La réponse est la même, pour presque rien.
+
+Reste deux cas, et ils sont connus :
+
+- La barre des menus du client appartient au client lui-même, donc un clic dedans
+  compte comme un clic de jeu.
+- **Le premier étage garde le dernier mot sur ce qui n'est pas compté.** Il ne
+  rapporte le clic que si le premier plan est déjà une fenêtre de jeu : revenir
+  d'un navigateur et cliquer dans un client déplace le personnage sans passer au
+  suivant, parce que le clic qui active la fenêtre part avant que le système ne
+  dise qui est devant. Pour le lever, il faudrait rapporter **tous** les clics
+  gauche et laisser le second étage jeter, soit un aller-retour d'accessibilité à
+  chaque clic du système. À voir si ça gêne pour de vrai.
+- Un clic que le système ne sait pas placer est perdu sans une ligne au journal.
+  Distinguer « rien sous le curseur » de « pas de réponse » demanderait une
+  variante de plus, et le premier cas est le cas courant.
+
 ## Ce qui reste
 
 - [ ] La bannière sur macOS : `transparent` demande `macOSPrivateApi`, activé,
       mais rien n'est vérifié là-bas. Le plan doute qu'elle tienne au-dessus
       d'un client en plein écran.
-- [ ] macOS : le `CGEventTap` sur `kCGEventLeftMouseUp`, l'observateur
-      `NSWorkspace` pour le pid du premier plan et pour constater la bascule, le
-      rebranchement sur `kCGEventTapDisabledByTimeout`.
 - [ ] Mesurer ce que coûte `AttachThreadInput` dans `focus_fast` : la règle de
       l'écran le dira sur une vraie soirée.
 - [ ] Ne pas compter les clics pendant les N secondes qui suivent une frappe au
       clavier, si les clics dans le chat gênent.
+- [ ] `kCGEventTargetUnixProcessID` a été essayé sur l'événement : il ne porte pas
+      le pid du destinataire pour un tap de session. Ne pas y revenir.
+- [ ] Le tap et le hook portent deux fois le même aiguillage — enfoncement vers
+      le juge, relâchement vers le juge, sinon laisser passer — et deux fois la
+      même table `gate` plus `sink` plus `judge`. Un seul type des deux côtés le
+      dirait mieux, une fois qu'on aura de quoi compiler Windows ici.
 
 ## À vérifier sur une vraie soirée
 
+- [ ] macOS : l'interrupteur allume, et le premier clic dans un client déplace
+- [ ] macOS, l'accessibilité retirée : l'interrupteur reste éteint et le journal
+      dit pourquoi
+- [ ] macOS : un clic sur le Dock, sur une autre fenêtre, sur le bureau : rien ne
+      doit bouger
+- [ ] macOS : la bannière au-dessus d'un client, en fenêtré puis en plein écran
 - [ ] Deux clients, mode allumé : deux clics rapides déplacent deux personnages
 - [ ] Le second clic parti trop tôt est mangé, et le premier personnage ne se
       déplace pas deux fois

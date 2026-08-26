@@ -18,7 +18,7 @@ versions déjà installées.
 
 ## Ajouter le Déplacement
 
-- [ ] Finir le Déplacement : le côté macOS, dont le détail est dans [plan-deplacement.md](./plan-deplacement.md)
+- [ ] Le Déplacement sur macOS : les clics sont lus, la bannière n'est pas vérifiée, et rien n'est essayé en jeu. Détail dans [plan-deplacement.md](./plan-deplacement.md)
 
 ## Vérifier sur une vraie soirée
 

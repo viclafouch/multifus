@@ -8,8 +8,6 @@ import { Note } from '@/components/layout/note'
 import { Panel } from '@/components/layout/panel'
 import { Screen } from '@/components/layout/screen'
 import { Switch } from '@/components/ui/switch'
-import { UnavailableSwitch } from '@/components/unavailable-switch'
-import { WindowsOnly } from '@/components/windows-only'
 import { strings } from '@/constants/strings'
 import { acceleratorParts } from '@/helpers/accelerator'
 import { setWalkEnabled } from '@/lib/multifus'
@@ -37,24 +35,13 @@ export const WalkScreen = ({ walk, shortcuts, run }: WalkScreenProps) => {
             <Footprints className="size-glyph" strokeWidth={1.75} aria-hidden />
           }
         >
-          {walk.supported ? (
-            <Switch
-              checked={walk.enabled}
-              aria-label={strings.walk.switchLabel}
-              onCheckedChange={(enabled) => {
-                run(setWalkEnabled(enabled))
-              }}
-            />
-          ) : (
-            <>
-              <WindowsOnly />
-              <UnavailableSwitch
-                label={strings.walk.switchLabel}
-                reason={strings.walk.unavailable}
-                checked={false}
-              />
-            </>
-          )}
+          <Switch
+            checked={walk.enabled}
+            aria-label={strings.walk.switchLabel}
+            onCheckedChange={(enabled) => {
+              run(setWalkEnabled(enabled))
+            }}
+          />
         </FieldRow>
         <FieldRow
           label={strings.walk.shortcutLabel}

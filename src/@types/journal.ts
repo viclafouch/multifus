@@ -139,6 +139,7 @@ export type JournalEvent =
   | { readonly kind: 'updateUpToDate' }
   | { readonly kind: 'walkIdle'; readonly reason: WalkIdle }
   | { readonly kind: 'walkListeningRefused'; readonly detail: string }
+  | { readonly kind: 'walkListeningResumed' }
   | { readonly kind: 'walkListeningLost' }
   | { readonly kind: 'bannerFailed'; readonly detail: string }
   | { readonly kind: 'walkSwitchFailed'; readonly detail: string }

@@ -143,9 +143,12 @@ use windows::UI::Notifications::UserNotification;
 use crate::domain::extract_nickname;
 use crate::domain::GameNotification;
 use crate::platform::click::ClickGate;
+use crate::platform::click::ClickJudge;
 use crate::platform::click::ClickReport;
 use crate::platform::click::ClickSink;
 use crate::platform::click::ClickWatcher;
+use crate::platform::click::ClickedAt;
+use crate::platform::click::Verdict;
 use crate::platform::display::DisplayKeeper;
 use crate::platform::display::ScreenSaverDelay;
 use crate::platform::error::PlatformError;
@@ -158,6 +161,7 @@ use crate::platform::window::icon_image;
 use crate::platform::window::matches_short_title;
 use crate::platform::window::title_suffix;
 use crate::platform::window::GameWindow;
+use crate::platform::window::ScreenPoint;
 use crate::platform::window::ShortTitleReport;
 use crate::platform::window::WindowId;
 use crate::platform::window::WindowManager;
@@ -322,6 +326,13 @@ impl WindowManager for Win32WindowManager {
             .collect())
     }
 
+    fn window_at(&self, at: ScreenPoint) -> Result<Option<WindowId>> {
+        Ok(root_window_at(POINT {
+            x: at.x as i32,
+            y: at.y as i32,
+        }))
+    }
+
     fn foreground_game_window(&self) -> Result<Option<GameWindow>> {
         let Some((id, title)) = titled_window(unsafe { GetForegroundWindow() }) else {
             return Ok(None);
@@ -359,6 +370,10 @@ impl WindowManager for Win32WindowManager {
     fn focus_fast(&self, window: WindowId) -> Result<()> {
         let handle = window_handle(window);
         let _attached = AttachedInput::new(handle);
+
+        if unsafe { IsIconic(handle) }.as_bool() {
+            let _ = unsafe { ShowWindowAsync(handle, SW_RESTORE) };
+        }
 
         let _ = unsafe { BringWindowToTop(handle) };
 
@@ -857,22 +872,11 @@ const EAT_THE_CLICK: LRESULT = LRESULT(1);
 struct Watched {
     gate: Arc<ClickGate>,
     sink: ClickSink,
-}
-
-enum Verdict {
-    Pass,
-    Eat,
-}
-
-#[derive(Clone, Copy)]
-enum Press {
-    Eaten,
-    Ours(WindowId),
+    judge: ClickJudge,
 }
 
 thread_local! {
     static WATCHED: RefCell<Option<Watched>> = const { RefCell::new(None) };
-    static PRESSED: Cell<Option<Press>> = const { Cell::new(None) };
     static HOOK_BUDGET: Cell<Duration> =
         const { Cell::new(Duration::from_millis(DEFAULT_HOOKS_TIMEOUT_MS)) };
 }
@@ -957,6 +961,7 @@ fn listen(gate: &Arc<ClickGate>, sink: &ClickSink, told: &mpsc::Sender<Result<u3
         *watched = Some(Watched {
             gate: Arc::clone(gate),
             sink: Arc::clone(sink),
+            judge: ClickJudge::default(),
         });
     });
 
@@ -980,8 +985,6 @@ fn listen(gate: &Arc<ClickGate>, sink: &ClickSink, told: &mpsc::Sender<Result<u3
     if let Some(foreground) = foreground {
         let _ = unsafe { UnhookWinEvent(foreground) };
     }
-
-    PRESSED.set(None);
 
     WATCHED.with_borrow_mut(|watched| {
         *watched = None;
@@ -1009,6 +1012,8 @@ fn pump_hooks(mouse: HHOOK, sink: &ClickSink) -> Option<HHOOK> {
 
             return None;
         };
+
+        (sink)(ClickReport::ListeningResumed);
 
         hook = rehooked;
     }
@@ -1071,59 +1076,27 @@ fn verdict_of(lparam: LPARAM, message: u32) -> Verdict {
         return Verdict::Pass;
     }
 
-    match message {
-        WM_LBUTTONDOWN => on_press(root_window_at(event.pt)),
-        WM_LBUTTONUP => on_release(),
-        _ => Verdict::Pass,
-    }
-}
-
-fn on_press(window: Option<WindowId>) -> Verdict {
-    let pressed = WATCHED.with_borrow(|watched| {
-        let (Some(watched), Some(window)) = (watched.as_ref(), window) else {
-            return None;
-        };
-
-        if !watched.gate.watches(window) {
-            return None;
-        }
-
-        if watched.gate.is_switching() {
-            return Some(Press::Eaten);
-        }
-
-        Some(Press::Ours(window))
-    });
-
-    PRESSED.set(pressed);
-
-    if matches!(pressed, Some(Press::Eaten)) {
-        Verdict::Eat
-    } else {
-        Verdict::Pass
-    }
-}
-
-fn on_release() -> Verdict {
-    let Some(pressed) = PRESSED.take() else {
-        return Verdict::Pass;
-    };
-
-    let Press::Ours(window) = pressed else {
-        return Verdict::Eat;
-    };
-
     WATCHED.with_borrow(|watched| {
         let Some(watched) = watched.as_ref() else {
-            return;
+            return Verdict::Pass;
         };
 
-        watched.gate.close();
+        match message {
+            WM_LBUTTONDOWN => watched.judge.press(&watched.gate, clicked_at(event.pt)),
+            WM_LBUTTONUP => watched.judge.release(&watched.gate, &watched.sink),
+            _ => Verdict::Pass,
+        }
+    })
+}
 
-        (watched.sink)(ClickReport::Clicked { window });
-    });
-
-    Verdict::Pass
+fn clicked_at(point: POINT) -> Option<ClickedAt> {
+    root_window_at(point).map(|window| ClickedAt {
+        window,
+        at: ScreenPoint {
+            x: f64::from(point.x),
+            y: f64::from(point.y),
+        },
+    })
 }
 
 fn root_window_at(point: POINT) -> Option<WindowId> {
@@ -1642,8 +1615,6 @@ fn system_parameter(action: SYSTEM_PARAMETERS_INFO_ACTION) -> Option<u32> {
 
 #[cfg(test)]
 mod tests {
-    use std::sync::Mutex;
-
     use windows::core::PCWSTR;
     use windows::Win32::UI::WindowsAndMessaging::CreateWindowExW;
     use windows::Win32::UI::WindowsAndMessaging::DefWindowProcW;
@@ -1658,9 +1629,6 @@ mod tests {
     use windows::Win32::UI::WindowsAndMessaging::WS_OVERLAPPEDWINDOW;
 
     use super::*;
-
-    const CLICKED: u64 = 41;
-    const ELSEWHERE: u64 = 42;
 
     const PAINTED_CLASS: PCWSTR = w!("MultifusPaintedWindow");
 
@@ -1798,115 +1766,5 @@ mod tests {
             NO_ICON,
             "a class with no small icon still holds the one the system drew for it"
         );
-    }
-
-    type Reported = Arc<Mutex<Vec<WindowId>>>;
-
-    fn watching(gate: &Arc<ClickGate>) -> Reported {
-        let reported: Reported = Arc::new(Mutex::new(Vec::new()));
-
-        gate.watch(&[WindowId::from_raw(CLICKED)]);
-
-        let sink: ClickSink = Arc::new({
-            let reported = Arc::clone(&reported);
-
-            move |report| {
-                if let ClickReport::Clicked { window, .. } = report {
-                    reported
-                        .lock()
-                        .unwrap_or_else(PoisonError::into_inner)
-                        .push(window);
-                }
-            }
-        });
-
-        WATCHED.with_borrow_mut(|watched| {
-            *watched = Some(Watched {
-                gate: Arc::clone(gate),
-                sink,
-            });
-        });
-
-        PRESSED.set(None);
-
-        reported
-    }
-
-    fn windows_of(reported: &Reported) -> Vec<u64> {
-        reported
-            .lock()
-            .unwrap_or_else(PoisonError::into_inner)
-            .iter()
-            .map(|window| window.raw())
-            .collect()
-    }
-
-    #[test]
-    fn a_whole_click_on_a_game_window_reaches_the_game_and_is_reported_once() {
-        let gate = Arc::new(ClickGate::default());
-        let reported = watching(&gate);
-
-        let press = on_press(Some(WindowId::from_raw(CLICKED)));
-        let release = on_release();
-
-        assert!(matches!(press, Verdict::Pass));
-        assert!(matches!(release, Verdict::Pass));
-        assert_eq!(windows_of(&reported), vec![CLICKED]);
-    }
-
-    #[test]
-    fn a_click_that_starts_during_a_switch_is_eaten_whole() {
-        let gate = Arc::new(ClickGate::default());
-        let reported = watching(&gate);
-
-        gate.close();
-
-        let press = on_press(Some(WindowId::from_raw(CLICKED)));
-
-        gate.open();
-
-        let release = on_release();
-
-        assert!(matches!(press, Verdict::Eat));
-        assert!(matches!(release, Verdict::Eat));
-        assert_eq!(windows_of(&reported), Vec::<u64>::new());
-    }
-
-    #[test]
-    fn a_release_belongs_to_the_window_the_button_went_down_on() {
-        let gate = Arc::new(ClickGate::default());
-        let reported = watching(&gate);
-
-        on_press(Some(WindowId::from_raw(CLICKED)));
-
-        gate.watch(&[WindowId::from_raw(ELSEWHERE)]);
-
-        on_release();
-
-        assert_eq!(windows_of(&reported), vec![CLICKED]);
-    }
-
-    #[test]
-    fn a_click_outside_the_game_is_left_alone() {
-        let gate = Arc::new(ClickGate::default());
-        let reported = watching(&gate);
-
-        let press = on_press(Some(WindowId::from_raw(ELSEWHERE)));
-        let release = on_release();
-
-        assert!(matches!(press, Verdict::Pass));
-        assert!(matches!(release, Verdict::Pass));
-        assert_eq!(windows_of(&reported), Vec::<u64>::new());
-    }
-
-    #[test]
-    fn a_release_without_a_press_walks_nothing() {
-        let gate = Arc::new(ClickGate::default());
-        let reported = watching(&gate);
-
-        let release = on_release();
-
-        assert!(matches!(release, Verdict::Pass));
-        assert_eq!(windows_of(&reported), Vec::<u64>::new());
     }
 }

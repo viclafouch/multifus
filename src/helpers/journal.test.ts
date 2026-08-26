@@ -1068,6 +1068,12 @@ const JOURNAL_CASES = {
       line: WALK_IDLE_LINES.tooSlow
     }
   ],
+  walkListeningResumed: [
+    {
+      event: { kind: 'walkListeningResumed' },
+      line: PLAIN_LINES.walkListeningResumed
+    }
+  ],
   walkListeningLost: [
     {
       event: { kind: 'walkListeningLost' },
@@ -1145,7 +1151,6 @@ const SNAPSHOT = {
   },
   walk: {
     enabled: false,
-    supported: true,
     banner: { corner: 'bottomRight', screen: null }
   },
   journal: [
@@ -1368,14 +1373,6 @@ describe('journalTranscript', () => {
     expect(transcript).toContain(
       'AutoFocus : suspendu, réveil des réduites inactif'
     )
-  })
-
-  it('dit le Déplacement indisponible là où les clics ne sont pas lus', () => {
-    const walk = { ...SNAPSHOT.walk, supported: false }
-
-    const transcript = journalTranscript({ ...SNAPSHOT, walk })
-
-    expect(transcript).toContain('Déplacement : indisponible sur ce système')
   })
 
   it('dit le Déplacement allumé', () => {

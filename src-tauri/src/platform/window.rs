@@ -127,6 +127,12 @@ pub struct ShortTitleReport {
     pub suffix: Option<String>,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct ScreenPoint {
+    pub x: f64,
+    pub y: f64,
+}
+
 pub trait WindowManager: Send + Sync {
     fn authorization(&self) -> Result<Authorization>;
 
@@ -135,6 +141,8 @@ pub trait WindowManager: Send + Sync {
     fn game_windows(&self) -> Result<Vec<GameWindow>>;
 
     fn foreground_game_window(&self) -> Result<Option<GameWindow>>;
+
+    fn window_at(&self, at: ScreenPoint) -> Result<Option<WindowId>>;
 
     fn is_minimized(&self, window: WindowId) -> Result<bool>;
 

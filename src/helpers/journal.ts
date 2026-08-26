@@ -372,7 +372,7 @@ export const journalTranscript = (snapshot: Snapshot) => {
     `Multifus ${snapshot.version} sur ${snapshot.system}`,
     `Autorisation : ${snapshot.authorization.granted ? 'accordée' : 'refusée'}, écoute ${snapshot.authorization.listening ? 'active' : 'arrêtée'}`,
     `AutoFocus : ${snapshot.autoFocusEnabled ? 'actif' : 'suspendu'}, réveil des réduites ${snapshot.wakesMinimized ? 'actif' : 'inactif'}`,
-    `Déplacement : ${walkTranscriptLine(snapshot.walk)}`,
+    `Déplacement : ${snapshot.walk.enabled ? 'allumé' : 'éteint'}`,
     shortcutsBoundLine(boundCombinations(snapshot)),
     `Configuration : ${snapshot.config.path}`,
     `Mise à jour : ${updateLine(snapshot.update)}`,
@@ -381,14 +381,6 @@ export const journalTranscript = (snapshot: Snapshot) => {
     '',
     ...lines
   ].join('\n')
-}
-
-const walkTranscriptLine = (walk: Snapshot['walk']) => {
-  if (!walk.supported) {
-    return 'indisponible sur ce système'
-  }
-
-  return walk.enabled ? 'allumé' : 'éteint'
 }
 
 type ShortcutLineParams = {
