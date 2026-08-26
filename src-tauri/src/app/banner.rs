@@ -418,12 +418,12 @@ mod tests {
 
     #[test]
     fn the_work_area_is_what_keeps_the_banner_off_the_taskbar() {
-        let full_screen = PhysicalRect {
+        let whole_screen = PhysicalRect {
             position: PhysicalPosition::new(0, 0),
             size: PhysicalSize::new(1920, 1080),
         };
         let above_taskbar = corner_of(&work_area(), banner(), BannerCorner::BottomLeft);
-        let over_taskbar = corner_of(&full_screen, banner(), BannerCorner::BottomLeft);
+        let over_taskbar = corner_of(&whole_screen, banner(), BannerCorner::BottomLeft);
 
         assert!(above_taskbar.y < over_taskbar.y);
     }

@@ -26,7 +26,8 @@ versions déjà installées.
 - [ ] Le journal porte une ligne par collage
 - [ ] Multifus lancé avec trois clients déjà ouverts n'agrandit rien
 - [ ] Une fenêtre remise en petit à la main reste en petit
-- [ ] Sur deux écrans, une fenêtre remplit celui où elle est
+- [ ] Sur deux écrans, une fenêtre s'agrandit sur celui où elle est
+- [ ] Windows, un client passé en vrai plein écran : ce que devient la bascule, et où passe la bannière
 - [ ] Un client qui s'ouvre pendant qu'on joue ailleurs prend le premier plan sur Windows, et pas sur macOS
 - [ ] Windows, six clients connectés : six pseudos dans la barre des tâches, et quitter Multifus rend les six titres
 - [ ] Windows, une tête de classe posée puis Multifus tué au `Ctrl+C` : au démarrage suivant, la classe remise à vide rend l'icône de Dofus Retro

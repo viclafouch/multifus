@@ -12,7 +12,7 @@ Une notification arrive dans le jeu, Multifus met devant vous la fenêtre du per
 - [x] Un sexe par personnage, et un raccourci qui met tous vos hommes de côté pendant qu'il remet vos femmes dans le défilement
 - [x] Des réponses rapides : une combinaison colle un texte tout prêt dans le chat, la touche Entrée reste la vôtre
 - [x] Vos messages privés sur votre téléphone par Telegram, tant que vous êtes loin du clavier
-- [x] Un client qui s'ouvre remplit l'écran tout seul, une seule fois
+- [x] Un client qui s'ouvre s'agrandit tout seul, une seule fois
 - [x] Une fenêtre de client titrée du seul pseudo, six clients lisibles d'un coup d'œil dans la barre des tâches (Windows)
 - [x] Une classe par personnage, et la fenêtre du client porte le portrait de sa classe dans la barre des tâches (Windows)
 - [x] Une icône de barre système qui liste les personnages connectés, un clic ramène la fenêtre
@@ -31,6 +31,8 @@ Les quatre derniers réglages sont décochés par défaut. Fermer la fenêtre ne
 | Linux, iOS, Android |                                     | Hors périmètre           |
 
 Sur macOS, Multifus demande l'**Accessibilité**, et il ne peut rien faire sans elle : ni lire le titre des fenêtres, ni les amener au premier plan, ni entendre les notifications du jeu. L'écran d'accueil mène au bon panneau des Réglages Système.
+
+Sur macOS toujours, gardez vos clients Dofus Retro en **fenêtre agrandie**, jamais en plein écran. Le bouton vert donne un bureau à chaque client : chaque bascule fait alors glisser tout l'écran, et le cœur avec. La bannière, elle, ne peut plus se poser par-dessus. `⌥` + clic sur ce même bouton vert agrandit la fenêtre sans passer en plein écran, et c'est ce que Multifus fait à l'ouverture d'un client.
 
 Sur Windows, il demande l'**accès aux notifications**. La mise à jour 1709 est le plancher, c'est elle qui a apporté l'écoute des notifications.
 

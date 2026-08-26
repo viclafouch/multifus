@@ -4,6 +4,7 @@ import { AUTO_FOCUS_STRINGS } from '@/constants/strings/auto-focus'
 import { CHARACTERS_STRINGS } from '@/constants/strings/characters'
 import { CONFIG_NOTICE_STRINGS } from '@/constants/strings/config-notice'
 import { JOURNAL_PANEL_STRINGS } from '@/constants/strings/journal-panel'
+import { MAXIMIZE_STRINGS } from '@/constants/strings/maximize'
 import { NAV_RAIL_STRINGS } from '@/constants/strings/nav-rail'
 import { RELAY_STRINGS } from '@/constants/strings/relay'
 import { SETTINGS_STRINGS } from '@/constants/strings/settings'
@@ -21,5 +22,6 @@ export const strings = {
   ...SETTINGS_STRINGS,
   ...ABOUT_STRINGS,
   ...CONFIG_NOTICE_STRINGS,
+  ...MAXIMIZE_STRINGS,
   ...JOURNAL_PANEL_STRINGS
 } as const

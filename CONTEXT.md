@@ -20,6 +20,10 @@ Les mots de Multifus, et rien d'autre. On en parle en français, on les écrit e
 
 **Focus** (`focus`) : l'action de faire passer une fenêtre au premier plan. Une fenêtre réduite en ressort.
 
+**Agrandir** (`maximize`) : étendre une fenêtre du jeu à toute la zone de travail de son écran, sans lui faire quitter le bureau : le Dock et la barre des menus restent là sur macOS, la barre des tâches sur Windows. C'est tout ce que Multifus fait à la taille d'une fenêtre, et un réglage le fait à l'ouverture d'un client.
+
+**Plein écran** : le mode du système, pris au bouton vert d'une fenêtre sur macOS, qui donne au client un bureau à lui. Il n'a pas d'identifiant, parce qu'il n'a pas de code : Multifus ne le donne jamais, et conseille de s'en passer. La bascule y devient un glissement d'un bureau à l'autre, et la bannière n'a pas le droit de se poser par-dessus. Le mot ne désigne que lui, jamais une fenêtre agrandie.
+
 **Défilement** (`cycle`) : le parcours des fenêtres au raccourci, dans un ordre choisi par l'utilisateur.
 
 **Déplacement rapide** (`Walk`) : le mécanisme qui passe au personnage suivant du défilement à chaque clic gauche dans une fenêtre de jeu. Un joueur emmène ainsi toute sa team d'une map à l'autre sans lâcher la souris. Il ne s'allume que d'un geste, jamais tout seul, et Multifus démarre toujours avec lui éteint. Son nom porte ses deux mots partout, jamais « déplacement » seul, qui se lirait comme le tirage d'une ligne du roster.

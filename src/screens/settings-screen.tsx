@@ -8,6 +8,7 @@ import {
 } from 'lucide-react'
 import type { Snapshot } from '@/@types/snapshot'
 import { FieldRow } from '@/components/layout/field-row'
+import { Note } from '@/components/layout/note'
 import { Panel } from '@/components/layout/panel'
 import { Screen } from '@/components/layout/screen'
 import { Switch } from '@/components/ui/switch'
@@ -75,6 +76,9 @@ export const SettingsScreen = ({
             }}
           />
         </FieldRow>
+      </Panel>
+      {IS_APPLE ? <Note>{strings.maximize.note}</Note> : null}
+      <Panel className="mt-5">
         <FieldRow
           label={strings.settings.shortTitlesLabel}
           description={strings.settings.shortTitlesDescription}

@@ -3,7 +3,12 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import type { ShortcutBinding } from '@/@types/shortcuts'
 import type { BannerPlace, BannerScreen } from '@/@types/walk'
 import { strings } from '@/constants/strings'
-import { bannerScreenOf, pending } from '@/test-doubles'
+import {
+  APPLE_AGENT,
+  bannerScreenOf,
+  pending,
+  WINDOWS_AGENT
+} from '@/test-doubles'
 
 const bridge = {
   setWalkEnabled: vi.fn(pending),
@@ -15,8 +20,6 @@ const bridge = {
 vi.mock(import('@/lib/multifus'), () => {
   return bridge
 })
-
-const { WalkScreen } = await import('@/screens/walk-screen')
 
 const LAPTOP = bannerScreenOf()
 
@@ -43,20 +46,23 @@ const walkShortcut = (accelerator: string | null): ShortcutBinding => {
   }
 }
 
-type ShowParams = {
+type RenderParams = {
   readonly enabled?: boolean
   readonly banner?: BannerPlace
   readonly shortcuts?: readonly ShortcutBinding[]
-  readonly screens?: readonly BannerScreen[]
+  readonly agent?: string
 }
 
-const show = async ({
+const renderScreen = async ({
   enabled = false,
   banner = { corner: 'bottomRight', screen: null },
   shortcuts = [],
-  screens = [LAPTOP]
-}: ShowParams = {}) => {
-  bridge.bannerScreens.mockResolvedValue([...screens])
+  agent = WINDOWS_AGENT
+}: RenderParams = {}) => {
+  vi.resetModules()
+  vi.stubGlobal('navigator', { userAgent: agent })
+
+  const { WalkScreen } = await import('@/screens/walk-screen')
 
   render(
     <WalkScreen
@@ -65,6 +71,16 @@ const show = async ({
       run={() => {}}
     />
   )
+}
+
+type ShowParams = RenderParams & {
+  readonly screens?: readonly BannerScreen[]
+}
+
+const show = async ({ screens = [LAPTOP], ...params }: ShowParams = {}) => {
+  bridge.bannerScreens.mockResolvedValue([...screens])
+
+  await renderScreen(params)
 
   await screen.findByText(strings.walk.banner.description)
 }
@@ -152,6 +168,20 @@ describe('l’écran du Déplacement rapide', () => {
     })
   })
 
+  describe('le conseil sur le plein écran', () => {
+    it('dit de garder les clients en fenêtre agrandie, sur un Mac', async () => {
+      await show({ agent: APPLE_AGENT })
+
+      expect(screen.getByText(strings.maximize.note)).not.toBeNull()
+    })
+
+    it('ne dit rien sur Windows', async () => {
+      await show({ agent: WINDOWS_AGENT })
+
+      expect(screen.queryByText(strings.maximize.note)).toBeNull()
+    })
+  })
+
   describe('le coin de la bannière', () => {
     it('dessine l’écran au format de celui qui porte la bannière', async () => {
       await show({
@@ -205,16 +235,10 @@ describe('l’écran du Déplacement rapide', () => {
       expect(screen.queryByText(strings.walk.banner.screenLegend)).toBeNull()
     })
 
-    it('ne demande rien tant que le système n’a pas répondu', () => {
+    it('ne demande rien tant que le système n’a pas répondu', async () => {
       bridge.bannerScreens.mockImplementation(pending)
 
-      render(
-        <WalkScreen
-          walk={{ enabled: false, banner: { corner: 'topLeft', screen: null } }}
-          shortcuts={[]}
-          run={() => {}}
-        />
-      )
+      await renderScreen({ banner: { corner: 'topLeft', screen: null } })
 
       expect(screen.queryByText(strings.walk.banner.screenLegend)).toBeNull()
       expect(cornerNamed(strings.walk.banner.corners.topLeft)).not.toBeNull()

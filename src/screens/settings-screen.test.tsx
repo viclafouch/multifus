@@ -78,7 +78,7 @@ describe('l’écran des paramètres', () => {
     expect(bridge.setStartAtLogin).toHaveBeenCalledWith(true)
   })
 
-  it('ouvre les clients en plein écran quand on bouge l’interrupteur', async () => {
+  it('agrandit les clients à leur ouverture quand on bouge l’interrupteur', async () => {
     await show({ agent: WINDOWS_AGENT })
 
     fireEvent.click(switchNamed(strings.settings.maximizeLabel))
@@ -116,11 +116,23 @@ describe('l’écran des paramètres', () => {
     )
   })
 
-  it('garde le démarrage et le plein écran sur un Mac', async () => {
+  it('garde le démarrage et l’agrandissement sur un Mac', async () => {
     await show({ agent: APPLE_AGENT })
 
     expect(querySwitch(strings.settings.startupLabel)).not.toBeNull()
     expect(querySwitch(strings.settings.maximizeLabel)).not.toBeNull()
+  })
+
+  it('conseille la fenêtre agrandie plutôt que le plein écran, sur un Mac', async () => {
+    await show({ agent: APPLE_AGENT })
+
+    expect(screen.getByText(strings.maximize.note)).not.toBeNull()
+  })
+
+  it('ne dit rien du plein écran sur Windows', async () => {
+    await show({ agent: WINDOWS_AGENT })
+
+    expect(screen.queryByText(strings.maximize.note)).toBeNull()
   })
 
   it('n’offre jamais de quitter l’arrière-plan', async () => {
