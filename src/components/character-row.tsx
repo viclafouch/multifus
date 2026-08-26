@@ -1,7 +1,7 @@
 import React from 'react'
 import { GripVertical } from 'lucide-react'
 import { useSortable } from '@dnd-kit/react/sortable'
-import type { Character, Class, Gender } from '@/@types/roster'
+import type { Character, Class, Gender, Portrait } from '@/@types/roster'
 import { CharacterMedallion } from '@/components/character-medallion'
 import { ClassDialog } from '@/components/class-dialog'
 import { RemoveButton } from '@/components/remove-button'
@@ -17,6 +17,7 @@ type RowActions = Readonly<{
   handleToggleAsleep: (nickname: string) => void
   handleSetGender: (nickname: string, gender: Gender | null) => void
   handleSetClass: (nickname: string, characterClass: Class | null) => void
+  handleSetPortrait: (nickname: string, portrait: Portrait) => void
   handleRemove: (nickname: string) => void
 }>
 
@@ -72,7 +73,7 @@ export const CharacterRow = ({
       <Button
         variant="ghost"
         aria-label={strings.characters.classDialog(nickname)}
-        className="size-fit shrink-0 rounded-full border-0 p-0 transition hover:bg-transparent hover:brightness-110"
+        className="size-fit shrink-0 rounded-full border-0 p-0.5"
         onClick={() => {
           setIsDialogOpen(true)
         }}
@@ -118,7 +119,9 @@ export const CharacterRow = ({
         }}
         onSetClass={(characterClass) => {
           actions.handleSetClass(nickname, characterClass)
-          setIsDialogOpen(false)
+        }}
+        onSetPortrait={(portrait) => {
+          actions.handleSetPortrait(nickname, portrait)
         }}
       />
     </li>

@@ -14,6 +14,11 @@ export type Class =
   | 'sram'
   | 'xelor'
 
+export type Portrait = {
+  readonly class: Class
+  readonly gender: Gender
+}
+
 export type Character = {
   readonly nickname: string
   readonly gender: Gender | null

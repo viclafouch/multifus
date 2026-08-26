@@ -50,13 +50,17 @@ Eniripsa, Iop, Crâ, Sadida, Sacrieur, Pandawa — chaque vignette avec son nom
 dessous. Une treizième case, « Aucune », enlève la classe.
 
 Changer le sexe **repeint les douze vignettes** : la grille montre toujours les
-portraits du sexe choisi. Tant qu'aucun sexe n'est choisi, les vignettes restent
-éteintes et ne se cliquent pas : un portrait est le produit des deux réponses,
-et une classe seule n'en donne aucun.
+portraits du sexe choisi. Tant qu'aucun sexe n'est choisi, elle montre les
+portraits d'homme, et **elle se clique quand même** : on vient là pour cliquer
+une tête, pas pour répondre à un formulaire.
 
-Un clic sur une classe l'écrit et **ferme la modale**. Aucun bouton Appliquer,
-aucun bouton Réinitialiser : partout ailleurs dans Multifus un réglage s'applique
-au clic. Échap ferme sans rien écrire.
+Un clic sur une classe l'écrit et **ferme la modale**. Si le sexe manque, la
+modale ne ferme pas : elle pose la question qui reste, `Iop — homme ou femme ?`,
+avec les **deux vraies têtes du Iop en grand**. Un clic écrit les deux réponses
+et ferme. « Changer de classe » revient à la grille.
+
+Aucun bouton Appliquer, aucun bouton Réinitialiser : partout ailleurs dans
+Multifus un réglage s'applique au clic. Échap ferme sans rien écrire.
 
 ### Les actions groupées
 
@@ -272,10 +276,15 @@ Le plan les mettait avec les portraits ; la règle du dépôt veut que toute cha
 française de l'interface vive dans `constants/strings/`. `classes.ts` ne garde
 que l'ordre du jeu et les vingt-quatre imports.
 
-**« Aucune » se clique même sans sexe.** Les douze vignettes s'éteignent tant
-qu'aucun sexe n'est choisi, parce qu'un portrait est le produit des deux
-réponses. « Aucune » n'est pas un portrait : la griser enfermerait celui qui a
-posé une classe puis retiré le sexe.
+**Le verrou du sexe est tombé, la question a changé de place.** La première
+version éteignait les douze vignettes tant qu'aucun sexe n'était choisi : un
+portrait est le produit des deux réponses, donc la grille attendait. À l'usage
+c'est faux : on ouvre la modale pour cliquer une tête, et une grille morte
+n'explique jamais pourquoi. Les vingt-quatre choix se posent donc en douze puis
+deux — la classe, puis le sexe s'il manque, en montrant les deux portraits de
+cette classe-là plutôt qu'un segment abstrait. Le segment Sexe reste sous la
+grille, pour qui veut le changer seul : les actions groupées en ont besoin même
+sans classe.
 
 **Le tooltip ne nomme que deux manquants.** `missingGenderLine` est dans
 `helpers/wording.ts`, avec le reste de ce qui met des choses en mots, et elle est
@@ -291,6 +300,8 @@ portraits, ce qui n'arrivera pas : les classes de Retro sont douze.
 ## À vérifier sur l'autre machine
 
 - [ ] Le médaillon d'un personnage sans classe montre son initiale en pointillés
+- [ ] Cliquer une tête sur un personnage sans sexe demande « homme ou femme ? » avec les deux portraits de cette classe
+- [ ] « Changer de classe » revient à la grille sans rien écrire
 - [ ] Choisir Homme puis Iop pose le portrait dans la ligne et sur la fenêtre
 - [ ] Passer de Homme à Femme sur un Iop change le portrait aux deux endroits
 - [ ] Un déconnecté a son portrait en gris, un connecté en couleur

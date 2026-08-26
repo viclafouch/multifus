@@ -1,9 +1,10 @@
 import { Mars, RefreshCw, Venus } from 'lucide-react'
 import { DragDropProvider } from '@dnd-kit/react'
-import type { Character, Class, Gender } from '@/@types/roster'
+import type { Character, Class, Gender, Portrait } from '@/@types/roster'
 import type { Snapshot } from '@/@types/snapshot'
 import { CharacterRow } from '@/components/character-row'
 import { EmptyState } from '@/components/layout/empty-state'
+import { Legend } from '@/components/layout/legend'
 import { Panel } from '@/components/layout/panel'
 import { Screen } from '@/components/layout/screen'
 import { Button } from '@/components/ui/button'
@@ -45,6 +46,13 @@ export const CharactersScreen = ({
     },
     handleSetClass: (nickname: string, characterClass: Class | null) => {
       run(setClass(nickname, characterClass))
+    },
+    handleSetPortrait: (nickname: string, portrait: Portrait) => {
+      run(
+        setClass(nickname, portrait.class).then(() => {
+          return setGender(nickname, portrait.gender)
+        })
+      )
     },
     handleRemove: (nickname: string) => {
       run(removeCharacter(nickname))
@@ -129,9 +137,7 @@ type GroupedActionsProps = Readonly<{
 const GroupedActions = ({ missing, onSet }: GroupedActionsProps) => {
   return (
     <div className="mb-3 flex items-center gap-2.5">
-      <span className="text-mini font-medium tracking-micro text-muted-foreground/70 uppercase">
-        {strings.characters.groupedActions}
-      </span>
+      <Legend className="text-mini">{strings.characters.groupedActions}</Legend>
       <GroupedAction gender="male" missing={missing} onSet={onSet} />
       <GroupedAction gender="female" missing={missing} onSet={onSet} />
     </div>
@@ -151,7 +157,7 @@ const GroupedAction = ({ gender, missing, onSet }: GroupedActionProps) => {
   const buttons = (
     <div
       data-incomplete={isComplete ? undefined : ''}
-      className="flex items-center gap-1.5 rounded-md border border-border/70 bg-card/40 py-1 pr-1 pl-2 data-incomplete:cursor-not-allowed data-incomplete:opacity-55"
+      className="flex items-center gap-1.5 rounded-md border border-border/70 bg-card/40 py-1 pr-1 pl-2 data-incomplete:opacity-55"
     >
       <Icon
         aria-hidden
@@ -164,7 +170,7 @@ const GroupedAction = ({ gender, missing, onSet }: GroupedActionProps) => {
       <Button
         variant="ghost"
         size="xs"
-        disabled={!isComplete}
+        aria-disabled={!isComplete}
         aria-label={strings.characters.sleepGroupLabel[gender]}
         onClick={() => {
           onSet(gender, true)
@@ -175,7 +181,7 @@ const GroupedAction = ({ gender, missing, onSet }: GroupedActionProps) => {
       <Button
         variant="ghost"
         size="xs"
-        disabled={!isComplete}
+        aria-disabled={!isComplete}
         aria-label={strings.characters.wakeGroupLabel[gender]}
         onClick={() => {
           onSet(gender, false)

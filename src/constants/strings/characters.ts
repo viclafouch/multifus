@@ -76,8 +76,13 @@ export const CHARACTERS_STRINGS = {
     classDialogClose: 'Fermer sans rien changer',
     classDialogGender: 'Sexe',
     classDialogClasses: 'Classe',
-    classDialogNeedsGender:
-      'Choisissez un sexe : un portrait est le produit des deux réponses.',
+    classDialogWhich: (label: string) => {
+      return `${label} — homme ou femme ?`
+    },
+    classDialogBack: 'Changer de classe',
+    classGenderLabel: (label: string, gender: Gender) => {
+      return gender === 'male' ? `${label} homme` : `${label} femme`
+    },
     noClass: 'Aucune',
     noClassLabel: (nickname: string) => {
       return `Retirer la classe de ${nickname}`
