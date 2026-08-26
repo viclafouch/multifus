@@ -24,6 +24,8 @@ export const SETTINGS_STRINGS = {
     portraitDescription: 'Vous repérez votre Enu à sa tête, pas à son titre.',
     ungroupLabel: 'Un bouton par personnage dans la barre des tâches',
     ungroupDescription:
-      'Chaque client garde son bouton, avec sa tête de classe.'
+      'Chaque client garde son bouton au lieu d’être empilé avec les autres.',
+    ungroupAlready:
+      'Déjà fait : votre Windows ne colle jamais les fenêtres ensemble.'
   }
 } as const

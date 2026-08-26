@@ -91,6 +91,8 @@ export const CHARACTERS_STRINGS = {
     classDialogBack: 'Changer de classe',
     classDialogWindowKeepsIcon:
       'Sur macOS, la tête reste ici : le client garde son logo Dofus.',
+    classDialogPortraitOff:
+      'La tête de classe est coupée dans les Paramètres : le client garde son logo Dofus.',
     classGenderLabel: (label: string, gender: Gender) => {
       return gender === 'male' ? `${label} homme` : `${label} femme`
     },

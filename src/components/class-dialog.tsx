@@ -15,10 +15,9 @@ import {
   DialogTitle
 } from '@/components/ui/dialog'
 import { CLASSES, CLASS_PORTRAITS } from '@/constants/classes'
-import { IS_APPLE } from '@/constants/keyboard'
 import { strings } from '@/constants/strings'
 import { portraitFor } from '@/helpers/portrait'
-import { characterState } from '@/helpers/wording'
+import { characterState, classDialogNote } from '@/helpers/wording'
 
 const GENDERS = ['male', 'female'] as const satisfies readonly Gender[]
 
@@ -26,6 +25,7 @@ const UNANSWERED_GENDER = 'male'
 
 type ClassDialogProps = Readonly<{
   character: Character
+  paintPortraits: boolean
   isOpen: boolean
   onOpenChange: (isOpen: boolean) => void
   onSetGender: (gender: Gender | null) => void
@@ -35,6 +35,7 @@ type ClassDialogProps = Readonly<{
 
 export const ClassDialog = ({
   character,
+  paintPortraits,
   isOpen,
   onOpenChange,
   onSetGender,
@@ -101,6 +102,7 @@ export const ClassDialog = ({
         {asked === null ? (
           <ClassStep
             character={character}
+            note={classDialogNote(paintPortraits)}
             onPickClass={handlePickClass}
             onSetGender={onSetGender}
           />
@@ -120,11 +122,17 @@ export const ClassDialog = ({
 
 type ClassStepProps = Readonly<{
   character: Character
+  note: string | null
   onPickClass: (characterClass: Class | null) => void
   onSetGender: (gender: Gender | null) => void
 }>
 
-const ClassStep = ({ character, onPickClass, onSetGender }: ClassStepProps) => {
+const ClassStep = ({
+  character,
+  note,
+  onPickClass,
+  onSetGender
+}: ClassStepProps) => {
   const { nickname, gender } = character
   const words = strings.characters
 
@@ -200,11 +208,11 @@ const ClassStep = ({ character, onPickClass, onSetGender }: ClassStepProps) => {
           </li>
         </ul>
       </div>
-      {IS_APPLE ? (
+      {note === null ? null : (
         <p className="border-t border-border/60 pt-3.5 text-note text-muted-foreground">
-          {words.classDialogWindowKeepsIcon}
+          {note}
         </p>
-      ) : null}
+      )}
     </>
   )
 }

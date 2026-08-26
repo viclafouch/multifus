@@ -232,6 +232,15 @@ pub fn set_short_titles(app: AppHandle, short: bool) -> Snapshot {
 }
 
 #[tauri::command]
+pub fn set_paint_portraits(app: AppHandle, paint: bool) -> Snapshot {
+    lock(&app).set_paint_portraits(paint);
+
+    runtime::wake();
+
+    runtime::emit_snapshot(&app)
+}
+
+#[tauri::command]
 pub fn set_ungroup_taskbar(app: AppHandle, ungroup: bool) -> Snapshot {
     lock(&app).set_ungroup_taskbar(ungroup);
 

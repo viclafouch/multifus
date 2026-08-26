@@ -27,6 +27,7 @@ export type Snapshot = {
   readonly startAtLogin: boolean
   readonly maximizeOnLaunch: boolean
   readonly shortTitles: boolean
+  readonly paintPortraits: boolean
   readonly ungroupTaskbar: boolean
   readonly taskbarCombines: boolean
   readonly authorization: Authorization

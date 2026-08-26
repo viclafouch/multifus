@@ -157,6 +157,10 @@ export const setShortTitles = async (short: boolean) => {
   return invoke<Snapshot>('set_short_titles', { short })
 }
 
+export const setPaintPortraits = async (paint: boolean) => {
+  return invoke<Snapshot>('set_paint_portraits', { paint })
+}
+
 export const setUngroupTaskbar = async (ungroup: boolean) => {
   return invoke<Snapshot>('set_ungroup_taskbar', { ungroup })
 }

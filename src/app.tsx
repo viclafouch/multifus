@@ -117,6 +117,7 @@ const CurrentScreen = ({ screen, snapshot, run }: CurrentScreenProps) => {
         startAtLogin={snapshot.startAtLogin}
         maximizeOnLaunch={snapshot.maximizeOnLaunch}
         shortTitles={snapshot.shortTitles}
+        paintPortraits={snapshot.paintPortraits}
         ungroupTaskbar={snapshot.ungroupTaskbar}
         taskbarCombines={snapshot.taskbarCombines}
         run={run}
@@ -136,7 +137,11 @@ const CurrentScreen = ({ screen, snapshot, run }: CurrentScreenProps) => {
   }
 
   return snapshot.authorization.granted ? (
-    <CharactersScreen characters={snapshot.characters} run={run} />
+    <CharactersScreen
+      characters={snapshot.characters}
+      paintPortraits={snapshot.paintPortraits}
+      run={run}
+    />
   ) : (
     <AuthorizationScreen run={run} />
   )

@@ -36,4 +36,4 @@ versions déjà installées.
 - [ ] Windows, une tête de classe posée puis Multifus tué au `Ctrl+C` : au démarrage suivant, la classe remise à vide rend l'icône de Dofus Retro
 - [ ] Windows, un personnage changé sans quitter le client : le titre court suit
 - [ ] Un personnage laissé inactif un quart d'heure repasse déconnecté comme avant
-- [ ] Windows, les Réglages : les titres courts gardent leur interrupteur, la ligne de la tête de classe n'existe pas, et la modale de classe ne dit rien de macOS
+- [ ] Windows, les Réglages : les six lignes sont là, la modale de classe ne dit rien de macOS, et le reste est dans [plan-tete-de-classe.md](./plan-tete-de-classe.md)

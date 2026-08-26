@@ -275,6 +275,7 @@ mod tests {
             },
             maximize_on_launch: true,
             short_titles: true,
+            paint_portraits: false,
             ungroup_taskbar: true,
             client_title_suffix: Some(" - Dofus Retro v1.48.21".to_owned()),
             quick_replies: vec![QuickReply {

@@ -28,11 +28,13 @@ import {
 
 type CharactersScreenProps = Readonly<{
   characters: readonly Character[]
+  paintPortraits: boolean
   run: (action: Promise<Snapshot>) => void
 }>
 
 export const CharactersScreen = ({
   characters,
+  paintPortraits,
   run
 }: CharactersScreenProps) => {
   const cycle = useCycleOrder({ characters, run })
@@ -118,6 +120,7 @@ export const CharactersScreen = ({
                   character={character}
                   rank={rankOf(cycle.rows, character)}
                   index={index}
+                  paintPortraits={paintPortraits}
                   actions={actions}
                 />
               )

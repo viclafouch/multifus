@@ -3,6 +3,7 @@ import type { PairingProblem } from '@/@types/relay'
 import type { Character } from '@/@types/roster'
 import type { QuickReply, ShortcutStatus } from '@/@types/shortcuts'
 import type { UpdateStatus } from '@/@types/system'
+import { IS_APPLE } from '@/constants/keyboard'
 import { strings } from '@/constants/strings'
 import type { TonedLine } from '@/helpers/wording'
 import {
@@ -13,6 +14,7 @@ import {
   characterPresenceSubLine,
   characterStateLine,
   characterSubLine,
+  classDialogNote,
   missingGenderLine,
   pairingProblemLine,
   shortcutStatusLine,
@@ -384,5 +386,18 @@ describe('characterStateLine', () => {
     const line = characterStateLine(character)
 
     expect(line).toBe(strings.characters.offline)
+  })
+})
+
+describe('classDialogNote', () => {
+  it('says nothing while the head goes to the taskbar', () => {
+    expect(IS_APPLE).toBe(false)
+    expect(classDialogNote(true)).toBeNull()
+  })
+
+  it('says where the head went once somebody cut it', () => {
+    expect(classDialogNote(false)).toBe(
+      strings.characters.classDialogPortraitOff
+    )
   })
 })

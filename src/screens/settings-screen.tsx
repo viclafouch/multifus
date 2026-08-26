@@ -12,11 +12,12 @@ import { Panel } from '@/components/layout/panel'
 import { Screen } from '@/components/layout/screen'
 import { Switch } from '@/components/ui/switch'
 import { UnavailableSwitch } from '@/components/unavailable-switch'
-import { WindowsOnly } from '@/components/windows-only'
+import { WindowsSwitch } from '@/components/windows-switch'
 import { IS_APPLE } from '@/constants/keyboard'
 import { strings } from '@/constants/strings'
 import {
   setMaximizeOnLaunch,
+  setPaintPortraits,
   setShortTitles,
   setStartAtLogin,
   setUngroupTaskbar
@@ -26,6 +27,7 @@ type SettingsScreenProps = Readonly<{
   startAtLogin: boolean
   maximizeOnLaunch: boolean
   shortTitles: boolean
+  paintPortraits: boolean
   ungroupTaskbar: boolean
   taskbarCombines: boolean
   run: (action: Promise<Snapshot>) => void
@@ -35,10 +37,13 @@ export const SettingsScreen = ({
   startAtLogin,
   maximizeOnLaunch,
   shortTitles,
+  paintPortraits,
   ungroupTaskbar,
   taskbarCombines,
   run
 }: SettingsScreenProps) => {
+  const isAlreadyUngrouped = !IS_APPLE && !taskbarCombines
+
   return (
     <Screen title={strings.settings.title} subtitle={strings.settings.subtitle}>
       <Panel>
@@ -75,54 +80,50 @@ export const SettingsScreen = ({
           description={strings.settings.shortTitlesDescription}
           icon={<Type className="size-glyph" strokeWidth={1.75} aria-hidden />}
         >
-          {IS_APPLE ? (
-            <WindowsOnly />
-          ) : (
-            <Switch
-              checked={shortTitles}
-              aria-label={strings.settings.shortTitlesLabel}
-              onCheckedChange={(short) => {
-                run(setShortTitles(short))
-              }}
-            />
-          )}
+          <WindowsSwitch
+            checked={shortTitles}
+            label={strings.settings.shortTitlesLabel}
+            onCheckedChange={(short) => {
+              run(setShortTitles(short))
+            }}
+          />
         </FieldRow>
-        {IS_APPLE ? (
-          <FieldRow
+        <FieldRow
+          label={strings.settings.portraitLabel}
+          description={strings.settings.portraitDescription}
+          icon={
+            <SquareUserRound
+              className="size-glyph"
+              strokeWidth={1.75}
+              aria-hidden
+            />
+          }
+        >
+          <WindowsSwitch
+            checked={paintPortraits}
             label={strings.settings.portraitLabel}
-            description={strings.settings.portraitDescription}
-            icon={
-              <SquareUserRound
-                className="size-glyph"
-                strokeWidth={1.75}
-                aria-hidden
-              />
-            }
-          >
-            <WindowsOnly />
-          </FieldRow>
-        ) : null}
-        {IS_APPLE || taskbarCombines ? (
-          <FieldRow
+            onCheckedChange={(paint) => {
+              run(setPaintPortraits(paint))
+            }}
+          />
+        </FieldRow>
+        <FieldRow
+          label={strings.settings.ungroupLabel}
+          description={
+            isAlreadyUngrouped
+              ? strings.settings.ungroupAlready
+              : strings.settings.ungroupDescription
+          }
+          icon={<Rows3 className="size-glyph" strokeWidth={1.75} aria-hidden />}
+        >
+          <WindowsSwitch
+            checked={ungroupTaskbar}
             label={strings.settings.ungroupLabel}
-            description={strings.settings.ungroupDescription}
-            icon={
-              <Rows3 className="size-glyph" strokeWidth={1.75} aria-hidden />
-            }
-          >
-            {IS_APPLE ? (
-              <WindowsOnly />
-            ) : (
-              <Switch
-                checked={ungroupTaskbar}
-                aria-label={strings.settings.ungroupLabel}
-                onCheckedChange={(ungroup) => {
-                  run(setUngroupTaskbar(ungroup))
-                }}
-              />
-            )}
-          </FieldRow>
-        ) : null}
+            onCheckedChange={(ungroup) => {
+              run(setUngroupTaskbar(ungroup))
+            }}
+          />
+        </FieldRow>
         <FieldRow
           label={strings.settings.backgroundLabel}
           description={strings.settings.backgroundDescription}

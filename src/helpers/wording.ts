@@ -12,6 +12,7 @@ import type {
   UpdateStatus
 } from '@/@types/system'
 import type { LampState } from '@/components/lamp'
+import { IS_APPLE } from '@/constants/keyboard'
 import { strings } from '@/constants/strings'
 
 export type TonedLine = {
@@ -263,6 +264,18 @@ export const characterPortraitTooltip = (character: Character) => {
   }
 
   return MISSING_PART_LABELS[missing](character.nickname)
+}
+
+export const classDialogNote = (paintPortraits: boolean) => {
+  if (IS_APPLE) {
+    return strings.characters.classDialogWindowKeepsIcon
+  }
+
+  if (!paintPortraits) {
+    return strings.characters.classDialogPortraitOff
+  }
+
+  return null
 }
 
 export const characterPresenceSubLine = (character: Character) => {

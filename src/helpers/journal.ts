@@ -270,6 +270,11 @@ const settingLine = (change: SettingChange) => {
 
       return `Pseudo seul dans le titre des fenêtres ${what}.`
     }
+    case 'paintPortraits': {
+      const what = change.paint ? 'activée' : 'désactivée'
+
+      return `Tête de classe dans la barre des tâches ${what}.`
+    }
     case 'ungroupTaskbar': {
       const what = change.ungroup ? 'activé' : 'désactivé'
 

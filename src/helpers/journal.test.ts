@@ -276,6 +276,22 @@ const SETTING_CASES = {
       line: 'Agrandissement des fenêtres au lancement désactivé.'
     }
   ],
+  paintPortraits: [
+    {
+      event: {
+        kind: 'setting',
+        change: { kind: 'paintPortraits', paint: true }
+      },
+      line: 'Tête de classe dans la barre des tâches activée.'
+    },
+    {
+      event: {
+        kind: 'setting',
+        change: { kind: 'paintPortraits', paint: false }
+      },
+      line: 'Tête de classe dans la barre des tâches désactivée.'
+    }
+  ],
   ungroupTaskbar: [
     {
       event: {
@@ -1111,6 +1127,7 @@ const SNAPSHOT = {
   startAtLogin: false,
   maximizeOnLaunch: false,
   shortTitles: false,
+  paintPortraits: true,
   ungroupTaskbar: false,
   taskbarCombines: true,
   authorization: { granted: true, listening: true },

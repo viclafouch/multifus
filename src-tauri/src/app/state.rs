@@ -190,6 +190,7 @@ impl Multifus {
             start_at_login: self.settings.start_at_login,
             maximize_on_launch: self.settings.maximize_on_launch,
             short_titles: self.settings.short_titles,
+            paint_portraits: self.settings.paint_portraits,
             ungroup_taskbar: self.settings.ungroup_taskbar,
             taskbar_combines: self.taskbar_combines,
             shortcuts: ShortcutAction::ALL
@@ -578,6 +579,20 @@ impl Multifus {
     }
 
     #[must_use]
+    pub fn paints_portraits(&self) -> bool {
+        self.settings.paint_portraits
+    }
+
+    pub fn set_paint_portraits(&mut self, paint: bool) {
+        self.settings.paint_portraits = paint;
+
+        self.log(JournalEvent::Setting {
+            change: SettingChange::PaintPortraits { paint },
+        });
+        self.save();
+    }
+
+    #[must_use]
     pub fn ungroups_taskbar(&self) -> bool {
         self.settings.ungroup_taskbar
     }
@@ -619,7 +634,11 @@ impl Multifus {
         };
 
         WindowLook {
-            portrait: character.portrait(),
+            portrait: self
+                .settings
+                .paint_portraits
+                .then(|| character.portrait())
+                .flatten(),
             ungrouped: self.settings.ungroup_taskbar && self.taskbar_combines,
         }
     }
@@ -2316,6 +2335,49 @@ mod tests {
                     ungrouped: false,
                 }
             )]
+        );
+    }
+
+    #[test]
+    fn a_head_is_only_painted_while_somebody_wants_it_there() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha")]);
+        state.set_gender("Alpha", Some(Gender::Male));
+        state.set_class("Alpha", Some(Class::Iop));
+
+        assert!(state.paints_portraits());
+
+        let painted = painting(
+            "Alpha",
+            1,
+            WindowLook {
+                portrait: Some(Portrait {
+                    class: Class::Iop,
+                    gender: Gender::Male,
+                }),
+                ungrouped: false,
+            },
+        );
+
+        assert_eq!(state.looks_to_paint(), vec![painted.clone()]);
+
+        state.remember_painted(&painted);
+        state.set_paint_portraits(false);
+
+        assert!(!state.paints_portraits());
+        assert!(!state.snapshot().paint_portraits);
+        assert_eq!(
+            state.looks_to_paint(),
+            vec![painting("Alpha", 1, WindowLook::default())],
+            "a head nobody wants goes back to the Dofus Retro egg"
+        );
+        assert!(
+            journalled(&state).contains(&JournalEvent::Setting {
+                change: SettingChange::PaintPortraits { paint: false }
+            }),
+            "{:?}",
+            journalled(&state)
         );
     }
 

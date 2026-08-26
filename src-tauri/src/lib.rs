@@ -53,6 +53,7 @@ pub fn run() {
             app::commands::set_start_at_login,
             app::commands::set_maximize_on_launch,
             app::commands::set_short_titles,
+            app::commands::set_paint_portraits,
             app::commands::set_ungroup_taskbar,
             app::commands::set_relayed,
             app::commands::set_send_body,

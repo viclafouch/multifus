@@ -36,6 +36,7 @@ pub struct Snapshot {
     pub start_at_login: bool,
     pub maximize_on_launch: bool,
     pub short_titles: bool,
+    pub paint_portraits: bool,
     pub ungroup_taskbar: bool,
     pub taskbar_combines: bool,
     pub authorization: AuthorizationView,

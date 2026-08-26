@@ -84,6 +84,7 @@ export type SettingChange =
     }
   | { readonly kind: 'maximizeOnLaunch'; readonly maximize: boolean }
   | { readonly kind: 'shortTitles'; readonly short: boolean }
+  | { readonly kind: 'paintPortraits'; readonly paint: boolean }
   | { readonly kind: 'ungroupTaskbar'; readonly ungroup: boolean }
   | { readonly kind: 'relayBody'; readonly sendBody: boolean }
   | {

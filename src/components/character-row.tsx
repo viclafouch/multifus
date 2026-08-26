@@ -35,6 +35,7 @@ type CharacterRowProps = Readonly<{
   character: Character
   rank: number | null
   index: number
+  paintPortraits: boolean
   actions: RowActions
 }>
 
@@ -42,6 +43,7 @@ export const CharacterRow = ({
   character,
   rank,
   index,
+  paintPortraits,
   actions
 }: CharacterRowProps) => {
   const { nickname, asleep, online } = character
@@ -126,6 +128,7 @@ export const CharacterRow = ({
       </span>
       <ClassDialog
         character={character}
+        paintPortraits={paintPortraits}
         isOpen={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         onSetGender={(gender) => {

@@ -323,6 +323,10 @@ pub enum SettingChange {
         short: bool,
     },
 
+    PaintPortraits {
+        paint: bool,
+    },
+
     UngroupTaskbar {
         ungroup: bool,
     },
