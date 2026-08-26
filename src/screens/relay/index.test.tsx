@@ -4,22 +4,17 @@ import type { PairingStatus, RelayStatus, TestStatus } from '@/@types/relay'
 import type { Character } from '@/@types/roster'
 import { strings } from '@/constants/strings'
 import { screenSaverDelay } from '@/helpers/format'
+import { characterOf, pending } from '@/test-doubles'
 
-function pending(): Promise<never> {
-  return new Promise(() => {})
+const bridge = {
+  pairRelay: vi.fn(),
+  unpairRelay: vi.fn(),
+  testRelay: vi.fn(),
+  setRelayActive: vi.fn(),
+  setRelayed: vi.fn(),
+  setSendBody: vi.fn(),
+  openRelayLink: vi.fn(pending)
 }
-
-const bridge = vi.hoisted(() => {
-  return {
-    pairRelay: vi.fn(pending),
-    unpairRelay: vi.fn(pending),
-    testRelay: vi.fn(pending),
-    setRelayActive: vi.fn(pending),
-    setRelayed: vi.fn(pending),
-    setSendBody: vi.fn(pending),
-    openRelayLink: vi.fn(pending)
-  }
-})
 
 vi.mock(import('@/lib/multifus'), () => {
   return bridge
@@ -37,21 +32,6 @@ const relayOf = (fields: Partial<RelayStatus> = {}): RelayStatus => {
     pairing: { kind: 'idle' },
     switch: { kind: 'idle' },
     test: { kind: 'idle' },
-    ...fields
-  }
-}
-
-const character = (
-  nickname: string,
-  fields: Partial<Character> = {}
-): Character => {
-  return {
-    nickname,
-    gender: 'female',
-    class: 'cra',
-    asleep: false,
-    online: true,
-    relayed: true,
     ...fields
   }
 }
@@ -362,14 +342,19 @@ describe('l’écran des messages privés, les personnages relayés', () => {
   })
 
   it('porte une ligne par personnage du roster', () => {
-    show({ characters: [character('Alpha'), character('Bravo')] })
+    show({
+      characters: [
+        characterOf({ nickname: 'Alpha' }),
+        characterOf({ nickname: 'Bravo' })
+      ]
+    })
 
     expect(relayedRows()).toHaveLength(2)
     expect(screen.queryByText(strings.relay.emptyBody)).toBeNull()
   })
 
   it('relaie un personnage quand on coche sa ligne', () => {
-    show({ characters: [character('Alpha', { relayed: false })] })
+    show({ characters: [characterOf({ nickname: 'Alpha', relayed: false })] })
 
     fireEvent.click(switchNamed(strings.relay.characterToggle('Alpha')))
 
@@ -377,7 +362,7 @@ describe('l’écran des messages privés, les personnages relayés', () => {
   })
 
   it('cesse de relayer un personnage quand on décoche sa ligne', () => {
-    show({ characters: [character('Alpha')] })
+    show({ characters: [characterOf({ nickname: 'Alpha' })] })
 
     fireEvent.click(switchNamed(strings.relay.characterToggle('Alpha')))
 
@@ -385,7 +370,7 @@ describe('l’écran des messages privés, les personnages relayés', () => {
   })
 
   it('garde coché un personnage que le jeu vient de déconnecter', () => {
-    show({ characters: [character('Alpha', { online: false })] })
+    show({ characters: [characterOf({ nickname: 'Alpha', online: false })] })
 
     const toggle = switchNamed(strings.relay.characterToggle('Alpha'))
 
@@ -395,20 +380,23 @@ describe('l’écran des messages privés, les personnages relayés', () => {
 
   it('dit la classe et la présence de chaque personnage', () => {
     show({
-      characters: [character('Alpha'), character('Bravo', { online: false })]
+      characters: [
+        characterOf({ nickname: 'Alpha' }),
+        characterOf({ nickname: 'Bravo', online: false })
+      ]
     })
 
     const subLines = relayedRows().map((row) => {
-      return within(row).getByText(/^Crâ · /u).textContent
+      return within(row).getByText(/^Iop · /u).textContent
     })
 
-    expect(subLines).toStrictEqual(['Crâ · Connecté', 'Crâ · Déconnecté'])
+    expect(subLines).toStrictEqual(['Iop · Connecté', 'Iop · Déconnecté'])
   })
 
   it('ne dit jamais qu’un personnage est de côté, le défilement ne compte pas ici', () => {
-    show({ characters: [character('Alpha', { asleep: true })] })
+    show({ characters: [characterOf({ nickname: 'Alpha', asleep: true })] })
 
-    expect(screen.getByText('Crâ · Connecté')).not.toBeNull()
+    expect(screen.getByText('Iop · Connecté')).not.toBeNull()
     expect(screen.queryByText(/De côté/u)).toBeNull()
   })
 })

@@ -3,42 +3,22 @@ import { fireEvent, render, screen, within } from '@testing-library/react'
 import type { Character } from '@/@types/roster'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { strings } from '@/constants/strings'
+import { characterOf } from '@/test-doubles'
 
-function pending(): Promise<never> {
-  return new Promise(() => {})
+const bridge = {
+  refresh: vi.fn(),
+  removeCharacter: vi.fn(),
+  setClass: vi.fn(),
+  setGender: vi.fn(),
+  setGenderAsleep: vi.fn(),
+  toggleAsleep: vi.fn()
 }
-
-const bridge = vi.hoisted(() => {
-  return {
-    refresh: vi.fn(pending),
-    removeCharacter: vi.fn(pending),
-    setClass: vi.fn(pending),
-    setGender: vi.fn(pending),
-    setGenderAsleep: vi.fn(pending),
-    toggleAsleep: vi.fn(pending)
-  }
-})
 
 vi.mock(import('@/lib/multifus'), () => {
   return bridge
 })
 
 const { CharactersScreen } = await import('@/screens/characters-screen')
-
-const character = (
-  nickname: string,
-  fields: Partial<Character> = {}
-): Character => {
-  return {
-    nickname,
-    gender: 'male',
-    class: 'iop',
-    asleep: false,
-    online: true,
-    relayed: true,
-    ...fields
-  }
-}
 
 const show = (characters: readonly Character[]) => {
   return render(
@@ -69,7 +49,11 @@ describe('l’écran des personnages', () => {
   })
 
   it('montre une ligne par personnage, dans l’ordre du défilement', () => {
-    show([character('Alpha'), character('Bravo'), character('Charlie')])
+    show([
+      characterOf({ nickname: 'Alpha' }),
+      characterOf({ nickname: 'Bravo' }),
+      characterOf({ nickname: 'Charlie' })
+    ])
 
     const nicknames = rows().map((row) => {
       return within(row).getByText(/^(Alpha|Bravo|Charlie)$/u).textContent
@@ -80,10 +64,10 @@ describe('l’écran des personnages', () => {
 
   it('numérote les personnages du défilement, et eux seuls', () => {
     show([
-      character('Alpha'),
-      character('Bravo', { asleep: true }),
-      character('Charlie'),
-      character('Delta', { online: false })
+      characterOf({ nickname: 'Alpha' }),
+      characterOf({ nickname: 'Bravo', asleep: true }),
+      characterOf({ nickname: 'Charlie' }),
+      characterOf({ nickname: 'Delta', online: false })
     ])
 
     const ranks = rows().map((row) => {
@@ -94,7 +78,7 @@ describe('l’écran des personnages', () => {
   })
 
   it('sort du défilement le personnage dont on bouge l’interrupteur', () => {
-    show([character('Alpha')])
+    show([characterOf({ nickname: 'Alpha' })])
 
     fireEvent.click(
       screen.getByRole('switch', {
@@ -106,7 +90,7 @@ describe('l’écran des personnages', () => {
   })
 
   it('laisse l’interrupteur d’un personnage déconnecté hors d’atteinte', () => {
-    show([character('Alpha', { online: false })])
+    show([characterOf({ nickname: 'Alpha', online: false })])
 
     const toggle = screen.getByRole('switch', {
       name: strings.characters.cycleToggle('Alpha')
@@ -119,7 +103,10 @@ describe('l’écran des personnages', () => {
   })
 
   it('n’offre de retirer du roster que les personnages déconnectés', () => {
-    show([character('Alpha'), character('Bravo', { online: false })])
+    show([
+      characterOf({ nickname: 'Alpha' }),
+      characterOf({ nickname: 'Bravo', online: false })
+    ])
 
     expect(
       screen.queryByRole('button', { name: strings.characters.remove('Alpha') })
@@ -130,7 +117,10 @@ describe('l’écran des personnages', () => {
   })
 
   it('met de côté tous les personnages d’un sexe', () => {
-    show([character('Alpha'), character('Bravo', { gender: 'female' })])
+    show([
+      characterOf({ nickname: 'Alpha' }),
+      characterOf({ nickname: 'Bravo', gender: 'female' })
+    ])
 
     fireEvent.click(
       screen.getByRole('button', {
@@ -142,7 +132,7 @@ describe('l’écran des personnages', () => {
   })
 
   it('remet dans le défilement tous les personnages d’un sexe', () => {
-    show([character('Alpha', { gender: 'female', asleep: true })])
+    show([characterOf({ nickname: 'Alpha', gender: 'female', asleep: true })])
 
     fireEvent.click(
       screen.getByRole('button', {
@@ -154,7 +144,7 @@ describe('l’écran des personnages', () => {
   })
 
   it('coupe les actions groupées tant qu’un connecté n’a pas de sexe', () => {
-    show([character('Alpha', { gender: null })])
+    show([characterOf({ nickname: 'Alpha', gender: null })])
 
     expect(
       screen.queryByRole('button', {
@@ -178,8 +168,8 @@ describe('l’écran des personnages', () => {
 
   it('ne compte pas un déconnecté sans sexe comme un manque', () => {
     show([
-      character('Alpha'),
-      character('Bravo', { gender: null, online: false })
+      characterOf({ nickname: 'Alpha' }),
+      characterOf({ nickname: 'Bravo', gender: null, online: false })
     ])
 
     fireEvent.click(
@@ -193,9 +183,9 @@ describe('l’écran des personnages', () => {
 
   it('dit sous chaque pseudo ce qui manque à son portrait', () => {
     show([
-      character('Alpha', { class: null }),
-      character('Bravo', { gender: null }),
-      character('Charlie')
+      characterOf({ nickname: 'Alpha', class: null }),
+      characterOf({ nickname: 'Bravo', gender: null }),
+      characterOf({ nickname: 'Charlie' })
     ])
 
     const subLines = rows().map((row) => {
@@ -210,7 +200,10 @@ describe('l’écran des personnages', () => {
   })
 
   it('mène du portrait vers ce qu’il reste à choisir', () => {
-    show([character('Alpha', { class: null }), character('Bravo')])
+    show([
+      characterOf({ nickname: 'Alpha', class: null }),
+      characterOf({ nickname: 'Bravo' })
+    ])
 
     expect(
       screen.getByRole('button', {
@@ -226,8 +219,8 @@ describe('l’écran des personnages', () => {
 
   it('dit d’un personnage mis de côté qu’il est de côté', () => {
     show([
-      character('Alpha', { asleep: true }),
-      character('Bravo', { online: false })
+      characterOf({ nickname: 'Alpha', asleep: true }),
+      characterOf({ nickname: 'Bravo', online: false })
     ])
 
     const subLines = rows().map((row) => {

@@ -2,24 +2,18 @@ import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import type { JournalEntry } from '@/@types/journal'
 import { strings } from '@/constants/strings'
-import { journalLine, journalTime } from '@/helpers/journal'
-import { snapshotOf } from '@/test-snapshot'
+import { journalTime } from '@/helpers/journal'
+import { pending, snapshotOf } from '@/test-doubles'
 
-function pending(): Promise<never> {
-  return new Promise(() => {})
+const bridge = {
+  revealJournal: vi.fn(pending)
 }
-
-const bridge = vi.hoisted(() => {
-  return { revealJournal: vi.fn(pending) }
-})
 
 vi.mock(import('@/lib/multifus'), () => {
   return bridge
 })
 
 const { JournalPanel } = await import('@/components/journal-panel')
-
-const words = strings.journal
 
 const NOON = Date.UTC(2026, 7, 26, 12, 0, 0)
 
@@ -41,6 +35,11 @@ const ENTRIES = [
   }
 ] as const satisfies readonly JournalEntry[]
 
+const LINES = [
+  'Multifus 1.4.2 a démarré sur macOS 15.3, lancé à la main.',
+  'Alpha : message privé relayé sur le téléphone.'
+]
+
 const show = (journal: readonly JournalEntry[]) => {
   render(<JournalPanel snapshot={snapshotOf({ journal })} />)
 }
@@ -54,19 +53,19 @@ describe('le journal', () => {
     show(ENTRIES)
 
     expect(toggle()).not.toBeNull()
-    expect(screen.queryByText(journalLine(ENTRIES[0].event))).toBeNull()
+    expect(screen.queryByText(LINES[0])).toBeNull()
   })
 
   it('compte ce qu’il a à dire, replié', () => {
     show(ENTRIES)
 
-    expect(screen.getByText(words.entries(2))).not.toBeNull()
+    expect(screen.getByText(strings.journal.entries(2))).not.toBeNull()
   })
 
   it('compte une entrée au singulier', () => {
     show([ENTRIES[0]])
 
-    expect(screen.getByText(words.entries(1))).not.toBeNull()
+    expect(screen.getByText(strings.journal.entries(1))).not.toBeNull()
   })
 
   it('déroule les lignes et leur heure quand on l’ouvre', () => {
@@ -74,8 +73,8 @@ describe('le journal', () => {
 
     fireEvent.click(toggle())
 
-    for (const entry of ENTRIES) {
-      expect(screen.getByText(journalLine(entry.event))).not.toBeNull()
+    for (const [rank, entry] of ENTRIES.entries()) {
+      expect(screen.getByText(LINES[rank])).not.toBeNull()
       expect(screen.getByText(journalTime(entry.at))).not.toBeNull()
     }
   })
@@ -86,7 +85,7 @@ describe('le journal', () => {
     fireEvent.click(toggle())
     fireEvent.click(screen.getByRole('button', { expanded: true }))
 
-    expect(screen.queryByText(journalLine(ENTRIES[0].event))).toBeNull()
+    expect(screen.queryByText(LINES[0])).toBeNull()
   })
 
   it('dit qu’il n’a rien à signaler quand il est vide', () => {
@@ -94,25 +93,31 @@ describe('le journal', () => {
 
     fireEvent.click(toggle())
 
-    expect(screen.getByText(words.empty)).not.toBeNull()
+    expect(screen.getByText(strings.journal.empty)).not.toBeNull()
   })
 
   it('n’offre de copier que lorsqu’il a quelque chose à dire', () => {
     show([])
 
-    expect(screen.queryByRole('button', { name: words.copy })).toBeNull()
+    expect(
+      screen.queryByRole('button', { name: strings.journal.copy })
+    ).toBeNull()
   })
 
   it('offre de copier dès la première ligne, même replié', () => {
     show(ENTRIES)
 
-    expect(screen.getByRole('button', { name: words.copy })).not.toBeNull()
+    expect(
+      screen.getByRole('button', { name: strings.journal.copy })
+    ).not.toBeNull()
   })
 
   it('mène au fichier du journal', () => {
     show([])
 
-    fireEvent.click(screen.getByRole('button', { name: words.reveal }))
+    fireEvent.click(
+      screen.getByRole('button', { name: strings.journal.reveal })
+    )
 
     expect(bridge.revealJournal).toHaveBeenCalledWith()
   })

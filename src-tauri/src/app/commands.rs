@@ -302,6 +302,8 @@ pub fn open_relay_link(app: AppHandle, link: relay::RelayLink) {
 pub fn reset(app: AppHandle) -> Snapshot {
     lock(&app).reset();
 
+    relay::pairing::forget_bot(&app);
+
     relay::run::stop_if_unready(&app, RelayStop::NoLongerPaired);
 
     shortcuts::apply(&app);

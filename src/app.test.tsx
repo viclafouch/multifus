@@ -1,29 +1,25 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, fireEvent, render, screen } from '@testing-library/react'
-import type { Character } from '@/@types/roster'
 import type { ScreenName, Snapshot } from '@/@types/snapshot'
 import type { ConfigProblem } from '@/@types/system'
 import { strings } from '@/constants/strings'
-import { snapshotOf } from '@/test-snapshot'
+import { ignore } from '@/lib/utils'
+import { characterOf, pending, snapshotOf } from '@/test-doubles'
 
-function pending(): Promise<never> {
-  return new Promise(() => {})
+type TrayHandler = Parameters<typeof import('@/lib/multifus').onNavigate>[0]
+
+const tray = {
+  asked: null as TrayHandler | null
 }
 
-const tray = vi.hoisted(() => {
-  return { asked: null as ((screen: ScreenName) => void) | null }
-})
-
-const bridge = vi.hoisted(() => {
-  return {
-    onSnapshot: vi.fn(),
-    onNavigate: vi.fn(),
-    snapshot: vi.fn(),
-    bannerScreens: vi.fn(),
-    dismissConfigProblem: vi.fn(pending),
-    revealQuarantinedConfig: vi.fn(pending)
-  }
-})
+const bridge = {
+  onSnapshot: vi.fn(),
+  onNavigate: vi.fn(),
+  snapshot: vi.fn(),
+  bannerScreens: vi.fn(),
+  dismissConfigProblem: vi.fn(pending),
+  revealQuarantinedConfig: vi.fn(pending)
+}
 
 vi.mock(import('@/lib/multifus'), () => {
   return bridge
@@ -31,19 +27,15 @@ vi.mock(import('@/lib/multifus'), () => {
 
 const { App } = await import('@/app')
 
-const unlisten = () => {}
-
 const open = async (snapshot: Snapshot) => {
-  bridge.onSnapshot.mockResolvedValue(unlisten)
+  bridge.onSnapshot.mockResolvedValue(ignore)
   bridge.snapshot.mockResolvedValue(snapshot)
   bridge.bannerScreens.mockResolvedValue([])
-  bridge.onNavigate.mockImplementation(
-    async (handle: (screen: ScreenName) => void) => {
-      tray.asked = handle
+  bridge.onNavigate.mockImplementation(async (handle: TrayHandler) => {
+    tray.asked = handle
 
-      return unlisten
-    }
-  )
+    return ignore
+  })
 
   render(<App />)
 
@@ -56,17 +48,6 @@ const navigateTo = (name: ScreenName) => {
 
 const currentEntry = () => {
   return screen.getByRole('button', { current: 'page' }).textContent
-}
-
-const character = (nickname: string, online: boolean): Character => {
-  return {
-    nickname,
-    gender: 'male',
-    class: 'iop',
-    asleep: false,
-    online,
-    relayed: true
-  }
 }
 
 type Arrival = {
@@ -140,9 +121,9 @@ describe('la fenêtre de Multifus', () => {
       await open(
         snapshotOf({
           characters: [
-            character('Alpha', true),
-            character('Bravo', false),
-            character('Charlie', true)
+            characterOf({ nickname: 'Alpha', online: true }),
+            characterOf({ nickname: 'Bravo', online: false }),
+            characterOf({ nickname: 'Charlie', online: true })
           ]
         })
       )

@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import type { BannerScreen } from '@/@types/walk'
+import { bannerScreenOf } from '@/test-doubles'
 
 const rust = vi.hoisted(() => {
   return {
@@ -22,12 +23,7 @@ vi.mock(import('@/lib/multifus'), () => {
 
 const { useBannerScreens } = await import('@/hooks/use-banner-screens')
 
-const LAPTOP: BannerScreen = {
-  name: 'Écran intégré',
-  width: 1512,
-  height: 982,
-  primary: true
-}
+const LAPTOP = bannerScreenOf()
 
 const listen = () => {
   return renderHook(() => {

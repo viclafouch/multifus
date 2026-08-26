@@ -24,7 +24,7 @@ versions déjà installées.
 
 - [ ] Ouvrir une couture pour `PlatformWindowManager`, aujourd'hui un alias concret, sans quoi rien ne se joue en test
 - [ ] Tester la couche qui touche au système : le tour de scan, l'enregistrement des raccourcis, la bascule, la bannière, le collage, le menu
-- [ ] Corriger `commands::reset`, qui laisse le jeton Telegram dans le trousseau, puis le tester
+- [ ] Vérifier à la main que « Tout réinitialiser » vide bien le trousseau : le code le fait, aucun test ne le prouve
 
 ## Vérifier sur une vraie soirée
 

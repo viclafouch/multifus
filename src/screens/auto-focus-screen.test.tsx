@@ -1,25 +1,17 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import type { AutoFocusSwitch, NotificationKind } from '@/@types/notification'
+import { APPLE_AGENT, WINDOWS_AGENT } from '@/test-doubles'
 
-function pending(): Promise<never> {
-  return new Promise(() => {})
+const bridge = {
+  setAutoFocus: vi.fn(),
+  setAutoFocusEnabled: vi.fn(),
+  setWakesMinimized: vi.fn()
 }
-
-const bridge = vi.hoisted(() => {
-  return {
-    setAutoFocus: vi.fn(pending),
-    setAutoFocusEnabled: vi.fn(pending),
-    setWakesMinimized: vi.fn(pending)
-  }
-})
 
 vi.mock(import('@/lib/multifus'), () => {
   return bridge
 })
-
-const APPLE_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)'
-const WINDOWS_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
 
 const ALL_KINDS = [
   'combat',
@@ -31,7 +23,7 @@ const ALL_KINDS = [
   'perceptor'
 ] as const satisfies readonly NotificationKind[]
 
-const allOn = ALL_KINDS.map((kind): AutoFocusSwitch => {
+const ALL_ON = ALL_KINDS.map((kind): AutoFocusSwitch => {
   return { kind, enabled: true }
 })
 
@@ -43,7 +35,7 @@ type ShowParams = {
 }
 
 const show = async ({
-  switches = allOn,
+  switches = ALL_ON,
   isEnabled = true,
   wakesMinimized = false,
   agent = WINDOWS_AGENT
@@ -71,10 +63,6 @@ const switchNamed = (label: string) => {
 }
 
 describe('l’écran de l’AutoFocus', () => {
-  afterEach(() => {
-    vi.unstubAllGlobals()
-  })
-
   it('porte une ligne par événement que le jeu sait annoncer', async () => {
     const words = await show()
 

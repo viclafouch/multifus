@@ -3,19 +3,14 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import type { ShortcutBinding } from '@/@types/shortcuts'
 import type { BannerPlace, BannerScreen } from '@/@types/walk'
 import { strings } from '@/constants/strings'
+import { bannerScreenOf, pending } from '@/test-doubles'
 
-function pending(): Promise<never> {
-  return new Promise(() => {})
+const bridge = {
+  setWalkEnabled: vi.fn(pending),
+  setBannerCorner: vi.fn(pending),
+  setBannerScreen: vi.fn(pending),
+  bannerScreens: vi.fn()
 }
-
-const bridge = vi.hoisted(() => {
-  return {
-    setWalkEnabled: vi.fn(pending),
-    setBannerCorner: vi.fn(pending),
-    setBannerScreen: vi.fn(pending),
-    bannerScreens: vi.fn()
-  }
-})
 
 vi.mock(import('@/lib/multifus'), () => {
   return bridge
@@ -23,21 +18,14 @@ vi.mock(import('@/lib/multifus'), () => {
 
 const { WalkScreen } = await import('@/screens/walk-screen')
 
-const words = strings.walk
+const LAPTOP = bannerScreenOf()
 
-const LAPTOP: BannerScreen = {
-  name: 'Écran intégré',
-  width: 1512,
-  height: 982,
-  primary: true
-}
-
-const TELEVISION: BannerScreen = {
+const TELEVISION = bannerScreenOf({
   name: 'DELL U2720Q',
   width: 3840,
   height: 2160,
   primary: false
-}
+})
 
 const walkShortcut = (accelerator: string | null): ShortcutBinding => {
   return {
@@ -71,12 +59,12 @@ const show = async ({
     />
   )
 
-  await screen.findByText(words.banner.hint)
+  await screen.findByText(strings.walk.banner.hint)
 }
 
 const keyCaps = () => {
-  return [...document.querySelectorAll('kbd')].map((cap) => {
-    return cap.textContent
+  return [...document.querySelectorAll('kbd')].map((keyCap) => {
+    return keyCap.textContent
   })
 }
 
@@ -86,7 +74,7 @@ const cornerNamed = (label: string) => {
 
 const chipNamed = (rank: number) => {
   return screen.getByRole('button', {
-    name: new RegExp(`^${words.banner.screenName(rank)}`, 'u')
+    name: new RegExp(`^${strings.walk.banner.screenName(rank)}`, 'u')
   })
 }
 
@@ -94,7 +82,9 @@ describe('l’écran du Déplacement', () => {
   it('allume le Déplacement quand on bouge l’interrupteur', async () => {
     await show({ enabled: false })
 
-    fireEvent.click(screen.getByRole('switch', { name: words.switchLabel }))
+    fireEvent.click(
+      screen.getByRole('switch', { name: strings.walk.switchLabel })
+    )
 
     expect(bridge.setWalkEnabled).toHaveBeenCalledWith(true)
   })
@@ -102,7 +92,9 @@ describe('l’écran du Déplacement', () => {
   it('éteint le Déplacement quand on rebouge l’interrupteur', async () => {
     await show({ enabled: true })
 
-    fireEvent.click(screen.getByRole('switch', { name: words.switchLabel }))
+    fireEvent.click(
+      screen.getByRole('switch', { name: strings.walk.switchLabel })
+    )
 
     expect(bridge.setWalkEnabled).toHaveBeenCalledWith(false)
   })
@@ -110,8 +102,8 @@ describe('l’écran du Déplacement', () => {
   it('rappelle qu’il démarre toujours éteint, et qu’il ne garde rien', async () => {
     await show()
 
-    expect(screen.getByText(words.startsOff)).not.toBeNull()
-    expect(screen.getByText(words.privacy)).not.toBeNull()
+    expect(screen.getByText(strings.walk.startsOff)).not.toBeNull()
+    expect(screen.getByText(strings.walk.privacy)).not.toBeNull()
   })
 
   describe('le rappel du raccourci', () => {
@@ -124,7 +116,7 @@ describe('l’écran du Déplacement', () => {
     it('dit qu’il n’y en a aucune tant que rien n’est posé', async () => {
       await show({ shortcuts: [walkShortcut(null)] })
 
-      expect(screen.getByText(words.shortcutEmpty)).not.toBeNull()
+      expect(screen.getByText(strings.walk.shortcutEmpty)).not.toBeNull()
       expect(keyCaps()).toStrictEqual([])
     })
 
@@ -140,7 +132,7 @@ describe('l’écran du Déplacement', () => {
         ]
       })
 
-      expect(screen.getByText(words.shortcutEmpty)).not.toBeNull()
+      expect(screen.getByText(strings.walk.shortcutEmpty)).not.toBeNull()
     })
   })
 
@@ -148,7 +140,7 @@ describe('l’écran du Déplacement', () => {
     it('offre les quatre coins', async () => {
       await show()
 
-      for (const label of Object.values(words.banner.corners)) {
+      for (const label of Object.values(strings.walk.banner.corners)) {
         expect(cornerNamed(label)).not.toBeNull()
       }
     })
@@ -157,10 +149,12 @@ describe('l’écran du Déplacement', () => {
       await show({ banner: { corner: 'topLeft', screen: null } })
 
       expect(
-        cornerNamed(words.banner.corners.topLeft).getAttribute('aria-pressed')
+        cornerNamed(strings.walk.banner.corners.topLeft).getAttribute(
+          'aria-pressed'
+        )
       ).toBe('true')
       expect(
-        cornerNamed(words.banner.corners.bottomRight).getAttribute(
+        cornerNamed(strings.walk.banner.corners.bottomRight).getAttribute(
           'aria-pressed'
         )
       ).toBe('false')
@@ -169,7 +163,7 @@ describe('l’écran du Déplacement', () => {
     it('pose la bannière dans le coin désigné', async () => {
       await show({ banner: { corner: 'bottomRight', screen: null } })
 
-      fireEvent.click(cornerNamed(words.banner.corners.topRight))
+      fireEvent.click(cornerNamed(strings.walk.banner.corners.topRight))
 
       expect(bridge.setBannerCorner).toHaveBeenCalledWith('topRight')
     })
@@ -179,7 +173,7 @@ describe('l’écran du Déplacement', () => {
     it('ne demande rien tant qu’il n’y a qu’un écran', async () => {
       await show({ screens: [LAPTOP] })
 
-      expect(screen.queryByText(words.banner.screenLegend)).toBeNull()
+      expect(screen.queryByText(strings.walk.banner.screenLegend)).toBeNull()
     })
 
     it('ne demande rien tant que le système n’a pas répondu', () => {
@@ -193,20 +187,20 @@ describe('l’écran du Déplacement', () => {
         />
       )
 
-      expect(screen.queryByText(words.banner.screenLegend)).toBeNull()
-      expect(cornerNamed(words.banner.corners.topLeft)).not.toBeNull()
+      expect(screen.queryByText(strings.walk.banner.screenLegend)).toBeNull()
+      expect(cornerNamed(strings.walk.banner.corners.topLeft)).not.toBeNull()
     })
 
     it('ne demande rien quand le système ne rend aucun écran', async () => {
       await show({ screens: [] })
 
-      expect(screen.queryByText(words.banner.screenLegend)).toBeNull()
+      expect(screen.queryByText(strings.walk.banner.screenLegend)).toBeNull()
     })
 
     it('offre une pastille par écran dès qu’il y en a deux', async () => {
       await show({ screens: [LAPTOP, TELEVISION] })
 
-      expect(screen.getByText(words.banner.screenLegend)).not.toBeNull()
+      expect(screen.getByText(strings.walk.banner.screenLegend)).not.toBeNull()
       expect(chipNamed(1)).not.toBeNull()
       expect(chipNamed(2)).not.toBeNull()
     })
@@ -215,9 +209,11 @@ describe('l’écran du Déplacement', () => {
       await show({ screens: [LAPTOP, TELEVISION] })
 
       expect(
-        screen.getByText(words.banner.screenSize(3840, 2160))
+        screen.getByText(strings.walk.banner.screenSize(3840, 2160))
       ).not.toBeNull()
-      expect(screen.getAllByText(words.banner.screenPrimary)).toHaveLength(1)
+      expect(
+        screen.getAllByText(strings.walk.banner.screenPrimary)
+      ).toHaveLength(1)
     })
 
     it('pose la bannière sur l’écran désigné', async () => {

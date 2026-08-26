@@ -1,4 +1,4 @@
-import { afterEach } from 'vitest'
+import { afterEach, vi } from 'vitest'
 import { cleanup } from '@testing-library/react'
 import { ignore } from '@/lib/utils'
 
@@ -12,4 +12,5 @@ globalThis.ResizeObserver = SilentResizeObserver
 
 afterEach(() => {
   cleanup()
+  vi.unstubAllGlobals()
 })

@@ -51,20 +51,34 @@ pub fn unpair(app: &AppHandle) {
     let app = app.clone();
 
     tauri::async_runtime::spawn(async move {
-        let erased = tauri::async_runtime::spawn_blocking(secret::erase).await;
-
-        if let Ok(Err(error)) = erased {
-            lock(&app).log(JournalEvent::RelayFailed {
-                reason: RelayFailure::Keychain {
-                    detail: error.to_string(),
-                },
-            });
-        }
+        erase_token(&app).await;
 
         lock(&app).set_unpaired();
 
         runtime::emit_snapshot(&app);
     });
+}
+
+pub fn forget_bot(app: &AppHandle) {
+    let app = app.clone();
+
+    tauri::async_runtime::spawn(async move {
+        erase_token(&app).await;
+
+        runtime::emit_snapshot(&app);
+    });
+}
+
+async fn erase_token(app: &AppHandle) {
+    let erased = tauri::async_runtime::spawn_blocking(secret::erase).await;
+
+    if let Ok(Err(error)) = erased {
+        lock(app).log(JournalEvent::RelayFailed {
+            reason: RelayFailure::Keychain {
+                detail: error.to_string(),
+            },
+        });
+    }
 }
 
 async fn attempt(token: BotToken) -> Result<i64, PairingProblem> {

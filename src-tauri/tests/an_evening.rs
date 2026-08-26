@@ -1,4 +1,11 @@
-use tempfile::TempDir;
+mod common;
+
+use common::client;
+use common::in_cycle;
+use common::nicknames;
+use common::opened;
+use common::paint_everything;
+use common::reopened;
 
 use multifus_lib::app::journal::JournalEvent;
 use multifus_lib::app::journal::Launch;
@@ -6,56 +13,12 @@ use multifus_lib::app::journal::Outcome;
 use multifus_lib::app::journal::Surface;
 use multifus_lib::app::state::Decision;
 use multifus_lib::app::state::ShortcutEffect;
-use multifus_lib::app::view::ScreenSaverView;
 use multifus_lib::app::view::ShortcutAction;
 use multifus_lib::app::Multifus;
-use multifus_lib::app::MultifusParams;
-use multifus_lib::config::ConfigStore;
 use multifus_lib::domain::Class;
 use multifus_lib::domain::Gender;
 use multifus_lib::domain::NotificationKind;
-use multifus_lib::platform::GameWindow;
 use multifus_lib::platform::WindowId;
-
-fn start(directory: &TempDir, launch: Launch) -> Multifus {
-    let store = ConfigStore::in_directory(directory.path());
-    let loaded = store.load();
-
-    Multifus::new(MultifusParams {
-        store,
-        loaded,
-        version: "0.1.0".to_owned(),
-        system: "test".to_owned(),
-        launch,
-        screen_saver: ScreenSaverView::Never,
-        taskbar_combines: true,
-    })
-}
-
-fn client(pid: u64, nickname: &str) -> GameWindow {
-    let title = format!("{nickname} - Dofus Retro v1.48.21");
-
-    GameWindow::from_title(WindowId::from_raw(pid), &title).expect("a game window")
-}
-
-fn nicknames(state: &Multifus) -> Vec<String> {
-    state
-        .snapshot()
-        .characters
-        .into_iter()
-        .map(|character| character.nickname)
-        .collect()
-}
-
-fn in_cycle(state: &Multifus) -> Vec<String> {
-    state
-        .snapshot()
-        .characters
-        .into_iter()
-        .filter(|character| character.online && !character.asleep)
-        .map(|character| character.nickname)
-        .collect()
-}
 
 fn written(state: &Multifus) -> Vec<JournalEvent> {
     state
@@ -68,8 +31,7 @@ fn written(state: &Multifus) -> Vec<JournalEvent> {
 
 #[test]
 fn an_evening_of_dofus_from_the_first_client_to_the_last() {
-    let directory = TempDir::new().expect("a temporary directory");
-    let mut state = start(&directory, Launch::ByHand);
+    let (_directory, mut state) = opened(Launch::ByHand);
 
     assert!(nicknames(&state).is_empty(), "a first launch knows nobody");
     assert!(!state.is_walk_enabled());
@@ -93,9 +55,7 @@ fn an_evening_of_dofus_from_the_first_client_to_the_last() {
 
     assert!(alpha.look.portrait.is_some());
 
-    for painting in &wanted {
-        state.remember_painted(painting);
-    }
+    paint_everything(&mut state);
 
     assert!(state.wore_portrait("Alpha"));
     assert!(
@@ -154,20 +114,17 @@ fn an_evening_of_dofus_from_the_first_client_to_the_last() {
 
 #[test]
 fn a_multifus_that_was_killed_finds_its_roster_and_its_traces_again() {
-    let directory = TempDir::new().expect("a temporary directory");
-    let mut died = start(&directory, Launch::ByHand);
+    let (directory, mut died) = opened(Launch::ByHand);
     died.apply_windows(&[client(1, "Alpha"), client(2, "Bravo")]);
     died.set_class("Alpha", Some(Class::Cra));
     died.set_gender("Alpha", Some(Gender::Female));
     died.toggle_asleep("Bravo");
 
-    for painting in died.looks_to_paint() {
-        died.remember_painted(&painting);
-    }
+    paint_everything(&mut died);
 
     drop(died);
 
-    let mut reborn = start(&directory, Launch::Session);
+    let mut reborn = reopened(&directory, Launch::Session);
 
     assert_eq!(nicknames(&reborn), ["Alpha", "Bravo"]);
     assert!(reborn.wore_portrait("Alpha"), "the trace outlived the run");
@@ -204,8 +161,7 @@ fn a_multifus_that_was_killed_finds_its_roster_and_its_traces_again() {
 
 #[test]
 fn an_evening_with_the_relay_says_who_left_and_when_there_is_nobody_left() {
-    let directory = TempDir::new().expect("a temporary directory");
-    let mut state = start(&directory, Launch::ByHand);
+    let (directory, mut state) = opened(Launch::ByHand);
     state.apply_windows(&[client(1, "Alpha"), client(2, "Bravo")]);
 
     assert!(!state.is_relay_ready(), "no bot yet");
@@ -232,5 +188,5 @@ fn an_evening_with_the_relay_says_who_left_and_when_there_is_nobody_left() {
     state.set_unpaired();
 
     assert!(!state.is_relay_ready());
-    assert!(!start(&directory, Launch::ByHand).is_relay_active());
+    assert!(!reopened(&directory, Launch::ByHand).is_relay_active());
 }

@@ -1,11 +1,9 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { strings } from '@/constants/strings'
+import { APPLE_AGENT, WINDOWS_AGENT } from '@/test-doubles'
 
 const EDIT_LABEL = 'Modifier le raccourci'
-
-const APPLE_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)'
-const WINDOWS_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
 
 type FieldParams = {
   readonly accelerator?: string | null
@@ -44,16 +42,12 @@ const field = async ({
 }
 
 const keyCaps = () => {
-  return [...document.querySelectorAll('kbd')].map((cap) => {
-    return cap.textContent
+  return [...document.querySelectorAll('kbd')].map((keyCap) => {
+    return keyCap.textContent
   })
 }
 
 describe('le champ d’un raccourci', () => {
-  afterEach(() => {
-    vi.unstubAllGlobals()
-  })
-
   it('dessine les touches de la combinaison en cours, sur Windows', async () => {
     await field({ accelerator: 'Control+Shift+Right' })
 

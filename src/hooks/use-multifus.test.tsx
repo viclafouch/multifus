@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import type { Snapshot } from '@/@types/snapshot'
-import { snapshotOf } from '@/test-snapshot'
+import { snapshotOf } from '@/test-doubles'
 
 type Heard = ((snapshot: Snapshot) => void) | null
 

@@ -8,28 +8,20 @@ import type {
 } from '@/@types/shortcuts'
 import { strings } from '@/constants/strings'
 
-function pending(): Promise<never> {
-  return new Promise(() => {})
+const bridge = {
+  setShortcut: vi.fn(),
+  resetShortcuts: vi.fn(),
+  addQuickReply: vi.fn(),
+  setQuickReplyText: vi.fn(),
+  setQuickReplyShortcut: vi.fn(),
+  removeQuickReply: vi.fn()
 }
-
-const bridge = vi.hoisted(() => {
-  return {
-    setShortcut: vi.fn(pending),
-    resetShortcuts: vi.fn(pending),
-    addQuickReply: vi.fn(pending),
-    setQuickReplyText: vi.fn(pending),
-    setQuickReplyShortcut: vi.fn(pending),
-    removeQuickReply: vi.fn(pending)
-  }
-})
 
 vi.mock(import('@/lib/multifus'), () => {
   return bridge
 })
 
 const { ShortcutsScreen } = await import('@/screens/shortcuts')
-
-const words = strings.shortcuts
 
 const ALL_ACTIONS = [
   'next',
@@ -99,24 +91,31 @@ const show = ({ shortcuts = [], quickReplies = [] }: ShowParams = {}) => {
 
 const fieldOf = (action: ShortcutAction) => {
   return screen.getByRole('button', {
-    name: words.edit(words.actions[action].label)
+    name: strings.shortcuts.edit(strings.shortcuts.actions[action].label)
   })
 }
 
 const quickReplyField = () => {
-  return screen.getByRole('button', { name: words.quickReplies.edit })
+  return screen.getByRole('button', {
+    name: strings.shortcuts.quickReplies.edit
+  })
 }
 
-const strike = (
-  field: HTMLElement,
-  key: Partial<KeyboardEvent> & { readonly code: string }
-) => {
-  fireEvent.keyDown(field, { key: key.code, ...key })
+type Combination = {
+  readonly code: string
+  readonly ctrlKey?: boolean
+  readonly altKey?: boolean
+  readonly shiftKey?: boolean
+  readonly metaKey?: boolean
+}
+
+const strike = (field: HTMLElement, combination: Combination) => {
+  fireEvent.keyDown(field, { key: combination.code, ...combination })
 }
 
 const capsOf = (field: HTMLElement) => {
-  return [...field.querySelectorAll('kbd')].map((cap) => {
-    return cap.textContent
+  return [...field.querySelectorAll('kbd')].map((keyCap) => {
+    return keyCap.textContent
   })
 }
 
@@ -129,7 +128,7 @@ describe('l’écran des raccourcis, les cinq actions', () => {
     show({ shortcuts: all })
 
     for (const action of ALL_ACTIONS) {
-      const { label, description } = words.actions[action]
+      const { label, description } = strings.shortcuts.actions[action]
 
       expect(fieldOf(action)).not.toBeNull()
       expect(screen.getByText(label)).not.toBeNull()
@@ -142,8 +141,10 @@ describe('l’écran des raccourcis, les cinq actions', () => {
 
     fireEvent.click(fieldOf('next'))
 
-    expect(screen.getAllByText(words.capture)).toHaveLength(1)
-    expect(within(fieldOf('next')).getByText(words.capture)).not.toBeNull()
+    expect(screen.getAllByText(strings.shortcuts.capture)).toHaveLength(1)
+    expect(
+      within(fieldOf('next')).getByText(strings.shortcuts.capture)
+    ).not.toBeNull()
   })
 
   it('referme la ligne d’avant quand on en ouvre une autre', () => {
@@ -152,8 +153,10 @@ describe('l’écran des raccourcis, les cinq actions', () => {
     fireEvent.click(fieldOf('next'))
     fireEvent.click(fieldOf('walk'))
 
-    expect(screen.getAllByText(words.capture)).toHaveLength(1)
-    expect(within(fieldOf('walk')).getByText(words.capture)).not.toBeNull()
+    expect(screen.getAllByText(strings.shortcuts.capture)).toHaveLength(1)
+    expect(
+      within(fieldOf('walk')).getByText(strings.shortcuts.capture)
+    ).not.toBeNull()
   })
 
   it('pose la combinaison frappée et referme la saisie', () => {
@@ -166,7 +169,7 @@ describe('l’écran des raccourcis, les cinq actions', () => {
       'next',
       'Control+Shift+KeyN'
     )
-    expect(screen.queryByText(words.capture)).toBeNull()
+    expect(screen.queryByText(strings.shortcuts.capture)).toBeNull()
   })
 
   it('efface la combinaison sur Retour arrière', () => {
@@ -201,39 +204,39 @@ describe('l’écran des raccourcis, le retour en arrière', () => {
   ]
 
   it('offre de remettre les touches d’avant, une fois la nouvelle posée', () => {
-    const again = show({ shortcuts: before })
+    const answered = show({ shortcuts: before })
 
     fireEvent.click(fieldOf('walk'))
     strike(fieldOf('walk'), { code: 'KeyW', ctrlKey: true, shiftKey: true })
-    again({ shortcuts: after })
+    answered({ shortcuts: after })
 
     const undo = screen.getByRole('button', {
-      name: words.undoLabel(words.actions.walk.label)
+      name: strings.shortcuts.undoLabel(strings.shortcuts.actions.walk.label)
     })
 
     expect(capsOf(undo)).toStrictEqual(['Alt', 'W'])
   })
 
   it('repose les touches d’avant, et n’offre plus rien', () => {
-    const again = show({ shortcuts: before })
+    const answered = show({ shortcuts: before })
 
     fireEvent.click(fieldOf('walk'))
     strike(fieldOf('walk'), { code: 'KeyW', ctrlKey: true, shiftKey: true })
-    again({ shortcuts: after })
+    answered({ shortcuts: after })
 
     fireEvent.click(
       screen.getByRole('button', {
-        name: words.undoLabel(words.actions.walk.label)
+        name: strings.shortcuts.undoLabel(strings.shortcuts.actions.walk.label)
       })
     )
 
     expect(bridge.setShortcut).toHaveBeenLastCalledWith('walk', 'Alt+KeyW')
 
-    again({ shortcuts: before })
+    answered({ shortcuts: before })
 
     expect(
       screen.queryByRole('button', {
-        name: words.undoLabel(words.actions.walk.label)
+        name: strings.shortcuts.undoLabel(strings.shortcuts.actions.walk.label)
       })
     ).toBeNull()
   })
@@ -243,23 +246,23 @@ describe('l’écran des raccourcis, le retour en arrière', () => {
 
     expect(
       screen.queryByRole('button', {
-        name: words.undoLabel(words.actions.walk.label)
+        name: strings.shortcuts.undoLabel(strings.shortcuts.actions.walk.label)
       })
     ).toBeNull()
   })
 
   it('offre de remettre aucune touche quand il n’y en avait pas', () => {
-    const again = show({ shortcuts: [shortcut('walk')] })
+    const answered = show({ shortcuts: [shortcut('walk')] })
 
     fireEvent.click(fieldOf('walk'))
     strike(fieldOf('walk'), { code: 'KeyW', ctrlKey: true, shiftKey: true })
-    again({ shortcuts: after })
+    answered({ shortcuts: after })
 
     expect(
       screen.getByRole('button', {
-        name: words.undoLabel(words.actions.walk.label)
+        name: strings.shortcuts.undoLabel(strings.shortcuts.actions.walk.label)
       }).textContent
-    ).toBe(words.undoNone)
+    ).toBe(strings.shortcuts.undoNone)
   })
 })
 
@@ -267,7 +270,9 @@ describe('l’écran des raccourcis, les touches d’origine', () => {
   it('n’offre rien tant que rien n’a bougé', () => {
     show({ shortcuts: [shortcut('walk'), shortcut('next')] })
 
-    expect(screen.queryByRole('button', { name: words.defaults })).toBeNull()
+    expect(
+      screen.queryByRole('button', { name: strings.shortcuts.defaults })
+    ).toBeNull()
   })
 
   it('offre de tout remettre dès qu’une touche a bougé', () => {
@@ -275,19 +280,21 @@ describe('l’écran des raccourcis, les touches d’origine', () => {
       shortcuts: [shortcut('walk'), shortcut('next', { isDefault: false })]
     })
 
-    fireEvent.click(screen.getByRole('button', { name: words.defaults }))
+    fireEvent.click(
+      screen.getByRole('button', { name: strings.shortcuts.defaults })
+    )
 
     expect(bridge.resetShortcuts).toHaveBeenCalledWith()
   })
 
   it('oublie les retours en arrière quand on remet tout d’origine', () => {
-    const again = show({
+    const answered = show({
       shortcuts: [shortcut('walk', { accelerator: 'Alt+KeyW' })]
     })
 
     fireEvent.click(fieldOf('walk'))
     strike(fieldOf('walk'), { code: 'KeyW', ctrlKey: true, shiftKey: true })
-    again({
+    answered({
       shortcuts: [
         shortcut('walk', {
           accelerator: 'Control+Shift+KeyW',
@@ -296,11 +303,13 @@ describe('l’écran des raccourcis, les touches d’origine', () => {
       ]
     })
 
-    fireEvent.click(screen.getByRole('button', { name: words.defaults }))
+    fireEvent.click(
+      screen.getByRole('button', { name: strings.shortcuts.defaults })
+    )
 
     expect(
       screen.queryByRole('button', {
-        name: words.undoLabel(words.actions.walk.label)
+        name: strings.shortcuts.undoLabel(strings.shortcuts.actions.walk.label)
       })
     ).toBeNull()
   })
@@ -310,7 +319,7 @@ describe('l’écran des raccourcis, ce que Rust répond d’une combinaison', (
   it('dit que rien ne se passera sans touches', () => {
     show({ shortcuts: [shortcut('walk')] })
 
-    expect(screen.getByText(words.status.unbound)).not.toBeNull()
+    expect(screen.getByText(strings.shortcuts.status.unbound)).not.toBeNull()
   })
 
   it('dit qu’un autre logiciel a déjà pris ces touches', () => {
@@ -323,7 +332,9 @@ describe('l’écran des raccourcis, ce que Rust répond d’une combinaison', (
       ]
     })
 
-    expect(screen.getByRole('alert').textContent).toBe(words.status.refused)
+    expect(screen.getByRole('alert').textContent).toBe(
+      strings.shortcuts.status.refused
+    )
   })
 
   it('nomme l’action qui tient déjà les mêmes touches', () => {
@@ -341,7 +352,9 @@ describe('l’écran des raccourcis, ce que Rust répond d’une combinaison', (
     })
 
     expect(screen.getByRole('alert').textContent).toBe(
-      words.status.duplicate(`« ${words.actions.next.label} »`)
+      strings.shortcuts.status.duplicate(
+        `« ${strings.shortcuts.actions.next.label} »`
+      )
     )
   })
 
@@ -360,7 +373,9 @@ describe('l’écran des raccourcis, ce que Rust répond d’une combinaison', (
     })
 
     expect(screen.getByRole('alert').textContent).toBe(
-      words.status.duplicate(words.quickReplies.named('Bonjour'))
+      strings.shortcuts.status.duplicate(
+        strings.shortcuts.quickReplies.named('Bonjour')
+      )
     )
   })
 
@@ -370,7 +385,7 @@ describe('l’écran des raccourcis, ce que Rust répond d’une combinaison', (
     })
 
     expect(screen.queryByRole('alert')).toBeNull()
-    expect(screen.queryByText(words.status.unbound)).toBeNull()
+    expect(screen.queryByText(strings.shortcuts.status.unbound)).toBeNull()
   })
 })
 
@@ -378,14 +393,16 @@ describe('l’écran des raccourcis, les réponses rapides', () => {
   it('invite à en ajouter une quand il n’y en a aucune', () => {
     show()
 
-    expect(screen.getByText(words.quickReplies.empty)).not.toBeNull()
+    expect(
+      screen.getByText(strings.shortcuts.quickReplies.empty)
+    ).not.toBeNull()
   })
 
   it('en ajoute une à la demande', () => {
     show()
 
     fireEvent.click(
-      screen.getByRole('button', { name: words.quickReplies.add })
+      screen.getByRole('button', { name: strings.shortcuts.quickReplies.add })
     )
 
     expect(bridge.addQuickReply).toHaveBeenCalledWith()
@@ -400,7 +417,9 @@ describe('l’écran des raccourcis, les réponses rapides', () => {
     })
 
     const texts = screen
-      .getAllByLabelText<HTMLInputElement>(words.quickReplies.textLabel)
+      .getAllByLabelText<HTMLInputElement>(
+        strings.shortcuts.quickReplies.textLabel
+      )
       .map((field) => {
         return field.value
       })
@@ -411,7 +430,9 @@ describe('l’écran des raccourcis, les réponses rapides', () => {
   it('garde le texte tapé, et ne l’envoie qu’une fois la ligne quittée', () => {
     show({ quickReplies: [quickReply(1, { text: '' })] })
 
-    const field = screen.getByLabelText(words.quickReplies.textLabel)
+    const field = screen.getByLabelText(
+      strings.shortcuts.quickReplies.textLabel
+    )
 
     fireEvent.change(field, { target: { value: 'Je suis en combat' } })
 
@@ -428,7 +449,9 @@ describe('l’écran des raccourcis, les réponses rapides', () => {
   it('taille les espaces autour du texte', () => {
     show({ quickReplies: [quickReply(1, { text: '' })] })
 
-    const field = screen.getByLabelText(words.quickReplies.textLabel)
+    const field = screen.getByLabelText(
+      strings.shortcuts.quickReplies.textLabel
+    )
 
     fireEvent.change(field, { target: { value: '  Bonjour  ' } })
     fireEvent.blur(field)
@@ -439,7 +462,9 @@ describe('l’écran des raccourcis, les réponses rapides', () => {
   it('n’envoie rien quand le texte n’a pas bougé', () => {
     show({ quickReplies: [quickReply(1, { text: 'Bonjour' })] })
 
-    fireEvent.blur(screen.getByLabelText(words.quickReplies.textLabel))
+    fireEvent.blur(
+      screen.getByLabelText(strings.shortcuts.quickReplies.textLabel)
+    )
 
     expect(bridge.setQuickReplyText).not.toHaveBeenCalled()
   })
@@ -447,7 +472,9 @@ describe('l’écran des raccourcis, les réponses rapides', () => {
   it('valide le texte sur Entrée', () => {
     show({ quickReplies: [quickReply(1, { text: '' })] })
 
-    const field = screen.getByLabelText(words.quickReplies.textLabel)
+    const field = screen.getByLabelText(
+      strings.shortcuts.quickReplies.textLabel
+    )
 
     field.focus()
     fireEvent.change(field, { target: { value: 'Bonjour' } })
@@ -460,7 +487,7 @@ describe('l’écran des raccourcis, les réponses rapides', () => {
     show({ quickReplies: [quickReply(1, { text: 'Bonjour' })] })
 
     const field = screen.getByLabelText<HTMLInputElement>(
-      words.quickReplies.textLabel
+      strings.shortcuts.quickReplies.textLabel
     )
 
     fireEvent.change(field, { target: { value: 'Autre chose' } })
@@ -474,7 +501,9 @@ describe('l’écran des raccourcis, les réponses rapides', () => {
     show({ quickReplies: [quickReply(4)] })
 
     fireEvent.click(
-      screen.getByRole('button', { name: words.quickReplies.remove })
+      screen.getByRole('button', {
+        name: strings.shortcuts.quickReplies.remove
+      })
     )
 
     expect(bridge.removeQuickReply).toHaveBeenCalledWith(4)
@@ -501,8 +530,10 @@ describe('l’écran des raccourcis, les réponses rapides', () => {
     fireEvent.click(fieldOf('walk'))
     fireEvent.click(quickReplyField())
 
-    expect(screen.getAllByText(words.capture)).toHaveLength(1)
-    expect(within(quickReplyField()).getByText(words.capture)).not.toBeNull()
+    expect(screen.getAllByText(strings.shortcuts.capture)).toHaveLength(1)
+    expect(
+      within(quickReplyField()).getByText(strings.shortcuts.capture)
+    ).not.toBeNull()
   })
 
   it('n’offre jamais de retour en arrière sur une réponse', () => {
@@ -511,13 +542,15 @@ describe('l’écran des raccourcis, les réponses rapides', () => {
     fireEvent.click(quickReplyField())
     strike(quickReplyField(), { code: 'KeyC', ctrlKey: true })
 
-    expect(screen.queryByText(words.undo)).toBeNull()
-    expect(screen.queryByText(words.undoNone)).toBeNull()
+    expect(screen.queryByText(strings.shortcuts.undo)).toBeNull()
+    expect(screen.queryByText(strings.shortcuts.undoNone)).toBeNull()
   })
 
   it('rappelle que le presse-papiers n’est qu’emprunté', () => {
     show()
 
-    expect(screen.getByText(words.quickReplies.clipboard)).not.toBeNull()
+    expect(
+      screen.getByText(strings.shortcuts.quickReplies.clipboard)
+    ).not.toBeNull()
   })
 })

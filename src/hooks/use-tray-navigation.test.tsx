@@ -2,9 +2,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import type { ScreenName } from '@/@types/snapshot'
 
+type TrayHandler = Parameters<typeof import('@/lib/multifus').onNavigate>[0]
+
 const rust = vi.hoisted(() => {
   return {
-    asked: null as ((screen: ScreenName) => void) | null,
+    asked: null as TrayHandler | null,
     open: null as (() => void) | null,
     unlisten: vi.fn()
   }

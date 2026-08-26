@@ -1,28 +1,20 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { strings } from '@/constants/strings'
+import { APPLE_AGENT, WINDOWS_AGENT } from '@/test-doubles'
 
-function pending(): Promise<never> {
-  return new Promise(() => {})
+const bridge = {
+  setStartAtLogin: vi.fn(),
+  setMaximizeOnLaunch: vi.fn(),
+  setShortTitles: vi.fn(),
+  setPaintPortraits: vi.fn(),
+  setUngroupTaskbar: vi.fn()
 }
-
-const bridge = vi.hoisted(() => {
-  return {
-    setStartAtLogin: vi.fn(pending),
-    setMaximizeOnLaunch: vi.fn(pending),
-    setShortTitles: vi.fn(pending),
-    setPaintPortraits: vi.fn(pending),
-    setUngroupTaskbar: vi.fn(pending)
-  }
-})
 
 vi.mock(import('@/lib/multifus'), () => {
   return bridge
 })
-
-const APPLE_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)'
-const WINDOWS_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
 
 type ShowParams = {
   readonly agent: string
@@ -65,10 +57,6 @@ const WINDOWS_ONLY_LABELS = [
 ]
 
 describe('l’écran des paramètres', () => {
-  afterEach(() => {
-    vi.unstubAllGlobals()
-  })
-
   it('porte les six lignes, sur les deux systèmes', async () => {
     await show({ agent: WINDOWS_AGENT })
 
