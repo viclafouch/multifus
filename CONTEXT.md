@@ -14,7 +14,7 @@ Les mots de Multifus, et rien d'autre. On en parle en français, on les écrit e
 
 **Roster** (`Roster`) : l'ensemble des personnages connus de Multifus, connectés ou non.
 
-**Connecté** (`online`) : se dit d'un personnage dont une fenêtre porte le pseudo en ce moment. Dofus Retro déconnecte tout seul un personnage qui ne fait rien, au bout d'un quart d'heure ou deux : sa fenêtre revient à l'écran de connexion, Multifus le voit repasser déconnecté, et le relais se tait pour lui. Personne n'a rien fait, et c'est le jeu qui décide.
+**Connecté** (`online`) : se dit d'un personnage dont une fenêtre porte le pseudo en ce moment. Dofus Retro déconnecte tout seul un personnage qui ne fait rien, au bout d'un quart d'heure ou deux : sa fenêtre revient à l'écran de connexion, Multifus le voit repasser déconnecté, et le relais se tait pour lui. Sa fenêtre se tait avec : elle n'est plus la sienne, elle reprend l'icône et le bouton du jeu jusqu'à son retour. Personne n'a rien fait, et c'est le jeu qui décide.
 
 **Fenêtre** (`GameWindow`) : l'incarnation d'un personnage à l'écran, un processus client par personnage.
 

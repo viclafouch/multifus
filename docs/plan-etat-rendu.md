@@ -112,7 +112,8 @@ emplacement pour lui-même.
       titres reprennent leur suffixe
 - [ ] Un client fermé et rouvert pendant que Multifus tourne : il retrouve sa
       tête de classe
-- [ ] Une mule laissée se déconnecter toute seule, puis Multifus quitté : sa
-      fenêtre à l'écran de connexion a repris l'icône de Dofus Retro
+- [ ] Une mule laissée se déconnecter toute seule, Multifus toujours en vie : sa
+      fenêtre à l'écran de connexion reprend l'icône de Dofus Retro tout de
+      suite, et sa tête de classe au retour du personnage
 - [ ] `config.json` ne porte plus aucune trace des fenêtres encore ouvertes une
       fois tout rendu

@@ -593,7 +593,7 @@ impl Multifus {
 
     #[must_use]
     pub fn looks_to_paint(&self) -> Vec<Painting> {
-        self.windows
+        self.windows_seen
             .iter()
             .filter_map(|(nickname, window)| {
                 let look = self.look_wanted(nickname);
@@ -609,7 +609,12 @@ impl Multifus {
 
     #[must_use]
     fn look_wanted(&self, nickname: &str) -> WindowLook {
-        let Some(character) = self.settings.roster.get(nickname) else {
+        let Some(character) = self
+            .settings
+            .roster
+            .get(nickname)
+            .filter(|character| character.online)
+        else {
             return WindowLook::default();
         };
 
@@ -672,6 +677,13 @@ impl Multifus {
             .filter(|(nickname, _)| traced.contains(*nickname))
             .map(|(nickname, window)| (nickname.clone(), *window))
             .collect()
+    }
+
+    pub fn forget_window(&mut self, nickname: &str) {
+        let forgotten = [nickname.to_owned()];
+
+        self.forget_portraits(&forgotten);
+        self.forget_groups(&forgotten);
     }
 
     pub fn forget_portraits(&mut self, nicknames: &[String]) {
@@ -2479,6 +2491,38 @@ mod tests {
         assert_eq!(
             state.looks_to_paint(),
             vec![painting("Alpha", 1, WindowLook::default())]
+        );
+    }
+
+    #[test]
+    fn a_character_the_game_logged_out_stops_wearing_his_face() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha")]);
+        state.set_gender("Alpha", Some(Gender::Male));
+        state.set_class("Alpha", Some(Class::Iop));
+
+        let worn = painting(
+            "Alpha",
+            1,
+            WindowLook {
+                portrait: Some(Portrait {
+                    class: Class::Iop,
+                    gender: Gender::Male,
+                }),
+                ungrouped: false,
+            },
+        );
+
+        assert_eq!(state.looks_to_paint(), vec![worn.clone()]);
+
+        state.remember_painted(&worn);
+        state.apply_windows(&[]);
+
+        assert_eq!(
+            state.looks_to_paint(),
+            vec![painting("Alpha", 1, WindowLook::default())],
+            "a window back on the login screen is nobody's, and wears nobody's face"
         );
     }
 

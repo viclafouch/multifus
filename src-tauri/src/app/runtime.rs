@@ -223,7 +223,8 @@ fn apply_window_icons(app: &AppHandle) -> bool {
 
         match painted {
             Ok(()) => state.remember_painted(&painting),
-            Err(PlatformError::AuthorizationDenied | PlatformError::WindowGone) => {}
+            Err(PlatformError::WindowGone) => state.forget_window(&painting.nickname),
+            Err(PlatformError::AuthorizationDenied) => {}
             Err(error) => {
                 written |= state.log_unless_repeated(JournalEvent::WindowIconFailed {
                     detail: error.to_string(),
