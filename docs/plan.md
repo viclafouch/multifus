@@ -22,8 +22,7 @@ versions déjà installées.
 
 ## Finir les tests
 
-- [ ] Ouvrir une couture pour `PlatformWindowManager`, aujourd'hui un alias concret, sans quoi rien ne se joue en test
-- [ ] Tester la couche qui touche au système : le tour de scan, l'enregistrement des raccourcis, la bascule, la bannière, le collage, le menu
+- [ ] Ouvrir la couture jusqu'à `answer` et `switch`, qui prennent encore l'`AppHandle` entier : la moitié d'un raccourci et la moitié d'une bascule s'arrêtent là. Détail dans [plan-tests.md](./plan-tests.md)
 - [ ] Vérifier à la main que « Tout réinitialiser » vide bien le trousseau : le code le fait, aucun test ne le prouve
 
 ## Vérifier sur une vraie soirée

@@ -15,6 +15,7 @@ pub mod update;
 pub mod view;
 pub mod walk;
 
+use std::sync::Arc;
 use std::sync::Mutex;
 
 use tauri::AppHandle;
@@ -28,12 +29,13 @@ use crate::platform::PlatformDisplayKeeper;
 use crate::platform::PlatformNotificationWatcher;
 use crate::platform::PlatformPasteSender;
 use crate::platform::PlatformWindowManager;
-use crate::platform::WindowManager;
 
 pub use state::AppState;
 pub use state::Multifus;
 pub use state::MultifusParams;
+pub use state::PasteState;
 pub use state::WatcherState;
+pub use state::WindowState;
 pub use view::Snapshot;
 
 pub fn setup(app: &AppHandle) -> Result<(), ConfigError> {
@@ -42,7 +44,9 @@ pub fn setup(app: &AppHandle) -> Result<(), ConfigError> {
     let store = ConfigStore::for_app(app)?;
     let loaded = store.load();
     let keeper = PlatformDisplayKeeper::new();
-    let windows = PlatformWindowManager::new(loaded.settings.traces.short_titles);
+    let windows: WindowState = Arc::new(PlatformWindowManager::new(
+        loaded.settings.traces.short_titles,
+    ));
 
     app.manage::<AppState>(Mutex::new(Multifus::new(MultifusParams {
         store,
@@ -53,8 +57,8 @@ pub fn setup(app: &AppHandle) -> Result<(), ConfigError> {
         screen_saver: screen_saver(&keeper),
         taskbar_combines: windows.taskbar_combines().unwrap_or(true),
     })));
-    app.manage(windows);
-    app.manage(PlatformPasteSender::new());
+    app.manage::<WindowState>(windows);
+    app.manage::<PasteState>(Arc::new(PlatformPasteSender::new()));
     app.manage::<WatcherState>(Mutex::new(PlatformNotificationWatcher::new()));
 
     relay::run::setup(app, keeper);

@@ -2,6 +2,8 @@ pub mod app;
 pub mod config;
 pub mod domain;
 pub mod platform;
+#[cfg(test)]
+pub mod test_doubles;
 
 use tauri_plugin_autostart::MacosLauncher;
 

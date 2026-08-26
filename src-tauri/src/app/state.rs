@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::collections::HashSet;
+use std::sync::Arc;
 use std::sync::Mutex;
 use std::sync::MutexGuard;
 use std::sync::PoisonError;
@@ -58,12 +59,18 @@ use crate::domain::Gender;
 use crate::domain::NotificationKind;
 use crate::domain::Portrait;
 use crate::platform::GameWindow;
+use crate::platform::PasteSender;
 use crate::platform::PlatformNotificationWatcher;
 use crate::platform::WindowId;
+use crate::platform::WindowManager;
 
 pub type AppState = Mutex<Multifus>;
 
 pub type WatcherState = Mutex<PlatformNotificationWatcher>;
+
+pub type WindowState = Arc<dyn WindowManager>;
+
+pub type PasteState = Arc<dyn PasteSender>;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct StartId(u64);
@@ -1376,10 +1383,21 @@ pub enum ShortcutEffect {
 }
 
 pub fn lock(app: &AppHandle) -> MutexGuard<'_, Multifus> {
-    app.state::<AppState>()
-        .inner()
-        .lock()
-        .unwrap_or_else(PoisonError::into_inner)
+    hold(app.state::<AppState>().inner())
+}
+
+pub fn hold(state: &AppState) -> MutexGuard<'_, Multifus> {
+    state.lock().unwrap_or_else(PoisonError::into_inner)
+}
+
+#[must_use]
+pub fn windows(app: &AppHandle) -> &dyn WindowManager {
+    app.state::<WindowState>().inner().as_ref()
+}
+
+#[must_use]
+pub fn paste_sender(app: &AppHandle) -> &dyn PasteSender {
+    app.state::<PasteState>().inner().as_ref()
 }
 
 #[cfg(test)]
@@ -1390,38 +1408,18 @@ mod tests {
     use tempfile::TempDir;
 
     use crate::app::journal::RelayFailure;
+    use crate::test_doubles;
 
     use super::*;
 
     fn multifus(directory: &TempDir) -> Multifus {
-        multifus_loaded(
-            directory,
-            Loaded {
-                settings: Settings::default(),
-                failure: None,
-                quarantined: None,
-                quarantine_failure: None,
-            },
-        )
+        test_doubles::multifus(directory, test_doubles::intact(Settings::default()))
     }
 
     fn multifus_reloaded(directory: &TempDir) -> Multifus {
-        let store = ConfigStore::in_directory(directory.path());
-        let loaded = store.load();
+        let loaded = ConfigStore::in_directory(directory.path()).load();
 
-        multifus_loaded(directory, loaded)
-    }
-
-    fn multifus_loaded(directory: &TempDir, loaded: Loaded) -> Multifus {
-        Multifus::new(MultifusParams {
-            store: ConfigStore::in_directory(directory.path()),
-            loaded,
-            version: "0.0.0".to_owned(),
-            system: "test".to_owned(),
-            launch: Launch::ByHand,
-            screen_saver: ScreenSaverView::Never,
-            taskbar_combines: true,
-        })
+        test_doubles::multifus(directory, loaded)
     }
 
     fn journalled(state: &Multifus) -> Vec<JournalEvent> {
@@ -2636,7 +2634,7 @@ mod tests {
         let directory = TempDir::new().expect("a temporary directory");
         let quarantined = directory.path().join("config.json.1");
 
-        let mut state = multifus_loaded(
+        let mut state = test_doubles::multifus(
             &directory,
             Loaded {
                 settings: Settings::default(),
@@ -2675,7 +2673,7 @@ mod tests {
         let directory = TempDir::new().expect("a temporary directory");
         let path = directory.path().join("config.json");
 
-        let state = multifus_loaded(
+        let state = test_doubles::multifus(
             &directory,
             Loaded {
                 settings: Settings::default(),

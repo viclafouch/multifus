@@ -18,6 +18,7 @@ use crate::app::journal::WalkFrom;
 use crate::app::journal::WalkIdle;
 use crate::app::journal::Work;
 use crate::app::state::lock;
+use crate::app::state::windows;
 use crate::app::view::BannerCharacter;
 use crate::platform::ClickGate;
 use crate::platform::ClickReport;
@@ -26,7 +27,6 @@ use crate::platform::ClickWatcher;
 use crate::platform::ClickedAt;
 use crate::platform::PlatformClickWatcher;
 use crate::platform::PlatformError;
-use crate::platform::PlatformWindowManager;
 use crate::platform::WindowId;
 use crate::platform::WindowManager;
 use crate::platform::SETTLE;
@@ -136,11 +136,7 @@ pub fn set_enabled(app: &AppHandle, enabled: bool, from: WalkFrom) {
 }
 
 fn who_is_here(app: &AppHandle) -> Option<BannerCharacter> {
-    let found = app
-        .state::<PlatformWindowManager>()
-        .foreground_game_window()
-        .ok()
-        .flatten()?;
+    let found = windows(app).foreground_game_window().ok().flatten()?;
 
     lock(app).banner_character_of(found.id())
 }
@@ -218,49 +214,73 @@ fn take(app: &AppHandle, step: WalkStep) {
     }
 }
 
-fn window_under(app: &AppHandle, clicked: ClickedAt) -> Option<WindowId> {
-    let under = app
-        .state::<PlatformWindowManager>()
-        .window_at(clicked.at)
-        .ok()
-        .flatten()?;
+#[derive(Debug, PartialEq, Eq)]
+enum Aim {
+    Elsewhere,
+    NobodyInCycle,
+    AlreadyThere,
+    Next(WindowId),
+}
 
-    app.state::<Walk>().watches(under).then_some(under)
+fn switch_said(refusal: Option<&PlatformError>, landed: bool) -> Option<JournalEvent> {
+    match refusal {
+        Some(error) => Some(JournalEvent::WalkSwitchFailed {
+            detail: error.to_string(),
+        }),
+        None if !landed => Some(JournalEvent::WalkIdle {
+            reason: WalkIdle::TooSlow,
+        }),
+        None => None,
+    }
+}
+
+fn aim(windows: &dyn WindowManager, walk: &Walk, clicked: ClickedAt) -> Aim {
+    let under = windows.window_at(clicked.at).ok().flatten();
+
+    let Some(under) = under.filter(|under| walk.watches(*under)) else {
+        return Aim::Elsewhere;
+    };
+
+    let Some(target) = walk.next_after(under) else {
+        return Aim::NobodyInCycle;
+    };
+
+    if target == under {
+        return Aim::AlreadyThere;
+    }
+
+    Aim::Next(target)
 }
 
 fn switch(app: &AppHandle, clicked: ClickedAt) {
     let asked_at = Instant::now();
     let walk = app.state::<Walk>();
 
-    let Some(under) = window_under(app, clicked) else {
-        walk.gate.open();
+    let target = match aim(windows(app), &walk, clicked) {
+        Aim::Elsewhere | Aim::AlreadyThere => {
+            walk.gate.open();
 
-        return;
+            return;
+        }
+        Aim::NobodyInCycle => {
+            walk.gate.open();
+
+            lock(app).log_unless_repeated(JournalEvent::WalkIdle {
+                reason: WalkIdle::NobodyInCycle,
+            });
+
+            banner::step(app, None);
+
+            return;
+        }
+        Aim::Next(target) => target,
     };
-
-    let Some(target) = walk.next_after(under) else {
-        walk.gate.open();
-
-        lock(app).log_unless_repeated(JournalEvent::WalkIdle {
-            reason: WalkIdle::NobodyInCycle,
-        });
-
-        banner::step(app, None);
-
-        return;
-    };
-
-    if target == under {
-        walk.gate.open();
-
-        return;
-    }
 
     thread::sleep(SETTLE.saturating_sub(asked_at.elapsed()));
 
     walk.gate.expect(target);
 
-    let asked = app.state::<PlatformWindowManager>().focus_fast(target);
+    let asked = windows(app).focus_fast(target);
     let landed = asked.is_ok() && walk.gate.await_arrival(SWITCH_CEILING);
 
     walk.gate.open();
@@ -268,18 +288,8 @@ fn switch(app: &AppHandle, clicked: ClickedAt) {
     let arrived = {
         let mut state = lock(app);
 
-        match asked {
-            Err(error) => {
-                state.log_unless_repeated(JournalEvent::WalkSwitchFailed {
-                    detail: error.to_string(),
-                });
-            }
-            Ok(()) if !landed => {
-                state.log_unless_repeated(JournalEvent::WalkIdle {
-                    reason: WalkIdle::TooSlow,
-                });
-            }
-            Ok(()) => {}
+        if let Some(said) = switch_said(asked.err().as_ref(), landed) {
+            state.log_unless_repeated(said);
         }
 
         state.banner_character_of(target)
@@ -294,6 +304,8 @@ mod tests {
 
     use super::*;
     use crate::platform::ScreenPoint;
+    use crate::test_doubles::Desktop;
+    use crate::test_doubles::FakeWindowManager;
 
     fn id(raw: u64) -> WindowId {
         WindowId::from_raw(raw)
@@ -370,6 +382,91 @@ mod tests {
                 ] if clicked.window == id(1) && *window == id(2)
             ),
             "{taken:?}"
+        );
+    }
+
+    #[test]
+    fn a_click_on_a_watched_window_aims_at_the_next_character_of_the_cycle() {
+        let (walk, _taken) = walk(plan_of(&[1, 2], &[(1, 2), (2, 1)]));
+        let windows = FakeWindowManager::showing(Desktop {
+            under_click: Some(id(1)),
+            ..Desktop::default()
+        });
+
+        assert_eq!(
+            aim(windows.as_ref(), &walk, clicked_at(1)),
+            Aim::Next(id(2))
+        );
+    }
+
+    #[test]
+    fn a_click_that_lands_outside_the_game_aims_nowhere() {
+        let (walk, _taken) = walk(plan_of(&[1, 2], &[(1, 2), (2, 1)]));
+        let windows = FakeWindowManager::showing(Desktop::default());
+
+        assert_eq!(aim(windows.as_ref(), &walk, clicked_at(1)), Aim::Elsewhere);
+
+        windows.show(Desktop {
+            under_click: Some(id(9)),
+            ..Desktop::default()
+        });
+
+        assert_eq!(
+            aim(windows.as_ref(), &walk, clicked_at(9)),
+            Aim::Elsewhere,
+            "a client the scan never handed over is not walked on"
+        );
+    }
+
+    #[test]
+    fn a_click_with_nobody_left_in_the_cycle_says_so_rather_than_switching() {
+        let (walk, _taken) = walk(plan_of(&[1], &[]));
+        let windows = FakeWindowManager::showing(Desktop {
+            under_click: Some(id(1)),
+            ..Desktop::default()
+        });
+
+        assert_eq!(
+            aim(windows.as_ref(), &walk, clicked_at(1)),
+            Aim::NobodyInCycle
+        );
+    }
+
+    #[test]
+    fn the_last_character_of_the_cycle_stays_where_it_is() {
+        let (walk, _taken) = walk(plan_of(&[1], &[(1, 1)]));
+        let windows = FakeWindowManager::showing(Desktop {
+            under_click: Some(id(1)),
+            ..Desktop::default()
+        });
+
+        assert_eq!(
+            aim(windows.as_ref(), &walk, clicked_at(1)),
+            Aim::AlreadyThere
+        );
+    }
+
+    #[test]
+    fn a_switch_is_only_over_when_the_system_says_the_window_came_forward() {
+        assert_eq!(switch_said(None, true), None);
+        assert_eq!(
+            switch_said(None, false),
+            Some(JournalEvent::WalkIdle {
+                reason: WalkIdle::TooSlow,
+            }),
+            "the system took the click but never brought the window forward"
+        );
+    }
+
+    #[test]
+    fn a_switch_the_system_refused_is_said_by_its_reason_and_not_by_its_delay() {
+        let refusal = PlatformError::system("focusing", "the system said no");
+
+        assert_eq!(
+            switch_said(Some(&refusal), false),
+            Some(JournalEvent::WalkSwitchFailed {
+                detail: "focusing failed: the system said no".to_owned(),
+            })
         );
     }
 

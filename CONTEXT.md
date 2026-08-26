@@ -26,6 +26,10 @@ Les mots de Multifus, et rien d'autre. On en parle en français, on les écrit e
 
 **Bascule** (`switch`) : le passage du premier plan d'une fenêtre à la suivante. Elle est finie quand le système la donne pour finie, pas quand on l'a demandée.
 
+**Tour** (`Turn`) : un passage de Multifus sur les fenêtres du jeu, une fois par seconde. Il lit ce qui est à l'écran, pose ce qui manque, et reprend ce qui n'a plus lieu d'être.
+
+**Visée** (`Aim`) : ce qu'un clic gauche vaut au Déplacement. Le clic tombe hors du jeu, ou sur une fenêtre que le tour n'a pas donnée, ou personne n'est dans le défilement, ou le suivant est celui sur lequel on est déjà, ou bien il désigne la fenêtre où aller.
+
 **Porte** (`ClickGate`) : ce qui décide, au moment du clic, si le clic compte. Fermée le temps d'une bascule, elle mange les clics qui arrivent trop tôt sur une fenêtre de jeu.
 
 **Juge** (`ClickJudge`) : ce qui tient un clic pour un tout. Il décide à l'enfoncement du bouton, et le relâchement suit sa décision : mangé, un clic l'est en entier, et le jeu n'en voit jamais la moitié.

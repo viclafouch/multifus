@@ -42,8 +42,6 @@ rustls = { version = "0.23", default-features = false, features = ["ring"] }
 keyring = "4"
 
 [dev-dependencies]
-# Only the configuration tests, which need a directory that disappears with them
-# rather than a path written into the source.
 tempfile = "3"
 
 # The Windows side of the boundary, and nothing else in the crate, talks to this.

@@ -25,14 +25,13 @@ use crate::app::main_window;
 use crate::app::relay;
 use crate::app::runtime;
 use crate::app::state::lock;
+use crate::app::state::windows;
 use crate::app::state::Multifus;
 use crate::app::update;
 use crate::app::view::CharacterView;
 use crate::app::view::Screen;
 use crate::app::walk;
 use crate::platform::PlatformError;
-use crate::platform::PlatformWindowManager;
-use crate::platform::WindowManager;
 
 const MENU_CHARACTERS: &str = "Personnages";
 const MENU_SHORTCUTS: &str = "Raccourcis";
@@ -126,9 +125,7 @@ fn tooltip(connected: usize) -> String {
     }
 }
 
-fn contents(app: &AppHandle) -> Contents {
-    let state = lock(app);
-
+fn contents(state: &Multifus) -> Contents {
     Contents {
         entries: entries(&state.connected()),
         auto_focus: state.is_auto_focus_enabled(),
@@ -136,7 +133,7 @@ fn contents(app: &AppHandle) -> Contents {
         wakes_minimized: state.wakes_minimized(),
         granted: state.is_granted(),
         update: state.available_update(),
-        relay: relay_item(&state),
+        relay: relay_item(state),
     }
 }
 
@@ -210,7 +207,7 @@ pub fn refresh(app: &AppHandle) {
         return;
     };
 
-    let wanted = contents(app);
+    let wanted = contents(&lock(app));
 
     {
         let mut shown = shown_menu(app);
@@ -505,7 +502,7 @@ fn focus(app: &AppHandle, nickname: &str) {
 
     let outcome = match window {
         None => TrayOutcome::NoWindow,
-        Some(window) => match app.state::<PlatformWindowManager>().focus(window) {
+        Some(window) => match windows(app).focus(window) {
             Ok(()) => TrayOutcome::Focused,
             Err(PlatformError::WindowGone) => TrayOutcome::NoWindow,
             Err(error) => TrayOutcome::FocusFailed {
@@ -540,6 +537,11 @@ mod tests {
     use std::collections::HashSet;
 
     use super::*;
+    use crate::config::Settings;
+    use crate::domain::Character;
+    use crate::domain::Roster;
+    use crate::test_doubles;
+    use crate::test_doubles::directory;
 
     fn connected(nickname: &str, asleep: bool) -> CharacterView {
         CharacterView {
@@ -550,6 +552,62 @@ mod tests {
             online: true,
             relayed: true,
         }
+    }
+
+    #[test]
+    fn the_menu_carries_the_characters_on_screen_and_the_switches_as_they_stand() {
+        let directory = directory();
+        let mut state = test_doubles::multifus(
+            &directory,
+            test_doubles::intact(Settings {
+                roster: Roster::from_characters(vec![
+                    Character::new("Alpha"),
+                    Character::new("Bravo"),
+                ]),
+                ..Settings::default()
+            }),
+        );
+
+        state.apply_windows(&[test_doubles::game_window(1, "Alpha")]);
+
+        let shown = contents(&state);
+
+        assert_eq!(
+            shown.entries,
+            vec![Entry {
+                nickname: "Alpha".to_owned(),
+                label: "Alpha".to_owned(),
+            }],
+            "the character whose window the scan did not find is gone from the menu"
+        );
+        assert!(shown.granted);
+        assert!(!shown.walk);
+        assert_eq!(shown.relay, RelayItem::NotReady);
+        assert_eq!(shown.update, None);
+    }
+
+    #[test]
+    fn the_menu_only_differs_when_something_it_shows_differs() {
+        let directory = directory();
+        let mut state = test_doubles::multifus(
+            &directory,
+            test_doubles::intact(Settings {
+                roster: Roster::from_characters(vec![Character::new("Alpha")]),
+                ..Settings::default()
+            }),
+        );
+
+        state.apply_windows(&[test_doubles::game_window(1, "Alpha")]);
+
+        let shown = contents(&state);
+
+        state.apply_windows(&[test_doubles::game_window(1, "Alpha")]);
+
+        assert_eq!(contents(&state), shown);
+
+        state.set_walk_enabled(true, WalkFrom::Shortcut);
+
+        assert_ne!(contents(&state), shown);
     }
 
     #[test]

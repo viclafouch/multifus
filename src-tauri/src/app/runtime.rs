@@ -21,8 +21,12 @@ use crate::app::journal::Work;
 use crate::app::main_window;
 use crate::app::portraits;
 use crate::app::relay;
+use crate::app::state::hold;
 use crate::app::state::lock;
+use crate::app::state::windows;
+use crate::app::state::AppState;
 use crate::app::state::Decision;
+use crate::app::state::Multifus;
 use crate::app::state::Painting;
 use crate::app::state::ScanChange;
 use crate::app::state::TracedWindow;
@@ -37,7 +41,6 @@ use crate::platform::NotificationSink;
 use crate::platform::NotificationWatcher;
 use crate::platform::PlatformError;
 use crate::platform::PlatformNotificationWatcher;
-use crate::platform::PlatformWindowManager;
 use crate::platform::WindowId;
 use crate::platform::WindowManager;
 
@@ -102,12 +105,32 @@ pub fn wake() {
     alarm.notify_one();
 }
 
+struct Turn<'a> {
+    windows: &'a dyn WindowManager,
+    state: &'a AppState,
+}
+
+impl<'a> Turn<'a> {
+    fn of(app: &'a AppHandle) -> Self {
+        Self {
+            windows: windows(app),
+            state: app.state::<AppState>().inner(),
+        }
+    }
+
+    fn hold(&self) -> MutexGuard<'_, Multifus> {
+        hold(self.state)
+    }
+}
+
 fn tick(app: &AppHandle) {
-    let renamed = apply_short_titles(app);
+    let turn = Turn::of(app);
+
+    let renamed = apply_short_titles(&turn);
     let changed = scan(app);
-    let maximized = maximize_new_clients(app);
-    let painted = apply_window_icons(app);
-    let regrouped = follow_taskbar(app);
+    let maximized = maximize_new_clients(&turn);
+    let painted = apply_window_icons(&turn);
+    let regrouped = follow_taskbar(&turn);
 
     walk::refresh(app);
 
@@ -117,7 +140,7 @@ fn tick(app: &AppHandle) {
 }
 
 fn scan(app: &AppHandle) -> bool {
-    let change = refresh_windows(app);
+    let change = refresh_windows(&Turn::of(app));
     let listening_changed = follow_authorization(app);
 
     relay::run::announce(app, &change);
@@ -127,29 +150,31 @@ fn scan(app: &AppHandle) -> bool {
     change.changed || listening_changed || display_changed
 }
 
-fn maximize_new_clients(app: &AppHandle) -> bool {
-    if !lock(app).maximizes_on_launch() {
-        lock(app).forget_client_windows();
+fn maximize_new_clients(turn: &Turn) -> bool {
+    if !turn.hold().maximizes_on_launch() {
+        turn.hold().forget_client_windows();
 
         return false;
     }
 
-    let client_windows = match app.state::<PlatformWindowManager>().client_windows() {
+    let client_windows = match turn.windows.client_windows() {
         Ok(client_windows) => client_windows,
         Err(PlatformError::AuthorizationDenied) => return false,
         Err(error) => {
-            return lock(app).log_unless_repeated(JournalEvent::ClientMaximizeFailed {
-                detail: error.to_string(),
-            })
+            return turn
+                .hold()
+                .log_unless_repeated(JournalEvent::ClientMaximizeFailed {
+                    detail: error.to_string(),
+                })
         }
     };
 
-    let appeared = lock(app).take_appeared_client_windows(&client_windows);
+    let appeared = turn.hold().take_appeared_client_windows(&client_windows);
     let mut written = false;
 
     for window in appeared {
-        let filled = app.state::<PlatformWindowManager>().maximize(window);
-        let mut state = lock(app);
+        let filled = turn.windows.maximize(window);
+        let mut state = turn.hold();
 
         written |= match filled {
             Ok(()) => {
@@ -167,20 +192,18 @@ fn maximize_new_clients(app: &AppHandle) -> bool {
     written
 }
 
-fn apply_short_titles(app: &AppHandle) -> bool {
+fn apply_short_titles(turn: &Turn) -> bool {
     let (short, suffix) = {
-        let state = lock(app);
+        let state = turn.hold();
 
         (state.shortens_titles(), state.client_title_suffix())
     };
 
-    let written = app
-        .state::<PlatformWindowManager>()
-        .apply_short_titles(short, suffix.as_deref());
+    let written = turn.windows.apply_short_titles(short, suffix.as_deref());
 
     match written {
         Ok(report) => {
-            let mut state = lock(app);
+            let mut state = turn.hold();
 
             state.remember_short_titles(report.on_screen);
 
@@ -191,24 +214,26 @@ fn apply_short_titles(app: &AppHandle) -> bool {
             false
         }
         Err(PlatformError::AuthorizationDenied) | Err(PlatformError::WindowGone) => false,
-        Err(error) => lock(app).log_unless_repeated(JournalEvent::ShortTitlesFailed {
-            detail: error.to_string(),
-        }),
+        Err(error) => turn
+            .hold()
+            .log_unless_repeated(JournalEvent::ShortTitlesFailed {
+                detail: error.to_string(),
+            }),
     }
 }
 
-fn follow_taskbar(app: &AppHandle) -> bool {
-    match app.state::<PlatformWindowManager>().taskbar_combines() {
-        Ok(combines) => lock(app).set_taskbar_combines(combines),
+fn follow_taskbar(turn: &Turn) -> bool {
+    match turn.windows.taskbar_combines() {
+        Ok(combines) => turn.hold().set_taskbar_combines(combines),
         Err(_) => false,
     }
 }
 
-fn apply_window_icons(app: &AppHandle) -> bool {
-    app.state::<PlatformWindowManager>().forget_closed_windows();
+fn apply_window_icons(turn: &Turn) -> bool {
+    turn.windows.forget_closed_windows();
 
     let looks = {
-        let mut state = lock(app);
+        let mut state = turn.hold();
 
         state.forget_closed_windows();
 
@@ -218,8 +243,8 @@ fn apply_window_icons(app: &AppHandle) -> bool {
     let mut written = false;
 
     for painting in looks {
-        let painted = paint_window(app, &painting);
-        let mut state = lock(app);
+        let painted = paint_window(turn, &painting);
+        let mut state = turn.hold();
 
         match painted {
             Ok(()) => state.remember_painted(&painting),
@@ -236,11 +261,9 @@ fn apply_window_icons(app: &AppHandle) -> bool {
     written
 }
 
-fn paint_window(app: &AppHandle, painting: &Painting) -> Result<(), PlatformError> {
-    let manager = app.state::<PlatformWindowManager>();
-
+fn paint_window(turn: &Turn, painting: &Painting) -> Result<(), PlatformError> {
     let (wore_portrait, was_ungrouped) = {
-        let state = lock(app);
+        let state = turn.hold();
 
         (
             state.wore_portrait(&painting.nickname),
@@ -250,11 +273,12 @@ fn paint_window(app: &AppHandle, painting: &Painting) -> Result<(), PlatformErro
     let Painting { window, look, .. } = painting;
 
     if look.portrait.is_some() || wore_portrait {
-        manager.set_window_icon(*window, look.portrait.map(portraits::icon_of))?;
+        turn.windows
+            .set_window_icon(*window, look.portrait.map(portraits::icon_of))?;
     }
 
     if look.ungrouped || was_ungrouped {
-        manager.set_window_group(
+        turn.windows.set_window_group(
             *window,
             look.ungrouped.then(|| group_of(*window)).as_deref(),
         )?;
@@ -271,9 +295,11 @@ const GROUP_PREFIX: &str = "multifus.window.";
 
 pub fn on_run_event(app: &AppHandle, event: RunEvent) {
     if matches!(event, RunEvent::Exit) {
-        give_titles_back(app);
-        give_icons_back(app);
-        give_groups_back(app);
+        let turn = Turn::of(app);
+
+        give_titles_back(&turn);
+        give_icons_back(&turn);
+        give_groups_back(&turn);
 
         return;
     }
@@ -281,53 +307,49 @@ pub fn on_run_event(app: &AppHandle, event: RunEvent) {
     main_window::show_on_dock_click(app, event);
 }
 
-fn give_icons_back(app: &AppHandle) {
-    let posed = lock(app).portraits_to_give_back();
-    let given = give_back(app, posed, |manager, window| {
-        manager.set_window_icon(window, None)
+fn give_icons_back(turn: &Turn) {
+    let posed = turn.hold().portraits_to_give_back();
+    let given = give_back(turn, posed, |windows, window| {
+        windows.set_window_icon(window, None)
     });
 
-    lock(app).forget_portraits(&given);
+    turn.hold().forget_portraits(&given);
 }
 
-fn give_groups_back(app: &AppHandle) {
-    let posed = lock(app).groups_to_give_back();
-    let given = give_back(app, posed, |manager, window| {
-        manager.set_window_group(window, None)
+fn give_groups_back(turn: &Turn) {
+    let posed = turn.hold().groups_to_give_back();
+    let given = give_back(turn, posed, |windows, window| {
+        windows.set_window_group(window, None)
     });
 
-    lock(app).forget_groups(&given);
+    turn.hold().forget_groups(&given);
 }
 
 fn give_back(
-    app: &AppHandle,
+    turn: &Turn,
     posed: Vec<TracedWindow>,
-    hand: impl Fn(&PlatformWindowManager, WindowId) -> Result<(), PlatformError>,
+    hand: impl Fn(&dyn WindowManager, WindowId) -> Result<(), PlatformError>,
 ) -> Vec<String> {
-    let manager = app.state::<PlatformWindowManager>();
-
     posed
         .into_iter()
-        .filter(|(_, window)| hand(manager.inner(), *window).is_ok())
+        .filter(|(_, window)| hand(turn.windows, *window).is_ok())
         .map(|(nickname, _)| nickname)
         .collect()
 }
 
-fn give_titles_back(app: &AppHandle) {
-    let suffix = lock(app).client_title_suffix();
-    let given = app
-        .state::<PlatformWindowManager>()
-        .apply_short_titles(false, suffix.as_deref());
+fn give_titles_back(turn: &Turn) {
+    let suffix = turn.hold().client_title_suffix();
+    let given = turn.windows.apply_short_titles(false, suffix.as_deref());
 
     if let Ok(report) = given {
-        lock(app).remember_short_titles(report.on_screen);
+        turn.hold().remember_short_titles(report.on_screen);
     }
 }
 
-fn refresh_windows(app: &AppHandle) -> ScanChange {
-    let outcome = app.state::<PlatformWindowManager>().game_windows();
+fn refresh_windows(turn: &Turn) -> ScanChange {
+    let outcome = turn.windows.game_windows();
 
-    let mut state = lock(app);
+    let mut state = turn.hold();
 
     match outcome {
         Ok(windows) => state.apply_windows(&windows),
@@ -418,8 +440,8 @@ fn on_notification(app: &AppHandle, notification: GameNotification) {
             Outcome::BodyUnread
         }
         Decision::Ignored(outcome) => outcome,
-        Decision::Focus(window) => focus(app, window),
-        Decision::FocusUnlessMinimized(window) => focus_unless_minimized(app, window),
+        Decision::Focus(window) => focus(windows(app), window),
+        Decision::FocusUnlessMinimized(window) => focus_unless_minimized(windows(app), window),
     };
 
     if outcome == Outcome::Focused {
@@ -455,17 +477,17 @@ fn dismiss(app: &AppHandle, nickname: &str) {
     drop(watcher.dismiss(nickname));
 }
 
-fn focus(app: &AppHandle, window: WindowId) -> Outcome {
-    match app.state::<PlatformWindowManager>().focus(window) {
+fn focus(windows: &dyn WindowManager, window: WindowId) -> Outcome {
+    match windows.focus(window) {
         Ok(()) => Outcome::Focused,
         Err(error) => refused(&error),
     }
 }
 
-fn focus_unless_minimized(app: &AppHandle, window: WindowId) -> Outcome {
-    match app.state::<PlatformWindowManager>().is_minimized(window) {
+fn focus_unless_minimized(windows: &dyn WindowManager, window: WindowId) -> Outcome {
+    match windows.is_minimized(window) {
         Ok(true) => Outcome::LeftMinimized,
-        Ok(false) => focus(app, window),
+        Ok(false) => focus(windows, window),
         Err(error) => refused(&error),
     }
 }
@@ -480,7 +502,7 @@ fn refused(error: &PlatformError) -> Outcome {
 }
 
 pub fn request_authorization(app: &AppHandle) {
-    let asked = app.state::<PlatformWindowManager>().request_authorization();
+    let asked = windows(app).request_authorization();
 
     let (granted, failure) = match asked {
         Ok(authorization) => (authorization.is_granted(), None),
@@ -538,4 +560,468 @@ fn watcher(app: &AppHandle) -> MutexGuard<'_, PlatformNotificationWatcher> {
         .inner()
         .lock()
         .unwrap_or_else(PoisonError::into_inner)
+}
+
+#[cfg(test)]
+mod tests {
+    use std::collections::HashSet;
+
+    use super::*;
+    use crate::config::Settings;
+    use crate::config::Traces;
+    use crate::domain::Character;
+    use crate::domain::Class;
+    use crate::domain::Gender;
+    use crate::domain::Roster;
+    use crate::platform::ShortTitleReport;
+    use crate::test_doubles::app_state;
+    use crate::test_doubles::directory;
+    use crate::test_doubles::game_window;
+    use crate::test_doubles::journalled;
+    use crate::test_doubles::Asked;
+    use crate::test_doubles::Desktop;
+    use crate::test_doubles::FakeWindowManager;
+
+    fn turn<'a>(windows: &'a FakeWindowManager, state: &'a AppState) -> Turn<'a> {
+        Turn { windows, state }
+    }
+
+    fn alpha_and_bravo() -> Roster {
+        Roster::from_characters(vec![
+            Character::new("Alpha")
+                .with_gender(Gender::Male)
+                .with_class(Class::Iop),
+            Character::new("Bravo")
+                .with_gender(Gender::Female)
+                .with_class(Class::Eniripsa),
+        ])
+    }
+
+    fn nicknames(state: &AppState) -> Vec<String> {
+        hold(state)
+            .connected()
+            .into_iter()
+            .map(|character| character.nickname)
+            .collect()
+    }
+
+    fn traced(nicknames: &[&str]) -> HashSet<String> {
+        nicknames
+            .iter()
+            .map(|nickname| (*nickname).to_owned())
+            .collect()
+    }
+
+    #[test]
+    fn a_scan_turns_the_windows_on_screen_into_connected_characters() {
+        let directory = directory();
+        let state = app_state(
+            &directory,
+            Settings {
+                roster: alpha_and_bravo(),
+                ..Settings::default()
+            },
+        );
+        let windows = FakeWindowManager::showing(Desktop {
+            game_windows: vec![game_window(1, "Alpha"), game_window(2, "Bravo")],
+            ..Desktop::default()
+        });
+        let turn = turn(&windows, &state);
+
+        let change = refresh_windows(&turn);
+
+        assert!(change.changed);
+        assert_eq!(nicknames(&state), vec!["Alpha", "Bravo"]);
+
+        windows.show(Desktop {
+            game_windows: vec![game_window(1, "Alpha")],
+            ..Desktop::default()
+        });
+
+        refresh_windows(&turn);
+
+        assert_eq!(
+            nicknames(&state),
+            vec!["Alpha"],
+            "a character whose window is gone is not connected any more"
+        );
+    }
+
+    #[test]
+    fn an_authorization_taken_away_takes_every_character_offline() {
+        let directory = directory();
+        let state = app_state(
+            &directory,
+            Settings {
+                roster: alpha_and_bravo(),
+                ..Settings::default()
+            },
+        );
+        let windows = FakeWindowManager::showing(Desktop {
+            game_windows: vec![game_window(1, "Alpha"), game_window(2, "Bravo")],
+            ..Desktop::default()
+        });
+        let turn = turn(&windows, &state);
+
+        refresh_windows(&turn);
+
+        assert_eq!(nicknames(&state), vec!["Alpha", "Bravo"]);
+        assert!(hold(&state).is_granted());
+
+        windows.show(Desktop {
+            scan_refusal: Some(PlatformError::AuthorizationDenied),
+            ..Desktop::default()
+        });
+
+        refresh_windows(&turn);
+
+        assert!(!hold(&state).is_granted());
+        assert!(
+            nicknames(&state).is_empty(),
+            "Multifus cannot see a window any more, so it says it sees nobody"
+        );
+        assert_eq!(
+            hold(&state).snapshot().characters.len(),
+            2,
+            "the characters themselves are kept, only their windows are lost"
+        );
+    }
+
+    #[test]
+    fn a_scan_that_breaks_is_written_down_once_and_not_at_every_turn() {
+        let directory = directory();
+        let state = app_state(&directory, Settings::default());
+        let windows = FakeWindowManager::showing(Desktop {
+            scan_refusal: Some(PlatformError::system("scanning", "the system said no")),
+            ..Desktop::default()
+        });
+        let turn = turn(&windows, &state);
+
+        refresh_windows(&turn);
+        refresh_windows(&turn);
+        refresh_windows(&turn);
+
+        let said = journalled(&state)
+            .into_iter()
+            .filter(|event| matches!(event, JournalEvent::ScanFailed { .. }))
+            .count();
+
+        assert_eq!(said, 1);
+    }
+
+    #[test]
+    fn the_clients_already_open_at_launch_are_left_the_size_they_were() {
+        let directory = directory();
+        let state = app_state(
+            &directory,
+            Settings {
+                maximize_on_launch: true,
+                ..Settings::default()
+            },
+        );
+        let windows = FakeWindowManager::showing(Desktop {
+            client_windows: vec![WindowId::from_raw(1), WindowId::from_raw(2)],
+            ..Desktop::default()
+        });
+
+        maximize_new_clients(&turn(&windows, &state));
+
+        assert_eq!(windows.asked(), Vec::new());
+    }
+
+    #[test]
+    fn a_client_that_opens_while_playing_is_filled_once_and_never_again() {
+        let directory = directory();
+        let state = app_state(
+            &directory,
+            Settings {
+                maximize_on_launch: true,
+                ..Settings::default()
+            },
+        );
+        let windows = FakeWindowManager::showing(Desktop {
+            client_windows: vec![WindowId::from_raw(1)],
+            ..Desktop::default()
+        });
+        let turn = turn(&windows, &state);
+
+        maximize_new_clients(&turn);
+
+        windows.show(Desktop {
+            client_windows: vec![WindowId::from_raw(1), WindowId::from_raw(2)],
+            ..Desktop::default()
+        });
+
+        maximize_new_clients(&turn);
+        maximize_new_clients(&turn);
+
+        assert_eq!(
+            windows.asked(),
+            vec![Asked::Maximized(WindowId::from_raw(2))]
+        );
+    }
+
+    #[test]
+    fn nothing_is_filled_when_the_setting_is_off() {
+        let directory = directory();
+        let state = app_state(&directory, Settings::default());
+        let windows = FakeWindowManager::showing(Desktop {
+            client_windows: vec![WindowId::from_raw(1)],
+            ..Desktop::default()
+        });
+
+        maximize_new_clients(&turn(&windows, &state));
+
+        assert_eq!(windows.asked(), Vec::new());
+    }
+
+    #[test]
+    fn the_short_titles_are_asked_with_the_suffix_the_client_taught() {
+        let directory = directory();
+        let state = app_state(
+            &directory,
+            Settings {
+                short_titles: true,
+                ..Settings::default()
+            },
+        );
+        let windows = FakeWindowManager::showing(Desktop {
+            short_titles: ShortTitleReport {
+                on_screen: true,
+                suffix: Some(" - Dofus Retro v1.48.21".to_owned()),
+            },
+            ..Desktop::default()
+        });
+        let turn = turn(&windows, &state);
+
+        apply_short_titles(&turn);
+
+        assert_eq!(
+            windows.asked(),
+            vec![Asked::ShortTitles {
+                short: true,
+                suffix: None,
+            }]
+        );
+
+        apply_short_titles(&turn);
+
+        assert_eq!(
+            windows.asked().last(),
+            Some(&Asked::ShortTitles {
+                short: true,
+                suffix: Some(" - Dofus Retro v1.48.21".to_owned()),
+            }),
+            "what one turn learns, the next one hands back"
+        );
+    }
+
+    #[test]
+    fn a_window_that_goes_while_its_title_is_written_is_not_worth_a_line() {
+        let directory = directory();
+        let state = app_state(&directory, Settings::default());
+        let windows = FakeWindowManager::showing(Desktop {
+            short_titles_refusal: Some(PlatformError::WindowGone),
+            ..Desktop::default()
+        });
+
+        apply_short_titles(&turn(&windows, &state));
+
+        assert_eq!(journalled(&state), Vec::new());
+    }
+
+    #[test]
+    fn the_class_head_is_posed_and_the_taskbar_button_set_apart() {
+        let directory = directory();
+        let state = app_state(
+            &directory,
+            Settings {
+                roster: alpha_and_bravo(),
+                ungroup_taskbar: true,
+                ..Settings::default()
+            },
+        );
+        let windows = FakeWindowManager::showing(Desktop {
+            game_windows: vec![game_window(1, "Alpha")],
+            ..Desktop::default()
+        });
+        let turn = turn(&windows, &state);
+
+        refresh_windows(&turn);
+        apply_window_icons(&turn);
+
+        let posed = windows.asked();
+
+        assert!(
+            posed.iter().any(|asked| matches!(
+                asked,
+                Asked::Icon {
+                    window,
+                    icon: Some(_)
+                } if *window == WindowId::from_raw(1)
+            )),
+            "{posed:?}"
+        );
+        assert!(
+            posed.contains(&Asked::Group {
+                window: WindowId::from_raw(1),
+                group: Some("multifus.window.1".to_owned()),
+            }),
+            "{posed:?}"
+        );
+
+        apply_window_icons(&turn);
+
+        assert_eq!(
+            &windows.asked()[posed.len()..],
+            [Asked::ClosedForgotten],
+            "a window that already wears its head is only asked to forget the closed ones"
+        );
+    }
+
+    #[test]
+    fn a_window_gone_while_it_is_painted_is_forgotten_rather_than_chased() {
+        let directory = directory();
+        let state = app_state(
+            &directory,
+            Settings {
+                roster: alpha_and_bravo(),
+                traces: Traces {
+                    portraits: traced(&["Alpha"]),
+                    ..Traces::default()
+                },
+                ..Settings::default()
+            },
+        );
+        let windows = FakeWindowManager::showing(Desktop {
+            game_windows: vec![game_window(1, "Alpha")],
+            icon_refusal: Some(PlatformError::WindowGone),
+            ..Desktop::default()
+        });
+        let turn = turn(&windows, &state);
+
+        refresh_windows(&turn);
+        apply_window_icons(&turn);
+
+        assert!(!hold(&state).wore_portrait("Alpha"));
+        assert!(!journalled(&state)
+            .iter()
+            .any(|event| matches!(event, JournalEvent::WindowIconFailed { .. })));
+    }
+
+    #[test]
+    fn what_multifus_posed_it_gives_back_when_it_quits() {
+        let directory = directory();
+        let state = app_state(
+            &directory,
+            Settings {
+                roster: alpha_and_bravo(),
+                short_titles: true,
+                traces: Traces {
+                    portraits: traced(&["Alpha"]),
+                    ungrouped: traced(&["Alpha"]),
+                    short_titles: true,
+                },
+                ..Settings::default()
+            },
+        );
+        let windows = FakeWindowManager::showing(Desktop {
+            game_windows: vec![game_window(1, "Alpha")],
+            ..Desktop::default()
+        });
+        let turn = turn(&windows, &state);
+
+        refresh_windows(&turn);
+
+        give_titles_back(&turn);
+        give_icons_back(&turn);
+        give_groups_back(&turn);
+
+        assert!(windows.asked().contains(&Asked::ShortTitles {
+            short: false,
+            suffix: None,
+        }));
+        assert!(windows.asked().contains(&Asked::Icon {
+            window: WindowId::from_raw(1),
+            icon: None,
+        }));
+        assert!(windows.asked().contains(&Asked::Group {
+            window: WindowId::from_raw(1),
+            group: None,
+        }));
+
+        let state = hold(&state);
+
+        assert!(!state.wore_portrait("Alpha"));
+        assert!(!state.was_ungrouped("Alpha"));
+    }
+
+    #[test]
+    fn a_trace_the_system_refuses_to_give_back_is_kept_for_the_next_launch() {
+        let directory = directory();
+        let state = app_state(
+            &directory,
+            Settings {
+                roster: alpha_and_bravo(),
+                traces: Traces {
+                    portraits: traced(&["Alpha"]),
+                    ..Traces::default()
+                },
+                ..Settings::default()
+            },
+        );
+        let windows = FakeWindowManager::showing(Desktop {
+            game_windows: vec![game_window(1, "Alpha")],
+            icon_refusal: Some(PlatformError::system("giving the icon back", "busy")),
+            ..Desktop::default()
+        });
+        let turn = turn(&windows, &state);
+
+        refresh_windows(&turn);
+        give_icons_back(&turn);
+
+        assert!(hold(&state).wore_portrait("Alpha"));
+    }
+
+    #[test]
+    fn a_focus_tells_a_window_that_is_gone_from_one_that_says_no() {
+        let windows = FakeWindowManager::showing(Desktop {
+            focus_refusal: Some(PlatformError::WindowGone),
+            ..Desktop::default()
+        });
+
+        assert_eq!(
+            focus(windows.as_ref(), WindowId::from_raw(1)),
+            Outcome::NoWindow
+        );
+
+        windows.show(Desktop::default());
+
+        assert_eq!(
+            focus(windows.as_ref(), WindowId::from_raw(1)),
+            Outcome::Focused
+        );
+    }
+
+    #[test]
+    fn a_minimized_window_is_left_alone_when_the_player_asked_for_it() {
+        let windows = FakeWindowManager::showing(Desktop {
+            minimized: vec![WindowId::from_raw(1)],
+            ..Desktop::default()
+        });
+
+        assert_eq!(
+            focus_unless_minimized(windows.as_ref(), WindowId::from_raw(1)),
+            Outcome::LeftMinimized
+        );
+        assert_eq!(
+            focus_unless_minimized(windows.as_ref(), WindowId::from_raw(2)),
+            Outcome::Focused
+        );
+        assert_eq!(
+            windows.asked(),
+            vec![Asked::Focused(WindowId::from_raw(2))],
+            "a window left minimized is never touched"
+        );
+    }
 }

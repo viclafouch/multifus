@@ -21,12 +21,12 @@ use tauri::WebviewWindowBuilder;
 use crate::app::journal::JournalEvent;
 use crate::app::journal::Work;
 use crate::app::state::lock;
+use crate::app::state::windows;
 use crate::app::view::BannerCharacter;
 use crate::app::view::BannerScreenView;
 use crate::app::view::BannerStep;
 use crate::config::Banner;
 use crate::config::BannerCorner;
-use crate::platform::PlatformWindowManager;
 use crate::platform::WindowManager;
 
 const LABEL: &str = "banner";
@@ -43,6 +43,16 @@ const PREVIEW: Duration = Duration::from_millis(2500);
 #[derive(Debug, Default)]
 struct BannerGeneration {
     latest: AtomicU64,
+}
+
+impl BannerGeneration {
+    fn next(&self) -> u64 {
+        self.latest.fetch_add(1, Ordering::AcqRel) + 1
+    }
+
+    fn matches_latest(&self, generation: u64) -> bool {
+        self.latest.load(Ordering::Acquire) == generation
+    }
 }
 
 pub fn setup(app: &AppHandle) {
@@ -120,15 +130,15 @@ pub fn preview(app: &AppHandle) {
         }
 
         if lock(app).is_walk_enabled() {
-            follow_foreground(app, matches_inside_game(app));
+            follow_foreground(app, matches_inside_game(windows(app)));
         } else {
             close(app);
         }
     });
 }
 
-fn matches_inside_game(app: &AppHandle) -> bool {
-    app.state::<PlatformWindowManager>()
+fn matches_inside_game(windows: &dyn WindowManager) -> bool {
+    windows
         .foreground_game_window()
         .is_ok_and(|found| found.is_some())
 }
@@ -160,17 +170,11 @@ fn apart(app: &AppHandle, work: impl FnOnce(&AppHandle) + Send + 'static) {
 }
 
 fn next_generation(app: &AppHandle) -> u64 {
-    app.state::<BannerGeneration>()
-        .latest
-        .fetch_add(1, Ordering::AcqRel)
-        + 1
+    app.state::<BannerGeneration>().next()
 }
 
 fn matches_current(app: &AppHandle, generation: u64) -> bool {
-    app.state::<BannerGeneration>()
-        .latest
-        .load(Ordering::Acquire)
-        == generation
+    app.state::<BannerGeneration>().matches_latest(generation)
 }
 
 fn raise(app: &AppHandle, generation: u64, inside_game: bool) {
@@ -338,6 +342,9 @@ pub fn screens(app: &AppHandle) -> Vec<BannerScreenView> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::test_doubles::game_window;
+    use crate::test_doubles::Desktop;
+    use crate::test_doubles::FakeWindowManager;
 
     const SCALE: f64 = 1.0;
 
@@ -350,6 +357,37 @@ mod tests {
 
     fn banner() -> PhysicalSize<u32> {
         PhysicalSize::from_logical(LogicalSize::new(WIDTH, HEIGHT), SCALE)
+    }
+
+    #[test]
+    fn the_banner_only_shows_itself_over_a_window_of_the_game() {
+        let windows = FakeWindowManager::showing(Desktop {
+            foreground: Some(game_window(1, "Alpha")),
+            ..Desktop::default()
+        });
+
+        assert!(matches_inside_game(windows.as_ref()));
+
+        windows.show(Desktop::default());
+
+        assert!(
+            !matches_inside_game(windows.as_ref()),
+            "the player left the game, so the banner has nothing to sit on"
+        );
+    }
+
+    #[test]
+    fn a_preview_that_a_newer_one_replaced_no_longer_speaks_for_the_banner() {
+        let generation = BannerGeneration::default();
+        let first = generation.next();
+        let second = generation.next();
+
+        assert!(generation.matches_latest(second));
+        assert!(
+            !generation.matches_latest(first),
+            "the preview that was asked for first must not close the one showing now"
+        );
+        assert_ne!(first, second);
     }
 
     #[test]

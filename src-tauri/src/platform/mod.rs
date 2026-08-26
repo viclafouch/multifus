@@ -24,9 +24,11 @@ pub use error::Result;
 pub use notification::NotificationReport;
 pub use notification::NotificationSink;
 pub use notification::NotificationWatcher;
+pub use paste::Clipboard;
 pub use paste::PasteSender;
 pub use window::GameWindow;
 pub use window::ScreenPoint;
+pub use window::ShortTitleReport;
 pub use window::WindowId;
 pub use window::WindowManager;
 
