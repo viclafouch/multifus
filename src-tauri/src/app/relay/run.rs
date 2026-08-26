@@ -545,6 +545,28 @@ mod tests {
     use super::*;
 
     #[test]
+    fn only_a_gesture_of_the_user_is_worth_a_last_word_on_the_phone() {
+        assert!(says_so(RelayStop::Shortcut));
+        assert!(says_so(RelayStop::Tray));
+        assert!(says_so(RelayStop::Window));
+
+        assert!(
+            !says_so(RelayStop::NoLongerPaired),
+            "there is no bot left to write to"
+        );
+        assert!(
+            !says_so(RelayStop::NoRelayedCharacter),
+            "nobody asked for this one"
+        );
+    }
+
+    #[test]
+    fn the_switch_says_which_of_the_two_places_it_was_moved_from() {
+        assert_eq!(stop_of(Surface::Tray), RelayStop::Tray);
+        assert_eq!(stop_of(Surface::Window), RelayStop::Window);
+    }
+
+    #[test]
     fn a_private_message_carries_the_nickname_and_the_kind_and_no_more() {
         let quiet = Message::Private {
             nickname: "Alpha".to_owned(),

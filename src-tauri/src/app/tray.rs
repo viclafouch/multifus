@@ -537,7 +537,88 @@ fn shown_menu(app: &AppHandle) -> MutexGuard<'_, Option<Contents>> {
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashSet;
+
     use super::*;
+
+    fn connected(nickname: &str, asleep: bool) -> CharacterView {
+        CharacterView {
+            nickname: nickname.to_owned(),
+            gender: None,
+            class: None,
+            asleep,
+            online: true,
+            relayed: true,
+        }
+    }
+
+    #[test]
+    fn the_menu_names_every_connected_character_and_says_which_are_set_aside() {
+        let listed = entries(&[connected("Alpha", false), connected("Bravo", true)]);
+
+        assert_eq!(
+            listed,
+            vec![
+                Entry {
+                    nickname: "Alpha".to_owned(),
+                    label: "Alpha".to_owned(),
+                },
+                Entry {
+                    nickname: "Bravo".to_owned(),
+                    label: "Bravo (de côté)".to_owned(),
+                },
+            ]
+        );
+    }
+
+    #[test]
+    fn the_tooltip_counts_the_characters_and_agrees_with_itself() {
+        assert_eq!(tooltip(0), "Multifus, aucun personnage connecté");
+        assert_eq!(tooltip(1), "Multifus, 1 personnage connecté");
+        assert_eq!(tooltip(6), "Multifus, 6 personnages connectés");
+    }
+
+    #[test]
+    fn a_switch_of_the_menu_offers_the_gesture_that_undoes_what_is_on() {
+        assert_eq!(
+            switch_label(true, MENU_WALK_OFF, MENU_WALK_ON),
+            "Désactiver le Déplacement"
+        );
+        assert_eq!(
+            switch_label(false, MENU_WALK_OFF, MENU_WALK_ON),
+            "Activer le Déplacement"
+        );
+        assert_eq!(
+            switch_label(true, MENU_LEAVE_MINIMIZED, MENU_WAKE_MINIMIZED),
+            "Laisser les fenêtres réduites"
+        );
+    }
+
+    #[test]
+    fn every_screen_of_the_rail_is_named_once_in_the_menu_and_read_back() {
+        for screen in Screen::ALL {
+            assert_eq!(screen_of(screen_id(screen)), Some(screen));
+            assert!(!screen_label(screen).is_empty());
+        }
+
+        let ids = Screen::ALL.map(screen_id);
+        let labels = Screen::ALL.map(screen_label);
+
+        assert_eq!(ids.len(), ids.iter().collect::<HashSet<_>>().len());
+        assert_eq!(labels.len(), labels.iter().collect::<HashSet<_>>().len());
+    }
+
+    #[test]
+    fn a_menu_line_that_names_no_screen_takes_the_window_nowhere() {
+        assert_eq!(screen_of("journal"), None);
+        assert_eq!(screen_of(""), None);
+        assert_eq!(screen_of("Characters"), None);
+    }
+
+    #[test]
+    fn the_update_line_names_the_version_it_is_about_to_install() {
+        assert_eq!(update_label("0.2.0"), "Installer la mise à jour 0.2.0");
+    }
 
     #[test]
     fn the_relay_item_says_a_different_thing_for_each_of_its_three_states() {

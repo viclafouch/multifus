@@ -287,3 +287,108 @@ fn switch(app: &AppHandle, clicked: ClickedAt) {
 
     banner::step(app, arrived);
 }
+
+#[cfg(test)]
+mod tests {
+    use std::sync::mpsc::Receiver;
+
+    use super::*;
+    use crate::platform::ScreenPoint;
+
+    fn id(raw: u64) -> WindowId {
+        WindowId::from_raw(raw)
+    }
+
+    fn clicked_at(raw: u64) -> ClickedAt {
+        ClickedAt {
+            window: id(raw),
+            at: ScreenPoint { x: 12.0, y: 34.0 },
+        }
+    }
+
+    fn walk(plan: WalkPlan) -> (Walk, Receiver<WalkStep>) {
+        let (steps, taken) = mpsc::channel::<WalkStep>();
+
+        (
+            Walk {
+                gate: Arc::new(ClickGate::default()),
+                plan: Mutex::new(plan),
+                steps,
+            },
+            taken,
+        )
+    }
+
+    fn plan_of(watched: &[u64], next: &[(u64, u64)]) -> WalkPlan {
+        WalkPlan {
+            watched: watched.iter().copied().map(id).collect(),
+            next: next.iter().map(|(from, to)| (id(*from), id(*to))).collect(),
+        }
+    }
+
+    #[test]
+    fn the_walk_only_answers_for_the_windows_the_scan_handed_it() {
+        let (walk, _taken) = walk(plan_of(&[1, 2], &[(1, 2), (2, 1)]));
+
+        assert!(walk.watches(id(1)));
+        assert!(!walk.watches(id(3)));
+        assert_eq!(walk.next_after(id(1)), Some(id(2)));
+        assert_eq!(walk.next_after(id(3)), None);
+    }
+
+    #[test]
+    fn a_click_on_a_watched_window_with_nobody_in_the_cycle_has_nowhere_to_go() {
+        let (walk, _taken) = walk(plan_of(&[1, 2], &[]));
+
+        assert!(walk.watches(id(1)));
+        assert_eq!(walk.next_after(id(1)), None);
+    }
+
+    #[test]
+    fn each_thing_the_system_reports_reaches_the_walk_as_one_step() {
+        let (steps, taken) = mpsc::channel::<WalkStep>();
+        let gate = Arc::new(ClickGate::default());
+        let sink = sink_of(Arc::clone(&gate), steps);
+
+        sink(ClickReport::Clicked {
+            clicked: clicked_at(1),
+        });
+        sink(ClickReport::Foreground { window: id(2) });
+        sink(ClickReport::ListeningResumed);
+        sink(ClickReport::ListeningLost);
+
+        let taken = taken.try_iter().collect::<Vec<_>>();
+
+        assert!(
+            matches!(
+                taken.as_slice(),
+                [
+                    WalkStep::Clicked { clicked },
+                    WalkStep::Foreground { window },
+                    WalkStep::ListeningResumed,
+                    WalkStep::ListeningLost,
+                ] if clicked.window == id(1) && *window == id(2)
+            ),
+            "{taken:?}"
+        );
+    }
+
+    #[test]
+    fn the_door_reopens_when_the_walk_is_no_longer_there_to_take_the_click() {
+        let (steps, taken) = mpsc::channel::<WalkStep>();
+        let gate = Arc::new(ClickGate::default());
+        let sink = sink_of(Arc::clone(&gate), steps);
+
+        gate.close();
+        drop(taken);
+
+        sink(ClickReport::Clicked {
+            clicked: clicked_at(1),
+        });
+
+        assert!(
+            !gate.is_switching(),
+            "a dead walk must not eat the clicks for ever"
+        );
+    }
+}

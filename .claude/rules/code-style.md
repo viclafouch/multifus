@@ -177,6 +177,11 @@ Before writing ANY function, component, type, or constant inside a feature file,
 - `*.test.ts` - Next to the module it reads and named after it, one file per
   module. Run by `vitest`, whose configuration is the `test` key of
   `vite.config.ts`
+- `*.test.tsx` - The same, for what renders: a hook through `renderHook`, a
+  screen through `render`. `@testing-library/react` on `jsdom`, and a query by
+  role or by the French text the user reads, never by class name
+- `src/test-setup.ts` - What jsdom lacks and a library asks for, and the
+  teardown between two tests. Nothing that a single test needs
 
 **Rules:**
 

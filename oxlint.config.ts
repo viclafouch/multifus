@@ -31,14 +31,20 @@ export default defineConfig({
   },
   overrides: [
     {
-      files: ['src/**/*.test.ts'],
+      files: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
       plugins: TEST_PLUGINS,
       rules: {
         ...vitest.rules,
         'vitest/consistent-test-filename': [
           'error',
-          { pattern: String.raw`.*\.test\.ts$` }
+          { pattern: String.raw`.*\.test\.tsx?$` }
         ]
+      }
+    },
+    {
+      files: ['src/lib/multifus.test.ts'],
+      rules: {
+        'typescript/prefer-readonly-parameter-types': 'off'
       }
     },
     {

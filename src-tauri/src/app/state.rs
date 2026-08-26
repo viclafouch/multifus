@@ -1384,6 +1384,9 @@ pub fn lock(app: &AppHandle) -> MutexGuard<'_, Multifus> {
 
 #[cfg(test)]
 mod tests {
+    use std::fs;
+    use std::io;
+
     use tempfile::TempDir;
 
     use crate::app::journal::RelayFailure;
@@ -2625,6 +2628,275 @@ mod tests {
         assert_eq!(
             state.decide_shortcut(ShortcutAction::Next, "Alpha"),
             ShortcutEffect::Settled(ShortcutOutcome::NobodyInCycle)
+        );
+    }
+
+    #[test]
+    fn a_configuration_nobody_could_read_is_said_once_and_dismissed_for_good() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let quarantined = directory.path().join("config.json.1");
+
+        let mut state = multifus_loaded(
+            &directory,
+            Loaded {
+                settings: Settings::default(),
+                failure: Some(ConfigError::malformed(
+                    directory.path().join("config.json"),
+                    "unexpected character",
+                )),
+                quarantined: Some(quarantined.clone()),
+                quarantine_failure: None,
+            },
+        );
+
+        assert_eq!(
+            state.quarantined_path(),
+            Some(quarantined.display().to_string().as_str())
+        );
+        assert!(matches!(
+            state.snapshot().config.problem,
+            Some(ConfigProblem::Malformed { .. })
+        ));
+        let said = journalled(&state)
+            .iter()
+            .filter(|event| matches!(event, JournalEvent::ConfigLoadFailed { .. }))
+            .count();
+
+        assert_eq!(said, 1);
+
+        state.dismiss_problem();
+
+        assert_eq!(state.snapshot().config.problem, None);
+        assert_eq!(state.quarantined_path(), None);
+    }
+
+    #[test]
+    fn a_configuration_that_could_not_even_be_set_aside_says_that_instead() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let path = directory.path().join("config.json");
+
+        let state = multifus_loaded(
+            &directory,
+            Loaded {
+                settings: Settings::default(),
+                failure: Some(ConfigError::malformed(path.clone(), "unexpected character")),
+                quarantined: None,
+                quarantine_failure: Some(ConfigError::io(
+                    "setting the configuration aside",
+                    path,
+                    &io::Error::from(io::ErrorKind::PermissionDenied),
+                )),
+            },
+        );
+
+        assert!(matches!(
+            state.snapshot().config.problem,
+            Some(ConfigProblem::NotSetAside { .. })
+        ));
+        assert_eq!(
+            state.quarantined_path(),
+            None,
+            "nothing was moved, so nothing can be shown"
+        );
+    }
+
+    #[test]
+    fn a_configuration_that_cannot_be_written_says_so_until_it_can_be_written_again() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let path = directory.path().join("config.json");
+        fs::create_dir(&path).expect("a directory takes the file's place");
+
+        let mut state = multifus(&directory);
+        state.set_short_titles(true);
+
+        assert!(matches!(
+            state.snapshot().config.problem,
+            Some(ConfigProblem::NotSaved { .. })
+        ));
+        assert!(journalled(&state)
+            .iter()
+            .any(|event| matches!(event, JournalEvent::SaveFailed { .. })));
+
+        fs::remove_dir(&path).expect("the file's place is given back");
+
+        state.set_short_titles(false);
+
+        assert_eq!(
+            state.snapshot().config.problem,
+            None,
+            "a save that works takes the warning away"
+        );
+    }
+
+    #[test]
+    fn what_a_client_writes_after_a_nickname_is_learned_and_kept_across_a_restart() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        assert_eq!(state.client_title_suffix(), None);
+
+        state.learn_title_suffix(" - Dofus Retro v1.48.21".to_owned());
+
+        assert_eq!(
+            multifus_reloaded(&directory)
+                .client_title_suffix()
+                .as_deref(),
+            Some(" - Dofus Retro v1.48.21")
+        );
+    }
+
+    #[test]
+    fn a_client_that_writes_its_title_another_way_teaches_the_new_one() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        state.learn_title_suffix(" - Dofus Retro v1.48.21".to_owned());
+        state.learn_title_suffix(" - Dofus Retro v1.48.22".to_owned());
+
+        assert_eq!(
+            state.client_title_suffix().as_deref(),
+            Some(" - Dofus Retro v1.48.22")
+        );
+    }
+
+    #[test]
+    fn an_update_is_only_offered_while_there_is_one_to_install() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        assert_eq!(state.available_update(), None, "the check is still running");
+
+        state.set_update(UpdateView::Available {
+            version: "0.2.0".to_owned(),
+        });
+
+        assert_eq!(state.available_update().as_deref(), Some("0.2.0"));
+
+        for update in [
+            UpdateView::UpToDate,
+            UpdateView::Installing,
+            UpdateView::Failed {
+                detail: "coupure".to_owned(),
+            },
+        ] {
+            state.set_update(update);
+
+            assert_eq!(state.available_update(), None);
+        }
+    }
+
+    #[test]
+    fn multifus_says_it_listens_the_turn_it_starts_and_not_at_every_turn_after() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        assert!(!state.is_listening());
+        assert!(state.set_listening(true));
+        assert!(!state.set_listening(true), "nothing moved, nothing to say");
+        assert!(state.is_listening());
+        assert!(state.snapshot().authorization.listening);
+
+        assert!(state.set_listening(false));
+
+        let said = journalled(&state)
+            .into_iter()
+            .filter(|event| matches!(event, JournalEvent::Listening))
+            .count();
+
+        assert_eq!(said, 1);
+    }
+
+    #[test]
+    fn the_corner_and_the_screen_of_the_banner_outlive_the_run_that_chose_them() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        state.set_banner_corner(BannerCorner::TopLeft);
+        state.set_banner_screen(Some("Écran interne".to_owned()));
+
+        let reborn = multifus_reloaded(&directory);
+        let banner = reborn.snapshot().walk.banner;
+
+        assert_eq!(banner.corner, BannerCorner::TopLeft);
+        assert_eq!(banner.screen.as_deref(), Some("Écran interne"));
+        assert!(!reborn.is_walk_enabled(), "the walk starts off, every time");
+    }
+
+    #[test]
+    fn the_menu_is_handed_the_connected_characters_and_nobody_else() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha"), window(2, "Bravo")]);
+        state.toggle_asleep("Bravo");
+        state.apply_windows(&[window(1, "Alpha")]);
+
+        let listed = state
+            .connected()
+            .into_iter()
+            .map(|character| (character.nickname, character.asleep))
+            .collect::<Vec<_>>();
+
+        assert_eq!(listed, vec![("Alpha".to_owned(), false)]);
+        assert_eq!(
+            state.snapshot().characters.len(),
+            2,
+            "the roster keeps both"
+        );
+
+        state.toggle_asleep("Alpha");
+
+        assert_eq!(
+            state.connected().first().map(|character| character.asleep),
+            Some(true),
+            "a character set aside is still on the menu, and says so"
+        );
+    }
+
+    #[test]
+    fn short_titles_left_on_screen_are_remembered_for_the_run_that_has_to_give_them_back() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        assert!(!multifus_reloaded(&directory).settings.traces.short_titles);
+
+        state.remember_short_titles(true);
+
+        assert!(
+            multifus_reloaded(&directory).settings.traces.short_titles,
+            "a multifus that is killed has to find its own renaming again"
+        );
+
+        state.remember_short_titles(false);
+
+        assert!(
+            !multifus_reloaded(&directory).settings.traces.short_titles,
+            "what is given back is no longer traced"
+        );
+    }
+
+    #[test]
+    fn a_reset_takes_back_everything_the_user_ever_chose() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha")]);
+        state.set_class("Alpha", Some(Class::Iop));
+        state.set_paired(42);
+        state.set_short_titles(true);
+        state.set_banner_corner(BannerCorner::TopLeft);
+
+        state.reset();
+
+        let snapshot = state.snapshot();
+
+        assert_eq!(snapshot.characters, Vec::new());
+        assert!(!snapshot.short_titles);
+        assert!(!snapshot.relay.paired);
+        assert_eq!(snapshot.walk.banner.corner, BannerCorner::BottomRight);
+        assert!(journalled(&state).contains(&JournalEvent::Reset));
+        assert_eq!(
+            multifus_reloaded(&directory).snapshot().characters,
+            Vec::new(),
+            "the file was written too"
         );
     }
 }

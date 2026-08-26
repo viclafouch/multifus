@@ -144,7 +144,7 @@ describe('acceleratorParts', () => {
 })
 
 describe('keyLabel', () => {
-  it('lit un clavier qui n’est pas un clavier Apple, sous Node', () => {
+  it('lit un clavier qui n’est pas un clavier Apple, sous jsdom', () => {
     expect(IS_APPLE).toBe(false)
   })
 
