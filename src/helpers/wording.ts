@@ -255,6 +255,16 @@ export const characterPortraitLabel = (character: Character) => {
   return MISSING_PART_LABELS[missing](character.nickname)
 }
 
+export const characterPortraitTooltip = (character: Character) => {
+  const missing = missingPart(character)
+
+  if (missing === null) {
+    return strings.characters.portraitChangeShort
+  }
+
+  return MISSING_PART_LABELS[missing](character.nickname)
+}
+
 export const characterPresenceSubLine = (character: Character) => {
   return classPrefixed(character, characterPresenceLine(character))
 }

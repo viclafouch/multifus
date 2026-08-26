@@ -16,6 +16,7 @@ import { strings } from '@/constants/strings'
 import { portraitFor } from '@/helpers/portrait'
 import {
   characterPortraitLabel,
+  characterPortraitTooltip,
   characterState,
   characterSubLine
 } from '@/helpers/wording'
@@ -48,6 +49,7 @@ export const CharacterRow = ({
   const [isEntering, setIsEntering] = React.useState(true)
   const [isDialogOpen, setIsDialogOpen] = React.useState(false)
   const portraitLabel = characterPortraitLabel(character)
+  const portraitTooltip = characterPortraitTooltip(character)
 
   return (
     <li
@@ -94,7 +96,7 @@ export const CharacterRow = ({
             state={characterState(character)}
           />
         </TooltipTrigger>
-        <TooltipContent>{portraitLabel}</TooltipContent>
+        <TooltipContent>{portraitTooltip}</TooltipContent>
       </Tooltip>
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <p className="selectable truncate text-row font-medium group-data-offline:text-muted-foreground">

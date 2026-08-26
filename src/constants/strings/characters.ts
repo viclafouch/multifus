@@ -81,6 +81,7 @@ export const CHARACTERS_STRINGS = {
     portraitChange: (nickname: string) => {
       return `Changer la classe ou le sexe de ${nickname}`
     },
+    portraitChangeShort: 'Modifier',
     classDialogClose: 'Fermer sans rien changer',
     classDialogGender: 'Sexe',
     classDialogClasses: 'Classe',

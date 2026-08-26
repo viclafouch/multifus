@@ -9,6 +9,7 @@ import {
   authorizationLine,
   bindingLabel,
   characterPortraitLabel,
+  characterPortraitTooltip,
   characterPresenceSubLine,
   characterStateLine,
   characterSubLine,
@@ -291,6 +292,22 @@ describe('characterPortraitLabel', () => {
     const label = characterPortraitLabel(character)
 
     expect(label).toBe(strings.characters.portraitChange('Alpha'))
+  })
+})
+
+describe('characterPortraitTooltip', () => {
+  it('invite à choisir la classe tant qu’elle manque', () => {
+    const tooltip = characterPortraitTooltip(ONLINE_CHARACTER)
+
+    expect(tooltip).toBe(strings.characters.classPick('Alpha'))
+  })
+
+  it('dit seulement Modifier une fois le portrait complet', () => {
+    const character = { ...ONLINE_CHARACTER, class: 'iop' } as const
+
+    const tooltip = characterPortraitTooltip(character)
+
+    expect(tooltip).toBe(strings.characters.portraitChangeShort)
   })
 })
 
