@@ -244,6 +244,13 @@ rend correctement.
 l'image 48, autant la laisser choisir plutôt que d'étirer la 32. En cas de
 réponse nulle, on retombe sur 16 et 32.
 
+**Le garde d'une boucle tient le verrou jusqu'au bout.** Écrire
+`for (window, look) in lock(app).looks_to_paint()` garde le `MutexGuard`
+temporaire vivant pendant toute la boucle, et le corps reprend le même mutex :
+Multifus se bloquait sur lui-même au premier tour dès qu'un client était ouvert,
+fenêtre grise et « ne répond pas ». La liste se lit dans un `let` avant la
+boucle, comme `maximize_new_clients` le faisait déjà.
+
 **Le réglage Windows de regroupement se relit à chaque tour.** Le lire une fois
 au démarrage laissait la ligne des Réglages absente pour qui bascule
 « Ne jamais combiner » en « Toujours combiner » sans relancer Multifus. Une

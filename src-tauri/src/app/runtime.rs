@@ -197,11 +197,17 @@ fn follow_taskbar(app: &AppHandle) -> bool {
 }
 
 fn apply_window_icons(app: &AppHandle) -> bool {
-    lock(app).forget_closed_windows();
+    let looks = {
+        let mut state = lock(app);
+
+        state.forget_closed_windows();
+
+        state.looks_to_paint()
+    };
 
     let mut written = false;
 
-    for (window, look) in lock(app).looks_to_paint() {
+    for (window, look) in looks {
         let painted = paint_window(app, window, look);
         let mut state = lock(app);
 
@@ -257,7 +263,9 @@ pub fn on_run_event(app: &AppHandle, event: RunEvent) {
 }
 
 fn give_groups_back(app: &AppHandle) {
-    for window in lock(app).ungrouped_windows() {
+    let ungrouped = lock(app).ungrouped_windows();
+
+    for window in ungrouped {
         drop(
             app.state::<PlatformWindowManager>()
                 .set_window_group(window, None),
