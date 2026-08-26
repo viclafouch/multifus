@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import type { Snapshot } from '@/@types/snapshot'
+import { snapshotOf } from '@/test-snapshot'
 
 type Heard = ((snapshot: Snapshot) => void) | null
 
@@ -34,40 +35,6 @@ vi.mock(import('@/lib/multifus'), () => {
 
 const { useMultifus } = await import('@/hooks/use-multifus')
 
-const snapshotOf = (version: string): Snapshot => {
-  return {
-    version,
-    system: 'test',
-    characters: [],
-    shortcuts: [],
-    quickReplies: [],
-    autoFocus: [],
-    autoFocusEnabled: true,
-    wakesMinimized: true,
-    startAtLogin: false,
-    maximizeOnLaunch: false,
-    shortTitles: false,
-    paintPortraits: true,
-    ungroupTaskbar: false,
-    taskbarCombines: true,
-    authorization: { granted: true, listening: true },
-    config: { path: '/tmp/multifus.json', problem: null },
-    update: { kind: 'upToDate' },
-    relay: {
-      paired: false,
-      sendBody: false,
-      active: false,
-      ready: false,
-      screenSaver: { kind: 'never' },
-      pairing: { kind: 'idle' },
-      switch: { kind: 'idle' },
-      test: { kind: 'idle' }
-    },
-    walk: { enabled: false, banner: { corner: 'bottomRight', screen: null } },
-    journal: []
-  }
-}
-
 const listening = async () => {
   await waitFor(() => {
     expect(bridge.open).not.toBeNull()
@@ -81,7 +48,7 @@ const listening = async () => {
 
 const answered = async (version: string) => {
   await act(async () => {
-    bridge.first?.(snapshotOf(version))
+    bridge.first?.(snapshotOf({ version }))
     await Promise.resolve()
   })
 }
@@ -91,7 +58,6 @@ describe('useMultifus', () => {
     bridge.heard = null
     bridge.open = null
     bridge.first = null
-    bridge.unlisten.mockClear()
   })
 
   it('n’a rien à montrer avant le premier instantané', () => {
@@ -110,7 +76,9 @@ describe('useMultifus', () => {
     await listening()
     await answered('0.1.0')
 
-    expect(result.current.snapshot).toStrictEqual(snapshotOf('0.1.0'))
+    expect(result.current.snapshot).toStrictEqual(
+      snapshotOf({ version: '0.1.0' })
+    )
   })
 
   it('écoute avant de demander, pour ne rien perdre', async () => {
@@ -121,10 +89,12 @@ describe('useMultifus', () => {
     await listening()
 
     act(() => {
-      bridge.heard?.(snapshotOf('0.2.0'))
+      bridge.heard?.(snapshotOf({ version: '0.2.0' }))
     })
 
-    expect(result.current.snapshot).toStrictEqual(snapshotOf('0.2.0'))
+    expect(result.current.snapshot).toStrictEqual(
+      snapshotOf({ version: '0.2.0' })
+    )
   })
 
   it('laisse le canal parler plus fort que la demande de départ', async () => {
@@ -135,11 +105,13 @@ describe('useMultifus', () => {
     await listening()
 
     act(() => {
-      bridge.heard?.(snapshotOf('0.2.0'))
+      bridge.heard?.(snapshotOf({ version: '0.2.0' }))
     })
     await answered('0.1.0')
 
-    expect(result.current.snapshot).toStrictEqual(snapshotOf('0.2.0'))
+    expect(result.current.snapshot).toStrictEqual(
+      snapshotOf({ version: '0.2.0' })
+    )
   })
 
   it('remplace l’instantané par ce qu’une commande rend', async () => {
@@ -151,11 +123,13 @@ describe('useMultifus', () => {
     await answered('0.1.0')
 
     await act(async () => {
-      result.current.run(Promise.resolve(snapshotOf('0.3.0')))
+      result.current.run(Promise.resolve(snapshotOf({ version: '0.3.0' })))
       await Promise.resolve()
     })
 
-    expect(result.current.snapshot).toStrictEqual(snapshotOf('0.3.0'))
+    expect(result.current.snapshot).toStrictEqual(
+      snapshotOf({ version: '0.3.0' })
+    )
   })
 
   it('garde l’instantané quand une commande échoue', async () => {
@@ -171,7 +145,9 @@ describe('useMultifus', () => {
       await Promise.resolve()
     })
 
-    expect(result.current.snapshot).toStrictEqual(snapshotOf('0.1.0'))
+    expect(result.current.snapshot).toStrictEqual(
+      snapshotOf({ version: '0.1.0' })
+    )
   })
 
   it('cesse d’écouter quand la fenêtre s’en va', async () => {

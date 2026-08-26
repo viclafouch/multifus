@@ -20,6 +20,12 @@ versions déjà installées.
 
 - [ ] Le Déplacement sur macOS : les clics sont lus, la bannière n'est pas vérifiée, et rien n'est essayé en jeu. Détail dans [plan-deplacement.md](./plan-deplacement.md)
 
+## Finir les tests
+
+- [ ] Ouvrir une couture pour `PlatformWindowManager`, aujourd'hui un alias concret, sans quoi rien ne se joue en test
+- [ ] Tester la couche qui touche au système : le tour de scan, l'enregistrement des raccourcis, la bascule, la bannière, le collage, le menu
+- [ ] Corriger `commands::reset`, qui laisse le jeton Telegram dans le trousseau, puis le tester
+
 ## Vérifier sur une vraie soirée
 
 - [ ] Windows, deux clients ouverts : le roster les voit, les quatre raccourcis et l'AutoFocus répondent

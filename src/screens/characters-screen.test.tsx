@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import type { Character } from '@/@types/roster'
 import { TooltipProvider } from '@/components/ui/tooltip'
@@ -53,12 +53,6 @@ const rows = () => {
 }
 
 describe('l’écran des personnages', () => {
-  beforeEach(() => {
-    for (const call of Object.values(bridge)) {
-      call.mockClear()
-    }
-  })
-
   it('invite à connecter un personnage quand le roster est vide', () => {
     show([])
 

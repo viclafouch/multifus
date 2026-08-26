@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { strings } from '@/constants/strings'
@@ -65,12 +65,6 @@ const WINDOWS_ONLY_LABELS = [
 ]
 
 describe('l’écran des paramètres', () => {
-  beforeEach(() => {
-    for (const call of Object.values(bridge)) {
-      call.mockClear()
-    }
-  })
-
   afterEach(() => {
     vi.unstubAllGlobals()
   })

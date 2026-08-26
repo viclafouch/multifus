@@ -182,6 +182,10 @@ Before writing ANY function, component, type, or constant inside a feature file,
   role or by the French text the user reads, never by class name
 - `src/test-setup.ts` - What jsdom lacks and a library asks for, and the
   teardown between two tests. Nothing that a single test needs
+- `src/test-snapshot.ts` - The snapshot Rust hands over, at its emptiest, and
+  nothing else. A test writes only the fields it reads
+- `vitest` hands every `vi.fn` back new between two tests (`mockReset`): a
+  `beforeEach` that only clears them is noise, do not write it
 
 **Rules:**
 

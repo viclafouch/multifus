@@ -46,6 +46,7 @@ export default defineConfig({
     include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
     environment: 'jsdom',
     setupFiles: ['./src/test-setup.ts'],
+    mockReset: true,
     env: {
       TZ: 'UTC'
     }
