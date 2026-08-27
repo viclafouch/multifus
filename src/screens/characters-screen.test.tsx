@@ -6,7 +6,6 @@ import { strings } from '@/constants/strings'
 import { characterOf } from '@/test-doubles'
 
 const bridge = {
-  refresh: vi.fn(),
   removeCharacter: vi.fn(),
   setClass: vi.fn(),
   setGender: vi.fn(),
@@ -46,19 +45,36 @@ const toggleOf = (gender: Gender) => {
 }
 
 describe('l’écran des personnages', () => {
-  it('invite à connecter un personnage quand le roster est vide', () => {
+  it('invite à entrer en jeu quand le roster est vide', () => {
     show([])
 
     expect(screen.getByText(strings.characters.emptyTitle)).not.toBeNull()
-    expect(screen.queryByRole('listitem')).toBeNull()
+    expect(screen.getByText(strings.characters.emptyWatch)).not.toBeNull()
+    expect(
+      screen.queryByRole('switch', {
+        name: strings.characters.includeToggle('Alpha')
+      })
+    ).toBeNull()
   })
 
-  it('cherche les clients ouverts à la demande', () => {
+  it('déroule les trois temps du joueur quand le roster est vide', () => {
     show([])
 
-    fireEvent.click(screen.getByRole('button', { name: /Chercher/u }))
+    const titles = rows().map((row) => {
+      return within(row).getByText(/^(Lancez|Entrez|Il arrive)/u).textContent
+    })
 
-    expect(bridge.refresh).toHaveBeenCalledWith()
+    expect(titles).toStrictEqual([
+      'Lancez le jeu',
+      'Entrez en jeu',
+      'Il arrive ici'
+    ])
+  })
+
+  it('ne laisse aucun bouton à cliquer quand le roster est vide', () => {
+    show([])
+
+    expect(screen.queryAllByRole('button')).toStrictEqual([])
   })
 
   it('montre une ligne par personnage, dans l’ordre du défilement', () => {

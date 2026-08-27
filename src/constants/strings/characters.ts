@@ -40,6 +40,26 @@ const INCLUDE_GROUP_LABELS = {
   female: 'Réintégrer toutes les femmes'
 } as const satisfies Record<Gender, string>
 
+type EmptyStep = Readonly<{
+  title: string
+  line: string
+}>
+
+const EMPTY_STEPS = [
+  {
+    title: 'Lancez le jeu',
+    line: 'Un client par personnage, comme d’habitude.'
+  },
+  {
+    title: 'Entrez en jeu',
+    line: 'Compte, serveur, puis votre personnage.'
+  },
+  {
+    title: 'Il arrive ici',
+    line: 'Sa ligne se pose seule, et elle y reste.'
+  }
+] as const satisfies readonly EmptyStep[]
+
 export const CHARACTERS_STRINGS = {
   characters: {
     title: 'Personnages',
@@ -127,9 +147,10 @@ export const CHARACTERS_STRINGS = {
     },
     emptyTitle: 'Votre roster est vide',
     emptyBody:
-      'Connectez un personnage dans Dofus Retro. Il arrive ici tout seul, et il y reste même une fois le client fermé.',
+      'Multifus ne connaît encore personne. Entrez en jeu, et votre premier personnage se pose ici tout seul.',
+    emptySteps: EMPTY_STEPS,
     emptyHint:
-      'Un client resté sur l’écran de connexion n’a pas encore de pseudo. Multifus ne peut pas le reconnaître.',
-    refresh: 'Chercher maintenant'
+      'Un client resté à l’écran de connexion n’a pas encore de pseudo.',
+    emptyWatch: 'Multifus regarde vos fenêtres, une fois par seconde.'
   }
 } as const

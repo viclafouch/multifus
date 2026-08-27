@@ -29,7 +29,6 @@ pub fn run() {
         .on_window_event(main_window::hide_rather_than_quit)
         .invoke_handler(tauri::generate_handler![
             app::commands::snapshot,
-            app::commands::refresh,
             app::commands::request_authorization,
             app::commands::open_authorization_settings,
             app::commands::set_gender,

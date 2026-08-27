@@ -1,0 +1,67 @@
+import type { Portrait } from '@/@types/roster'
+import { Lamp } from '@/components/lamp'
+import { EmptyState } from '@/components/layout/empty-state'
+import { CLASS_PORTRAITS } from '@/constants/classes'
+import { strings } from '@/constants/strings'
+
+const TEAM_PORTRAITS = [
+  { class: 'iop', gender: 'male' },
+  { class: 'eniripsa', gender: 'female' },
+  { class: 'sram', gender: 'male' },
+  { class: 'sadida', gender: 'female' },
+  { class: 'xelor', gender: 'male' },
+  { class: 'ecaflip', gender: 'female' }
+] as const satisfies readonly Portrait[]
+
+export const EmptyRoster = () => {
+  return (
+    <EmptyState
+      title={strings.characters.emptyTitle}
+      body={strings.characters.emptyBody}
+      hint={strings.characters.emptyHint}
+      mark={<TeamMark />}
+      footer={
+        <>
+          <Lamp state="live" />
+          {strings.characters.emptyWatch}
+        </>
+      }
+    >
+      <ol className="grid w-full grid-cols-3 gap-2.5">
+        {strings.characters.emptySteps.map((step, index) => {
+          return (
+            <li
+              key={step.title}
+              className="flex flex-col gap-1.5 rounded-lg border border-border bg-card/45 p-3.5 text-left"
+            >
+              <span className="font-mono text-log tabular-nums text-primary/80">
+                {String(index + 1).padStart(2, '0')}
+              </span>
+              <span className="text-row font-medium">{step.title}</span>
+              <span className="text-note text-muted-foreground">
+                {step.line}
+              </span>
+            </li>
+          )
+        })}
+      </ol>
+    </EmptyState>
+  )
+}
+
+const TeamMark = () => {
+  return (
+    <span aria-hidden className="mb-1 flex items-center -space-x-3">
+      {TEAM_PORTRAITS.map((portrait) => {
+        return (
+          <img
+            key={portrait.class}
+            alt=""
+            src={CLASS_PORTRAITS[portrait.class][portrait.gender]}
+            className="size-12 rounded-full border-2 border-background bg-card object-cover ring-1 ring-border"
+          />
+        )
+      })}
+    </span>
+  )
+}

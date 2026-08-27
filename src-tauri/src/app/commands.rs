@@ -30,13 +30,6 @@ pub fn snapshot(app: AppHandle) -> Snapshot {
 }
 
 #[tauri::command]
-pub fn refresh(app: AppHandle) -> Snapshot {
-    runtime::refresh(&app);
-
-    runtime::emit_snapshot(&app)
-}
-
-#[tauri::command]
 pub fn request_authorization(app: AppHandle) -> Snapshot {
     runtime::request_authorization(&app);
 

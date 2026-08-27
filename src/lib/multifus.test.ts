@@ -129,12 +129,6 @@ const CALLS = [
     }
   },
   {
-    name: 'refresh',
-    run: () => {
-      return multifus.refresh()
-    }
-  },
-  {
     name: 'requestAuthorization',
     run: () => {
       return multifus.requestAuthorization()

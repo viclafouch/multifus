@@ -31,10 +31,6 @@ export const snapshot = async () => {
   return invoke<Snapshot>('snapshot')
 }
 
-export const refresh = async () => {
-  return invoke<Snapshot>('refresh')
-}
-
 export const requestAuthorization = async () => {
   return invoke<Snapshot>('request_authorization')
 }

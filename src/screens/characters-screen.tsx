@@ -1,14 +1,12 @@
-import { RefreshCw } from 'lucide-react'
 import { DragDropProvider } from '@dnd-kit/react'
 import type { Character, Class, Gender, Portrait } from '@/@types/roster'
 import type { Snapshot } from '@/@types/snapshot'
 import { CharacterRow } from '@/components/character-row'
+import { EmptyRoster } from '@/components/empty-roster'
 import { GenderToggle } from '@/components/gender-toggle'
-import { EmptyState } from '@/components/layout/empty-state'
 import { Panel } from '@/components/layout/panel'
 import { PanelHeader } from '@/components/layout/panel-header'
 import { Screen } from '@/components/layout/screen'
-import { Button } from '@/components/ui/button'
 import { GENDERS } from '@/constants/roster'
 import { strings } from '@/constants/strings'
 import {
@@ -20,7 +18,6 @@ import { genderGroupHint, missingGenderLine } from '@/helpers/wording'
 import { useCycleOrder } from '@/hooks/use-cycle-order'
 import { DRAG_ACCESSIBILITY, DRAG_MODIFIERS } from '@/lib/drag'
 import {
-  refresh,
   removeCharacter,
   setClass,
   setGender,
@@ -70,22 +67,7 @@ export const CharactersScreen = ({
   if (characters.length === 0) {
     return (
       <Screen title={strings.characters.title}>
-        <EmptyState
-          title={strings.characters.emptyTitle}
-          body={strings.characters.emptyBody}
-          hint={strings.characters.emptyHint}
-        >
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              run(refresh())
-            }}
-          >
-            <RefreshCw aria-hidden />
-            {strings.characters.refresh}
-          </Button>
-        </EmptyState>
+        <EmptyRoster />
       </Screen>
     )
   }
