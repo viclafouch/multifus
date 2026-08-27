@@ -466,8 +466,6 @@ pub enum ShortcutOutcome {
 
     Included { nickname: String },
 
-    Swapped { kept: Gender },
-
     OutsideGame,
 
     NotInRoster { nickname: String },
@@ -479,8 +477,6 @@ pub enum ShortcutOutcome {
     AlreadyThere { nickname: String },
 
     Walk { enabled: bool },
-
-    NoGender,
 
     NoWindow { nickname: String },
 

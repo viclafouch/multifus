@@ -69,7 +69,7 @@ const SHORTCUTS = [
     isDefault: false
   },
   {
-    action: 'swap',
+    action: 'walk',
     accelerator: 'Control+Shift+KeyX',
     status: { kind: 'invalid', detail: 'touche inconnue' },
     isDefault: false
@@ -102,7 +102,7 @@ const BINDINGS = [
     status: { kind: 'pending' }
   },
   {
-    binding: { kind: 'action', action: 'swap' },
+    binding: { kind: 'action', action: 'walk' },
     accelerator: 'Control+Shift+KeyX',
     status: { kind: 'invalid', detail: 'touche inconnue' }
   },
@@ -114,7 +114,7 @@ const BINDINGS = [
 ] as const satisfies readonly BoundCombination[]
 
 const BINDINGS_LINE =
-  'Raccourcis : Fenêtre suivante Control+Shift+ArrowRight · Fenêtre précédente non attribué · Exclure pas encore posé · Inverser hommes et femmes Control+Shift+KeyX illisible (touche inconnue) · Réponse rapide 1 Control+Shift+KeyP.'
+  'Raccourcis : Fenêtre suivante Control+Shift+ArrowRight · Fenêtre précédente non attribué · Exclure pas encore posé · Déplacement rapide Control+Shift+KeyX illisible (touche inconnue) · Réponse rapide 1 Control+Shift+KeyP.'
 
 const ROSTER_CASES = {
   excluded: [
@@ -388,24 +388,6 @@ const SHORTCUT_CASES = {
       line: 'Exclure : Alpha réintégré.'
     }
   ],
-  swapped: [
-    {
-      event: {
-        kind: 'shortcut',
-        action: 'swap',
-        outcome: { outcome: 'swapped', kept: 'male' }
-      },
-      line: 'Inverser hommes et femmes : les hommes défilent, les femmes sont exclues.'
-    },
-    {
-      event: {
-        kind: 'shortcut',
-        action: 'swap',
-        outcome: { outcome: 'swapped', kept: 'female' }
-      },
-      line: 'Inverser hommes et femmes : les femmes défilent, les hommes sont exclus.'
-    }
-  ],
   outsideGame: [
     {
       event: {
@@ -434,16 +416,6 @@ const SHORTCUT_CASES = {
         outcome: { outcome: 'nobodyInCycle' }
       },
       line: 'Fenêtre suivante : personne dans le défilement.'
-    }
-  ],
-  noGender: [
-    {
-      event: {
-        kind: 'shortcut',
-        action: 'swap',
-        outcome: { outcome: 'noGender' }
-      },
-      line: 'Inverser hommes et femmes : aucun personnage connecté n’a de sexe assigné.'
     }
   ],
   noMain: [
@@ -884,13 +856,13 @@ const JOURNAL_CASES = {
             }
           },
           {
-            binding: { kind: 'action', action: 'swap' },
+            binding: { kind: 'action', action: 'main' },
             accelerator: null,
             status: { kind: 'refused', detail: 'déjà prise' }
           }
         ]
       },
-      line: 'Raccourcis : Fenêtre suivante Control+Shift+ArrowRight en doublon avec Fenêtre précédente, donc inerte · Inverser hommes et femmes aucune combinaison refusé (déjà prise).'
+      line: 'Raccourcis : Fenêtre suivante Control+Shift+ArrowRight en doublon avec Fenêtre précédente, donc inerte · Personnage principal aucune combinaison refusé (déjà prise).'
     },
     {
       event: {

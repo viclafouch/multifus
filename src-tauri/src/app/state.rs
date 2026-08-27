@@ -453,7 +453,6 @@ impl Multifus {
             ShortcutAction::Previous => &mut self.settings.shortcuts.previous,
             ShortcutAction::Main => &mut self.settings.shortcuts.main,
             ShortcutAction::ToggleExcluded => &mut self.settings.shortcuts.toggle_excluded,
-            ShortcutAction::Swap => &mut self.settings.shortcuts.swap,
             ShortcutAction::Walk => &mut self.settings.shortcuts.walk,
         };
 
@@ -1259,10 +1258,6 @@ impl Multifus {
             }
             ShortcutAction::Main => self.aim_at_main(current),
             ShortcutAction::ToggleExcluded => self.toggle_foreground(current),
-            ShortcutAction::Swap => match self.settings.roster.swap() {
-                Some(kept) => ShortcutEffect::Settled(ShortcutOutcome::Swapped { kept }),
-                None => ShortcutEffect::Settled(ShortcutOutcome::NoGender),
-            },
             ShortcutAction::Walk => ShortcutEffect::Settled(ShortcutOutcome::Walk {
                 enabled: self.walk_enabled,
             }),
@@ -1360,7 +1355,6 @@ fn shortcut_in(shortcuts: &Shortcuts, action: ShortcutAction) -> Option<&Shortcu
         ShortcutAction::Previous => shortcuts.previous.as_ref(),
         ShortcutAction::Main => shortcuts.main.as_ref(),
         ShortcutAction::ToggleExcluded => shortcuts.toggle_excluded.as_ref(),
-        ShortcutAction::Swap => shortcuts.swap.as_ref(),
         ShortcutAction::Walk => shortcuts.walk.as_ref(),
     }
 }
@@ -1898,32 +1892,6 @@ mod tests {
     }
 
     #[test]
-    fn the_swap_shortcut_alternates_and_does_nothing_without_a_gender() {
-        let directory = TempDir::new().expect("a temporary directory");
-        let mut state = multifus(&directory);
-        state.apply_windows(&[window(1, "Alpha"), window(2, "Bravo")]);
-
-        assert_eq!(
-            state.decide_shortcut(ShortcutAction::Swap, "Alpha"),
-            ShortcutEffect::Settled(ShortcutOutcome::NoGender)
-        );
-
-        state.set_gender("Alpha", Some(Gender::Male));
-        state.set_gender("Bravo", Some(Gender::Female));
-
-        assert_eq!(
-            state.decide_shortcut(ShortcutAction::Swap, "Alpha"),
-            ShortcutEffect::Settled(ShortcutOutcome::Swapped {
-                kept: Gender::Female
-            })
-        );
-        assert_eq!(
-            state.decide_shortcut(ShortcutAction::Swap, "Alpha"),
-            ShortcutEffect::Settled(ShortcutOutcome::Swapped { kept: Gender::Male })
-        );
-    }
-
-    #[test]
     fn a_veille_moved_from_a_row_is_written_down() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
@@ -2247,7 +2215,7 @@ mod tests {
     }
 
     #[test]
-    fn the_six_actions_come_before_the_quick_replies() {
+    fn the_five_actions_come_before_the_quick_replies() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
         let id = state.add_quick_reply();
@@ -2255,7 +2223,7 @@ mod tests {
 
         let bindings = state.bindings();
 
-        assert_eq!(bindings.len(), 8);
+        assert_eq!(bindings.len(), 7);
         assert_eq!(
             bindings.first().map(|(binding, _)| *binding),
             Some(Binding::Action {
@@ -2275,12 +2243,12 @@ mod tests {
         let id = state.add_quick_reply();
         state.set_quick_reply_shortcut(id, Some("Alt+P".to_owned()));
         state.set_shortcut(ShortcutAction::Next, Some("Alt+N".to_owned()));
-        state.set_shortcut(ShortcutAction::Swap, None);
+        state.set_shortcut(ShortcutAction::ToggleExcluded, None);
 
         state.reset_shortcuts();
 
         assert_eq!(state.settings.shortcuts, Shortcuts::default());
-        assert!(state.accelerator(ShortcutAction::Swap).is_some());
+        assert!(state.accelerator(ShortcutAction::ToggleExcluded).is_some());
         assert_eq!(
             state.bindings().last().cloned(),
             Some((Binding::QuickReply { id }, Some("Alt+P".to_owned())))

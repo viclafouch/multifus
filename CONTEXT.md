@@ -46,9 +46,7 @@ Les mots de Multifus, et rien d'autre. On en parle en français, on les écrit e
 
 **Réintégrer** (`included`) : rendre à un exclu le défilement et l'AutoFocus. C'est le seul contraire d'exclure, et l'écran ne dit jamais « remettre ».
 
-**Inversion** (`swap`) : l'action d'exclure tous les personnages d'un sexe et de réintégrer ceux de l'autre. Le sexe réintégré est celui qu'on garde (`kept`).
-
-**Principal** (`main`) : le personnage qu'un raccourci ramène devant, où que l'on soit dans le jeu. Un seul à la fois, ou aucun. Il le reste déconnecté, exclu, et d'un lancement à l'autre. Être principal ne dit que cela : il défile, s'exclut et s'inverse comme les autres.
+**Principal** (`main`) : le personnage qu'un raccourci ramène devant, où que l'on soit dans le jeu. Un seul à la fois, ou aucun. Il le reste déconnecté, exclu, et d'un lancement à l'autre. Être principal ne dit que cela : il défile et s'exclut comme les autres.
 
 **Notification de jeu** (`GameNotification`) : une notification système émise par un client Dofus. Son titre porte le pseudo du destinataire, son corps décrit l'événement.
 

@@ -272,7 +272,6 @@ mod tests {
                 previous: Shortcut::new("Alt+Left"),
                 main: Shortcut::new("Alt+Home"),
                 toggle_excluded: None,
-                swap: Shortcut::new("Alt+Space"),
                 walk: Shortcut::new("Alt+KeyD"),
             },
             maximize_on_launch: true,
@@ -424,7 +423,7 @@ mod tests {
             ]
           },
           "shortcuts": { "next": "Alt+Right", "previous": null,
-                         "toggle_excluded": null, "swap": null },
+                         "toggle_excluded": null },
           "auto_focus": { "enabled": true, "combat": false },
           "start_at_login": true
         }"#;

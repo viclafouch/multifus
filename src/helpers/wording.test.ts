@@ -170,12 +170,12 @@ describe('shortcutStatusLine', () => {
   it('nomme l’action qui tient déjà la combinaison', () => {
     const status = {
       kind: 'duplicate',
-      binding: { kind: 'action', action: 'swap' }
+      binding: { kind: 'action', action: 'walk' }
     } as const
 
     const written = shortcutStatusLine(status, QUICK_REPLIES)
 
-    expect(written?.text).toContain(strings.shortcuts.actions.swap.label)
+    expect(written?.text).toContain(strings.shortcuts.actions.walk.label)
   })
 
   it('nomme par son texte la quickReply qui tient déjà la combinaison', () => {

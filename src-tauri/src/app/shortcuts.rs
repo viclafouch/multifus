@@ -444,7 +444,7 @@ mod tests {
         answer(
             &press,
             Binding::Action {
-                action: ShortcutAction::Swap,
+                action: ShortcutAction::Next,
             },
         );
         answer(
@@ -458,7 +458,7 @@ mod tests {
             journalled(&state),
             vec![
                 JournalEvent::Shortcut {
-                    action: ShortcutAction::Swap,
+                    action: ShortcutAction::Next,
                     outcome: ShortcutOutcome::ForegroundUnknown {
                         detail: detail.clone(),
                     },
@@ -656,9 +656,9 @@ mod tests {
         let windows = FakeWindowManager::showing(Desktop::default());
 
         assert_eq!(
-            pressed(&state, &windows, ShortcutAction::Swap),
-            ShortcutOutcome::NoGender,
-            "nobody has a gender yet, so there is nobody to put aside"
+            pressed(&state, &windows, ShortcutAction::Main),
+            ShortcutOutcome::NoMain,
+            "nobody is the main yet, so there is nowhere to go"
         );
         assert_eq!(windows.asked(), Vec::new());
     }

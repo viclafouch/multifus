@@ -28,7 +28,6 @@ const ALL_ACTIONS = [
   'previous',
   'main',
   'toggleExcluded',
-  'swap',
   'walk'
 ] as const satisfies readonly ShortcutAction[]
 
@@ -120,7 +119,7 @@ const capsOf = (field: HTMLElement) => {
   })
 }
 
-describe('l’écran des raccourcis, les six actions', () => {
+describe('l’écran des raccourcis, les cinq actions', () => {
   const all = ALL_ACTIONS.map((action) => {
     return shortcut(action)
   })

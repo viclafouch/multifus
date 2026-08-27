@@ -29,14 +29,12 @@ export type ShortcutOutcome =
   | { readonly outcome: 'focused'; readonly nickname: string }
   | { readonly outcome: 'foregroundUnknown'; readonly detail: string }
   | { readonly outcome: 'alreadyThere'; readonly nickname: string }
-  | { readonly outcome: 'noGender' }
   | { readonly outcome: 'noMain' }
   | { readonly outcome: 'nobodyInCycle' }
   | { readonly outcome: 'notInRoster'; readonly nickname: string }
   | { readonly outcome: 'noWindow'; readonly nickname: string }
   | { readonly outcome: 'outsideGame' }
   | { readonly outcome: 'excluded'; readonly nickname: string }
-  | { readonly outcome: 'swapped'; readonly kept: Gender }
   | { readonly outcome: 'walk'; readonly enabled: boolean }
   | { readonly outcome: 'included'; readonly nickname: string }
 

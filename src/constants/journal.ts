@@ -105,11 +105,6 @@ export const GENDER_GROUP_LINES = {
   }
 } as const satisfies Record<Gender, Record<'excluded' | 'included', string>>
 
-export const SWAP_LINES = {
-  male: 'les hommes défilent, les femmes sont exclues.',
-  female: 'les femmes défilent, les hommes sont exclus.'
-} as const satisfies Record<Gender, string>
-
 export const WALK_FROM_LABELS = {
   window: 'la fenêtre',
   tray: 'la barre système',
@@ -122,12 +117,10 @@ export const SHORTCUT_TONES = {
   focused: 'good',
   excluded: 'good',
   included: 'good',
-  swapped: 'good',
   walk: 'good',
   outsideGame: 'neutral',
   notInRoster: 'neutral',
   nobodyInCycle: 'neutral',
-  noGender: 'neutral',
   noMain: 'neutral',
   alreadyThere: 'neutral',
   noWindow: 'neutral',

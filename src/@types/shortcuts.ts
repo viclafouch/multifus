@@ -2,7 +2,6 @@ export type ShortcutAction =
   | 'main'
   | 'next'
   | 'previous'
-  | 'swap'
   | 'toggleExcluded'
   | 'walk'
 

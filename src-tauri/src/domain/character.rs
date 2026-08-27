@@ -8,16 +8,6 @@ pub enum Gender {
     Female,
 }
 
-impl Gender {
-    #[must_use]
-    pub fn other(self) -> Self {
-        match self {
-            Self::Male => Self::Female,
-            Self::Female => Self::Male,
-        }
-    }
-}
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum Class {

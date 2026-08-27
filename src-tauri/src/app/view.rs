@@ -238,17 +238,15 @@ pub enum ShortcutAction {
     Previous,
     Main,
     ToggleExcluded,
-    Swap,
     Walk,
 }
 
 impl ShortcutAction {
-    pub const ALL: [Self; 6] = [
+    pub const ALL: [Self; 5] = [
         Self::Next,
         Self::Previous,
         Self::Main,
         Self::ToggleExcluded,
-        Self::Swap,
         Self::Walk,
     ];
 }
@@ -616,7 +614,7 @@ mod tests {
 
         assert_eq!(
             actions,
-            ["next", "previous", "main", "toggleExcluded", "swap", "walk"]
+            ["next", "previous", "main", "toggleExcluded", "walk"]
         );
     }
 
@@ -624,9 +622,9 @@ mod tests {
     fn a_binding_is_an_action_or_a_quick_reply_and_says_which() {
         assert_eq!(
             json_of(&Binding::Action {
-                action: ShortcutAction::Swap
+                action: ShortcutAction::ToggleExcluded
             }),
-            json!({ "kind": "action", "action": "swap" })
+            json!({ "kind": "action", "action": "toggleExcluded" })
         );
         assert_eq!(
             json_of(&Binding::QuickReply {

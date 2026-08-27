@@ -18,10 +18,6 @@ const ACTION_LABELS = {
     label: 'Exclure',
     description: 'Exclut le personnage devant vous, ou le réintègre.'
   },
-  swap: {
-    label: 'Inverser hommes et femmes',
-    description: 'Vos hommes sont exclus, vos femmes réintégrées. Ou l’inverse.'
-  },
   walk: {
     label: 'Déplacement rapide',
     description: 'Allume et éteint le Déplacement rapide, même hors du jeu.'

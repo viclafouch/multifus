@@ -30,7 +30,6 @@ import {
   WALK_IDLE_TONES,
   RELAY_STOP_LINES,
   SHORTCUT_TONES,
-  SWAP_LINES,
   TONES,
   TRAY_TONES,
   WORK_LABELS
@@ -403,9 +402,6 @@ const shortcutLine = ({ action, outcome }: ShortcutLineParams) => {
     case 'included': {
       return `${label} : ${outcome.nickname} réintégré.`
     }
-    case 'swapped': {
-      return `${label} : ${SWAP_LINES[outcome.kept]}`
-    }
     case 'outsideGame': {
       return `${label} : ignoré, aucune fenêtre Dofus au premier plan.`
     }
@@ -423,9 +419,6 @@ const shortcutLine = ({ action, outcome }: ShortcutLineParams) => {
     }
     case 'walk': {
       return outcome.enabled ? `${label} : allumé.` : `${label} : éteint.`
-    }
-    case 'noGender': {
-      return `${label} : aucun personnage connecté n’a de sexe assigné.`
     }
     case 'noWindow': {
       return `${label} : la fenêtre de ${outcome.nickname} a disparu.`

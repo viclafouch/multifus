@@ -181,39 +181,6 @@ impl Roster {
         changed
     }
 
-    pub fn swap_to(&mut self, kept: Gender) {
-        self.set_excluded_for_gender(kept, false);
-        self.set_excluded_for_gender(kept.other(), true);
-    }
-
-    pub fn swap(&mut self) -> Option<Gender> {
-        let has_gender = self
-            .characters
-            .iter()
-            .any(|character| character.gender.is_some() && character.is_excludable());
-
-        if !has_gender {
-            return None;
-        }
-
-        let kept = if self.has_in_cycle(Gender::Male) {
-            Gender::Female
-        } else {
-            Gender::Male
-        };
-
-        self.swap_to(kept);
-
-        Some(kept)
-    }
-
-    #[must_use]
-    pub fn has_in_cycle(&self, gender: Gender) -> bool {
-        self.characters
-            .iter()
-            .any(|character| character.gender == Some(gender) && character.is_in_cycle())
-    }
-
     pub fn set_relayed(&mut self, nickname: &str, relayed: bool) -> bool {
         match self.get_mut(nickname) {
             Some(character) => {
@@ -454,62 +421,6 @@ mod tests {
         assert_eq!(nicknames(&roster), vec!["Bravo", "Charlie"]);
 
         assert_eq!(roster.set_excluded_for_gender(Gender::Male, true), 0);
-    }
-
-    #[test]
-    fn a_swap_excludes_one_gender_and_includes_the_other() {
-        let mut roster = roster(vec![
-            Character::new("Alpha").with_gender(Gender::Male),
-            Character::new("Bravo")
-                .with_gender(Gender::Female)
-                .excluded(),
-            Character::new("Charlie")
-                .with_gender(Gender::Female)
-                .excluded(),
-        ]);
-
-        roster.swap_to(Gender::Female);
-        assert_eq!(nicknames(&roster), vec!["Bravo", "Charlie"]);
-
-        roster.swap_to(Gender::Male);
-        assert_eq!(nicknames(&roster), vec!["Alpha"]);
-    }
-
-    #[test]
-    fn a_swap_leaves_the_characters_without_a_gender_alone() {
-        let mut roster = roster(vec![
-            Character::new("Alpha").with_gender(Gender::Male),
-            Character::new("Bravo"),
-        ]);
-
-        roster.swap_to(Gender::Female);
-
-        assert_eq!(nicknames(&roster), vec!["Bravo"]);
-    }
-
-    #[test]
-    fn the_swap_shortcut_alternates_between_the_two_genders() {
-        let mut roster = roster(vec![
-            Character::new("Alpha").with_gender(Gender::Male),
-            Character::new("Bravo").with_gender(Gender::Female),
-        ]);
-
-        assert_eq!(roster.swap(), Some(Gender::Female));
-        assert_eq!(nicknames(&roster), vec!["Bravo"]);
-
-        assert_eq!(roster.swap(), Some(Gender::Male));
-        assert_eq!(nicknames(&roster), vec!["Alpha"]);
-    }
-
-    #[test]
-    fn the_swap_shortcut_does_nothing_without_a_gendered_character() {
-        let mut roster = roster(vec![
-            Character::new("Alpha"),
-            Character::new("Bravo").with_gender(Gender::Male).offline(),
-        ]);
-
-        assert_eq!(roster.swap(), None);
-        assert_eq!(nicknames(&roster), vec!["Alpha"]);
     }
 
     #[test]

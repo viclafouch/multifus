@@ -50,7 +50,7 @@ describe('matchIsSameBinding', () => {
   })
 
   it('ne reconnaît rien quand rien n’est en cours', () => {
-    const isSame = matchIsSameBinding(null, { kind: 'action', action: 'swap' })
+    const isSame = matchIsSameBinding(null, { kind: 'action', action: 'walk' })
 
     expect(isSame).toBe(false)
   })
