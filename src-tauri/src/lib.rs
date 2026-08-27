@@ -35,6 +35,7 @@ pub fn run() {
             app::commands::set_gender,
             app::commands::set_class,
             app::commands::toggle_excluded,
+            app::commands::set_main,
             app::commands::set_gender_excluded,
             app::commands::reorder,
             app::commands::remove_character,

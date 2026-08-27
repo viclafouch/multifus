@@ -225,6 +225,35 @@ impl Roster {
         }
     }
 
+    pub fn set_main(&mut self, nickname: &str, main: bool) -> bool {
+        if self.get(nickname).is_none() {
+            return false;
+        }
+
+        let mut changed = false;
+
+        for character in &mut self.characters {
+            let is_the_one = character.nickname == nickname;
+            let wanted = if is_the_one {
+                main
+            } else {
+                character.main && !main
+            };
+
+            if character.main != wanted {
+                character.main = wanted;
+                changed = true;
+            }
+        }
+
+        changed
+    }
+
+    #[must_use]
+    pub fn main(&self) -> Option<&Character> {
+        self.characters.iter().find(|character| character.is_main())
+    }
+
     pub fn relayed(&self) -> impl DoubleEndedIterator<Item = &Character> {
         self.characters.iter().filter(|character| character.relayed)
     }
@@ -596,6 +625,106 @@ mod tests {
 
         assert!(roster.has_relayed_online());
         assert_eq!(nicknames(&roster), Vec::<&str>::new());
+    }
+
+    #[test]
+    fn only_one_character_at_a_time_wears_the_star() {
+        let mut roster = roster(vec![
+            Character::new("Alpha"),
+            Character::new("Bravo"),
+            Character::new("Charlie"),
+        ]);
+
+        assert_eq!(roster.main(), None);
+
+        assert!(roster.set_main("Bravo", true));
+        assert_eq!(roster.main().unwrap().nickname, "Bravo");
+
+        assert!(roster.set_main("Charlie", true));
+        assert_eq!(roster.main().unwrap().nickname, "Charlie");
+        assert!(!roster.get("Bravo").unwrap().is_main());
+    }
+
+    #[test]
+    fn taking_the_star_back_leaves_nobody_wearing_it() {
+        let mut roster = roster(vec![Character::new("Alpha"), Character::new("Bravo")]);
+
+        roster.set_main("Alpha", true);
+
+        assert!(roster.set_main("Alpha", false));
+        assert_eq!(roster.main(), None);
+    }
+
+    #[test]
+    fn taking_the_star_off_somebody_who_never_had_it_moves_nothing() {
+        let mut roster = roster(vec![Character::new("Alpha"), Character::new("Bravo")]);
+
+        roster.set_main("Alpha", true);
+
+        assert!(
+            !roster.set_main("Bravo", false),
+            "nothing moved, so nothing is written down"
+        );
+        assert_eq!(roster.main().unwrap().nickname, "Alpha");
+    }
+
+    #[test]
+    fn giving_the_star_to_the_one_who_already_wears_it_moves_nothing() {
+        let mut roster = roster(vec![Character::new("Alpha"), Character::new("Bravo")]);
+
+        roster.set_main("Alpha", true);
+
+        assert!(!roster.set_main("Alpha", true));
+        assert_eq!(roster.main().unwrap().nickname, "Alpha");
+    }
+
+    #[test]
+    fn the_star_refuses_a_nickname_the_roster_does_not_hold() {
+        let mut roster = roster(vec![Character::new("Alpha").main()]);
+
+        assert!(!roster.set_main("Echo", true));
+        assert_eq!(roster.main().unwrap().nickname, "Alpha");
+    }
+
+    #[test]
+    fn the_star_holds_on_a_character_the_cycle_has_dropped() {
+        let mut roster = roster(vec![Character::new("Alpha"), Character::new("Bravo")]);
+
+        roster.set_main("Alpha", true);
+        roster.toggle_excluded("Alpha");
+        roster.set_online("Alpha", false);
+
+        assert_eq!(roster.main().unwrap().nickname, "Alpha");
+        assert_eq!(nicknames(&roster), vec!["Bravo"]);
+    }
+
+    #[test]
+    fn a_file_hand_edited_with_two_stars_keeps_the_first_until_the_next_gesture() {
+        let mut roster = roster(vec![
+            Character::new("Alpha").main(),
+            Character::new("Bravo").main(),
+        ]);
+
+        assert_eq!(roster.main().unwrap().nickname, "Alpha");
+
+        roster.set_main("Charlie", true);
+
+        assert_eq!(roster.main().unwrap().nickname, "Alpha", "Charlie is unknown");
+
+        roster.set_main("Bravo", true);
+
+        assert_eq!(roster.main().unwrap().nickname, "Bravo");
+        assert!(!roster.get("Alpha").unwrap().is_main());
+    }
+
+    #[test]
+    fn removing_a_character_takes_his_star_with_him() {
+        let mut roster = roster(vec![Character::new("Alpha"), Character::new("Bravo")]);
+
+        roster.set_main("Alpha", true);
+        roster.remove("Alpha");
+
+        assert_eq!(roster.main(), None);
     }
 
     #[test]

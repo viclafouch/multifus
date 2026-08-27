@@ -48,6 +48,8 @@ Les mots de Multifus, et rien d'autre. On en parle en français, on les écrit e
 
 **Inversion** (`swap`) : l'action d'exclure tous les personnages d'un sexe et de réintégrer ceux de l'autre. Le sexe réintégré est celui qu'on garde (`kept`).
 
+**Principal** (`main`) : le personnage qu'un raccourci ramène devant, où que l'on soit dans le jeu. Un seul à la fois, ou aucun. Il garde son étoile déconnecté, exclu, et d'un lancement à l'autre. L'étoile ne dit que cela : le principal défile, s'exclut et s'inverse comme les autres.
+
 **Notification de jeu** (`GameNotification`) : une notification système émise par un client Dofus. Son titre porte le pseudo du destinataire, son corps décrit l'événement.
 
 **Type de notification** (`NotificationKind`) : la catégorie de l'événement, lue dans le corps : combat, échange, groupe, craft, message privé, défi, percepteur.

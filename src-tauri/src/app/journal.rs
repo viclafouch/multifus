@@ -293,6 +293,11 @@ pub enum RosterChange {
         nickname: String,
         relayed: bool,
     },
+
+    Main {
+        nickname: String,
+        main: bool,
+    },
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
@@ -467,6 +472,10 @@ pub enum ShortcutOutcome {
     NotInRoster { nickname: String },
 
     NobodyInCycle,
+
+    NoMain,
+
+    AlreadyThere { nickname: String },
 
     Walk { enabled: bool },
 

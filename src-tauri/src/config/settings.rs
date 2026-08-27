@@ -93,6 +93,7 @@ impl BannerCorner {
 pub struct Shortcuts {
     pub next: Option<Shortcut>,
     pub previous: Option<Shortcut>,
+    pub main: Option<Shortcut>,
     pub toggle_excluded: Option<Shortcut>,
     pub swap: Option<Shortcut>,
     pub walk: Option<Shortcut>,
@@ -100,6 +101,7 @@ pub struct Shortcuts {
 
 const DEFAULT_NEXT: &str = "Control+Shift+Right";
 const DEFAULT_PREVIOUS: &str = "Control+Shift+Left";
+const DEFAULT_MAIN: &str = "Control+Shift+Home";
 const DEFAULT_TOGGLE_EXCLUDED: &str = "Control+Shift+Down";
 const DEFAULT_SWAP: &str = "Control+Shift+Up";
 const DEFAULT_WALK: &str = "Control+Shift+KeyD";
@@ -109,6 +111,7 @@ impl Default for Shortcuts {
         Self {
             next: Shortcut::new(DEFAULT_NEXT),
             previous: Shortcut::new(DEFAULT_PREVIOUS),
+            main: Shortcut::new(DEFAULT_MAIN),
             toggle_excluded: Shortcut::new(DEFAULT_TOGGLE_EXCLUDED),
             swap: Shortcut::new(DEFAULT_SWAP),
             walk: Shortcut::new(DEFAULT_WALK),
@@ -374,11 +377,12 @@ mod tests {
     }
 
     #[test]
-    fn the_five_shortcuts_are_bound_by_default_and_all_differ() {
+    fn the_six_shortcuts_are_bound_by_default_and_all_differ() {
         let shortcuts = Shortcuts::default();
         let bound = [
             shortcuts.next.as_ref(),
             shortcuts.previous.as_ref(),
+            shortcuts.main.as_ref(),
             shortcuts.toggle_excluded.as_ref(),
             shortcuts.swap.as_ref(),
             shortcuts.walk.as_ref(),
@@ -388,14 +392,14 @@ mod tests {
         .map(Shortcut::as_str)
         .collect::<Vec<_>>();
 
-        assert_eq!(bound.len(), 5);
+        assert_eq!(bound.len(), 6);
 
         let mut unique = bound.clone();
         unique.sort_unstable();
         unique.dedup();
         assert_eq!(
             unique.len(),
-            5,
+            6,
             "two actions share a combination: {bound:?}"
         );
     }
@@ -415,6 +419,7 @@ mod tests {
         let shortcuts = Shortcuts {
             next: Shortcut::new("Alt+Tab"),
             previous: None,
+            main: None,
             toggle_excluded: None,
             swap: None,
             walk: None,

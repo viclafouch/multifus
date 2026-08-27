@@ -44,7 +44,7 @@ export const CHARACTERS_STRINGS = {
   characters: {
     title: 'Personnages',
     subtitle:
-      'Tirez une ligne par sa poignée pour changer l’ordre du défilement.',
+      'Tirez une ligne par sa poignée pour changer l’ordre du défilement. L’étoile marque le personnage qu’un raccourci ramène devant.',
     online: 'Connecté',
     excluded: 'Exclu',
     offline: 'Déconnecté',
@@ -70,6 +70,11 @@ export const CHARACTERS_STRINGS = {
     includeToggle: (nickname: string) => {
       return `${nickname} dans le défilement et l’AutoFocus`
     },
+    mainToggle: (nickname: string) => {
+      return `${nickname} comme personnage principal`
+    },
+    mainSet: 'En faire votre principal',
+    mainUnset: 'Retirer l’étoile',
     remove: (nickname: string) => {
       return `Retirer ${nickname} du roster`
     },

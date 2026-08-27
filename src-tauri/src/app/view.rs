@@ -225,6 +225,7 @@ pub struct CharacterView {
     pub nickname: String,
     pub gender: Option<Gender>,
     pub class: Option<Class>,
+    pub main: bool,
     pub excluded: bool,
     pub online: bool,
     pub relayed: bool,
@@ -235,15 +236,17 @@ pub struct CharacterView {
 pub enum ShortcutAction {
     Next,
     Previous,
+    Main,
     ToggleExcluded,
     Swap,
     Walk,
 }
 
 impl ShortcutAction {
-    pub const ALL: [Self; 5] = [
+    pub const ALL: [Self; 6] = [
         Self::Next,
         Self::Previous,
+        Self::Main,
         Self::ToggleExcluded,
         Self::Swap,
         Self::Walk,
@@ -462,6 +465,7 @@ mod tests {
             nickname: "Alpha".to_owned(),
             gender: Some(Gender::Male),
             class: Some(Class::Iop),
+            main: false,
             excluded: false,
             online: true,
             relayed: true,
@@ -511,13 +515,14 @@ mod tests {
     }
 
     #[test]
-    fn a_character_crosses_with_the_six_things_a_row_shows() {
+    fn a_character_crosses_with_the_seven_things_a_row_shows() {
         assert_eq!(
             json_of(&character()),
             json!({
                 "nickname": "Alpha",
                 "gender": "male",
                 "class": "iop",
+                "main": false,
                 "excluded": false,
                 "online": true,
                 "relayed": true,
@@ -598,7 +603,7 @@ mod tests {
     }
 
     #[test]
-    fn the_five_actions_travel_under_the_names_the_shortcuts_screen_uses() {
+    fn the_six_actions_travel_under_the_names_the_shortcuts_screen_uses() {
         let actions = ShortcutAction::ALL
             .into_iter()
             .map(|action| {
@@ -611,7 +616,7 @@ mod tests {
 
         assert_eq!(
             actions,
-            ["next", "previous", "toggleExcluded", "swap", "walk"]
+            ["next", "previous", "main", "toggleExcluded", "swap", "walk"]
         );
     }
 

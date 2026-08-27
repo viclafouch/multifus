@@ -165,6 +165,12 @@ const CALLS = [
     }
   },
   {
+    name: 'setMain',
+    run: () => {
+      return multifus.setMain(NICKNAME, true)
+    }
+  },
+  {
     name: 'setGenderExcluded',
     run: () => {
       return multifus.setGenderExcluded('female', true)

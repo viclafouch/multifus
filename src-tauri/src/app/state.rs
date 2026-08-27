@@ -451,6 +451,7 @@ impl Multifus {
         let slot = match action {
             ShortcutAction::Next => &mut self.settings.shortcuts.next,
             ShortcutAction::Previous => &mut self.settings.shortcuts.previous,
+            ShortcutAction::Main => &mut self.settings.shortcuts.main,
             ShortcutAction::ToggleExcluded => &mut self.settings.shortcuts.toggle_excluded,
             ShortcutAction::Swap => &mut self.settings.shortcuts.swap,
             ShortcutAction::Walk => &mut self.settings.shortcuts.walk,
@@ -880,6 +881,20 @@ impl Multifus {
         self.save();
     }
 
+    pub fn set_main(&mut self, nickname: &str, main: bool) {
+        if !self.settings.roster.set_main(nickname, main) {
+            return;
+        }
+
+        self.log(JournalEvent::Roster {
+            change: RosterChange::Main {
+                nickname: nickname.to_owned(),
+                main,
+            },
+        });
+        self.save();
+    }
+
     pub fn set_relayed(&mut self, nickname: &str, relayed: bool) {
         if !self.settings.roster.set_relayed(nickname, relayed) {
             return;
@@ -1242,6 +1257,7 @@ impl Multifus {
 
                 self.aim_at(target)
             }
+            ShortcutAction::Main => self.aim_at_main(current),
             ShortcutAction::ToggleExcluded => self.toggle_foreground(current),
             ShortcutAction::Swap => match self.settings.roster.swap() {
                 Some(kept) => ShortcutEffect::Settled(ShortcutOutcome::Swapped { kept }),
@@ -1251,6 +1267,23 @@ impl Multifus {
                 enabled: self.walk_enabled,
             }),
         }
+    }
+
+    fn aim_at_main(&self, current: &str) -> ShortcutEffect {
+        let Some(nickname) = self
+            .settings
+            .roster
+            .main()
+            .map(|main| main.nickname.clone())
+        else {
+            return ShortcutEffect::Settled(ShortcutOutcome::NoMain);
+        };
+
+        if nickname == current {
+            return ShortcutEffect::Settled(ShortcutOutcome::AlreadyThere { nickname });
+        }
+
+        self.aim_at(Some(nickname))
     }
 
     fn aim_at(&self, target: Option<String>) -> ShortcutEffect {
@@ -1325,6 +1358,7 @@ fn shortcut_in(shortcuts: &Shortcuts, action: ShortcutAction) -> Option<&Shortcu
     match action {
         ShortcutAction::Next => shortcuts.next.as_ref(),
         ShortcutAction::Previous => shortcuts.previous.as_ref(),
+        ShortcutAction::Main => shortcuts.main.as_ref(),
         ShortcutAction::ToggleExcluded => shortcuts.toggle_excluded.as_ref(),
         ShortcutAction::Swap => shortcuts.swap.as_ref(),
         ShortcutAction::Walk => shortcuts.walk.as_ref(),
@@ -1340,6 +1374,7 @@ fn view_of(character: &Character) -> CharacterView {
         nickname: character.nickname.clone(),
         gender: character.gender,
         class: character.class,
+        main: character.main,
         excluded: character.excluded,
         online: character.online,
         relayed: character.relayed,
@@ -1725,6 +1760,144 @@ mod tests {
     }
 
     #[test]
+    fn the_main_shortcut_brings_the_starred_character_in_front() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha"), window(2, "Bravo")]);
+        state.set_main("Bravo", true);
+
+        assert_eq!(
+            state.decide_shortcut(ShortcutAction::Main, "Alpha"),
+            ShortcutEffect::Focus {
+                nickname: "Bravo".to_owned(),
+                window: WindowId::from_raw(2),
+            }
+        );
+    }
+
+    #[test]
+    fn the_main_shortcut_brings_back_a_character_the_cycle_steps_over() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha"), window(2, "Bravo")]);
+        state.set_main("Bravo", true);
+        state.toggle_excluded("Bravo");
+
+        assert_eq!(
+            state.decide_shortcut(ShortcutAction::Main, "Alpha"),
+            ShortcutEffect::Focus {
+                nickname: "Bravo".to_owned(),
+                window: WindowId::from_raw(2),
+            }
+        );
+        assert_eq!(
+            state.decide_shortcut(ShortcutAction::Next, "Alpha"),
+            ShortcutEffect::Focus {
+                nickname: "Alpha".to_owned(),
+                window: WindowId::from_raw(1),
+            },
+            "the cycle keeps stepping over him"
+        );
+    }
+
+    #[test]
+    fn the_main_shortcut_says_when_no_star_is_posed() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha")]);
+
+        assert_eq!(
+            state.decide_shortcut(ShortcutAction::Main, "Alpha"),
+            ShortcutEffect::Settled(ShortcutOutcome::NoMain)
+        );
+    }
+
+    #[test]
+    fn the_main_shortcut_says_when_you_are_already_there() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha")]);
+        state.set_main("Alpha", true);
+
+        assert_eq!(
+            state.decide_shortcut(ShortcutAction::Main, "Alpha"),
+            ShortcutEffect::Settled(ShortcutOutcome::AlreadyThere {
+                nickname: "Alpha".to_owned()
+            })
+        );
+    }
+
+    #[test]
+    fn the_main_shortcut_says_when_the_star_is_on_somebody_disconnected() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha"), window(2, "Bravo")]);
+        state.set_main("Bravo", true);
+        state.apply_windows(&[window(1, "Alpha")]);
+
+        assert_eq!(
+            state.decide_shortcut(ShortcutAction::Main, "Alpha"),
+            ShortcutEffect::Settled(ShortcutOutcome::NoWindow {
+                nickname: "Bravo".to_owned()
+            })
+        );
+    }
+
+    #[test]
+    fn the_star_is_written_down_and_survives_a_restart() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha"), window(2, "Bravo")]);
+        state.set_main("Bravo", true);
+
+        assert!(journalled(&state).contains(&JournalEvent::Roster {
+            change: RosterChange::Main {
+                nickname: "Bravo".to_owned(),
+                main: true,
+            }
+        }));
+
+        let reloaded = multifus_reloaded(&directory);
+
+        assert_eq!(
+            reloaded
+                .snapshot()
+                .characters
+                .into_iter()
+                .filter(|character| character.main)
+                .map(|character| character.nickname)
+                .collect::<Vec<_>>(),
+            vec!["Bravo".to_owned()]
+        );
+    }
+
+    #[test]
+    fn a_star_that_moves_nobody_writes_nothing() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha"), window(2, "Bravo")]);
+        state.set_main("Alpha", true);
+
+        state.set_main("Nobody", true);
+        state.set_main("Bravo", false);
+        state.set_main("Alpha", true);
+
+        let stars = journalled(&state)
+            .into_iter()
+            .filter(|event| {
+                matches!(
+                    event,
+                    JournalEvent::Roster {
+                        change: RosterChange::Main { .. }
+                    }
+                )
+            })
+            .count();
+
+        assert_eq!(stars, 1, "only the gesture that moved the star is written");
+    }
+
+    #[test]
     fn the_swap_shortcut_alternates_and_does_nothing_without_a_gender() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
@@ -2074,7 +2247,7 @@ mod tests {
     }
 
     #[test]
-    fn the_five_actions_come_before_the_quick_replies() {
+    fn the_six_actions_come_before_the_quick_replies() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
         let id = state.add_quick_reply();
@@ -2082,7 +2255,7 @@ mod tests {
 
         let bindings = state.bindings();
 
-        assert_eq!(bindings.len(), 7);
+        assert_eq!(bindings.len(), 8);
         assert_eq!(
             bindings.first().map(|(binding, _)| *binding),
             Some(Binding::Action {

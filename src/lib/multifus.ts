@@ -58,6 +58,10 @@ export const toggleExcluded = async (nickname: string) => {
   return invoke<Snapshot>('toggle_excluded', { nickname })
 }
 
+export const setMain = async (nickname: string, main: boolean) => {
+  return invoke<Snapshot>('set_main', { nickname, main })
+}
+
 export const setGenderExcluded = async (gender: Gender, excluded: boolean) => {
   return invoke<Snapshot>('set_gender_excluded', { gender, excluded })
 }

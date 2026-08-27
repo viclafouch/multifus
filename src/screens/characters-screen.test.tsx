@@ -11,6 +11,7 @@ const bridge = {
   setClass: vi.fn(),
   setGender: vi.fn(),
   setGenderExcluded: vi.fn(),
+  setMain: vi.fn(),
   toggleExcluded: vi.fn()
 }
 
@@ -30,6 +31,12 @@ const show = (characters: readonly Character[]) => {
 
 const rows = () => {
   return screen.getAllByRole('listitem')
+}
+
+const starOf = (nickname: string) => {
+  return screen.getByRole('button', {
+    name: strings.characters.mainToggle(nickname)
+  })
 }
 
 const toggleOf = (gender: Gender) => {
@@ -231,6 +238,47 @@ describe('l’écran des personnages', () => {
         name: strings.characters.portraitChange('Bravo')
       })
     ).not.toBeNull()
+  })
+
+  it('pose l’étoile sur le personnage qui ne l’a pas', () => {
+    show([characterOf({ nickname: 'Alpha' })])
+
+    fireEvent.click(starOf('Alpha'))
+
+    expect(bridge.setMain).toHaveBeenCalledWith('Alpha', true)
+  })
+
+  it('reprend l’étoile au personnage qui la porte', () => {
+    show([characterOf({ nickname: 'Alpha', main: true })])
+
+    fireEvent.click(starOf('Alpha'))
+
+    expect(bridge.setMain).toHaveBeenCalledWith('Alpha', false)
+  })
+
+  it('n’allume l’étoile que sur le personnage principal', () => {
+    show([
+      characterOf({ nickname: 'Alpha' }),
+      characterOf({ nickname: 'Bravo', main: true })
+    ])
+
+    const lit = ['Alpha', 'Bravo'].map((nickname) => {
+      return starOf(nickname).getAttribute('aria-pressed')
+    })
+
+    expect(lit).toStrictEqual(['false', 'true'])
+  })
+
+  it('offre l’étoile à un déconnecté et à un exclu comme aux autres', () => {
+    show([
+      characterOf({ nickname: 'Alpha', online: false }),
+      characterOf({ nickname: 'Bravo', excluded: true, main: true })
+    ])
+
+    fireEvent.click(starOf('Alpha'))
+
+    expect(bridge.setMain).toHaveBeenCalledWith('Alpha', true)
+    expect(starOf('Bravo').getAttribute('aria-pressed')).toBe('true')
   })
 
   it('dit d’un personnage exclu qu’il est exclu', () => {

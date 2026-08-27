@@ -4,6 +4,7 @@ import { useSortable } from '@dnd-kit/react/sortable'
 import type { Character, Class, Gender, Portrait } from '@/@types/roster'
 import { CharacterMedallion } from '@/components/character-medallion'
 import { ClassDialog } from '@/components/class-dialog'
+import { MainStar } from '@/components/main-star'
 import { RemoveButton } from '@/components/remove-button'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
@@ -26,6 +27,7 @@ const STAGGER_MS = 38
 
 type RowActions = Readonly<{
   handleToggleExcluded: (nickname: string) => void
+  handleSetMain: (nickname: string, main: boolean) => void
   handleSetGender: (nickname: string, gender: Gender | null) => void
   handleSetClass: (nickname: string, characterClass: Class | null) => void
   handleSetPortrait: (nickname: string, portrait: Portrait) => void
@@ -47,7 +49,7 @@ export const CharacterRow = ({
   paintPortraits,
   actions
 }: CharacterRowProps) => {
-  const { nickname, excluded, online } = character
+  const { nickname, main, excluded, online } = character
   const { ref, handleRef, isDragging } = useSortable({ id: nickname, index })
   const [isEntering, setIsEntering] = React.useState(true)
   const [isDialogOpen, setIsDialogOpen] = React.useState(false)
@@ -110,6 +112,13 @@ export const CharacterRow = ({
           {characterSubLine(character)}
         </p>
       </div>
+      <MainStar
+        nickname={nickname}
+        isMain={main}
+        onToggle={() => {
+          actions.handleSetMain(nickname, !main)
+        }}
+      />
       <Switch
         checked={matchIsInCycle(character)}
         disabled={!online}

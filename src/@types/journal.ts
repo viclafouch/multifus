@@ -28,7 +28,9 @@ export type ShortcutOutcome =
     }
   | { readonly outcome: 'focused'; readonly nickname: string }
   | { readonly outcome: 'foregroundUnknown'; readonly detail: string }
+  | { readonly outcome: 'alreadyThere'; readonly nickname: string }
   | { readonly outcome: 'noGender' }
+  | { readonly outcome: 'noMain' }
   | { readonly outcome: 'nobodyInCycle' }
   | { readonly outcome: 'notInRoster'; readonly nickname: string }
   | { readonly outcome: 'noWindow'; readonly nickname: string }
@@ -67,6 +69,7 @@ export type RosterChange =
       readonly nickname: string
       readonly relayed: boolean
     }
+  | { readonly kind: 'main'; readonly nickname: string; readonly main: boolean }
   | { readonly kind: 'removed'; readonly nickname: string }
   | { readonly kind: 'reordered'; readonly order: readonly string[] }
   | { readonly kind: 'excluded'; readonly nickname: string }

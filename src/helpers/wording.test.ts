@@ -16,6 +16,7 @@ import {
   characterSubLine,
   classDialogNote,
   genderGroupHint,
+  mainShortcutHint,
   missingGenderLine,
   pairingProblemLine,
   shortcutStatusLine,
@@ -129,6 +130,7 @@ const ONLINE_CHARACTER = {
   nickname: 'Alpha',
   gender: 'male',
   class: null,
+  main: false,
   excluded: false,
   online: true,
   relayed: false
@@ -405,6 +407,32 @@ describe('genderGroupHint', () => {
     })
 
     expect(hint).toBe(strings.characters.emptyGroupLabel.female)
+  })
+})
+
+describe('mainShortcutHint', () => {
+  it('prévient qu’aucune étoile n’est posée', () => {
+    const hint = mainShortcutHint([ONLINE_CHARACTER])
+
+    expect(hint).toBe(strings.shortcuts.mainHint.noStar)
+  })
+
+  it('prévient aussi quand le roster est vide', () => {
+    expect(mainShortcutHint([])).toBe(strings.shortcuts.mainHint.noStar)
+  })
+
+  it('prévient que celui qui porte l’étoile est déconnecté', () => {
+    const character = { ...ONLINE_CHARACTER, main: true, online: false }
+
+    const hint = mainShortcutHint([character])
+
+    expect(hint).toBe(strings.shortcuts.mainHint.offline('Alpha'))
+  })
+
+  it('ne dit rien quand l’étoile est sur un connecté, même exclu', () => {
+    const character = { ...ONLINE_CHARACTER, main: true, excluded: true }
+
+    expect(mainShortcutHint([character])).toBeNull()
   })
 })
 

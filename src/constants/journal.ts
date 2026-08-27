@@ -127,6 +127,8 @@ export const SHORTCUT_TONES = {
   notInRoster: 'neutral',
   nobodyInCycle: 'neutral',
   noGender: 'neutral',
+  noMain: 'neutral',
+  alreadyThere: 'neutral',
   noWindow: 'neutral',
   focusFailed: 'warning',
   foregroundUnknown: 'warning'

@@ -263,12 +263,14 @@ mod tests {
                     .with_class(Class::Iop),
                 Character::new("Bravo")
                     .with_gender(Gender::Female)
-                    .not_relayed(),
+                    .not_relayed()
+                    .main(),
                 Character::new("Charlie"),
             ]),
             shortcuts: Shortcuts {
                 next: Shortcut::new("Alt+Right"),
                 previous: Shortcut::new("Alt+Left"),
+                main: Shortcut::new("Alt+Home"),
                 toggle_excluded: None,
                 swap: Shortcut::new("Alt+Space"),
                 walk: Shortcut::new("Alt+KeyD"),

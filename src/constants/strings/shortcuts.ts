@@ -10,6 +10,10 @@ const ACTION_LABELS = {
     label: 'Fenêtre précédente',
     description: 'Passe à la fenêtre Dofus Retro précédente.'
   },
+  main: {
+    label: 'Personnage principal',
+    description: 'Vous ramène direct sur celui qui porte l’étoile.'
+  },
   toggleExcluded: {
     label: 'Exclure',
     description:
@@ -49,6 +53,18 @@ const REJECTION_LINES = {
   pasteCombination:
     'C’est le raccourci pour coller sur votre ordinateur. Prenez-en un autre.'
 } as const satisfies Record<CaptureRejection, string>
+
+type MainHintStrings = {
+  readonly noStar: string
+  readonly offline: (nickname: string) => string
+}
+
+const MAIN_HINT_STRINGS = {
+  noStar: 'Aucune étoile posée pour l’instant.',
+  offline: (nickname: string) => {
+    return `${nickname} est déconnecté : rien ne se passera.`
+  }
+} as const satisfies MainHintStrings
 
 const QUICK_REPLIES_STRINGS = {
   title: 'Réponses rapides',
@@ -91,6 +107,7 @@ export const SHORTCUTS_STRINGS = {
     status: STATUS_LINES,
     rejected: REJECTION_LINES,
     actions: ACTION_LABELS,
+    mainHint: MAIN_HINT_STRINGS,
     quickReplies: QUICK_REPLIES_STRINGS
   }
 } as const

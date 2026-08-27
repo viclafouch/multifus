@@ -25,6 +25,7 @@ import {
   setClass,
   setGender,
   setGenderExcluded,
+  setMain,
   toggleExcluded
 } from '@/lib/multifus'
 
@@ -44,6 +45,9 @@ export const CharactersScreen = ({
   const actions = {
     handleToggleExcluded: (nickname: string) => {
       run(toggleExcluded(nickname))
+    },
+    handleSetMain: (nickname: string, main: boolean) => {
+      run(setMain(nickname, main))
     },
     handleSetGender: (nickname: string, gender: Gender | null) => {
       run(setGender(nickname, gender))

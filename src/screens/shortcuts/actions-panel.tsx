@@ -24,6 +24,7 @@ export type ActionsPanelActions = Readonly<{
 type ActionsPanelProps = Readonly<{
   shortcuts: readonly ShortcutBinding[]
   quickReplies: readonly QuickReply[]
+  mainHint: string | null
   editing: Binding | null
   undoFor: (shortcut: ShortcutBinding) => ShortcutUndo | null
   actions: ActionsPanelActions
@@ -32,6 +33,7 @@ type ActionsPanelProps = Readonly<{
 export const ActionsPanel = ({
   shortcuts,
   quickReplies,
+  mainHint,
   editing,
   undoFor,
   actions
@@ -48,11 +50,16 @@ export const ActionsPanel = ({
         {shortcuts.map((shortcut) => {
           const { label, description } = words.actions[shortcut.action]
 
+          const rowDescription =
+            shortcut.action === 'main' && mainHint !== null
+              ? `${description} ${mainHint}`
+              : description
+
           return (
             <FieldRow
               key={shortcut.action}
               label={label}
-              description={description}
+              description={rowDescription}
             >
               <ShortcutField
                 accelerator={shortcut.accelerator}

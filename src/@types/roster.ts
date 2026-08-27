@@ -23,6 +23,7 @@ export type Character = {
   readonly nickname: string
   readonly gender: Gender | null
   readonly class: Class | null
+  readonly main: boolean
   readonly excluded: boolean
   readonly online: boolean
   readonly relayed: boolean

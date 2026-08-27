@@ -68,6 +68,8 @@ pub struct Character {
     pub gender: Option<Gender>,
     #[serde(default)]
     pub class: Option<Class>,
+    #[serde(default)]
+    pub main: bool,
     #[serde(default = "relayed_by_default")]
     pub relayed: bool,
     #[serde(skip)]
@@ -83,6 +85,7 @@ impl Character {
             nickname: nickname.into(),
             gender: None,
             class: None,
+            main: false,
             relayed: true,
             excluded: false,
             online: true,
@@ -114,6 +117,12 @@ impl Character {
     }
 
     #[must_use]
+    pub fn main(mut self) -> Self {
+        self.main = true;
+        self
+    }
+
+    #[must_use]
     pub fn offline(mut self) -> Self {
         self.online = false;
         self
@@ -140,6 +149,11 @@ impl Character {
     #[must_use]
     pub fn is_excluded(&self) -> bool {
         self.excluded
+    }
+
+    #[must_use]
+    pub fn is_main(&self) -> bool {
+        self.main
     }
 
     #[must_use]
@@ -234,6 +248,44 @@ mod tests {
 
         assert!(excluded.is_relayed_online());
         assert!(!excluded.is_in_cycle());
+    }
+
+    #[test]
+    fn nobody_wears_the_star_until_somebody_is_given_it() {
+        assert!(!Character::new("Alpha").is_main());
+        assert!(Character::new("Alpha").main().is_main());
+    }
+
+    #[test]
+    fn a_character_written_before_the_star_existed_does_not_wear_it() {
+        let stored = r#"{"nickname":"Alpha","gender":"male","class":"iop","relayed":true}"#;
+
+        let character = serde_json::from_str::<Character>(stored)
+            .expect("a character from an earlier version still loads");
+
+        assert!(!character.is_main());
+    }
+
+    #[test]
+    fn the_star_travels_to_the_file_and_comes_back() {
+        let character = Character::new("Alpha").main();
+
+        let json = serde_json::to_string(&character).expect("a character serialises");
+
+        assert!(json.contains(r#""main":true"#), "{json}");
+        assert!(serde_json::from_str::<Character>(&json)
+            .expect("a character reads back")
+            .is_main());
+    }
+
+    #[test]
+    fn the_star_says_nothing_about_the_cycle_or_the_relay() {
+        let excluded = Character::new("Alpha").main().excluded();
+
+        assert!(excluded.is_main());
+        assert!(!excluded.is_in_cycle());
+        assert!(excluded.is_relayed_online());
+        assert!(Character::new("Alpha").main().offline().is_main());
     }
 
     #[test]

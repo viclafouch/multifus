@@ -72,6 +72,13 @@ pub fn toggle_excluded(app: AppHandle, nickname: String) -> Snapshot {
 }
 
 #[tauri::command]
+pub fn set_main(app: AppHandle, nickname: String, main: bool) -> Snapshot {
+    lock(&app).set_main(&nickname, main);
+
+    runtime::emit_snapshot(&app)
+}
+
+#[tauri::command]
 pub fn set_gender_excluded(app: AppHandle, gender: Gender, excluded: bool) -> Snapshot {
     lock(&app).set_gender_excluded(gender, excluded);
 

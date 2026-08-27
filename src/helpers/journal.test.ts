@@ -224,6 +224,22 @@ const ROSTER_CASES = {
       },
       line: 'Alpha n’est plus relayé.'
     }
+  ],
+  main: [
+    {
+      event: {
+        kind: 'roster',
+        change: { kind: 'main', nickname: NICKNAME, main: true }
+      },
+      line: 'Alpha devient votre personnage principal.'
+    },
+    {
+      event: {
+        kind: 'roster',
+        change: { kind: 'main', nickname: NICKNAME, main: false }
+      },
+      line: 'Alpha n’est plus votre personnage principal.'
+    }
   ]
 } as const satisfies Record<RosterChange['kind'], readonly Case<'roster'>[]>
 
@@ -430,6 +446,26 @@ const SHORTCUT_CASES = {
       line: 'Inverser hommes et femmes : aucun personnage connecté n’a de sexe assigné.'
     }
   ],
+  noMain: [
+    {
+      event: {
+        kind: 'shortcut',
+        action: 'main',
+        outcome: { outcome: 'noMain' }
+      },
+      line: 'Personnage principal : aucune étoile posée.'
+    }
+  ],
+  alreadyThere: [
+    {
+      event: {
+        kind: 'shortcut',
+        action: 'main',
+        outcome: { outcome: 'alreadyThere', nickname: NICKNAME }
+      },
+      line: 'Personnage principal : vous êtes déjà sur Alpha.'
+    }
+  ],
   noWindow: [
     {
       event: {
@@ -438,6 +474,14 @@ const SHORTCUT_CASES = {
         outcome: { outcome: 'noWindow', nickname: NICKNAME }
       },
       line: 'Fenêtre suivante : la fenêtre de Alpha a disparu.'
+    },
+    {
+      event: {
+        kind: 'shortcut',
+        action: 'main',
+        outcome: { outcome: 'noWindow', nickname: NICKNAME }
+      },
+      line: 'Personnage principal : la fenêtre de Alpha a disparu.'
     }
   ],
   focusFailed: [

@@ -225,6 +225,11 @@ const rosterLine = (change: RosterChange) => {
         ? 'Ordre du défilement modifié, roster vide.'
         : `Ordre du défilement : ${change.order.join(', ')}.`
     }
+    case 'main': {
+      return change.main
+        ? `${change.nickname} devient votre personnage principal.`
+        : `${change.nickname} n’est plus votre personnage principal.`
+    }
     case 'removed': {
       return `${change.nickname} retiré du roster.`
     }
@@ -409,6 +414,12 @@ const shortcutLine = ({ action, outcome }: ShortcutLineParams) => {
     }
     case 'nobodyInCycle': {
       return `${label} : personne dans le défilement.`
+    }
+    case 'noMain': {
+      return `${label} : aucune étoile posée.`
+    }
+    case 'alreadyThere': {
+      return `${label} : vous êtes déjà sur ${outcome.nickname}.`
     }
     case 'walk': {
       return outcome.enabled ? `${label} : allumé.` : `${label} : éteint.`

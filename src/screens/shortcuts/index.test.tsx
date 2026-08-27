@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, within } from '@testing-library/react'
+import type { Character } from '@/@types/roster'
 import type {
   QuickReply,
   ShortcutAction,
@@ -7,6 +8,7 @@ import type {
   ShortcutStatus
 } from '@/@types/shortcuts'
 import { strings } from '@/constants/strings'
+import { characterOf } from '@/test-doubles'
 
 const bridge = {
   setShortcut: vi.fn(),
@@ -26,6 +28,7 @@ const { ShortcutsScreen } = await import('@/screens/shortcuts')
 const ALL_ACTIONS = [
   'next',
   'previous',
+  'main',
   'toggleExcluded',
   'swap',
   'walk'
@@ -67,13 +70,19 @@ const quickReply = (
 type ShowParams = {
   readonly shortcuts?: readonly ShortcutBinding[]
   readonly quickReplies?: readonly QuickReply[]
+  readonly characters?: readonly Character[]
 }
 
-const show = ({ shortcuts = [], quickReplies = [] }: ShowParams = {}) => {
+const show = ({
+  shortcuts = [],
+  quickReplies = [],
+  characters = []
+}: ShowParams = {}) => {
   const { rerender } = render(
     <ShortcutsScreen
       shortcuts={shortcuts}
       quickReplies={quickReplies}
+      characters={characters}
       run={() => {}}
     />
   )
@@ -83,6 +92,7 @@ const show = ({ shortcuts = [], quickReplies = [] }: ShowParams = {}) => {
       <ShortcutsScreen
         shortcuts={next.shortcuts ?? shortcuts}
         quickReplies={next.quickReplies ?? quickReplies}
+        characters={next.characters ?? characters}
         run={() => {}}
       />
     )
@@ -119,13 +129,15 @@ const capsOf = (field: HTMLElement) => {
   })
 }
 
-describe('l’écran des raccourcis, les cinq actions', () => {
+describe('l’écran des raccourcis, les six actions', () => {
   const all = ALL_ACTIONS.map((action) => {
     return shortcut(action)
   })
 
+  const starred = [characterOf({ nickname: 'Alpha', main: true })]
+
   it('porte une ligne par action, avec ce qu’elle fait', () => {
-    show({ shortcuts: all })
+    show({ shortcuts: all, characters: starred })
 
     for (const action of ALL_ACTIONS) {
       const { label, description } = strings.shortcuts.actions[action]
@@ -191,6 +203,55 @@ describe('l’écran des raccourcis, les cinq actions', () => {
 
     expect(capsOf(fieldOf('next'))).toStrictEqual(['Ctrl', '→'])
     expect(capsOf(fieldOf('previous'))).toStrictEqual(['Ctrl', '←'])
+  })
+})
+
+describe('l’écran des raccourcis, ce que le personnage principal fera', () => {
+  const mainShortcut = [shortcut('main', { accelerator: 'Control+Shift+Home' })]
+  const words = strings.shortcuts
+
+  it('prévient qu’aucune étoile n’est posée', () => {
+    show({
+      shortcuts: mainShortcut,
+      characters: [characterOf({ nickname: 'Alpha' })]
+    })
+
+    expect(
+      screen.getByText(
+        `${words.actions.main.description} ${words.mainHint.noStar}`
+      )
+    ).not.toBeNull()
+  })
+
+  it('prévient que celui qui la porte est déconnecté', () => {
+    show({
+      shortcuts: mainShortcut,
+      characters: [
+        characterOf({ nickname: 'Bravo', main: true, online: false })
+      ]
+    })
+
+    expect(
+      screen.getByText(
+        `${words.actions.main.description} ${words.mainHint.offline('Bravo')}`
+      )
+    ).not.toBeNull()
+  })
+
+  it('ne prévient de rien quand l’étoile est sur un connecté', () => {
+    show({
+      shortcuts: mainShortcut,
+      characters: [characterOf({ nickname: 'Bravo', main: true })]
+    })
+
+    expect(screen.getByText(words.actions.main.description)).not.toBeNull()
+  })
+
+  it('garde la combinaison posée même quand la frappe ne fera rien', () => {
+    show({ shortcuts: mainShortcut, characters: [] })
+
+    expect(capsOf(fieldOf('main'))).toStrictEqual(['Ctrl', 'Maj', 'Origine'])
+    expect(screen.queryByRole('alert')).toBeNull()
   })
 })
 

@@ -13,6 +13,7 @@ const BLANK_CHARACTER: Character = {
   nickname: 'Alpha',
   gender: 'male',
   class: 'iop',
+  main: false,
   excluded: false,
   online: true,
   relayed: true
