@@ -1760,7 +1760,7 @@ mod tests {
     }
 
     #[test]
-    fn the_main_shortcut_brings_the_starred_character_in_front() {
+    fn the_main_shortcut_brings_the_main_character_in_front() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
         state.apply_windows(&[window(1, "Alpha"), window(2, "Bravo")]);
@@ -1801,7 +1801,7 @@ mod tests {
     }
 
     #[test]
-    fn the_main_shortcut_says_when_no_star_is_posed() {
+    fn the_main_shortcut_says_when_no_main_is_chosen() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
         state.apply_windows(&[window(1, "Alpha")]);
@@ -1828,7 +1828,7 @@ mod tests {
     }
 
     #[test]
-    fn the_main_shortcut_says_when_the_star_is_on_somebody_disconnected() {
+    fn the_main_shortcut_says_when_the_main_is_disconnected() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
         state.apply_windows(&[window(1, "Alpha"), window(2, "Bravo")]);
@@ -1872,7 +1872,7 @@ mod tests {
     }
 
     #[test]
-    fn a_star_that_moves_nobody_writes_nothing() {
+    fn a_main_that_moves_nobody_writes_nothing() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
         state.apply_windows(&[window(1, "Alpha"), window(2, "Bravo")]);
@@ -1882,7 +1882,7 @@ mod tests {
         state.set_main("Bravo", false);
         state.set_main("Alpha", true);
 
-        let stars = journalled(&state)
+        let changes = journalled(&state)
             .into_iter()
             .filter(|event| {
                 matches!(
@@ -1894,7 +1894,7 @@ mod tests {
             })
             .count();
 
-        assert_eq!(stars, 1, "only the gesture that moved the star is written");
+        assert_eq!(changes, 1, "only the gesture that moved the main is written");
     }
 
     #[test]

@@ -7,13 +7,13 @@ import {
 } from '@/components/ui/tooltip'
 import { strings } from '@/constants/strings'
 
-type MainStarProps = Readonly<{
+type MainToggleProps = Readonly<{
   nickname: string
   isMain: boolean
   onToggle: () => void
 }>
 
-export const MainStar = ({ nickname, isMain, onToggle }: MainStarProps) => {
+export const MainToggle = ({ nickname, isMain, onToggle }: MainToggleProps) => {
   const words = strings.characters
 
   return (
@@ -27,7 +27,7 @@ export const MainStar = ({ nickname, isMain, onToggle }: MainStarProps) => {
       >
         <Star
           strokeWidth={1.75}
-          className="size-3.5 text-muted-foreground/30 transition-colors duration-200 group-hover:text-muted-foreground/70 group-hover/button:text-muted-foreground/70 group-aria-pressed/button:star-lit group-aria-pressed/button:fill-current group-aria-pressed/button:text-primary"
+          className="size-3.5 text-muted-foreground/30 transition-colors duration-200 group-hover:text-muted-foreground/70 group-hover/button:text-muted-foreground/70 group-aria-pressed/button:main-lit group-aria-pressed/button:fill-current group-aria-pressed/button:text-primary"
         />
       </TooltipTrigger>
       <TooltipContent>

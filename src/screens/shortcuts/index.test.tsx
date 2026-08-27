@@ -1,6 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, within } from '@testing-library/react'
-import type { Character } from '@/@types/roster'
 import type {
   QuickReply,
   ShortcutAction,
@@ -8,7 +7,6 @@ import type {
   ShortcutStatus
 } from '@/@types/shortcuts'
 import { strings } from '@/constants/strings'
-import { characterOf } from '@/test-doubles'
 
 const bridge = {
   setShortcut: vi.fn(),
@@ -70,19 +68,13 @@ const quickReply = (
 type ShowParams = {
   readonly shortcuts?: readonly ShortcutBinding[]
   readonly quickReplies?: readonly QuickReply[]
-  readonly characters?: readonly Character[]
 }
 
-const show = ({
-  shortcuts = [],
-  quickReplies = [],
-  characters = []
-}: ShowParams = {}) => {
+const show = ({ shortcuts = [], quickReplies = [] }: ShowParams = {}) => {
   const { rerender } = render(
     <ShortcutsScreen
       shortcuts={shortcuts}
       quickReplies={quickReplies}
-      characters={characters}
       run={() => {}}
     />
   )
@@ -92,7 +84,6 @@ const show = ({
       <ShortcutsScreen
         shortcuts={next.shortcuts ?? shortcuts}
         quickReplies={next.quickReplies ?? quickReplies}
-        characters={next.characters ?? characters}
         run={() => {}}
       />
     )
@@ -134,10 +125,8 @@ describe('l’écran des raccourcis, les six actions', () => {
     return shortcut(action)
   })
 
-  const starred = [characterOf({ nickname: 'Alpha', main: true })]
-
   it('porte une ligne par action, avec ce qu’elle fait', () => {
-    show({ shortcuts: all, characters: starred })
+    show({ shortcuts: all })
 
     for (const action of ALL_ACTIONS) {
       const { label, description } = strings.shortcuts.actions[action]
@@ -206,52 +195,15 @@ describe('l’écran des raccourcis, les six actions', () => {
   })
 })
 
-describe('l’écran des raccourcis, ce que le personnage principal fera', () => {
-  const mainShortcut = [
-    shortcut('main', { accelerator: 'Control+Shift+Space' })
-  ]
-  const words = strings.shortcuts
-
-  it('prévient qu’aucune étoile n’est posée', () => {
+describe('l’écran des raccourcis, le personnage principal', () => {
+  it('dit ce que la frappe fera, sans nommer personne', () => {
     show({
-      shortcuts: mainShortcut,
-      characters: [characterOf({ nickname: 'Alpha' })]
+      shortcuts: [shortcut('main', { accelerator: 'Control+Shift+Space' })]
     })
 
     expect(
-      screen.getByText(
-        `${words.actions.main.description} ${words.mainHint.noStar}`
-      )
+      screen.getByText(strings.shortcuts.actions.main.description)
     ).not.toBeNull()
-  })
-
-  it('prévient que celui qui la porte est déconnecté', () => {
-    show({
-      shortcuts: mainShortcut,
-      characters: [
-        characterOf({ nickname: 'Bravo', main: true, online: false })
-      ]
-    })
-
-    expect(
-      screen.getByText(
-        `${words.actions.main.description} ${words.mainHint.offline('Bravo')}`
-      )
-    ).not.toBeNull()
-  })
-
-  it('ne prévient de rien quand l’étoile est sur un connecté', () => {
-    show({
-      shortcuts: mainShortcut,
-      characters: [characterOf({ nickname: 'Bravo', main: true })]
-    })
-
-    expect(screen.getByText(words.actions.main.description)).not.toBeNull()
-  })
-
-  it('garde la combinaison posée même quand la frappe ne fera rien', () => {
-    show({ shortcuts: mainShortcut, characters: [] })
-
     expect(capsOf(fieldOf('main'))).toStrictEqual(['Ctrl', 'Maj', 'Espace'])
     expect(screen.queryByRole('alert')).toBeNull()
   })

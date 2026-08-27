@@ -33,7 +33,7 @@ const rows = () => {
   return screen.getAllByRole('listitem')
 }
 
-const starOf = (nickname: string) => {
+const mainToggleOf = (nickname: string) => {
   return screen.getByRole('button', {
     name: strings.characters.mainToggle(nickname)
   })
@@ -240,45 +240,45 @@ describe('l’écran des personnages', () => {
     ).not.toBeNull()
   })
 
-  it('pose l’étoile sur le personnage qui ne l’a pas', () => {
+  it('fait de ce personnage le principal', () => {
     show([characterOf({ nickname: 'Alpha' })])
 
-    fireEvent.click(starOf('Alpha'))
+    fireEvent.click(mainToggleOf('Alpha'))
 
     expect(bridge.setMain).toHaveBeenCalledWith('Alpha', true)
   })
 
-  it('reprend l’étoile au personnage qui la porte', () => {
+  it('reprend le principal à celui qui l’est', () => {
     show([characterOf({ nickname: 'Alpha', main: true })])
 
-    fireEvent.click(starOf('Alpha'))
+    fireEvent.click(mainToggleOf('Alpha'))
 
     expect(bridge.setMain).toHaveBeenCalledWith('Alpha', false)
   })
 
-  it('n’allume l’étoile que sur le personnage principal', () => {
+  it('n’allume le bouton que sur le personnage principal', () => {
     show([
       characterOf({ nickname: 'Alpha' }),
       characterOf({ nickname: 'Bravo', main: true })
     ])
 
     const lit = ['Alpha', 'Bravo'].map((nickname) => {
-      return starOf(nickname).getAttribute('aria-pressed')
+      return mainToggleOf(nickname).getAttribute('aria-pressed')
     })
 
     expect(lit).toStrictEqual(['false', 'true'])
   })
 
-  it('offre l’étoile à un déconnecté et à un exclu comme aux autres', () => {
+  it('offre le principal à un déconnecté et à un exclu comme aux autres', () => {
     show([
       characterOf({ nickname: 'Alpha', online: false }),
       characterOf({ nickname: 'Bravo', excluded: true, main: true })
     ])
 
-    fireEvent.click(starOf('Alpha'))
+    fireEvent.click(mainToggleOf('Alpha'))
 
     expect(bridge.setMain).toHaveBeenCalledWith('Alpha', true)
-    expect(starOf('Bravo').getAttribute('aria-pressed')).toBe('true')
+    expect(mainToggleOf('Bravo').getAttribute('aria-pressed')).toBe('true')
   })
 
   it('dit d’un personnage exclu qu’il est exclu', () => {

@@ -4,7 +4,7 @@ import { useSortable } from '@dnd-kit/react/sortable'
 import type { Character, Class, Gender, Portrait } from '@/@types/roster'
 import { CharacterMedallion } from '@/components/character-medallion'
 import { ClassDialog } from '@/components/class-dialog'
-import { MainStar } from '@/components/main-star'
+import { MainToggle } from '@/components/main-toggle'
 import { RemoveButton } from '@/components/remove-button'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
@@ -112,7 +112,7 @@ export const CharacterRow = ({
           {characterSubLine(character)}
         </p>
       </div>
-      <MainStar
+      <MainToggle
         nickname={nickname}
         isMain={main}
         onToggle={() => {

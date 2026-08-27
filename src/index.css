@@ -94,7 +94,7 @@
     0 0 12px -2px color-mix(in oklch, var(--sign), transparent 42%);
 }
 
-@utility star-lit {
+@utility main-lit {
   filter: drop-shadow(
     0 0 5px color-mix(in oklch, var(--primary), transparent 55%)
   );

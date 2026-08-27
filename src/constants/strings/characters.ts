@@ -44,7 +44,7 @@ export const CHARACTERS_STRINGS = {
   characters: {
     title: 'Personnages',
     subtitle:
-      'Tirez une ligne par sa poignée pour changer l’ordre du défilement. L’étoile marque le personnage qu’un raccourci ramène devant.',
+      'Tirez une ligne par sa poignée pour changer l’ordre du défilement. Un raccourci vous ramène direct sur votre personnage principal.',
     online: 'Connecté',
     excluded: 'Exclu',
     offline: 'Déconnecté',
@@ -73,8 +73,8 @@ export const CHARACTERS_STRINGS = {
     mainToggle: (nickname: string) => {
       return `${nickname} comme personnage principal`
     },
-    mainSet: 'En faire votre principal',
-    mainUnset: 'Retirer l’étoile',
+    mainSet: 'En faire votre personnage principal',
+    mainUnset: 'Ne plus en faire votre personnage principal',
     remove: (nickname: string) => {
       return `Retirer ${nickname} du roster`
     },

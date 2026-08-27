@@ -453,7 +453,7 @@ const SHORTCUT_CASES = {
         action: 'main',
         outcome: { outcome: 'noMain' }
       },
-      line: 'Personnage principal : aucune étoile posée.'
+      line: 'Personnage principal : vous n’en avez pas encore choisi un.'
     }
   ],
   alreadyThere: [

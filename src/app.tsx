@@ -75,7 +75,6 @@ const CurrentScreen = ({ screen, snapshot, run }: CurrentScreenProps) => {
       <ShortcutsScreen
         shortcuts={snapshot.shortcuts}
         quickReplies={snapshot.quickReplies}
-        characters={snapshot.characters}
         run={run}
       />
     )

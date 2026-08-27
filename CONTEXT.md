@@ -26,7 +26,7 @@ Les mots de Multifus, et rien d'autre. On en parle en français, on les écrit e
 
 **Défilement** (`cycle`) : le parcours des fenêtres au raccourci, dans un ordre choisi par l'utilisateur.
 
-**Déplacement rapide** (`Walk`) : le mécanisme qui passe au personnage suivant du défilement à chaque clic gauche dans une fenêtre de jeu. Un joueur emmène ainsi toute sa team d'une map à l'autre sans lâcher la souris. Il ne s'allume que d'un geste, jamais tout seul, et Multifus démarre toujours avec lui éteint. Son nom porte ses deux mots partout, jamais « déplacement » seul, qui se lirait comme le tirage d'une ligne du roster.
+**Déplacement rapide** (`Walk`) : le mécanisme qui passe au personnage suivant du défilement à chaque clic gauche dans une fenêtre de jeu. Un joueur emmène ainsi toute sa team d'une map à l'autre sans lâcher la souris. Il ne s'allume que d'un geste, jamais tout seul, et Multifus démarre toujours avec lui éteint. Il s'éteint seul dès que Multifus n'a plus une fenêtre à parcourir, les clients fermés comme revenus à l'écran de connexion : plus une fenêtre où aller, plus un clic à prendre. Son nom porte ses deux mots partout, jamais « déplacement » seul, qui se lirait comme le tirage d'une ligne du roster.
 
 **Bascule** (`switch`) : le passage du premier plan d'une fenêtre à la suivante. Elle est finie quand le système la donne pour finie, pas quand on l'a demandée.
 
@@ -48,7 +48,7 @@ Les mots de Multifus, et rien d'autre. On en parle en français, on les écrit e
 
 **Inversion** (`swap`) : l'action d'exclure tous les personnages d'un sexe et de réintégrer ceux de l'autre. Le sexe réintégré est celui qu'on garde (`kept`).
 
-**Principal** (`main`) : le personnage qu'un raccourci ramène devant, où que l'on soit dans le jeu. Un seul à la fois, ou aucun. Il garde son étoile déconnecté, exclu, et d'un lancement à l'autre. L'étoile ne dit que cela : le principal défile, s'exclut et s'inverse comme les autres.
+**Principal** (`main`) : le personnage qu'un raccourci ramène devant, où que l'on soit dans le jeu. Un seul à la fois, ou aucun. Il le reste déconnecté, exclu, et d'un lancement à l'autre. Être principal ne dit que cela : il défile, s'exclut et s'inverse comme les autres.
 
 **Notification de jeu** (`GameNotification`) : une notification système émise par un client Dofus. Son titre porte le pseudo du destinataire, son corps décrit l'événement.
 

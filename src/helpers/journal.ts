@@ -416,7 +416,7 @@ const shortcutLine = ({ action, outcome }: ShortcutLineParams) => {
       return `${label} : personne dans le défilement.`
     }
     case 'noMain': {
-      return `${label} : aucune étoile posée.`
+      return `${label} : vous n’en avez pas encore choisi un.`
     }
     case 'alreadyThere': {
       return `${label} : vous êtes déjà sur ${outcome.nickname}.`

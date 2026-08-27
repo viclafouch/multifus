@@ -127,20 +127,6 @@ export const shortcutUndoLabel = (action: ShortcutAction) => {
   return strings.shortcuts.undoLabel(strings.shortcuts.actions[action].label)
 }
 
-export const mainShortcutHint = (characters: readonly Character[]) => {
-  const hints = strings.shortcuts.mainHint
-
-  const main = characters.find((character) => {
-    return character.main
-  })
-
-  if (main === undefined) {
-    return hints.noStar
-  }
-
-  return main.online ? null : hints.offline(main.nickname)
-}
-
 export const shortcutStatusLine = (
   status: ShortcutStatus,
   quickReplies: readonly QuickReply[]

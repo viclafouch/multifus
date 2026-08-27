@@ -4,20 +4,19 @@ import type { CaptureRejection } from '@/constants/keyboard'
 const ACTION_LABELS = {
   next: {
     label: 'Fenêtre suivante',
-    description: 'Passe à la fenêtre Dofus Retro suivante.'
+    description: 'Le personnage d’après, dans l’ordre de l’écran Personnages.'
   },
   previous: {
     label: 'Fenêtre précédente',
-    description: 'Passe à la fenêtre Dofus Retro précédente.'
+    description: 'Le personnage d’avant, dans le même ordre.'
   },
   main: {
     label: 'Personnage principal',
-    description: 'Vous ramène direct sur celui qui porte l’étoile.'
+    description: 'Vous ramène direct sur votre personnage principal.'
   },
   toggleExcluded: {
     label: 'Exclure',
-    description:
-      'Exclut le personnage que vous avez devant vous, ou le réintègre.'
+    description: 'Exclut le personnage devant vous, ou le réintègre.'
   },
   swap: {
     label: 'Inverser hommes et femmes',
@@ -25,8 +24,7 @@ const ACTION_LABELS = {
   },
   walk: {
     label: 'Déplacement rapide',
-    description:
-      'Allume et éteint le Déplacement rapide, dans le jeu comme ailleurs.'
+    description: 'Allume et éteint le Déplacement rapide, même hors du jeu.'
   }
 } as const satisfies Record<
   ShortcutAction,
@@ -54,18 +52,6 @@ const REJECTION_LINES = {
     'C’est le raccourci pour coller sur votre ordinateur. Prenez-en un autre.'
 } as const satisfies Record<CaptureRejection, string>
 
-type MainHintStrings = {
-  readonly noStar: string
-  readonly offline: (nickname: string) => string
-}
-
-const MAIN_HINT_STRINGS = {
-  noStar: 'Aucune étoile posée pour l’instant.',
-  offline: (nickname: string) => {
-    return `${nickname} est déconnecté : rien ne se passera.`
-  }
-} as const satisfies MainHintStrings
-
 const QUICK_REPLIES_STRINGS = {
   title: 'Réponses rapides',
   description:
@@ -89,7 +75,7 @@ export const SHORTCUTS_STRINGS = {
   shortcuts: {
     title: 'Raccourcis',
     subtitle:
-      'Changez de personnage sans lâcher la souris. Ces touches ne répondent que quand Dofus Retro est devant vous.',
+      'Changez de personnage sans lâcher la souris. Ces touches ne marchent que dans Dofus Retro.',
     silent:
       'Un autre logiciel peut déjà utiliser les mêmes touches. Multifus les accepte, mais rien ne se passera dans le jeu. En cas de doute, essayez le raccourci depuis Dofus Retro et regardez le journal, en bas.',
     defaults: 'Remettre les touches d’origine',
@@ -107,7 +93,6 @@ export const SHORTCUTS_STRINGS = {
     status: STATUS_LINES,
     rejected: REJECTION_LINES,
     actions: ACTION_LABELS,
-    mainHint: MAIN_HINT_STRINGS,
     quickReplies: QUICK_REPLIES_STRINGS
   }
 } as const
