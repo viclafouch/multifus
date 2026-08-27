@@ -79,14 +79,8 @@ une bascule lente, celle que le point 2 décrit, se serait comptée comme un co�
 de lecture et aurait endormi l'écoute dix fois plus longtemps. Le garde-fou
 punissait le succès.
 
-## À vérifier sur la vraie machine
-
-- [ ] Un combat sur un personnage exclu : sa notification disparaît du centre de
-      notifications, et aucune fenêtre ne bouge
-- [ ] Un type décoché dans l'AutoFocus : même chose
-- [ ] Trente notifications d'une autre application en attente : Multifus ne
-      chauffe pas, et l'AutoFocus répond encore
-- [ ] Une soirée entière : le centre de notifications ne garde rien de Dofus
+Ce qui reste à voir sur la vraie machine est passé dans
+[plan.md](./plan.md).
 
 ## 2. Chaque bascule paie AttachThreadInput
 
@@ -155,11 +149,32 @@ Concentration (`autofocus.py:219`).
 `reorder_with_ungroup_regroup` enchaîne des attentes en dur de 0,3 s, 0,05 s et
 0,2 s.
 
+## Le Mac n'a pas de banc
+
+Tout ce qui précède est du Windows, Dracoon n'existant que là. Le Mac n'a été
+mesuré nulle part, et deux chemins chauds y restent inconnus.
+
+La bascule passe par l'Accessibilité : `live_application`, puis un parcours des
+fenêtres de l'application pour retrouver celle du jeu, puis `activate`. Chaque
+appel est un aller-retour synchrone vers le client visé, et un client qui rend
+un combat répond quand il veut. C'est la même famille de risque
+qu'`AttachThreadInput`, sans le chiffre qui le dirait.
+
+L'écoute des notifications, elle, ne scrute pas : un `AXObserver` sur le Centre
+de notifications réveille Multifus quand une bannière se pose. Le problème du
+point 1 ne s'y pose pas, et `MINIMUM_REST` n'y a pas d'équivalent à régler.
+
+En revanche `dismiss` ne fait rien sur le Mac : on lit la bannière, on ne la
+retire pas. Le joueur retrouve donc toutes ses notifications de Dofus dans son
+centre, là où Windows les lui enlève. Rien ne coûte de ce côté, mais les deux
+systèmes ne racontent pas la même soirée.
+
 ## Ordre
 
 1. La scrutation des notifications, faite
 2. Le déverrouillage du premier plan, le plus large
 3. Le cache de process, le moins visible
+4. Le banc de bascule du Mac, qui dira s'il y a un point 5
 
 ## Le banc
 
