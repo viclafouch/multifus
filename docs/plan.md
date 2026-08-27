@@ -16,8 +16,18 @@ La paire de clés de l'updater existe déjà, dans `~/.tauri/multifus.key` et so
 `tauri.conf.json`. En régénérer une rendrait insignables les mises à jour des
 versions déjà installées.
 
+## Rattraper Dracoon sur la vitesse
+
+Ce qui reste de [plan-performances.md](./plan-performances.md), la scrutation
+des notifications étant faite.
+
+- [ ] Déverrouiller le premier plan une fois au démarrage, `SPI_SETFOREGROUNDLOCKTIMEOUT` à zéro, et le rendre en quittant : chaque bascule cesse de payer `AttachThreadInput`
+- [ ] Mettre en cache le lien entre un identifiant de process et « c'est un client », pour cesser d'ouvrir un process par fenêtre visible à chaque tour
+
 ## Vérifier sur une vraie soirée
 
+- [ ] Un combat sur un personnage exclu : sa notification disparaît du centre de notifications, et aucune fenêtre ne bouge
+- [ ] Trente notifications d'une autre application en attente : Multifus ne chauffe pas, et l'AutoFocus répond encore
 - [ ] Windows, deux clients ouverts : le roster les voit, les quatre raccourcis et l'AutoFocus répondent
 - [ ] Une réponse rapide sans combinaison ne fait rien, et l'écran le dit
 - [ ] Une combinaison déjà prise par le Défilement est refusée par son nom

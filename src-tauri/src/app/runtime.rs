@@ -431,6 +431,7 @@ fn on_notification(app: &AppHandle, notification: GameNotification) {
     };
 
     relay::run::offer(app, &notification, &nickname);
+    dismiss(app, &nickname);
 
     let kind = notification.kind();
     let decision = lock(app).decide(&nickname, kind);
@@ -443,10 +444,6 @@ fn on_notification(app: &AppHandle, notification: GameNotification) {
         Decision::Focus(window) => focus(windows(app), window),
         Decision::FocusUnlessMinimized(window) => focus_unless_minimized(windows(app), window),
     };
-
-    if outcome == Outcome::Focused {
-        dismiss(app, &nickname);
-    }
 
     lock(app).log(JournalEvent::Notification {
         nickname,

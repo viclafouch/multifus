@@ -173,7 +173,9 @@ const PROCESS_PATH_UNITS: usize = 1024;
 
 const CONTINUE_ENUMERATION: BOOL = BOOL(1);
 
-const POLL_INTERVAL: Duration = Duration::from_millis(500);
+const MINIMUM_REST: Duration = Duration::from_millis(100);
+
+const REST_PER_READ: u32 = 10;
 
 const PUMP_INTERVAL: Duration = Duration::from_millis(25);
 
@@ -1314,15 +1316,15 @@ fn watch(
     drop(ready.send(Ok(())));
 
     while running.load(Ordering::Relaxed) {
-        dismiss_queued(&listener, toasts);
-        drop(poll(&listener, sink, toasts));
+        let read_cost = poll(&listener, sink, toasts).unwrap_or_default();
 
-        wait(running);
+        dismiss_queued(&listener, toasts);
+        wait(running, read_cost);
     }
 }
 
-fn wait(running: &AtomicBool) {
-    let deadline = Instant::now() + POLL_INTERVAL;
+fn wait(running: &AtomicBool, read_cost: Duration) {
+    let deadline = Instant::now() + MINIMUM_REST.max(read_cost * REST_PER_READ);
 
     while running.load(Ordering::Relaxed) && Instant::now() < deadline {
         pump();
@@ -1346,11 +1348,13 @@ fn poll(
     listener: &UserNotificationListener,
     sink: &NotificationSink,
     toasts: &Mutex<ToastTable>,
-) -> Result<()> {
+) -> Result<Duration> {
+    let started = Instant::now();
     let current = listener
         .GetNotificationsAsync(NotificationKinds::Toast)
         .and_then(|request| request.join())
         .map_err(|error| PlatformError::system("GetNotificationsAsync", error.to_string()))?;
+    let read_cost = started.elapsed();
 
     let mut live = HashSet::new();
     let mut fresh = Vec::new();
@@ -1394,7 +1398,7 @@ fn poll(
         })));
     }
 
-    Ok(())
+    Ok(read_cost)
 }
 
 fn dismiss_queued(listener: &UserNotificationListener, toasts: &Mutex<ToastTable>) {

@@ -620,7 +620,11 @@ mod tests {
 
         roster.set_main("Charlie", true);
 
-        assert_eq!(roster.main().unwrap().nickname, "Alpha", "Charlie is unknown");
+        assert_eq!(
+            roster.main().unwrap().nickname,
+            "Alpha",
+            "Charlie is unknown"
+        );
 
         roster.set_main("Bravo", true);
 
