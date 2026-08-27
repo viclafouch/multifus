@@ -417,6 +417,7 @@ pub enum WalkFrom {
     Tray,
     Shortcut,
     ListeningLost,
+    NoWindowLeft,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]

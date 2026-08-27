@@ -114,7 +114,8 @@ export const WALK_FROM_LABELS = {
   window: 'la fenêtre',
   tray: 'la barre système',
   shortcut: 'un raccourci',
-  listeningLost: 'Multifus, qui n’écoutait plus les clics'
+  listeningLost: 'Multifus, qui n’écoutait plus les clics',
+  noWindowLeft: 'Multifus, qui n’avait plus une fenêtre à parcourir'
 } as const satisfies Record<WalkFrom, string>
 
 export const SHORTCUT_TONES = {

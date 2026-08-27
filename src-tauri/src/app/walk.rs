@@ -5,6 +5,7 @@ use std::sync::mpsc;
 use std::sync::mpsc::Sender;
 use std::sync::Arc;
 use std::sync::Mutex;
+use std::sync::MutexGuard;
 use std::sync::PoisonError;
 use std::thread;
 use std::time::Instant;
@@ -56,21 +57,27 @@ pub struct Walk {
 }
 
 impl Walk {
+    fn plan(&self) -> MutexGuard<'_, WalkPlan> {
+        self.plan.lock().unwrap_or_else(PoisonError::into_inner)
+    }
+
     fn watches(&self, window: WindowId) -> bool {
-        self.plan
-            .lock()
-            .unwrap_or_else(PoisonError::into_inner)
-            .watched
-            .contains(&window)
+        self.plan().watched.contains(&window)
     }
 
     fn next_after(&self, clicked: WindowId) -> Option<WindowId> {
-        self.plan
-            .lock()
-            .unwrap_or_else(PoisonError::into_inner)
-            .next
-            .get(&clicked)
-            .copied()
+        self.plan().next.get(&clicked).copied()
+    }
+
+    fn remember(&self, plan: WalkPlan) -> bool {
+        self.gate.watch(&plan.watched);
+
+        let mut held = self.plan();
+        let no_window_left = !held.watched.is_empty() && plan.watched.is_empty();
+
+        *held = plan;
+
+        no_window_left
     }
 }
 
@@ -149,24 +156,24 @@ pub fn toggle(app: &AppHandle, from: WalkFrom) {
     set_enabled(app, !enabled, from);
 }
 
-pub fn refresh(app: &AppHandle) {
+pub fn refresh(app: &AppHandle) -> bool {
     let plan = {
         let state = lock(app);
 
         state.is_walk_enabled().then(|| state.walk_plan())
     };
 
-    if let Some(plan) = plan {
-        remember(app, plan);
+    let Some(plan) = plan else {
+        return false;
+    };
+
+    if !app.state::<Walk>().remember(plan) {
+        return false;
     }
-}
 
-fn remember(app: &AppHandle, plan: WalkPlan) {
-    let walk = app.state::<Walk>();
+    set_enabled(app, false, WalkFrom::NoWindowLeft);
 
-    walk.gate.watch(&plan.watched);
-
-    *walk.plan.lock().unwrap_or_else(PoisonError::into_inner) = plan;
+    true
 }
 
 fn listen(app: &AppHandle) -> Result<(), PlatformError> {
@@ -179,7 +186,9 @@ fn listen(app: &AppHandle) -> Result<(), PlatformError> {
     app.state::<PlatformClickWatcher>()
         .start(Arc::clone(&gate), sink_of(gate, steps))?;
 
-    remember(app, lock(app).walk_plan());
+    let plan = lock(app).walk_plan();
+
+    let _ = app.state::<Walk>().remember(plan);
 
     Ok(())
 }
@@ -458,6 +467,29 @@ mod tests {
         assert!(!walk.watches(id(3)));
         assert_eq!(walk.next_after(id(1)), Some(id(2)));
         assert_eq!(walk.next_after(id(3)), None);
+    }
+
+    #[test]
+    fn the_walk_says_the_turn_where_the_last_window_it_watched_leaves_the_screen() {
+        let (walk, _taken) = walk(plan_of(&[1, 2], &[(1, 2), (2, 1)]));
+
+        assert!(
+            !walk.remember(plan_of(&[1], &[(1, 1)])),
+            "one client of the two is closed, and the other is still there to walk on"
+        );
+        assert!(walk.remember(plan_of(&[], &[])));
+        assert!(
+            !walk.remember(plan_of(&[], &[])),
+            "the walk is already off, and the turns that follow have nothing to say"
+        );
+    }
+
+    #[test]
+    fn a_walk_turned_on_without_a_single_client_stays_on_and_waits() {
+        let (walk, _taken) = walk(plan_of(&[], &[]));
+
+        assert!(!walk.remember(plan_of(&[], &[])));
+        assert!(!walk.remember(plan_of(&[1], &[(1, 1)])));
     }
 
     #[test]

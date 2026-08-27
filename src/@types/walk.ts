@@ -1,6 +1,11 @@
 import type { Class, Gender } from '@/@types/roster'
 
-export type WalkFrom = 'listeningLost' | 'shortcut' | 'tray' | 'window'
+export type WalkFrom =
+  | 'listeningLost'
+  | 'noWindowLeft'
+  | 'shortcut'
+  | 'tray'
+  | 'window'
 
 export type WalkIdle = 'nobodyInCycle' | 'tooSlow'
 

@@ -1117,6 +1117,10 @@ const JOURNAL_CASES = {
     {
       event: { kind: 'walkEnabled', enabled: false, from: 'listeningLost' },
       line: 'Déplacement rapide éteint depuis Multifus, qui n’écoutait plus les clics.'
+    },
+    {
+      event: { kind: 'walkEnabled', enabled: false, from: 'noWindowLeft' },
+      line: 'Déplacement rapide éteint depuis Multifus, qui n’avait plus une fenêtre à parcourir.'
     }
   ],
   walkIdle: [

@@ -132,9 +132,9 @@ fn tick(app: &AppHandle) {
     let painted = apply_window_icons(&turn);
     let regrouped = follow_taskbar(&turn);
 
-    walk::refresh(app);
+    let walk_stopped = walk::refresh(app);
 
-    if changed || maximized || renamed || painted || regrouped {
+    if changed || maximized || renamed || painted || regrouped || walk_stopped {
         emit_snapshot(app);
     }
 }
