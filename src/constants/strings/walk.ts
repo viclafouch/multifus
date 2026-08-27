@@ -48,7 +48,7 @@ export const WALK_STRINGS = {
       'Un clic déplace le personnage que vous avez devant vous, et la fenêtre du suivant prend sa place. Vous recliquez au même endroit, et toute la team change de map sans toucher au clavier.',
     switchLabel: 'Déplacement rapide',
     shortcutLabel: 'Raccourci',
-    shortcutDescription: 'Allumez et éteignez sans quitter le jeu.',
+    shortcutDescription: 'Allume sans quitter le jeu.',
     shortcutEmpty: 'Aucune',
     state: STATE_LINES,
     banner: BANNER_STRINGS

@@ -114,7 +114,7 @@ const BINDINGS = [
 ] as const satisfies readonly BoundCombination[]
 
 const BINDINGS_LINE =
-  'Raccourcis : Fenêtre suivante Control+Shift+ArrowRight · Fenêtre précédente non attribué · Exclure pas encore posé · Déplacement rapide Control+Shift+KeyX illisible (touche inconnue) · Réponse rapide 1 Control+Shift+KeyP.'
+  'Raccourcis : Fenêtre suivante Control+Shift+ArrowRight · Fenêtre précédente non attribué · Exclure ou réintégrer pas encore posé · Déplacement rapide Control+Shift+KeyX illisible (touche inconnue) · Réponse rapide 1 Control+Shift+KeyP.'
 
 const ROSTER_CASES = {
   excluded: [
@@ -375,7 +375,7 @@ const SHORTCUT_CASES = {
         action: 'toggleExcluded',
         outcome: { outcome: 'excluded', nickname: NICKNAME }
       },
-      line: 'Exclure : Alpha exclu.'
+      line: 'Exclure ou réintégrer : Alpha exclu.'
     }
   ],
   included: [
@@ -385,7 +385,7 @@ const SHORTCUT_CASES = {
         action: 'toggleExcluded',
         outcome: { outcome: 'included', nickname: NICKNAME }
       },
-      line: 'Exclure : Alpha réintégré.'
+      line: 'Exclure ou réintégrer : Alpha réintégré.'
     }
   ],
   outsideGame: [

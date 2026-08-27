@@ -4,23 +4,25 @@ import type { CaptureRejection } from '@/constants/keyboard'
 const ACTION_LABELS = {
   next: {
     label: 'Fenêtre suivante',
-    description: 'Le personnage d’après, dans l’ordre de l’écran Personnages.'
+    description:
+      'Passe au personnage d’après, dans l’ordre de l’écran Personnages.'
   },
   previous: {
     label: 'Fenêtre précédente',
-    description: 'Le personnage d’avant, dans le même ordre.'
+    description: 'Passe au personnage d’avant, dans le même ordre.'
   },
   main: {
     label: 'Personnage principal',
-    description: 'Vous ramène direct sur votre personnage principal.'
+    description: 'Ramène devant votre personnage principal, où que vous soyez.'
   },
   toggleExcluded: {
-    label: 'Exclure',
-    description: 'Exclut le personnage devant vous, ou le réintègre.'
+    label: 'Exclure ou réintégrer',
+    description:
+      'Sort le personnage devant vous du défilement et de l’AutoFocus.'
   },
   walk: {
     label: 'Déplacement rapide',
-    description: 'Allume et éteint le Déplacement rapide, même hors du jeu.'
+    description: 'Allume le clic qui emmène toute la team, même hors du jeu.'
   }
 } as const satisfies Record<
   ShortcutAction,
