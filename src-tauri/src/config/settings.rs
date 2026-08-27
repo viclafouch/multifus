@@ -101,7 +101,7 @@ pub struct Shortcuts {
 
 const DEFAULT_NEXT: &str = "Control+Shift+Right";
 const DEFAULT_PREVIOUS: &str = "Control+Shift+Left";
-const DEFAULT_MAIN: &str = "Control+Shift+Home";
+const DEFAULT_MAIN: &str = "Control+Shift+Space";
 const DEFAULT_TOGGLE_EXCLUDED: &str = "Control+Shift+Down";
 const DEFAULT_SWAP: &str = "Control+Shift+Up";
 const DEFAULT_WALK: &str = "Control+Shift+KeyD";

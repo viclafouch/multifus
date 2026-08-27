@@ -32,13 +32,13 @@ fichier de chaînes tient ce que l'utilisateur lit dans les écrans.
 **Principal** entre dans `CONTEXT.md` après **Inversion**, pas après
 **Réintégrer** : Exclu, Réintégrer et Inversion se lisent d'affilée.
 
-## Le point à trancher à l'essai
+## Le raccourci
 
-`Control+Shift+Home` s'écrit « Ctrl+Maj+Origine ». Un clavier de MacBook n'a pas
-de touche Origine : il faut `Fn` et la flèche gauche, ce qui fait quatre touches.
-Sur un clavier complet, macOS comme Windows, la frappe est directe. Si la
-combinaison gêne, `DEFAULT_MAIN` dans `src-tauri/src/config/settings.rs` est la
-seule ligne à changer.
+`Control+Shift+Space`, « Ctrl+Maj+Espace ». `Control+Shift+Home` a tenu deux
+jours : « Origine » ne dit rien à un joueur, et un MacBook n'a pas cette touche.
+Espace est sur tous les claviers, sous le pouce, et Windows ne se la réserve
+nulle part. Si la combinaison gêne, `DEFAULT_MAIN` dans
+`src-tauri/src/config/settings.rs` est la seule ligne à changer.
 
 ## À vérifier sur la vraie machine
 
@@ -58,8 +58,10 @@ seule ligne à changer.
 - [ ] Frapper le raccourci en étant déjà sur le principal : rien, et le journal
       le dit
 - [ ] Frapper le raccourci hors du jeu : rien, comme Fenêtre suivante
+- [ ] Ctrl+Maj+Espace en combat, la barre de sorts ouverte : le jeu ne reçoit
+      pas l'espace, et rien ne se lance
 - [ ] Retirer le personnage du roster : l'étoile part avec lui
-- [ ] « Remettre les touches d'origine » redonne Ctrl+Maj+Origine
+- [ ] « Remettre les touches d'origine » redonne Ctrl+Maj+Espace
 - [ ] Le tirage par la poignée marche toujours sur une ligne qui porte l'étoile
 - [ ] L'étoile allumée se voit bien sur une ligne barrée en rouge, et la
       creuse se voit sans survoler la ligne

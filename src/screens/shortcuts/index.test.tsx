@@ -207,7 +207,9 @@ describe('l’écran des raccourcis, les six actions', () => {
 })
 
 describe('l’écran des raccourcis, ce que le personnage principal fera', () => {
-  const mainShortcut = [shortcut('main', { accelerator: 'Control+Shift+Home' })]
+  const mainShortcut = [
+    shortcut('main', { accelerator: 'Control+Shift+Space' })
+  ]
   const words = strings.shortcuts
 
   it('prévient qu’aucune étoile n’est posée', () => {
@@ -250,7 +252,7 @@ describe('l’écran des raccourcis, ce que le personnage principal fera', () =>
   it('garde la combinaison posée même quand la frappe ne fera rien', () => {
     show({ shortcuts: mainShortcut, characters: [] })
 
-    expect(capsOf(fieldOf('main'))).toStrictEqual(['Ctrl', 'Maj', 'Origine'])
+    expect(capsOf(fieldOf('main'))).toStrictEqual(['Ctrl', 'Maj', 'Espace'])
     expect(screen.queryByRole('alert')).toBeNull()
   })
 })
