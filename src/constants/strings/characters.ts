@@ -21,27 +21,32 @@ const GENDER_LABELS = {
 } as const satisfies Record<Gender, string>
 
 const GROUP_LABELS = {
-  male: 'Hommes',
-  female: 'Femmes'
+  male: 'Hommes dans le défilement et l’AutoFocus',
+  female: 'Femmes dans le défilement et l’AutoFocus'
 } as const satisfies Record<Gender, string>
 
-const SLEEP_GROUP_LABELS = {
-  male: 'Mettre tous les hommes de côté',
-  female: 'Mettre toutes les femmes de côté'
+const EMPTY_GROUP_LABELS = {
+  male: 'Aucun homme connecté',
+  female: 'Aucune femme connectée'
 } as const satisfies Record<Gender, string>
 
-const WAKE_GROUP_LABELS = {
-  male: 'Remettre tous les hommes dans le défilement',
-  female: 'Remettre toutes les femmes dans le défilement'
+const EXCLUDE_GROUP_LABELS = {
+  male: 'Exclure tous les hommes',
+  female: 'Exclure toutes les femmes'
+} as const satisfies Record<Gender, string>
+
+const INCLUDE_GROUP_LABELS = {
+  male: 'Réintégrer tous les hommes',
+  female: 'Réintégrer toutes les femmes'
 } as const satisfies Record<Gender, string>
 
 export const CHARACTERS_STRINGS = {
   characters: {
     title: 'Personnages',
     subtitle:
-      'Vos personnages défilent au raccourci dans cet ordre. Tirez une ligne par sa poignée pour le changer.',
+      'Tirez une ligne par sa poignée pour changer l’ordre du défilement.',
     online: 'Connecté',
-    asleep: 'De côté',
+    excluded: 'Exclu',
     offline: 'Déconnecté',
     rankNone: '·',
     handle: (nickname: string) => {
@@ -62,8 +67,8 @@ export const CHARACTERS_STRINGS = {
           : `${nickname} est posé.`
       }
     },
-    cycleToggle: (nickname: string) => {
-      return `Défilement de ${nickname}`
+    includeToggle: (nickname: string) => {
+      return `${nickname} dans le défilement et l’AutoFocus`
     },
     remove: (nickname: string) => {
       return `Retirer ${nickname} du roster`
@@ -103,14 +108,17 @@ export const CHARACTERS_STRINGS = {
     classLabel: (nickname: string, label: string) => {
       return `Marquer ${nickname} comme ${label}`
     },
-    groupedActions: 'Actions groupées',
+    exclusionTitle: 'Exclusion',
+    exclusionDescription:
+      'Un personnage exclu est sauté par les raccourcis et par le Déplacement rapide, et l’AutoFocus ne le fait plus passer devant. Ses messages privés continuent d’arriver.',
     groupLabel: GROUP_LABELS,
-    sleepGroup: 'De côté',
-    wakeGroup: 'Remettre',
-    sleepGroupLabel: SLEEP_GROUP_LABELS,
-    wakeGroupLabel: WAKE_GROUP_LABELS,
+    excludeGroupLabel: EXCLUDE_GROUP_LABELS,
+    includeGroupLabel: INCLUDE_GROUP_LABELS,
+    emptyGroupLabel: EMPTY_GROUP_LABELS,
     missingGender: (names: string, alone: boolean) => {
-      return alone ? `${names} n’a pas de sexe.` : `${names} n’ont pas de sexe.`
+      return alone
+        ? `${names} n’a pas de sexe : il ne bougera pas.`
+        : `${names} n’ont pas de sexe : ils ne bougeront pas.`
     },
     emptyTitle: 'Votre roster est vide',
     emptyBody:

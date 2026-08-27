@@ -26,7 +26,7 @@ const { ShortcutsScreen } = await import('@/screens/shortcuts')
 const ALL_ACTIONS = [
   'next',
   'previous',
-  'toggleAsleep',
+  'toggleExcluded',
   'swap',
   'walk'
 ] as const satisfies readonly ShortcutAction[]

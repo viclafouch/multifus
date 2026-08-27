@@ -65,15 +65,15 @@ pub fn set_class(app: AppHandle, nickname: String, class: Option<Class>) -> Snap
 }
 
 #[tauri::command]
-pub fn toggle_asleep(app: AppHandle, nickname: String) -> Snapshot {
-    lock(&app).toggle_asleep(&nickname);
+pub fn toggle_excluded(app: AppHandle, nickname: String) -> Snapshot {
+    lock(&app).toggle_excluded(&nickname);
 
     runtime::emit_snapshot(&app)
 }
 
 #[tauri::command]
-pub fn set_gender_asleep(app: AppHandle, gender: Gender, asleep: bool) -> Snapshot {
-    lock(&app).set_gender_asleep(gender, asleep);
+pub fn set_gender_excluded(app: AppHandle, gender: Gender, excluded: bool) -> Snapshot {
+    lock(&app).set_gender_excluded(gender, excluded);
 
     runtime::emit_snapshot(&app)
 }

@@ -22,7 +22,7 @@ export const CharacterMedallion = ({
       className={cn(
         'flex size-medallion shrink-0 items-center justify-center overflow-hidden rounded-full border-2 bg-card/60 transition-colors duration-300',
         'data-[state=live]:medallion-live data-[state=live]:border-live',
-        'data-[state=asleep]:border-idle/70',
+        'data-[state=excluded]:border-destructive/65',
         'data-[state=offline]:border-muted-foreground/25',
         'data-empty:border-dashed data-empty:bg-primary/12 data-empty:text-primary',
         'group-hover/portrait:data-empty:bg-primary/25',

@@ -7,6 +7,7 @@ import type { WalkFrom, WalkIdle } from '@/@types/walk'
 
 export type NotificationOutcome =
   | { readonly outcome: 'bodyUnread' }
+  | { readonly outcome: 'excluded' }
   | { readonly outcome: 'focusFailed'; readonly detail: string }
   | { readonly outcome: 'focused' }
   | { readonly outcome: 'kindDisabled' }
@@ -32,10 +33,10 @@ export type ShortcutOutcome =
   | { readonly outcome: 'notInRoster'; readonly nickname: string }
   | { readonly outcome: 'noWindow'; readonly nickname: string }
   | { readonly outcome: 'outsideGame' }
-  | { readonly outcome: 'slept'; readonly nickname: string }
-  | { readonly outcome: 'swapped'; readonly awake: Gender }
+  | { readonly outcome: 'excluded'; readonly nickname: string }
+  | { readonly outcome: 'swapped'; readonly kept: Gender }
   | { readonly outcome: 'walk'; readonly enabled: boolean }
-  | { readonly outcome: 'woke'; readonly nickname: string }
+  | { readonly outcome: 'included'; readonly nickname: string }
 
 export type QuickReplyFailure =
   | { readonly reason: 'clipboardNotGivenBack'; readonly detail: string }
@@ -47,9 +48,9 @@ export type QuickReplyFailure =
 
 export type RosterChange =
   | {
-      readonly kind: 'genderAsleep'
+      readonly kind: 'genderExcluded'
       readonly gender: Gender
-      readonly asleep: boolean
+      readonly excluded: boolean
     }
   | {
       readonly kind: 'genderAssigned'
@@ -68,8 +69,8 @@ export type RosterChange =
     }
   | { readonly kind: 'removed'; readonly nickname: string }
   | { readonly kind: 'reordered'; readonly order: readonly string[] }
-  | { readonly kind: 'slept'; readonly nickname: string }
-  | { readonly kind: 'woke'; readonly nickname: string }
+  | { readonly kind: 'excluded'; readonly nickname: string }
+  | { readonly kind: 'included'; readonly nickname: string }
 
 export type SettingChange =
   | {

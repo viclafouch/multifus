@@ -51,6 +51,11 @@ impl Roster {
             .find(|character| character.nickname == nickname)
     }
 
+    #[must_use]
+    pub fn is_excluded(&self, nickname: &str) -> bool {
+        self.get(nickname).is_some_and(Character::is_excluded)
+    }
+
     pub fn get_mut(&mut self, nickname: &str) -> Option<&mut Character> {
         self.characters
             .iter_mut()
@@ -146,29 +151,29 @@ impl Roster {
             .find(|character| character.is_in_cycle())
     }
 
-    pub fn toggle_asleep(&mut self, nickname: &str) -> Option<bool> {
+    pub fn toggle_excluded(&mut self, nickname: &str) -> Option<bool> {
         let character = self.get_mut(nickname)?;
 
-        if !character.is_sleepable() {
+        if !character.is_excludable() {
             return None;
         }
 
-        character.asleep = !character.asleep;
+        character.excluded = !character.excluded;
 
-        Some(character.asleep)
+        Some(character.excluded)
     }
 
-    pub fn set_asleep_for_gender(&mut self, gender: Gender, asleep: bool) -> usize {
+    pub fn set_excluded_for_gender(&mut self, gender: Gender, excluded: bool) -> usize {
         let mut changed = 0;
 
         let concerned = self
             .characters
             .iter_mut()
-            .filter(|character| character.gender == Some(gender) && character.is_sleepable());
+            .filter(|character| character.gender == Some(gender) && character.is_excludable());
 
         for character in concerned {
-            if character.asleep != asleep {
-                character.asleep = asleep;
+            if character.excluded != excluded {
+                character.excluded = excluded;
                 changed += 1;
             }
         }
@@ -176,34 +181,34 @@ impl Roster {
         changed
     }
 
-    pub fn swap_to(&mut self, awake: Gender) {
-        self.set_asleep_for_gender(awake, false);
-        self.set_asleep_for_gender(awake.other(), true);
+    pub fn swap_to(&mut self, kept: Gender) {
+        self.set_excluded_for_gender(kept, false);
+        self.set_excluded_for_gender(kept.other(), true);
     }
 
     pub fn swap(&mut self) -> Option<Gender> {
         let has_gender = self
             .characters
             .iter()
-            .any(|character| character.gender.is_some() && character.is_sleepable());
+            .any(|character| character.gender.is_some() && character.is_excludable());
 
         if !has_gender {
             return None;
         }
 
-        let awake = if self.has_awake(Gender::Male) {
+        let kept = if self.has_in_cycle(Gender::Male) {
             Gender::Female
         } else {
             Gender::Male
         };
 
-        self.swap_to(awake);
+        self.swap_to(kept);
 
-        Some(awake)
+        Some(kept)
     }
 
     #[must_use]
-    pub fn has_awake(&self, gender: Gender) -> bool {
+    pub fn has_in_cycle(&self, gender: Gender) -> bool {
         self.characters
             .iter()
             .any(|character| character.gender == Some(gender) && character.is_in_cycle())
@@ -296,11 +301,11 @@ mod tests {
     }
 
     #[test]
-    fn cycle_skips_asleep_characters() {
+    fn cycle_skips_excluded_characters() {
         let roster = roster(vec![
             Character::new("Alpha"),
-            Character::new("Bravo").asleep(),
-            Character::new("Charlie").asleep(),
+            Character::new("Bravo").excluded(),
+            Character::new("Charlie").excluded(),
             Character::new("Delta"),
         ]);
 
@@ -326,10 +331,10 @@ mod tests {
     }
 
     #[test]
-    fn cycle_starts_from_an_asleep_character() {
+    fn cycle_starts_from_an_excluded_character() {
         let roster = roster(vec![
             Character::new("Alpha"),
-            Character::new("Bravo").asleep(),
+            Character::new("Bravo").excluded(),
             Character::new("Charlie"),
         ]);
 
@@ -338,11 +343,11 @@ mod tests {
     }
 
     #[test]
-    fn cycle_stays_on_the_only_awake_character() {
+    fn cycle_stays_on_the_only_included_character() {
         let roster = roster(vec![
-            Character::new("Alpha").asleep(),
+            Character::new("Alpha").excluded(),
             Character::new("Bravo"),
-            Character::new("Charlie").asleep(),
+            Character::new("Charlie").excluded(),
         ]);
 
         assert_eq!(roster.next_in_cycle("Bravo").unwrap().nickname, "Bravo");
@@ -350,11 +355,11 @@ mod tests {
     }
 
     #[test]
-    fn cycle_gives_nothing_when_everyone_is_asleep() {
+    fn cycle_gives_nothing_when_everyone_is_excluded() {
         let roster = roster(vec![
-            Character::new("Alpha").asleep(),
-            Character::new("Bravo").asleep(),
-            Character::new("Charlie").asleep(),
+            Character::new("Alpha").excluded(),
+            Character::new("Bravo").excluded(),
+            Character::new("Charlie").excluded(),
         ]);
 
         assert_eq!(roster.next_in_cycle("Alpha"), None);
@@ -376,7 +381,7 @@ mod tests {
     #[test]
     fn an_unknown_current_falls_back_to_the_ends_of_the_roster() {
         let roster = roster(vec![
-            Character::new("Alpha").asleep(),
+            Character::new("Alpha").excluded(),
             Character::new("Bravo"),
             Character::new("Charlie"),
         ]);
@@ -389,23 +394,23 @@ mod tests {
     }
 
     #[test]
-    fn toggle_asleep_takes_a_character_out_of_the_cycle_and_back_in() {
+    fn toggle_excluded_takes_a_character_out_of_the_cycle_and_back_in() {
         let mut roster = roster(vec![Character::new("Alpha"), Character::new("Bravo")]);
 
-        assert_eq!(roster.toggle_asleep("Bravo"), Some(true));
+        assert_eq!(roster.toggle_excluded("Bravo"), Some(true));
         assert_eq!(nicknames(&roster), vec!["Alpha"]);
 
-        assert_eq!(roster.toggle_asleep("Bravo"), Some(false));
+        assert_eq!(roster.toggle_excluded("Bravo"), Some(false));
         assert_eq!(nicknames(&roster), vec!["Alpha", "Bravo"]);
     }
 
     #[test]
-    fn toggle_asleep_refuses_unknown_and_offline_characters() {
+    fn toggle_excluded_refuses_unknown_and_offline_characters() {
         let mut roster = roster(vec![Character::new("Alpha").offline()]);
 
-        assert_eq!(roster.toggle_asleep("Alpha"), None);
-        assert_eq!(roster.toggle_asleep("Echo"), None);
-        assert!(!roster.get("Alpha").unwrap().asleep);
+        assert_eq!(roster.toggle_excluded("Alpha"), None);
+        assert_eq!(roster.toggle_excluded("Echo"), None);
+        assert!(!roster.get("Alpha").unwrap().excluded);
     }
 
     #[test]
@@ -416,20 +421,22 @@ mod tests {
             Character::new("Charlie"),
         ]);
 
-        assert_eq!(roster.set_asleep_for_gender(Gender::Male, true), 1);
+        assert_eq!(roster.set_excluded_for_gender(Gender::Male, true), 1);
         assert_eq!(nicknames(&roster), vec!["Bravo", "Charlie"]);
 
-        assert_eq!(roster.set_asleep_for_gender(Gender::Male, true), 0);
+        assert_eq!(roster.set_excluded_for_gender(Gender::Male, true), 0);
     }
 
     #[test]
-    fn a_swap_sleeps_one_gender_and_wakes_the_other() {
+    fn a_swap_excludes_one_gender_and_includes_the_other() {
         let mut roster = roster(vec![
             Character::new("Alpha").with_gender(Gender::Male),
-            Character::new("Bravo").with_gender(Gender::Female).asleep(),
+            Character::new("Bravo")
+                .with_gender(Gender::Female)
+                .excluded(),
             Character::new("Charlie")
                 .with_gender(Gender::Female)
-                .asleep(),
+                .excluded(),
         ]);
 
         roster.swap_to(Gender::Female);
@@ -493,7 +500,7 @@ mod tests {
     #[test]
     fn reordering_keeps_everyone_the_order_forgot() {
         let mut roster = roster(vec![
-            Character::new("Alpha").with_gender(Gender::Male).asleep(),
+            Character::new("Alpha").with_gender(Gender::Male).excluded(),
             Character::new("Bravo"),
             Character::new("Charlie"),
         ]);
@@ -507,7 +514,7 @@ mod tests {
             .collect::<Vec<_>>();
 
         assert_eq!(order, vec!["Bravo", "Alpha", "Charlie"]);
-        assert!(roster.get("Alpha").unwrap().asleep);
+        assert!(roster.get("Alpha").unwrap().excluded);
         assert_eq!(roster.get("Alpha").unwrap().gender, Some(Gender::Male));
     }
 
@@ -582,10 +589,10 @@ mod tests {
     }
 
     #[test]
-    fn an_asleep_character_is_relayed_like_the_others() {
+    fn an_excluded_character_is_relayed_like_the_others() {
         let mut roster = roster(vec![Character::new("Alpha")]);
 
-        roster.toggle_asleep("Alpha");
+        roster.toggle_excluded("Alpha");
 
         assert!(roster.has_relayed_online());
         assert_eq!(nicknames(&roster), Vec::<&str>::new());

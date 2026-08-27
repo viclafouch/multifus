@@ -42,15 +42,17 @@ Les mots de Multifus, et rien d'autre. On en parle en français, on les écrit e
 
 **Tirage** (`drag`) : l'action de prendre une ligne par sa poignée, et de la porter plus haut ou plus bas pour changer l'ordre du défilement.
 
-**De côté** (`asleep`) : état d'un personnage retiré du défilement.
+**Exclu** (`excluded`) : état d'un personnage que l'utilisateur écarte à la main. Les raccourcis Fenêtre suivante et précédente le sautent, le Déplacement rapide aussi, et l'AutoFocus ne passe plus sa fenêtre devant. Ses messages privés partent comme avant. L'exclusion ne survit pas à un redémarrage de Multifus.
 
-**Inversion** (`swap`) : l'action de mettre de côté tous les personnages d'un sexe et de remettre ceux de l'autre dans le défilement.
+**Réintégrer** (`included`) : rendre à un exclu le défilement et l'AutoFocus. C'est le seul contraire d'exclure, et l'écran ne dit jamais « remettre ».
+
+**Inversion** (`swap`) : l'action d'exclure tous les personnages d'un sexe et de réintégrer ceux de l'autre. Le sexe réintégré est celui qu'on garde (`kept`).
 
 **Notification de jeu** (`GameNotification`) : une notification système émise par un client Dofus. Son titre porte le pseudo du destinataire, son corps décrit l'événement.
 
 **Type de notification** (`NotificationKind`) : la catégorie de l'événement, lue dans le corps : combat, échange, groupe, craft, message privé, défi, percepteur.
 
-**AutoFocus** (`AutoFocus`) : le mécanisme qui focus la fenêtre d'un personnage quand une notification de jeu le concerne.
+**AutoFocus** (`AutoFocus`) : le mécanisme qui focus la fenêtre d'un personnage quand une notification de jeu le concerne. Il se tait pour un personnage exclu.
 
 **Frappe** (`Press`) : un appui sur une combinaison, et ce que Multifus en fait. Elle ne vaut que dans le jeu, sauf celle du Déplacement rapide, qui répond de partout.
 

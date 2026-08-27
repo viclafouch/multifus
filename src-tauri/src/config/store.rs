@@ -269,7 +269,7 @@ mod tests {
             shortcuts: Shortcuts {
                 next: Shortcut::new("Alt+Right"),
                 previous: Shortcut::new("Alt+Left"),
-                toggle_asleep: None,
+                toggle_excluded: None,
                 swap: Shortcut::new("Alt+Space"),
                 walk: Shortcut::new("Alt+KeyD"),
             },
@@ -307,7 +307,7 @@ mod tests {
             .characters()
             .iter()
             .map(|character| Character {
-                asleep: false,
+                excluded: false,
                 online: false,
                 ..character.clone()
             })
@@ -378,9 +378,11 @@ mod tests {
         let (_directory, store) = store();
         let settings = Settings {
             roster: Roster::from_characters(vec![
-                Character::new("Alpha").with_gender(Gender::Male).asleep(),
-                Character::new("Bravo").with_gender(Gender::Female).asleep(),
-                Character::new("Charlie").asleep(),
+                Character::new("Alpha").with_gender(Gender::Male).excluded(),
+                Character::new("Bravo")
+                    .with_gender(Gender::Female)
+                    .excluded(),
+                Character::new("Charlie").excluded(),
             ]),
             ..Settings::default()
         };
@@ -388,7 +390,7 @@ mod tests {
         store.save(&settings).expect("the configuration is written");
 
         let written = fs::read_to_string(store.path()).expect("the file is readable");
-        assert!(!written.contains(r#""asleep""#), "{written}");
+        assert!(!written.contains(r#""excluded""#), "{written}");
         assert!(!written.contains(r#""online""#), "{written}");
 
         let roster = store.load().settings.roster;
@@ -396,7 +398,11 @@ mod tests {
         assert_eq!(roster.len(), 3);
 
         for character in roster.characters() {
-            assert!(!character.asleep, "{} came back asleep", character.nickname);
+            assert!(
+                !character.excluded,
+                "{} came back excluded",
+                character.nickname
+            );
             assert!(!character.online, "{} came back online", character.nickname);
         }
 
@@ -416,7 +422,7 @@ mod tests {
             ]
           },
           "shortcuts": { "next": "Alt+Right", "previous": null,
-                         "toggle_asleep": null, "swap": null },
+                         "toggle_excluded": null, "swap": null },
           "auto_focus": { "enabled": true, "combat": false },
           "start_at_login": true
         }"#;

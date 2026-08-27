@@ -153,7 +153,7 @@ fn the_game_logs_a_character_out_by_itself() {
     assert_eq!(bravo.class, Some(Class::Eniripsa));
     assert_eq!(bravo.gender, Some(Gender::Female));
     assert!(!bravo.online);
-    assert!(!bravo.asleep, "the game logging him out is not a choice");
+    assert!(!bravo.excluded, "the game logging him out is not a choice");
 
     state.apply_windows(&[client(1, "Alpha"), client(2, "Bravo")]);
 
@@ -235,8 +235,8 @@ fn a_shortcut_struck_while_everybody_is_set_aside_goes_nowhere() {
     let (_directory, mut state) = opened(Launch::ByHand);
 
     state.apply_windows(&[client(1, "Alpha"), client(2, "Bravo")]);
-    state.toggle_asleep("Alpha");
-    state.toggle_asleep("Bravo");
+    state.toggle_excluded("Alpha");
+    state.toggle_excluded("Bravo");
 
     assert_eq!(
         state.decide_shortcut(ShortcutAction::Next, "Alpha"),
@@ -284,7 +284,7 @@ fn setting_aside_a_client_multifus_never_met_changes_nothing() {
     state.apply_windows(&[client(1, "Alpha")]);
 
     assert_eq!(
-        state.decide_shortcut(ShortcutAction::ToggleAsleep, "Inconnu"),
+        state.decide_shortcut(ShortcutAction::ToggleExcluded, "Inconnu"),
         ShortcutEffect::Settled(ShortcutOutcome::NotInRoster {
             nickname: "Inconnu".to_owned(),
         })

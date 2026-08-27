@@ -71,7 +71,7 @@ pub struct Character {
     #[serde(default = "relayed_by_default")]
     pub relayed: bool,
     #[serde(skip)]
-    pub asleep: bool,
+    pub excluded: bool,
     #[serde(skip)]
     pub online: bool,
 }
@@ -84,7 +84,7 @@ impl Character {
             gender: None,
             class: None,
             relayed: true,
-            asleep: false,
+            excluded: false,
             online: true,
         }
     }
@@ -108,8 +108,8 @@ impl Character {
     }
 
     #[must_use]
-    pub fn asleep(mut self) -> Self {
-        self.asleep = true;
+    pub fn excluded(mut self) -> Self {
+        self.excluded = true;
         self
     }
 
@@ -129,12 +129,17 @@ impl Character {
 
     #[must_use]
     pub fn is_in_cycle(&self) -> bool {
-        self.online && !self.asleep
+        self.online && !self.excluded
     }
 
     #[must_use]
-    pub fn is_sleepable(&self) -> bool {
+    pub fn is_excludable(&self) -> bool {
         self.online
+    }
+
+    #[must_use]
+    pub fn is_excluded(&self) -> bool {
+        self.excluded
     }
 
     #[must_use]
@@ -224,11 +229,11 @@ mod tests {
     }
 
     #[test]
-    fn the_relay_ignores_whether_a_character_is_asleep() {
-        let asleep = Character::new("Alpha").asleep();
+    fn the_relay_ignores_whether_a_character_is_excluded() {
+        let excluded = Character::new("Alpha").excluded();
 
-        assert!(asleep.is_relayed_online());
-        assert!(!asleep.is_in_cycle());
+        assert!(excluded.is_relayed_online());
+        assert!(!excluded.is_in_cycle());
     }
 
     #[test]

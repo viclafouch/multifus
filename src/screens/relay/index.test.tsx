@@ -393,11 +393,11 @@ describe('l’écran des messages privés, les personnages relayés', () => {
     expect(subLines).toStrictEqual(['Iop · Connecté', 'Iop · Déconnecté'])
   })
 
-  it('ne dit jamais qu’un personnage est de côté, le défilement ne compte pas ici', () => {
-    show({ characters: [characterOf({ nickname: 'Alpha', asleep: true })] })
+  it('ne dit jamais qu’un personnage est exclu, l’exclusion ne compte pas ici', () => {
+    show({ characters: [characterOf({ nickname: 'Alpha', excluded: true })] })
 
     expect(screen.getByText('Iop · Connecté')).not.toBeNull()
-    expect(screen.queryByText(/De côté/u)).toBeNull()
+    expect(screen.queryByText(/Exclu/u)).toBeNull()
   })
 })
 

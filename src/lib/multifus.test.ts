@@ -159,15 +159,15 @@ const CALLS = [
     }
   },
   {
-    name: 'toggleAsleep',
+    name: 'toggleExcluded',
     run: () => {
-      return multifus.toggleAsleep(NICKNAME)
+      return multifus.toggleExcluded(NICKNAME)
     }
   },
   {
-    name: 'setGenderAsleep',
+    name: 'setGenderExcluded',
     run: () => {
-      return multifus.setGenderAsleep('female', true)
+      return multifus.setGenderExcluded('female', true)
     }
   },
   {

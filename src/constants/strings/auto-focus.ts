@@ -48,7 +48,7 @@ export const AUTO_FOCUS_STRINGS = {
       : 'Même un personnage rangé dans la barre des tâches revient devant vous.',
     kindsTitle: 'Quand Multifus change de fenêtre',
     kindsDescription:
-      'À ces moments, le personnage concerné passe devant. Cela vaut pour tous vos personnages.',
+      'À ces moments, le personnage concerné passe devant. Un personnage exclu dans les Personnages ne bouge pas.',
     kinds: KIND_LABELS
   }
 } as const

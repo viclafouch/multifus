@@ -225,7 +225,7 @@ pub struct CharacterView {
     pub nickname: String,
     pub gender: Option<Gender>,
     pub class: Option<Class>,
-    pub asleep: bool,
+    pub excluded: bool,
     pub online: bool,
     pub relayed: bool,
 }
@@ -235,7 +235,7 @@ pub struct CharacterView {
 pub enum ShortcutAction {
     Next,
     Previous,
-    ToggleAsleep,
+    ToggleExcluded,
     Swap,
     Walk,
 }
@@ -244,7 +244,7 @@ impl ShortcutAction {
     pub const ALL: [Self; 5] = [
         Self::Next,
         Self::Previous,
-        Self::ToggleAsleep,
+        Self::ToggleExcluded,
         Self::Swap,
         Self::Walk,
     ];
@@ -462,7 +462,7 @@ mod tests {
             nickname: "Alpha".to_owned(),
             gender: Some(Gender::Male),
             class: Some(Class::Iop),
-            asleep: false,
+            excluded: false,
             online: true,
             relayed: true,
         }
@@ -518,7 +518,7 @@ mod tests {
                 "nickname": "Alpha",
                 "gender": "male",
                 "class": "iop",
-                "asleep": false,
+                "excluded": false,
                 "online": true,
                 "relayed": true,
             })
@@ -611,7 +611,7 @@ mod tests {
 
         assert_eq!(
             actions,
-            ["next", "previous", "toggleAsleep", "swap", "walk"]
+            ["next", "previous", "toggleExcluded", "swap", "walk"]
         );
     }
 

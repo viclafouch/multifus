@@ -54,7 +54,7 @@ pub fn in_cycle(state: &Multifus) -> Vec<String> {
         .snapshot()
         .characters
         .into_iter()
-        .filter(|character| character.online && !character.asleep)
+        .filter(|character| character.online && !character.excluded)
         .map(|character| character.nickname)
         .collect()
 }

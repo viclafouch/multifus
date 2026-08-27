@@ -93,14 +93,14 @@ impl BannerCorner {
 pub struct Shortcuts {
     pub next: Option<Shortcut>,
     pub previous: Option<Shortcut>,
-    pub toggle_asleep: Option<Shortcut>,
+    pub toggle_excluded: Option<Shortcut>,
     pub swap: Option<Shortcut>,
     pub walk: Option<Shortcut>,
 }
 
 const DEFAULT_NEXT: &str = "Control+Shift+Right";
 const DEFAULT_PREVIOUS: &str = "Control+Shift+Left";
-const DEFAULT_TOGGLE_ASLEEP: &str = "Control+Shift+Down";
+const DEFAULT_TOGGLE_EXCLUDED: &str = "Control+Shift+Down";
 const DEFAULT_SWAP: &str = "Control+Shift+Up";
 const DEFAULT_WALK: &str = "Control+Shift+KeyD";
 
@@ -109,7 +109,7 @@ impl Default for Shortcuts {
         Self {
             next: Shortcut::new(DEFAULT_NEXT),
             previous: Shortcut::new(DEFAULT_PREVIOUS),
-            toggle_asleep: Shortcut::new(DEFAULT_TOGGLE_ASLEEP),
+            toggle_excluded: Shortcut::new(DEFAULT_TOGGLE_EXCLUDED),
             swap: Shortcut::new(DEFAULT_SWAP),
             walk: Shortcut::new(DEFAULT_WALK),
         }
@@ -379,7 +379,7 @@ mod tests {
         let bound = [
             shortcuts.next.as_ref(),
             shortcuts.previous.as_ref(),
-            shortcuts.toggle_asleep.as_ref(),
+            shortcuts.toggle_excluded.as_ref(),
             shortcuts.swap.as_ref(),
             shortcuts.walk.as_ref(),
         ]
@@ -415,7 +415,7 @@ mod tests {
         let shortcuts = Shortcuts {
             next: Shortcut::new("Alt+Tab"),
             previous: None,
-            toggle_asleep: None,
+            toggle_excluded: None,
             swap: None,
             walk: None,
         };

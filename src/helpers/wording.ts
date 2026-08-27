@@ -1,5 +1,5 @@
 import type { PairingProblem } from '@/@types/relay'
-import type { Character } from '@/@types/roster'
+import type { Character, Gender } from '@/@types/roster'
 import type {
   Binding,
   QuickReply,
@@ -176,12 +176,12 @@ export const characterState = (character: Character): LampState => {
     return 'offline'
   }
 
-  return character.asleep ? 'asleep' : 'live'
+  return character.excluded ? 'excluded' : 'live'
 }
 
 const CHARACTER_STATE_LINES = {
   offline: strings.characters.offline,
-  asleep: strings.characters.asleep,
+  excluded: strings.characters.excluded,
   live: strings.characters.online
 } as const satisfies Record<LampState, string>
 
@@ -290,6 +290,10 @@ const NAMES = new Intl.ListFormat('fr-FR', {
 })
 
 export const missingGenderLine = (nicknames: readonly string[]) => {
+  if (nicknames.length === 0) {
+    return null
+  }
+
   const named = nicknames.slice(0, MISSING_GENDER_NAMED)
   const rest = nicknames.length - named.length
   const others = rest > 1 ? `${rest} autres` : `${rest} autre`
@@ -299,4 +303,24 @@ export const missingGenderLine = (nicknames: readonly string[]) => {
     NAMES.format(parts),
     nicknames.length === 1
   )
+}
+
+type GenderGroupHintParams = {
+  readonly gender: Gender
+  readonly isEmpty: boolean
+  readonly isIncluded: boolean
+}
+
+export const genderGroupHint = ({
+  gender,
+  isEmpty,
+  isIncluded
+}: GenderGroupHintParams) => {
+  if (isEmpty) {
+    return strings.characters.emptyGroupLabel[gender]
+  }
+
+  return isIncluded
+    ? strings.characters.excludeGroupLabel[gender]
+    : strings.characters.includeGroupLabel[gender]
 }

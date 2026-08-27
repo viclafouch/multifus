@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, within } from '@testing-library/react'
-import type { Character } from '@/@types/roster'
+import type { Character, Gender } from '@/@types/roster'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { strings } from '@/constants/strings'
 import { characterOf } from '@/test-doubles'
@@ -10,8 +10,8 @@ const bridge = {
   removeCharacter: vi.fn(),
   setClass: vi.fn(),
   setGender: vi.fn(),
-  setGenderAsleep: vi.fn(),
-  toggleAsleep: vi.fn()
+  setGenderExcluded: vi.fn(),
+  toggleExcluded: vi.fn()
 }
 
 vi.mock(import('@/lib/multifus'), () => {
@@ -30,6 +30,12 @@ const show = (characters: readonly Character[]) => {
 
 const rows = () => {
   return screen.getAllByRole('listitem')
+}
+
+const toggleOf = (gender: Gender) => {
+  return screen.getByRole('button', {
+    name: strings.characters.groupLabel[gender]
+  })
 }
 
 describe('l’écran des personnages', () => {
@@ -65,7 +71,7 @@ describe('l’écran des personnages', () => {
   it('numérote les personnages du défilement, et eux seuls', () => {
     show([
       characterOf({ nickname: 'Alpha' }),
-      characterOf({ nickname: 'Bravo', asleep: true }),
+      characterOf({ nickname: 'Bravo', excluded: true }),
       characterOf({ nickname: 'Charlie' }),
       characterOf({ nickname: 'Delta', online: false })
     ])
@@ -77,29 +83,29 @@ describe('l’écran des personnages', () => {
     expect(ranks).toStrictEqual(['01', '·', '02', '·'])
   })
 
-  it('sort du défilement le personnage dont on bouge l’interrupteur', () => {
+  it('exclut le personnage dont on bouge l’interrupteur', () => {
     show([characterOf({ nickname: 'Alpha' })])
 
     fireEvent.click(
       screen.getByRole('switch', {
-        name: strings.characters.cycleToggle('Alpha')
+        name: strings.characters.includeToggle('Alpha')
       })
     )
 
-    expect(bridge.toggleAsleep).toHaveBeenCalledWith('Alpha')
+    expect(bridge.toggleExcluded).toHaveBeenCalledWith('Alpha')
   })
 
   it('laisse l’interrupteur d’un personnage déconnecté hors d’atteinte', () => {
     show([characterOf({ nickname: 'Alpha', online: false })])
 
     const toggle = screen.getByRole('switch', {
-      name: strings.characters.cycleToggle('Alpha')
+      name: strings.characters.includeToggle('Alpha')
     })
 
     fireEvent.click(toggle)
 
     expect(toggle.getAttribute('aria-disabled')).toBe('true')
-    expect(bridge.toggleAsleep).not.toHaveBeenCalled()
+    expect(bridge.toggleExcluded).not.toHaveBeenCalled()
   })
 
   it('n’offre de retirer du roster que les personnages déconnectés', () => {
@@ -116,54 +122,51 @@ describe('l’écran des personnages', () => {
     ).not.toBeNull()
   })
 
-  it('met de côté tous les personnages d’un sexe', () => {
+  it('montre les deux sexes allumés quand tout le monde défile', () => {
     show([
       characterOf({ nickname: 'Alpha' }),
       characterOf({ nickname: 'Bravo', gender: 'female' })
     ])
 
-    fireEvent.click(
-      screen.getByRole('button', {
-        name: strings.characters.sleepGroupLabel.male
-      })
-    )
-
-    expect(bridge.setGenderAsleep).toHaveBeenCalledWith('male', true)
+    expect(toggleOf('male').getAttribute('aria-pressed')).toBe('true')
+    expect(toggleOf('female').getAttribute('aria-pressed')).toBe('true')
   })
 
-  it('remet dans le défilement tous les personnages d’un sexe', () => {
-    show([characterOf({ nickname: 'Alpha', gender: 'female', asleep: true })])
+  it('éteint le sexe dont tous les connectés sont exclus', () => {
+    show([
+      characterOf({ nickname: 'Alpha', excluded: true }),
+      characterOf({ nickname: 'Bravo', gender: 'female' })
+    ])
 
-    fireEvent.click(
-      screen.getByRole('button', {
-        name: strings.characters.wakeGroupLabel.female
-      })
-    )
-
-    expect(bridge.setGenderAsleep).toHaveBeenCalledWith('female', false)
+    expect(toggleOf('male').getAttribute('aria-pressed')).toBe('false')
+    expect(toggleOf('female').getAttribute('aria-pressed')).toBe('true')
   })
 
-  it('coupe les actions groupées tant qu’un connecté n’a pas de sexe', () => {
+  it('exclut tout un sexe encore dans le défilement', () => {
+    show([
+      characterOf({ nickname: 'Alpha' }),
+      characterOf({ nickname: 'Bravo', gender: 'female' })
+    ])
+
+    fireEvent.click(toggleOf('male'))
+
+    expect(bridge.setGenderExcluded).toHaveBeenCalledWith('male', true)
+  })
+
+  it('réintègre un sexe entièrement exclu', () => {
+    show([characterOf({ nickname: 'Alpha', gender: 'female', excluded: true })])
+
+    fireEvent.click(toggleOf('female'))
+
+    expect(bridge.setGenderExcluded).toHaveBeenCalledWith('female', false)
+  })
+
+  it('laisse les deux sexes sous la main quand un connecté n’a pas de sexe', () => {
     show([characterOf({ nickname: 'Alpha', gender: null })])
 
-    expect(
-      screen.queryByRole('button', {
-        name: strings.characters.sleepGroupLabel.male
-      })
-    ).toBeNull()
-    expect(
-      screen
-        .getByRole('button', {
-          name: strings.characters.sleepGroupLabel.male,
-          hidden: true
-        })
-        .getAttribute('tabindex')
-    ).toBe('-1')
-    expect(
-      screen
-        .getByLabelText(strings.characters.groupLabel.male)
-        .getAttribute('aria-disabled')
-    ).toBe('true')
+    fireEvent.click(toggleOf('male'))
+
+    expect(bridge.setGenderExcluded).toHaveBeenCalledWith('male', false)
   })
 
   it('ne compte pas un déconnecté sans sexe comme un manque', () => {
@@ -172,13 +175,26 @@ describe('l’écran des personnages', () => {
       characterOf({ nickname: 'Bravo', gender: null, online: false })
     ])
 
-    fireEvent.click(
-      screen.getByRole('button', {
-        name: strings.characters.sleepGroupLabel.male
-      })
-    )
+    fireEvent.click(toggleOf('male'))
 
-    expect(bridge.setGenderAsleep).toHaveBeenCalledWith('male', true)
+    expect(bridge.setGenderExcluded).toHaveBeenCalledWith('male', true)
+  })
+
+  it('éteint l’interrupteur d’un personnage exclu, et lui seul', () => {
+    show([
+      characterOf({ nickname: 'Alpha', excluded: true }),
+      characterOf({ nickname: 'Bravo' })
+    ])
+
+    const states = ['Alpha', 'Bravo'].map((nickname) => {
+      return screen
+        .getByRole('switch', {
+          name: strings.characters.includeToggle(nickname)
+        })
+        .getAttribute('aria-checked')
+    })
+
+    expect(states).toStrictEqual(['false', 'true'])
   })
 
   it('dit sous chaque pseudo ce qui manque à son portrait', () => {
@@ -217,9 +233,9 @@ describe('l’écran des personnages', () => {
     ).not.toBeNull()
   })
 
-  it('dit d’un personnage mis de côté qu’il est de côté', () => {
+  it('dit d’un personnage exclu qu’il est exclu', () => {
     show([
-      characterOf({ nickname: 'Alpha', asleep: true }),
+      characterOf({ nickname: 'Alpha', excluded: true }),
       characterOf({ nickname: 'Bravo', online: false })
     ])
 
@@ -227,6 +243,6 @@ describe('l’écran des personnages', () => {
       return within(row).getByText(/^Iop · /u).textContent
     })
 
-    expect(subLines).toStrictEqual(['Iop · De côté', 'Iop · Déconnecté'])
+    expect(subLines).toStrictEqual(['Iop · Exclu', 'Iop · Déconnecté'])
   })
 })

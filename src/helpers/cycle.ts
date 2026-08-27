@@ -1,9 +1,37 @@
-import type { Character } from '@/@types/roster'
+import type { Character, Gender } from '@/@types/roster'
 
 export const nicknamesOf = (characters: readonly Character[]) => {
   return characters.map((character) => {
     return character.nickname
   })
+}
+
+export const matchIsInCycle = (character: Character) => {
+  return character.online && !character.excluded
+}
+
+type GenderGroupParams = {
+  readonly characters: readonly Character[]
+  readonly gender: Gender
+}
+
+export const genderGroupOf = ({ characters, gender }: GenderGroupParams) => {
+  const connected = characters.filter((character) => {
+    return character.online && character.gender === gender
+  })
+
+  return {
+    isEmpty: connected.length === 0,
+    isIncluded: connected.some(matchIsInCycle)
+  }
+}
+
+export const genderlessNicknames = (characters: readonly Character[]) => {
+  const genderless = characters.filter((character) => {
+    return character.online && character.gender === null
+  })
+
+  return nicknamesOf(genderless)
 }
 
 type ArrangeParams = {

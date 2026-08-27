@@ -15,11 +15,10 @@ import {
   DialogTitle
 } from '@/components/ui/dialog'
 import { CLASSES, CLASS_PORTRAITS } from '@/constants/classes'
+import { GENDERS } from '@/constants/roster'
 import { strings } from '@/constants/strings'
 import { portraitFor } from '@/helpers/portrait'
 import { characterState, classDialogNote } from '@/helpers/wording'
-
-const GENDERS = ['male', 'female'] as const satisfies readonly Gender[]
 
 const UNANSWERED_GENDER = 'male'
 

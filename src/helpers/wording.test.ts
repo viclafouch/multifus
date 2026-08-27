@@ -15,6 +15,7 @@ import {
   characterStateLine,
   characterSubLine,
   classDialogNote,
+  genderGroupHint,
   missingGenderLine,
   pairingProblemLine,
   shortcutStatusLine,
@@ -128,7 +129,7 @@ const ONLINE_CHARACTER = {
   nickname: 'Alpha',
   gender: 'male',
   class: null,
-  asleep: false,
+  excluded: false,
   online: true,
   relayed: false
 } as const satisfies Character
@@ -322,8 +323,8 @@ describe('characterPresenceSubLine', () => {
     expect(line).toBe(`Iop · ${strings.characters.online}`)
   })
 
-  it('tait le côté d’un personnage connecté et mis de côté', () => {
-    const character = { ...ONLINE_CHARACTER, asleep: true }
+  it('tait l’exclusion d’un personnage connecté et exclu', () => {
+    const character = { ...ONLINE_CHARACTER, excluded: true }
 
     const line = characterPresenceSubLine(character)
 
@@ -331,7 +332,7 @@ describe('characterPresenceSubLine', () => {
   })
 
   it('dit la déconnexion d’un personnage déconnecté', () => {
-    const character = { ...ONLINE_CHARACTER, asleep: true, online: false }
+    const character = { ...ONLINE_CHARACTER, excluded: true, online: false }
 
     const line = characterPresenceSubLine(character)
 
@@ -340,28 +341,70 @@ describe('characterPresenceSubLine', () => {
 })
 
 describe('missingGenderLine', () => {
+  it('ne dit rien quand personne ne manque', () => {
+    expect(missingGenderLine([])).toBeNull()
+  })
+
   it('nomme un seul manquant au singulier', () => {
     const line = missingGenderLine(['Chafoin'])
 
-    expect(line).toBe('Chafoin n’a pas de sexe.')
+    expect(line).toBe('Chafoin n’a pas de sexe : il ne bougera pas.')
   })
 
   it('nomme deux manquants sans les compter', () => {
     const line = missingGenderLine(['Chafoin', 'Bilou'])
 
-    expect(line).toBe('Chafoin et Bilou n’ont pas de sexe.')
+    expect(line).toBe(
+      'Chafoin et Bilou n’ont pas de sexe : ils ne bougeront pas.'
+    )
   })
 
   it('nomme les deux premiers et compte le reste', () => {
     const line = missingGenderLine(['Chafoin', 'Bilou', 'Nabur', 'Elyandra'])
 
-    expect(line).toBe('Chafoin, Bilou et 2 autres n’ont pas de sexe.')
+    expect(line).toBe(
+      'Chafoin, Bilou et 2 autres n’ont pas de sexe : ils ne bougeront pas.'
+    )
   })
 
   it('accorde le reste au singulier', () => {
     const line = missingGenderLine(['Chafoin', 'Bilou', 'Nabur'])
 
-    expect(line).toBe('Chafoin, Bilou et 1 autre n’ont pas de sexe.')
+    expect(line).toBe(
+      'Chafoin, Bilou et 1 autre n’ont pas de sexe : ils ne bougeront pas.'
+    )
+  })
+})
+
+describe('genderGroupHint', () => {
+  it('propose d’exclure un sexe encore dans le défilement', () => {
+    const hint = genderGroupHint({
+      gender: 'male',
+      isEmpty: false,
+      isIncluded: true
+    })
+
+    expect(hint).toBe(strings.characters.excludeGroupLabel.male)
+  })
+
+  it('propose de réintégrer un sexe entièrement exclu', () => {
+    const hint = genderGroupHint({
+      gender: 'female',
+      isEmpty: false,
+      isIncluded: false
+    })
+
+    expect(hint).toBe(strings.characters.includeGroupLabel.female)
+  })
+
+  it('dit qu’un sexe n’a personne de connecté', () => {
+    const hint = genderGroupHint({
+      gender: 'female',
+      isEmpty: true,
+      isIncluded: false
+    })
+
+    expect(hint).toBe(strings.characters.emptyGroupLabel.female)
   })
 })
 
@@ -372,16 +415,16 @@ describe('characterStateLine', () => {
     expect(line).toBe(strings.characters.online)
   })
 
-  it('dit le côté pour un personnage connecté et mis de côté', () => {
-    const character = { ...ONLINE_CHARACTER, asleep: true }
+  it('dit l’exclusion pour un personnage connecté et exclu', () => {
+    const character = { ...ONLINE_CHARACTER, excluded: true }
 
     const line = characterStateLine(character)
 
-    expect(line).toBe(strings.characters.asleep)
+    expect(line).toBe(strings.characters.excluded)
   })
 
-  it('dit la déconnexion avant le côté pour un personnage déconnecté', () => {
-    const character = { ...ONLINE_CHARACTER, asleep: true, online: false }
+  it('dit la déconnexion avant l’exclusion pour un personnage déconnecté', () => {
+    const character = { ...ONLINE_CHARACTER, excluded: true, online: false }
 
     const line = characterStateLine(character)
 

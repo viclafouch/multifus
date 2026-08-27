@@ -2,7 +2,7 @@ export type ShortcutAction =
   | 'next'
   | 'previous'
   | 'swap'
-  | 'toggleAsleep'
+  | 'toggleExcluded'
   | 'walk'
 
 export type QuickReplyId = number

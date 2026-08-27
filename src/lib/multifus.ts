@@ -54,12 +54,12 @@ export const setClass = async (
   return invoke<Snapshot>('set_class', { nickname, class: characterClass })
 }
 
-export const toggleAsleep = async (nickname: string) => {
-  return invoke<Snapshot>('toggle_asleep', { nickname })
+export const toggleExcluded = async (nickname: string) => {
+  return invoke<Snapshot>('toggle_excluded', { nickname })
 }
 
-export const setGenderAsleep = async (gender: Gender, asleep: boolean) => {
-  return invoke<Snapshot>('set_gender_asleep', { gender, asleep })
+export const setGenderExcluded = async (gender: Gender, excluded: boolean) => {
+  return invoke<Snapshot>('set_gender_excluded', { gender, excluded })
 }
 
 export const reorder = async (order: readonly string[]) => {

@@ -258,17 +258,17 @@ pub enum Launch {
     rename_all_fields = "camelCase"
 )]
 pub enum RosterChange {
-    Slept {
+    Excluded {
         nickname: String,
     },
 
-    Woke {
+    Included {
         nickname: String,
     },
 
-    GenderAsleep {
+    GenderExcluded {
         gender: Gender,
-        asleep: bool,
+        excluded: bool,
     },
 
     GenderAssigned {
@@ -432,6 +432,8 @@ pub enum Outcome {
 
     BodyUnread,
 
+    Excluded,
+
     NoWindow,
 
     LeftMinimized,
@@ -454,11 +456,11 @@ pub enum TrayOutcome {
 pub enum ShortcutOutcome {
     Focused { nickname: String },
 
-    Slept { nickname: String },
+    Excluded { nickname: String },
 
-    Woke { nickname: String },
+    Included { nickname: String },
 
-    Swapped { awake: Gender },
+    Swapped { kept: Gender },
 
     OutsideGame,
 

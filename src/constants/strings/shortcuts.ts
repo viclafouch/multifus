@@ -10,15 +10,14 @@ const ACTION_LABELS = {
     label: 'Fenêtre précédente',
     description: 'Passe à la fenêtre Dofus Retro précédente.'
   },
-  toggleAsleep: {
-    label: 'Mettre de côté',
+  toggleExcluded: {
+    label: 'Exclure',
     description:
-      'Sort du défilement le personnage que vous avez devant vous, ou l’y remet.'
+      'Exclut le personnage que vous avez devant vous, ou le réintègre.'
   },
   swap: {
     label: 'Inverser hommes et femmes',
-    description:
-      'Vos hommes sortent du défilement, vos femmes y entrent. Ou l’inverse.'
+    description: 'Vos hommes sont exclus, vos femmes réintégrées. Ou l’inverse.'
   },
   walk: {
     label: 'Déplacement rapide',

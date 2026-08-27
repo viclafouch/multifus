@@ -339,12 +339,12 @@ impl Multifus {
         self.save();
     }
 
-    pub fn toggle_asleep(&mut self, nickname: &str) {
-        let change = match self.settings.roster.toggle_asleep(nickname) {
-            Some(true) => RosterChange::Slept {
+    pub fn toggle_excluded(&mut self, nickname: &str) {
+        let change = match self.settings.roster.toggle_excluded(nickname) {
+            Some(true) => RosterChange::Excluded {
                 nickname: nickname.to_owned(),
             },
-            Some(false) => RosterChange::Woke {
+            Some(false) => RosterChange::Included {
                 nickname: nickname.to_owned(),
             },
             None => return,
@@ -353,15 +353,18 @@ impl Multifus {
         self.log(JournalEvent::Roster { change });
     }
 
-    pub fn set_gender_asleep(&mut self, gender: Gender, asleep: bool) {
-        let moved = self.settings.roster.set_asleep_for_gender(gender, asleep);
+    pub fn set_gender_excluded(&mut self, gender: Gender, excluded: bool) {
+        let moved = self
+            .settings
+            .roster
+            .set_excluded_for_gender(gender, excluded);
 
         if moved == 0 {
             return;
         }
 
         self.log(JournalEvent::Roster {
-            change: RosterChange::GenderAsleep { gender, asleep },
+            change: RosterChange::GenderExcluded { gender, excluded },
         });
     }
 
@@ -448,7 +451,7 @@ impl Multifus {
         let slot = match action {
             ShortcutAction::Next => &mut self.settings.shortcuts.next,
             ShortcutAction::Previous => &mut self.settings.shortcuts.previous,
-            ShortcutAction::ToggleAsleep => &mut self.settings.shortcuts.toggle_asleep,
+            ShortcutAction::ToggleExcluded => &mut self.settings.shortcuts.toggle_excluded,
             ShortcutAction::Swap => &mut self.settings.shortcuts.swap,
             ShortcutAction::Walk => &mut self.settings.shortcuts.walk,
         };
@@ -1216,6 +1219,10 @@ impl Multifus {
             return Decision::Ignored(Outcome::KindDisabled);
         }
 
+        if self.settings.roster.is_excluded(nickname) {
+            return Decision::Ignored(Outcome::Excluded);
+        }
+
         match self.windows.get(nickname) {
             Some(window) if self.settings.auto_focus.wakes_minimized => Decision::Focus(*window),
             Some(window) => Decision::FocusUnlessMinimized(*window),
@@ -1235,9 +1242,9 @@ impl Multifus {
 
                 self.aim_at(target)
             }
-            ShortcutAction::ToggleAsleep => self.toggle_foreground(current),
+            ShortcutAction::ToggleExcluded => self.toggle_foreground(current),
             ShortcutAction::Swap => match self.settings.roster.swap() {
-                Some(awake) => ShortcutEffect::Settled(ShortcutOutcome::Swapped { awake }),
+                Some(kept) => ShortcutEffect::Settled(ShortcutOutcome::Swapped { kept }),
                 None => ShortcutEffect::Settled(ShortcutOutcome::NoGender),
             },
             ShortcutAction::Walk => ShortcutEffect::Settled(ShortcutOutcome::Walk {
@@ -1263,9 +1270,9 @@ impl Multifus {
     fn toggle_foreground(&mut self, current: &str) -> ShortcutEffect {
         let nickname = current.to_owned();
 
-        let outcome = match self.settings.roster.toggle_asleep(current) {
-            Some(true) => ShortcutOutcome::Slept { nickname },
-            Some(false) => ShortcutOutcome::Woke { nickname },
+        let outcome = match self.settings.roster.toggle_excluded(current) {
+            Some(true) => ShortcutOutcome::Excluded { nickname },
+            Some(false) => ShortcutOutcome::Included { nickname },
             None => ShortcutOutcome::NotInRoster { nickname },
         };
 
@@ -1318,7 +1325,7 @@ fn shortcut_in(shortcuts: &Shortcuts, action: ShortcutAction) -> Option<&Shortcu
     match action {
         ShortcutAction::Next => shortcuts.next.as_ref(),
         ShortcutAction::Previous => shortcuts.previous.as_ref(),
-        ShortcutAction::ToggleAsleep => shortcuts.toggle_asleep.as_ref(),
+        ShortcutAction::ToggleExcluded => shortcuts.toggle_excluded.as_ref(),
         ShortcutAction::Swap => shortcuts.swap.as_ref(),
         ShortcutAction::Walk => shortcuts.walk.as_ref(),
     }
@@ -1333,7 +1340,7 @@ fn view_of(character: &Character) -> CharacterView {
         nickname: character.nickname.clone(),
         gender: character.gender,
         class: character.class,
-        asleep: character.asleep,
+        excluded: character.excluded,
         online: character.online,
         relayed: character.relayed,
     }
@@ -1474,7 +1481,7 @@ mod tests {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
         state.apply_windows(&[window(1, "Alpha"), window(2, "Bravo"), window(3, "Charlie")]);
-        state.toggle_asleep("Bravo");
+        state.toggle_excluded("Bravo");
 
         let plan = state.walk_plan();
 
@@ -1530,7 +1537,7 @@ mod tests {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
         state.apply_windows(&[window(1, "Alpha"), window(2, "Bravo"), window(3, "Charlie")]);
-        state.toggle_asleep("Bravo");
+        state.toggle_excluded("Bravo");
 
         let plan = state.walk_plan();
 
@@ -1564,8 +1571,8 @@ mod tests {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
         state.apply_windows(&[window(1, "Alpha"), window(2, "Bravo")]);
-        state.toggle_asleep("Alpha");
-        state.toggle_asleep("Bravo");
+        state.toggle_excluded("Alpha");
+        state.toggle_excluded("Bravo");
 
         let plan = state.walk_plan();
 
@@ -1633,6 +1640,27 @@ mod tests {
     }
 
     #[test]
+    fn an_excluded_character_is_left_where_he_is() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha")]);
+
+        state.toggle_excluded("Alpha");
+
+        assert_eq!(
+            state.decide("Alpha", Some(NotificationKind::Combat)),
+            Decision::Ignored(Outcome::Excluded)
+        );
+
+        state.toggle_excluded("Alpha");
+
+        assert_eq!(
+            state.decide("Alpha", Some(NotificationKind::Combat)),
+            Decision::Focus(WindowId::from_raw(1))
+        );
+    }
+
+    #[test]
     fn the_cycle_shortcuts_hand_back_the_window_of_the_next_character() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
@@ -1661,8 +1689,8 @@ mod tests {
         state.apply_windows(&[window(1, "Alpha"), window(2, "Bravo")]);
 
         assert_eq!(
-            state.decide_shortcut(ShortcutAction::ToggleAsleep, "Alpha"),
-            ShortcutEffect::Settled(ShortcutOutcome::Slept {
+            state.decide_shortcut(ShortcutAction::ToggleExcluded, "Alpha"),
+            ShortcutEffect::Settled(ShortcutOutcome::Excluded {
                 nickname: "Alpha".to_owned()
             })
         );
@@ -1676,8 +1704,8 @@ mod tests {
         );
 
         assert_eq!(
-            state.decide_shortcut(ShortcutAction::ToggleAsleep, "Alpha"),
-            ShortcutEffect::Settled(ShortcutOutcome::Woke {
+            state.decide_shortcut(ShortcutAction::ToggleExcluded, "Alpha"),
+            ShortcutEffect::Settled(ShortcutOutcome::Included {
                 nickname: "Alpha".to_owned()
             })
         );
@@ -1689,7 +1717,7 @@ mod tests {
         let mut state = multifus(&directory);
 
         assert_eq!(
-            state.decide_shortcut(ShortcutAction::ToggleAsleep, "Echo"),
+            state.decide_shortcut(ShortcutAction::ToggleExcluded, "Echo"),
             ShortcutEffect::Settled(ShortcutOutcome::NotInRoster {
                 nickname: "Echo".to_owned()
             })
@@ -1713,14 +1741,12 @@ mod tests {
         assert_eq!(
             state.decide_shortcut(ShortcutAction::Swap, "Alpha"),
             ShortcutEffect::Settled(ShortcutOutcome::Swapped {
-                awake: Gender::Female
+                kept: Gender::Female
             })
         );
         assert_eq!(
             state.decide_shortcut(ShortcutAction::Swap, "Alpha"),
-            ShortcutEffect::Settled(ShortcutOutcome::Swapped {
-                awake: Gender::Male
-            })
+            ShortcutEffect::Settled(ShortcutOutcome::Swapped { kept: Gender::Male })
         );
     }
 
@@ -1730,14 +1756,14 @@ mod tests {
         let mut state = multifus(&directory);
         state.apply_windows(&[window(1, "Alpha")]);
 
-        state.toggle_asleep("Alpha");
-        state.toggle_asleep("Alpha");
+        state.toggle_excluded("Alpha");
+        state.toggle_excluded("Alpha");
 
         let written = journalled(&state);
 
         assert!(
             written.contains(&JournalEvent::Roster {
-                change: RosterChange::Slept {
+                change: RosterChange::Excluded {
                     nickname: "Alpha".to_owned()
                 }
             }),
@@ -1745,7 +1771,7 @@ mod tests {
         );
         assert!(
             written.contains(&JournalEvent::Roster {
-                change: RosterChange::Woke {
+                change: RosterChange::Included {
                     nickname: "Alpha".to_owned()
                 }
             }),
@@ -1758,7 +1784,7 @@ mod tests {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
 
-        state.toggle_asleep("Nobody");
+        state.toggle_excluded("Nobody");
 
         assert_eq!(journalled(&state), Vec::new());
     }
@@ -1769,7 +1795,7 @@ mod tests {
         let mut state = multifus(&directory);
         state.apply_windows(&[window(1, "Alpha")]);
 
-        state.set_gender_asleep(Gender::Female, true);
+        state.set_gender_excluded(Gender::Female, true);
 
         let roster_changes = journalled(&state)
             .into_iter()
@@ -1951,13 +1977,13 @@ mod tests {
     }
 
     #[test]
-    fn an_asleep_character_is_still_relayed_and_an_unticked_one_is_not() {
+    fn an_excluded_character_is_still_relayed_and_an_unticked_one_is_not() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
         state.apply_windows(&[window(1, "Alpha"), window(2, "Bravo")]);
         state.set_paired(42);
         state.set_relayed("Bravo", false);
-        state.toggle_asleep("Alpha");
+        state.toggle_excluded("Alpha");
 
         assert!(!state.relays("Alpha"), "the relay is not switched on");
 
@@ -2617,11 +2643,11 @@ mod tests {
     }
 
     #[test]
-    fn a_cycle_shortcut_with_everyone_asleep_settles_on_nothing() {
+    fn a_cycle_shortcut_with_everyone_excluded_settles_on_nothing() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
         state.apply_windows(&[window(1, "Alpha")]);
-        state.toggle_asleep("Alpha");
+        state.toggle_excluded("Alpha");
 
         assert_eq!(
             state.decide_shortcut(ShortcutAction::Next, "Alpha"),
@@ -2825,13 +2851,13 @@ mod tests {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
         state.apply_windows(&[window(1, "Alpha"), window(2, "Bravo")]);
-        state.toggle_asleep("Bravo");
+        state.toggle_excluded("Bravo");
         state.apply_windows(&[window(1, "Alpha")]);
 
         let listed = state
             .connected()
             .into_iter()
-            .map(|character| (character.nickname, character.asleep))
+            .map(|character| (character.nickname, character.excluded))
             .collect::<Vec<_>>();
 
         assert_eq!(listed, vec![("Alpha".to_owned(), false)]);
@@ -2841,12 +2867,15 @@ mod tests {
             "the roster keeps both"
         );
 
-        state.toggle_asleep("Alpha");
+        state.toggle_excluded("Alpha");
 
         assert_eq!(
-            state.connected().first().map(|character| character.asleep),
+            state
+                .connected()
+                .first()
+                .map(|character| character.excluded),
             Some(true),
-            "a character set aside is still on the menu, and says so"
+            "an excluded character is still on the menu, and says so"
         );
     }
 

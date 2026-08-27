@@ -63,7 +63,7 @@ fn an_evening_of_dofus_from_the_first_client_to_the_last() {
         "nothing is painted twice"
     );
 
-    state.toggle_asleep("Bravo");
+    state.toggle_excluded("Bravo");
 
     assert_eq!(in_cycle(&state), ["Alpha", "Charlie"]);
     assert_eq!(
@@ -95,7 +95,7 @@ fn an_evening_of_dofus_from_the_first_client_to_the_last() {
     let logged_out = state.apply_windows(&[client(1, "Alpha"), client(2, "Bravo")]);
 
     assert!(logged_out.changed);
-    assert_eq!(in_cycle(&state), ["Alpha"], "Bravo is still set aside");
+    assert_eq!(in_cycle(&state), ["Alpha"], "Bravo is still excluded");
     assert_eq!(nicknames(&state), ["Alpha", "Bravo", "Charlie"]);
     assert_eq!(
         state.decide("Charlie", Some(NotificationKind::Combat)),
@@ -118,7 +118,7 @@ fn a_multifus_that_was_killed_finds_its_roster_and_its_traces_again() {
     died.apply_windows(&[client(1, "Alpha"), client(2, "Bravo")]);
     died.set_class("Alpha", Some(Class::Cra));
     died.set_gender("Alpha", Some(Gender::Female));
-    died.toggle_asleep("Bravo");
+    died.toggle_excluded("Bravo");
 
     paint_everything(&mut died);
 
@@ -147,7 +147,7 @@ fn a_multifus_that_was_killed_finds_its_roster_and_its_traces_again() {
     assert_eq!(
         in_cycle(&reborn),
         ["Alpha", "Bravo"],
-        "nobody stays set aside across a restart"
+        "nobody stays excluded across a restart"
     );
     assert!(
         written(&reborn).contains(&JournalEvent::Started {

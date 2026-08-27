@@ -13,6 +13,7 @@ import {
   TooltipTrigger
 } from '@/components/ui/tooltip'
 import { strings } from '@/constants/strings'
+import { matchIsInCycle } from '@/helpers/cycle'
 import { portraitFor } from '@/helpers/portrait'
 import {
   characterPortraitLabel,
@@ -24,7 +25,7 @@ import {
 const STAGGER_MS = 38
 
 type RowActions = Readonly<{
-  handleToggleAsleep: (nickname: string) => void
+  handleToggleExcluded: (nickname: string) => void
   handleSetGender: (nickname: string, gender: Gender | null) => void
   handleSetClass: (nickname: string, characterClass: Class | null) => void
   handleSetPortrait: (nickname: string, portrait: Portrait) => void
@@ -46,7 +47,7 @@ export const CharacterRow = ({
   paintPortraits,
   actions
 }: CharacterRowProps) => {
-  const { nickname, asleep, online } = character
+  const { nickname, excluded, online } = character
   const { ref, handleRef, isDragging } = useSortable({ id: nickname, index })
   const [isEntering, setIsEntering] = React.useState(true)
   const [isDialogOpen, setIsDialogOpen] = React.useState(false)
@@ -59,13 +60,14 @@ export const CharacterRow = ({
       data-entering={isEntering ? '' : undefined}
       data-dragging={isDragging ? '' : undefined}
       data-offline={online ? undefined : ''}
+      data-excluded={excluded ? '' : undefined}
       style={{ animationDelay: `${index * STAGGER_MS}ms` }}
       onAnimationEnd={(event) => {
         if (event.target === event.currentTarget) {
           setIsEntering(false)
         }
       }}
-      className="transition-row group relative flex h-row items-center gap-3 rounded-lg border border-transparent px-2 hover:border-border hover:bg-card/70 data-dragging:border-primary/35 data-dragging:bg-card data-dragging:shadow-lg data-entering:rise data-offline:dimmed"
+      className="transition-row group relative flex h-row items-center gap-3 rounded-lg border border-transparent px-2 hover:border-border hover:bg-card/70 data-excluded:border-destructive/25 data-excluded:bg-destructive/8 data-excluded:hover:border-destructive/45 data-excluded:hover:bg-destructive/14 data-dragging:border-primary/35 data-dragging:bg-card data-dragging:shadow-lg data-entering:rise data-offline:dimmed"
     >
       <Button
         ref={handleRef}
@@ -101,7 +103,7 @@ export const CharacterRow = ({
         <TooltipContent>{portraitTooltip}</TooltipContent>
       </Tooltip>
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <p className="selectable truncate text-row font-medium group-data-offline:text-muted-foreground">
+        <p className="selectable truncate text-row font-medium group-data-excluded:text-destructive group-data-excluded:line-through group-data-excluded:decoration-destructive/80">
           {nickname}
         </p>
         <p className="text-micro font-medium tracking-micro text-muted-foreground/65 uppercase">
@@ -109,11 +111,12 @@ export const CharacterRow = ({
         </p>
       </div>
       <Switch
-        checked={online && !asleep}
+        checked={matchIsInCycle(character)}
         disabled={!online}
-        aria-label={strings.characters.cycleToggle(nickname)}
+        aria-label={strings.characters.includeToggle(nickname)}
+        className="group-data-excluded:data-unchecked:bg-destructive/45"
         onCheckedChange={() => {
-          actions.handleToggleAsleep(nickname)
+          actions.handleToggleExcluded(nickname)
         }}
       />
       <span className="flex w-6 shrink-0 justify-end">

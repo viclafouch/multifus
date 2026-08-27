@@ -5,6 +5,7 @@ import type {
   TrayOutcome
 } from '@/@types/journal'
 import type { NoticeCase, RelayStop } from '@/@types/relay'
+import type { Gender } from '@/@types/roster'
 import type { ShortcutBinding } from '@/@types/shortcuts'
 import type { Work } from '@/@types/system'
 import type { WalkFrom, WalkIdle } from '@/@types/walk'
@@ -93,6 +94,22 @@ export const WALK_IDLE_LINES = {
     'Déplacement rapide : la fenêtre suivante a mis plus de temps que prévu à passer devant.'
 } as const satisfies Record<WalkIdle, string>
 
+export const GENDER_GROUP_LINES = {
+  male: {
+    excluded: 'Tous les hommes connectés sont exclus.',
+    included: 'Tous les hommes connectés sont réintégrés.'
+  },
+  female: {
+    excluded: 'Toutes les femmes connectées sont exclues.',
+    included: 'Toutes les femmes connectées sont réintégrées.'
+  }
+} as const satisfies Record<Gender, Record<'excluded' | 'included', string>>
+
+export const SWAP_LINES = {
+  male: 'les hommes défilent, les femmes sont exclues.',
+  female: 'les femmes défilent, les hommes sont exclus.'
+} as const satisfies Record<Gender, string>
+
 export const WALK_FROM_LABELS = {
   window: 'la fenêtre',
   tray: 'la barre système',
@@ -102,8 +119,8 @@ export const WALK_FROM_LABELS = {
 
 export const SHORTCUT_TONES = {
   focused: 'good',
-  slept: 'good',
-  woke: 'good',
+  excluded: 'good',
+  included: 'good',
   swapped: 'good',
   walk: 'good',
   outsideGame: 'neutral',

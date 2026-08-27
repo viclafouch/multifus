@@ -10,7 +10,6 @@ import type {
 } from '@/@types/journal'
 import type { NotificationKind } from '@/@types/notification'
 import type { RelayFailure } from '@/@types/relay'
-import type { Gender } from '@/@types/roster'
 import type {
   Binding,
   BoundCombination,
@@ -22,6 +21,7 @@ import type { JournalTone } from '@/constants/journal'
 import {
   DEAD_SHORTCUT_STATUSES,
   DETAILED_LINES,
+  GENDER_GROUP_LINES,
   NOTICE_LINES,
   QUICK_REPLY_FAILURE_TONES,
   PLAIN_LINES,
@@ -30,6 +30,7 @@ import {
   WALK_IDLE_TONES,
   RELAY_STOP_LINES,
   SHORTCUT_TONES,
+  SWAP_LINES,
   TONES,
   TRAY_TONES,
   WORK_LABELS
@@ -190,22 +191,18 @@ const surfaceLabel = (surface: Surface) => {
   return surface === 'tray' ? 'la barre système' : 'la fenêtre'
 }
 
-const genderPluralLabel = (gender: Gender) => {
-  return gender === 'male' ? 'les hommes' : 'les femmes'
-}
-
 const rosterLine = (change: RosterChange) => {
   switch (change.kind) {
-    case 'slept': {
-      return `${change.nickname} mis de côté.`
+    case 'excluded': {
+      return `${change.nickname} exclu.`
     }
-    case 'woke': {
-      return `${change.nickname} remis dans le défilement.`
+    case 'included': {
+      return `${change.nickname} réintégré.`
     }
-    case 'genderAsleep': {
-      const what = change.asleep ? 'de côté' : 'dans le défilement'
+    case 'genderExcluded': {
+      const lines = GENDER_GROUP_LINES[change.gender]
 
-      return `Tous ${genderPluralLabel(change.gender)} connectés sont ${what}.`
+      return change.excluded ? lines.excluded : lines.included
     }
     case 'genderAssigned': {
       if (change.gender === null) {
@@ -395,16 +392,14 @@ const shortcutLine = ({ action, outcome }: ShortcutLineParams) => {
     case 'focused': {
       return `${label} : ${outcome.nickname} au premier plan.`
     }
-    case 'slept': {
-      return `${label} : ${outcome.nickname} mis de côté.`
+    case 'excluded': {
+      return `${label} : ${outcome.nickname} exclu.`
     }
-    case 'woke': {
-      return `${label} : ${outcome.nickname} remis dans le défilement.`
+    case 'included': {
+      return `${label} : ${outcome.nickname} réintégré.`
     }
     case 'swapped': {
-      return outcome.awake === 'male'
-        ? `${label} : les hommes sont dans le défilement, les femmes de côté.`
-        : `${label} : les femmes sont dans le défilement, les hommes de côté.`
+      return `${label} : ${SWAP_LINES[outcome.kept]}`
     }
     case 'outsideGame': {
       return `${label} : ignoré, aucune fenêtre Dofus au premier plan.`
@@ -486,6 +481,9 @@ const notificationLine = ({
     }
     case 'noWindow': {
       return `${subject} : aucune fenêtre à ramener.`
+    }
+    case 'excluded': {
+      return `${subject} : personnage exclu, sa fenêtre reste où elle est.`
     }
     case 'leftMinimized': {
       return `${subject} : fenêtre réduite, laissée où elle est.`

@@ -63,7 +63,7 @@ const SHORTCUTS = [
     isDefault: false
   },
   {
-    action: 'toggleAsleep',
+    action: 'toggleExcluded',
     accelerator: 'Control+Shift+KeyS',
     status: { kind: 'pending' },
     isDefault: false
@@ -97,7 +97,7 @@ const BINDINGS = [
     status: { kind: 'unbound' }
   },
   {
-    binding: { kind: 'action', action: 'toggleAsleep' },
+    binding: { kind: 'action', action: 'toggleExcluded' },
     accelerator: 'Control+Shift+KeyS',
     status: { kind: 'pending' }
   },
@@ -114,35 +114,41 @@ const BINDINGS = [
 ] as const satisfies readonly BoundCombination[]
 
 const BINDINGS_LINE =
-  'Raccourcis : Fenêtre suivante Control+Shift+ArrowRight · Fenêtre précédente non attribué · Mettre de côté pas encore posé · Inverser hommes et femmes Control+Shift+KeyX illisible (touche inconnue) · Réponse rapide 1 Control+Shift+KeyP.'
+  'Raccourcis : Fenêtre suivante Control+Shift+ArrowRight · Fenêtre précédente non attribué · Exclure pas encore posé · Inverser hommes et femmes Control+Shift+KeyX illisible (touche inconnue) · Réponse rapide 1 Control+Shift+KeyP.'
 
 const ROSTER_CASES = {
-  slept: [
-    {
-      event: { kind: 'roster', change: { kind: 'slept', nickname: NICKNAME } },
-      line: 'Alpha mis de côté.'
-    }
-  ],
-  woke: [
-    {
-      event: { kind: 'roster', change: { kind: 'woke', nickname: NICKNAME } },
-      line: 'Alpha remis dans le défilement.'
-    }
-  ],
-  genderAsleep: [
+  excluded: [
     {
       event: {
         kind: 'roster',
-        change: { kind: 'genderAsleep', gender: 'male', asleep: true }
+        change: { kind: 'excluded', nickname: NICKNAME }
       },
-      line: 'Tous les hommes connectés sont de côté.'
+      line: 'Alpha exclu.'
+    }
+  ],
+  included: [
+    {
+      event: {
+        kind: 'roster',
+        change: { kind: 'included', nickname: NICKNAME }
+      },
+      line: 'Alpha réintégré.'
+    }
+  ],
+  genderExcluded: [
+    {
+      event: {
+        kind: 'roster',
+        change: { kind: 'genderExcluded', gender: 'male', excluded: true }
+      },
+      line: 'Tous les hommes connectés sont exclus.'
     },
     {
       event: {
         kind: 'roster',
-        change: { kind: 'genderAsleep', gender: 'female', asleep: false }
+        change: { kind: 'genderExcluded', gender: 'female', excluded: false }
       },
-      line: 'Tous les femmes connectés sont dans le défilement.'
+      line: 'Toutes les femmes connectées sont réintégrées.'
     }
   ],
   classAssigned: [
@@ -346,24 +352,24 @@ const SHORTCUT_CASES = {
       line: 'Fenêtre suivante : Alpha au premier plan.'
     }
   ],
-  slept: [
+  excluded: [
     {
       event: {
         kind: 'shortcut',
-        action: 'toggleAsleep',
-        outcome: { outcome: 'slept', nickname: NICKNAME }
+        action: 'toggleExcluded',
+        outcome: { outcome: 'excluded', nickname: NICKNAME }
       },
-      line: 'Mettre de côté : Alpha mis de côté.'
+      line: 'Exclure : Alpha exclu.'
     }
   ],
-  woke: [
+  included: [
     {
       event: {
         kind: 'shortcut',
-        action: 'toggleAsleep',
-        outcome: { outcome: 'woke', nickname: NICKNAME }
+        action: 'toggleExcluded',
+        outcome: { outcome: 'included', nickname: NICKNAME }
       },
-      line: 'Mettre de côté : Alpha remis dans le défilement.'
+      line: 'Exclure : Alpha réintégré.'
     }
   ],
   swapped: [
@@ -371,17 +377,17 @@ const SHORTCUT_CASES = {
       event: {
         kind: 'shortcut',
         action: 'swap',
-        outcome: { outcome: 'swapped', awake: 'male' }
+        outcome: { outcome: 'swapped', kept: 'male' }
       },
-      line: 'Inverser hommes et femmes : les hommes sont dans le défilement, les femmes de côté.'
+      line: 'Inverser hommes et femmes : les hommes défilent, les femmes sont exclues.'
     },
     {
       event: {
         kind: 'shortcut',
         action: 'swap',
-        outcome: { outcome: 'swapped', awake: 'female' }
+        outcome: { outcome: 'swapped', kept: 'female' }
       },
-      line: 'Inverser hommes et femmes : les femmes sont dans le défilement, les hommes de côté.'
+      line: 'Inverser hommes et femmes : les femmes défilent, les hommes sont exclus.'
     }
   ],
   outsideGame: [
@@ -619,6 +625,17 @@ const NOTIFICATION_CASES = {
         outcome: { outcome: 'noWindow' }
       },
       line: 'Échange pour Alpha : aucune fenêtre à ramener.'
+    }
+  ],
+  excluded: [
+    {
+      event: {
+        kind: 'notification',
+        nickname: NICKNAME,
+        notificationKind: 'combat',
+        outcome: { outcome: 'excluded' }
+      },
+      line: 'Combat pour Alpha : personnage exclu, sa fenêtre reste où elle est.'
     }
   ],
   leftMinimized: [

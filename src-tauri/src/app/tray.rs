@@ -42,7 +42,7 @@ const MENU_SETTINGS: &str = "Paramètres";
 const MENU_ABOUT: &str = "À propos";
 const MENU_QUIT: &str = "Quitter Multifus";
 const MENU_NOBODY: &str = "Aucun personnage connecté";
-const MENU_ASLEEP: &str = " (de côté)";
+const MENU_EXCLUDED: &str = " (exclu)";
 const MENU_AUTO_FOCUS_ON: &str = "Activer l'AutoFocus";
 const MENU_WALK_ON: &str = "Activer le Déplacement rapide";
 const MENU_WALK_OFF: &str = "Désactiver le Déplacement rapide";
@@ -158,8 +158,8 @@ fn entries(connected: &[CharacterView]) -> Vec<Entry> {
         .iter()
         .map(|character| Entry {
             nickname: character.nickname.clone(),
-            label: if character.asleep {
-                format!("{}{MENU_ASLEEP}", character.nickname)
+            label: if character.excluded {
+                format!("{}{MENU_EXCLUDED}", character.nickname)
             } else {
                 character.nickname.clone()
             },
@@ -543,12 +543,12 @@ mod tests {
     use crate::test_doubles;
     use crate::test_doubles::directory;
 
-    fn connected(nickname: &str, asleep: bool) -> CharacterView {
+    fn connected(nickname: &str, excluded: bool) -> CharacterView {
         CharacterView {
             nickname: nickname.to_owned(),
             gender: None,
             class: None,
-            asleep,
+            excluded,
             online: true,
             relayed: true,
         }
@@ -623,7 +623,7 @@ mod tests {
                 },
                 Entry {
                     nickname: "Bravo".to_owned(),
-                    label: "Bravo (de côté)".to_owned(),
+                    label: "Bravo (exclu)".to_owned(),
                 },
             ]
         );
