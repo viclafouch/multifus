@@ -8,8 +8,10 @@ Une notification arrive dans le jeu, Multifus met devant vous la fenêtre du per
 
 - [x] Ramener une fenêtre au premier plan sur sept événements : combat, échange, groupe, craft, message privé, défi, percepteur
 - [x] Deux raccourcis pour passer au personnage suivant ou précédent, dans l'ordre que vous rangez vous-même
-- [x] Un raccourci pour mettre un personnage de côté : il sort du défilement, et une notification le ramène quand même
-- [x] Un sexe par personnage, et un raccourci qui met tous vos hommes de côté pendant qu'il remet vos femmes dans le défilement
+- [x] Un raccourci pour exclure un personnage : il sort du défilement, et sa fenêtre ne passe plus devant sur une notification
+- [x] Un sexe par personnage, et deux sigils qui excluent ou réintègrent tous vos hommes, ou toutes vos femmes, d'un clic
+- [x] Un raccourci qui vous ramène sur votre personnage principal, d'où que vous veniez dans le jeu
+- [x] Le Déplacement rapide : chaque clic gauche passe au personnage suivant, et vous emmenez toute votre team d'une map à l'autre sans lâcher la souris. Une bannière dit sur qui vous venez d'arriver
 - [x] Des réponses rapides : une combinaison colle un texte tout prêt dans le chat, la touche Entrée reste la vôtre
 - [x] Vos messages privés sur votre téléphone par Telegram, tant que vous êtes loin du clavier
 - [x] Un client qui s'ouvre s'agrandit tout seul, une seule fois
@@ -20,13 +22,13 @@ Une notification arrive dans le jeu, Multifus met devant vous la fenêtre du per
 - [x] Un journal qui se copie d'un clic, pour le jour où rien ne se passe
 - [x] Une mise à jour proposée quand une version sort, à installer d'un clic
 
-Les quatre derniers réglages sont décochés par défaut. Fermer la fenêtre ne quitte pas Multifus, qui continue dans la barre système ; on le quitte par le menu de son icône.
+Le portrait de classe mis à part, ces réglages sont décochés par défaut. Fermer la fenêtre ne quitte pas Multifus, qui continue dans la barre système ; on le quitte par le menu de son icône.
 
 ## Compatibilité
 
 | Système             | Version minimale                    | État                     |
 | ------------------- | ----------------------------------- | ------------------------ |
-| macOS               | 10.13 High Sierra                   | Vérifié sur macOS 26     |
+| macOS               | 11 Big Sur, Apple Silicon           | Vérifié sur macOS 26     |
 | Windows             | 10, mise à jour 1709 d'octobre 2017 | En cours de vérification |
 | Linux, iOS, Android |                                     | Hors périmètre           |
 
