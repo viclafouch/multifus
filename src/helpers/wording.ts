@@ -96,7 +96,7 @@ export const bindingLabel = (
   binding: Binding,
   quickReplies: readonly QuickReply[]
 ): string => {
-  const words = strings.shortcuts.quickReplies
+  const words = strings.quickReplies
 
   if (binding.kind === 'action') {
     return `« ${strings.shortcuts.actions[binding.action].label} »`
@@ -111,6 +111,14 @@ export const bindingLabel = (
   }
 
   return words.named(shorten(quickReply.text))
+}
+
+export const quickReplyEditLabel = (quickReply: QuickReply) => {
+  const words = strings.quickReplies
+
+  return quickReply.text.length === 0
+    ? words.edit
+    : words.editNamed(shorten(quickReply.text))
 }
 
 const shorten = (text: string) => {
@@ -140,9 +148,6 @@ export const shortcutStatusLine = (
     case 'unbound': {
       return { tone: 'calm', text: answers.unbound }
     }
-    case 'pending': {
-      return { tone: 'calm', text: answers.pending }
-    }
     case 'invalid': {
       return { tone: 'bad', text: answers.invalid }
     }
@@ -156,7 +161,7 @@ export const shortcutStatusLine = (
       }
     }
     default: {
-      return { tone: 'calm', text: answers.pending }
+      return null
     }
   }
 }

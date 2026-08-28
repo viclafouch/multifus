@@ -1,12 +1,12 @@
 import React from 'react'
 import { KeyCap } from '@/components/key-cap'
+import { ShortcutUndoButton } from '@/components/shortcut-undo-button'
 import { Button } from '@/components/ui/button'
 import type { CaptureRejection } from '@/constants/keyboard'
 import { strings } from '@/constants/strings'
 import { acceleratorParts, capture, heldModifiers } from '@/helpers/accelerator'
 import type { TonedLine } from '@/helpers/wording'
 import type { ShortcutUndo } from '@/hooks/use-shortcut-undo'
-import { ShortcutUndoButton } from '@/screens/shortcuts/shortcut-undo-button'
 
 type ShortcutFieldProps = Readonly<{
   accelerator: string | null

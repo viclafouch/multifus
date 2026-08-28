@@ -1,14 +1,15 @@
 import React from 'react'
 import type { Binding, QuickReply, QuickReplyId } from '@/@types/shortcuts'
 import { RemoveButton } from '@/components/remove-button'
+import { ShortcutField } from '@/components/shortcut-field'
 import { Input } from '@/components/ui/input'
 import { strings } from '@/constants/strings'
 import { matchIsSameBinding } from '@/helpers/binding'
 import type { TonedLine } from '@/helpers/wording'
+import { quickReplyEditLabel } from '@/helpers/wording'
 import { useDraft } from '@/hooks/use-draft'
-import { ShortcutField } from '@/screens/shortcuts/shortcut-field'
 
-export type QuickReplyRowActions = Readonly<{
+export type ReplyRowActions = Readonly<{
   handleText: (id: QuickReplyId, text: string) => void
   handleShortcut: (id: QuickReplyId, accelerator: string | null) => void
   handleRemove: (id: QuickReplyId) => void
@@ -16,21 +17,21 @@ export type QuickReplyRowActions = Readonly<{
   handleClose: () => void
 }>
 
-type QuickReplyRowProps = Readonly<{
+type ReplyRowProps = Readonly<{
   quickReply: QuickReply
   statusLine: TonedLine | null
   editing: Binding | null
-  actions: QuickReplyRowActions
+  actions: ReplyRowActions
 }>
 
-export const QuickReplyRow = ({
+export const ReplyRow = ({
   quickReply,
   statusLine,
   editing,
   actions
-}: QuickReplyRowProps) => {
+}: ReplyRowProps) => {
   const { draft, setDraft } = useDraft(quickReply.text)
-  const words = strings.shortcuts.quickReplies
+  const words = strings.quickReplies
 
   const handleBlur = () => {
     const text = draft.trim()
@@ -54,18 +55,25 @@ export const QuickReplyRow = ({
 
   return (
     <li className="group flex items-start gap-3 border-b border-border/70 px-4 py-3 last:border-b-0">
-      <Input
-        value={draft}
-        placeholder={words.placeholder}
-        aria-label={words.textLabel}
-        spellCheck={false}
-        onChange={(event) => {
-          setDraft(event.target.value)
-        }}
-        onBlur={handleBlur}
-        onKeyDown={handleKeyDown}
-        className="h-8 text-note"
-      />
+      <div className="flex min-w-0 flex-1 flex-col gap-1">
+        <Input
+          value={draft}
+          placeholder={words.placeholder}
+          aria-label={words.textLabel}
+          spellCheck={false}
+          onChange={(event) => {
+            setDraft(event.target.value)
+          }}
+          onBlur={handleBlur}
+          onKeyDown={handleKeyDown}
+          className="h-8 font-display text-row"
+        />
+        {draft.length === 0 ? (
+          <p className="px-1 text-mini text-muted-foreground/75">
+            {words.blank}
+          </p>
+        ) : null}
+      </div>
       <RemoveButton
         label={words.remove}
         onRemove={() => {
@@ -76,7 +84,7 @@ export const QuickReplyRow = ({
       <ShortcutField
         accelerator={quickReply.accelerator}
         statusLine={statusLine}
-        editLabel={words.edit}
+        editLabel={quickReplyEditLabel(quickReply)}
         undo={null}
         editing={{
           isActive: matchIsSameBinding(editing, {

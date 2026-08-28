@@ -10,11 +10,7 @@ import { strings } from '@/constants/strings'
 
 const bridge = {
   setShortcut: vi.fn(),
-  resetShortcuts: vi.fn(),
-  addQuickReply: vi.fn(),
-  setQuickReplyText: vi.fn(),
-  setQuickReplyShortcut: vi.fn(),
-  removeQuickReply: vi.fn()
+  resetShortcuts: vi.fn()
 }
 
 vi.mock(import('@/lib/multifus'), () => {
@@ -92,12 +88,6 @@ const show = ({ shortcuts = [], quickReplies = [] }: ShowParams = {}) => {
 const fieldOf = (action: ShortcutAction) => {
   return screen.getByRole('button', {
     name: strings.shortcuts.edit(strings.shortcuts.actions[action].label)
-  })
-}
-
-const quickReplyField = () => {
-  return screen.getByRole('button', {
-    name: strings.shortcuts.quickReplies.edit
   })
 }
 
@@ -387,9 +377,7 @@ describe('l’écran des raccourcis, ce que Rust répond d’une combinaison', (
     })
 
     expect(screen.getByRole('alert').textContent).toBe(
-      strings.shortcuts.status.duplicate(
-        strings.shortcuts.quickReplies.named('Bonjour')
-      )
+      strings.shortcuts.status.duplicate(strings.quickReplies.named('Bonjour'))
     )
   })
 
@@ -400,171 +388,5 @@ describe('l’écran des raccourcis, ce que Rust répond d’une combinaison', (
 
     expect(screen.queryByRole('alert')).toBeNull()
     expect(screen.queryByText(strings.shortcuts.status.unbound)).toBeNull()
-  })
-})
-
-describe('l’écran des raccourcis, les réponses rapides', () => {
-  it('invite à en ajouter une quand il n’y en a aucune', () => {
-    show()
-
-    expect(
-      screen.getByText(strings.shortcuts.quickReplies.empty)
-    ).not.toBeNull()
-  })
-
-  it('en ajoute une à la demande', () => {
-    show()
-
-    fireEvent.click(
-      screen.getByRole('button', { name: strings.shortcuts.quickReplies.add })
-    )
-
-    expect(bridge.addQuickReply).toHaveBeenCalledWith()
-  })
-
-  it('porte le texte de chaque réponse', () => {
-    show({
-      quickReplies: [
-        quickReply(1, { text: 'Je vends, mp moi' }),
-        quickReply(2, { text: 'En combat, j’arrive' })
-      ]
-    })
-
-    const texts = screen
-      .getAllByLabelText<HTMLInputElement>(
-        strings.shortcuts.quickReplies.textLabel
-      )
-      .map((field) => {
-        return field.value
-      })
-
-    expect(texts).toStrictEqual(['Je vends, mp moi', 'En combat, j’arrive'])
-  })
-
-  it('garde le texte tapé, et ne l’envoie qu’une fois la ligne quittée', () => {
-    show({ quickReplies: [quickReply(1, { text: '' })] })
-
-    const field = screen.getByLabelText(
-      strings.shortcuts.quickReplies.textLabel
-    )
-
-    fireEvent.change(field, { target: { value: 'Je suis en combat' } })
-
-    expect(bridge.setQuickReplyText).not.toHaveBeenCalled()
-
-    fireEvent.blur(field)
-
-    expect(bridge.setQuickReplyText).toHaveBeenCalledWith(
-      1,
-      'Je suis en combat'
-    )
-  })
-
-  it('taille les espaces autour du texte', () => {
-    show({ quickReplies: [quickReply(1, { text: '' })] })
-
-    const field = screen.getByLabelText(
-      strings.shortcuts.quickReplies.textLabel
-    )
-
-    fireEvent.change(field, { target: { value: '  Bonjour  ' } })
-    fireEvent.blur(field)
-
-    expect(bridge.setQuickReplyText).toHaveBeenCalledWith(1, 'Bonjour')
-  })
-
-  it('n’envoie rien quand le texte n’a pas bougé', () => {
-    show({ quickReplies: [quickReply(1, { text: 'Bonjour' })] })
-
-    fireEvent.blur(
-      screen.getByLabelText(strings.shortcuts.quickReplies.textLabel)
-    )
-
-    expect(bridge.setQuickReplyText).not.toHaveBeenCalled()
-  })
-
-  it('valide le texte sur Entrée', () => {
-    show({ quickReplies: [quickReply(1, { text: '' })] })
-
-    const field = screen.getByLabelText(
-      strings.shortcuts.quickReplies.textLabel
-    )
-
-    field.focus()
-    fireEvent.change(field, { target: { value: 'Bonjour' } })
-    fireEvent.keyDown(field, { key: 'Enter', code: 'Enter' })
-
-    expect(bridge.setQuickReplyText).toHaveBeenCalledWith(1, 'Bonjour')
-  })
-
-  it('rend le texte d’avant sur Échap', () => {
-    show({ quickReplies: [quickReply(1, { text: 'Bonjour' })] })
-
-    const field = screen.getByLabelText<HTMLInputElement>(
-      strings.shortcuts.quickReplies.textLabel
-    )
-
-    fireEvent.change(field, { target: { value: 'Autre chose' } })
-    fireEvent.keyDown(field, { key: 'Escape', code: 'Escape' })
-
-    expect(field.value).toBe('Bonjour')
-    expect(bridge.setQuickReplyText).not.toHaveBeenCalled()
-  })
-
-  it('en retire une à la demande', () => {
-    show({ quickReplies: [quickReply(4)] })
-
-    fireEvent.click(
-      screen.getByRole('button', {
-        name: strings.shortcuts.quickReplies.remove
-      })
-    )
-
-    expect(bridge.removeQuickReply).toHaveBeenCalledWith(4)
-  })
-
-  it('range une réponse sous les touches frappées', () => {
-    show({ quickReplies: [quickReply(4)] })
-
-    fireEvent.click(quickReplyField())
-    strike(quickReplyField(), { code: 'KeyB', ctrlKey: true, altKey: true })
-
-    expect(bridge.setQuickReplyShortcut).toHaveBeenCalledWith(
-      4,
-      'Control+Alt+KeyB'
-    )
-  })
-
-  it('referme la ligne d’une action quand on ouvre celle d’une réponse', () => {
-    show({
-      shortcuts: [shortcut('walk')],
-      quickReplies: [quickReply(4)]
-    })
-
-    fireEvent.click(fieldOf('walk'))
-    fireEvent.click(quickReplyField())
-
-    expect(screen.getAllByText(strings.shortcuts.capture)).toHaveLength(1)
-    expect(
-      within(quickReplyField()).getByText(strings.shortcuts.capture)
-    ).not.toBeNull()
-  })
-
-  it('n’offre jamais de retour en arrière sur une réponse', () => {
-    show({ quickReplies: [quickReply(4, { accelerator: 'Control+KeyB' })] })
-
-    fireEvent.click(quickReplyField())
-    strike(quickReplyField(), { code: 'KeyC', ctrlKey: true })
-
-    expect(screen.queryByText(strings.shortcuts.undo)).toBeNull()
-    expect(screen.queryByText(strings.shortcuts.undoNone)).toBeNull()
-  })
-
-  it('rappelle que le presse-papiers n’est qu’emprunté', () => {
-    show()
-
-    expect(
-      screen.getByText(strings.shortcuts.quickReplies.clipboard)
-    ).not.toBeNull()
   })
 })

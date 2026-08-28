@@ -19,7 +19,7 @@ const field = async ({
   vi.resetModules()
   vi.stubGlobal('navigator', { userAgent: agent })
 
-  const { ShortcutField } = await import('@/screens/shortcuts/shortcut-field')
+  const { ShortcutField } = await import('@/components/shortcut-field')
 
   const editing = {
     isActive,

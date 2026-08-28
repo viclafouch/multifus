@@ -6,6 +6,7 @@ import { CONFIG_NOTICE_STRINGS } from '@/constants/strings/config-notice'
 import { JOURNAL_PANEL_STRINGS } from '@/constants/strings/journal-panel'
 import { MAXIMIZE_STRINGS } from '@/constants/strings/maximize'
 import { NAV_RAIL_STRINGS } from '@/constants/strings/nav-rail'
+import { QUICK_REPLIES_STRINGS } from '@/constants/strings/quick-replies'
 import { RELAY_STRINGS } from '@/constants/strings/relay'
 import { SETTINGS_STRINGS } from '@/constants/strings/settings'
 import { SHORTCUTS_STRINGS } from '@/constants/strings/shortcuts'
@@ -16,6 +17,7 @@ export const strings = {
   ...CHARACTERS_STRINGS,
   ...AUTHORIZATION_STRINGS,
   ...SHORTCUTS_STRINGS,
+  ...QUICK_REPLIES_STRINGS,
   ...AUTO_FOCUS_STRINGS,
   ...WALK_STRINGS,
   ...RELAY_STRINGS,

@@ -10,6 +10,7 @@ export type ScreenName =
   | 'about'
   | 'autoFocus'
   | 'characters'
+  | 'quickReplies'
   | 'relay'
   | 'settings'
   | 'shortcuts'

@@ -30,7 +30,6 @@ const ACTION_LABELS = {
 >
 
 const STATUS_LINES = {
-  pending: 'Un instant, Multifus s’en occupe.',
   unbound: 'Sans touches, il ne se passera rien.',
   invalid: 'Ces touches ne peuvent pas servir de raccourci.',
   refused: 'Refusé : un autre logiciel utilise déjà ces touches.',
@@ -49,25 +48,6 @@ const REJECTION_LINES = {
   pasteCombination:
     'C’est le raccourci pour coller sur votre ordinateur. Prenez-en un autre.'
 } as const satisfies Record<CaptureRejection, string>
-
-const QUICK_REPLIES_STRINGS = {
-  title: 'Réponses rapides',
-  description:
-    'Marre de retaper toujours la même chose ? Rangez le texte sous des touches, et collez-le dans Dofus Retro en un instant.',
-  add: 'Ajouter une réponse',
-  empty:
-    'Aucune réponse pour l’instant. Ajoutez « Je vends, mp moi » ou « En combat, j’arrive ».',
-  placeholder: 'Je vends, mp moi !',
-  textLabel: 'Texte de la réponse',
-  remove: 'Retirer cette réponse',
-  edit: 'Modifier le raccourci de cette réponse',
-  named: (text: string) => {
-    return `la réponse « ${text} »`
-  },
-  unnamed: 'une réponse sans texte',
-  clipboard:
-    'Multifus colle le texte, c’est vous qui appuyez sur Entrée. Le temps du collage, il emprunte votre presse-papiers, puis vous le rend.'
-} as const
 
 export const SHORTCUTS_STRINGS = {
   shortcuts: {
@@ -90,7 +70,6 @@ export const SHORTCUTS_STRINGS = {
     },
     status: STATUS_LINES,
     rejected: REJECTION_LINES,
-    actions: ACTION_LABELS,
-    quickReplies: QUICK_REPLIES_STRINGS
+    actions: ACTION_LABELS
   }
 } as const

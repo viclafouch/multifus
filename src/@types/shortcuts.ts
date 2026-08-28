@@ -14,7 +14,6 @@ export type Binding =
 export type ShortcutStatus =
   | { readonly kind: 'duplicate'; readonly binding: Binding }
   | { readonly kind: 'invalid'; readonly detail: string }
-  | { readonly kind: 'pending' }
   | { readonly kind: 'refused'; readonly detail: string }
   | { readonly kind: 'registered' }
   | { readonly kind: 'unbound' }

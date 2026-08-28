@@ -92,10 +92,6 @@ const STATUS_CASES = {
     status: { kind: 'unbound' },
     answer: { tone: 'calm', text: strings.shortcuts.status.unbound }
   },
-  pending: {
-    status: { kind: 'pending' },
-    answer: { tone: 'calm', text: strings.shortcuts.status.pending }
-  },
   invalid: {
     status: { kind: 'invalid', detail: 'touche inconnue' },
     answer: { tone: 'bad', text: strings.shortcuts.status.invalid }
@@ -197,7 +193,7 @@ describe('shortcutStatusLine', () => {
 
     const written = shortcutStatusLine(status, QUICK_REPLIES)
 
-    expect(written?.text).toContain(strings.shortcuts.quickReplies.unnamed)
+    expect(written?.text).toContain(strings.quickReplies.unnamed)
   })
 })
 
@@ -215,7 +211,7 @@ describe('bindingLabel', () => {
   it('nomme une quickReply que le tableau ne porte plus', () => {
     const label = bindingLabel({ kind: 'quickReply', id: 404 }, QUICK_REPLIES)
 
-    expect(label).toBe(strings.shortcuts.quickReplies.unnamed)
+    expect(label).toBe(strings.quickReplies.unnamed)
   })
 })
 

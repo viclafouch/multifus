@@ -422,7 +422,7 @@ impl Multifus {
         self.shortcut_statuses
             .get(&binding)
             .cloned()
-            .unwrap_or(ShortcutStatus::Pending)
+            .unwrap_or(ShortcutStatus::Unbound)
     }
 
     #[must_use]
@@ -2212,6 +2212,24 @@ mod tests {
         assert_ne!(third, first);
         assert_eq!(state.quick_reply_text(first).as_deref(), Some("prix libre"));
         assert_eq!(state.quick_reply_text(third).as_deref(), Some(""));
+    }
+
+    #[test]
+    fn a_quick_reply_nobody_has_given_keys_to_reads_as_unbound() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        let id = state.add_quick_reply();
+
+        let quick_reply = state
+            .snapshot()
+            .quick_replies
+            .into_iter()
+            .find(|quick_reply| quick_reply.id == id)
+            .expect("the quick reply that was just added");
+
+        assert_eq!(quick_reply.accelerator, None);
+        assert_eq!(quick_reply.status, ShortcutStatus::Unbound);
     }
 
     #[test]

@@ -200,6 +200,7 @@ pub enum UpdateView {
 pub enum Screen {
     Characters,
     Shortcuts,
+    QuickReplies,
     AutoFocus,
     Walk,
     Relay,
@@ -208,9 +209,10 @@ pub enum Screen {
 }
 
 impl Screen {
-    pub const ALL: [Self; 7] = [
+    pub const ALL: [Self; 8] = [
         Self::Characters,
         Self::Shortcuts,
+        Self::QuickReplies,
         Self::AutoFocus,
         Self::Walk,
         Self::Relay,
@@ -295,8 +297,6 @@ pub struct BindingView {
     rename_all_fields = "camelCase"
 )]
 pub enum ShortcutStatus {
-    Pending,
-
     Unbound,
 
     Registered,
@@ -637,7 +637,6 @@ mod tests {
     #[test]
     fn every_state_a_combination_can_be_in_says_its_kind() {
         let statuses = [
-            ShortcutStatus::Pending,
             ShortcutStatus::Unbound,
             ShortcutStatus::Registered,
             ShortcutStatus::Invalid { detail: detail() },
@@ -652,7 +651,6 @@ mod tests {
         assert_eq!(
             kinds_of(&statuses),
             [
-                "pending",
                 "unbound",
                 "registered",
                 "invalid",
@@ -661,7 +659,7 @@ mod tests {
             ]
         );
         assert_eq!(
-            json_of(&statuses[4])["binding"],
+            json_of(&statuses[3])["binding"],
             json!({ "kind": "action", "action": "next" })
         );
     }
@@ -970,7 +968,7 @@ mod tests {
     }
 
     #[test]
-    fn the_seven_screens_travel_under_the_names_the_rail_answers_to() {
+    fn the_eight_screens_travel_under_the_names_the_rail_answers_to() {
         let screens = Screen::ALL.map(|screen| json_of(&screen));
 
         assert_eq!(
@@ -978,6 +976,7 @@ mod tests {
             [
                 json!("characters"),
                 json!("shortcuts"),
+                json!("quickReplies"),
                 json!("autoFocus"),
                 json!("walk"),
                 json!("relay"),

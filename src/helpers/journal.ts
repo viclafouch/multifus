@@ -316,9 +316,6 @@ const boundCombinationLabel = ({ accelerator, status }: BoundCombination) => {
     case 'unbound': {
       return 'non attribué'
     }
-    case 'pending': {
-      return 'pas encore posé'
-    }
     case 'invalid': {
       return `${combination} illisible (${status.detail})`
     }

@@ -12,7 +12,8 @@ import type { NoticeCase, RelayFailure } from '@/@types/relay'
 import type {
   BoundCombination,
   QuickReply,
-  ShortcutBinding
+  ShortcutBinding,
+  ShortcutStatus
 } from '@/@types/shortcuts'
 import type { Snapshot } from '@/@types/snapshot'
 import {
@@ -65,7 +66,7 @@ const SHORTCUTS = [
   {
     action: 'toggleExcluded',
     accelerator: 'Control+Shift+KeyS',
-    status: { kind: 'pending' },
+    status: { kind: 'refused', detail: 'déjà prise' },
     isDefault: false
   },
   {
@@ -99,7 +100,7 @@ const BINDINGS = [
   {
     binding: { kind: 'action', action: 'toggleExcluded' },
     accelerator: 'Control+Shift+KeyS',
-    status: { kind: 'pending' }
+    status: { kind: 'refused', detail: 'déjà prise' }
   },
   {
     binding: { kind: 'action', action: 'walk' },
@@ -113,8 +114,13 @@ const BINDINGS = [
   }
 ] as const satisfies readonly BoundCombination[]
 
+const QUIET_STATUSES = new Set<ShortcutStatus['kind']>([
+  'registered',
+  'unbound'
+])
+
 const BINDINGS_LINE =
-  'Raccourcis : Fenêtre suivante Control+Shift+ArrowRight · Fenêtre précédente non attribué · Exclure ou réintégrer pas encore posé · Déplacement rapide Control+Shift+KeyX illisible (touche inconnue) · Réponse rapide 1 Control+Shift+KeyP.'
+  'Raccourcis : Fenêtre suivante Control+Shift+ArrowRight · Fenêtre précédente non attribué · Exclure ou réintégrer Control+Shift+KeyS refusé (déjà prise) · Déplacement rapide Control+Shift+KeyX illisible (touche inconnue) · Réponse rapide 1 Control+Shift+KeyP.'
 
 const ROSTER_CASES = {
   excluded: [
@@ -1335,7 +1341,7 @@ describe('journalTone', () => {
 
   it('reste neutre quand chaque combinaison est posée ou vide', () => {
     const bindings = BINDINGS.filter((binding) => {
-      return binding.status.kind !== 'invalid'
+      return QUIET_STATUSES.has(binding.status.kind)
     })
 
     const tone = journalTone({ kind: 'shortcutsBound', bindings })

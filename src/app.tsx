@@ -12,6 +12,7 @@ import { AboutScreen } from '@/screens/about-screen'
 import { AuthorizationScreen } from '@/screens/authorization-screen'
 import { AutoFocusScreen } from '@/screens/auto-focus-screen'
 import { CharactersScreen } from '@/screens/characters-screen'
+import { QuickRepliesScreen } from '@/screens/quick-replies'
 import { RelayScreen } from '@/screens/relay'
 import { SettingsScreen } from '@/screens/settings-screen'
 import { ShortcutsScreen } from '@/screens/shortcuts'
@@ -78,6 +79,10 @@ const CurrentScreen = ({ screen, snapshot, run }: CurrentScreenProps) => {
         run={run}
       />
     )
+  }
+
+  if (screen === 'quickReplies') {
+    return <QuickRepliesScreen quickReplies={snapshot.quickReplies} run={run} />
   }
 
   if (screen === 'autoFocus') {

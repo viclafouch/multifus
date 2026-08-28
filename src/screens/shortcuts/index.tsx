@@ -5,16 +5,8 @@ import { Note } from '@/components/layout/note'
 import { Screen } from '@/components/layout/screen'
 import { strings } from '@/constants/strings'
 import { useShortcutUndo } from '@/hooks/use-shortcut-undo'
-import {
-  addQuickReply,
-  removeQuickReply,
-  resetShortcuts,
-  setQuickReplyShortcut,
-  setQuickReplyText,
-  setShortcut
-} from '@/lib/multifus'
+import { resetShortcuts, setShortcut } from '@/lib/multifus'
 import { ActionsPanel } from '@/screens/shortcuts/actions-panel'
-import { QuickRepliesPanel } from '@/screens/shortcuts/quick-replies-panel'
 
 type ShortcutsScreenProps = Readonly<{
   shortcuts: readonly ShortcutBinding[]
@@ -32,10 +24,6 @@ export const ShortcutsScreen = ({
   const undo = useShortcutUndo((action, accelerator) => {
     run(setShortcut(action, accelerator))
   })
-
-  const handleClose = () => {
-    setEditing(null)
-  }
 
   return (
     <Screen
@@ -60,33 +48,12 @@ export const ShortcutsScreen = ({
           handleOpen: (action) => {
             setEditing({ kind: 'action', action })
           },
-          handleClose
+          handleClose: () => {
+            setEditing(null)
+          }
         }}
       />
       <Note className="mt-4">{strings.shortcuts.silent}</Note>
-      <QuickRepliesPanel
-        quickReplies={quickReplies}
-        editing={editing}
-        handleAdd={() => {
-          run(addQuickReply())
-        }}
-        actions={{
-          handleText: (id, text) => {
-            run(setQuickReplyText(id, text))
-          },
-          handleShortcut: (id, accelerator) => {
-            setEditing(null)
-            run(setQuickReplyShortcut(id, accelerator))
-          },
-          handleRemove: (id) => {
-            run(removeQuickReply(id))
-          },
-          handleOpen: (id) => {
-            setEditing({ kind: 'quickReply', id })
-          },
-          handleClose
-        }}
-      />
     </Screen>
   )
 }

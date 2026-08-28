@@ -7,12 +7,12 @@ import type {
 } from '@/@types/shortcuts'
 import { FieldRow } from '@/components/layout/field-row'
 import { Panel } from '@/components/layout/panel'
+import { ShortcutField } from '@/components/shortcut-field'
 import { Button } from '@/components/ui/button'
 import { strings } from '@/constants/strings'
 import { matchIsSameBinding } from '@/helpers/binding'
 import { shortcutStatusLine } from '@/helpers/wording'
 import type { ShortcutUndo } from '@/hooks/use-shortcut-undo'
-import { ShortcutField } from '@/screens/shortcuts/shortcut-field'
 
 export type ActionsPanelActions = Readonly<{
   handleCapture: (shortcut: ShortcutBinding, accelerator: string | null) => void

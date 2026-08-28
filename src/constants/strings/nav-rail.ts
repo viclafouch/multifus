@@ -3,6 +3,7 @@ import type { ScreenName } from '@/@types/snapshot'
 const SCREEN_LABELS = {
   characters: 'Personnages',
   shortcuts: 'Raccourcis',
+  quickReplies: 'Réponses rapides',
   autoFocus: 'AutoFocus',
   walk: 'Déplacement rapide',
   relay: 'Messages privés',

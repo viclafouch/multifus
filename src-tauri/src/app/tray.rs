@@ -35,6 +35,7 @@ use crate::platform::PlatformError;
 
 const MENU_CHARACTERS: &str = "Personnages";
 const MENU_SHORTCUTS: &str = "Raccourcis";
+const MENU_QUICK_REPLIES: &str = "Réponses rapides";
 const MENU_AUTO_FOCUS_SCREEN: &str = "AutoFocus";
 const MENU_WALK_SCREEN: &str = "Déplacement rapide";
 const MENU_RELAY: &str = "Messages privés";
@@ -445,6 +446,7 @@ fn screen_id(screen: Screen) -> &'static str {
     match screen {
         Screen::Characters => "characters",
         Screen::Shortcuts => "shortcuts",
+        Screen::QuickReplies => "quickReplies",
         Screen::AutoFocus => "autoFocus",
         Screen::Walk => "walk",
         Screen::Relay => "relay",
@@ -463,6 +465,7 @@ fn screen_label(screen: Screen) -> &'static str {
     match screen {
         Screen::Characters => MENU_CHARACTERS,
         Screen::Shortcuts => MENU_SHORTCUTS,
+        Screen::QuickReplies => MENU_QUICK_REPLIES,
         Screen::AutoFocus => MENU_AUTO_FOCUS_SCREEN,
         Screen::Walk => MENU_WALK_SCREEN,
         Screen::Relay => MENU_RELAY,

@@ -3,6 +3,7 @@ import {
   Footprints,
   Info,
   Keyboard,
+  MessageSquareQuote,
   Send,
   SlidersHorizontal,
   Users,
@@ -20,6 +21,11 @@ export type NavItem = {
 export const NAV_ITEMS = [
   { name: 'characters', label: strings.nav.characters, Icon: Users },
   { name: 'shortcuts', label: strings.nav.shortcuts, Icon: Keyboard },
+  {
+    name: 'quickReplies',
+    label: strings.nav.quickReplies,
+    Icon: MessageSquareQuote
+  },
   { name: 'autoFocus', label: strings.nav.autoFocus, Icon: Zap },
   { name: 'walk', label: strings.nav.walk, Icon: Footprints },
   { name: 'relay', label: strings.nav.relay, Icon: Send },
