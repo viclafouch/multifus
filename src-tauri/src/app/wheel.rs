@@ -8,6 +8,7 @@ use std::sync::MutexGuard;
 use std::sync::PoisonError;
 use std::thread;
 use std::time::Duration;
+use std::time::Instant;
 
 use tauri::AppHandle;
 use tauri::Emitter;
@@ -45,11 +46,15 @@ const STEP_EVENT: &str = "multifus://wheel";
 
 const AIM_EVENT: &str = "multifus://wheel-aim";
 
+const WIPE_EVENT: &str = "multifus://wheel-wipe";
+
 const PAGE: &str = "wheel.html";
 
 const PREVIEW: Duration = Duration::from_millis(2500);
 
 const POLL: Duration = Duration::from_millis(16);
+
+const WIPE: Duration = Duration::from_millis(150);
 
 pub const DEAD_ZONE: f64 = 0.32;
 
@@ -160,6 +165,7 @@ impl Open {
 #[derive(Debug, Default)]
 pub struct Wheel {
     latest: AtomicU64,
+    wiped: AtomicU64,
     gesture: Mutex<()>,
     open: Mutex<Option<Open>>,
 }
@@ -167,6 +173,18 @@ pub struct Wheel {
 impl Wheel {
     fn next(&self) -> u64 {
         self.latest.fetch_add(1, Ordering::AcqRel) + 1
+    }
+
+    fn matches_latest(&self, generation: u64) -> bool {
+        self.latest.load(Ordering::Acquire) == generation
+    }
+
+    fn set_wiped(&self, generation: u64) {
+        self.wiped.fetch_max(generation, Ordering::AcqRel);
+    }
+
+    fn matches_wiped(&self, generation: u64) -> bool {
+        self.wiped.load(Ordering::Acquire) >= generation
     }
 
     fn gesture(&self) -> MutexGuard<'_, ()> {
@@ -436,8 +454,7 @@ fn shut_if(app: &AppHandle, generation: u64) -> Option<Open> {
 
     let open = wheel.take_if(generation)?;
 
-    hide(app);
-    point_at(app, None);
+    wipe(app, generation);
 
     if !open.previewing {
         walk::hold_clicks(app, false);
@@ -487,7 +504,7 @@ fn follow_cursor(app: &AppHandle, generation: u64) {
     });
 }
 
-fn apart(app: &AppHandle, work: impl FnOnce(&AppHandle) + Send + 'static) {
+fn apart(app: &AppHandle, work: impl FnOnce(&AppHandle) + Send + 'static) -> bool {
     let spawned = thread::Builder::new()
         .name("multifus-wheel".to_owned())
         .spawn({
@@ -504,7 +521,11 @@ fn apart(app: &AppHandle, work: impl FnOnce(&AppHandle) + Send + 'static) {
         lock(app).log_unless_repeated(JournalEvent::WheelFailed {
             detail: error.to_string(),
         });
+
+        return false;
     }
+
+    true
 }
 
 fn tell(app: &AppHandle, step: &WheelStep) {
@@ -536,13 +557,57 @@ fn reveal(app: &AppHandle) {
     said(app, window.show());
 }
 
+pub fn wiped(app: &AppHandle, generation: u64) {
+    app.state::<Wheel>().set_wiped(generation);
+}
+
+fn wipe(app: &AppHandle, generation: u64) {
+    let Some(window) = app.get_webview_window(LABEL) else {
+        return;
+    };
+
+    said(app, window.set_ignore_cursor_events(true));
+    said(app, app.emit_to(target(), WIPE_EVENT, generation));
+
+    let hiding = apart(app, move |app| {
+        hide_once_empty(app, generation);
+    });
+
+    if !hiding {
+        hide(app);
+    }
+}
+
+fn hide_once_empty(app: &AppHandle, generation: u64) {
+    wait_to_hide(app, generation);
+
+    let wheel = app.state::<Wheel>();
+    let _gesture = wheel.gesture();
+
+    if wheel.matches_latest(generation) {
+        hide(app);
+    }
+}
+
+fn wait_to_hide(app: &AppHandle, generation: u64) {
+    let until = Instant::now() + WIPE;
+    let wheel = app.state::<Wheel>();
+
+    while Instant::now() < until {
+        if wheel.matches_wiped(generation) || !wheel.matches_latest(generation) {
+            return;
+        }
+
+        thread::sleep(POLL);
+    }
+}
+
 fn hide(app: &AppHandle) {
     let Some(window) = app.get_webview_window(LABEL) else {
         return;
     };
 
     said(app, window.hide());
-    said(app, window.set_ignore_cursor_events(true));
 }
 
 fn cursor_of(app: &AppHandle) -> Option<(f64, f64)> {
@@ -558,23 +623,12 @@ fn cursor_of(app: &AppHandle) -> Option<(f64, f64)> {
     }
 }
 
-pub fn step(app: &AppHandle) -> WheelStep {
+pub fn step(app: &AppHandle) -> Option<WheelStep> {
     let diameter = lock(app).wheel_diameter();
     let wheel = app.state::<Wheel>();
     let held = wheel.held();
 
-    held.as_ref()
-        .map_or_else(|| shut_step(diameter), |open| open.step(diameter))
-}
-
-fn shut_step(diameter: u32) -> WheelStep {
-    WheelStep {
-        diameter,
-        dead_zone: DEAD_ZONE,
-        slices: Vec::new(),
-        hovered: None,
-        previewing: false,
-    }
+    held.as_ref().map(|open| open.step(diameter))
 }
 
 pub fn display(app: &AppHandle) -> Option<DisplayView> {
@@ -636,7 +690,7 @@ fn place(
         size.height.saturating_sub(halo * 2),
     );
     let at = held_inside(screen.work_area(), disc, halo, (middle_x, middle_y));
-    let placed = window.set_position(at).and_then(|()| window.set_size(size));
+    let placed = window.set_size(size).and_then(|()| window.set_position(at));
 
     if let Err(error) = placed {
         lock(app).log_unless_repeated(JournalEvent::WheelFailed {
@@ -1023,6 +1077,37 @@ mod tests {
         assert!(!wheel.holds(first));
         assert!(wheel.take_if(second).is_some());
         assert!(!wheel.holds(second));
+    }
+
+    #[test]
+    fn the_wheel_stays_on_screen_until_the_window_says_it_has_nothing_left_to_draw() {
+        let wheel = Wheel::default();
+        let generation = wheel.next();
+
+        assert!(!wheel.matches_wiped(generation));
+
+        wheel.set_wiped(generation);
+
+        assert!(wheel.matches_wiped(generation));
+    }
+
+    #[test]
+    fn a_window_emptied_late_never_hides_the_wheel_opened_since() {
+        let wheel = Wheel::default();
+        let first = wheel.next();
+        let second = wheel.next();
+
+        wheel.set_wiped(first);
+
+        assert!(
+            !wheel.matches_latest(first),
+            "the player held the keys again, and the wheel showing now stays"
+        );
+        assert!(wheel.matches_latest(second));
+        assert!(
+            !wheel.matches_wiped(second),
+            "the window has yet to empty itself of the wheel showing now"
+        );
     }
 
     #[test]

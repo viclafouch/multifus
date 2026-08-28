@@ -251,8 +251,13 @@ pub fn wheel_display(app: AppHandle) -> Option<DisplayView> {
 }
 
 #[tauri::command]
-pub fn wheel_step(app: AppHandle) -> WheelStep {
+pub fn wheel_step(app: AppHandle) -> Option<WheelStep> {
     wheel::step(&app)
+}
+
+#[tauri::command]
+pub fn wheel_wiped(app: AppHandle, generation: u64) {
+    wheel::wiped(&app, generation);
 }
 
 #[tauri::command]

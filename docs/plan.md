@@ -92,6 +92,8 @@ ce qu'elle coûte.
 - [ ] Cmd+Tab pendant le maintien : la roue part au tour suivant
 - [ ] Sur le Mac, lâcher la lettre en gardant Ctrl et Maj : la roue se ferme
 - [ ] La jauge d'un bout à l'autre, 280 puis 360 : le dessin suit, et le bouton pose la vraie roue à la bonne taille au milieu de l'écran
+- [ ] La toute première ouverture après le lancement tombe au milieu, à la même place que les suivantes
+- [ ] Deux ouvertures de suite avec deux équipes différentes : la seconde ne montre à aucun moment celle d'avant
 - [ ] Un diamètre de 720 hérité d'une version d'avant revient à 360 au démarrage
 - [ ] Le dessin de l'écran montre six faux personnages même sans un client ouvert, et la jauge Personnages les compte de un à huit sans rien enregistrer
 - [ ] « Voir en vrai » pose les faux personnages même avec toute la team connectée, et le survol y allume les parts comme dans le jeu

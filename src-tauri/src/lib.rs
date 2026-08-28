@@ -59,6 +59,7 @@ pub fn run() {
             app::commands::preview_wheel,
             app::commands::wheel_display,
             app::commands::wheel_step,
+            app::commands::wheel_wiped,
             app::commands::set_start_at_login,
             app::commands::set_maximize_on_launch,
             app::commands::maximize_all_clients,

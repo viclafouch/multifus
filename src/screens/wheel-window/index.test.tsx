@@ -7,7 +7,9 @@ import { pending, wheelSliceOf } from '@/test-doubles'
 const bridge = {
   wheelStep: vi.fn(),
   onWheelStep: vi.fn(),
-  onWheelAim: vi.fn()
+  onWheelAim: vi.fn(),
+  onWheelWipe: vi.fn(),
+  wheelWiped: vi.fn()
 }
 
 vi.mock(import('@/lib/multifus'), () => {
@@ -39,6 +41,7 @@ const show = async (step: WheelStep) => {
   bridge.wheelStep.mockResolvedValue(step)
   bridge.onWheelStep.mockResolvedValue(stopListening)
   bridge.onWheelAim.mockResolvedValue(stopListening)
+  bridge.onWheelWipe.mockResolvedValue(stopListening)
 
   render(<WheelWindow />)
 
@@ -58,6 +61,7 @@ describe('la roue', () => {
     bridge.wheelStep.mockImplementation(pending)
     bridge.onWheelStep.mockImplementation(pending)
     bridge.onWheelAim.mockImplementation(pending)
+    bridge.onWheelWipe.mockImplementation(pending)
 
     const { container } = render(<WheelWindow />)
 

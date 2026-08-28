@@ -7,13 +7,18 @@ type HeardStep = ((step: WheelStep) => void) | null
 
 type HeardAim = ((hovered: number | null) => void) | null
 
+type HeardWipe = ((generation: number) => void) | null
+
 const bridge = vi.hoisted(() => {
   return {
     heard: null as HeardStep,
     aimed: null as HeardAim,
+    wiped: null as HeardWipe,
     first: null as HeardStep,
     unlisten: vi.fn(),
-    unaim: vi.fn()
+    unaim: vi.fn(),
+    unwipe: vi.fn(),
+    answered: vi.fn()
   }
 })
 
@@ -28,6 +33,16 @@ vi.mock(import('@/lib/multifus'), () => {
       bridge.aimed = handle
 
       return Promise.resolve(bridge.unaim)
+    },
+    onWheelWipe: (handle: (generation: number) => void) => {
+      bridge.wiped = handle
+
+      return Promise.resolve(bridge.unwipe)
+    },
+    wheelWiped: (generation: number) => {
+      bridge.answered(generation)
+
+      return Promise.resolve(null)
     },
     wheelStep: () => {
       return new Promise<WheelStep>((resolve) => {
@@ -77,9 +92,8 @@ describe('useWheelStep', () => {
   beforeEach(() => {
     bridge.heard = null
     bridge.aimed = null
+    bridge.wiped = null
     bridge.first = null
-    bridge.unlisten.mockClear()
-    bridge.unaim.mockClear()
   })
 
   it('n’a rien à dessiner avant que Rust ouvre la roue', () => {
@@ -153,7 +167,46 @@ describe('useWheelStep', () => {
     expect(result.current).toBeNull()
   })
 
-  it('cesse d’écouter les deux canaux quand la fenêtre s’en va', async () => {
+  it('efface la roue dès que Rust la referme, et le lui dit', async () => {
+    const { result } = show()
+
+    await listening()
+    await answered(stepOf(1))
+
+    act(() => {
+      bridge.wiped?.(7)
+    })
+
+    expect(result.current).toBeNull()
+
+    await waitFor(() => {
+      expect(bridge.answered).toHaveBeenCalledWith(7)
+    })
+  })
+
+  it('ne dit rien à Rust tant que la roue est à l’écran', async () => {
+    show()
+
+    await listening()
+    await answered(stepOf(null))
+
+    expect(bridge.answered).not.toHaveBeenCalled()
+  })
+
+  it('laisse effacée la roue que Rust a refermée avant sa réponse', async () => {
+    const { result } = show()
+
+    await listening()
+
+    act(() => {
+      bridge.wiped?.(7)
+    })
+    await answered(stepOf(null))
+
+    expect(result.current).toBeNull()
+  })
+
+  it('cesse d’écouter les trois canaux quand la fenêtre s’en va', async () => {
     const { unmount } = show()
 
     await listening()
@@ -163,5 +216,6 @@ describe('useWheelStep', () => {
 
     expect(bridge.unlisten).toHaveBeenCalledWith()
     expect(bridge.unaim).toHaveBeenCalledWith()
+    expect(bridge.unwipe).toHaveBeenCalledWith()
   })
 })

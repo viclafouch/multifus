@@ -305,6 +305,12 @@ const CALLS = [
     }
   },
   {
+    name: 'wheelWiped',
+    run: () => {
+      return multifus.wheelWiped(1)
+    }
+  },
+  {
     name: 'setWakesMinimized',
     run: () => {
       return multifus.setWakesMinimized(false)
@@ -444,7 +450,8 @@ const LISTENERS = [
   'onBannerStep',
   'onClients',
   'onWheelStep',
-  'onWheelAim'
+  'onWheelAim',
+  'onWheelWipe'
 ]
 
 const lastCall = async (call: Call) => {
@@ -541,6 +548,12 @@ describe('le pont vers Rust', () => {
     await multifus.onWheelAim(() => {})
 
     expect(listenedEvent()).toBe(rustConstant(WHEEL_SOURCE, 'AIM_EVENT'))
+  })
+
+  it('écoute l’effacement de la roue sur le canal que wheel.rs émet', async () => {
+    await multifus.onWheelWipe(() => {})
+
+    expect(listenedEvent()).toBe(rustConstant(WHEEL_SOURCE, 'WIPE_EVENT'))
   })
 
   it('écoute la taille des clients sur le canal que le tour émet', async () => {

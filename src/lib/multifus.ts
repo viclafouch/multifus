@@ -171,7 +171,11 @@ export const wheelDisplay = async () => {
 }
 
 export const wheelStep = async () => {
-  return invoke<WheelStep>('wheel_step')
+  return invoke<WheelStep | null>('wheel_step')
+}
+
+export const wheelWiped = async (generation: number) => {
+  return invoke<null>('wheel_wiped', { generation })
 }
 
 const WHEEL_EVENT = 'multifus://wheel'
@@ -196,6 +200,16 @@ export const onWheelAim = async (handle: (hovered: number | null) => void) => {
 }
 
 type WheelAimEvent = { readonly payload: number | null }
+
+const WHEEL_WIPE_EVENT = 'multifus://wheel-wipe'
+
+export const onWheelWipe = async (handle: (generation: number) => void) => {
+  return listen<number>(WHEEL_WIPE_EVENT, ({ payload }: WheelWipeEvent) => {
+    handle(payload)
+  })
+}
+
+type WheelWipeEvent = { readonly payload: number }
 
 export const setWakesMinimized = async (wakes: boolean) => {
   return invoke<Snapshot>('set_wakes_minimized', { wakes })

@@ -1,13 +1,20 @@
 import React from 'react'
 import type { WheelStep } from '@/@types/wheel'
-import { onWheelAim, onWheelStep, wheelStep } from '@/lib/multifus'
+import { useWheelWiped } from '@/hooks/use-wheel-wiped'
+import { onWheelAim, onWheelStep, onWheelWipe, wheelStep } from '@/lib/multifus'
 import { ignore } from '@/lib/utils'
 
 export const useWheelStep = () => {
   const [step, setStep] = React.useState<WheelStep | null>(null)
+  const [wipedGeneration, setWipedGeneration] = React.useState<number | null>(
+    null
+  )
+
+  useWheelWiped(wipedGeneration)
 
   React.useEffect(() => {
     let isLive = true
+    let hasHeardRust = false
     const stops: (() => void)[] = []
 
     const keep = (stop: () => void) => {
@@ -22,6 +29,8 @@ export const useWheelStep = () => {
       keep(
         await onWheelStep((next) => {
           if (isLive) {
+            hasHeardRust = true
+
             setStep(next)
           }
         })
@@ -35,13 +44,21 @@ export const useWheelStep = () => {
           }
         })
       )
+      keep(
+        await onWheelWipe((generation) => {
+          if (isLive) {
+            hasHeardRust = true
+
+            setStep(null)
+            setWipedGeneration(generation)
+          }
+        })
+      )
 
       const first = await wheelStep()
 
-      if (isLive) {
-        setStep((current) => {
-          return current ?? first
-        })
+      if (isLive && !hasHeardRust) {
+        setStep(first)
       }
     }
 
