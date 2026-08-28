@@ -16,6 +16,7 @@ import { UnavailableSwitch } from '@/components/unavailable-switch'
 import { WindowsSwitch } from '@/components/windows-switch'
 import { IS_APPLE } from '@/constants/keyboard'
 import { strings } from '@/constants/strings'
+import { useClients } from '@/hooks/use-clients'
 import {
   setMaximizeOnLaunch,
   setPaintPortraits,
@@ -23,6 +24,7 @@ import {
   setStartAtLogin,
   setUngroupTaskbar
 } from '@/lib/multifus'
+import { ClientsPanel } from '@/screens/settings/clients-panel'
 
 type SettingsScreenProps = Readonly<{
   startAtLogin: boolean
@@ -44,10 +46,12 @@ export const SettingsScreen = ({
   run
 }: SettingsScreenProps) => {
   const isAlreadyUngrouped = !IS_APPLE && !taskbarCombines
+  const clients = useClients()
 
   return (
     <Screen title={strings.settings.title} subtitle={strings.settings.subtitle}>
       {IS_APPLE ? <Note className="mb-4">{strings.maximize.note}</Note> : null}
+      {clients === null ? null : <ClientsPanel clients={clients} run={run} />}
       <Panel>
         <FieldRow
           label={strings.settings.startupLabel}

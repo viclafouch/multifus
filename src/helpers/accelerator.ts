@@ -1,3 +1,4 @@
+import type { KeyLabels } from '@/@types/system'
 import type { CaptureRejection, Modifier } from '@/constants/keyboard'
 import {
   ALIASES,
@@ -83,7 +84,13 @@ export const acceleratorParts = (accelerator: string): readonly string[] => {
   return [...modifiers, ...keys]
 }
 
-export const keyLabel = (token: string) => {
+export const keyLabel = (token: string, printed: KeyLabels = {}) => {
+  const onTheKeyboard = printed[token]
+
+  if (onTheKeyboard !== undefined) {
+    return onTheKeyboard
+  }
+
   const known = KEY_LABELS.get(token)
 
   if (known !== undefined) {

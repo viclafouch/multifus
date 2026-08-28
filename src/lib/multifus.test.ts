@@ -5,6 +5,7 @@ import * as multifus from '@/lib/multifus'
 import BANNER_SOURCE from '../../src-tauri/src/app/banner.rs?raw'
 import COMMANDS_SOURCE from '../../src-tauri/src/app/commands.rs?raw'
 import RUNTIME_SOURCE from '../../src-tauri/src/app/runtime.rs?raw'
+import WHEEL_SOURCE from '../../src-tauri/src/app/wheel.rs?raw'
 import HANDLER_SOURCE from '../../src-tauri/src/lib.rs?raw'
 
 declare global {
@@ -61,7 +62,8 @@ const listenedHandler = () => {
   return handler
 }
 
-const COMMAND_PATTERN = /#\[tauri::command\]\s*pub fn (\w+)\(([^)]*)\)/gu
+const COMMAND_PATTERN =
+  /#\[tauri::command(?:\([^)]*\))?\]\s*pub fn (\w+)\(([^)]*)\)/gu
 
 const parametersOf = (signature: string) => {
   return signature
@@ -279,6 +281,30 @@ const CALLS = [
     }
   },
   {
+    name: 'setWheelDiameter',
+    run: () => {
+      return multifus.setWheelDiameter(560)
+    }
+  },
+  {
+    name: 'previewWheel',
+    run: () => {
+      return multifus.previewWheel(6)
+    }
+  },
+  {
+    name: 'wheelDisplay',
+    run: () => {
+      return multifus.wheelDisplay()
+    }
+  },
+  {
+    name: 'wheelStep',
+    run: () => {
+      return multifus.wheelStep()
+    }
+  },
+  {
     name: 'setWakesMinimized',
     run: () => {
       return multifus.setWakesMinimized(false)
@@ -294,6 +320,24 @@ const CALLS = [
     name: 'setMaximizeOnLaunch',
     run: () => {
       return multifus.setMaximizeOnLaunch(true)
+    }
+  },
+  {
+    name: 'maximizeAllClients',
+    run: () => {
+      return multifus.maximizeAllClients()
+    }
+  },
+  {
+    name: 'clients',
+    run: () => {
+      return multifus.clients()
+    }
+  },
+  {
+    name: 'watchClients',
+    run: () => {
+      return multifus.watchClients(true)
     }
   },
   {
@@ -394,7 +438,14 @@ const CALLS = [
   }
 ] as const satisfies readonly Call[]
 
-const LISTENERS = ['onSnapshot', 'onNavigate', 'onBannerStep']
+const LISTENERS = [
+  'onSnapshot',
+  'onNavigate',
+  'onBannerStep',
+  'onClients',
+  'onWheelStep',
+  'onWheelAim'
+]
 
 const lastCall = async (call: Call) => {
   await call.run()
@@ -478,6 +529,24 @@ describe('le pont vers Rust', () => {
     await multifus.onBannerStep(() => {})
 
     expect(listenedEvent()).toBe(rustConstant(BANNER_SOURCE, 'STEP_EVENT'))
+  })
+
+  it('écoute la roue sur le canal que wheel.rs émet', async () => {
+    await multifus.onWheelStep(() => {})
+
+    expect(listenedEvent()).toBe(rustConstant(WHEEL_SOURCE, 'STEP_EVENT'))
+  })
+
+  it('écoute la part visée sur le canal que le fil de la roue émet', async () => {
+    await multifus.onWheelAim(() => {})
+
+    expect(listenedEvent()).toBe(rustConstant(WHEEL_SOURCE, 'AIM_EVENT'))
+  })
+
+  it('écoute la taille des clients sur le canal que le tour émet', async () => {
+    await multifus.onClients(() => {})
+
+    expect(listenedEvent()).toBe(rustConstant(RUNTIME_SOURCE, 'CLIENTS_EVENT'))
   })
 
   it('rend à la fenêtre ce que le canal porte, et rien d’autre', async () => {

@@ -1,6 +1,7 @@
 pub mod click;
 pub mod display;
 pub mod error;
+pub mod keyboard;
 pub mod notification;
 pub mod paste;
 pub mod window;
@@ -21,6 +22,8 @@ pub use display::DisplayKeeper;
 pub use display::ScreenSaverDelay;
 pub use error::PlatformError;
 pub use error::Result;
+pub use keyboard::key_labels;
+pub use keyboard::KeyLabels;
 pub use notification::NotificationReport;
 pub use notification::NotificationSink;
 pub use notification::NotificationWatcher;

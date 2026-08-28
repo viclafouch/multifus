@@ -35,7 +35,9 @@ const ALL_ACTIONS = [
   'previous',
   'main',
   'toggleExcluded',
-  'walk'
+  'walk',
+  'maximizeAll',
+  'wheel'
 ] as const satisfies readonly ShortcutAction[]
 
 type ShortcutParams = {
@@ -102,7 +104,7 @@ const fieldOfCharacter = (nickname: string) => {
   })
 }
 
-describe('l’écran des raccourcis, les cinq actions', () => {
+describe('l’écran des raccourcis, les sept actions', () => {
   const all = ALL_ACTIONS.map((action) => {
     return shortcut(action)
   })
@@ -117,6 +119,12 @@ describe('l’écran des raccourcis, les cinq actions', () => {
       expect(screen.getByText(label)).not.toBeNull()
       expect(screen.getByText(description)).not.toBeNull()
     }
+  })
+
+  it('marque la seule action qui répond à une touche maintenue', () => {
+    show({ shortcuts: all })
+
+    expect(screen.getAllByText(strings.shortcuts.held)).toHaveLength(1)
   })
 
   it('n’ouvre la saisie que sur la ligne cliquée', () => {

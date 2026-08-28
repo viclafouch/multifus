@@ -1,16 +1,17 @@
 import { describe, expect, it } from 'vitest'
-import type { BannerScreen } from '@/@types/walk'
-import { BANNER_SIZE, MONITOR_SIZE } from '@/constants/banner'
+import type { Display } from '@/@types/display'
+import { BANNER_SIZE } from '@/constants/banner'
+import { DRAWN_SCREEN } from '@/constants/display'
 import { monitorShape, screenOf } from '@/helpers/banner'
 
-const LAPTOP: BannerScreen = {
+const LAPTOP: Display = {
   name: 'DISPLAY1',
   width: 1920,
   height: 1080,
   primary: true
 }
 
-const SIDE: BannerScreen = {
+const SIDE: Display = {
   name: 'DISPLAY2',
   width: 2560,
   height: 1440,
@@ -35,7 +36,7 @@ describe('screenOf', () => {
   })
 
   it('keeps the main screen when a nameless one is plugged in', () => {
-    const nameless: BannerScreen = { ...SIDE, name: null }
+    const nameless: Display = { ...SIDE, name: null }
 
     expect(screenOf([nameless, LAPTOP], null)).toBe(LAPTOP)
   })
@@ -45,7 +46,7 @@ describe('screenOf', () => {
   })
 })
 
-const PORTRAIT: BannerScreen = {
+const PORTRAIT: Display = {
   name: 'DISPLAY3',
   width: 1080,
   height: 1920,
@@ -64,8 +65,8 @@ describe('monitorShape', () => {
   it('never draws a screen taller than the panel allows', () => {
     const { drawnWidth, ratio } = monitorShape(PORTRAIT)
 
-    expect(drawnWidth / ratio).toBeLessThanOrEqual(MONITOR_SIZE.height)
-    expect(drawnWidth).toBeLessThan(MONITOR_SIZE.width)
+    expect(drawnWidth / ratio).toBeLessThanOrEqual(DRAWN_SCREEN.height)
+    expect(drawnWidth).toBeLessThan(DRAWN_SCREEN.width)
   })
 
   it('draws the banner at the scale it will really have on that screen', () => {
@@ -75,7 +76,7 @@ describe('monitorShape', () => {
   })
 
   it('keeps the banner readable on a screen too wide to scale it down', () => {
-    const television: BannerScreen = { ...SIDE, width: 3840, height: 2160 }
+    const television: Display = { ...SIDE, width: 3840, height: 2160 }
 
     expect(monitorShape(television).bannerWidth).toBe(BANNER_SIZE.smallestDrawn)
   })

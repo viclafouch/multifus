@@ -23,13 +23,6 @@ export type BannerPlace = {
   readonly screen: string | null
 }
 
-export type BannerScreen = {
-  readonly name: string | null
-  readonly width: number
-  readonly height: number
-  readonly primary: boolean
-}
-
 export type BannerCharacter = {
   readonly nickname: string
   readonly class: Class | null

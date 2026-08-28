@@ -6,6 +6,7 @@ import type {
   ShortcutAction,
   ShortcutStatus
 } from '@/@types/shortcuts'
+import type { Clients, ClientsState } from '@/@types/snapshot'
 import type {
   Authorization,
   ConfigProblem,
@@ -14,6 +15,7 @@ import type {
 import type { LampState } from '@/components/lamp'
 import { IS_APPLE } from '@/constants/keyboard'
 import { strings } from '@/constants/strings'
+import { matchIsPlural } from '@/helpers/format'
 
 export type TonedLine = {
   readonly tone: 'bad' | 'calm'
@@ -189,6 +191,30 @@ export const authorizationLine = (authorization: Authorization) => {
     : strings.status.notListening
 }
 
+const clientsState = ({ open, small, readable }: Clients): ClientsState => {
+  if (!readable) {
+    return 'unreadable'
+  }
+
+  if (open === 0) {
+    return 'none'
+  }
+
+  return small === 0 ? 'maximized' : 'small'
+}
+
+export const clientsLines = (clients: Clients) => {
+  const words = strings.settings.clients
+  const state = clientsState(clients)
+
+  return {
+    state,
+    badge:
+      state === 'small' ? words.badge.small(clients.small) : words.badge[state],
+    body: words.body[state]
+  }
+}
+
 export const characterState = (character: Character): LampState => {
   if (!character.online) {
     return 'offline'
@@ -314,12 +340,12 @@ export const missingGenderLine = (nicknames: readonly string[]) => {
 
   const named = nicknames.slice(0, MISSING_GENDER_NAMED)
   const rest = nicknames.length - named.length
-  const others = rest > 1 ? `${rest} autres` : `${rest} autre`
+  const others = matchIsPlural(rest) ? `${rest} autres` : `${rest} autre`
   const parts = rest === 0 ? named : [...named, others]
 
   return strings.characters.missingGender(
     NAMES.format(parts),
-    nicknames.length === 1
+    !matchIsPlural(nicknames.length)
   )
 }
 

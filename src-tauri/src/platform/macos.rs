@@ -83,6 +83,7 @@ use crate::platform::display::DisplayKeeper;
 use crate::platform::display::ScreenSaverDelay;
 use crate::platform::error::PlatformError;
 use crate::platform::error::Result;
+use crate::platform::keyboard::KeyLabels;
 use crate::platform::notification::NotificationReport;
 use crate::platform::notification::NotificationSink;
 use crate::platform::notification::NotificationWatcher;
@@ -384,6 +385,61 @@ fn point_attribute(element: &AXUIElement, name: &str) -> Result<Option<CGPoint>>
     Ok(read.then_some(point))
 }
 
+fn size_attribute(element: &AXUIElement, name: &str) -> Result<Option<CGSize>> {
+    let Some(value) = attribute(element, name)? else {
+        return Ok(None);
+    };
+
+    let Ok(value) = value.downcast::<AXValue>() else {
+        return Ok(None);
+    };
+
+    let mut size = CGSize::ZERO;
+
+    // SAFETY: the type asked for is the one `size` holds.
+    let read = unsafe { value.value(AXValueType::CGSize, NonNull::from(&mut size).cast()) };
+
+    Ok(read.then_some(size))
+}
+
+fn matches_maximized_window(window: WindowId, areas: &WorkAreas) -> bool {
+    let Ok((_, element)) = live_application(window) else {
+        return false;
+    };
+
+    let Ok(Some(game_window)) = client_window_element(&element) else {
+        return false;
+    };
+
+    let (Ok(Some(position)), Ok(Some(size))) = (
+        point_attribute(&game_window, AX_POSITION),
+        size_attribute(&game_window, AX_SIZE),
+    ) else {
+        return false;
+    };
+
+    let Some(area) = work_area_of(areas, position) else {
+        return false;
+    };
+
+    matches_maximized(CGRect::new(position, size), area)
+}
+
+const MAXIMIZED_SLACK: CGFloat = 2.0;
+
+fn matches_maximized(frame: CGRect, area: CGRect) -> bool {
+    let sides = [
+        (frame.origin.x, area.origin.x),
+        (frame.origin.y, area.origin.y),
+        (frame.size.width, area.size.width),
+        (frame.size.height, area.size.height),
+    ];
+
+    sides
+        .into_iter()
+        .all(|(worn, wanted)| (worn - wanted).abs() <= MAXIMIZED_SLACK)
+}
+
 fn set_position(window: &AXUIElement, mut position: CGPoint) -> Result<()> {
     // SAFETY: the pointer is to a live `CGPoint`, which is the type named.
     let value = unsafe { AXValue::new(AXValueType::CGPoint, NonNull::from(&mut position).cast()) };
@@ -422,19 +478,43 @@ fn set_window_value(
     }
 }
 
-fn work_area(position: CGPoint) -> Option<CGRect> {
-    on_main_thread(move |marker| {
+struct WorkAreas {
+    screens: Vec<(CGRect, CGRect)>,
+    main: Option<CGRect>,
+}
+
+fn work_areas() -> Option<WorkAreas> {
+    on_main_thread(|marker| {
         let screens = NSScreen::screens(marker);
         let flip = screens.firstObject()?.frame().size.height;
 
-        let screen = screens
-            .iter()
-            .find(|screen| holds(flipped(screen.frame(), flip), position))
-            .or_else(|| NSScreen::mainScreen(marker))?;
-
-        Some(flipped(screen.visibleFrame(), flip))
+        Some(WorkAreas {
+            screens: screens
+                .iter()
+                .map(|screen| {
+                    (
+                        flipped(screen.frame(), flip),
+                        flipped(screen.visibleFrame(), flip),
+                    )
+                })
+                .collect(),
+            main: NSScreen::mainScreen(marker).map(|screen| flipped(screen.visibleFrame(), flip)),
+        })
     })
     .flatten()
+}
+
+fn work_area_of(areas: &WorkAreas, position: CGPoint) -> Option<CGRect> {
+    areas
+        .screens
+        .iter()
+        .find(|(frame, _)| holds(*frame, position))
+        .map(|(_, visible)| *visible)
+        .or(areas.main)
+}
+
+fn work_area(position: CGPoint) -> Option<CGRect> {
+    work_area_of(&work_areas()?, position)
 }
 
 fn flipped(frame: CGRect, flip: CGFloat) -> CGRect {
@@ -616,6 +696,18 @@ impl WindowManager for AccessibilityWindowManager {
         }
 
         Ok(clients)
+    }
+
+    fn maximized_windows(&self, windows: &[WindowId]) -> Vec<WindowId> {
+        let Some(areas) = work_areas() else {
+            return Vec::new();
+        };
+
+        windows
+            .iter()
+            .filter(|window| matches_maximized_window(**window, &areas))
+            .copied()
+            .collect()
     }
 
     fn maximize(&self, window: WindowId) -> Result<()> {
@@ -1452,9 +1544,240 @@ fn screen_saver_delay() -> ScreenSaverDelay {
     }
 }
 
+const KEY_POSITIONS: [(&str, u16); 37] = [
+    ("KeyA", 0x00),
+    ("KeyS", 0x01),
+    ("KeyD", 0x02),
+    ("KeyF", 0x03),
+    ("KeyH", 0x04),
+    ("KeyG", 0x05),
+    ("KeyZ", 0x06),
+    ("KeyX", 0x07),
+    ("KeyC", 0x08),
+    ("KeyV", 0x09),
+    ("KeyB", 0x0b),
+    ("KeyQ", 0x0c),
+    ("KeyW", 0x0d),
+    ("KeyE", 0x0e),
+    ("KeyR", 0x0f),
+    ("KeyY", 0x10),
+    ("KeyT", 0x11),
+    ("Equal", 0x18),
+    ("Minus", 0x1b),
+    ("BracketRight", 0x1e),
+    ("KeyO", 0x1f),
+    ("KeyU", 0x20),
+    ("BracketLeft", 0x21),
+    ("KeyI", 0x22),
+    ("KeyP", 0x23),
+    ("KeyL", 0x25),
+    ("KeyJ", 0x26),
+    ("Quote", 0x27),
+    ("KeyK", 0x28),
+    ("Semicolon", 0x29),
+    ("Backslash", 0x2a),
+    ("Comma", 0x2b),
+    ("Slash", 0x2c),
+    ("KeyN", 0x2d),
+    ("KeyM", 0x2e),
+    ("Period", 0x2f),
+    ("Backquote", 0x32),
+];
+
+const KEY_ACTION_DISPLAY: u16 = 3;
+
+const NO_DEAD_KEYS: u32 = 1;
+
+const LONGEST_LABEL: usize = 4;
+
+#[must_use]
+pub fn key_labels() -> KeyLabels {
+    let Some(layout) = KeyboardLayout::current() else {
+        return KeyLabels::new();
+    };
+
+    KEY_POSITIONS
+        .iter()
+        .filter_map(|(code, position)| {
+            let printed = layout.printed(*position)?;
+
+            Some(((*code).to_owned(), printed))
+        })
+        .collect()
+}
+
+struct KeyboardLayout {
+    source: *mut c_void,
+    data: *const u8,
+    keyboard: u32,
+}
+
+impl KeyboardLayout {
+    fn current() -> Option<Self> {
+        // SAFETY: the source is retained by the copy, and released by `Drop`.
+        let source = unsafe { TISCopyCurrentKeyboardLayoutInputSource() };
+
+        if source.is_null() {
+            return None;
+        }
+
+        // SAFETY: the source is alive, and the key is the framework's own constant.
+        let data = unsafe { TISGetInputSourceProperty(source, kTISPropertyUnicodeKeyLayoutData) };
+
+        if data.is_null() {
+            // SAFETY: the copy above handed over one reference, and nothing else holds it.
+            unsafe { CFRelease(source) };
+
+            return None;
+        }
+
+        // SAFETY: the property gives a CFData that lives as long as the source.
+        let bytes = unsafe { CFDataGetBytePtr(data) };
+
+        if bytes.is_null() {
+            // SAFETY: the copy above handed over one reference, and nothing else holds it.
+            unsafe { CFRelease(source) };
+
+            return None;
+        }
+
+        Some(Self {
+            source,
+            data: bytes,
+            keyboard: keyboard_type(),
+        })
+    }
+
+    fn printed(&self, position: u16) -> Option<String> {
+        let mut dead = 0_u32;
+        let mut written = 0_usize;
+        let mut letters = [0_u16; LONGEST_LABEL];
+
+        // SAFETY: the layout outlives the call, and the buffer is as long as it says.
+        let failed = unsafe {
+            UCKeyTranslate(
+                self.data,
+                position,
+                KEY_ACTION_DISPLAY,
+                0,
+                self.keyboard,
+                NO_DEAD_KEYS,
+                &raw mut dead,
+                LONGEST_LABEL,
+                &raw mut written,
+                letters.as_mut_ptr(),
+            )
+        } != 0;
+
+        if failed || written == 0 {
+            return None;
+        }
+
+        let printed = String::from_utf16_lossy(&letters[..written]);
+
+        printed
+            .chars()
+            .all(|letter| !letter.is_control() && !letter.is_whitespace())
+            .then(|| printed.to_uppercase())
+    }
+}
+
+impl Drop for KeyboardLayout {
+    fn drop(&mut self) {
+        // SAFETY: the copy handed over one reference, and this is its only release.
+        unsafe { CFRelease(self.source) };
+    }
+}
+
+fn keyboard_type() -> u32 {
+    let source = CGEventSource::new(CGEventSourceStateID::HIDSystemState);
+
+    CGEventSource::keyboard_type(source.as_deref())
+}
+
+#[link(name = "Carbon", kind = "framework")]
+extern "C" {
+    static kTISPropertyUnicodeKeyLayoutData: *const c_void;
+
+    fn TISCopyCurrentKeyboardLayoutInputSource() -> *mut c_void;
+
+    fn TISGetInputSourceProperty(source: *mut c_void, key: *const c_void) -> *mut c_void;
+
+    fn UCKeyTranslate(
+        layout: *const u8,
+        position: u16,
+        action: u16,
+        modifiers: u32,
+        keyboard: u32,
+        options: u32,
+        dead: *mut u32,
+        longest: usize,
+        written: *mut usize,
+        letters: *mut u16,
+    ) -> i32;
+}
+
+#[link(name = "CoreFoundation", kind = "framework")]
+extern "C" {
+    fn CFDataGetBytePtr(data: *mut c_void) -> *const u8;
+
+    fn CFRelease(value: *mut c_void);
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn area() -> CGRect {
+        CGRect::new(CGPoint::new(0.0, 25.0), CGSize::new(1440.0, 875.0))
+    }
+
+    #[test]
+    fn a_window_that_covers_the_work_area_is_filled() {
+        assert!(matches_maximized(area(), area()));
+    }
+
+    #[test]
+    fn a_window_a_hair_off_the_work_area_is_still_filled() {
+        let worn = CGRect::new(CGPoint::new(1.0, 26.0), CGSize::new(1439.0, 874.0));
+
+        assert!(
+            matches_maximized(worn, area()),
+            "the system rounds, and two points of slack are not a small window"
+        );
+    }
+
+    #[test]
+    fn a_window_that_leaves_room_on_any_side_is_not_filled() {
+        let short = CGRect::new(area().origin, CGSize::new(1440.0, 700.0));
+        let narrow = CGRect::new(area().origin, CGSize::new(1000.0, 875.0));
+        let moved = CGRect::new(CGPoint::new(40.0, 25.0), area().size);
+
+        assert!(!matches_maximized(short, area()));
+        assert!(!matches_maximized(narrow, area()));
+        assert!(!matches_maximized(moved, area()));
+    }
+
+    #[test]
+    fn a_window_on_the_screen_it_sits_on_is_measured_against_that_screen() {
+        let left = CGRect::new(CGPoint::new(0.0, 0.0), CGSize::new(1440.0, 900.0));
+        let right = CGRect::new(CGPoint::new(1440.0, 0.0), CGSize::new(1920.0, 1080.0));
+        let areas = WorkAreas {
+            screens: vec![(left, left), (right, right)],
+            main: Some(left),
+        };
+
+        assert_eq!(
+            work_area_of(&areas, CGPoint::new(1500.0, 10.0)),
+            Some(right)
+        );
+        assert_eq!(work_area_of(&areas, CGPoint::new(10.0, 10.0)), Some(left));
+        assert_eq!(
+            work_area_of(&areas, CGPoint::new(-4000.0, 10.0)),
+            Some(left),
+            "a window nobody's screen holds falls back to the main one"
+        );
+    }
 
     #[test]
     fn a_watcher_that_never_listened_stops_without_complaining() {

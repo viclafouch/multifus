@@ -1,8 +1,9 @@
-import type { BannerScreen } from '@/@types/walk'
-import { BANNER_SIZE, MONITOR_SIZE, WIDESCREEN } from '@/constants/banner'
+import type { Display } from '@/@types/display'
+import { BANNER_SIZE } from '@/constants/banner'
+import { screenShape } from '@/helpers/display'
 
 export const screenOf = (
-  screens: readonly BannerScreen[],
+  screens: readonly Display[],
   wanted: string | null
 ) => {
   const named = screens.find((screen) => {
@@ -16,10 +17,8 @@ export const screenOf = (
   return named ?? primary ?? screens.at(0) ?? null
 }
 
-export const monitorShape = (screen: BannerScreen | null) => {
-  const { width, height } = screen ?? WIDESCREEN
-  const ratio = width / height
-  const drawnWidth = Math.min(MONITOR_SIZE.width, MONITOR_SIZE.height * ratio)
+export const monitorShape = (screen: Display | null) => {
+  const { width, ratio, drawnWidth } = screenShape(screen)
   const scaled = (BANNER_SIZE.width * drawnWidth) / width
   const bannerWidth = Math.max(BANNER_SIZE.smallestDrawn, scaled)
 

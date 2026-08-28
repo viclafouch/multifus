@@ -30,6 +30,7 @@ Accessibilité vers un client qui rend peut-être un combat, et aucun banc ne di
 ce qu'elle coûte.
 
 - [ ] Chronométrer une bascule sur le Mac, six clients ouverts, comme `toast-latency` chronomètre une notification sur Windows
+- [ ] Chronométrer l'ouverture de la roue sur le Mac : elle lit le curseur par la boucle d'évènements, puis fait le tour des écrans. `monitor_from_point` ferait moins de travail, mais tao y compare des points logiques à un curseur physique, et il ne trouve rien sur un écran Retina
 
 ## Vérifier sur une vraie soirée, sur les deux machines
 
@@ -70,8 +71,54 @@ ce qu'elle coûte.
 ### Les raccourcis
 
 - [ ] La même combinaison frappée hors du jeu ne fait rien
-- [ ] « Remettre les touches d'origine » redonne les cinq combinaisons
+- [ ] « Remettre les touches d'origine » redonne les sept combinaisons
+- [ ] Ctrl+Maj+A n'est pris ni par Dofus Retro ni par un autre logiciel, et agrandit les clients depuis le bureau comme depuis le jeu
 - [ ] Une touche posée sur un personnage le ramène devant, et « Remettre les touches d'origine » n'y touche pas
+
+### La roue
+
+- [ ] Maintenir la combinaison de la roue hors du jeu : rien ne s'ouvre
+- [ ] Maintenir dans le jeu, ne pas bouger la souris, lâcher : personne ne bouge
+- [ ] Maintenir, aller sur une part, lâcher : la fenêtre passe devant, et le journal porte une ligne
+- [ ] Lâcher au centre, et lâcher hors du disque : rien, et le journal se tait
+- [ ] Le curseur dans un coin de l'écran : la roue s'ouvre quand même au milieu, la souris ne bouge pas, et aucune part ne s'allume tant qu'on n'est pas sur le disque
+- [ ] Sur deux écrans, la roue s'ouvre au milieu de celui où est la souris
+- [ ] Un seul personnage connecté : la roue s'ouvre sur une part
+- [ ] Aucun personnage connecté : la roue s'ouvre vide et le dit
+- [ ] La part de la fenêtre du dessus est peinte d'un ambre pâle, et le principal porte son étoile
+- [ ] La roue par-dessus la barre de sorts : rien ne s'allume dans le jeu derrière le disque, et tout y répond de nouveau la roue fermée
+- [ ] Le Déplacement rapide allumé : un clic gauche pendant la roue est mangé, et le clic d'après part du personnage choisi
+- [ ] La bannière se pose sur l'arrivée par la roue comme sur l'arrivée par un clic
+- [ ] Cmd+Tab pendant le maintien : la roue part au tour suivant
+- [ ] Sur le Mac, lâcher la lettre en gardant Ctrl et Maj : la roue se ferme
+- [ ] La jauge d'un bout à l'autre, 280 puis 360 : le dessin suit, et le bouton pose la vraie roue à la bonne taille au milieu de l'écran
+- [ ] Un diamètre de 720 hérité d'une version d'avant revient à 360 au démarrage
+- [ ] Le dessin de l'écran montre six faux personnages même sans un client ouvert, et la jauge Personnages les compte de un à huit sans rien enregistrer
+- [ ] « Voir en vrai » pose les faux personnages même avec toute la team connectée, et le survol y allume les parts comme dans le jeu
+- [ ] La jauge Personnages à trois, puis « Voir en vrai » : la vraie roue en porte trois
+- [ ] Relâcher sur une part de l'aperçu ne ramène aucune fenêtre devant, et le journal se tait
+- [ ] Vider la combinaison dans l'écran Raccourcis : l'écran Roue le dit en tête, et le maintien ne fait plus rien
+
+### Agrandir tout
+
+- [ ] Six clients ouverts avant Multifus, un clic sur la ligne de la barre système : les six couvrent l'écran, et le journal dit « demandé à 6 clients ». Le journal ne prouve rien de ce qui a bougé, c'est l'écran qu'il faut regarder
+- [ ] Le panneau des Paramètres dit « 6 clients en petit » avant le geste, puis « Tout est agrandi » après
+- [ ] Rester sur l'écran Paramètres et remettre une fenêtre en petit à la main : le panneau le voit dans la seconde, sans changer d'écran
+- [ ] Quitter l'écran Paramètres, remettre une fenêtre en petit : Multifus ne lit plus rien, et le compte est juste au retour
+- [ ] Retirer l'autorisation d'Accessibilité, écran Paramètres ouvert : le panneau dit « Fenêtres illisibles », pas « Aucun client ouvert »
+- [ ] Cliquer le bouton avec six clients ouverts : l'interface ne se fige pas le temps des six allers Accessibilité
+- [ ] Le même geste sans un seul client ouvert : le journal dit qu'aucun client n'est ouvert, et rien ne casse
+- [ ] Un client sur l'écran de connexion s'agrandit comme les autres
+- [ ] Le bouton des Paramètres écrit la même ligne de journal que la barre système, la porte près
+
+### Le clavier
+
+- [ ] Mac AZERTY : l'écran Raccourcis écrit « Z » pour la roue, et la touche Z l'ouvre
+- [ ] Mac AZERTY : enregistrer un raccourci en appuyant sur W écrit « W », et la touche W le déclenche
+- [ ] Mac AZERTY : les signes suivent aussi, `Semicolon` s'écrit « M »
+- [ ] Mac QWERTY et Windows : les lettres restent celles d'avant
+- [ ] Une disposition non latine, grec ou cyrillique : les lettres s'écrivent, et rien ne casse
+- [ ] Changer de disposition sans quitter Multifus garde les lettres d'avant, la table ne partant qu'au démarrage
 
 ### Les réponses rapides
 
@@ -97,11 +144,13 @@ ce qu'elle coûte.
 - [ ] `⌥` + clic sur le bouton vert d'un client agrandit sans plein écran
 - [ ] La note est là sur les paramètres et sur le Déplacement rapide
 - [ ] Une soirée entière : ce que devient le centre de notifications, `dismiss` ne faisant rien sur le Mac là où Windows vide la file
-- [ ] Ctrl+Maj+Espace, Ctrl+Maj+Gauche et Ctrl+Maj+Droite ne sont pris ni par Mission Control ni par la source de saisie
+- [ ] Une soirée avec l'écran Paramètres ouvert : ce que la lecture par seconde coûte, six clients ouverts
+- [ ] Une fenêtre passée en vrai plein écran : ce qu'Agrandir tout en fait, et si le journal ment
+- [ ] Ctrl+Maj+Espace, Ctrl+Maj+Gauche, Ctrl+Maj+Droite et Ctrl+Maj+A ne sont pris ni par Mission Control ni par la source de saisie
 
 ## Vérifier sur la machine Windows
 
-- [ ] Deux clients ouverts : le roster les voit, les cinq raccourcis et l'AutoFocus répondent
+- [ ] Deux clients ouverts : le roster les voit, les sept raccourcis et l'AutoFocus répondent
 - [ ] Un combat sur un personnage exclu : sa notification disparaît du centre de notifications, et aucune fenêtre ne bouge
 - [ ] Un type décoché dans l'AutoFocus : même chose
 - [ ] Une soirée entière : le centre de notifications ne garde rien de Dofus

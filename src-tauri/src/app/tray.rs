@@ -17,6 +17,7 @@ use tauri::Manager;
 use tauri::Wry;
 
 use crate::app::journal::JournalEvent;
+use crate::app::journal::Surface;
 use crate::app::journal::TrayOutcome;
 use crate::app::journal::WalkFrom;
 use crate::app::journal::Work;
@@ -38,12 +39,14 @@ const MENU_SHORTCUTS: &str = "Raccourcis";
 const MENU_QUICK_REPLIES: &str = "Réponses rapides";
 const MENU_AUTO_FOCUS_SCREEN: &str = "AutoFocus";
 const MENU_WALK_SCREEN: &str = "Déplacement rapide";
+const MENU_WHEEL_SCREEN: &str = "Roue";
 const MENU_RELAY: &str = "Messages privés";
 const MENU_SETTINGS: &str = "Paramètres";
 const MENU_ABOUT: &str = "À propos";
 const MENU_QUIT: &str = "Quitter Multifus";
 const MENU_NOBODY: &str = "Aucun personnage connecté";
 const MENU_EXCLUDED: &str = " (exclu)";
+const MENU_MAXIMIZE_ALL: &str = "Agrandir les fenêtres";
 const MENU_AUTO_FOCUS_ON: &str = "Activer l'AutoFocus";
 const MENU_WALK_ON: &str = "Activer le Déplacement rapide";
 const MENU_WALK_OFF: &str = "Désactiver le Déplacement rapide";
@@ -73,6 +76,8 @@ const QUIT_ID: &str = "multifus://quit";
 
 const NOBODY_ID: &str = "multifus://nobody";
 
+const MAXIMIZE_ALL_ID: &str = "multifus://maximize-all";
+
 const AUTO_FOCUS_ID: &str = "multifus://auto-focus";
 
 const WALK_ID: &str = "multifus://walk";
@@ -90,7 +95,13 @@ const OPEN_SETTINGS_ID: &str = "multifus://open-settings";
 
 const CHARACTER_PREFIX: &str = "multifus://character/";
 
-type TrayQueue = Sender<String>;
+#[derive(Debug, Clone, PartialEq, Eq)]
+enum TrayWork {
+    Focus { nickname: String },
+    MaximizeAll,
+}
+
+type TrayQueue = Sender<TrayWork>;
 
 type ShownMenu = Mutex<Option<Contents>>;
 
@@ -273,6 +284,14 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
         )?)?;
     }
 
+    menu.append(&MenuItem::with_id(
+        app,
+        MAXIMIZE_ALL_ID,
+        MENU_MAXIMIZE_ALL,
+        true,
+        None::<&str>,
+    )?)?;
+
     menu.append(&PredefinedMenuItem::separator(app)?)?;
 
     menu.append(&MenuItem::with_id(
@@ -429,9 +448,24 @@ fn on_menu_event(app: &AppHandle, event: MenuEvent) {
         return;
     }
 
-    if let Some(nickname) = id.strip_prefix(CHARACTER_PREFIX) {
-        drop(app.state::<TrayQueue>().send(nickname.to_owned()));
+    if id == MAXIMIZE_ALL_ID {
+        hand_over(app, TrayWork::MaximizeAll);
+
+        return;
     }
+
+    if let Some(nickname) = id.strip_prefix(CHARACTER_PREFIX) {
+        hand_over(
+            app,
+            TrayWork::Focus {
+                nickname: nickname.to_owned(),
+            },
+        );
+    }
+}
+
+fn hand_over(app: &AppHandle, work: TrayWork) {
+    drop(app.state::<TrayQueue>().send(work));
 }
 
 fn switch_label(on: bool, undo: &'static str, redo: &'static str) -> &'static str {
@@ -449,6 +483,7 @@ fn screen_id(screen: Screen) -> &'static str {
         Screen::QuickReplies => "quickReplies",
         Screen::AutoFocus => "autoFocus",
         Screen::Walk => "walk",
+        Screen::Wheel => "wheel",
         Screen::Relay => "relay",
         Screen::Settings => "settings",
         Screen::About => "about",
@@ -468,6 +503,7 @@ fn screen_label(screen: Screen) -> &'static str {
         Screen::QuickReplies => MENU_QUICK_REPLIES,
         Screen::AutoFocus => MENU_AUTO_FOCUS_SCREEN,
         Screen::Walk => MENU_WALK_SCREEN,
+        Screen::Wheel => MENU_WHEEL_SCREEN,
         Screen::Relay => MENU_RELAY,
         Screen::Settings => MENU_SETTINGS,
         Screen::About => MENU_ABOUT,
@@ -475,7 +511,7 @@ fn screen_label(screen: Screen) -> &'static str {
 }
 
 fn start_worker(app: &AppHandle) {
-    let (queue, nicknames) = mpsc::channel::<String>();
+    let (queue, works) = mpsc::channel::<TrayWork>();
 
     let spawned = thread::Builder::new()
         .name("multifus-tray".to_owned())
@@ -483,8 +519,8 @@ fn start_worker(app: &AppHandle) {
             let app = app.clone();
 
             move || {
-                for nickname in nicknames {
-                    if catch_unwind(AssertUnwindSafe(|| focus(&app, &nickname))).is_err() {
+                for work in works {
+                    if catch_unwind(AssertUnwindSafe(|| carry_out(&app, &work))).is_err() {
                         lock(&app).log_unless_repeated(JournalEvent::Panicked { work: Work::Tray });
                     }
                 }
@@ -498,6 +534,17 @@ fn start_worker(app: &AppHandle) {
     }
 
     app.manage::<TrayQueue>(queue);
+}
+
+fn carry_out(app: &AppHandle, work: &TrayWork) {
+    match work {
+        TrayWork::Focus { nickname } => focus(app, nickname),
+        TrayWork::MaximizeAll => {
+            runtime::maximize_all(app, Surface::Tray);
+
+            runtime::emit_snapshot(app);
+        }
+    }
 }
 
 fn focus(app: &AppHandle, nickname: &str) {

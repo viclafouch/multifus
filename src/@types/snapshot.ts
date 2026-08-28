@@ -3,8 +3,22 @@ import type { AutoFocusSwitch } from '@/@types/notification'
 import type { RelayStatus } from '@/@types/relay'
 import type { Character } from '@/@types/roster'
 import type { QuickReply, ShortcutBinding } from '@/@types/shortcuts'
-import type { Authorization, ConfigStatus, UpdateStatus } from '@/@types/system'
+import type {
+  Authorization,
+  ConfigStatus,
+  KeyLabels,
+  UpdateStatus
+} from '@/@types/system'
 import type { WalkStatus } from '@/@types/walk'
+import type { WheelSize } from '@/@types/wheel'
+
+export type Clients = {
+  readonly open: number
+  readonly small: number
+  readonly readable: boolean
+}
+
+export type ClientsState = 'maximized' | 'none' | 'small' | 'unreadable'
 
 export type ScreenName =
   | 'about'
@@ -15,10 +29,12 @@ export type ScreenName =
   | 'settings'
   | 'shortcuts'
   | 'walk'
+  | 'wheel'
 
 export type Snapshot = {
   readonly version: string
   readonly system: string
+  readonly keyboard: KeyLabels
   readonly characters: readonly Character[]
   readonly shortcuts: readonly ShortcutBinding[]
   readonly quickReplies: readonly QuickReply[]
@@ -36,5 +52,6 @@ export type Snapshot = {
   readonly update: UpdateStatus
   readonly relay: RelayStatus
   readonly walk: WalkStatus
+  readonly wheel: WheelSize
   readonly journal: readonly JournalEntry[]
 }

@@ -1,0 +1,15 @@
+@import 'tailwindcss';
+
+@import '@fontsource-variable/fraunces/wght.css';
+
+@import './theme.css';
+
+@layer base {
+  html,
+  body {
+    @apply overflow-hidden bg-transparent text-foreground antialiased;
+
+    user-select: none;
+    cursor: default;
+  }
+}

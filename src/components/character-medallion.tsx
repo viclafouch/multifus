@@ -1,7 +1,6 @@
 import type { LampState } from '@/components/lamp'
+import { PORTRAIT_UNKNOWN } from '@/constants/classes'
 import { cn } from '@/lib/utils'
-
-const PORTRAIT_UNKNOWN = '?'
 
 type CharacterMedallionProps = Readonly<{
   portrait: string | null

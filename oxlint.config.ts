@@ -52,7 +52,9 @@ export default defineConfig({
       rules: {
         'typescript/prefer-readonly-parameter-types': 'off',
         'react/function-component-definition': 'off',
-        'eslint/no-restricted-imports': 'off'
+        'eslint/no-restricted-imports': 'off',
+        'eslint/no-nested-ternary': 'off',
+        'eslint/arrow-body-style': 'off'
       }
     },
     {

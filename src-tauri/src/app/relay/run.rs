@@ -128,6 +128,7 @@ fn stop_of(surface: Surface) -> RelayStop {
     match surface {
         Surface::Tray => RelayStop::Tray,
         Surface::Window => RelayStop::Window,
+        Surface::Shortcut => RelayStop::Shortcut,
     }
 }
 
@@ -561,9 +562,10 @@ mod tests {
     }
 
     #[test]
-    fn the_switch_says_which_of_the_two_places_it_was_moved_from() {
+    fn the_switch_says_which_of_the_three_places_it_was_moved_from() {
         assert_eq!(stop_of(Surface::Tray), RelayStop::Tray);
         assert_eq!(stop_of(Surface::Window), RelayStop::Window);
+        assert_eq!(stop_of(Surface::Shortcut), RelayStop::Shortcut);
     }
 
     #[test]

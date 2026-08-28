@@ -17,6 +17,10 @@ const bridge = {
   onNavigate: vi.fn(),
   snapshot: vi.fn(),
   bannerScreens: vi.fn(),
+  wheelDisplay: vi.fn(),
+  clients: vi.fn(pending),
+  watchClients: vi.fn(pending),
+  onClients: vi.fn(pending),
   dismissConfigProblem: vi.fn(pending),
   revealQuarantinedConfig: vi.fn(pending)
 }
@@ -31,6 +35,7 @@ const open = async (snapshot: Snapshot) => {
   bridge.onSnapshot.mockResolvedValue(ignore)
   bridge.snapshot.mockResolvedValue(snapshot)
   bridge.bannerScreens.mockResolvedValue([])
+  bridge.wheelDisplay.mockResolvedValue(null)
   bridge.onNavigate.mockImplementation(async (handle: TrayHandler) => {
     tray.asked = handle
 
@@ -60,6 +65,7 @@ const ARRIVALS = [
   { name: 'quickReplies', mark: strings.quickReplies.subtitle },
   { name: 'autoFocus', mark: strings.autoFocus.subtitle },
   { name: 'walk', mark: strings.walk.subtitle },
+  { name: 'wheel', mark: strings.wheel.subtitle },
   { name: 'relay', mark: strings.relay.subtitle },
   { name: 'settings', mark: strings.settings.subtitle },
   { name: 'about', mark: strings.about.legalTitle }
@@ -87,7 +93,7 @@ describe('la fenêtre de Multifus', () => {
     expect(screen.getByText(strings.characters.emptyTitle)).not.toBeNull()
   })
 
-  it('porte les huit écrans, et la version de Multifus', async () => {
+  it('porte les neuf écrans, et la version de Multifus', async () => {
     await open(snapshotOf({ version: '1.4.2' }))
 
     for (const label of Object.values(strings.nav)) {

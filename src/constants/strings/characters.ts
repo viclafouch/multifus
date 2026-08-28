@@ -136,7 +136,7 @@ export const CHARACTERS_STRINGS = {
     },
     exclusionTitle: 'Exclusion',
     exclusionDescription:
-      'Un personnage exclu est sauté par les raccourcis et par le Déplacement rapide, et l’AutoFocus ne le fait plus passer devant. Ses messages privés continuent d’arriver.',
+      'Un personnage exclu est sauté par le défilement et par le Déplacement rapide, et l’AutoFocus ne le fait plus passer devant. Ses messages privés continuent d’arriver.',
     groupLabel: GROUP_LABELS,
     excludeGroupLabel: EXCLUDE_GROUP_LABELS,
     includeGroupLabel: INCLUDE_GROUP_LABELS,

@@ -1,0 +1,11 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "wheel",
+  "description": "Capability for the wheel window",
+  "windows": [
+    "wheel"
+  ],
+  "permissions": [
+    "core:default"
+  ]
+}

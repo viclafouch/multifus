@@ -14,6 +14,7 @@ pub mod tray;
 pub mod update;
 pub mod view;
 pub mod walk;
+pub mod wheel;
 
 use std::sync::Arc;
 use std::sync::Mutex;
@@ -24,6 +25,7 @@ use tauri::Manager;
 use crate::app::view::ScreenSaverView;
 use crate::config::ConfigError;
 use crate::config::ConfigStore;
+use crate::platform::key_labels;
 use crate::platform::DisplayKeeper;
 use crate::platform::PlatformDisplayKeeper;
 use crate::platform::PlatformNotificationWatcher;
@@ -53,6 +55,7 @@ pub fn setup(app: &AppHandle) -> Result<(), ConfigError> {
         loaded,
         version: app.package_info().version.to_string(),
         system: system(),
+        keyboard: key_labels(),
         launch: main_window::launch(),
         screen_saver: screen_saver(&keeper),
         taskbar_combines: windows.taskbar_combines().unwrap_or(true),
@@ -66,6 +69,8 @@ pub fn setup(app: &AppHandle) -> Result<(), ConfigError> {
     banner::setup(app);
 
     walk::setup(app);
+
+    wheel::setup(app);
 
     shortcuts::start(app);
     shortcuts::apply(app);

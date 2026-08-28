@@ -18,6 +18,7 @@ use crate::config::Settings;
 use crate::platform::Authorization;
 use crate::platform::ClickGate;
 use crate::platform::GameWindow;
+use crate::platform::KeyLabels;
 use crate::platform::PlatformError;
 use crate::platform::Result;
 use crate::platform::ScreenPoint;
@@ -50,6 +51,7 @@ pub struct Desktop {
     pub client_windows: Vec<WindowId>,
     pub foreground: Option<GameWindow>,
     pub minimized: Vec<WindowId>,
+    pub maximized: Vec<WindowId>,
     pub under_click: Option<WindowId>,
     pub tells_arrival: Option<Arc<ClickGate>>,
     pub taskbar_combines: bool,
@@ -59,6 +61,8 @@ pub struct Desktop {
     pub short_titles_refusal: Option<PlatformError>,
     pub icon_refusal: Option<PlatformError>,
     pub focus_refusal: Option<PlatformError>,
+    pub client_windows_refusal: Option<PlatformError>,
+    pub maximize_refusal: Option<PlatformError>,
 }
 
 impl Default for Desktop {
@@ -68,6 +72,7 @@ impl Default for Desktop {
             client_windows: Vec::new(),
             foreground: None,
             minimized: Vec::new(),
+            maximized: Vec::new(),
             under_click: None,
             tells_arrival: None,
             taskbar_combines: true,
@@ -77,6 +82,8 @@ impl Default for Desktop {
             short_titles_refusal: None,
             icon_refusal: None,
             focus_refusal: None,
+            client_windows_refusal: None,
+            maximize_refusal: None,
         }
     }
 }
@@ -174,6 +181,16 @@ impl WindowManager for FakeWindowManager {
         Ok(self.desktop().minimized.contains(&window))
     }
 
+    fn maximized_windows(&self, windows: &[WindowId]) -> Vec<WindowId> {
+        let desktop = self.desktop();
+
+        windows
+            .iter()
+            .filter(|window| desktop.maximized.contains(window))
+            .copied()
+            .collect()
+    }
+
     fn focus(&self, window: WindowId) -> Result<()> {
         self.write_down(Asked::Focused(window));
 
@@ -191,13 +208,15 @@ impl WindowManager for FakeWindowManager {
     }
 
     fn client_windows(&self) -> Result<Vec<WindowId>> {
-        Ok(self.desktop().client_windows)
+        let desktop = self.desktop();
+
+        unless_refused(desktop.client_windows_refusal, desktop.client_windows)
     }
 
     fn maximize(&self, window: WindowId) -> Result<()> {
         self.write_down(Asked::Maximized(window));
 
-        Ok(())
+        unless_refused(self.desktop().maximize_refusal, ())
     }
 
     fn apply_short_titles(&self, short: bool, suffix: Option<&str>) -> Result<ShortTitleReport> {
@@ -267,6 +286,7 @@ pub fn multifus(directory: &TempDir, loaded: Loaded) -> Multifus {
         loaded,
         version: "0.0.0".to_owned(),
         system: "test".to_owned(),
+        keyboard: KeyLabels::new(),
         launch: Launch::ByHand,
         screen_saver: ScreenSaverView::Never,
         taskbar_combines: true,

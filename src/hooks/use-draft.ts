@@ -1,6 +1,8 @@
 import React from 'react'
 
-export const useDraft = (stored: string) => {
+export const useDraft = <Value extends boolean | number | string>(
+  stored: Value
+) => {
   const [draft, setDraft] = React.useState(stored)
   const [seen, setSeen] = React.useState(stored)
 

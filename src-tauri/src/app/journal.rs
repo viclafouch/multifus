@@ -21,6 +21,7 @@ pub enum Work {
     Tray,
     Walk,
     Banner,
+    Wheel,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -123,6 +124,15 @@ pub enum JournalEvent {
     ClientMaximized,
 
     ClientMaximizeFailed {
+        detail: String,
+    },
+
+    MaximizeAll {
+        from: Surface,
+        outcome: MaximizeAllOutcome,
+    },
+
+    ClientsCountFailed {
         detail: String,
     },
 
@@ -233,6 +243,14 @@ pub enum JournalEvent {
     },
 
     BannerFailed {
+        detail: String,
+    },
+
+    WheelPicked {
+        outcome: WheelOutcome,
+    },
+
+    WheelFailed {
         detail: String,
     },
 
@@ -413,6 +431,7 @@ pub enum NoticeCase {
 pub enum Surface {
     Window,
     Tray,
+    Shortcut,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
@@ -481,13 +500,35 @@ pub enum ShortcutOutcome {
 
     AlreadyThere { nickname: String },
 
-    Walk { enabled: bool },
-
     NoWindow { nickname: String },
 
     FocusFailed { nickname: String, detail: String },
 
     ForegroundUnknown { detail: String },
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(tag = "outcome", rename_all = "camelCase")]
+pub enum WheelOutcome {
+    Focused { nickname: String },
+
+    NoWindow { nickname: String },
+
+    FocusFailed { nickname: String, detail: String },
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(tag = "outcome", rename_all = "camelCase")]
+pub enum MaximizeAllOutcome {
+    Asked { windows: usize },
+
+    NothingMoved,
+
+    NoClient,
+
+    Denied,
+
+    Refused { detail: String },
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -820,5 +861,20 @@ mod tests {
     #[test]
     fn an_unreadable_body_is_not_an_unknown_kind() {
         assert_ne!(Outcome::BodyUnread, Outcome::KindUnknown);
+    }
+
+    #[test]
+    fn the_wheel_only_writes_a_line_when_it_was_asked_for_somebody() {
+        let picked = JournalEvent::WheelPicked {
+            outcome: WheelOutcome::Focused {
+                nickname: "Bravo".to_owned(),
+            },
+        };
+
+        assert_eq!(fields_of(&picked), ["kind", "outcome"]);
+        assert_eq!(
+            serde_json::to_string(&picked).expect("the event serialises"),
+            r#"{"kind":"wheelPicked","outcome":{"outcome":"focused","nickname":"Bravo"}}"#
+        );
     }
 }

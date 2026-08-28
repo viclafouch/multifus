@@ -16,7 +16,9 @@ use tauri::RunEvent;
 use tauri_plugin_opener::OpenerExt;
 
 use crate::app::journal::JournalEvent;
+use crate::app::journal::MaximizeAllOutcome;
 use crate::app::journal::Outcome;
+use crate::app::journal::Surface;
 use crate::app::journal::Work;
 use crate::app::main_window;
 use crate::app::portraits;
@@ -32,9 +34,11 @@ use crate::app::state::ScanChange;
 use crate::app::state::TracedWindow;
 use crate::app::state::WatcherState;
 use crate::app::tray;
+use crate::app::view::ClientsView;
 use crate::app::view::Screen;
 use crate::app::view::Snapshot;
 use crate::app::walk;
+use crate::app::wheel;
 use crate::domain::GameNotification;
 use crate::platform::NotificationReport;
 use crate::platform::NotificationSink;
@@ -134,6 +138,10 @@ fn tick(app: &AppHandle) {
 
     let walk_stopped = walk::refresh(app);
 
+    wheel::follow_foreground(app);
+
+    follow_clients(app, &turn);
+
     if changed || maximized || renamed || painted || regrouped || walk_stopped {
         emit_snapshot(app);
     }
@@ -150,6 +158,22 @@ fn scan(app: &AppHandle) -> bool {
     change.changed || listening_changed || display_changed
 }
 
+enum ClientsOnScreen {
+    Open(Vec<WindowId>),
+    Denied,
+    Unreadable { detail: String },
+}
+
+fn clients_on_screen(turn: &Turn) -> ClientsOnScreen {
+    match turn.windows.client_windows() {
+        Ok(open) => ClientsOnScreen::Open(open),
+        Err(PlatformError::AuthorizationDenied) => ClientsOnScreen::Denied,
+        Err(error) => ClientsOnScreen::Unreadable {
+            detail: error.to_string(),
+        },
+    }
+}
+
 fn maximize_new_clients(turn: &Turn) -> bool {
     if !turn.hold().maximizes_on_launch() {
         turn.hold().forget_client_windows();
@@ -157,15 +181,13 @@ fn maximize_new_clients(turn: &Turn) -> bool {
         return false;
     }
 
-    let client_windows = match turn.windows.client_windows() {
-        Ok(client_windows) => client_windows,
-        Err(PlatformError::AuthorizationDenied) => return false,
-        Err(error) => {
+    let client_windows = match clients_on_screen(turn) {
+        ClientsOnScreen::Open(open) => open,
+        ClientsOnScreen::Denied => return false,
+        ClientsOnScreen::Unreadable { detail } => {
             return turn
                 .hold()
-                .log_unless_repeated(JournalEvent::ClientMaximizeFailed {
-                    detail: error.to_string(),
-                })
+                .log_unless_repeated(JournalEvent::ClientMaximizeFailed { detail })
         }
     };
 
@@ -190,6 +212,87 @@ fn maximize_new_clients(turn: &Turn) -> bool {
     }
 
     written
+}
+
+pub const CLIENTS_EVENT: &str = "multifus://clients";
+
+pub fn clients(app: &AppHandle) -> ClientsView {
+    count_clients(&Turn::of(app))
+}
+
+pub fn watch_clients(app: &AppHandle, watching: bool) {
+    lock(app).watch_clients(watching);
+}
+
+fn follow_clients(app: &AppHandle, turn: &Turn) {
+    if !turn.hold().watches_clients() || !main_window::is_on_screen(app) {
+        return;
+    }
+
+    let counted = count_clients(turn);
+
+    let Some(changed) = turn.hold().take_changed_clients(counted) else {
+        return;
+    };
+
+    if let Err(error) = app.emit(CLIENTS_EVENT, changed) {
+        turn.hold()
+            .log_unless_repeated(JournalEvent::ClientsCountFailed {
+                detail: error.to_string(),
+            });
+    }
+}
+
+fn count_clients(turn: &Turn) -> ClientsView {
+    let ClientsOnScreen::Open(open) = clients_on_screen(turn) else {
+        return ClientsView::UNREADABLE;
+    };
+
+    let maximized = turn.windows.maximized_windows(&open).len();
+
+    ClientsView {
+        open: open.len(),
+        small: open.len().saturating_sub(maximized),
+        readable: true,
+    }
+}
+
+pub fn maximize_all(app: &AppHandle, from: Surface) {
+    let turn = Turn::of(app);
+    let outcome = maximize_clients_on_screen(&turn);
+
+    turn.hold().log(JournalEvent::MaximizeAll { from, outcome });
+}
+
+fn maximize_clients_on_screen(turn: &Turn) -> MaximizeAllOutcome {
+    let client_windows = match clients_on_screen(turn) {
+        ClientsOnScreen::Open(open) => open,
+        ClientsOnScreen::Denied => return MaximizeAllOutcome::Denied,
+        ClientsOnScreen::Unreadable { detail } => return MaximizeAllOutcome::Refused { detail },
+    };
+
+    if client_windows.is_empty() {
+        return MaximizeAllOutcome::NoClient;
+    }
+
+    let mut windows = 0;
+
+    for window in client_windows {
+        match turn.windows.maximize(window) {
+            Ok(()) => windows += 1,
+            Err(error) => {
+                turn.hold().log(JournalEvent::ClientMaximizeFailed {
+                    detail: error.to_string(),
+                });
+            }
+        }
+    }
+
+    if windows == 0 {
+        MaximizeAllOutcome::NothingMoved
+    } else {
+        MaximizeAllOutcome::Asked { windows }
+    }
 }
 
 fn apply_short_titles(turn: &Turn) -> bool {
@@ -755,6 +858,181 @@ mod tests {
         assert_eq!(
             windows.asked(),
             vec![Asked::Maximized(WindowId::from_raw(2))]
+        );
+    }
+
+    #[test]
+    fn asking_for_all_of_them_fills_every_client_on_screen_and_counts_them() {
+        let directory = directory();
+        let state = app_state(&directory, Settings::default());
+        let windows = FakeWindowManager::showing(Desktop {
+            client_windows: vec![WindowId::from_raw(1), WindowId::from_raw(2)],
+            ..Desktop::default()
+        });
+
+        assert_eq!(
+            maximize_clients_on_screen(&turn(&windows, &state)),
+            MaximizeAllOutcome::Asked { windows: 2 },
+            "the setting is off, and a gesture made by hand answers all the same"
+        );
+        assert_eq!(
+            windows.asked(),
+            vec![
+                Asked::Maximized(WindowId::from_raw(1)),
+                Asked::Maximized(WindowId::from_raw(2)),
+            ]
+        );
+    }
+
+    #[test]
+    fn the_screen_is_told_how_many_clients_are_open_and_how_many_stayed_small() {
+        let directory = directory();
+        let state = app_state(&directory, Settings::default());
+        let windows = FakeWindowManager::showing(Desktop {
+            client_windows: vec![
+                WindowId::from_raw(1),
+                WindowId::from_raw(2),
+                WindowId::from_raw(3),
+            ],
+            maximized: vec![WindowId::from_raw(2)],
+            ..Desktop::default()
+        });
+
+        assert_eq!(
+            count_clients(&turn(&windows, &state)),
+            ClientsView {
+                open: 3,
+                small: 2,
+                readable: true
+            }
+        );
+    }
+
+    #[test]
+    fn a_window_the_system_will_not_vouch_for_is_counted_as_one_left_small() {
+        let directory = directory();
+        let state = app_state(&directory, Settings::default());
+        let windows = FakeWindowManager::showing(Desktop {
+            client_windows: vec![WindowId::from_raw(1)],
+            maximized: Vec::new(),
+            ..Desktop::default()
+        });
+
+        assert_eq!(
+            count_clients(&turn(&windows, &state)),
+            ClientsView {
+                open: 1,
+                small: 1,
+                readable: true
+            },
+            "the doubt falls on the side that still offers the gesture"
+        );
+    }
+
+    #[test]
+    fn a_desktop_nobody_can_read_is_told_apart_from_a_desktop_without_a_client() {
+        let directory = directory();
+        let state = app_state(&directory, Settings::default());
+        let windows = FakeWindowManager::showing(Desktop {
+            client_windows_refusal: Some(PlatformError::AuthorizationDenied),
+            ..Desktop::default()
+        });
+
+        assert_eq!(
+            count_clients(&turn(&windows, &state)),
+            ClientsView::UNREADABLE
+        );
+
+        windows.show(Desktop::default());
+
+        assert_eq!(
+            count_clients(&turn(&windows, &state)),
+            ClientsView {
+                open: 0,
+                small: 0,
+                readable: true
+            },
+            "no client open is not the same thing as no window readable"
+        );
+    }
+
+    #[test]
+    fn asking_for_all_of_them_with_no_client_open_says_so_and_moves_nothing() {
+        let directory = directory();
+        let state = app_state(&directory, Settings::default());
+        let windows = FakeWindowManager::showing(Desktop::default());
+
+        assert_eq!(
+            maximize_clients_on_screen(&turn(&windows, &state)),
+            MaximizeAllOutcome::NoClient
+        );
+        assert_eq!(windows.asked(), Vec::new());
+    }
+
+    #[test]
+    fn a_client_that_will_not_be_filled_is_told_apart_from_a_desktop_nobody_can_read() {
+        let directory = directory();
+        let state = app_state(&directory, Settings::default());
+        let windows = FakeWindowManager::showing(Desktop {
+            client_windows: vec![WindowId::from_raw(1)],
+            maximize_refusal: Some(PlatformError::system("filling", "the system said no")),
+            ..Desktop::default()
+        });
+
+        assert_eq!(
+            maximize_clients_on_screen(&turn(&windows, &state)),
+            MaximizeAllOutcome::NothingMoved
+        );
+        assert!(
+            journalled(&state).contains(&JournalEvent::ClientMaximizeFailed {
+                detail: "filling failed: the system said no".to_owned(),
+            })
+        );
+
+        windows.show(Desktop {
+            client_windows_refusal: Some(PlatformError::AuthorizationDenied),
+            ..Desktop::default()
+        });
+
+        assert_eq!(
+            maximize_clients_on_screen(&turn(&windows, &state)),
+            MaximizeAllOutcome::Denied
+        );
+    }
+
+    #[test]
+    fn asking_for_all_of_them_never_spends_the_one_fill_a_new_client_is_owed() {
+        let directory = directory();
+        let state = app_state(
+            &directory,
+            Settings {
+                maximize_on_launch: true,
+                ..Settings::default()
+            },
+        );
+        let windows = FakeWindowManager::showing(Desktop {
+            client_windows: vec![WindowId::from_raw(1)],
+            ..Desktop::default()
+        });
+        let turn = turn(&windows, &state);
+
+        maximize_new_clients(&turn);
+        maximize_clients_on_screen(&turn);
+
+        windows.show(Desktop {
+            client_windows: vec![WindowId::from_raw(1), WindowId::from_raw(2)],
+            ..Desktop::default()
+        });
+
+        maximize_new_clients(&turn);
+
+        assert_eq!(
+            windows.asked(),
+            vec![
+                Asked::Maximized(WindowId::from_raw(1)),
+                Asked::Maximized(WindowId::from_raw(2)),
+            ],
+            "the gesture made by hand filled the first, and the client that opened later is still owed its own"
         );
     }
 

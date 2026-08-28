@@ -29,6 +29,7 @@ use crate::app::view::BannerView;
 use crate::app::view::Binding;
 use crate::app::view::BindingView;
 use crate::app::view::CharacterView;
+use crate::app::view::ClientsView;
 use crate::app::view::ConfigProblem;
 use crate::app::view::ConfigView;
 use crate::app::view::PairingView;
@@ -43,7 +44,11 @@ use crate::app::view::SwitchView;
 use crate::app::view::TestView;
 use crate::app::view::UpdateView;
 use crate::app::view::WalkView;
+use crate::app::view::WheelSlice;
+use crate::app::view::WheelView;
 use crate::app::walk::WalkPlan;
+use crate::app::wheel;
+use crate::app::wheel::WheelPlan;
 use crate::config::Banner;
 use crate::config::BannerCorner;
 use crate::config::ConfigError;
@@ -54,6 +59,9 @@ use crate::config::QuickReplyId;
 use crate::config::Settings;
 use crate::config::Shortcuts;
 use crate::config::Traces;
+use crate::config::WHEEL_SMALLEST;
+use crate::config::WHEEL_STEP;
+use crate::config::WHEEL_WIDEST;
 use crate::domain::Character;
 use crate::domain::Class;
 use crate::domain::Gender;
@@ -61,6 +69,7 @@ use crate::domain::NotificationKind;
 use crate::domain::Portrait;
 use crate::domain::Shortcut;
 use crate::platform::GameWindow;
+use crate::platform::KeyLabels;
 use crate::platform::PasteSender;
 use crate::platform::PlatformNotificationWatcher;
 use crate::platform::WindowId;
@@ -82,12 +91,15 @@ pub struct Multifus {
     store: ConfigStore,
     version: String,
     system: String,
+    keyboard: KeyLabels,
     settings: Settings,
     shortcut_statuses: HashMap<Binding, ShortcutStatus>,
     held: HashMap<Binding, String>,
     windows: HashMap<String, WindowId>,
     windows_seen: HashMap<String, WindowId>,
     seen_client_windows: Option<HashSet<WindowId>>,
+    client_watchers: usize,
+    watched_clients: Option<ClientsView>,
     painted_windows: HashMap<WindowId, WindowLook>,
     taskbar_combines: bool,
     granted: Option<bool>,
@@ -113,6 +125,7 @@ pub struct MultifusParams {
     pub loaded: Loaded,
     pub version: String,
     pub system: String,
+    pub keyboard: KeyLabels,
     pub launch: Launch,
     pub screen_saver: ScreenSaverView,
     pub taskbar_combines: bool,
@@ -126,6 +139,7 @@ impl Multifus {
             loaded,
             version,
             system,
+            keyboard,
             launch,
             screen_saver,
             taskbar_combines,
@@ -157,12 +171,15 @@ impl Multifus {
             store,
             version,
             system,
+            keyboard,
             settings,
             shortcut_statuses: HashMap::new(),
             held: HashMap::new(),
             windows: HashMap::new(),
             windows_seen: HashMap::new(),
             seen_client_windows: None,
+            client_watchers: 0,
+            watched_clients: None,
             painted_windows: HashMap::new(),
             taskbar_combines,
             granted: None,
@@ -190,6 +207,7 @@ impl Multifus {
         Snapshot {
             version: self.version.clone(),
             system: self.system.clone(),
+            keyboard: self.keyboard.clone(),
             characters: self
                 .settings
                 .roster
@@ -247,6 +265,14 @@ impl Multifus {
                     corner: self.settings.banner.corner,
                     screen: self.settings.banner.screen.clone(),
                 },
+            },
+            wheel: WheelView {
+                diameter: self.settings.wheel.diameter,
+                smallest: WHEEL_SMALLEST,
+                widest: WHEEL_WIDEST,
+                step: WHEEL_STEP,
+                dead_zone: wheel::DEAD_ZONE,
+                demo: wheel::demo_slices(wheel::demo_crowd()),
             },
             relay: RelayView {
                 paired: self.settings.relay.chat_id.is_some(),
@@ -502,6 +528,8 @@ impl Multifus {
             ShortcutAction::Main => &mut self.settings.shortcuts.main,
             ShortcutAction::ToggleExcluded => &mut self.settings.shortcuts.toggle_excluded,
             ShortcutAction::Walk => &mut self.settings.shortcuts.walk,
+            ShortcutAction::MaximizeAll => &mut self.settings.shortcuts.maximize_all,
+            ShortcutAction::Wheel => &mut self.settings.shortcuts.wheel,
         };
 
         *slot = shortcut;
@@ -901,6 +929,40 @@ impl Multifus {
     }
 
     #[must_use]
+    pub fn wheel_diameter(&self) -> u32 {
+        self.settings.wheel.diameter
+    }
+
+    pub fn set_wheel_diameter(&mut self, diameter: u32) {
+        self.settings.wheel.set_diameter(diameter);
+
+        self.save();
+    }
+
+    #[must_use]
+    pub fn wheel_plan(&self, here: Option<WindowId>) -> WheelPlan {
+        let mut slices = Vec::new();
+        let mut windows = Vec::new();
+
+        for character in self.settings.roster.characters() {
+            let Some(window) = self.windows.get(&character.nickname).copied() else {
+                continue;
+            };
+
+            slices.push(WheelSlice {
+                nickname: character.nickname.clone(),
+                class: character.class,
+                gender: character.gender,
+                main: character.main,
+                here: Some(window) == here,
+            });
+            windows.push(window);
+        }
+
+        WheelPlan { slices, windows }
+    }
+
+    #[must_use]
     pub fn walk_plan(&self) -> WalkPlan {
         let watched = self.windows.values().copied().collect();
 
@@ -1205,6 +1267,31 @@ impl Multifus {
     }
 
     #[must_use]
+    pub fn watches_clients(&self) -> bool {
+        self.client_watchers > 0
+    }
+
+    pub fn watch_clients(&mut self, watching: bool) {
+        self.client_watchers = if watching {
+            self.client_watchers.saturating_add(1)
+        } else {
+            self.client_watchers.saturating_sub(1)
+        };
+
+        self.watched_clients = None;
+    }
+
+    pub fn take_changed_clients(&mut self, counted: ClientsView) -> Option<ClientsView> {
+        if !self.watches_clients() || self.watched_clients == Some(counted) {
+            return None;
+        }
+
+        self.watched_clients = Some(counted);
+
+        Some(counted)
+    }
+
+    #[must_use]
     pub fn window_of(&self, nickname: &str) -> Option<WindowId> {
         self.windows.get(nickname).copied()
     }
@@ -1303,23 +1390,25 @@ impl Multifus {
         }
     }
 
-    pub fn decide_shortcut(&mut self, action: ShortcutAction, current: &str) -> ShortcutEffect {
+    pub fn decide_shortcut(
+        &mut self,
+        action: ShortcutAction,
+        current: &str,
+    ) -> Option<ShortcutEffect> {
         match action {
             ShortcutAction::Next => {
                 let target = nickname_of(self.settings.roster.next_in_cycle(current));
 
-                self.aim_at(target)
+                Some(self.aim_at(target))
             }
             ShortcutAction::Previous => {
                 let target = nickname_of(self.settings.roster.previous_in_cycle(current));
 
-                self.aim_at(target)
+                Some(self.aim_at(target))
             }
-            ShortcutAction::Main => self.aim_at_main(current),
-            ShortcutAction::ToggleExcluded => self.toggle_foreground(current),
-            ShortcutAction::Walk => ShortcutEffect::Settled(ShortcutOutcome::Walk {
-                enabled: self.walk_enabled,
-            }),
+            ShortcutAction::Main => Some(self.aim_at_main(current)),
+            ShortcutAction::ToggleExcluded => Some(self.toggle_foreground(current)),
+            ShortcutAction::Walk | ShortcutAction::MaximizeAll | ShortcutAction::Wheel => None,
         }
     }
 
@@ -1430,6 +1519,8 @@ fn shortcut_in(shortcuts: &Shortcuts, action: ShortcutAction) -> Option<&Shortcu
         ShortcutAction::Main => shortcuts.main.as_ref(),
         ShortcutAction::ToggleExcluded => shortcuts.toggle_excluded.as_ref(),
         ShortcutAction::Walk => shortcuts.walk.as_ref(),
+        ShortcutAction::MaximizeAll => shortcuts.maximize_all.as_ref(),
+        ShortcutAction::Wheel => shortcuts.wheel.as_ref(),
     }
 }
 
@@ -1542,6 +1633,12 @@ mod tests {
         GameWindow::from_title(WindowId::from_raw(pid), &title).expect("a game window")
     }
 
+    fn decided(state: &mut Multifus, action: ShortcutAction, current: &str) -> ShortcutEffect {
+        state
+            .decide_shortcut(action, current)
+            .expect("this action decides something of the window in front")
+    }
+
     fn raw(window: WindowId) -> u64 {
         window.raw()
     }
@@ -1612,6 +1709,82 @@ mod tests {
     }
 
     #[test]
+    fn the_wheel_shows_the_connected_in_the_order_of_the_cycle_and_marks_where_one_is() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha"), window(2, "Bravo"), window(3, "Charlie")]);
+        state.set_main("Charlie", true);
+        state.toggle_excluded("Bravo");
+
+        let plan = state.wheel_plan(Some(WindowId::from_raw(2)));
+
+        assert_eq!(
+            plan.slices
+                .iter()
+                .map(|slice| slice.nickname.clone())
+                .collect::<Vec<_>>(),
+            vec!["Alpha", "Bravo", "Charlie"],
+            "a character set aside is picked by hand like any other"
+        );
+        assert_eq!(
+            plan.windows,
+            vec![
+                WindowId::from_raw(1),
+                WindowId::from_raw(2),
+                WindowId::from_raw(3),
+            ]
+        );
+        assert_eq!(
+            plan.slices
+                .iter()
+                .map(|slice| (slice.here, slice.main))
+                .collect::<Vec<_>>(),
+            vec![(false, false), (true, false), (false, true)]
+        );
+    }
+
+    #[test]
+    fn a_character_who_is_not_connected_takes_no_slice_of_the_wheel() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha"), window(2, "Bravo")]);
+        state.apply_windows(&[window(1, "Alpha")]);
+
+        let plan = state.wheel_plan(None);
+
+        assert_eq!(plan.slices.len(), 1);
+        assert_eq!(plan.slices[0].nickname, "Alpha");
+        assert!(!plan.slices[0].here, "nobody is in front of the player");
+    }
+
+    #[test]
+    fn a_slice_carries_the_class_head_the_character_wears_everywhere_else() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha")]);
+        state.set_class("Alpha", Some(Class::Sram));
+        state.set_gender("Alpha", Some(Gender::Male));
+
+        let plan = state.wheel_plan(None);
+
+        assert_eq!(plan.slices[0].class, Some(Class::Sram));
+        assert_eq!(plan.slices[0].gender, Some(Gender::Male));
+    }
+
+    #[test]
+    fn the_gauge_of_the_wheel_outlives_a_restart() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        assert_eq!(state.wheel_diameter(), 320);
+
+        state.set_wheel_diameter(300);
+
+        assert_eq!(state.wheel_diameter(), 300);
+        assert_eq!(multifus_reloaded(&directory).wheel_diameter(), 300);
+    }
+
+    #[test]
     fn the_banner_forgets_its_character_and_keeps_its_corner() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
@@ -1639,7 +1812,7 @@ mod tests {
         let plan = state.walk_plan();
 
         for (nickname, window) in [("Alpha", 1_u64), ("Bravo", 2), ("Charlie", 3)] {
-            let shortcut = state.decide_shortcut(ShortcutAction::Next, nickname);
+            let shortcut = decided(&mut state, ShortcutAction::Next, nickname);
             let ShortcutEffect::Focus { window: aimed, .. } = shortcut else {
                 panic!("the next shortcut aims at a window");
             };
@@ -1764,14 +1937,14 @@ mod tests {
         state.apply_windows(&[window(1, "Alpha"), window(2, "Bravo")]);
 
         assert_eq!(
-            state.decide_shortcut(ShortcutAction::Next, "Alpha"),
+            decided(&mut state, ShortcutAction::Next, "Alpha"),
             ShortcutEffect::Focus {
                 nickname: "Bravo".to_owned(),
                 window: WindowId::from_raw(2),
             }
         );
         assert_eq!(
-            state.decide_shortcut(ShortcutAction::Previous, "Alpha"),
+            decided(&mut state, ShortcutAction::Previous, "Alpha"),
             ShortcutEffect::Focus {
                 nickname: "Bravo".to_owned(),
                 window: WindowId::from_raw(2),
@@ -1786,14 +1959,14 @@ mod tests {
         state.apply_windows(&[window(1, "Alpha"), window(2, "Bravo")]);
 
         assert_eq!(
-            state.decide_shortcut(ShortcutAction::ToggleExcluded, "Alpha"),
+            decided(&mut state, ShortcutAction::ToggleExcluded, "Alpha"),
             ShortcutEffect::Settled(ShortcutOutcome::Excluded {
                 nickname: "Alpha".to_owned()
             })
         );
 
         assert_eq!(
-            state.decide_shortcut(ShortcutAction::Next, "Bravo"),
+            decided(&mut state, ShortcutAction::Next, "Bravo"),
             ShortcutEffect::Focus {
                 nickname: "Bravo".to_owned(),
                 window: WindowId::from_raw(2),
@@ -1801,7 +1974,7 @@ mod tests {
         );
 
         assert_eq!(
-            state.decide_shortcut(ShortcutAction::ToggleExcluded, "Alpha"),
+            decided(&mut state, ShortcutAction::ToggleExcluded, "Alpha"),
             ShortcutEffect::Settled(ShortcutOutcome::Included {
                 nickname: "Alpha".to_owned()
             })
@@ -1814,11 +1987,122 @@ mod tests {
         let mut state = multifus(&directory);
 
         assert_eq!(
-            state.decide_shortcut(ShortcutAction::ToggleExcluded, "Echo"),
+            decided(&mut state, ShortcutAction::ToggleExcluded, "Echo"),
             ShortcutEffect::Settled(ShortcutOutcome::NotInRoster {
                 nickname: "Echo".to_owned()
             })
         );
+    }
+
+    #[test]
+    fn nobody_watching_the_clients_is_told_nothing_of_them() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        assert!(!state.watches_clients());
+        assert_eq!(
+            state.take_changed_clients(ClientsView {
+                open: 2,
+                small: 1,
+                readable: true
+            }),
+            None
+        );
+    }
+
+    #[test]
+    fn a_watched_count_is_told_once_and_again_only_when_it_moves() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        let counted = ClientsView {
+            open: 2,
+            small: 1,
+            readable: true,
+        };
+
+        state.watch_clients(true);
+
+        assert!(state.watches_clients());
+        assert_eq!(state.take_changed_clients(counted), Some(counted));
+        assert_eq!(
+            state.take_changed_clients(counted),
+            None,
+            "the same count twice is not worth waking the window for"
+        );
+
+        let filled = ClientsView {
+            open: 2,
+            small: 0,
+            readable: true,
+        };
+
+        assert_eq!(state.take_changed_clients(filled), Some(filled));
+    }
+
+    #[test]
+    fn an_screen_that_opens_twice_and_closes_once_is_still_watching() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        state.watch_clients(true);
+        state.watch_clients(true);
+        state.watch_clients(false);
+
+        assert!(
+            state.watches_clients(),
+            "React mounts twice and cleans up once between the two, and the order of the three is not ours to choose"
+        );
+
+        state.watch_clients(false);
+
+        assert!(!state.watches_clients());
+    }
+
+    #[test]
+    fn a_closing_nobody_opened_leaves_the_count_alone() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        state.watch_clients(false);
+        state.watch_clients(true);
+
+        assert!(state.watches_clients());
+    }
+
+    #[test]
+    fn coming_back_to_the_screen_is_told_the_count_again() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        let counted = ClientsView {
+            open: 2,
+            small: 1,
+            readable: true,
+        };
+
+        state.watch_clients(true);
+        state.take_changed_clients(counted);
+        state.watch_clients(false);
+
+        assert!(!state.watches_clients());
+
+        state.watch_clients(true);
+
+        assert_eq!(state.take_changed_clients(counted), Some(counted));
+    }
+
+    #[test]
+    fn an_action_that_moves_no_window_by_itself_decides_nothing_of_the_one_in_front() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha")]);
+
+        for action in ShortcutAction::ALL {
+            assert_eq!(
+                state.decide_shortcut(action, "Alpha").is_none(),
+                action.answers_anywhere().is_some() || action.matches_held(),
+                "{action:?} disagrees with what it says of itself"
+            );
+        }
     }
 
     #[test]
@@ -1829,7 +2113,7 @@ mod tests {
         state.set_main("Bravo", true);
 
         assert_eq!(
-            state.decide_shortcut(ShortcutAction::Main, "Alpha"),
+            decided(&mut state, ShortcutAction::Main, "Alpha"),
             ShortcutEffect::Focus {
                 nickname: "Bravo".to_owned(),
                 window: WindowId::from_raw(2),
@@ -1846,14 +2130,14 @@ mod tests {
         state.toggle_excluded("Bravo");
 
         assert_eq!(
-            state.decide_shortcut(ShortcutAction::Main, "Alpha"),
+            decided(&mut state, ShortcutAction::Main, "Alpha"),
             ShortcutEffect::Focus {
                 nickname: "Bravo".to_owned(),
                 window: WindowId::from_raw(2),
             }
         );
         assert_eq!(
-            state.decide_shortcut(ShortcutAction::Next, "Alpha"),
+            decided(&mut state, ShortcutAction::Next, "Alpha"),
             ShortcutEffect::Focus {
                 nickname: "Alpha".to_owned(),
                 window: WindowId::from_raw(1),
@@ -1869,7 +2153,7 @@ mod tests {
         state.apply_windows(&[window(1, "Alpha")]);
 
         assert_eq!(
-            state.decide_shortcut(ShortcutAction::Main, "Alpha"),
+            decided(&mut state, ShortcutAction::Main, "Alpha"),
             ShortcutEffect::Settled(ShortcutOutcome::NoMain)
         );
     }
@@ -1882,7 +2166,7 @@ mod tests {
         state.set_main("Alpha", true);
 
         assert_eq!(
-            state.decide_shortcut(ShortcutAction::Main, "Alpha"),
+            decided(&mut state, ShortcutAction::Main, "Alpha"),
             ShortcutEffect::Settled(ShortcutOutcome::AlreadyThere {
                 nickname: "Alpha".to_owned()
             })
@@ -1898,7 +2182,7 @@ mod tests {
         state.apply_windows(&[window(1, "Alpha")]);
 
         assert_eq!(
-            state.decide_shortcut(ShortcutAction::Main, "Alpha"),
+            decided(&mut state, ShortcutAction::Main, "Alpha"),
             ShortcutEffect::Settled(ShortcutOutcome::NoWindow {
                 nickname: "Bravo".to_owned()
             })
@@ -2304,7 +2588,7 @@ mod tests {
     }
 
     #[test]
-    fn the_five_actions_come_before_the_characters_and_the_quick_replies() {
+    fn the_seven_actions_come_before_the_characters_and_the_quick_replies() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
         state.apply_windows(&[window(1, "Alpha")]);
@@ -2315,7 +2599,7 @@ mod tests {
 
         let bindings = state.bindings();
 
-        assert_eq!(bindings.len(), 8);
+        assert_eq!(bindings.len(), 10);
         assert_eq!(
             bindings.first().map(|(binding, _)| binding.clone()),
             Some(Binding::Action {
@@ -2323,7 +2607,7 @@ mod tests {
             })
         );
         assert_eq!(
-            bindings.get(5).cloned(),
+            bindings.get(ShortcutAction::ALL.len()).cloned(),
             Some((
                 Binding::Character {
                     nickname: "Alpha".to_owned()
@@ -2951,7 +3235,7 @@ mod tests {
         state.toggle_excluded("Alpha");
 
         assert_eq!(
-            state.decide_shortcut(ShortcutAction::Next, "Alpha"),
+            decided(&mut state, ShortcutAction::Next, "Alpha"),
             ShortcutEffect::Settled(ShortcutOutcome::NobodyInCycle)
         );
     }

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import type { KeyLabels } from '@/@types/system'
 import { IS_APPLE } from '@/constants/keyboard'
 import {
   acceleratorParts,
@@ -155,6 +156,14 @@ describe('acceleratorParts', () => {
   })
 })
 
+const AZERTY: KeyLabels = {
+  KeyA: 'Q',
+  KeyQ: 'A',
+  KeyW: 'Z',
+  KeyZ: 'W',
+  Semicolon: 'M'
+}
+
 describe('keyLabel', () => {
   it('lit un clavier qui n’est pas un clavier Apple, sous jsdom', () => {
     expect(IS_APPLE).toBe(false)
@@ -194,5 +203,20 @@ describe('keyLabel', () => {
 
   it('rend un token inconnu tel quel', () => {
     expect(keyLabel('F13')).toBe('F13')
+  })
+
+  it('écrit la lettre du clavier de l’utilisateur avant la sienne', () => {
+    expect(keyLabel('KeyW', AZERTY)).toBe('Z')
+    expect(keyLabel('KeyA', AZERTY)).toBe('Q')
+    expect(keyLabel('Semicolon', AZERTY)).toBe('M')
+  })
+
+  it('garde ses lettres pour une touche que le clavier ne nomme pas', () => {
+    expect(keyLabel('KeyB', AZERTY)).toBe('B')
+    expect(keyLabel('ArrowRight', AZERTY)).toBe('→')
+  })
+
+  it('garde ses lettres quand le système n’a rien su dire', () => {
+    expect(keyLabel('KeyW', {})).toBe('W')
   })
 })

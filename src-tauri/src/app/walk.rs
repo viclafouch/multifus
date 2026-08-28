@@ -150,6 +150,10 @@ fn who_is_here(app: &AppHandle) -> Option<BannerCharacter> {
     lock(app).banner_character_of(found.id())
 }
 
+pub fn hold_clicks(app: &AppHandle, held: bool) {
+    app.state::<Walk>().gate.hold(held);
+}
+
 pub fn toggle(app: &AppHandle, from: WalkFrom) {
     let enabled = lock(app).is_walk_enabled();
 

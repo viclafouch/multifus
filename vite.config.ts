@@ -20,7 +20,8 @@ export default defineConfig({
     rolldownOptions: {
       input: {
         main: path.resolve(import.meta.dirname, './index.html'),
-        banner: path.resolve(import.meta.dirname, './banner.html')
+        banner: path.resolve(import.meta.dirname, './banner.html'),
+        wheel: path.resolve(import.meta.dirname, './wheel.html')
       }
     }
   },

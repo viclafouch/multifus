@@ -1,12 +1,18 @@
-import { describe, expect, it, vi } from 'vitest'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import type { Clients } from '@/@types/snapshot'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { strings } from '@/constants/strings'
-import { APPLE_AGENT, WINDOWS_AGENT } from '@/test-doubles'
+import { ignore } from '@/lib/utils'
+import { APPLE_AGENT, snapshotOf, WINDOWS_AGENT } from '@/test-doubles'
 
 const bridge = {
   setStartAtLogin: vi.fn(),
   setMaximizeOnLaunch: vi.fn(),
+  maximizeAllClients: vi.fn(),
+  clients: vi.fn(),
+  watchClients: vi.fn(),
+  onClients: vi.fn(),
   setShortTitles: vi.fn(),
   setPaintPortraits: vi.fn(),
   setUngroupTaskbar: vi.fn()
@@ -16,18 +22,33 @@ vi.mock(import('@/lib/multifus'), () => {
   return bridge
 })
 
+const counter = { told: null as ((counted: Clients) => void) | null }
+
 type ShowParams = {
   readonly agent: string
   readonly taskbarCombines?: boolean
+  readonly clients?: Clients
 }
 
-const show = async ({ agent, taskbarCombines = true }: ShowParams) => {
+const show = async ({
+  agent,
+  taskbarCombines = true,
+  clients = { open: 3, small: 1, readable: true }
+}: ShowParams) => {
   vi.resetModules()
   vi.stubGlobal('navigator', { userAgent: agent })
+  bridge.clients.mockResolvedValue(clients)
+  bridge.watchClients.mockResolvedValue(null)
+  bridge.maximizeAllClients.mockResolvedValue(snapshotOf())
+  bridge.onClients.mockImplementation(async (handle: (of: Clients) => void) => {
+    counter.told = handle
 
-  const { SettingsScreen } = await import('@/screens/settings-screen')
+    return ignore
+  })
 
-  render(
+  const { SettingsScreen } = await import('@/screens/settings')
+
+  const shown = render(
     <TooltipProvider>
       <SettingsScreen
         startAtLogin={false}
@@ -40,6 +61,10 @@ const show = async ({ agent, taskbarCombines = true }: ShowParams) => {
       />
     </TooltipProvider>
   )
+
+  await screen.findByRole('button', { name: strings.settings.clients.action })
+
+  return shown
 }
 
 const switchNamed = (label: string) => {
@@ -56,8 +81,16 @@ const WINDOWS_ONLY_LABELS = [
   strings.settings.ungroupLabel
 ]
 
+const maximizeButton = () => {
+  return screen.getByRole('button', { name: strings.settings.clients.action })
+}
+
 describe('l’écran des paramètres', () => {
-  it('porte les six lignes, sur les deux systèmes', async () => {
+  beforeEach(() => {
+    counter.told = null
+  })
+
+  it('porte les six lignes de réglages, sur les deux systèmes', async () => {
     await show({ agent: WINDOWS_AGENT })
 
     for (const label of [
@@ -68,6 +101,103 @@ describe('l’écran des paramètres', () => {
     ]) {
       expect(screen.getByText(label)).not.toBeNull()
     }
+  })
+
+  it('compte les clients restés en petit, et propose de les agrandir', async () => {
+    await show({
+      agent: WINDOWS_AGENT,
+      clients: { open: 3, small: 2, readable: true }
+    })
+
+    expect(
+      screen.getByText(strings.settings.clients.badge.small(2))
+    ).not.toBeNull()
+    expect(screen.getByText(strings.settings.clients.body.small)).not.toBeNull()
+  })
+
+  it('dit que tout est déjà agrandi quand plus rien n’est en petit', async () => {
+    await show({
+      agent: WINDOWS_AGENT,
+      clients: { open: 3, small: 0, readable: true }
+    })
+
+    expect(
+      screen.getByText(strings.settings.clients.badge.maximized)
+    ).not.toBeNull()
+    expect(
+      screen.getByText(strings.settings.clients.body.maximized)
+    ).not.toBeNull()
+  })
+
+  it('dit qu’aucun client n’est ouvert, et garde le bouton', async () => {
+    await show({
+      agent: WINDOWS_AGENT,
+      clients: { open: 0, small: 0, readable: true }
+    })
+
+    expect(screen.getByText(strings.settings.clients.badge.none)).not.toBeNull()
+    expect(maximizeButton()).not.toBeNull()
+  })
+
+  it('dit qu’il ne peut pas lire les fenêtres, plutôt qu’il n’en voit aucune', async () => {
+    await show({
+      agent: WINDOWS_AGENT,
+      clients: { open: 0, small: 0, readable: false }
+    })
+
+    expect(
+      screen.getByText(strings.settings.clients.badge.unreadable)
+    ).not.toBeNull()
+    expect(screen.queryByText(strings.settings.clients.badge.none)).toBeNull()
+  })
+
+  it('agrandit les clients d’un clic', async () => {
+    await show({ agent: WINDOWS_AGENT })
+
+    fireEvent.click(maximizeButton())
+
+    expect(bridge.maximizeAllClients).toHaveBeenCalledWith()
+  })
+
+  it('suit la taille des fenêtres sans qu’on quitte l’écran', async () => {
+    await show({
+      agent: WINDOWS_AGENT,
+      clients: { open: 3, small: 2, readable: true }
+    })
+
+    expect(bridge.watchClients).toHaveBeenCalledWith(true)
+
+    act(() => {
+      counter.told?.({ open: 3, small: 0, readable: true })
+    })
+
+    expect(
+      screen.getByText(strings.settings.clients.badge.maximized)
+    ).not.toBeNull()
+
+    act(() => {
+      counter.told?.({ open: 3, small: 1, readable: true })
+    })
+
+    expect(
+      screen.getByText(strings.settings.clients.badge.small(1))
+    ).not.toBeNull()
+  })
+
+  it('cesse de suivre dès qu’on quitte l’écran', async () => {
+    const { unmount } = await show({ agent: WINDOWS_AGENT })
+
+    unmount()
+
+    await waitFor(() => {
+      expect(bridge.watchClients).toHaveBeenCalledWith(false)
+    })
+  })
+
+  it('garde le bouton d’agrandissement sur un Mac', async () => {
+    await show({ agent: APPLE_AGENT })
+
+    expect(maximizeButton()).not.toBeNull()
   })
 
   it('lance Multifus au démarrage quand on bouge l’interrupteur', async () => {

@@ -16,6 +16,7 @@ use crate::app::journal::JournalEvent;
 use crate::app::journal::QuickReplyFailure;
 use crate::app::journal::RelayStop;
 use crate::app::journal::ShortcutOutcome;
+use crate::app::journal::Surface;
 use crate::app::journal::WalkFrom;
 use crate::app::journal::Work;
 use crate::app::quick_replies;
@@ -27,11 +28,13 @@ use crate::app::state::windows;
 use crate::app::state::AppState;
 use crate::app::state::CharacterAim;
 use crate::app::state::ShortcutEffect;
+use crate::app::view::AnywhereAction;
 use crate::app::view::Binding;
 use crate::app::view::BindingView;
 use crate::app::view::ShortcutAction;
 use crate::app::view::ShortcutStatus;
 use crate::app::walk;
+use crate::app::wheel;
 use crate::app::Multifus;
 use crate::config::QuickReplyId;
 use crate::platform::GameWindow;
@@ -39,10 +42,16 @@ use crate::platform::PlatformError;
 use crate::platform::WindowId;
 use crate::platform::WindowManager;
 
-pub type ShortcutQueue = Sender<Binding>;
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Struck {
+    Pressed(Binding),
+    Released(Binding),
+}
+
+pub type ShortcutQueue = Sender<Struck>;
 
 pub fn start(app: &AppHandle) {
-    let (queue, bindings) = mpsc::channel::<Binding>();
+    let (queue, bindings) = mpsc::channel::<Struck>();
 
     let spawned = thread::Builder::new()
         .name("multifus-shortcuts".to_owned())
@@ -50,8 +59,8 @@ pub fn start(app: &AppHandle) {
             let app = app.clone();
 
             move || {
-                for binding in bindings {
-                    if catch_unwind(AssertUnwindSafe(|| on_press(&app, binding))).is_err() {
+                for struck in bindings {
+                    if catch_unwind(AssertUnwindSafe(|| on_struck(&app, struck))).is_err() {
                         lock(&app).log_unless_repeated(JournalEvent::Panicked {
                             work: Work::Shortcuts,
                         });
@@ -176,12 +185,12 @@ fn bind(
     };
 
     let handler_app = app.clone();
-    let pressed_binding = binding.clone();
+    let struck_binding = binding.clone();
     let posted = app
         .global_shortcut()
         .on_shortcut(shortcut, move |_, _, event| {
-            if event.state() == ShortcutState::Pressed {
-                fire(&handler_app, pressed_binding.clone());
+            if let Some(struck) = struck_as(event.state(), &struck_binding) {
+                fire(&handler_app, struck);
             }
         });
 
@@ -197,8 +206,21 @@ fn bind(
     }
 }
 
-fn fire(app: &AppHandle, binding: Binding) {
-    let _ = app.state::<ShortcutQueue>().send(binding);
+fn struck_as(state: ShortcutState, binding: &Binding) -> Option<Struck> {
+    match state {
+        ShortcutState::Pressed => Some(Struck::Pressed(binding.clone())),
+        ShortcutState::Released => {
+            matches_held(binding).then(|| Struck::Released(binding.clone()))
+        }
+    }
+}
+
+fn matches_held(binding: &Binding) -> bool {
+    matches!(binding, Binding::Action { action } if action.matches_held())
+}
+
+fn fire(app: &AppHandle, struck: Struck) {
+    let _ = app.state::<ShortcutQueue>().send(struck);
 }
 
 enum Refusal {
@@ -209,9 +231,15 @@ enum Refusal {
 trait Mechanisms {
     fn toggle_walk(&self);
 
+    fn maximize_all(&self);
+
     fn stop_relay(&self);
 
     fn paste_quick_reply(&self, id: QuickReplyId);
+
+    fn open_wheel(&self, here: WindowId);
+
+    fn release_wheel(&self);
 }
 
 struct AppMechanisms<'a>(&'a AppHandle);
@@ -221,12 +249,24 @@ impl Mechanisms for AppMechanisms<'_> {
         walk::toggle(self.0, WalkFrom::Shortcut);
     }
 
+    fn maximize_all(&self) {
+        runtime::maximize_all(self.0, Surface::Shortcut);
+    }
+
     fn stop_relay(&self) {
         relay::run::stop(self.0, RelayStop::Shortcut);
     }
 
     fn paste_quick_reply(&self, id: QuickReplyId) {
         quick_replies::paste(self.0, id);
+    }
+
+    fn open_wheel(&self, here: WindowId) {
+        wheel::open(self.0, here);
+    }
+
+    fn release_wheel(&self) {
+        wheel::release(self.0);
     }
 }
 
@@ -236,29 +276,37 @@ struct Press<'a> {
     mechanisms: &'a dyn Mechanisms,
 }
 
-fn on_press(app: &AppHandle, binding: Binding) {
+fn on_struck(app: &AppHandle, struck: Struck) {
     answer(
         &Press {
             windows: windows(app),
             state: app.state::<AppState>().inner(),
             mechanisms: &AppMechanisms(app),
         },
-        binding,
+        struck,
     );
 
     runtime::emit_snapshot(app);
 }
 
-fn answer(press: &Press, binding: Binding) {
-    if matches!(
-        binding,
-        Binding::Action {
-            action: ShortcutAction::Walk
-        }
-    ) {
-        press.mechanisms.toggle_walk();
+fn answer(press: &Press, struck: Struck) {
+    let binding = match struck {
+        Struck::Released(binding) => {
+            if matches_held(&binding) {
+                press.mechanisms.release_wheel();
+            }
 
-        return;
+            return;
+        }
+        Struck::Pressed(binding) => binding,
+    };
+
+    if let Binding::Action { action } = binding {
+        if let Some(anywhere) = action.answers_anywhere() {
+            set_going(press.mechanisms, anywhere);
+
+            return;
+        }
     }
 
     match press.windows.foreground_game_window() {
@@ -278,10 +326,23 @@ fn answer(press: &Press, binding: Binding) {
     }
 }
 
+fn set_going(mechanisms: &dyn Mechanisms, anywhere: AnywhereAction) {
+    match anywhere {
+        AnywhereAction::Walk => mechanisms.toggle_walk(),
+        AnywhereAction::MaximizeAll => mechanisms.maximize_all(),
+    }
+}
+
 fn act_on(press: &Press, binding: Binding, window: &GameWindow) {
     match binding {
+        Binding::Action {
+            action: ShortcutAction::Wheel,
+        } => press.mechanisms.open_wheel(window.id()),
         Binding::Action { action } => {
-            let effect = hold(press.state).decide_shortcut(action, window.nickname());
+            let Some(effect) = hold(press.state).decide_shortcut(action, window.nickname()) else {
+                return;
+            };
+
             let outcome = act(press.windows, effect);
 
             hold(press.state).log_unless_repeated(JournalEvent::Shortcut { action, outcome });
@@ -393,8 +454,11 @@ mod tests {
     #[derive(Debug, Clone, PartialEq, Eq)]
     enum Mechanism {
         WalkToggled,
+        AllMaximized,
         RelayStopped,
         QuickReplyPasted(QuickReplyId),
+        WheelOpened(WindowId),
+        WheelReleased,
     }
 
     #[derive(Debug, Default)]
@@ -423,12 +487,24 @@ mod tests {
             self.write_down(Mechanism::WalkToggled);
         }
 
+        fn maximize_all(&self) {
+            self.write_down(Mechanism::AllMaximized);
+        }
+
         fn stop_relay(&self) {
             self.write_down(Mechanism::RelayStopped);
         }
 
         fn paste_quick_reply(&self, id: QuickReplyId) {
             self.write_down(Mechanism::QuickReplyPasted(id));
+        }
+
+        fn open_wheel(&self, here: WindowId) {
+            self.write_down(Mechanism::WheelOpened(here));
+        }
+
+        fn release_wheel(&self) {
+            self.write_down(Mechanism::WheelReleased);
         }
     }
 
@@ -454,12 +530,18 @@ mod tests {
         state
     }
 
+    fn answering(press: &Press, binding: Binding) {
+        answer(press, Struck::Pressed(binding));
+    }
+
     fn pressed(
         state: &AppState,
         windows: &FakeWindowManager,
         action: ShortcutAction,
     ) -> ShortcutOutcome {
-        let effect = hold(state).decide_shortcut(action, "Alpha");
+        let effect = hold(state)
+            .decide_shortcut(action, "Alpha")
+            .expect("this action decides something of the window in front");
 
         act(windows, effect)
     }
@@ -476,13 +558,13 @@ mod tests {
             mechanisms: &mechanisms,
         };
 
-        answer(
+        answering(
             &press,
             Binding::Action {
                 action: ShortcutAction::Next,
             },
         );
-        answer(
+        answering(
             &press,
             Binding::QuickReply {
                 id: QuickReplyId::default(),
@@ -528,13 +610,13 @@ mod tests {
         };
         let detail = "reading the foreground failed: the system said no".to_owned();
 
-        answer(
+        answering(
             &press,
             Binding::Action {
                 action: ShortcutAction::Next,
             },
         );
-        answer(
+        answering(
             &press,
             Binding::QuickReply {
                 id: QuickReplyId::default(),
@@ -565,7 +647,7 @@ mod tests {
         let windows = FakeWindowManager::showing(Desktop::default());
         let mechanisms = FakeMechanisms::default();
 
-        answer(
+        answering(
             &Press {
                 windows: windows.as_ref(),
                 state: &state,
@@ -590,6 +672,62 @@ mod tests {
     }
 
     #[test]
+    fn the_maximize_all_shortcut_answers_outside_the_game_and_leaves_the_relay_alone() {
+        let directory = directory();
+        let state = app_state(&directory, Settings::default());
+        let windows = FakeWindowManager::showing(Desktop::default());
+        let mechanisms = FakeMechanisms::default();
+
+        answering(
+            &Press {
+                windows: windows.as_ref(),
+                state: &state,
+                mechanisms: &mechanisms,
+            },
+            Binding::Action {
+                action: ShortcutAction::MaximizeAll,
+            },
+        );
+
+        assert_eq!(mechanisms.set_going(), vec![Mechanism::AllMaximized]);
+        assert_eq!(
+            journalled(&state),
+            Vec::new(),
+            "nobody is at the game, and the windows are widened all the same"
+        );
+    }
+
+    #[test]
+    fn an_action_that_answers_anywhere_is_the_only_one_the_bare_desktop_does_not_refuse() {
+        for action in ShortcutAction::ALL {
+            let directory = directory();
+            let state = app_state(&directory, Settings::default());
+            let windows = FakeWindowManager::showing(Desktop::default());
+            let mechanisms = FakeMechanisms::default();
+
+            answering(
+                &Press {
+                    windows: windows.as_ref(),
+                    state: &state,
+                    mechanisms: &mechanisms,
+                },
+                Binding::Action { action },
+            );
+
+            assert_eq!(
+                mechanisms.set_going().is_empty(),
+                !action.answers_anywhere().is_some(),
+                "{action:?} disagrees with what it says of itself"
+            );
+            assert_eq!(
+                journalled(&state).is_empty(),
+                action.answers_anywhere().is_some(),
+                "{action:?} is refused outside the game, or it is not"
+            );
+        }
+    }
+
+    #[test]
     fn a_shortcut_struck_in_the_game_silences_the_private_messages_and_moves_a_window() {
         let directory = directory();
         let state = three_in_the_cycle(&directory);
@@ -599,7 +737,7 @@ mod tests {
         });
         let mechanisms = FakeMechanisms::default();
 
-        answer(
+        answering(
             &Press {
                 windows: windows.as_ref(),
                 state: &state,
@@ -631,7 +769,7 @@ mod tests {
         let mechanisms = FakeMechanisms::default();
         let id = QuickReplyId::default();
 
-        answer(
+        answering(
             &Press {
                 windows: windows.as_ref(),
                 state: &state,
@@ -661,7 +799,7 @@ mod tests {
         });
         let mechanisms = FakeMechanisms::default();
 
-        answer(
+        answering(
             &Press {
                 windows: windows.as_ref(),
                 state: &state,
@@ -691,7 +829,7 @@ mod tests {
         });
         let mechanisms = FakeMechanisms::default();
 
-        answer(
+        answering(
             &Press {
                 windows: windows.as_ref(),
                 state: &state,
@@ -718,7 +856,7 @@ mod tests {
         let windows = FakeWindowManager::showing(Desktop::default());
         let mechanisms = FakeMechanisms::default();
 
-        answer(
+        answering(
             &Press {
                 windows: windows.as_ref(),
                 state: &state,
@@ -873,6 +1011,132 @@ mod tests {
                 nickname: "Bravo".to_owned(),
                 detail: "focusing failed: the system said no".to_owned(),
             }
+        );
+    }
+
+    #[test]
+    fn the_wheel_opens_on_the_window_the_player_is_holding_the_keys_from() {
+        let directory = directory();
+        let state = three_in_the_cycle(&directory);
+        let windows = FakeWindowManager::showing(Desktop {
+            foreground: Some(game_window(2, "Bravo")),
+            ..Desktop::default()
+        });
+        let mechanisms = FakeMechanisms::default();
+
+        answering(
+            &Press {
+                windows: windows.as_ref(),
+                state: &state,
+                mechanisms: &mechanisms,
+            },
+            Binding::Action {
+                action: ShortcutAction::Wheel,
+            },
+        );
+
+        assert_eq!(
+            mechanisms.set_going(),
+            vec![
+                Mechanism::RelayStopped,
+                Mechanism::WheelOpened(WindowId::from_raw(2)),
+            ]
+        );
+        assert_eq!(
+            windows.asked(),
+            Vec::new(),
+            "opening the wheel moves no window on its own"
+        );
+    }
+
+    #[test]
+    fn the_wheel_struck_outside_the_game_never_opens_and_says_so() {
+        let directory = directory();
+        let state = app_state(&directory, Settings::default());
+        let windows = FakeWindowManager::showing(Desktop::default());
+        let mechanisms = FakeMechanisms::default();
+
+        answering(
+            &Press {
+                windows: windows.as_ref(),
+                state: &state,
+                mechanisms: &mechanisms,
+            },
+            Binding::Action {
+                action: ShortcutAction::Wheel,
+            },
+        );
+
+        assert_eq!(mechanisms.set_going(), Vec::new());
+        assert_eq!(
+            journalled(&state),
+            vec![JournalEvent::Shortcut {
+                action: ShortcutAction::Wheel,
+                outcome: ShortcutOutcome::OutsideGame,
+            }]
+        );
+    }
+
+    #[test]
+    fn only_the_wheel_hears_a_key_coming_back_up() {
+        let directory = directory();
+        let state = three_in_the_cycle(&directory);
+        let windows = FakeWindowManager::showing(Desktop {
+            foreground: Some(game_window(1, "Alpha")),
+            ..Desktop::default()
+        });
+        let mechanisms = FakeMechanisms::default();
+        let press = Press {
+            windows: windows.as_ref(),
+            state: &state,
+            mechanisms: &mechanisms,
+        };
+
+        answer(
+            &press,
+            Struck::Released(Binding::Action {
+                action: ShortcutAction::Next,
+            }),
+        );
+
+        assert_eq!(mechanisms.set_going(), Vec::new());
+        assert_eq!(windows.asked(), Vec::new());
+
+        answer(
+            &press,
+            Struck::Released(Binding::Action {
+                action: ShortcutAction::Wheel,
+            }),
+        );
+
+        assert_eq!(mechanisms.set_going(), vec![Mechanism::WheelReleased]);
+    }
+
+    #[test]
+    fn the_system_is_only_asked_for_the_key_coming_back_up_of_the_wheel() {
+        for action in ShortcutAction::ALL {
+            let binding = Binding::Action { action };
+            let released = struck_as(ShortcutState::Released, &binding);
+
+            assert_eq!(
+                released.is_some(),
+                action == ShortcutAction::Wheel,
+                "{action:?} disagrees with what it says of itself"
+            );
+            assert_eq!(
+                struck_as(ShortcutState::Pressed, &binding),
+                Some(Struck::Pressed(binding.clone()))
+            );
+        }
+
+        assert_eq!(
+            struck_as(
+                ShortcutState::Released,
+                &Binding::Character {
+                    nickname: "Alpha".to_owned(),
+                },
+            ),
+            None
         );
     }
 

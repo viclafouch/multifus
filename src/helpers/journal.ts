@@ -2,12 +2,14 @@ import type {
   CharacterShortcutOutcome,
   JournalEntry,
   JournalEvent,
+  MaximizeAllOutcome,
   NotificationOutcome,
   QuickReplyFailure,
   RosterChange,
   SettingChange,
   ShortcutOutcome,
-  TrayOutcome
+  TrayOutcome,
+  WheelOutcome
 } from '@/@types/journal'
 import type { NotificationKind } from '@/@types/notification'
 import type { RelayFailure } from '@/@types/relay'
@@ -23,9 +25,11 @@ import {
   DEAD_SHORTCUT_STATUSES,
   DETAILED_LINES,
   GENDER_GROUP_LINES,
+  MAXIMIZE_ALL_TONES,
   NOTICE_LINES,
   QUICK_REPLY_FAILURE_TONES,
   PLAIN_LINES,
+  SURFACE_LABELS,
   WALK_FROM_LABELS,
   WALK_IDLE_LINES,
   WALK_IDLE_TONES,
@@ -33,9 +37,11 @@ import {
   SHORTCUT_TONES,
   TONES,
   TRAY_TONES,
+  WHEEL_TONES,
   WORK_LABELS
 } from '@/constants/journal'
 import { strings } from '@/constants/strings'
+import { matchIsPlural } from '@/helpers/format'
 import { bindingLabel, updateLine } from '@/helpers/wording'
 
 export const journalTime = (milliseconds: number) => {
@@ -78,6 +84,10 @@ export const journalTone = (event: JournalEvent): JournalTone => {
     return QUICK_REPLY_FAILURE_TONES[event.reason.reason]
   }
 
+  if (event.kind === 'maximizeAll') {
+    return MAXIMIZE_ALL_TONES[event.outcome.outcome]
+  }
+
   if (event.kind === 'shortcutsBound') {
     const isDead = event.bindings.some((binding) => {
       return DEAD_SHORTCUT_STATUSES.has(binding.status.kind)
@@ -92,6 +102,10 @@ export const journalTone = (event: JournalEvent): JournalTone => {
 
   if (event.kind === 'walkIdle') {
     return WALK_IDLE_TONES[event.reason]
+  }
+
+  if (event.kind === 'wheelPicked') {
+    return WHEEL_TONES[event.outcome.outcome]
   }
 
   return TONES[event.kind]
@@ -187,8 +201,40 @@ const quickReplyFailedLine = (reason: QuickReplyFailure) => {
   }
 }
 
-const surfaceLabel = (surface: Surface) => {
-  return surface === 'tray' ? 'la barre système' : 'la fenêtre'
+type MaximizeAllLineParams = {
+  readonly from: Surface
+  readonly outcome: MaximizeAllOutcome
+}
+
+const maximizeAllLine = ({ from, outcome }: MaximizeAllLineParams) => {
+  const subject = `${strings.maximize.all}, depuis ${SURFACE_LABELS[from]}`
+
+  switch (outcome.outcome) {
+    case 'asked': {
+      return `${subject} : ${askedWindows(outcome.windows)}.`
+    }
+    case 'nothingMoved': {
+      return `${subject} : aucun client n’a accepté.`
+    }
+    case 'noClient': {
+      return `${subject} : aucun client Dofus ouvert.`
+    }
+    case 'denied': {
+      return `${subject} : l’autorisation manque.`
+    }
+    case 'refused': {
+      return `${subject} : lecture des fenêtres impossible (${outcome.detail}).`
+    }
+    default: {
+      return `${subject}.`
+    }
+  }
+}
+
+const askedWindows = (windows: number) => {
+  return matchIsPlural(windows)
+    ? `demandé à ${windows} clients`
+    : 'demandé à un client'
 }
 
 const rosterLine = (change: RosterChange) => {
@@ -249,7 +295,7 @@ const settingLine = (change: SettingChange) => {
     case 'autoFocusEnabled': {
       const what = change.enabled ? 'activé' : 'désactivé'
 
-      return `AutoFocus ${what} depuis ${surfaceLabel(change.from)}.`
+      return `AutoFocus ${what} depuis ${SURFACE_LABELS[change.from]}.`
     }
     case 'autoFocusKind': {
       const { label } = strings.autoFocus.kinds[change.notificationKind]
@@ -260,7 +306,7 @@ const settingLine = (change: SettingChange) => {
     case 'wakesMinimized': {
       const what = change.wakes ? 'activé' : 'désactivé'
 
-      return `Réveil des fenêtres réduites ${what} depuis ${surfaceLabel(change.from)}.`
+      return `Réveil des fenêtres réduites ${what} depuis ${SURFACE_LABELS[change.from]}.`
     }
     case 'maximizeOnLaunch': {
       const what = change.maximize ? 'activé' : 'désactivé'
@@ -427,9 +473,6 @@ const shortcutLine = ({ action, outcome }: ShortcutLineParams) => {
     case 'alreadyThere': {
       return `${label} : vous êtes déjà sur ${outcome.nickname}.`
     }
-    case 'walk': {
-      return outcome.enabled ? `${label} : allumé.` : `${label} : éteint.`
-    }
     case 'noWindow': {
       return `${label} : la fenêtre de ${outcome.nickname} a disparu.`
     }
@@ -441,6 +484,23 @@ const shortcutLine = ({ action, outcome }: ShortcutLineParams) => {
     }
     default: {
       return label
+    }
+  }
+}
+
+const wheelLine = (outcome: WheelOutcome) => {
+  switch (outcome.outcome) {
+    case 'focused': {
+      return `La roue a ramené ${outcome.nickname} devant.`
+    }
+    case 'noWindow': {
+      return `La roue : la fenêtre de ${outcome.nickname} a disparu.`
+    }
+    case 'focusFailed': {
+      return `La roue : le système a refusé de ramener ${outcome.nickname} devant (${outcome.detail}).`
+    }
+    default: {
+      return ''
     }
   }
 }
@@ -684,6 +744,9 @@ const actionLine = (event: EventOf<ActionEventKind>) => {
     case 'characterShortcut': {
       return characterShortcutLine(event)
     }
+    case 'maximizeAll': {
+      return maximizeAllLine(event)
+    }
     case 'quickReplyPasted': {
       return `Réponse rapide collée dans le jeu : « ${event.excerpt} »`
     }
@@ -694,7 +757,7 @@ const actionLine = (event: EventOf<ActionEventKind>) => {
       return trayLine(event)
     }
     case 'relayEnabled': {
-      return `Envoi des messages privés activé depuis ${surfaceLabel(event.surface)}.`
+      return `Envoi des messages privés activé depuis ${SURFACE_LABELS[event.surface]}.`
     }
     case 'relayDisabled': {
       return RELAY_STOP_LINES[event.reason]
@@ -706,6 +769,9 @@ const actionLine = (event: EventOf<ActionEventKind>) => {
     }
     case 'walkIdle': {
       return WALK_IDLE_LINES[event.reason]
+    }
+    case 'wheelPicked': {
+      return wheelLine(event.outcome)
     }
     default: {
       return ''

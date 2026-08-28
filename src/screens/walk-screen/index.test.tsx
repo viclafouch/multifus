@@ -1,11 +1,12 @@
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
+import type { Display } from '@/@types/display'
 import type { ShortcutBinding } from '@/@types/shortcuts'
-import type { BannerPlace, BannerScreen } from '@/@types/walk'
+import type { BannerPlace } from '@/@types/walk'
 import { strings } from '@/constants/strings'
 import {
   APPLE_AGENT,
-  bannerScreenOf,
+  displayOf,
   pending,
   WINDOWS_AGENT
 } from '@/test-doubles'
@@ -21,16 +22,16 @@ vi.mock(import('@/lib/multifus'), () => {
   return bridge
 })
 
-const LAPTOP = bannerScreenOf()
+const LAPTOP = displayOf()
 
-const TELEVISION = bannerScreenOf({
+const TELEVISION = displayOf({
   name: 'DELL U2720Q',
   width: 3840,
   height: 2160,
   primary: false
 })
 
-const ULTRAWIDE = bannerScreenOf({
+const ULTRAWIDE = displayOf({
   name: 'LG 34WN750',
   width: 3440,
   height: 1440,
@@ -74,7 +75,7 @@ const renderScreen = async ({
 }
 
 type ShowParams = RenderParams & {
-  readonly screens?: readonly BannerScreen[]
+  readonly screens?: readonly Display[]
 }
 
 const show = async ({ screens = [LAPTOP], ...params }: ShowParams = {}) => {
@@ -148,7 +149,7 @@ describe('l’écran du Déplacement rapide', () => {
     it('dit qu’il n’y en a aucune tant que rien n’est posé', async () => {
       await show({ shortcuts: [walkShortcut(null)] })
 
-      expect(screen.getByText(strings.walk.shortcutEmpty)).not.toBeNull()
+      expect(screen.getByText(strings.shortcuts.empty)).not.toBeNull()
       expect(keyCaps()).toStrictEqual([])
     })
 
@@ -164,7 +165,7 @@ describe('l’écran du Déplacement rapide', () => {
         ]
       })
 
-      expect(screen.getByText(strings.walk.shortcutEmpty)).not.toBeNull()
+      expect(screen.getByText(strings.shortcuts.empty)).not.toBeNull()
     })
   })
 

@@ -6,6 +6,7 @@ import {
   MessageSquareQuote,
   Send,
   SlidersHorizontal,
+  Target,
   Users,
   Zap
 } from 'lucide-react'
@@ -28,6 +29,7 @@ export const NAV_ITEMS = [
   },
   { name: 'autoFocus', label: strings.nav.autoFocus, Icon: Zap },
   { name: 'walk', label: strings.nav.walk, Icon: Footprints },
+  { name: 'wheel', label: strings.nav.wheel, Icon: Target },
   { name: 'relay', label: strings.nav.relay, Icon: Send },
   { name: 'settings', label: strings.nav.settings, Icon: SlidersHorizontal },
   { name: 'about', label: strings.nav.about, Icon: Info }

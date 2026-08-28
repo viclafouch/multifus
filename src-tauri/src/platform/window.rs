@@ -146,6 +146,8 @@ pub trait WindowManager: Send + Sync {
 
     fn is_minimized(&self, window: WindowId) -> Result<bool>;
 
+    fn maximized_windows(&self, windows: &[WindowId]) -> Vec<WindowId>;
+
     fn focus(&self, window: WindowId) -> Result<()>;
 
     fn focus_fast(&self, window: WindowId) -> Result<()>;

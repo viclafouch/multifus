@@ -1,11 +1,14 @@
 use tempfile::TempDir;
 
 use multifus_lib::app::journal::Launch;
+use multifus_lib::app::state::ShortcutEffect;
 use multifus_lib::app::view::ScreenSaverView;
+use multifus_lib::app::view::ShortcutAction;
 use multifus_lib::app::Multifus;
 use multifus_lib::app::MultifusParams;
 use multifus_lib::config::ConfigStore;
 use multifus_lib::platform::GameWindow;
+use multifus_lib::platform::KeyLabels;
 use multifus_lib::platform::WindowId;
 
 const CLIENT_TITLE_SUFFIX: &str = " - Dofus Retro v1.48.21";
@@ -30,6 +33,7 @@ pub fn reopened(directory: &TempDir, launch: Launch) -> Multifus {
         loaded,
         version: "0.1.0".to_owned(),
         system: "test".to_owned(),
+        keyboard: KeyLabels::new(),
         launch,
         screen_saver: ScreenSaverView::Never,
         taskbar_combines: true,
@@ -57,6 +61,12 @@ pub fn in_cycle(state: &Multifus) -> Vec<String> {
         .filter(|character| character.online && !character.excluded)
         .map(|character| character.nickname)
         .collect()
+}
+
+pub fn decided(state: &mut Multifus, action: ShortcutAction, current: &str) -> ShortcutEffect {
+    state
+        .decide_shortcut(action, current)
+        .expect("this action decides something of the window in front")
 }
 
 pub fn paint_everything(state: &mut Multifus) {

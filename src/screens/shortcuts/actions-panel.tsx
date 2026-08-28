@@ -46,13 +46,14 @@ export const ActionsPanel = ({
     <>
       <Panel>
         {shortcuts.map((shortcut) => {
-          const { label, description } = words.actions[shortcut.action]
+          const { label, description, mention } = words.actions[shortcut.action]
 
           return (
             <FieldRow
               key={shortcut.action}
               label={label}
               description={description}
+              mention={mention ?? undefined}
             >
               <ShortcutField
                 accelerator={shortcut.accelerator}

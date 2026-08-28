@@ -49,7 +49,6 @@ export const WALK_STRINGS = {
     switchLabel: 'Déplacement rapide',
     shortcutLabel: 'Raccourci',
     shortcutDescription: 'Allume sans quitter le jeu.',
-    shortcutEmpty: 'Aucune',
     state: STATE_LINES,
     banner: BANNER_STRINGS
   }

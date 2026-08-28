@@ -1,34 +1,56 @@
 import type { ShortcutAction, ShortcutStatus } from '@/@types/shortcuts'
 import type { CaptureRejection } from '@/constants/keyboard'
 import { IS_APPLE } from '@/constants/keyboard'
+import { MAXIMIZE_STRINGS } from '@/constants/strings/maximize'
+
+const HELD = 'au maintien'
+
+type ActionLabel = {
+  readonly label: string
+  readonly description: string
+  readonly mention: string | null
+}
 
 const ACTION_LABELS = {
   next: {
     label: 'Fenêtre suivante',
     description:
-      'Passe au personnage d’après, dans l’ordre de l’écran Personnages.'
+      'Passe au personnage d’après, dans l’ordre de l’écran Personnages.',
+    mention: null
   },
   previous: {
     label: 'Fenêtre précédente',
-    description: 'Passe au personnage d’avant, dans le même ordre.'
+    description: 'Passe au personnage d’avant, dans le même ordre.',
+    mention: null
   },
   main: {
     label: 'Personnage principal',
-    description: 'Ramène devant votre personnage principal, où que vous soyez.'
+    description: 'Ramène devant votre personnage principal, où que vous soyez.',
+    mention: null
   },
   toggleExcluded: {
     label: 'Exclure ou réintégrer',
     description:
-      'Sort le personnage devant vous du défilement et de l’AutoFocus.'
+      'Sort le personnage devant vous du défilement et de l’AutoFocus.',
+    mention: null
   },
   walk: {
     label: 'Déplacement rapide',
-    description: 'Allume le clic qui emmène toute la team, même hors du jeu.'
+    description: 'Allume le clic qui emmène toute la team, même hors du jeu.',
+    mention: null
+  },
+  maximizeAll: {
+    label: MAXIMIZE_STRINGS.maximize.all,
+    description: 'Agrandit tous vos clients, même ceux ouverts avant Multifus.',
+    mention: null
+  },
+  wheel: {
+    label: 'Roue des personnages',
+    description:
+      'La team s’ouvre au milieu de l’écran, vous visez une tête, vous lâchez.',
+    mention: HELD
   }
-} as const satisfies Record<
-  ShortcutAction,
-  { readonly label: string; readonly description: string }
->
+} as const satisfies Record<ShortcutAction, ActionLabel>
 
 const STATUS_LINES = {
   unbound: 'Sans touches, il ne se passera rien.',
@@ -63,6 +85,7 @@ export const SHORTCUTS_STRINGS = {
     capture: 'Appuyez sur vos touches',
     captureHint: 'Échap pour annuler, Retour arrière pour effacer.',
     empty: 'Aucune',
+    held: HELD,
     undo: 'Remettre',
     undoNone: 'Remettre : aucune touche',
     undoLabel: (label: string) => {

@@ -16,6 +16,7 @@ pub struct Settings {
     pub auto_focus: AutoFocus,
     pub relay: Relay,
     pub banner: Banner,
+    pub wheel: Wheel,
     pub maximize_on_launch: bool,
     pub short_titles: bool,
     pub paint_portraits: bool,
@@ -48,6 +49,7 @@ impl Default for Settings {
             auto_focus: AutoFocus::default(),
             relay: Relay::default(),
             banner: Banner::default(),
+            wheel: Wheel::default(),
             maximize_on_launch: false,
             short_titles: false,
             paint_portraits: true,
@@ -88,6 +90,34 @@ impl BannerCorner {
     }
 }
 
+pub const WHEEL_SMALLEST: u32 = 280;
+pub const WHEEL_WIDEST: u32 = 360;
+pub const WHEEL_STEP: u32 = 20;
+
+const DEFAULT_DIAMETER: u32 = 320;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct Wheel {
+    pub diameter: u32,
+}
+
+impl Default for Wheel {
+    fn default() -> Self {
+        Self {
+            diameter: DEFAULT_DIAMETER,
+        }
+    }
+}
+
+impl Wheel {
+    pub fn set_diameter(&mut self, diameter: u32) {
+        let steps = diameter.saturating_add(WHEEL_STEP / 2) / WHEEL_STEP;
+
+        self.diameter = (steps * WHEEL_STEP).clamp(WHEEL_SMALLEST, WHEEL_WIDEST);
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Shortcuts {
@@ -96,6 +126,8 @@ pub struct Shortcuts {
     pub main: Option<Shortcut>,
     pub toggle_excluded: Option<Shortcut>,
     pub walk: Option<Shortcut>,
+    pub maximize_all: Option<Shortcut>,
+    pub wheel: Option<Shortcut>,
 }
 
 const DEFAULT_NEXT: &str = "Control+Shift+Right";
@@ -103,6 +135,8 @@ const DEFAULT_PREVIOUS: &str = "Control+Shift+Left";
 const DEFAULT_MAIN: &str = "Control+Shift+Space";
 const DEFAULT_TOGGLE_EXCLUDED: &str = "Control+Shift+Down";
 const DEFAULT_WALK: &str = "Control+Shift+KeyD";
+const DEFAULT_MAXIMIZE_ALL: &str = "Control+Shift+KeyA";
+const DEFAULT_WHEEL: &str = "Control+Shift+KeyW";
 
 impl Default for Shortcuts {
     fn default() -> Self {
@@ -112,6 +146,8 @@ impl Default for Shortcuts {
             main: Shortcut::new(DEFAULT_MAIN),
             toggle_excluded: Shortcut::new(DEFAULT_TOGGLE_EXCLUDED),
             walk: Shortcut::new(DEFAULT_WALK),
+            maximize_all: Shortcut::new(DEFAULT_MAXIMIZE_ALL),
+            wheel: Shortcut::new(DEFAULT_WHEEL),
         }
     }
 }
@@ -332,7 +368,7 @@ mod tests {
     }
 
     #[test]
-    fn the_five_shortcuts_are_bound_by_default_and_all_differ() {
+    fn the_seven_shortcuts_are_bound_by_default_and_all_differ() {
         let shortcuts = Shortcuts::default();
         let bound = [
             shortcuts.next.as_ref(),
@@ -340,22 +376,59 @@ mod tests {
             shortcuts.main.as_ref(),
             shortcuts.toggle_excluded.as_ref(),
             shortcuts.walk.as_ref(),
+            shortcuts.maximize_all.as_ref(),
+            shortcuts.wheel.as_ref(),
         ]
         .into_iter()
         .flatten()
         .map(Shortcut::as_str)
         .collect::<Vec<_>>();
 
-        assert_eq!(bound.len(), 5);
+        assert_eq!(bound.len(), 7);
 
         let mut unique = bound.clone();
         unique.sort_unstable();
         unique.dedup();
         assert_eq!(
             unique.len(),
-            5,
+            7,
             "two actions share a combination: {bound:?}"
         );
+    }
+
+    #[test]
+    fn the_wheel_opens_on_the_same_combination_on_both_machines() {
+        assert_eq!(
+            Shortcuts::default().wheel.as_ref().map(Shortcut::as_str),
+            Some("Control+Shift+KeyW")
+        );
+    }
+
+    #[test]
+    fn the_wheel_has_a_width_of_its_own_until_the_gauge_is_moved() {
+        assert_eq!(Wheel::default().diameter, DEFAULT_DIAMETER);
+        assert!((WHEEL_SMALLEST..=WHEEL_WIDEST).contains(&DEFAULT_DIAMETER));
+        assert_eq!(
+            serde_json::from_str::<Wheel>("{}").expect("a wheel with nothing in it"),
+            Wheel::default()
+        );
+    }
+
+    #[test]
+    fn a_diameter_lands_on_a_step_of_the_gauge_and_never_leaves_its_ends() {
+        let mut wheel = Wheel::default();
+
+        wheel.set_diameter(0);
+        assert_eq!(wheel.diameter, WHEEL_SMALLEST);
+
+        wheel.set_diameter(u32::MAX);
+        assert_eq!(wheel.diameter, WHEEL_WIDEST);
+
+        wheel.set_diameter(333);
+        assert_eq!(wheel.diameter, 340);
+
+        wheel.set_diameter(300);
+        assert_eq!(wheel.diameter, 300);
     }
 
     #[test]
@@ -366,6 +439,8 @@ mod tests {
             main: None,
             toggle_excluded: None,
             walk: None,
+            maximize_all: None,
+            wheel: None,
         };
 
         let json = serde_json::to_string(&shortcuts).expect("shortcuts serialise");

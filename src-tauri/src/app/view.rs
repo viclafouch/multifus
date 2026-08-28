@@ -8,6 +8,7 @@ use crate::config::QuickReplyId;
 use crate::domain::Class;
 use crate::domain::Gender;
 use crate::domain::NotificationKind;
+use crate::platform::KeyLabels;
 use crate::platform::ScreenSaverDelay;
 
 impl From<ScreenSaverDelay> for ScreenSaverView {
@@ -22,11 +23,12 @@ impl From<ScreenSaverDelay> for ScreenSaverView {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Snapshot {
     pub version: String,
     pub system: String,
+    pub keyboard: KeyLabels,
     pub characters: Vec<CharacterView>,
     pub shortcuts: Vec<ShortcutView>,
     pub quick_replies: Vec<QuickReplyView>,
@@ -44,7 +46,24 @@ pub struct Snapshot {
     pub update: UpdateView,
     pub relay: RelayView,
     pub walk: WalkView,
+    pub wheel: WheelView,
     pub journal: Vec<JournalEntry>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ClientsView {
+    pub open: usize,
+    pub small: usize,
+    pub readable: bool,
+}
+
+impl ClientsView {
+    pub const UNREADABLE: Self = Self {
+        open: 0,
+        small: 0,
+        readable: false,
+    };
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -63,11 +82,42 @@ pub struct BannerView {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct BannerScreenView {
+pub struct DisplayView {
     pub name: Option<String>,
     pub width: u32,
     pub height: u32,
     pub primary: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct WheelView {
+    pub diameter: u32,
+    pub smallest: u32,
+    pub widest: u32,
+    pub step: u32,
+    pub dead_zone: f64,
+    pub demo: Vec<WheelSlice>,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct WheelStep {
+    pub diameter: u32,
+    pub dead_zone: f64,
+    pub slices: Vec<WheelSlice>,
+    pub hovered: Option<usize>,
+    pub previewing: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct WheelSlice {
+    pub nickname: String,
+    pub class: Option<Class>,
+    pub gender: Option<Gender>,
+    pub main: bool,
+    pub here: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -203,18 +253,20 @@ pub enum Screen {
     QuickReplies,
     AutoFocus,
     Walk,
+    Wheel,
     Relay,
     Settings,
     About,
 }
 
 impl Screen {
-    pub const ALL: [Self; 8] = [
+    pub const ALL: [Self; 9] = [
         Self::Characters,
         Self::Shortcuts,
         Self::QuickReplies,
         Self::AutoFocus,
         Self::Walk,
+        Self::Wheel,
         Self::Relay,
         Self::Settings,
         Self::About,
@@ -243,16 +295,44 @@ pub enum ShortcutAction {
     Main,
     ToggleExcluded,
     Walk,
+    MaximizeAll,
+    Wheel,
 }
 
 impl ShortcutAction {
-    pub const ALL: [Self; 5] = [
+    pub const ALL: [Self; 7] = [
         Self::Next,
         Self::Previous,
         Self::Main,
         Self::ToggleExcluded,
         Self::Walk,
+        Self::MaximizeAll,
+        Self::Wheel,
     ];
+
+    #[must_use]
+    pub fn answers_anywhere(self) -> Option<AnywhereAction> {
+        match self {
+            Self::Walk => Some(AnywhereAction::Walk),
+            Self::MaximizeAll => Some(AnywhereAction::MaximizeAll),
+            Self::Next
+            | Self::Previous
+            | Self::Main
+            | Self::ToggleExcluded
+            | Self::Wheel => None,
+        }
+    }
+
+    #[must_use]
+    pub fn matches_held(self) -> bool {
+        matches!(self, Self::Wheel)
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AnywhereAction {
+    Walk,
+    MaximizeAll,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
@@ -403,10 +483,21 @@ mod tests {
         "détail".to_owned()
     }
 
+    fn slice() -> WheelSlice {
+        WheelSlice {
+            nickname: "Bravo".to_owned(),
+            class: Some(Class::Cra),
+            gender: Some(Gender::Female),
+            main: false,
+            here: true,
+        }
+    }
+
     fn snapshot() -> Snapshot {
         Snapshot {
             version: "0.1.0".to_owned(),
             system: "macos 15.0 aarch64".to_owned(),
+            keyboard: KeyLabels::new(),
             characters: vec![character()],
             shortcuts: vec![ShortcutView {
                 action: ShortcutAction::Next,
@@ -448,6 +539,14 @@ mod tests {
                     corner: BannerCorner::BottomRight,
                     screen: None,
                 },
+            },
+            wheel: WheelView {
+                diameter: 400,
+                smallest: 280,
+                widest: 720,
+                step: 20,
+                dead_zone: 0.32,
+                demo: vec![slice()],
             },
             journal: vec![JournalEntry {
                 id: 1,
@@ -499,6 +598,7 @@ mod tests {
                 "characters",
                 "config",
                 "journal",
+                "keyboard",
                 "maximizeOnLaunch",
                 "paintPortraits",
                 "quickReplies",
@@ -513,6 +613,7 @@ mod tests {
                 "version",
                 "wakesMinimized",
                 "walk",
+                "wheel",
             ]
         );
     }
@@ -620,7 +721,7 @@ mod tests {
     }
 
     #[test]
-    fn the_six_actions_travel_under_the_names_the_shortcuts_screen_uses() {
+    fn the_seven_actions_travel_under_the_names_the_shortcuts_screen_uses() {
         let actions = ShortcutAction::ALL
             .into_iter()
             .map(|action| {
@@ -633,7 +734,30 @@ mod tests {
 
         assert_eq!(
             actions,
-            ["next", "previous", "main", "toggleExcluded", "walk"]
+            [
+                "next",
+                "previous",
+                "main",
+                "toggleExcluded",
+                "walk",
+                "maximizeAll",
+                "wheel",
+            ]
+        );
+    }
+
+    #[test]
+    fn the_wheel_is_the_only_action_that_answers_to_a_key_held_down() {
+        let held = ShortcutAction::ALL
+            .into_iter()
+            .filter(|action| action.matches_held())
+            .collect::<Vec<_>>();
+
+        assert_eq!(held, vec![ShortcutAction::Wheel]);
+        assert_eq!(
+            ShortcutAction::Wheel.answers_anywhere(),
+            None,
+            "the wheel opens in the game and nowhere else"
         );
     }
 
@@ -936,9 +1060,9 @@ mod tests {
     }
 
     #[test]
-    fn a_screen_of_the_walk_carries_its_name_its_size_and_whether_it_is_the_main_one() {
+    fn a_screen_carries_its_name_its_size_and_whether_it_is_the_main_one() {
         assert_eq!(
-            json_of(&BannerScreenView {
+            json_of(&DisplayView {
                 name: None,
                 width: 1920,
                 height: 1080,
@@ -946,6 +1070,82 @@ mod tests {
             }),
             json!({ "name": null, "width": 1920, "height": 1080, "primary": true })
         );
+    }
+
+    #[test]
+    fn the_wheel_hands_the_screen_its_gauge_and_the_two_ends_of_it() {
+        assert_eq!(
+            json_of(&WheelView {
+                diameter: 400,
+                smallest: 280,
+                widest: 720,
+                step: 20,
+                dead_zone: 0.32,
+                demo: vec![slice()],
+            }),
+            json!({
+                "diameter": 400,
+                "smallest": 280,
+                "widest": 720,
+                "step": 20,
+                "deadZone": 0.32,
+                "demo": [{
+                    "nickname": "Bravo",
+                    "class": "cra",
+                    "gender": "female",
+                    "main": false,
+                    "here": true,
+                }],
+            })
+        );
+    }
+
+    #[test]
+    fn a_step_of_the_wheel_carries_every_slice_and_the_one_under_the_cursor() {
+        let step = WheelStep {
+            diameter: 400,
+            dead_zone: 0.32,
+            slices: vec![WheelSlice {
+                nickname: "Bravo".to_owned(),
+                class: Some(Class::Cra),
+                gender: Some(Gender::Female),
+                main: true,
+                here: false,
+            }],
+            hovered: Some(0),
+            previewing: false,
+        };
+
+        assert_eq!(
+            json_of(&step),
+            json!({
+                "diameter": 400,
+                "deadZone": 0.32,
+                "slices": [{
+                    "nickname": "Bravo",
+                    "class": "cra",
+                    "gender": "female",
+                    "main": true,
+                    "here": false,
+                }],
+                "hovered": 0,
+                "previewing": false,
+            })
+        );
+    }
+
+    #[test]
+    fn a_wheel_nobody_is_pointing_at_carries_no_slice_at_all() {
+        let step = WheelStep {
+            diameter: 400,
+            dead_zone: 0.32,
+            slices: Vec::new(),
+            hovered: None,
+            previewing: true,
+        };
+
+        assert_eq!(json_of(&step)["hovered"], Value::Null);
+        assert_eq!(json_of(&step)["slices"], json!([]));
     }
 
     #[test]
@@ -987,7 +1187,7 @@ mod tests {
     }
 
     #[test]
-    fn the_eight_screens_travel_under_the_names_the_rail_answers_to() {
+    fn the_nine_screens_travel_under_the_names_the_rail_answers_to() {
         let screens = Screen::ALL.map(|screen| json_of(&screen));
 
         assert_eq!(
@@ -998,6 +1198,7 @@ mod tests {
                 json!("quickReplies"),
                 json!("autoFocus"),
                 json!("walk"),
+                json!("wheel"),
                 json!("relay"),
                 json!("settings"),
                 json!("about"),

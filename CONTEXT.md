@@ -22,6 +22,12 @@ Les mots de Multifus, et rien d'autre. On en parle en français, on les écrit e
 
 **Agrandir** (`maximize`) : étendre une fenêtre du jeu à toute la zone de travail de son écran, sans lui faire quitter le bureau : le Dock et la barre des menus restent là sur macOS, la barre des tâches sur Windows. C'est tout ce que Multifus fait à la taille d'une fenêtre, et un réglage le fait à l'ouverture d'un client.
 
+**Agrandir tout** (`MaximizeAll`) : agrandir d'un coup toutes les fenêtres du jeu ouvertes, connectées ou non. C'est le rattrapage de l'agrandissement à l'ouverture, pour les clients qui étaient déjà là quand Multifus a démarré. Il se demande de trois endroits, la barre système, un raccourci et les paramètres, et il n'arrive jamais tout seul. Le code dit `MaximizeAll`, l'écran dit partout « Agrandir les fenêtres ». Multifus demande l'agrandissement, il ne voit pas la fenêtre grandir : Windows accepte sans rien promettre, et le journal dit donc ce qui a été demandé, jamais ce qui est arrivé.
+
+**En petit** (`small`) : état d'une fenêtre du jeu qui ne couvre pas la zone de travail de son écran. Windows le sait d'un mot, `IsZoomed` ; le Mac n'a pas ce mot, et Multifus y compare le cadre de la fenêtre à la zone de travail, à deux points près. Le système ne dit que ce qu'il peut jurer : une fenêtre qu'il ne confirme pas agrandie est comptée en petit, et le doute laisse le geste offert plutôt qu'il ne le retire.
+
+**Illisible** (`readable` à faux) : l'état où Multifus ne peut pas lire les fenêtres du tout, faute d'autorisation ou parce que le système a refusé. Ce n'est pas « aucun client ouvert », et l'écran ne dit jamais l'un pour l'autre.
+
 **Plein écran** : le mode du système, pris au bouton vert d'une fenêtre sur macOS, qui donne au client un bureau à lui. Il n'a pas d'identifiant, parce qu'il n'a pas de code : Multifus ne le donne jamais, et conseille de s'en passer. La bascule y devient un glissement d'un bureau à l'autre, et la bannière n'a pas le droit de se poser par-dessus. Le mot ne désigne que lui, jamais une fenêtre agrandie.
 
 **Défilement** (`cycle`) : le parcours des fenêtres au raccourci, dans un ordre choisi par l'utilisateur.
@@ -40,6 +46,12 @@ Les mots de Multifus, et rien d'autre. On en parle en français, on les écrit e
 
 **Bannière** (`banner`) : la petite fenêtre sans bord posée devant tout le reste, qui porte la tête de classe et le pseudo du personnage sur lequel on vient d'arriver. Elle n'existe que Déplacement rapide allumé, ne se montre qu'au-dessus d'une fenêtre de jeu, et son coin se choisit dans l'écran Déplacement rapide.
 
+**Roue** (`Wheel`) : le disque de têtes de classe qui s'ouvre au milieu de l'écran au maintien d'une combinaison, et qui se ferme dessus. Elle s'ouvre toujours au même endroit, quoi que fasse la souris : Multifus ne déplace jamais le curseur, c'est le joueur qui vient sur le disque. Ouverte, elle prend la souris et le jeu cesse de la voir : rien ne s'allume derrière le disque. Fermée, elle la rend, et le curseur la traverse comme si elle n'existait pas. Relâcher hors du disque annule, comme au centre. Elle ne s'ouvre que dans le jeu, elle montre les personnages connectés, exclus compris, et la part relâchée passe devant. Elle est figée à l'ouverture : le tour passe pendant le maintien, la roue ne bouge pas. L'écran et la ligne des Raccourcis l'appellent « la roue des personnages », la barre de gauche « Roue » faute de place, jamais « menu radial », qui ne dit rien du jeu.
+
+**Part** (`Slice`) : un camembert de la roue, un personnage connecté. Toutes les parts font la même taille. Elle porte sa tête de classe et son pseudo dessous, sur une ligne coupée s'il le faut, et elle se remplit d'ambre au survol. La part de la fenêtre d'où l'on part porte déjà un fond ambré, plus pâle que le survol. Le centre de la roue porte la tête de la fenêtre où l'on est, et rien d'écrit. Une part sans classe porte le point d'interrogation du roster. Relâcher au centre ou hors du disque annule.
+
+**Aperçu** (`preview`) : la vraie roue posée deux secondes et demie au milieu de l'écran, au bouton de l'écran Roue. Elle ne montre jamais vos personnages, toujours les mêmes faux, autant que la jauge en demande et six par défaut, et le premier fait celui d'où l'on part. Le survol y répond comme dans le jeu, mais relâcher ne ramène jamais une fenêtre : c'est un aperçu, rien n'arrive. Les faux personnages sont écrits une seule fois, dans le Rust, et le dessin de l'écran les tient du même endroit.
+
 **Tirage** (`drag`) : l'action de prendre une ligne par sa poignée, et de la porter plus haut ou plus bas pour changer l'ordre du défilement.
 
 **Exclu** (`excluded`) : état d'un personnage que l'utilisateur écarte à la main. Les raccourcis Fenêtre suivante et précédente le sautent, le Déplacement rapide aussi, et l'AutoFocus ne passe plus sa fenêtre devant. Ses messages privés partent comme avant. L'exclusion ne survit pas à un redémarrage de Multifus.
@@ -54,7 +66,9 @@ Les mots de Multifus, et rien d'autre. On en parle en français, on les écrit e
 
 **AutoFocus** (`AutoFocus`) : le mécanisme qui focus la fenêtre d'un personnage quand une notification de jeu le concerne. Il se tait pour un personnage exclu.
 
-**Frappe** (`Press`) : un appui sur une combinaison, et ce que Multifus en fait. Elle ne vaut que dans le jeu, sauf celle du Déplacement rapide, qui répond de partout.
+**Frappe** (`Press`) : un appui sur une combinaison, et ce que Multifus en fait. Elle ne vaut que dans le jeu, sauf celles du Déplacement rapide et d'Agrandir tout, qui répondent de partout et laissent les messages privés partir.
+
+**Touche** (`key`) : une touche du clavier, gardée par sa **position** et jamais par sa lettre. `KeyW` nomme la position du W d'un QWERTY, et sur un AZERTY cette position porte un Z. Multifus arme la position, et écrit à l'écran la lettre que le clavier de l'utilisateur y a imprimée : sur un AZERTY, il affiche « Z » là où il garde `KeyW`. Le joueur lit ce qui est sur sa touche, et appuie dessus. Le Mac seul demande cette traduction, Carbon armant une position ; Windows résout déjà par la lettre, et la touche marquée W y déclenche. Les vingt-six lettres et onze signes suivent la disposition, les chiffres gardent leur chiffre : la rangée du haut d'un AZERTY rend `&` sans Maj, et personne n'appelle cette touche « esperluette ». Quand le système ne sait pas dire la lettre, la position s'écrit telle quelle.
 
 **Mécanisme** (`Mechanisms`) : ce qu'une frappe met en marche sans toucher à une fenêtre : le Déplacement rapide, les messages privés, la réponse rapide.
 

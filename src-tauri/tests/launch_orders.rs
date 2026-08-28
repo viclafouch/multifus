@@ -1,6 +1,7 @@
 mod common;
 
 use common::client;
+use common::decided;
 use common::in_cycle;
 use common::nicknames;
 use common::opened;
@@ -239,7 +240,7 @@ fn a_shortcut_struck_while_everybody_is_set_aside_goes_nowhere() {
     state.toggle_excluded("Bravo");
 
     assert_eq!(
-        state.decide_shortcut(ShortcutAction::Next, "Alpha"),
+        decided(&mut state, ShortcutAction::Next, "Alpha"),
         ShortcutEffect::Settled(ShortcutOutcome::NobodyInCycle)
     );
 }
@@ -252,7 +253,7 @@ fn a_shortcut_steps_over_the_client_that_just_closed() {
     state.apply_windows(&[client(1, "Alpha"), client(3, "Charlie")]);
 
     assert_eq!(
-        state.decide_shortcut(ShortcutAction::Next, "Alpha"),
+        decided(&mut state, ShortcutAction::Next, "Alpha"),
         ShortcutEffect::Focus {
             nickname: "Charlie".to_owned(),
             window: WindowId::from_raw(3),
@@ -268,7 +269,7 @@ fn a_shortcut_struck_on_the_last_client_left_stays_where_it_is() {
     state.apply_windows(&[client(1, "Alpha")]);
 
     assert_eq!(
-        state.decide_shortcut(ShortcutAction::Next, "Alpha"),
+        decided(&mut state, ShortcutAction::Next, "Alpha"),
         ShortcutEffect::Focus {
             nickname: "Alpha".to_owned(),
             window: WindowId::from_raw(1),
@@ -284,7 +285,7 @@ fn setting_aside_a_client_multifus_never_met_changes_nothing() {
     state.apply_windows(&[client(1, "Alpha")]);
 
     assert_eq!(
-        state.decide_shortcut(ShortcutAction::ToggleExcluded, "Inconnu"),
+        decided(&mut state, ShortcutAction::ToggleExcluded, "Inconnu"),
         ShortcutEffect::Settled(ShortcutOutcome::NotInRoster {
             nickname: "Inconnu".to_owned(),
         })
@@ -307,7 +308,7 @@ fn a_roster_learnt_before_the_clients_open_puts_nobody_in_the_cycle() {
         "Multifus opened before Dofus, so nobody is there yet"
     );
     assert_eq!(
-        second.decide_shortcut(ShortcutAction::Next, "Alpha"),
+        decided(&mut second, ShortcutAction::Next, "Alpha"),
         ShortcutEffect::Settled(ShortcutOutcome::NobodyInCycle)
     );
 

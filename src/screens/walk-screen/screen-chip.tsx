@@ -1,9 +1,9 @@
-import type { BannerScreen } from '@/@types/walk'
+import type { Display } from '@/@types/display'
 import { Button } from '@/components/ui/button'
 import { strings } from '@/constants/strings'
 
 type ScreenChipProps = Readonly<{
-  screen: BannerScreen
+  screen: Display
   rank: number
   isPicked: boolean
   onPick: () => void

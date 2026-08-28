@@ -6,16 +6,6 @@ export const BANNER_SIZE = {
   smallestDrawn: 44
 } as const
 
-export const MONITOR_SIZE = {
-  width: 448,
-  height: 260
-} as const
-
-export const WIDESCREEN = {
-  width: 1920,
-  height: 1080
-} as const
-
 type CornerPlacement = {
   readonly anchor: string
   readonly fromLeft: boolean

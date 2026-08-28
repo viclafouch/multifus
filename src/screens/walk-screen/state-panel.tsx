@@ -1,13 +1,12 @@
 import { Keyboard } from 'lucide-react'
 import type { Snapshot } from '@/@types/snapshot'
 import type { WalkLiveState, WalkStatus } from '@/@types/walk'
-import { KeyCap } from '@/components/key-cap'
 import { FieldRow } from '@/components/layout/field-row'
 import { Panel } from '@/components/layout/panel'
+import { ShortcutRecall } from '@/components/shortcut-recall'
 import { StateBadge } from '@/components/state-badge'
 import { Switch } from '@/components/ui/switch'
 import { strings } from '@/constants/strings'
-import { acceleratorParts } from '@/helpers/accelerator'
 import { setWalkEnabled } from '@/lib/multifus'
 
 const TONES = 'data-[walk=on]:tone-live data-[walk=off]:tone-idle'
@@ -53,26 +52,4 @@ export const StatePanel = ({ walk, accelerator, run }: StatePanelProps) => {
 
 const liveState = ({ enabled }: WalkStatus): WalkLiveState => {
   return enabled ? 'on' : 'off'
-}
-
-type ShortcutRecallProps = Readonly<{
-  accelerator: string | null
-}>
-
-const ShortcutRecall = ({ accelerator }: ShortcutRecallProps) => {
-  if (accelerator === null) {
-    return (
-      <span className="text-note text-muted-foreground">
-        {strings.walk.shortcutEmpty}
-      </span>
-    )
-  }
-
-  return (
-    <span className="flex items-center gap-1">
-      {acceleratorParts(accelerator).map((token) => {
-        return <KeyCap key={token} token={token} />
-      })}
-    </span>
-  )
 }

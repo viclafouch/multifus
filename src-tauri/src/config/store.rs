@@ -197,7 +197,9 @@ impl Loaded {
         }
     }
 
-    fn read(settings: Settings) -> Self {
+    fn read(mut settings: Settings) -> Self {
+        settings.wheel.set_diameter(settings.wheel.diameter);
+
         Self {
             settings,
             failure: None,
@@ -236,6 +238,8 @@ mod tests {
     use crate::config::settings::Relay;
     use crate::config::settings::Shortcuts;
     use crate::config::settings::Traces;
+    use crate::config::settings::Wheel;
+    use crate::config::settings::WHEEL_WIDEST;
     use crate::domain::Character;
     use crate::domain::Class;
     use crate::domain::Gender;
@@ -273,6 +277,8 @@ mod tests {
                 main: Shortcut::new("Alt+Home"),
                 toggle_excluded: None,
                 walk: Shortcut::new("Alt+KeyD"),
+                maximize_all: Shortcut::new("Alt+KeyA"),
+                wheel: Shortcut::new("Alt+KeyW"),
             },
             maximize_on_launch: true,
             short_titles: true,
@@ -293,6 +299,7 @@ mod tests {
                 corner: BannerCorner::TopLeft,
                 screen: Some("DISPLAY2".to_owned()),
             },
+            wheel: Wheel { diameter: 300 },
             start_at_login: true,
             traces: Traces {
                 portraits: HashSet::from(["Alpha".to_owned()]),
@@ -318,6 +325,21 @@ mod tests {
             roster: Roster::from_characters(characters),
             ..settings.clone()
         }
+    }
+
+    #[test]
+    fn a_wheel_wider_than_the_gauge_allows_comes_back_within_its_ends() {
+        let (_directory, store) = store();
+        let settings = Settings {
+            wheel: Wheel {
+                diameter: WHEEL_WIDEST * 2,
+            },
+            ..a_settled_configuration()
+        };
+
+        store.save(&settings).expect("the configuration is written");
+
+        assert_eq!(store.load().settings.wheel.diameter, WHEEL_WIDEST);
     }
 
     #[test]

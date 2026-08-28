@@ -23,8 +23,8 @@ use crate::app::journal::Work;
 use crate::app::state::lock;
 use crate::app::state::windows;
 use crate::app::view::BannerCharacter;
-use crate::app::view::BannerScreenView;
 use crate::app::view::BannerStep;
+use crate::app::view::DisplayView;
 use crate::config::Banner;
 use crate::config::BannerCorner;
 use crate::platform::WindowManager;
@@ -320,7 +320,7 @@ fn screen_of(app: &AppHandle, wanted: Option<&str>) -> tauri::Result<Option<Moni
     Ok(found.or(primary))
 }
 
-pub fn screens(app: &AppHandle) -> Vec<BannerScreenView> {
+pub fn screens(app: &AppHandle) -> Vec<DisplayView> {
     let Ok(screens) = app.available_monitors() else {
         return Vec::new();
     };
@@ -330,13 +330,19 @@ pub fn screens(app: &AppHandle) -> Vec<BannerScreenView> {
 
     screens
         .iter()
-        .map(|screen| BannerScreenView {
-            name: screen.name().cloned(),
-            width: screen.size().width,
-            height: screen.size().height,
-            primary: screen.name() == primary,
-        })
+        .map(|screen| display_of(screen, screen.name() == primary))
         .collect()
+}
+
+pub fn display_of(screen: &Monitor, primary: bool) -> DisplayView {
+    let size = screen.size().to_logical::<f64>(screen.scale_factor());
+
+    DisplayView {
+        name: screen.name().cloned(),
+        width: size.width.round() as u32,
+        height: size.height.round() as u32,
+        primary,
+    }
 }
 
 #[cfg(test)]

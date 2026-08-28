@@ -1,10 +1,10 @@
 import React from 'react'
-import type { BannerScreen } from '@/@types/walk'
+import type { Display } from '@/@types/display'
 import { bannerScreens } from '@/lib/multifus'
 import { ignore } from '@/lib/utils'
 
 export const useBannerScreens = () => {
-  const [screens, setScreens] = React.useState<readonly BannerScreen[]>([])
+  const [screens, setScreens] = React.useState<readonly Display[]>([])
 
   React.useEffect(() => {
     let isLive = true

@@ -53,3 +53,5 @@ export const CLASS_PORTRAITS = {
   sacrieur: { female: sacrieurFemale, male: sacrieurMale },
   pandawa: { female: pandawaFemale, male: pandawaMale }
 } as const satisfies Record<Class, Record<Gender, string>>
+
+export const PORTRAIT_UNKNOWN = '?'

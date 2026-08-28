@@ -1,8 +1,9 @@
 import { fireEvent } from '@testing-library/react'
+import type { Display } from '@/@types/display'
 import type { Character } from '@/@types/roster'
 import type { QuickReply } from '@/@types/shortcuts'
 import type { Snapshot } from '@/@types/snapshot'
-import type { BannerScreen } from '@/@types/walk'
+import type { WheelSlice } from '@/@types/wheel'
 
 export const APPLE_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)'
 export const WINDOWS_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
@@ -56,20 +57,33 @@ export const keyCapsOf = (field: HTMLElement) => {
   })
 }
 
-const BLANK_SCREEN: BannerScreen = {
+const BLANK_SCREEN: Display = {
   name: 'Écran intégré',
   width: 1512,
   height: 982,
   primary: true
 }
 
-export const bannerScreenOf = (fields: Partial<BannerScreen> = {}) => {
+export const displayOf = (fields: Partial<Display> = {}) => {
   return { ...BLANK_SCREEN, ...fields }
+}
+
+const BLANK_SLICE: WheelSlice = {
+  nickname: 'Alpha',
+  class: 'iop',
+  gender: 'male',
+  main: false,
+  here: false
+}
+
+export const wheelSliceOf = (fields: Partial<WheelSlice> = {}) => {
+  return { ...BLANK_SLICE, ...fields }
 }
 
 const BLANK_SNAPSHOT: Snapshot = {
   version: '0.0.0',
   system: 'test',
+  keyboard: {},
   characters: [],
   shortcuts: [],
   quickReplies: [],
@@ -96,6 +110,14 @@ const BLANK_SNAPSHOT: Snapshot = {
     test: { kind: 'idle' }
   },
   walk: { enabled: false, banner: { corner: 'bottomRight', screen: null } },
+  wheel: {
+    diameter: 400,
+    smallest: 280,
+    widest: 720,
+    step: 20,
+    deadZone: 0.32,
+    demo: []
+  },
   journal: []
 }
 

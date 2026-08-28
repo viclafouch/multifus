@@ -13,11 +13,14 @@ use crate::app::runtime;
 use crate::app::shortcuts;
 use crate::app::state::lock;
 use crate::app::update;
-use crate::app::view::BannerScreenView;
 use crate::app::view::BannerStep;
+use crate::app::view::ClientsView;
+use crate::app::view::DisplayView;
 use crate::app::view::ShortcutAction;
 use crate::app::view::Snapshot;
+use crate::app::view::WheelStep;
 use crate::app::walk;
+use crate::app::wheel;
 use crate::config::BannerCorner;
 use crate::config::QuickReplyId;
 use crate::domain::Class;
@@ -219,13 +222,37 @@ pub fn set_banner_screen(app: AppHandle, screen: Option<String>) -> Snapshot {
 }
 
 #[tauri::command]
-pub fn banner_screens(app: AppHandle) -> Vec<BannerScreenView> {
+pub fn banner_screens(app: AppHandle) -> Vec<DisplayView> {
     banner::screens(&app)
 }
 
 #[tauri::command]
 pub fn banner_step(app: AppHandle) -> BannerStep {
     lock(&app).banner_step()
+}
+
+#[tauri::command]
+pub fn set_wheel_diameter(app: AppHandle, diameter: u32) -> Snapshot {
+    lock(&app).set_wheel_diameter(diameter);
+
+    runtime::emit_snapshot(&app)
+}
+
+#[tauri::command]
+pub fn preview_wheel(app: AppHandle, crowd: usize) -> Snapshot {
+    wheel::preview(&app, crowd);
+
+    runtime::emit_snapshot(&app)
+}
+
+#[tauri::command]
+pub fn wheel_display(app: AppHandle) -> Option<DisplayView> {
+    wheel::display(&app)
+}
+
+#[tauri::command]
+pub fn wheel_step(app: AppHandle) -> WheelStep {
+    wheel::step(&app)
 }
 
 #[tauri::command]
@@ -249,6 +276,23 @@ pub fn set_maximize_on_launch(app: AppHandle, maximize: bool) -> Snapshot {
     lock(&app).set_maximize_on_launch(maximize);
 
     runtime::emit_snapshot(&app)
+}
+
+#[tauri::command(async)]
+pub fn maximize_all_clients(app: AppHandle) -> Snapshot {
+    runtime::maximize_all(&app, Surface::Window);
+
+    runtime::emit_snapshot(&app)
+}
+
+#[tauri::command(async)]
+pub fn clients(app: AppHandle) -> ClientsView {
+    runtime::clients(&app)
+}
+
+#[tauri::command]
+pub fn watch_clients(app: AppHandle, watching: bool) {
+    runtime::watch_clients(&app, watching);
 }
 
 #[tauri::command]

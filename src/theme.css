@@ -134,6 +134,71 @@
     0 0 10px -1px var(--halo-far);
 }
 
+@utility main-lit {
+  filter: drop-shadow(
+    0 0 5px color-mix(in oklch, var(--primary), transparent 55%)
+  );
+}
+
+@utility wheel-glass {
+  filter: drop-shadow(0 5px 16px oklch(0 0 0 / 0.6));
+}
+
+@utility wheel-plate {
+  fill: oklch(0.14 0.007 66 / 0.96);
+}
+
+@utility wheel-hub {
+  fill: oklch(0.12 0.006 66 / 0.98);
+  stroke: color-mix(in oklch, var(--foreground), transparent 88%);
+  stroke-width: 0.4;
+}
+
+@utility wheel-face {
+  border: 1px solid color-mix(in oklch, var(--foreground), transparent 84%);
+  background-color: oklch(0.12 0.006 66);
+}
+
+@utility wheel-slice {
+  fill: oklch(0.235 0.009 66);
+  transition: fill 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &[data-here] {
+    fill: color-mix(in oklch, var(--primary), oklch(0.235 0.009 66) 80%);
+  }
+
+  &[data-hovered] {
+    fill: color-mix(in oklch, var(--primary), oklch(0.235 0.009 66) 52%);
+  }
+}
+
+@utility wheel-name {
+  color: color-mix(in oklch, var(--foreground), transparent 12%);
+  text-shadow: 0 1px 2px oklch(0 0 0 / 0.75);
+  transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &[data-hovered] {
+    color: var(--foreground);
+  }
+}
+
+@utility wheel-head {
+  transition:
+    box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border-color: color-mix(in oklch, var(--foreground), transparent 76%);
+  box-shadow: 0 2px 6px -2px oklch(0 0 0 / 0.8);
+
+  &[data-empty] {
+    border-style: dashed;
+  }
+
+  &[data-hovered] {
+    border-color: color-mix(in oklch, var(--foreground), transparent 30%);
+    border-style: solid;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

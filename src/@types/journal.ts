@@ -35,8 +35,23 @@ export type ShortcutOutcome =
   | { readonly outcome: 'noWindow'; readonly nickname: string }
   | { readonly outcome: 'outsideGame' }
   | { readonly outcome: 'excluded'; readonly nickname: string }
-  | { readonly outcome: 'walk'; readonly enabled: boolean }
   | { readonly outcome: 'included'; readonly nickname: string }
+
+export type WheelOutcome =
+  | { readonly outcome: 'focused'; readonly nickname: string }
+  | { readonly outcome: 'noWindow'; readonly nickname: string }
+  | {
+      readonly outcome: 'focusFailed'
+      readonly nickname: string
+      readonly detail: string
+    }
+
+export type MaximizeAllOutcome =
+  | { readonly outcome: 'denied' }
+  | { readonly outcome: 'asked'; readonly windows: number }
+  | { readonly outcome: 'noClient' }
+  | { readonly outcome: 'nothingMoved' }
+  | { readonly outcome: 'refused'; readonly detail: string }
 
 export type CharacterShortcutOutcome =
   | { readonly outcome: 'alreadyThere' }
@@ -110,6 +125,7 @@ export type JournalEvent =
   | { readonly kind: 'characterOnline'; readonly nickname: string }
   | { readonly kind: 'clientMaximized' }
   | { readonly kind: 'clientMaximizeFailed'; readonly detail: string }
+  | { readonly kind: 'clientsCountFailed'; readonly detail: string }
   | { readonly kind: 'shortTitlesFailed'; readonly detail: string }
   | { readonly kind: 'windowIconFailed'; readonly detail: string }
   | { readonly kind: 'configNotSetAside'; readonly detail: string }
@@ -153,6 +169,8 @@ export type JournalEvent =
   | { readonly kind: 'walkListeningResumed' }
   | { readonly kind: 'walkListeningLost' }
   | { readonly kind: 'bannerFailed'; readonly detail: string }
+  | { readonly kind: 'wheelFailed'; readonly detail: string }
+  | { readonly kind: 'wheelPicked'; readonly outcome: WheelOutcome }
   | { readonly kind: 'walkSwitchFailed'; readonly detail: string }
   | { readonly kind: 'windowFailed'; readonly detail: string }
   | {
@@ -185,6 +203,11 @@ export type JournalEvent =
       readonly kind: 'shortcut'
       readonly action: ShortcutAction
       readonly outcome: ShortcutOutcome
+    }
+  | {
+      readonly kind: 'maximizeAll'
+      readonly from: Surface
+      readonly outcome: MaximizeAllOutcome
     }
   | {
       readonly kind: 'characterShortcut'

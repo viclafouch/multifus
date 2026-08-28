@@ -53,6 +53,7 @@ pub trait ClickWatcher: Send + Sync {
 #[derive(Debug, Default)]
 pub struct ClickGate {
     switching: AtomicBool,
+    held: AtomicBool,
     awaited: AtomicU64,
     watched: Mutex<HashSet<WindowId>>,
     arrival: (Mutex<bool>, Condvar),
@@ -77,7 +78,7 @@ impl ClickGate {
 
     #[must_use]
     pub fn is_switching(&self) -> bool {
-        self.switching.load(Ordering::Acquire)
+        self.switching.load(Ordering::Acquire) || self.held.load(Ordering::Acquire)
     }
 
     pub fn close(&self) {
@@ -87,6 +88,10 @@ impl ClickGate {
     pub fn open(&self) {
         self.awaited.store(NOTHING_AWAITED, Ordering::Release);
         self.switching.store(false, Ordering::Release);
+    }
+
+    pub fn hold(&self, held: bool) {
+        self.held.store(held, Ordering::Release);
     }
 
     pub fn expect(&self, window: WindowId) {
@@ -272,6 +277,43 @@ mod tests {
         gate.open();
 
         assert!(!gate.is_switching());
+    }
+
+    #[test]
+    fn the_wheel_holds_the_door_shut_whatever_a_switch_does_meanwhile() {
+        let gate = ClickGate::default();
+
+        gate.hold(true);
+        gate.close();
+        gate.open();
+
+        assert!(
+            gate.is_switching(),
+            "the switch is over, and the wheel is still open under the hand"
+        );
+
+        gate.hold(false);
+
+        assert!(!gate.is_switching());
+    }
+
+    #[test]
+    fn the_wheel_letting_go_of_the_door_never_cuts_a_switch_short() {
+        let gate = ClickGate::default();
+
+        gate.close();
+        gate.expect(window(7));
+        gate.hold(true);
+        gate.hold(false);
+
+        assert!(
+            gate.is_switching(),
+            "the switch that was under way keeps the door to itself"
+        );
+
+        gate.note_foreground(window(7));
+
+        assert!(gate.await_arrival(SWITCH_CEILING));
     }
 
     #[test]

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import type {
   CharacterShortcutOutcome,
   JournalEvent,
+  MaximizeAllOutcome,
   NotificationOutcome,
   QuickReplyFailure,
   RosterChange,
@@ -558,28 +559,76 @@ const SHORTCUT_CASES = {
       },
       line: `Fenêtre précédente : impossible de savoir quelle fenêtre est au premier plan (${DETAIL}).`
     }
-  ],
-  walk: [
-    {
-      event: {
-        kind: 'shortcut',
-        action: 'walk',
-        outcome: { outcome: 'walk', enabled: true }
-      },
-      line: 'Déplacement rapide : allumé.'
-    },
-    {
-      event: {
-        kind: 'shortcut',
-        action: 'walk',
-        outcome: { outcome: 'walk', enabled: false }
-      },
-      line: 'Déplacement rapide : éteint.'
-    }
   ]
 } as const satisfies Record<
   ShortcutOutcome['outcome'],
   readonly Case<'shortcut'>[]
+>
+
+const MAXIMIZE_ALL_SUBJECT = strings.maximize.all
+
+const MAXIMIZE_ALL_CASES = {
+  asked: [
+    {
+      event: {
+        kind: 'maximizeAll',
+        from: 'tray',
+        outcome: { outcome: 'asked', windows: 6 }
+      },
+      line: `${MAXIMIZE_ALL_SUBJECT}, depuis la barre système : demandé à 6 clients.`
+    },
+    {
+      event: {
+        kind: 'maximizeAll',
+        from: 'shortcut',
+        outcome: { outcome: 'asked', windows: 1 }
+      },
+      line: `${MAXIMIZE_ALL_SUBJECT}, depuis un raccourci : demandé à un client.`
+    }
+  ],
+  nothingMoved: [
+    {
+      event: {
+        kind: 'maximizeAll',
+        from: 'window',
+        outcome: { outcome: 'nothingMoved' }
+      },
+      line: `${MAXIMIZE_ALL_SUBJECT}, depuis la fenêtre : aucun client n’a accepté.`
+    }
+  ],
+  noClient: [
+    {
+      event: {
+        kind: 'maximizeAll',
+        from: 'window',
+        outcome: { outcome: 'noClient' }
+      },
+      line: `${MAXIMIZE_ALL_SUBJECT}, depuis la fenêtre : aucun client Dofus ouvert.`
+    }
+  ],
+  denied: [
+    {
+      event: {
+        kind: 'maximizeAll',
+        from: 'tray',
+        outcome: { outcome: 'denied' }
+      },
+      line: `${MAXIMIZE_ALL_SUBJECT}, depuis la barre système : l’autorisation manque.`
+    }
+  ],
+  refused: [
+    {
+      event: {
+        kind: 'maximizeAll',
+        from: 'shortcut',
+        outcome: { outcome: 'refused', detail: DETAIL }
+      },
+      line: `${MAXIMIZE_ALL_SUBJECT}, depuis un raccourci : lecture des fenêtres impossible (${DETAIL}).`
+    }
+  ]
+} as const satisfies Record<
+  MaximizeAllOutcome['outcome'],
+  readonly Case<'maximizeAll'>[]
 >
 
 const QUICK_REPLY_CASES = {
@@ -913,6 +962,7 @@ const JOURNAL_CASES = {
   roster: Object.values(ROSTER_CASES).flat(),
   setting: Object.values(SETTING_CASES).flat(),
   shortcut: Object.values(SHORTCUT_CASES).flat(),
+  maximizeAll: Object.values(MAXIMIZE_ALL_CASES).flat(),
   characterShortcut: Object.values(CHARACTER_SHORTCUT_CASES).flat(),
   quickReplyFailed: Object.values(QUICK_REPLY_CASES).flat(),
   quickReplyPasted: [
@@ -1029,6 +1079,12 @@ const JOURNAL_CASES = {
     {
       event: { kind: 'clientMaximizeFailed', detail: DETAIL },
       line: `${DETAILED_LINES.clientMaximizeFailed} : ${DETAIL}`
+    }
+  ],
+  clientsCountFailed: [
+    {
+      event: { kind: 'clientsCountFailed', detail: DETAIL },
+      line: `${DETAILED_LINES.clientsCountFailed} : ${DETAIL}`
     }
   ],
   configLoadFailed: [
@@ -1219,6 +1275,35 @@ const JOURNAL_CASES = {
       line: `${DETAILED_LINES.bannerFailed} : ${DETAIL}`
     }
   ],
+  wheelFailed: [
+    {
+      event: { kind: 'wheelFailed', detail: DETAIL },
+      line: `${DETAILED_LINES.wheelFailed} : ${DETAIL}`
+    }
+  ],
+  wheelPicked: [
+    {
+      event: {
+        kind: 'wheelPicked',
+        outcome: { outcome: 'focused', nickname: NICKNAME }
+      },
+      line: `La roue a ramené ${NICKNAME} devant.`
+    },
+    {
+      event: {
+        kind: 'wheelPicked',
+        outcome: { outcome: 'noWindow', nickname: NICKNAME }
+      },
+      line: `La roue : la fenêtre de ${NICKNAME} a disparu.`
+    },
+    {
+      event: {
+        kind: 'wheelPicked',
+        outcome: { outcome: 'focusFailed', nickname: NICKNAME, detail: DETAIL }
+      },
+      line: `La roue : le système a refusé de ramener ${NICKNAME} devant (${DETAIL}).`
+    }
+  ],
   reset: [{ event: { kind: 'reset' }, line: PLAIN_LINES.reset }],
   quit: [{ event: { kind: 'quit' }, line: PLAIN_LINES.quit }]
 } as const satisfies JournalCases
@@ -1245,6 +1330,7 @@ const NOON = Date.UTC(2026, 0, 15, 12, 30, 0)
 const SNAPSHOT = {
   version: '0.1.0',
   system: 'macOS 26.0 (arm64)',
+  keyboard: {},
   characters: [],
   shortcuts: SHORTCUTS,
   quickReplies: QUICK_REPLIES,
@@ -1273,6 +1359,14 @@ const SNAPSHOT = {
   walk: {
     enabled: false,
     banner: { corner: 'bottomRight', screen: null }
+  },
+  wheel: {
+    diameter: 400,
+    smallest: 280,
+    widest: 720,
+    step: 20,
+    deadZone: 0.32,
+    demo: []
   },
   journal: [
     { id: 1, at: MORNING, event: { kind: 'listening' } },

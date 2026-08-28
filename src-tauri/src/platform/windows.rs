@@ -87,6 +87,7 @@ use windows::Win32::UI::WindowsAndMessaging::GetWindowThreadProcessId;
 use windows::Win32::UI::WindowsAndMessaging::IsIconic;
 use windows::Win32::UI::WindowsAndMessaging::IsWindow;
 use windows::Win32::UI::WindowsAndMessaging::IsWindowVisible;
+use windows::Win32::UI::WindowsAndMessaging::IsZoomed;
 use windows::Win32::UI::WindowsAndMessaging::PeekMessageW;
 use windows::Win32::UI::WindowsAndMessaging::PostThreadMessageW;
 use windows::Win32::UI::WindowsAndMessaging::SendMessageTimeoutW;
@@ -347,6 +348,17 @@ impl WindowManager for Win32WindowManager {
         let handle = live_game_window(window)?;
 
         Ok(unsafe { IsIconic(handle) }.as_bool())
+    }
+
+    fn maximized_windows(&self, windows: &[WindowId]) -> Vec<WindowId> {
+        windows
+            .iter()
+            .filter(|window| match live_game_window(**window) {
+                Ok(handle) => unsafe { IsZoomed(handle) }.as_bool(),
+                Err(_) => false,
+            })
+            .copied()
+            .collect()
     }
 
     fn focus(&self, window: WindowId) -> Result<()> {

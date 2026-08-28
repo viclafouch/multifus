@@ -1,9 +1,11 @@
 export type ShortcutAction =
   | 'main'
+  | 'maximizeAll'
   | 'next'
   | 'previous'
   | 'toggleExcluded'
   | 'walk'
+  | 'wheel'
 
 export type QuickReplyId = number
 

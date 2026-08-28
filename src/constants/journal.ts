@@ -1,13 +1,15 @@
 import type {
   JournalEvent,
+  MaximizeAllOutcome,
   QuickReplyFailure,
   ShortcutOutcome,
-  TrayOutcome
+  TrayOutcome,
+  WheelOutcome
 } from '@/@types/journal'
 import type { NoticeCase, RelayStop } from '@/@types/relay'
 import type { Gender } from '@/@types/roster'
 import type { ShortcutBinding } from '@/@types/shortcuts'
-import type { Work } from '@/@types/system'
+import type { Surface, Work } from '@/@types/system'
 import type { WalkFrom, WalkIdle } from '@/@types/walk'
 
 export type JournalTone = 'good' | 'neutral' | 'warning'
@@ -17,12 +19,14 @@ type PlainEventKind = Exclude<
   | 'authorization'
   | 'authorizationRequested'
   | 'characterShortcut'
+  | 'maximizeAll'
   | 'notification'
   | 'quickReplyFailed'
   | 'shortcut'
   | 'shortcutsBound'
   | 'trayFocus'
   | 'walkIdle'
+  | 'wheelPicked'
 >
 
 export const TONES = {
@@ -50,8 +54,10 @@ export const TONES = {
   walkListeningRefused: 'warning',
   walkSwitchFailed: 'warning',
   bannerFailed: 'warning',
+  wheelFailed: 'warning',
   clientMaximized: 'good',
   clientMaximizeFailed: 'warning',
+  clientsCountFailed: 'warning',
   shortTitlesFailed: 'warning',
   windowIconFailed: 'warning',
   startAtLoginReconciled: 'neutral',
@@ -106,10 +112,14 @@ export const GENDER_GROUP_LINES = {
   }
 } as const satisfies Record<Gender, Record<'excluded' | 'included', string>>
 
-export const WALK_FROM_LABELS = {
+export const SURFACE_LABELS = {
   window: 'la fenêtre',
   tray: 'la barre système',
-  shortcut: 'un raccourci',
+  shortcut: 'un raccourci'
+} as const satisfies Record<Surface, string>
+
+export const WALK_FROM_LABELS = {
+  ...SURFACE_LABELS,
   listeningLost: 'Multifus, qui n’écoutait plus les clics',
   noWindowLeft: 'Multifus, qui n’avait plus une fenêtre à parcourir'
 } as const satisfies Record<WalkFrom, string>
@@ -118,7 +128,6 @@ export const SHORTCUT_TONES = {
   focused: 'good',
   excluded: 'good',
   included: 'good',
-  walk: 'good',
   outsideGame: 'neutral',
   notInRoster: 'neutral',
   nobodyInCycle: 'neutral',
@@ -128,6 +137,20 @@ export const SHORTCUT_TONES = {
   focusFailed: 'warning',
   foregroundUnknown: 'warning'
 } as const satisfies Record<ShortcutOutcome['outcome'], JournalTone>
+
+export const WHEEL_TONES = {
+  focused: 'good',
+  noWindow: 'neutral',
+  focusFailed: 'warning'
+} as const satisfies Record<WheelOutcome['outcome'], JournalTone>
+
+export const MAXIMIZE_ALL_TONES = {
+  asked: 'good',
+  nothingMoved: 'warning',
+  noClient: 'neutral',
+  denied: 'warning',
+  refused: 'warning'
+} as const satisfies Record<MaximizeAllOutcome['outcome'], JournalTone>
 
 export const DEAD_SHORTCUT_STATUSES = new Set<
   ShortcutBinding['status']['kind']
@@ -154,6 +177,8 @@ export const DETAILED_LINES = {
   startAtLoginFailed: 'Démarrage avec la session impossible',
   scanFailed: 'Lecture des fenêtres impossible',
   clientMaximizeFailed: 'Agrandissement de la fenêtre d’un client impossible',
+  clientsCountFailed:
+    'Le compte des fenêtres du jeu n’est pas arrivé à l’écran',
   shortTitlesFailed: 'Titre d’une fenêtre impossible à changer',
   windowIconFailed: 'Icône d’une fenêtre impossible à poser',
   walkListeningRefused:
@@ -161,6 +186,7 @@ export const DETAILED_LINES = {
   walkSwitchFailed:
     'Déplacement rapide : la fenêtre suivante n’est pas passée devant',
   bannerFailed: 'La bannière du Déplacement rapide n’a pas suivi',
+  wheelFailed: 'La roue n’a pas suivi',
   saveFailed: 'Configuration non enregistrée',
   configNotSetAside:
     'Configuration illisible et impossible à déplacer, le prochain enregistrement l’écrasera',
@@ -215,5 +241,6 @@ export const WORK_LABELS = {
   shortcuts: 'La réponse à un raccourci',
   tray: 'La réponse à un clic dans la barre système',
   walk: 'La bascule du Déplacement rapide',
-  banner: 'La bannière du Déplacement rapide'
+  banner: 'La bannière du Déplacement rapide',
+  wheel: 'La roue'
 } as const satisfies Record<Work, string>

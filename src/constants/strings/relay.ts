@@ -11,7 +11,7 @@ const networkLine = (detail: string) => {
 const STATE_LINES = {
   active: {
     badge: 'En marche',
-    body: 'Vous ne raterez rien tant que Dofus Retro vous garde connecté. Un raccourci frappé dans le jeu coupe l’envoi, puisque vous voilà revenu.'
+    body: 'Vous ne raterez rien tant que Dofus Retro vous garde connecté. Un raccourci qui vous ramène sur une fenêtre coupe l’envoi, puisque vous voilà revenu.'
   },
   ready: {
     badge: 'À l’arrêt',

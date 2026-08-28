@@ -1,3 +1,5 @@
+export type KeyLabels = Readonly<Record<string, string | undefined>>
+
 export type Authorization = {
   readonly granted: boolean
   readonly listening: boolean
@@ -32,6 +34,6 @@ export type ScreenSaver =
 
 export type Launch = 'byHand' | 'session'
 
-export type Surface = 'tray' | 'window'
+export type Surface = 'shortcut' | 'tray' | 'window'
 
-export type Work = 'banner' | 'scan' | 'shortcuts' | 'tray' | 'walk'
+export type Work = 'banner' | 'scan' | 'shortcuts' | 'tray' | 'walk' | 'wheel'

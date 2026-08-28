@@ -3,6 +3,7 @@ import type { ScreenName, Snapshot } from '@/@types/snapshot'
 import type { ConfigProblem } from '@/@types/system'
 import { ConfigNotice } from '@/components/config-notice'
 import { JournalPanel } from '@/components/journal-panel'
+import { KeyLabelsProvider } from '@/components/key-labels-provider'
 import { NavRail } from '@/components/nav-rail'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { useMultifus } from '@/hooks/use-multifus'
@@ -14,9 +15,10 @@ import { AutoFocusScreen } from '@/screens/auto-focus-screen'
 import { CharactersScreen } from '@/screens/characters-screen'
 import { QuickRepliesScreen } from '@/screens/quick-replies'
 import { RelayScreen } from '@/screens/relay'
-import { SettingsScreen } from '@/screens/settings-screen'
+import { SettingsScreen } from '@/screens/settings'
 import { ShortcutsScreen } from '@/screens/shortcuts'
 import { WalkScreen } from '@/screens/walk-screen'
+import { WheelScreen } from '@/screens/wheel'
 
 export const App = () => {
   const { snapshot, run } = useMultifus()
@@ -29,38 +31,40 @@ export const App = () => {
   }
 
   return (
-    <TooltipProvider>
-      <Backdrop />
-      <div className="relative flex h-screen flex-col">
-        <div className="flex min-h-0 flex-1">
-          <NavRail
-            current={screen}
-            characters={snapshot.characters}
-            authorization={snapshot.authorization}
-            version={snapshot.version}
-            onNavigate={setScreen}
-          />
-          <main className="flex min-h-0 flex-1 flex-col">
-            {snapshot.config.problem === null ? null : (
-              <ConfigNotice
-                problem={snapshot.config.problem}
-                quarantined={quarantinedPath(snapshot.config.problem)}
-                onReveal={() => {
-                  revealQuarantinedConfig().catch(ignoreOpenFailure)
-                }}
-                onDismiss={() => {
-                  run(dismissConfigProblem())
-                }}
-              />
-            )}
-            <div className="min-h-0 flex-1 overflow-y-auto">
-              <CurrentScreen screen={screen} snapshot={snapshot} run={run} />
-            </div>
-          </main>
+    <KeyLabelsProvider labels={snapshot.keyboard}>
+      <TooltipProvider>
+        <Backdrop />
+        <div className="relative flex h-screen flex-col">
+          <div className="flex min-h-0 flex-1">
+            <NavRail
+              current={screen}
+              characters={snapshot.characters}
+              authorization={snapshot.authorization}
+              version={snapshot.version}
+              onNavigate={setScreen}
+            />
+            <main className="flex min-h-0 flex-1 flex-col">
+              {snapshot.config.problem === null ? null : (
+                <ConfigNotice
+                  problem={snapshot.config.problem}
+                  quarantined={quarantinedPath(snapshot.config.problem)}
+                  onReveal={() => {
+                    revealQuarantinedConfig().catch(ignoreOpenFailure)
+                  }}
+                  onDismiss={() => {
+                    run(dismissConfigProblem())
+                  }}
+                />
+              )}
+              <div className="min-h-0 flex-1 overflow-y-auto">
+                <CurrentScreen screen={screen} snapshot={snapshot} run={run} />
+              </div>
+            </main>
+          </div>
+          <JournalPanel snapshot={snapshot} />
         </div>
-        <JournalPanel snapshot={snapshot} />
-      </div>
-    </TooltipProvider>
+      </TooltipProvider>
+    </KeyLabelsProvider>
   )
 }
 
@@ -101,6 +105,16 @@ const CurrentScreen = ({ screen, snapshot, run }: CurrentScreenProps) => {
     return (
       <WalkScreen
         walk={snapshot.walk}
+        shortcuts={snapshot.shortcuts}
+        run={run}
+      />
+    )
+  }
+
+  if (screen === 'wheel') {
+    return (
+      <WheelScreen
+        wheel={snapshot.wheel}
         shortcuts={snapshot.shortcuts}
         run={run}
       />

@@ -55,6 +55,12 @@ pub fn show(app: &AppHandle) {
     }
 }
 
+#[must_use]
+pub fn is_on_screen(app: &AppHandle) -> bool {
+    app.get_webview_window(LABEL)
+        .is_some_and(|window| window.is_visible().unwrap_or(true))
+}
+
 pub fn hide_rather_than_quit(window: &Window<Wry>, event: &WindowEvent) {
     let WindowEvent::CloseRequested { api, .. } = event else {
         return;

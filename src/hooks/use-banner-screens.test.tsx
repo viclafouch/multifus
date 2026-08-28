@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, renderHook, waitFor } from '@testing-library/react'
-import type { BannerScreen } from '@/@types/walk'
-import { bannerScreenOf } from '@/test-doubles'
+import type { Display } from '@/@types/display'
+import { displayOf } from '@/test-doubles'
 
 const rust = vi.hoisted(() => {
   return {
-    answer: null as ((screens: BannerScreen[]) => void) | null,
+    answer: null as ((screens: Display[]) => void) | null,
     refuse: null as ((reason: Error) => void) | null
   }
 })
@@ -13,7 +13,7 @@ const rust = vi.hoisted(() => {
 vi.mock(import('@/lib/multifus'), () => {
   return {
     bannerScreens: () => {
-      return new Promise<BannerScreen[]>((resolve, reject) => {
+      return new Promise<Display[]>((resolve, reject) => {
         rust.answer = resolve
         rust.refuse = reject
       })
@@ -23,7 +23,7 @@ vi.mock(import('@/lib/multifus'), () => {
 
 const { useBannerScreens } = await import('@/hooks/use-banner-screens')
 
-const LAPTOP = bannerScreenOf()
+const LAPTOP = displayOf()
 
 const listen = () => {
   return renderHook(() => {

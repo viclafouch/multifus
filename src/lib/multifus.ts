@@ -1,11 +1,13 @@
 import { invoke } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event'
+import type { Display } from '@/@types/display'
 import type { NotificationKind } from '@/@types/notification'
 import type { RelayLink } from '@/@types/relay'
 import type { Class, Gender } from '@/@types/roster'
 import type { QuickReplyId, ShortcutAction } from '@/@types/shortcuts'
-import type { ScreenName, Snapshot } from '@/@types/snapshot'
-import type { BannerCorner, BannerScreen, BannerStep } from '@/@types/walk'
+import type { Clients, ScreenName, Snapshot } from '@/@types/snapshot'
+import type { BannerCorner, BannerStep } from '@/@types/walk'
+import type { WheelStep } from '@/@types/wheel'
 
 const SNAPSHOT_EVENT = 'multifus://snapshot'
 
@@ -139,7 +141,7 @@ export const setBannerScreen = async (screen: string | null) => {
 }
 
 export const bannerScreens = async () => {
-  return invoke<BannerScreen[]>('banner_screens')
+  return invoke<Display[]>('banner_screens')
 }
 
 export const bannerStep = async () => {
@@ -156,6 +158,45 @@ export const onBannerStep = async (handle: (step: BannerStep) => void) => {
 
 type BannerStepEvent = { readonly payload: BannerStep }
 
+export const setWheelDiameter = async (diameter: number) => {
+  return invoke<Snapshot>('set_wheel_diameter', { diameter })
+}
+
+export const previewWheel = async (crowd: number) => {
+  return invoke<Snapshot>('preview_wheel', { crowd })
+}
+
+export const wheelDisplay = async () => {
+  return invoke<Display | null>('wheel_display')
+}
+
+export const wheelStep = async () => {
+  return invoke<WheelStep>('wheel_step')
+}
+
+const WHEEL_EVENT = 'multifus://wheel'
+
+export const onWheelStep = async (handle: (step: WheelStep) => void) => {
+  return listen<WheelStep>(WHEEL_EVENT, ({ payload }: WheelStepEvent) => {
+    handle(payload)
+  })
+}
+
+type WheelStepEvent = { readonly payload: WheelStep }
+
+const WHEEL_AIM_EVENT = 'multifus://wheel-aim'
+
+export const onWheelAim = async (handle: (hovered: number | null) => void) => {
+  return listen<number | null>(
+    WHEEL_AIM_EVENT,
+    ({ payload }: WheelAimEvent) => {
+      handle(payload)
+    }
+  )
+}
+
+type WheelAimEvent = { readonly payload: number | null }
+
 export const setWakesMinimized = async (wakes: boolean) => {
   return invoke<Snapshot>('set_wakes_minimized', { wakes })
 }
@@ -167,6 +208,28 @@ export const setStartAtLogin = async (startAtLogin: boolean) => {
 export const setMaximizeOnLaunch = async (maximize: boolean) => {
   return invoke<Snapshot>('set_maximize_on_launch', { maximize })
 }
+
+export const maximizeAllClients = async () => {
+  return invoke<Snapshot>('maximize_all_clients')
+}
+
+export const clients = async () => {
+  return invoke<Clients>('clients')
+}
+
+export const watchClients = async (watching: boolean) => {
+  return invoke<null>('watch_clients', { watching })
+}
+
+const CLIENTS_EVENT = 'multifus://clients'
+
+export const onClients = async (handle: (counted: Clients) => void) => {
+  return listen<Clients>(CLIENTS_EVENT, ({ payload }: ClientsEvent) => {
+    handle(payload)
+  })
+}
+
+type ClientsEvent = { readonly payload: Clients }
 
 export const setShortTitles = async (short: boolean) => {
   return invoke<Snapshot>('set_short_titles', { short })

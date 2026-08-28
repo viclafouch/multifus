@@ -1,6 +1,7 @@
 mod common;
 
 use common::client;
+use common::decided;
 use common::in_cycle;
 use common::nicknames;
 use common::opened;
@@ -67,7 +68,7 @@ fn an_evening_of_dofus_from_the_first_client_to_the_last() {
 
     assert_eq!(in_cycle(&state), ["Alpha", "Charlie"]);
     assert_eq!(
-        state.decide_shortcut(ShortcutAction::Next, "Alpha"),
+        decided(&mut state, ShortcutAction::Next, "Alpha"),
         ShortcutEffect::Focus {
             nickname: "Charlie".to_owned(),
             window: WindowId::from_raw(3),
@@ -189,4 +190,49 @@ fn an_evening_with_the_relay_says_who_left_and_when_there_is_nobody_left() {
 
     assert!(!state.is_relay_ready());
     assert!(!reopened(&directory, Launch::ByHand).is_relay_active());
+}
+
+#[test]
+fn a_wheel_opened_in_the_middle_of_an_evening_shows_the_team_and_lands_on_one() {
+    let (directory, mut state) = opened(Launch::ByHand);
+    state.apply_windows(&[client(1, "Alpha"), client(2, "Bravo"), client(3, "Charlie")]);
+    state.set_class("Bravo", Some(Class::Cra));
+    state.set_gender("Bravo", Some(Gender::Female));
+    state.set_main("Charlie", true);
+    state.toggle_excluded("Bravo");
+
+    let plan = state.wheel_plan(Some(WindowId::from_raw(1)));
+
+    assert_eq!(
+        plan.slices
+            .iter()
+            .map(|slice| slice.nickname.clone())
+            .collect::<Vec<_>>(),
+        ["Alpha", "Bravo", "Charlie"],
+        "the wheel is a choice made by hand, and it never sets a character aside"
+    );
+    assert!(plan.slices[0].here, "the player starts on Alpha");
+    assert!(plan.slices[2].main);
+    assert_eq!(plan.slices[1].class, Some(Class::Cra));
+    assert_eq!(plan.windows[1], WindowId::from_raw(2));
+
+    let frozen = state.wheel_plan(Some(WindowId::from_raw(1)));
+
+    state.apply_windows(&[client(1, "Alpha")]);
+
+    assert_eq!(
+        state.wheel_plan(None).slices.len(),
+        1,
+        "the turn that follows the hold sees two clients close"
+    );
+    assert_eq!(
+        frozen.windows[1],
+        WindowId::from_raw(2),
+        "the wheel that was opened keeps the window it was opened with"
+    );
+
+    state.set_wheel_diameter(300);
+
+    assert_eq!(state.snapshot().wheel.diameter, 300);
+    assert_eq!(reopened(&directory, Launch::ByHand).wheel_diameter(), 300);
 }

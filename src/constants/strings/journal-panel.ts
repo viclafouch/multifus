@@ -1,3 +1,5 @@
+import { matchIsPlural } from '@/helpers/format'
+
 export const JOURNAL_PANEL_STRINGS = {
   journal: {
     title: 'Journal',
@@ -8,7 +10,7 @@ export const JOURNAL_PANEL_STRINGS = {
     copied: 'Journal copié',
     reveal: 'Montrer le fichier du journal',
     entries: (count: number) => {
-      return count === 1 ? '1 entrée' : `${count} entrées`
+      return matchIsPlural(count) ? `${count} entrées` : `${count} entrée`
     }
   }
 } as const
