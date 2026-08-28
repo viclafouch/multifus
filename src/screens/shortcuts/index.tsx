@@ -1,9 +1,9 @@
-import React from 'react'
-import type { Binding, QuickReply, ShortcutBinding } from '@/@types/shortcuts'
+import type { QuickReply, ShortcutBinding } from '@/@types/shortcuts'
 import type { Snapshot } from '@/@types/snapshot'
 import { Note } from '@/components/layout/note'
 import { Screen } from '@/components/layout/screen'
 import { strings } from '@/constants/strings'
+import { useShortcutEditing } from '@/hooks/use-shortcut-editing'
 import { useShortcutUndo } from '@/hooks/use-shortcut-undo'
 import { resetShortcuts, setShortcut } from '@/lib/multifus'
 import { ActionsPanel } from '@/screens/shortcuts/actions-panel'
@@ -19,7 +19,7 @@ export const ShortcutsScreen = ({
   quickReplies,
   run
 }: ShortcutsScreenProps) => {
-  const [editing, setEditing] = React.useState<Binding | null>(null)
+  const editing = useShortcutEditing()
 
   const undo = useShortcutUndo((action, accelerator) => {
     run(setShortcut(action, accelerator))
@@ -33,11 +33,11 @@ export const ShortcutsScreen = ({
       <ActionsPanel
         shortcuts={shortcuts}
         quickReplies={quickReplies}
-        editing={editing}
+        editing={editing.binding}
         undoFor={undo.undoFor}
         actions={{
           handleCapture: (shortcut, accelerator) => {
-            setEditing(null)
+            editing.close()
             undo.remember([shortcut])
             run(setShortcut(shortcut.action, accelerator))
           },
@@ -46,11 +46,9 @@ export const ShortcutsScreen = ({
             run(resetShortcuts())
           },
           handleOpen: (action) => {
-            setEditing({ kind: 'action', action })
+            editing.open({ kind: 'action', action })
           },
-          handleClose: () => {
-            setEditing(null)
-          }
+          handleClose: editing.close
         }}
       />
       <Note className="mt-4">{strings.shortcuts.silent}</Note>

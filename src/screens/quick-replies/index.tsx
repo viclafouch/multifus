@@ -1,6 +1,5 @@
-import React from 'react'
 import { Plus } from 'lucide-react'
-import type { Binding, QuickReply } from '@/@types/shortcuts'
+import type { QuickReply } from '@/@types/shortcuts'
 import type { Snapshot } from '@/@types/snapshot'
 import { Note } from '@/components/layout/note'
 import { Panel } from '@/components/layout/panel'
@@ -8,6 +7,7 @@ import { Screen } from '@/components/layout/screen'
 import { Button } from '@/components/ui/button'
 import { strings } from '@/constants/strings'
 import { shortcutStatusLine } from '@/helpers/wording'
+import { useShortcutEditing } from '@/hooks/use-shortcut-editing'
 import {
   addQuickReply,
   removeQuickReply,
@@ -27,7 +27,7 @@ export const QuickRepliesScreen = ({
   quickReplies,
   run
 }: QuickRepliesScreenProps) => {
-  const [editing, setEditing] = React.useState<Binding | null>(null)
+  const editing = useShortcutEditing()
   const words = strings.quickReplies
 
   const handleAdd = () => {
@@ -39,18 +39,16 @@ export const QuickRepliesScreen = ({
       run(setQuickReplyText(id, text))
     },
     handleShortcut: (id, accelerator) => {
-      setEditing(null)
+      editing.close()
       run(setQuickReplyShortcut(id, accelerator))
     },
     handleRemove: (id) => {
       run(removeQuickReply(id))
     },
     handleOpen: (id) => {
-      setEditing({ kind: 'quickReply', id })
+      editing.open({ kind: 'quickReply', id })
     },
-    handleClose: () => {
-      setEditing(null)
-    }
+    handleClose: editing.close
   }
 
   return (
@@ -60,16 +58,17 @@ export const QuickRepliesScreen = ({
       ) : (
         <Panel>
           <ul>
-            {quickReplies.map((quickReply) => {
+            {quickReplies.map((quickReply, index) => {
               return (
                 <ReplyRow
                   key={quickReply.id}
                   quickReply={quickReply}
+                  rank={index + 1}
                   statusLine={shortcutStatusLine(
                     quickReply.status,
                     quickReplies
                   )}
-                  editing={editing}
+                  editing={editing.binding}
                   actions={actions}
                 />
               )

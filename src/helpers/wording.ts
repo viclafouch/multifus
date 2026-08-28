@@ -113,12 +113,12 @@ export const bindingLabel = (
   return words.named(shorten(quickReply.text))
 }
 
-export const quickReplyEditLabel = (quickReply: QuickReply) => {
+export const quickReplyEditLabel = (quickReply: QuickReply, rank: number) => {
   const words = strings.quickReplies
 
   return quickReply.text.length === 0
-    ? words.edit
-    : words.editNamed(shorten(quickReply.text))
+    ? words.edit(rank)
+    : words.editNamed(rank, shorten(quickReply.text))
 }
 
 const shorten = (text: string) => {

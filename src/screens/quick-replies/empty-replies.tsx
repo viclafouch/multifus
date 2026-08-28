@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { strings } from '@/constants/strings'
 import { acceleratorParts } from '@/helpers/accelerator'
 
-const MARK_ACCELERATOR = 'Control+Alt+KeyB'
+const EXAMPLE_ACCELERATOR = 'Control+Alt+KeyB'
 
 type EmptyRepliesProps = Readonly<{
   handleAdd: () => void
@@ -32,12 +32,12 @@ const ReplyMark = () => {
   return (
     <span aria-hidden className="dimmed mb-2 flex items-center gap-4">
       <span className="flex items-center gap-1">
-        {acceleratorParts(MARK_ACCELERATOR).map((part) => {
+        {acceleratorParts(EXAMPLE_ACCELERATOR).map((part) => {
           return <KeyCap key={part} token={part} />
         })}
       </span>
       <span className="font-display text-row">
-        {strings.quickReplies.emptyMark}
+        {strings.quickReplies.example}
       </span>
     </span>
   )

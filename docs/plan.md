@@ -67,14 +67,19 @@ ce qu'elle coûte.
 - [ ] Laisser la team se déconnecter toute seule, les clients ouverts sur l'écran de connexion : le Déplacement rapide s'éteint, et la ligne du journal se lit sans mentir
 - [ ] Le tour ne marque pas d'à-coup pendant l'extinction
 
-### Les raccourcis et les réponses rapides
+### Les raccourcis
 
-- [ ] Une réponse rapide sans combinaison ne fait rien, et l'écran le dit
-- [ ] Une combinaison déjà prise par le Défilement est refusée par son nom
 - [ ] La même combinaison frappée hors du jeu ne fait rien
+- [ ] « Remettre les touches d'origine » redonne les cinq combinaisons
+
+### Les réponses rapides
+
+- [ ] La barre de gauche et la barre système ouvrent toutes deux « Réponses rapides »
+- [ ] Une réponse rapide sans combinaison ne fait rien, et l'écran le dit
+- [ ] Une réponse rapide sans texte non plus, et l'écran le dit aussi
+- [ ] Une combinaison déjà prise par le Défilement est refusée par son nom
 - [ ] Le texte copié avant un collage revient dans le presse-papiers après
 - [ ] Le journal porte une ligne par collage
-- [ ] « Remettre les touches d'origine » redonne les cinq combinaisons
 
 ### Les fenêtres et les notifications
 

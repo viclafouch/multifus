@@ -7,6 +7,7 @@ import type {
   ShortcutStatus
 } from '@/@types/shortcuts'
 import { strings } from '@/constants/strings'
+import { keyCapsOf, quickReplyOf, strike } from '@/test-doubles'
 
 const bridge = {
   setShortcut: vi.fn(),
@@ -47,19 +48,6 @@ const shortcut = (
   }
 }
 
-const quickReply = (
-  id: number,
-  fields: Partial<QuickReply> = {}
-): QuickReply => {
-  return {
-    id,
-    text: 'Je vends, mp moi',
-    accelerator: null,
-    status: { kind: 'unbound' },
-    ...fields
-  }
-}
-
 type ShowParams = {
   readonly shortcuts?: readonly ShortcutBinding[]
   readonly quickReplies?: readonly QuickReply[]
@@ -88,24 +76,6 @@ const show = ({ shortcuts = [], quickReplies = [] }: ShowParams = {}) => {
 const fieldOf = (action: ShortcutAction) => {
   return screen.getByRole('button', {
     name: strings.shortcuts.edit(strings.shortcuts.actions[action].label)
-  })
-}
-
-type Combination = {
-  readonly code: string
-  readonly ctrlKey?: boolean
-  readonly altKey?: boolean
-  readonly shiftKey?: boolean
-  readonly metaKey?: boolean
-}
-
-const strike = (field: HTMLElement, combination: Combination) => {
-  fireEvent.keyDown(field, { key: combination.code, ...combination })
-}
-
-const capsOf = (field: HTMLElement) => {
-  return [...field.querySelectorAll('kbd')].map((keyCap) => {
-    return keyCap.textContent
   })
 }
 
@@ -179,8 +149,8 @@ describe('l’écran des raccourcis, les cinq actions', () => {
       ]
     })
 
-    expect(capsOf(fieldOf('next'))).toStrictEqual(['Ctrl', '→'])
-    expect(capsOf(fieldOf('previous'))).toStrictEqual(['Ctrl', '←'])
+    expect(keyCapsOf(fieldOf('next'))).toStrictEqual(['Ctrl', '→'])
+    expect(keyCapsOf(fieldOf('previous'))).toStrictEqual(['Ctrl', '←'])
   })
 })
 
@@ -193,7 +163,7 @@ describe('l’écran des raccourcis, le personnage principal', () => {
     expect(
       screen.getByText(strings.shortcuts.actions.main.description)
     ).not.toBeNull()
-    expect(capsOf(fieldOf('main'))).toStrictEqual(['Ctrl', 'Maj', 'Espace'])
+    expect(keyCapsOf(fieldOf('main'))).toStrictEqual(['Ctrl', 'Maj', 'Espace'])
     expect(screen.queryByRole('alert')).toBeNull()
   })
 })
@@ -218,7 +188,7 @@ describe('l’écran des raccourcis, le retour en arrière', () => {
       name: strings.shortcuts.undoLabel(strings.shortcuts.actions.walk.label)
     })
 
-    expect(capsOf(undo)).toStrictEqual(['Alt', 'W'])
+    expect(keyCapsOf(undo)).toStrictEqual(['Alt', 'W'])
   })
 
   it('repose les touches d’avant, et n’offre plus rien', () => {
@@ -373,7 +343,7 @@ describe('l’écran des raccourcis, ce que Rust répond d’une combinaison', (
           }
         })
       ],
-      quickReplies: [quickReply(7, { text: 'Bonjour' })]
+      quickReplies: [quickReplyOf({ id: 7, text: 'Bonjour' })]
     })
 
     expect(screen.getByRole('alert').textContent).toBe(

@@ -57,6 +57,7 @@ type Arrival = {
 
 const ARRIVALS = [
   { name: 'shortcuts', mark: strings.shortcuts.subtitle },
+  { name: 'quickReplies', mark: strings.quickReplies.subtitle },
   { name: 'autoFocus', mark: strings.autoFocus.subtitle },
   { name: 'walk', mark: strings.walk.subtitle },
   { name: 'relay', mark: strings.relay.subtitle },
@@ -86,7 +87,7 @@ describe('la fenêtre de Multifus', () => {
     expect(screen.getByText(strings.characters.emptyTitle)).not.toBeNull()
   })
 
-  it('porte les sept écrans, et la version de Multifus', async () => {
+  it('porte les huit écrans, et la version de Multifus', async () => {
     await open(snapshotOf({ version: '1.4.2' }))
 
     for (const label of Object.values(strings.nav)) {

@@ -42,7 +42,7 @@ export default defineConfig({
       }
     },
     {
-      files: ['src/lib/multifus.test.ts'],
+      files: ['src/lib/multifus.test.ts', 'src/test-doubles.ts'],
       rules: {
         'typescript/prefer-readonly-parameter-types': 'off'
       }

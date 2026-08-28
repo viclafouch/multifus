@@ -106,7 +106,7 @@ export const ShortcutField = ({
         <p
           data-tone={hint.tone}
           role={hint.tone === 'bad' ? 'alert' : undefined}
-          className="max-w-60 text-right text-mini text-muted-foreground/75 data-[tone=bad]:text-destructive"
+          className="max-w-60 text-right text-mini text-muted-foreground data-[tone=bad]:text-destructive"
         >
           {hint.text}
         </p>

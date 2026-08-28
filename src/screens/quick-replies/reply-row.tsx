@@ -19,6 +19,7 @@ export type ReplyRowActions = Readonly<{
 
 type ReplyRowProps = Readonly<{
   quickReply: QuickReply
+  rank: number
   statusLine: TonedLine | null
   editing: Binding | null
   actions: ReplyRowActions
@@ -26,6 +27,7 @@ type ReplyRowProps = Readonly<{
 
 export const ReplyRow = ({
   quickReply,
+  rank,
   statusLine,
   editing,
   actions
@@ -58,7 +60,7 @@ export const ReplyRow = ({
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <Input
           value={draft}
-          placeholder={words.placeholder}
+          placeholder={words.example}
           aria-label={words.textLabel}
           spellCheck={false}
           onChange={(event) => {
@@ -69,9 +71,7 @@ export const ReplyRow = ({
           className="h-8 font-display text-row"
         />
         {draft.length === 0 ? (
-          <p className="px-1 text-mini text-muted-foreground/75">
-            {words.blank}
-          </p>
+          <p className="px-1 text-mini text-muted-foreground">{words.blank}</p>
         ) : null}
       </div>
       <RemoveButton
@@ -84,7 +84,7 @@ export const ReplyRow = ({
       <ShortcutField
         accelerator={quickReply.accelerator}
         statusLine={statusLine}
-        editLabel={quickReplyEditLabel(quickReply)}
+        editLabel={quickReplyEditLabel(quickReply, rank)}
         undo={null}
         editing={{
           isActive: matchIsSameBinding(editing, {

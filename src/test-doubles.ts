@@ -1,4 +1,6 @@
+import { fireEvent } from '@testing-library/react'
 import type { Character } from '@/@types/roster'
+import type { QuickReply } from '@/@types/shortcuts'
 import type { Snapshot } from '@/@types/snapshot'
 import type { BannerScreen } from '@/@types/walk'
 
@@ -21,6 +23,35 @@ const BLANK_CHARACTER: Character = {
 
 export const characterOf = (fields: Partial<Character> = {}) => {
   return { ...BLANK_CHARACTER, ...fields }
+}
+
+const BLANK_QUICK_REPLY: QuickReply = {
+  id: 1,
+  text: '',
+  accelerator: null,
+  status: { kind: 'unbound' }
+}
+
+export const quickReplyOf = (fields: Partial<QuickReply> = {}) => {
+  return { ...BLANK_QUICK_REPLY, ...fields }
+}
+
+export type Combination = {
+  readonly code: string
+  readonly ctrlKey?: boolean
+  readonly altKey?: boolean
+  readonly shiftKey?: boolean
+  readonly metaKey?: boolean
+}
+
+export const strike = (field: HTMLElement, combination: Combination) => {
+  fireEvent.keyDown(field, { key: combination.code, ...combination })
+}
+
+export const keyCapsOf = (field: HTMLElement) => {
+  return [...field.querySelectorAll('kbd')].map((keyCap) => {
+    return keyCap.textContent
+  })
 }
 
 const BLANK_SCREEN: BannerScreen = {

@@ -2,6 +2,8 @@ import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import type { QuickReply } from '@/@types/shortcuts'
 import { strings } from '@/constants/strings'
+import { quickReplyEditLabel } from '@/helpers/wording'
+import { keyCapsOf, quickReplyOf, strike } from '@/test-doubles'
 
 const bridge = {
   addQuickReply: vi.fn(),
@@ -18,19 +20,6 @@ const { QuickRepliesScreen } = await import('@/screens/quick-replies')
 
 const words = strings.quickReplies
 
-const quickReply = (
-  id: number,
-  fields: Partial<QuickReply> = {}
-): QuickReply => {
-  return {
-    id,
-    text: 'Je vends, mp moi',
-    accelerator: null,
-    status: { kind: 'unbound' },
-    ...fields
-  }
-}
-
 const show = (quickReplies: readonly QuickReply[] = []) => {
   render(<QuickRepliesScreen quickReplies={quickReplies} run={() => {}} />)
 }
@@ -39,31 +28,14 @@ const addButton = () => {
   return screen.getByRole('button', { name: words.add })
 }
 
-const fieldOf = (reply: QuickReply) => {
+const fieldOf = (reply: QuickReply, rank = 1) => {
   return screen.getByRole('button', {
-    name: reply.text.length === 0 ? words.edit : words.editNamed(reply.text)
+    name: quickReplyEditLabel(reply, rank)
   })
 }
 
 const textFieldOf = (index: number) => {
   return screen.getAllByLabelText<HTMLInputElement>(words.textLabel)[index]
-}
-
-type Combination = {
-  readonly code: string
-  readonly ctrlKey?: boolean
-  readonly altKey?: boolean
-  readonly shiftKey?: boolean
-}
-
-const strike = (field: HTMLElement, combination: Combination) => {
-  fireEvent.keyDown(field, { key: combination.code, ...combination })
-}
-
-const capsOf = (field: HTMLElement) => {
-  return [...field.querySelectorAll('kbd')].map((keyCap) => {
-    return keyCap.textContent
-  })
 }
 
 describe('l’écran des réponses rapides, quand il n’y en a aucune', () => {
@@ -86,8 +58,8 @@ describe('l’écran des réponses rapides, quand il n’y en a aucune', () => {
 describe('l’écran des réponses rapides, la liste', () => {
   it('porte le texte de chaque réponse', () => {
     show([
-      quickReply(1, { text: 'Je vends, mp moi' }),
-      quickReply(2, { text: 'En combat, j’arrive' })
+      quickReplyOf({ id: 1, text: 'Je vends, mp moi' }),
+      quickReplyOf({ id: 2, text: 'En combat, j’arrive' })
     ])
 
     const texts = screen
@@ -100,7 +72,8 @@ describe('l’écran des réponses rapides, la liste', () => {
   })
 
   it('dessine les touches rangées sous chaque réponse', () => {
-    const bound = quickReply(1, {
+    const bound = quickReplyOf({
+      id: 1,
       text: 'Bon jeu à toi !',
       accelerator: 'Control+Alt+KeyB',
       status: { kind: 'registered' }
@@ -108,29 +81,38 @@ describe('l’écran des réponses rapides, la liste', () => {
 
     show([bound])
 
-    expect(capsOf(fieldOf(bound))).toStrictEqual(['Ctrl', 'Alt', 'B'])
+    expect(keyCapsOf(fieldOf(bound))).toStrictEqual(['Ctrl', 'Alt', 'B'])
   })
 
   it('donne un nom différent aux touches de deux réponses', () => {
     show([
-      quickReply(1, { text: 'Je vends, mp moi' }),
-      quickReply(2, { text: 'En combat, j’arrive' })
+      quickReplyOf({ id: 1, text: 'Je vends, mp moi' }),
+      quickReplyOf({ id: 2, text: 'En combat, j’arrive' })
     ])
 
     expect(
       screen.getByRole('button', {
-        name: words.editNamed('Je vends, mp moi')
+        name: words.editNamed(1, 'Je vends, mp moi')
       })
     ).not.toBeNull()
     expect(
       screen.getByRole('button', {
-        name: words.editNamed('En combat, j’arrive')
+        name: words.editNamed(2, 'En combat, j’arrive')
       })
     ).not.toBeNull()
   })
 
+  it('donne un nom différent aux touches de deux réponses vides', () => {
+    const first = quickReplyOf({ id: 1, text: '' })
+    const second = quickReplyOf({ id: 2, text: '' })
+
+    show([first, second])
+
+    expect(fieldOf(first)).not.toBe(fieldOf(second, 2))
+  })
+
   it('en ajoute une depuis le bas de la liste', () => {
-    show([quickReply(1)])
+    show([quickReplyOf({ id: 1 })])
 
     fireEvent.click(addButton())
 
@@ -138,7 +120,7 @@ describe('l’écran des réponses rapides, la liste', () => {
   })
 
   it('en retire une à la demande', () => {
-    show([quickReply(4)])
+    show([quickReplyOf({ id: 4 })])
 
     fireEvent.click(screen.getByRole('button', { name: words.remove }))
 
@@ -148,7 +130,7 @@ describe('l’écran des réponses rapides, la liste', () => {
 
 describe('l’écran des réponses rapides, le texte', () => {
   it('garde le texte tapé, et ne l’envoie qu’une fois la ligne quittée', () => {
-    show([quickReply(1, { text: '' })])
+    show([quickReplyOf({ id: 1, text: '' })])
 
     const field = textFieldOf(0)
 
@@ -165,7 +147,7 @@ describe('l’écran des réponses rapides, le texte', () => {
   })
 
   it('taille les espaces autour du texte', () => {
-    show([quickReply(1, { text: '' })])
+    show([quickReplyOf({ id: 1, text: '' })])
 
     fireEvent.change(textFieldOf(0), { target: { value: '  Bonjour  ' } })
     fireEvent.blur(textFieldOf(0))
@@ -174,7 +156,7 @@ describe('l’écran des réponses rapides, le texte', () => {
   })
 
   it('n’envoie rien quand le texte n’a pas bougé', () => {
-    show([quickReply(1, { text: 'Bonjour' })])
+    show([quickReplyOf({ id: 1, text: 'Bonjour' })])
 
     fireEvent.blur(textFieldOf(0))
 
@@ -182,7 +164,7 @@ describe('l’écran des réponses rapides, le texte', () => {
   })
 
   it('valide le texte sur Entrée', () => {
-    show([quickReply(1, { text: '' })])
+    show([quickReplyOf({ id: 1, text: '' })])
 
     const field = textFieldOf(0)
 
@@ -194,7 +176,7 @@ describe('l’écran des réponses rapides, le texte', () => {
   })
 
   it('rend le texte d’avant sur Échap', () => {
-    show([quickReply(1, { text: 'Bonjour' })])
+    show([quickReplyOf({ id: 1, text: 'Bonjour' })])
 
     const field = textFieldOf(0)
 
@@ -206,7 +188,7 @@ describe('l’écran des réponses rapides, le texte', () => {
   })
 
   it('dit qu’une réponse sans texte n’a rien à coller', () => {
-    show([quickReply(1, { text: '' })])
+    show([quickReplyOf({ id: 1, text: '' })])
 
     expect(screen.getByText(words.blank)).not.toBeNull()
 
@@ -218,7 +200,7 @@ describe('l’écran des réponses rapides, le texte', () => {
 
 describe('l’écran des réponses rapides, les touches', () => {
   it('range une réponse sous les touches frappées', () => {
-    const blank = quickReply(4, { text: '' })
+    const blank = quickReplyOf({ id: 4, text: '' })
 
     show([blank])
 
@@ -232,29 +214,30 @@ describe('l’écran des réponses rapides, les touches', () => {
   })
 
   it('n’ouvre la saisie que sur la ligne cliquée', () => {
-    const first = quickReply(1, { text: 'Je vends, mp moi' })
-    const second = quickReply(2, { text: 'En combat, j’arrive' })
+    const first = quickReplyOf({ id: 1, text: 'Je vends, mp moi' })
+    const second = quickReplyOf({ id: 2, text: 'En combat, j’arrive' })
 
     show([first, second])
 
     fireEvent.click(fieldOf(first))
-    fireEvent.click(fieldOf(second))
+    fireEvent.click(fieldOf(second, 2))
 
     expect(screen.getAllByText(strings.shortcuts.capture)).toHaveLength(1)
     expect(
-      within(fieldOf(second)).getByText(strings.shortcuts.capture)
+      within(fieldOf(second, 2)).getByText(strings.shortcuts.capture)
     ).not.toBeNull()
   })
 
   it('dit que rien ne se passera sans touches', () => {
-    show([quickReply(1)])
+    show([quickReplyOf({ id: 1 })])
 
     expect(screen.getByText(strings.shortcuts.status.unbound)).not.toBeNull()
   })
 
   it('nomme l’action qui tient déjà les mêmes touches', () => {
     show([
-      quickReply(1, {
+      quickReplyOf({
+        id: 1,
         accelerator: 'Control+Right',
         status: {
           kind: 'duplicate',
@@ -271,7 +254,7 @@ describe('l’écran des réponses rapides, les touches', () => {
   })
 
   it('n’offre jamais de retour en arrière sur une réponse', () => {
-    const bound = quickReply(4, { text: '', accelerator: 'Control+KeyB' })
+    const bound = quickReplyOf({ id: 4, text: '', accelerator: 'Control+KeyB' })
 
     show([bound])
 
@@ -283,7 +266,7 @@ describe('l’écran des réponses rapides, les touches', () => {
   })
 
   it('rappelle que le presse-papiers n’est qu’emprunté', () => {
-    show([quickReply(1)])
+    show([quickReplyOf({ id: 1 })])
 
     expect(screen.getByText(words.clipboard)).not.toBeNull()
   })
