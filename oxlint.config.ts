@@ -51,10 +51,7 @@ export default defineConfig({
       files: ['src/components/ui/**', 'src/lib/utils.ts'],
       rules: {
         'typescript/prefer-readonly-parameter-types': 'off',
-        'react/function-component-definition': 'off',
-        'eslint/no-restricted-imports': 'off',
-        'eslint/no-nested-ternary': 'off',
-        'eslint/arrow-body-style': 'off'
+        'react/function-component-definition': 'off'
       }
     },
     {

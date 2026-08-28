@@ -9,11 +9,9 @@ function Slider({
   max = 100,
   ...props
 }: SliderPrimitive.Root.Props) {
-  const _values = Array.isArray(value)
-    ? value
-    : Array.isArray(defaultValue)
-      ? defaultValue
-      : [min, max]
+  const selectedValues = Array.isArray(value) ? value : null
+  const initialValues = Array.isArray(defaultValue) ? defaultValue : null
+  const thumbValues = selectedValues ?? initialValues ?? [min, max]
 
   return (
     <SliderPrimitive.Root
@@ -36,13 +34,15 @@ function Slider({
             className="bg-primary select-none data-horizontal:h-full data-vertical:w-full"
           />
         </SliderPrimitive.Track>
-        {Array.from({ length: _values.length }, (_, index) => (
-          <SliderPrimitive.Thumb
-            data-slot="slider-thumb"
-            key={index}
-            className="block size-4 shrink-0 rounded-full border border-primary bg-white shadow-sm ring-ring/50 transition-[color,box-shadow] select-none hover:ring-4 focus-visible:ring-4 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50"
-          />
-        ))}
+        {Array.from({ length: thumbValues.length }, (_, index) => {
+          return (
+            <SliderPrimitive.Thumb
+              data-slot="slider-thumb"
+              key={index}
+              className="block size-4 shrink-0 rounded-full border border-primary bg-white shadow-sm ring-ring/50 transition-[color,box-shadow] select-none hover:ring-4 focus-visible:ring-4 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50"
+            />
+          )
+        })}
       </SliderPrimitive.Control>
     </SliderPrimitive.Root>
   )
