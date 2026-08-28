@@ -62,6 +62,18 @@ describe('capture', () => {
     expect(result).toStrictEqual({ status: 'rejected', reason: 'noModifier' })
   })
 
+  it('prend une touche de fonction seule, ailleurs que sur un Mac', () => {
+    const result = capture({ ...NOTHING_HELD, code: 'F5' })
+
+    expect(result).toStrictEqual({ status: 'captured', accelerator: 'F5' })
+  })
+
+  it('prend une touche de fonction sous un modificateur comme une autre', () => {
+    const result = capture({ ...NOTHING_HELD, code: 'F5', altKey: true })
+
+    expect(result).toStrictEqual({ status: 'captured', accelerator: 'Alt+F5' })
+  })
+
   it('refuse la combinaison de collage, qu’une quickReply déclencherait elle-même', () => {
     const press = { ...NOTHING_HELD, code: 'KeyV', ctrlKey: true }
 

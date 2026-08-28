@@ -12,6 +12,10 @@ export type CaptureRejection =
   | 'pasteCombination'
   | 'unsupportedKey'
 
+export const FUNCTION_KEYS = Array.from({ length: 24 }, (_, index) => {
+  return `F${index + 1}`
+})
+
 export const KEYS: ReadonlySet<string> = new Set([
   ...Array.from({ length: 26 }, (_, index) => {
     return `Key${String.fromCodePoint(65 + index)}`
@@ -19,9 +23,7 @@ export const KEYS: ReadonlySet<string> = new Set([
   ...Array.from({ length: 10 }, (_, index) => {
     return `Digit${index}`
   }),
-  ...Array.from({ length: 24 }, (_, index) => {
-    return `F${index + 1}`
-  }),
+  ...FUNCTION_KEYS,
   ...Array.from({ length: 10 }, (_, index) => {
     return `Numpad${index}`
   }),
@@ -81,6 +83,10 @@ export const ALIASES = new Map<string, string>([
 export const IS_APPLE = navigator.userAgent.includes('Mac')
 
 export const PASTE_COMBINATION = IS_APPLE ? 'Super+KeyV' : 'Control+KeyV'
+
+export const LONE_KEYS: ReadonlySet<string> = new Set(
+  IS_APPLE ? [] : FUNCTION_KEYS
+)
 
 export const KEY_LABELS = new Map<string, string>([
   ['Alt', IS_APPLE ? '⌥' : 'Alt'],

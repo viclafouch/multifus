@@ -3,6 +3,7 @@ import {
   ALIASES,
   KEY_LABELS,
   KEYS,
+  LONE_KEYS,
   MODIFIERS,
   PASTE_COMBINATION
 } from '@/constants/keyboard'
@@ -31,7 +32,7 @@ export const capture = (event: KeyPress): CaptureResult => {
 
   const modifiers = heldModifiers(event)
 
-  if (modifiers.length === 0) {
+  if (modifiers.length === 0 && !LONE_KEYS.has(event.code)) {
     return { status: 'rejected', reason: 'noModifier' }
   }
 

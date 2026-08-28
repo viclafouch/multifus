@@ -2,6 +2,7 @@ import type { QuickReply, ShortcutBinding } from '@/@types/shortcuts'
 import type { Snapshot } from '@/@types/snapshot'
 import { Note } from '@/components/layout/note'
 import { Screen } from '@/components/layout/screen'
+import { IS_APPLE } from '@/constants/keyboard'
 import { strings } from '@/constants/strings'
 import { useShortcutEditing } from '@/hooks/use-shortcut-editing'
 import { useShortcutUndo } from '@/hooks/use-shortcut-undo'
@@ -52,6 +53,7 @@ export const ShortcutsScreen = ({
         }}
       />
       <Note className="mt-4">{strings.shortcuts.silent}</Note>
+      {IS_APPLE ? null : <Note className="mt-2">{strings.shortcuts.lone}</Note>}
     </Screen>
   )
 }

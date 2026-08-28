@@ -149,6 +149,29 @@ describe('le champ d’un raccourci', () => {
     )
   })
 
+  it('prend une touche de fonction frappée seule, sur Windows', async () => {
+    const { editing, button } = await field({ isActive: true })
+
+    fireEvent.keyDown(button, { key: 'F5', code: 'F5' })
+
+    expect(editing.handleCapture).toHaveBeenCalledWith('F5')
+    expect(screen.queryByRole('alert')).toBeNull()
+  })
+
+  it('refuse la même touche de fonction sur un Mac, où le système la tient', async () => {
+    const { editing, button } = await field({
+      isActive: true,
+      agent: APPLE_AGENT
+    })
+
+    fireEvent.keyDown(button, { key: 'F5', code: 'F5' })
+
+    expect(editing.handleCapture).not.toHaveBeenCalled()
+    expect(screen.getByRole('alert').textContent).not.toContain(
+      'touche de fonction'
+    )
+  })
+
   it('refuse la combinaison de collage de Windows sur Windows', async () => {
     const { editing, button } = await field({ isActive: true })
 

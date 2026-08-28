@@ -1,5 +1,6 @@
 import type { ShortcutAction, ShortcutStatus } from '@/@types/shortcuts'
 import type { CaptureRejection } from '@/constants/keyboard'
+import { IS_APPLE } from '@/constants/keyboard'
 
 const ACTION_LABELS = {
   next: {
@@ -42,8 +43,9 @@ const STATUS_LINES = {
 >
 
 const REJECTION_LINES = {
-  noModifier:
-    'Ajoutez Ctrl, Alt ou Maj. Seule, cette touche serait prise dans tous vos logiciels.',
+  noModifier: IS_APPLE
+    ? 'Ajoutez Ctrl, Alt ou Maj. Seule, cette touche serait prise dans tous vos logiciels.'
+    : 'Ajoutez Ctrl, Alt ou Maj, ou prenez une touche de fonction : F1, F2, F5… Seule, cette touche serait prise dans tous vos logiciels.',
   unsupportedKey: 'Cette touche ne peut pas servir de raccourci.',
   pasteCombination:
     'C’est le raccourci pour coller sur votre ordinateur. Prenez-en un autre.'
@@ -56,6 +58,7 @@ export const SHORTCUTS_STRINGS = {
       'Changez de personnage sans lâcher la souris. Ces touches ne marchent que dans Dofus Retro.',
     silent:
       'Un autre logiciel peut déjà utiliser les mêmes touches. Multifus les accepte, mais rien ne se passera dans le jeu. En cas de doute, essayez le raccourci depuis Dofus Retro et regardez le journal, en bas.',
+    lone: 'Une touche de fonction se pose seule, sans Ctrl ni Alt. Prise ici, elle ne redescend plus dans le jeu : évitez celles que vous avez posées dans les options de Dofus Retro.',
     defaults: 'Remettre les touches d’origine',
     capture: 'Appuyez sur vos touches',
     captureHint: 'Échap pour annuler, Retour arrière pour effacer.',
