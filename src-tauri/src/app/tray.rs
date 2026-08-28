@@ -540,6 +540,7 @@ mod tests {
     use std::collections::HashSet;
 
     use super::*;
+    use crate::app::view::ShortcutStatus;
     use crate::config::Settings;
     use crate::domain::Character;
     use crate::domain::Roster;
@@ -555,6 +556,8 @@ mod tests {
             excluded,
             online: true,
             relayed: true,
+            shortcut: None,
+            shortcut_status: ShortcutStatus::Unbound,
         }
     }
 

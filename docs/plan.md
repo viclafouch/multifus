@@ -71,6 +71,7 @@ ce qu'elle coûte.
 
 - [ ] La même combinaison frappée hors du jeu ne fait rien
 - [ ] « Remettre les touches d'origine » redonne les cinq combinaisons
+- [ ] Une touche posée sur un personnage le ramène devant, et « Remettre les touches d'origine » n'y touche pas
 
 ### Les réponses rapides
 

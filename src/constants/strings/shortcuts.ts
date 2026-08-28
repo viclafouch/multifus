@@ -35,7 +35,7 @@ const STATUS_LINES = {
   invalid: 'Ces touches ne peuvent pas servir de raccourci.',
   refused: 'Refusé : un autre logiciel utilise déjà ces touches.',
   duplicate: (label: string) => {
-    return `Déjà pris par ${label}, donc celui-ci ne fera rien.`
+    return `Déjà pris par ${label}.`
   }
 } as const satisfies Record<
   Exclude<ShortcutStatus['kind'], 'registered'>,
@@ -70,6 +70,18 @@ export const SHORTCUTS_STRINGS = {
     },
     edit: (label: string) => {
       return `Modifier le raccourci ${label}`
+    },
+    charactersTitle: 'Un personnage, une touche',
+    charactersDescription: IS_APPLE
+      ? 'Ctrl+Maj+1 sur l’Eniripsa, Ctrl+Maj+2 sur le Sacrieur : sa fenêtre passe devant, où que vous soyez.'
+      : 'F1 sur l’Eniripsa, F2 sur le Sacrieur : sa fenêtre passe devant, où que vous soyez.',
+    charactersEmpty:
+      'Entrez en jeu, et vos personnages se posent ici tout seuls.',
+    characterEdit: (nickname: string) => {
+      return `Modifier le raccourci de ${nickname}`
+    },
+    characterNamed: (nickname: string) => {
+      return `« ${nickname} »`
     },
     status: STATUS_LINES,
     rejected: REJECTION_LINES,

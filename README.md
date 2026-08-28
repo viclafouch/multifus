@@ -11,6 +11,7 @@ Une notification arrive dans le jeu, Multifus met devant vous la fenêtre du per
 - [x] Un raccourci pour exclure un personnage : il sort du défilement, et sa fenêtre ne passe plus devant sur une notification
 - [x] Un sexe par personnage, et deux sigils qui excluent ou réintègrent tous vos hommes, ou toutes vos femmes, d'un clic
 - [x] Un raccourci qui vous ramène sur votre personnage principal, d'où que vous veniez dans le jeu
+- [x] Une touche par personnage si vous voulez, et sa fenêtre passe devant. Sur Windows, une touche de fonction se pose seule : F1 sur l'Eniripsa, F2 sur le Sacrieur
 - [x] Le Déplacement rapide : chaque clic gauche passe au personnage suivant, et vous emmenez toute votre team d'une map à l'autre sans lâcher la souris. Une bannière dit sur qui vous venez d'arriver
 - [x] Des réponses rapides : une combinaison colle un texte tout prêt dans le chat, la touche Entrée reste la vôtre
 - [x] Vos messages privés sur votre téléphone par Telegram, tant que vous êtes loin du clavier

@@ -1,6 +1,7 @@
 import React from 'react'
 import { ChevronDown, ChevronUp, FolderOpen } from 'lucide-react'
 import type { JournalEntry } from '@/@types/journal'
+import type { QuickReply } from '@/@types/shortcuts'
 import type { Snapshot } from '@/@types/snapshot'
 import { CopyButton } from '@/components/copy-button'
 import { Button } from '@/components/ui/button'
@@ -105,7 +106,13 @@ export const JournalPanel = ({ snapshot }: JournalPanelProps) => {
             </li>
           ) : (
             entries.map((entry) => {
-              return <JournalLine key={entry.id} entry={entry} />
+              return (
+                <JournalLine
+                  key={entry.id}
+                  entry={entry}
+                  quickReplies={snapshot.quickReplies}
+                />
+              )
             })
           )}
         </ol>
@@ -116,11 +123,12 @@ export const JournalPanel = ({ snapshot }: JournalPanelProps) => {
 
 type JournalLineProps = Readonly<{
   entry: JournalEntry
+  quickReplies: readonly QuickReply[]
 }>
 
 const ignoreRevealFailure = () => {}
 
-const JournalLine = ({ entry }: JournalLineProps) => {
+const JournalLine = ({ entry, quickReplies }: JournalLineProps) => {
   return (
     <li
       data-tone={journalTone(entry.event)}
@@ -134,7 +142,7 @@ const JournalLine = ({ entry }: JournalLineProps) => {
         {journalTime(entry.at)}
       </time>
       <span className="selectable min-w-0 break-words text-muted-foreground group-data-[tone=warning]/line:text-foreground/90">
-        {journalLine(entry.event)}
+        {journalLine(entry.event, quickReplies)}
       </span>
     </li>
   )

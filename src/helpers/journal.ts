@@ -1,4 +1,5 @@
 import type {
+  CharacterShortcutOutcome,
   JournalEntry,
   JournalEvent,
   NotificationOutcome,
@@ -11,8 +12,8 @@ import type {
 import type { NotificationKind } from '@/@types/notification'
 import type { RelayFailure } from '@/@types/relay'
 import type {
-  Binding,
   BoundCombination,
+  QuickReply,
   ShortcutAction
 } from '@/@types/shortcuts'
 import type { Snapshot } from '@/@types/snapshot'
@@ -35,7 +36,7 @@ import {
   WORK_LABELS
 } from '@/constants/journal'
 import { strings } from '@/constants/strings'
-import { updateLine } from '@/helpers/wording'
+import { bindingLabel, updateLine } from '@/helpers/wording'
 
 export const journalTime = (milliseconds: number) => {
   return new Date(milliseconds).toLocaleTimeString('fr-FR', {
@@ -69,7 +70,7 @@ export const journalTone = (event: JournalEvent): JournalTone => {
     return event.outcome.outcome === 'focused' ? 'good' : 'neutral'
   }
 
-  if (event.kind === 'shortcut') {
+  if (event.kind === 'shortcut' || event.kind === 'characterShortcut') {
     return SHORTCUT_TONES[event.outcome.outcome]
   }
 
@@ -292,21 +293,21 @@ const settingLine = (change: SettingChange) => {
   }
 }
 
-const shortcutsBoundLine = (bindings: readonly BoundCombination[]) => {
+const shortcutsBoundLine = (
+  bindings: readonly BoundCombination[],
+  quickReplies: readonly QuickReply[]
+) => {
   const parts = bindings.map((bound) => {
-    return `${journalBindingLabel(bound.binding)} ${boundCombinationLabel(bound)}`
+    return `${bindingLabel(bound.binding, quickReplies)} ${boundCombinationLabel(bound, quickReplies)}`
   })
 
   return `Raccourcis : ${parts.join(' · ')}.`
 }
 
-const journalBindingLabel = (binding: Binding) => {
-  return binding.kind === 'action'
-    ? strings.shortcuts.actions[binding.action].label
-    : `Réponse rapide ${binding.id}`
-}
-
-const boundCombinationLabel = ({ accelerator, status }: BoundCombination) => {
+const boundCombinationLabel = (
+  { accelerator, status }: BoundCombination,
+  quickReplies: readonly QuickReply[]
+) => {
   const combination = accelerator ?? 'aucune combinaison'
 
   switch (status.kind) {
@@ -320,7 +321,7 @@ const boundCombinationLabel = ({ accelerator, status }: BoundCombination) => {
       return `${combination} illisible (${status.detail})`
     }
     case 'duplicate': {
-      return `${combination} en doublon avec ${journalBindingLabel(status.binding)}, donc inerte`
+      return `${combination} en doublon avec ${bindingLabel(status.binding, quickReplies)}, donc inerte`
     }
     case 'refused': {
       return `${combination} refusé (${status.detail})`
@@ -336,6 +337,18 @@ const boundCombinations = (snapshot: Snapshot): readonly BoundCombination[] => {
     return { binding: { kind: 'action', action }, accelerator, status } as const
   })
 
+  const characters = snapshot.characters
+    .filter((character) => {
+      return character.shortcut !== null
+    })
+    .map(({ nickname, shortcut, shortcutStatus }) => {
+      return {
+        binding: { kind: 'character', nickname },
+        accelerator: shortcut,
+        status: shortcutStatus
+      } as const
+    })
+
   const quickReplies = snapshot.quickReplies.map(
     ({ id, accelerator, status }) => {
       return {
@@ -346,7 +359,7 @@ const boundCombinations = (snapshot: Snapshot): readonly BoundCombination[] => {
     }
   )
 
-  return [...actions, ...quickReplies]
+  return [...actions, ...characters, ...quickReplies]
 }
 
 const journalPeriod = (entries: readonly JournalEntry[]) => {
@@ -363,7 +376,7 @@ export const journalTranscript = (snapshot: Snapshot) => {
   const { journal } = snapshot
 
   const lines = journal.map((entry) => {
-    return `${journalTime(entry.at)}  ${journalLine(entry.event)}`
+    return `${journalTime(entry.at)}  ${journalLine(entry.event, snapshot.quickReplies)}`
   })
 
   return [
@@ -371,7 +384,7 @@ export const journalTranscript = (snapshot: Snapshot) => {
     `Autorisation : ${snapshot.authorization.granted ? 'accordée' : 'refusée'}, écoute ${snapshot.authorization.listening ? 'active' : 'arrêtée'}`,
     `AutoFocus : ${snapshot.autoFocusEnabled ? 'actif' : 'suspendu'}, réveil des réduites ${snapshot.wakesMinimized ? 'actif' : 'inactif'}`,
     `Déplacement rapide : ${snapshot.walk.enabled ? 'allumé' : 'éteint'}`,
-    shortcutsBoundLine(boundCombinations(snapshot)),
+    shortcutsBoundLine(boundCombinations(snapshot), snapshot.quickReplies),
     `Configuration : ${snapshot.config.path}`,
     `Mise à jour : ${updateLine(snapshot.update)}`,
     `Entrées en mémoire : ${journal.length}, ${journalPeriod(journal)}`,
@@ -428,6 +441,45 @@ const shortcutLine = ({ action, outcome }: ShortcutLineParams) => {
     }
     default: {
       return label
+    }
+  }
+}
+
+type CharacterShortcutLineParams = {
+  readonly nickname: string
+  readonly outcome: CharacterShortcutOutcome
+}
+
+const characterShortcutLine = ({
+  nickname,
+  outcome
+}: CharacterShortcutLineParams) => {
+  const subject = `Raccourci de ${nickname}`
+
+  switch (outcome.outcome) {
+    case 'focused': {
+      return `${subject} : sa fenêtre passe au premier plan.`
+    }
+    case 'alreadyThere': {
+      return `${subject} : vous y êtes déjà.`
+    }
+    case 'notInRoster': {
+      return `${subject} : il n’est plus dans le roster.`
+    }
+    case 'noWindow': {
+      return `${subject} : sa fenêtre a disparu.`
+    }
+    case 'outsideGame': {
+      return `${subject} : ignoré, aucune fenêtre Dofus au premier plan.`
+    }
+    case 'focusFailed': {
+      return `${subject} : le système a refusé de le ramener au premier plan (${outcome.detail}).`
+    }
+    case 'foregroundUnknown': {
+      return `${subject} : impossible de savoir quelle fenêtre est au premier plan (${outcome.detail}).`
+    }
+    default: {
+      return subject
     }
   }
 }
@@ -552,7 +604,10 @@ const isRunEvent = (
   return RUN_KINDS.has(event.kind)
 }
 
-const runLine = (event: EventOf<RunEventKind>) => {
+const runLine = (
+  event: EventOf<RunEventKind>,
+  quickReplies: readonly QuickReply[]
+) => {
   switch (event.kind) {
     case 'started': {
       return startedLine(event)
@@ -575,7 +630,7 @@ const runLine = (event: EventOf<RunEventKind>) => {
       return notificationLine(event)
     }
     case 'shortcutsBound': {
-      return shortcutsBoundLine(event.bindings)
+      return shortcutsBoundLine(event.bindings, quickReplies)
     }
     case 'startAtLoginReconciled': {
       return event.enabled
@@ -626,6 +681,9 @@ const actionLine = (event: EventOf<ActionEventKind>) => {
     case 'shortcut': {
       return shortcutLine(event)
     }
+    case 'characterShortcut': {
+      return characterShortcutLine(event)
+    }
     case 'quickReplyPasted': {
       return `Réponse rapide collée dans le jeu : « ${event.excerpt} »`
     }
@@ -655,7 +713,10 @@ const actionLine = (event: EventOf<ActionEventKind>) => {
   }
 }
 
-export const journalLine = (event: JournalEvent) => {
+export const journalLine = (
+  event: JournalEvent,
+  quickReplies: readonly QuickReply[]
+) => {
   if (isDetailed(event)) {
     return `${DETAILED_LINES[event.kind]} : ${event.detail}`
   }
@@ -664,5 +725,5 @@ export const journalLine = (event: JournalEvent) => {
     return PLAIN_LINES[event.kind]
   }
 
-  return isRunEvent(event) ? runLine(event) : actionLine(event)
+  return isRunEvent(event) ? runLine(event, quickReplies) : actionLine(event)
 }

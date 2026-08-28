@@ -1,6 +1,8 @@
 use serde::Deserialize;
 use serde::Serialize;
 
+use super::shortcut::Shortcut;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum Gender {
@@ -60,6 +62,8 @@ pub struct Character {
     pub class: Option<Class>,
     #[serde(default)]
     pub main: bool,
+    #[serde(default)]
+    pub shortcut: Option<Shortcut>,
     #[serde(default = "relayed_by_default")]
     pub relayed: bool,
     #[serde(skip)]
@@ -76,6 +80,7 @@ impl Character {
             gender: None,
             class: None,
             main: false,
+            shortcut: None,
             relayed: true,
             excluded: false,
             online: true,
@@ -266,6 +271,39 @@ mod tests {
         assert!(serde_json::from_str::<Character>(&json)
             .expect("a character reads back")
             .is_main());
+    }
+
+    #[test]
+    fn nobody_has_keys_of_his_own_until_they_are_given_to_him() {
+        assert_eq!(Character::new("Alpha").shortcut, None);
+    }
+
+    #[test]
+    fn the_keys_of_a_character_travel_to_the_file_and_come_back() {
+        let character = Character {
+            shortcut: Shortcut::new("F1"),
+            ..Character::new("Alpha")
+        };
+
+        let json = serde_json::to_string(&character).expect("a character serialises");
+
+        assert!(json.contains(r#""shortcut":"F1""#), "{json}");
+        assert_eq!(
+            serde_json::from_str::<Character>(&json)
+                .expect("a character reads back")
+                .shortcut,
+            Shortcut::new("F1")
+        );
+    }
+
+    #[test]
+    fn a_character_written_before_the_keys_existed_has_none() {
+        let stored = r#"{"nickname":"Alpha","gender":"male","class":"iop","relayed":true}"#;
+
+        let character = serde_json::from_str::<Character>(stored)
+            .expect("a character from an earlier version still loads");
+
+        assert_eq!(character.shortcut, None);
     }
 
     #[test]

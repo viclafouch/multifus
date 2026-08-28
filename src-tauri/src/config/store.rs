@@ -234,7 +234,6 @@ mod tests {
     use crate::config::settings::QuickReply;
     use crate::config::settings::QuickReplyId;
     use crate::config::settings::Relay;
-    use crate::config::settings::Shortcut;
     use crate::config::settings::Shortcuts;
     use crate::config::settings::Traces;
     use crate::domain::Character;
@@ -242,6 +241,7 @@ mod tests {
     use crate::domain::Gender;
     use crate::domain::NotificationKind;
     use crate::domain::Roster;
+    use crate::domain::Shortcut;
 
     fn store() -> (TempDir, ConfigStore) {
         let directory = TempDir::new().expect("a temporary directory");

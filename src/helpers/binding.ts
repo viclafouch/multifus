@@ -9,6 +9,10 @@ export const matchIsSameBinding = (binding: Binding | null, other: Binding) => {
     return binding.action === other.action
   }
 
+  if (binding.kind === 'character' && other.kind === 'character') {
+    return binding.nickname === other.nickname
+  }
+
   if (binding.kind === 'quickReply' && other.kind === 'quickReply') {
     return binding.id === other.id
   }

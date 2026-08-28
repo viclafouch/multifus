@@ -3,13 +3,15 @@ import { fireEvent, render, screen, within } from '@testing-library/react'
 import type { QuickReply } from '@/@types/shortcuts'
 import { strings } from '@/constants/strings'
 import { quickReplyEditLabel } from '@/helpers/wording'
-import { keyCapsOf, quickReplyOf, strike } from '@/test-doubles'
+import { keyCapsOf, pending, quickReplyOf, strike } from '@/test-doubles'
 
 const bridge = {
   addQuickReply: vi.fn(),
   setQuickReplyText: vi.fn(),
   setQuickReplyShortcut: vi.fn(),
-  removeQuickReply: vi.fn()
+  removeQuickReply: vi.fn(),
+  suspendShortcuts: vi.fn(pending),
+  resumeShortcuts: vi.fn(pending)
 }
 
 vi.mock(import('@/lib/multifus'), () => {

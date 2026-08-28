@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, within } from '@testing-library/react'
+import type { Character } from '@/@types/roster'
 import type {
   QuickReply,
   ShortcutAction,
@@ -7,11 +8,20 @@ import type {
   ShortcutStatus
 } from '@/@types/shortcuts'
 import { strings } from '@/constants/strings'
-import { keyCapsOf, quickReplyOf, strike } from '@/test-doubles'
+import {
+  characterOf,
+  keyCapsOf,
+  pending,
+  quickReplyOf,
+  strike
+} from '@/test-doubles'
 
 const bridge = {
   setShortcut: vi.fn(),
-  resetShortcuts: vi.fn()
+  setCharacterShortcut: vi.fn(),
+  resetShortcuts: vi.fn(),
+  suspendShortcuts: vi.fn(pending),
+  resumeShortcuts: vi.fn(pending)
 }
 
 vi.mock(import('@/lib/multifus'), () => {
@@ -50,13 +60,19 @@ const shortcut = (
 
 type ShowParams = {
   readonly shortcuts?: readonly ShortcutBinding[]
+  readonly characters?: readonly Character[]
   readonly quickReplies?: readonly QuickReply[]
 }
 
-const show = ({ shortcuts = [], quickReplies = [] }: ShowParams = {}) => {
+const show = ({
+  shortcuts = [],
+  characters = [],
+  quickReplies = []
+}: ShowParams = {}) => {
   const { rerender } = render(
     <ShortcutsScreen
       shortcuts={shortcuts}
+      characters={characters}
       quickReplies={quickReplies}
       run={() => {}}
     />
@@ -66,6 +82,7 @@ const show = ({ shortcuts = [], quickReplies = [] }: ShowParams = {}) => {
     rerender(
       <ShortcutsScreen
         shortcuts={next.shortcuts ?? shortcuts}
+        characters={next.characters ?? characters}
         quickReplies={next.quickReplies ?? quickReplies}
         run={() => {}}
       />
@@ -76,6 +93,12 @@ const show = ({ shortcuts = [], quickReplies = [] }: ShowParams = {}) => {
 const fieldOf = (action: ShortcutAction) => {
   return screen.getByRole('button', {
     name: strings.shortcuts.edit(strings.shortcuts.actions[action].label)
+  })
+}
+
+const fieldOfCharacter = (nickname: string) => {
+  return screen.getByRole('button', {
+    name: strings.shortcuts.characterEdit(nickname)
   })
 }
 
@@ -358,5 +381,104 @@ describe('l’écran des raccourcis, ce que Rust répond d’une combinaison', (
 
     expect(screen.queryByRole('alert')).toBeNull()
     expect(screen.queryByText(strings.shortcuts.status.unbound)).toBeNull()
+  })
+})
+
+describe('l’écran des raccourcis, un personnage une touche', () => {
+  const ALPHA = characterOf({ nickname: 'Alpha' })
+  const BRAVO = characterOf({ nickname: 'Bravo', online: false })
+
+  it('porte une ligne par personnage du roster, connecté ou non', () => {
+    show({ characters: [ALPHA, BRAVO] })
+
+    expect(screen.getByText(strings.shortcuts.charactersTitle)).not.toBeNull()
+    expect(fieldOfCharacter('Alpha')).not.toBeNull()
+    expect(fieldOfCharacter('Bravo')).not.toBeNull()
+  })
+
+  it('dit où les personnages arrivent quand le roster est vide', () => {
+    show({ characters: [] })
+
+    expect(screen.getByText(strings.shortcuts.charactersEmpty)).not.toBeNull()
+  })
+
+  it('ne donne aucune touche à un personnage, et ne l’en avertit pas', () => {
+    show({ characters: [ALPHA] })
+
+    expect(keyCapsOf(fieldOfCharacter('Alpha'))).toStrictEqual([])
+    expect(screen.queryByText(strings.shortcuts.status.unbound)).toBeNull()
+  })
+
+  it('pose la touche frappée sur le personnage, et referme la saisie', () => {
+    show({ characters: [ALPHA] })
+
+    fireEvent.click(fieldOfCharacter('Alpha'))
+    strike(fieldOfCharacter('Alpha'), {
+      code: 'F1',
+      ctrlKey: true,
+      shiftKey: true
+    })
+
+    expect(bridge.setCharacterShortcut).toHaveBeenCalledWith(
+      'Alpha',
+      'Control+Shift+F1'
+    )
+    expect(screen.queryByText(strings.shortcuts.capture)).toBeNull()
+  })
+
+  it('efface la touche d’un personnage sur Retour arrière', () => {
+    show({ characters: [characterOf({ shortcut: 'F1' })] })
+
+    fireEvent.click(fieldOfCharacter('Alpha'))
+    fireEvent.keyDown(fieldOfCharacter('Alpha'), {
+      key: 'Backspace',
+      code: 'Backspace'
+    })
+
+    expect(bridge.setCharacterShortcut).toHaveBeenCalledWith('Alpha', null)
+  })
+
+  it('n’ouvre la saisie que sur la ligne cliquée, actions comprises', () => {
+    show({ shortcuts: [shortcut('next')], characters: [ALPHA] })
+
+    fireEvent.click(fieldOf('next'))
+    fireEvent.click(fieldOfCharacter('Alpha'))
+
+    expect(screen.getAllByText(strings.shortcuts.capture)).toHaveLength(1)
+    expect(
+      within(fieldOfCharacter('Alpha')).getByText(strings.shortcuts.capture)
+    ).not.toBeNull()
+  })
+
+  it('marque d’une étoile le personnage principal, et lui seul', () => {
+    show({
+      characters: [
+        characterOf({ nickname: 'Alpha', main: true }),
+        characterOf({ nickname: 'Bravo' })
+      ]
+    })
+
+    expect(screen.getAllByText(strings.characters.mainMark)).toHaveLength(1)
+  })
+
+  it('nomme le personnage qui tient déjà les mêmes touches', () => {
+    show({
+      shortcuts: [
+        shortcut('walk', {
+          accelerator: 'F1',
+          status: {
+            kind: 'duplicate',
+            binding: { kind: 'character', nickname: 'Alpha' }
+          }
+        })
+      ],
+      characters: [characterOf({ shortcut: 'F1' })]
+    })
+
+    expect(screen.getByRole('alert').textContent).toBe(
+      strings.shortcuts.status.duplicate(
+        strings.shortcuts.characterNamed('Alpha')
+      )
+    )
   })
 })

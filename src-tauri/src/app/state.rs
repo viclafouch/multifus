@@ -10,6 +10,7 @@ use std::time::Instant;
 use tauri::AppHandle;
 use tauri::Manager;
 
+use crate::app::journal::CharacterShortcutOutcome;
 use crate::app::journal::Journal;
 use crate::app::journal::JournalEvent;
 use crate::app::journal::Launch;
@@ -26,6 +27,7 @@ use crate::app::view::BannerCharacter;
 use crate::app::view::BannerStep;
 use crate::app::view::BannerView;
 use crate::app::view::Binding;
+use crate::app::view::BindingView;
 use crate::app::view::CharacterView;
 use crate::app::view::ConfigProblem;
 use crate::app::view::ConfigView;
@@ -50,7 +52,6 @@ use crate::config::Loaded;
 use crate::config::QuickReply;
 use crate::config::QuickReplyId;
 use crate::config::Settings;
-use crate::config::Shortcut;
 use crate::config::Shortcuts;
 use crate::config::Traces;
 use crate::domain::Character;
@@ -58,6 +59,7 @@ use crate::domain::Class;
 use crate::domain::Gender;
 use crate::domain::NotificationKind;
 use crate::domain::Portrait;
+use crate::domain::Shortcut;
 use crate::platform::GameWindow;
 use crate::platform::PasteSender;
 use crate::platform::PlatformNotificationWatcher;
@@ -82,6 +84,7 @@ pub struct Multifus {
     system: String,
     settings: Settings,
     shortcut_statuses: HashMap<Binding, ShortcutStatus>,
+    held: HashMap<Binding, String>,
     windows: HashMap<String, WindowId>,
     windows_seen: HashMap<String, WindowId>,
     seen_client_windows: Option<HashSet<WindowId>>,
@@ -156,6 +159,7 @@ impl Multifus {
             system,
             settings,
             shortcut_statuses: HashMap::new(),
+            held: HashMap::new(),
             windows: HashMap::new(),
             windows_seen: HashMap::new(),
             seen_client_windows: None,
@@ -191,7 +195,7 @@ impl Multifus {
                 .roster
                 .characters()
                 .iter()
-                .map(view_of)
+                .map(|character| self.view_of(character))
                 .collect(),
             start_at_login: self.settings.start_at_login,
             maximize_on_launch: self.settings.maximize_on_launch,
@@ -204,7 +208,7 @@ impl Multifus {
                 .map(|action| ShortcutView {
                     action,
                     accelerator: self.accelerator(action),
-                    status: self.status_of(Binding::Action { action }),
+                    status: self.status_of(&Binding::Action { action }),
                     is_default: self.shortcut(action) == shortcut_in(&defaults, action),
                 })
                 .collect(),
@@ -216,7 +220,7 @@ impl Multifus {
                     id: quick_reply.id,
                     text: quick_reply.text.clone(),
                     accelerator: accelerator_of(quick_reply.shortcut.as_ref()),
-                    status: self.status_of(Binding::QuickReply { id: quick_reply.id }),
+                    status: self.status_of(&Binding::QuickReply { id: quick_reply.id }),
                 })
                 .collect(),
             auto_focus: NotificationKind::ALL
@@ -265,7 +269,7 @@ impl Multifus {
             .characters()
             .iter()
             .filter(|character| character.online)
-            .map(view_of)
+            .map(|character| self.view_of(character))
             .collect()
     }
 
@@ -418,11 +422,28 @@ impl Multifus {
     }
 
     #[must_use]
-    fn status_of(&self, binding: Binding) -> ShortcutStatus {
+    fn status_of(&self, binding: &Binding) -> ShortcutStatus {
         self.shortcut_statuses
-            .get(&binding)
+            .get(binding)
             .cloned()
             .unwrap_or(ShortcutStatus::Unbound)
+    }
+
+    #[must_use]
+    fn view_of(&self, character: &Character) -> CharacterView {
+        CharacterView {
+            nickname: character.nickname.clone(),
+            gender: character.gender,
+            class: character.class,
+            main: character.main,
+            excluded: character.excluded,
+            online: character.online,
+            relayed: character.relayed,
+            shortcut: accelerator_of(character.shortcut.as_ref()),
+            shortcut_status: self.status_of(&Binding::Character {
+                nickname: character.nickname.clone(),
+            }),
+        }
     }
 
     #[must_use]
@@ -431,6 +452,15 @@ impl Multifus {
             .into_iter()
             .map(|action| (Binding::Action { action }, self.accelerator(action)));
 
+        let characters = self.settings.roster.characters().iter().map(|character| {
+            (
+                Binding::Character {
+                    nickname: character.nickname.clone(),
+                },
+                accelerator_of(character.shortcut.as_ref()),
+            )
+        });
+
         let quick_replies = self.settings.quick_replies.iter().map(|quick_reply| {
             (
                 Binding::QuickReply { id: quick_reply.id },
@@ -438,11 +468,29 @@ impl Multifus {
             )
         });
 
-        actions.chain(quick_replies).collect()
+        actions.chain(characters).chain(quick_replies).collect()
     }
 
-    pub fn set_shortcut_statuses(&mut self, statuses: HashMap<Binding, ShortcutStatus>) {
-        self.shortcut_statuses = statuses;
+    #[must_use]
+    pub fn held(&self) -> HashMap<Binding, String> {
+        self.held.clone()
+    }
+
+    pub fn remember_bound(&mut self, bindings: &[BindingView]) {
+        self.shortcut_statuses = bindings
+            .iter()
+            .map(|bound| (bound.binding.clone(), bound.status.clone()))
+            .collect();
+
+        self.held = bindings
+            .iter()
+            .filter_map(|bound| {
+                let accelerator = bound.accelerator.clone()?;
+
+                matches!(bound.status, ShortcutStatus::Registered)
+                    .then(|| (bound.binding.clone(), accelerator))
+            })
+            .collect();
     }
 
     pub fn set_shortcut(&mut self, action: ShortcutAction, accelerator: Option<String>) {
@@ -458,6 +506,17 @@ impl Multifus {
 
         *slot = shortcut;
 
+        self.save();
+    }
+
+    pub fn set_character_shortcut(&mut self, nickname: &str, accelerator: Option<String>) {
+        let shortcut = accelerator.and_then(Shortcut::new);
+
+        let Some(character) = self.settings.roster.get_mut(nickname) else {
+            return;
+        };
+
+        character.shortcut = shortcut;
         self.save();
     }
 
@@ -1264,6 +1323,21 @@ impl Multifus {
         }
     }
 
+    pub fn decide_character_shortcut(&self, nickname: &str, current: &str) -> CharacterAim {
+        if self.settings.roster.get(nickname).is_none() {
+            return CharacterAim::Settled(CharacterShortcutOutcome::NotInRoster);
+        }
+
+        if nickname == current {
+            return CharacterAim::Settled(CharacterShortcutOutcome::AlreadyThere);
+        }
+
+        match self.windows.get(nickname) {
+            Some(window) => CharacterAim::Focus { window: *window },
+            None => CharacterAim::Settled(CharacterShortcutOutcome::NoWindow),
+        }
+    }
+
     fn aim_at_main(&self, current: &str) -> ShortcutEffect {
         let Some(nickname) = self
             .settings
@@ -1363,18 +1437,6 @@ fn nickname_of(character: Option<&Character>) -> Option<String> {
     character.map(|character| character.nickname.clone())
 }
 
-fn view_of(character: &Character) -> CharacterView {
-    CharacterView {
-        nickname: character.nickname.clone(),
-        gender: character.gender,
-        class: character.class,
-        main: character.main,
-        excluded: character.excluded,
-        online: character.online,
-        relayed: character.relayed,
-    }
-}
-
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub struct WindowLook {
     pub portrait: Option<Portrait>,
@@ -1416,6 +1478,12 @@ pub enum Decision {
 pub enum ShortcutEffect {
     Focus { nickname: String, window: WindowId },
     Settled(ShortcutOutcome),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum CharacterAim {
+    Focus { window: WindowId },
+    Settled(CharacterShortcutOutcome),
 }
 
 pub fn lock(app: &AppHandle) -> MutexGuard<'_, Multifus> {
@@ -1888,7 +1956,10 @@ mod tests {
             })
             .count();
 
-        assert_eq!(changes, 1, "only the gesture that moved the main is written");
+        assert_eq!(
+            changes, 1,
+            "only the gesture that moved the main is written"
+        );
     }
 
     #[test]
@@ -2233,24 +2304,95 @@ mod tests {
     }
 
     #[test]
-    fn the_five_actions_come_before_the_quick_replies() {
+    fn the_five_actions_come_before_the_characters_and_the_quick_replies() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha")]);
+        state.set_character_shortcut("Alpha", Some("F1".to_owned()));
+
         let id = state.add_quick_reply();
         state.set_quick_reply_shortcut(id, Some("Alt+P".to_owned()));
 
         let bindings = state.bindings();
 
-        assert_eq!(bindings.len(), 7);
+        assert_eq!(bindings.len(), 8);
         assert_eq!(
-            bindings.first().map(|(binding, _)| *binding),
+            bindings.first().map(|(binding, _)| binding.clone()),
             Some(Binding::Action {
                 action: ShortcutAction::Next
             })
         );
         assert_eq!(
+            bindings.get(5).cloned(),
+            Some((
+                Binding::Character {
+                    nickname: "Alpha".to_owned()
+                },
+                Some("F1".to_owned())
+            ))
+        );
+        assert_eq!(
             bindings.last().cloned(),
             Some((Binding::QuickReply { id }, Some("Alt+P".to_owned())))
+        );
+    }
+
+    #[test]
+    fn a_character_keeps_his_keys_across_a_restart_and_loses_them_with_his_line() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha"), window(2, "Bravo")]);
+        state.set_character_shortcut("Alpha", Some("F1".to_owned()));
+
+        let mut reloaded = multifus_reloaded(&directory);
+
+        assert_eq!(
+            reloaded
+                .snapshot()
+                .characters
+                .into_iter()
+                .find(|character| character.nickname == "Alpha")
+                .and_then(|character| character.shortcut),
+            Some("F1".to_owned())
+        );
+
+        reloaded.remove("Alpha");
+
+        assert!(reloaded.bindings().iter().all(|(binding, _)| {
+            binding
+                != &Binding::Character {
+                    nickname: "Alpha".to_owned(),
+                }
+        }));
+    }
+
+    #[test]
+    fn a_character_shortcut_aims_at_him_unless_the_player_is_already_there() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha"), window(2, "Bravo")]);
+
+        assert_eq!(
+            state.decide_character_shortcut("Bravo", "Alpha"),
+            CharacterAim::Focus {
+                window: WindowId::from_raw(2),
+            }
+        );
+        assert_eq!(
+            state.decide_character_shortcut("Alpha", "Alpha"),
+            CharacterAim::Settled(CharacterShortcutOutcome::AlreadyThere)
+        );
+        assert_eq!(
+            state.decide_character_shortcut("Charlie", "Alpha"),
+            CharacterAim::Settled(CharacterShortcutOutcome::NotInRoster)
+        );
+
+        state.apply_windows(&[window(1, "Alpha")]);
+
+        assert_eq!(
+            state.decide_character_shortcut("Bravo", "Alpha"),
+            CharacterAim::Settled(CharacterShortcutOutcome::NoWindow),
+            "Bravo stays in the roster once his client is gone"
         );
     }
 

@@ -128,7 +128,9 @@ const ONLINE_CHARACTER = {
   main: false,
   excluded: false,
   online: true,
-  relayed: false
+  relayed: false,
+  shortcut: null,
+  shortcutStatus: { kind: 'unbound' }
 } as const satisfies Character
 
 describe('updateLine', () => {

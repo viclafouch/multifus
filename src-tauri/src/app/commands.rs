@@ -89,6 +89,8 @@ pub fn reorder(app: AppHandle, order: Vec<String>) -> Snapshot {
 pub fn remove_character(app: AppHandle, nickname: String) -> Snapshot {
     lock(&app).remove(&nickname);
 
+    shortcuts::apply(&app);
+
     runtime::emit_snapshot(&app)
 }
 
@@ -99,6 +101,33 @@ pub fn set_shortcut(
     accelerator: Option<String>,
 ) -> Snapshot {
     lock(&app).set_shortcut(action, accelerator);
+
+    shortcuts::apply(&app);
+
+    runtime::emit_snapshot(&app)
+}
+
+#[tauri::command]
+pub fn suspend_shortcuts(app: AppHandle) -> Snapshot {
+    shortcuts::suspend(&app);
+
+    runtime::emit_snapshot(&app)
+}
+
+#[tauri::command]
+pub fn resume_shortcuts(app: AppHandle) -> Snapshot {
+    shortcuts::apply(&app);
+
+    runtime::emit_snapshot(&app)
+}
+
+#[tauri::command]
+pub fn set_character_shortcut(
+    app: AppHandle,
+    nickname: String,
+    accelerator: Option<String>,
+) -> Snapshot {
+    lock(&app).set_character_shortcut(&nickname, accelerator);
 
     shortcuts::apply(&app);
 

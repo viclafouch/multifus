@@ -231,6 +231,8 @@ pub struct CharacterView {
     pub excluded: bool,
     pub online: bool,
     pub relayed: bool,
+    pub shortcut: Option<String>,
+    pub shortcut_status: ShortcutStatus,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -253,7 +255,7 @@ impl ShortcutAction {
     ];
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 #[serde(
     tag = "kind",
     rename_all = "camelCase",
@@ -261,6 +263,7 @@ impl ShortcutAction {
 )]
 pub enum Binding {
     Action { action: ShortcutAction },
+    Character { nickname: String },
     QuickReply { id: QuickReplyId },
 }
 
@@ -467,6 +470,8 @@ mod tests {
             excluded: false,
             online: true,
             relayed: true,
+            shortcut: Some("F1".to_owned()),
+            shortcut_status: ShortcutStatus::Registered,
         }
     }
 
@@ -513,7 +518,7 @@ mod tests {
     }
 
     #[test]
-    fn a_character_crosses_with_the_seven_things_a_row_shows() {
+    fn a_character_crosses_with_everything_a_row_shows_of_it() {
         assert_eq!(
             json_of(&character()),
             json!({
@@ -524,8 +529,22 @@ mod tests {
                 "excluded": false,
                 "online": true,
                 "relayed": true,
+                "shortcut": "F1",
+                "shortcutStatus": { "kind": "registered" },
             })
         );
+    }
+
+    #[test]
+    fn a_character_nobody_has_given_keys_to_crosses_with_nothing_rather_than_a_gap() {
+        let bare = CharacterView {
+            shortcut: None,
+            shortcut_status: ShortcutStatus::Unbound,
+            ..character()
+        };
+
+        assert_eq!(json_of(&bare)["shortcut"], Value::Null);
+        assert_eq!(json_of(&bare)["shortcutStatus"]["kind"], json!("unbound"));
     }
 
     #[test]
@@ -619,12 +638,18 @@ mod tests {
     }
 
     #[test]
-    fn a_binding_is_an_action_or_a_quick_reply_and_says_which() {
+    fn a_binding_is_an_action_a_character_or_a_quick_reply_and_says_which() {
         assert_eq!(
             json_of(&Binding::Action {
                 action: ShortcutAction::ToggleExcluded
             }),
             json!({ "kind": "action", "action": "toggleExcluded" })
+        );
+        assert_eq!(
+            json_of(&Binding::Character {
+                nickname: "Alpha".to_owned()
+            }),
+            json!({ "kind": "character", "nickname": "Alpha" })
         );
         assert_eq!(
             json_of(&Binding::QuickReply {
@@ -650,13 +675,7 @@ mod tests {
 
         assert_eq!(
             kinds_of(&statuses),
-            [
-                "unbound",
-                "registered",
-                "invalid",
-                "duplicate",
-                "refused",
-            ]
+            ["unbound", "registered", "invalid", "duplicate", "refused",]
         );
         assert_eq!(
             json_of(&statuses[3])["binding"],

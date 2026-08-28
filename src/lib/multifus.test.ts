@@ -183,9 +183,27 @@ const CALLS = [
     }
   },
   {
+    name: 'suspendShortcuts',
+    run: () => {
+      return multifus.suspendShortcuts()
+    }
+  },
+  {
+    name: 'resumeShortcuts',
+    run: () => {
+      return multifus.resumeShortcuts()
+    }
+  },
+  {
     name: 'setShortcut',
     run: () => {
       return multifus.setShortcut('next', 'Control+Shift+Right')
+    }
+  },
+  {
+    name: 'setCharacterShortcut',
+    run: () => {
+      return multifus.setCharacterShortcut(NICKNAME, 'F1')
     }
   },
   {

@@ -16,6 +16,7 @@ type PlainEventKind = Exclude<
   JournalEvent['kind'],
   | 'authorization'
   | 'authorizationRequested'
+  | 'characterShortcut'
   | 'notification'
   | 'quickReplyFailed'
   | 'shortcut'

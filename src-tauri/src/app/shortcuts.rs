@@ -11,6 +11,7 @@ use tauri_plugin_global_shortcut::GlobalShortcutExt;
 use tauri_plugin_global_shortcut::Shortcut;
 use tauri_plugin_global_shortcut::ShortcutState;
 
+use crate::app::journal::CharacterShortcutOutcome;
 use crate::app::journal::JournalEvent;
 use crate::app::journal::QuickReplyFailure;
 use crate::app::journal::RelayStop;
@@ -24,15 +25,18 @@ use crate::app::state::hold;
 use crate::app::state::lock;
 use crate::app::state::windows;
 use crate::app::state::AppState;
+use crate::app::state::CharacterAim;
 use crate::app::state::ShortcutEffect;
 use crate::app::view::Binding;
 use crate::app::view::BindingView;
 use crate::app::view::ShortcutAction;
 use crate::app::view::ShortcutStatus;
 use crate::app::walk;
+use crate::app::Multifus;
 use crate::config::QuickReplyId;
 use crate::platform::GameWindow;
 use crate::platform::PlatformError;
+use crate::platform::WindowId;
 use crate::platform::WindowManager;
 
 pub type ShortcutQueue = Sender<Binding>;
@@ -65,37 +69,77 @@ pub fn start(app: &AppHandle) {
     app.manage::<ShortcutQueue>(queue);
 }
 
-pub fn apply(app: &AppHandle) {
-    let wanted = lock(app).bindings();
+pub fn suspend(app: &AppHandle) {
+    let mut state = lock(app);
 
+    forget(app, &mut state);
+}
+
+fn forget(app: &AppHandle, state: &mut Multifus) {
     if let Err(error) = app.global_shortcut().unregister_all() {
-        lock(app).log_unless_repeated(JournalEvent::ShortcutsFailed {
+        state.log_unless_repeated(JournalEvent::ShortcutsFailed {
             detail: error.to_string(),
         });
     }
+}
+
+pub fn apply(app: &AppHandle) {
+    let mut state = lock(app);
+
+    let wanted = state.bindings();
+    let held = state.held();
+
+    forget(app, &mut state);
 
     let mut claimed = HashMap::new();
-    let mut bindings = Vec::new();
+    let mut statuses = vec![ShortcutStatus::Unbound; wanted.len()];
 
-    for (binding, accelerator) in wanted {
-        let status = bind(app, binding, accelerator.as_deref(), &mut claimed);
+    for index in claiming_order(&wanted, &held) {
+        let (binding, accelerator) = &wanted[index];
 
-        bindings.push(BindingView {
+        statuses[index] = bind(app, binding.clone(), accelerator.as_deref(), &mut claimed);
+    }
+
+    let bindings = wanted
+        .into_iter()
+        .zip(statuses)
+        .map(|((binding, accelerator), status)| BindingView {
             binding,
             accelerator,
             status,
-        });
-    }
+        })
+        .collect::<Vec<_>>();
 
-    let statuses = bindings
+    let told = bindings
         .iter()
-        .map(|bound| (bound.binding, bound.status.clone()))
+        .filter(|bound| is_worth_telling(bound))
+        .cloned()
         .collect();
 
-    let mut state = lock(app);
+    state.remember_bound(&bindings);
+    state.log_unless_repeated(JournalEvent::ShortcutsBound { bindings: told });
+}
 
-    state.set_shortcut_statuses(statuses);
-    state.log(JournalEvent::ShortcutsBound { bindings });
+fn claiming_order(
+    wanted: &[(Binding, Option<String>)],
+    held: &HashMap<Binding, String>,
+) -> Vec<usize> {
+    let (keeping, asking): (Vec<usize>, Vec<usize>) = (0..wanted.len()).partition(|index| {
+        let (binding, accelerator) = &wanted[*index];
+
+        accelerator
+            .as_ref()
+            .is_some_and(|accelerator| held.get(binding) == Some(accelerator))
+    });
+
+    keeping.into_iter().chain(asking).collect()
+}
+
+fn is_worth_telling(bound: &BindingView) -> bool {
+    !matches!(
+        (&bound.binding, &bound.status),
+        (Binding::Character { .. }, ShortcutStatus::Unbound)
+    )
 }
 
 fn claim(
@@ -113,7 +157,9 @@ fn claim(
         })?;
 
     match claimed.get(&shortcut.id()) {
-        Some(owner) => Err(ShortcutStatus::Duplicate { binding: *owner }),
+        Some(owner) => Err(ShortcutStatus::Duplicate {
+            binding: owner.clone(),
+        }),
         None => Ok(shortcut),
     }
 }
@@ -130,15 +176,16 @@ fn bind(
     };
 
     let handler_app = app.clone();
-    let registered = app
+    let pressed_binding = binding.clone();
+    let posted = app
         .global_shortcut()
         .on_shortcut(shortcut, move |_, _, event| {
             if event.state() == ShortcutState::Pressed {
-                fire(&handler_app, binding);
+                fire(&handler_app, pressed_binding.clone());
             }
         });
 
-    match registered {
+    match posted {
         Ok(()) => {
             claimed.insert(shortcut.id(), binding);
 
@@ -239,6 +286,13 @@ fn act_on(press: &Press, binding: Binding, window: &GameWindow) {
 
             hold(press.state).log_unless_repeated(JournalEvent::Shortcut { action, outcome });
         }
+        Binding::Character { nickname } => {
+            let aim = hold(press.state).decide_character_shortcut(&nickname, window.nickname());
+            let outcome = aim_at(press.windows, aim);
+
+            hold(press.state)
+                .log_unless_repeated(JournalEvent::CharacterShortcut { nickname, outcome });
+        }
         Binding::QuickReply { id } => press.mechanisms.paste_quick_reply(id),
     }
 }
@@ -258,6 +312,15 @@ fn refusal_said(binding: Binding, refusal: Refusal) -> JournalEvent {
                 }
             },
         },
+        Binding::Character { nickname } => JournalEvent::CharacterShortcut {
+            nickname,
+            outcome: match refusal {
+                Refusal::OutsideGame => CharacterShortcutOutcome::OutsideGame,
+                Refusal::ForegroundUnknown { detail } => {
+                    CharacterShortcutOutcome::ForegroundUnknown { detail }
+                }
+            },
+        },
         Binding::QuickReply { .. } => JournalEvent::QuickReplyFailed {
             reason: match refusal {
                 Refusal::OutsideGame => QuickReplyFailure::OutsideGame,
@@ -269,16 +332,40 @@ fn refusal_said(binding: Binding, refusal: Refusal) -> JournalEvent {
     }
 }
 
+enum Landing {
+    Arrived,
+    WindowGone,
+    Refused { detail: String },
+}
+
+fn land(windows: &dyn WindowManager, window: WindowId) -> Landing {
+    match windows.focus(window) {
+        Ok(()) => Landing::Arrived,
+        Err(PlatformError::WindowGone) => Landing::WindowGone,
+        Err(error) => Landing::Refused {
+            detail: error.to_string(),
+        },
+    }
+}
+
+fn aim_at(windows: &dyn WindowManager, aim: CharacterAim) -> CharacterShortcutOutcome {
+    match aim {
+        CharacterAim::Settled(outcome) => outcome,
+        CharacterAim::Focus { window } => match land(windows, window) {
+            Landing::Arrived => CharacterShortcutOutcome::Focused,
+            Landing::WindowGone => CharacterShortcutOutcome::NoWindow,
+            Landing::Refused { detail } => CharacterShortcutOutcome::FocusFailed { detail },
+        },
+    }
+}
+
 fn act(windows: &dyn WindowManager, effect: ShortcutEffect) -> ShortcutOutcome {
     match effect {
         ShortcutEffect::Settled(outcome) => outcome,
-        ShortcutEffect::Focus { nickname, window } => match windows.focus(window) {
-            Ok(()) => ShortcutOutcome::Focused { nickname },
-            Err(PlatformError::WindowGone) => ShortcutOutcome::NoWindow { nickname },
-            Err(error) => ShortcutOutcome::FocusFailed {
-                nickname,
-                detail: error.to_string(),
-            },
+        ShortcutEffect::Focus { nickname, window } => match land(windows, window) {
+            Landing::Arrived => ShortcutOutcome::Focused { nickname },
+            Landing::WindowGone => ShortcutOutcome::NoWindow { nickname },
+            Landing::Refused { detail } => ShortcutOutcome::FocusFailed { nickname, detail },
         },
     }
 }
@@ -565,6 +652,146 @@ mod tests {
     }
 
     #[test]
+    fn a_character_shortcut_brings_his_window_forward_from_any_other_one() {
+        let directory = directory();
+        let state = three_in_the_cycle(&directory);
+        let windows = FakeWindowManager::showing(Desktop {
+            foreground: Some(game_window(1, "Alpha")),
+            ..Desktop::default()
+        });
+        let mechanisms = FakeMechanisms::default();
+
+        answer(
+            &Press {
+                windows: windows.as_ref(),
+                state: &state,
+                mechanisms: &mechanisms,
+            },
+            Binding::Character {
+                nickname: "Charlie".to_owned(),
+            },
+        );
+
+        assert_eq!(windows.asked(), vec![Asked::Focused(WindowId::from_raw(3))]);
+        assert!(
+            journalled(&state).contains(&JournalEvent::CharacterShortcut {
+                nickname: "Charlie".to_owned(),
+                outcome: CharacterShortcutOutcome::Focused,
+            })
+        );
+    }
+
+    #[test]
+    fn a_character_shortcut_struck_on_his_own_window_moves_nothing_and_says_so() {
+        let directory = directory();
+        let state = three_in_the_cycle(&directory);
+        let windows = FakeWindowManager::showing(Desktop {
+            foreground: Some(game_window(1, "Alpha")),
+            ..Desktop::default()
+        });
+        let mechanisms = FakeMechanisms::default();
+
+        answer(
+            &Press {
+                windows: windows.as_ref(),
+                state: &state,
+                mechanisms: &mechanisms,
+            },
+            Binding::Character {
+                nickname: "Alpha".to_owned(),
+            },
+        );
+
+        assert_eq!(windows.asked(), Vec::new());
+        assert!(
+            journalled(&state).contains(&JournalEvent::CharacterShortcut {
+                nickname: "Alpha".to_owned(),
+                outcome: CharacterShortcutOutcome::AlreadyThere,
+            })
+        );
+    }
+
+    #[test]
+    fn a_character_shortcut_struck_outside_the_game_names_the_character_it_meant() {
+        let directory = directory();
+        let state = app_state(&directory, Settings::default());
+        let windows = FakeWindowManager::showing(Desktop::default());
+        let mechanisms = FakeMechanisms::default();
+
+        answer(
+            &Press {
+                windows: windows.as_ref(),
+                state: &state,
+                mechanisms: &mechanisms,
+            },
+            Binding::Character {
+                nickname: "Bravo".to_owned(),
+            },
+        );
+
+        assert_eq!(
+            journalled(&state),
+            vec![JournalEvent::CharacterShortcut {
+                nickname: "Bravo".to_owned(),
+                outcome: CharacterShortcutOutcome::OutsideGame,
+            }]
+        );
+    }
+
+    fn asked(nickname: &str, accelerator: &str) -> (Binding, Option<String>) {
+        (
+            Binding::Character {
+                nickname: nickname.to_owned(),
+            },
+            Some(accelerator.to_owned()),
+        )
+    }
+
+    #[test]
+    fn the_one_who_already_holds_a_combination_claims_it_before_the_one_who_asks() {
+        let wanted = vec![asked("Alpha", "F2"), asked("Bravo", "F2")];
+        let held = HashMap::from([(wanted[1].0.clone(), "F2".to_owned())]);
+
+        assert_eq!(
+            claiming_order(&wanted, &held),
+            vec![1, 0],
+            "Bravo held F2 first, and the roster order does not take it from him"
+        );
+        assert_eq!(
+            claiming_order(&wanted, &HashMap::new()),
+            vec![0, 1],
+            "nobody holds it yet, so the roster order decides"
+        );
+    }
+
+    #[test]
+    fn asking_for_the_combination_of_another_never_takes_it_from_him() {
+        let wanted = vec![asked("Alpha", "F5"), asked("Bravo", "F5")];
+        let held = HashMap::from([
+            (wanted[0].0.clone(), "F2".to_owned()),
+            (wanted[1].0.clone(), "F5".to_owned()),
+        ]);
+
+        assert_eq!(
+            claiming_order(&wanted, &held),
+            vec![1, 0],
+            "Alpha leaves his F2 for the F5 Bravo holds, and Bravo keeps it"
+        );
+    }
+
+    #[test]
+    fn a_binding_without_a_combination_never_claims_anything_first() {
+        let wanted = vec![(
+            Binding::Character {
+                nickname: "Alpha".to_owned(),
+            },
+            None,
+        )];
+
+        assert_eq!(claiming_order(&wanted, &HashMap::new()), vec![0]);
+    }
+
+    #[test]
     fn a_combination_the_cycle_already_took_is_refused_by_the_name_of_its_owner() {
         let next = Binding::Action {
             action: ShortcutAction::Next,
@@ -572,7 +799,7 @@ mod tests {
         let mut claimed = HashMap::new();
         let shortcut = claim(Some("Alt+Right"), &claimed).expect("a free combination");
 
-        claimed.insert(shortcut.id(), next);
+        claimed.insert(shortcut.id(), next.clone());
 
         assert_eq!(
             claim(Some("Alt+Right"), &claimed),

@@ -102,6 +102,10 @@ export const bindingLabel = (
     return `« ${strings.shortcuts.actions[binding.action].label} »`
   }
 
+  if (binding.kind === 'character') {
+    return strings.shortcuts.characterNamed(binding.nickname)
+  }
+
   const quickReply = quickReplies.find((candidate) => {
     return candidate.id === binding.id
   })
@@ -164,6 +168,15 @@ export const shortcutStatusLine = (
       return null
     }
   }
+}
+
+export const characterShortcutStatusLine = (
+  status: ShortcutStatus,
+  quickReplies: readonly QuickReply[]
+): TonedLine | null => {
+  return status.kind === 'unbound'
+    ? null
+    : shortcutStatusLine(status, quickReplies)
 }
 
 export const authorizationLine = (authorization: Authorization) => {

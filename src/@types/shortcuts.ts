@@ -9,6 +9,7 @@ export type QuickReplyId = number
 
 export type Binding =
   | { readonly kind: 'action'; readonly action: ShortcutAction }
+  | { readonly kind: 'character'; readonly nickname: string }
   | { readonly kind: 'quickReply'; readonly id: QuickReplyId }
 
 export type ShortcutStatus =

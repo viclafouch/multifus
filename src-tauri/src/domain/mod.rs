@@ -1,6 +1,7 @@
 pub mod character;
 pub mod notification;
 pub mod roster;
+pub mod shortcut;
 
 pub use character::Character;
 pub use character::Class;
@@ -11,3 +12,4 @@ pub use notification::extract_nickname;
 pub use notification::GameNotification;
 pub use notification::NotificationKind;
 pub use roster::Roster;
+pub use shortcut::Shortcut;

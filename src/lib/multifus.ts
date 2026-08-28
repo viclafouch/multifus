@@ -70,11 +70,26 @@ export const removeCharacter = async (nickname: string) => {
   return invoke<Snapshot>('remove_character', { nickname })
 }
 
+export const suspendShortcuts = async () => {
+  return invoke<null>('suspend_shortcuts')
+}
+
+export const resumeShortcuts = async () => {
+  return invoke<null>('resume_shortcuts')
+}
+
 export const setShortcut = async (
   action: ShortcutAction,
   accelerator: string | null
 ) => {
   return invoke<Snapshot>('set_shortcut', { action, accelerator })
+}
+
+export const setCharacterShortcut = async (
+  nickname: string,
+  accelerator: string | null
+) => {
+  return invoke<Snapshot>('set_character_shortcut', { nickname, accelerator })
 }
 
 export const resetShortcuts = async () => {

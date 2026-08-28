@@ -16,7 +16,9 @@ const ALPHA = {
   main: false,
   excluded: false,
   online: true,
-  relayed: true
+  relayed: true,
+  shortcut: null,
+  shortcutStatus: { kind: 'unbound' }
 } as const satisfies Character
 
 const BETA = { ...ALPHA, nickname: 'Beta' }

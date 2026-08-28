@@ -1,4 +1,4 @@
-import { Star } from 'lucide-react'
+import { MainStar } from '@/components/main-star'
 import { Button } from '@/components/ui/button'
 import {
   Tooltip,
@@ -25,10 +25,7 @@ export const MainToggle = ({ nickname, isMain, onToggle }: MainToggleProps) => {
         className="shrink-0"
         onClick={onToggle}
       >
-        <Star
-          strokeWidth={1.75}
-          className="size-3.5 text-muted-foreground/30 transition-colors duration-200 group-hover:text-muted-foreground/70 group-hover/button:text-muted-foreground/70 group-aria-pressed/button:main-lit group-aria-pressed/button:fill-current group-aria-pressed/button:text-primary"
-        />
+        <MainStar isMain={isMain} />
       </TooltipTrigger>
       <TooltipContent>
         {isMain ? words.mainUnset : words.mainSet}

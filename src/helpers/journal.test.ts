@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type {
+  CharacterShortcutOutcome,
   JournalEvent,
   NotificationOutcome,
   QuickReplyFailure,
@@ -120,7 +121,7 @@ const QUIET_STATUSES = new Set<ShortcutStatus['kind']>([
 ])
 
 const BINDINGS_LINE =
-  'Raccourcis : Fenêtre suivante Control+Shift+ArrowRight · Fenêtre précédente non attribué · Exclure ou réintégrer Control+Shift+KeyS refusé (déjà prise) · Déplacement rapide Control+Shift+KeyX illisible (touche inconnue) · Réponse rapide 1 Control+Shift+KeyP.'
+  'Raccourcis : « Fenêtre suivante » Control+Shift+ArrowRight · « Fenêtre précédente » non attribué · « Exclure ou réintégrer » Control+Shift+KeyS refusé (déjà prise) · « Déplacement rapide » Control+Shift+KeyX illisible (touche inconnue) · la réponse « prix libre » Control+Shift+KeyP.'
 
 const ROSTER_CASES = {
   excluded: [
@@ -362,6 +363,82 @@ const SETTING_CASES = {
     }
   ]
 } as const satisfies Record<SettingChange['kind'], readonly Case<'setting'>[]>
+
+const CHARACTER_SHORTCUT_CASES = {
+  focused: [
+    {
+      event: {
+        kind: 'characterShortcut',
+        nickname: NICKNAME,
+        outcome: { outcome: 'focused' }
+      },
+      line: 'Raccourci de Alpha : sa fenêtre passe au premier plan.'
+    }
+  ],
+  alreadyThere: [
+    {
+      event: {
+        kind: 'characterShortcut',
+        nickname: NICKNAME,
+        outcome: { outcome: 'alreadyThere' }
+      },
+      line: 'Raccourci de Alpha : vous y êtes déjà.'
+    }
+  ],
+  notInRoster: [
+    {
+      event: {
+        kind: 'characterShortcut',
+        nickname: NICKNAME,
+        outcome: { outcome: 'notInRoster' }
+      },
+      line: 'Raccourci de Alpha : il n’est plus dans le roster.'
+    }
+  ],
+  noWindow: [
+    {
+      event: {
+        kind: 'characterShortcut',
+        nickname: NICKNAME,
+        outcome: { outcome: 'noWindow' }
+      },
+      line: 'Raccourci de Alpha : sa fenêtre a disparu.'
+    }
+  ],
+  outsideGame: [
+    {
+      event: {
+        kind: 'characterShortcut',
+        nickname: NICKNAME,
+        outcome: { outcome: 'outsideGame' }
+      },
+      line: 'Raccourci de Alpha : ignoré, aucune fenêtre Dofus au premier plan.'
+    }
+  ],
+  focusFailed: [
+    {
+      event: {
+        kind: 'characterShortcut',
+        nickname: NICKNAME,
+        outcome: { outcome: 'focusFailed', detail: DETAIL }
+      },
+      line: `Raccourci de Alpha : le système a refusé de le ramener au premier plan (${DETAIL}).`
+    }
+  ],
+  foregroundUnknown: [
+    {
+      event: {
+        kind: 'characterShortcut',
+        nickname: NICKNAME,
+        outcome: { outcome: 'foregroundUnknown', detail: DETAIL }
+      },
+      line: `Raccourci de Alpha : impossible de savoir quelle fenêtre est au premier plan (${DETAIL}).`
+    }
+  ]
+} as const satisfies Record<
+  CharacterShortcutOutcome['outcome'],
+  readonly Case<'characterShortcut'>[]
+>
 
 const SHORTCUT_CASES = {
   focused: [
@@ -836,6 +913,7 @@ const JOURNAL_CASES = {
   roster: Object.values(ROSTER_CASES).flat(),
   setting: Object.values(SETTING_CASES).flat(),
   shortcut: Object.values(SHORTCUT_CASES).flat(),
+  characterShortcut: Object.values(CHARACTER_SHORTCUT_CASES).flat(),
   quickReplyFailed: Object.values(QUICK_REPLY_CASES).flat(),
   quickReplyPasted: [
     {
@@ -868,7 +946,7 @@ const JOURNAL_CASES = {
           }
         ]
       },
-      line: 'Raccourcis : Fenêtre suivante Control+Shift+ArrowRight en doublon avec Fenêtre précédente, donc inerte · Personnage principal aucune combinaison refusé (déjà prise).'
+      line: 'Raccourcis : « Fenêtre suivante » Control+Shift+ArrowRight en doublon avec « Fenêtre précédente », donc inerte · « Personnage principal » aucune combinaison refusé (déjà prise).'
     },
     {
       event: {
@@ -884,7 +962,7 @@ const JOURNAL_CASES = {
           }
         ]
       },
-      line: 'Raccourcis : Réponse rapide 2 Control+Shift+KeyP en doublon avec Fenêtre suivante, donc inerte.'
+      line: 'Raccourcis : une réponse sans texte Control+Shift+KeyP en doublon avec « Fenêtre suivante », donc inerte.'
     }
   ],
   shortcutsFailed: [
@@ -1206,7 +1284,7 @@ describe('journalLine', () => {
   it.each(Object.values(JOURNAL_CASES).flat())(
     '$event.kind se lit « $line »',
     ({ event, line }) => {
-      const written = journalLine(event)
+      const written = journalLine(event, QUICK_REPLIES)
 
       expect(written).toBe(line)
     }

@@ -45,7 +45,9 @@ const character = (nickname: string): Character => {
     main: false,
     excluded: false,
     online: true,
-    relayed: true
+    relayed: true,
+    shortcut: null,
+    shortcutStatus: { kind: 'unbound' }
   }
 }
 

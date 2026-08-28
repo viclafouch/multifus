@@ -93,6 +93,7 @@ export const CHARACTERS_STRINGS = {
     mainToggle: (nickname: string) => {
       return `${nickname} comme personnage principal`
     },
+    mainMark: 'Personnage principal',
     mainSet: 'En faire votre personnage principal',
     mainUnset: 'Ne plus en faire votre personnage principal',
     remove: (nickname: string) => {

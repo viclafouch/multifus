@@ -1,3 +1,5 @@
+import type { ShortcutStatus } from '@/@types/shortcuts'
+
 export type Gender = 'female' | 'male'
 
 export type Class =
@@ -27,4 +29,6 @@ export type Character = {
   readonly excluded: boolean
   readonly online: boolean
   readonly relayed: boolean
+  readonly shortcut: string | null
+  readonly shortcutStatus: ShortcutStatus
 }

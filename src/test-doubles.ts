@@ -18,7 +18,9 @@ const BLANK_CHARACTER: Character = {
   main: false,
   excluded: false,
   online: true,
-  relayed: true
+  relayed: true,
+  shortcut: null,
+  shortcutStatus: { kind: 'unbound' }
 }
 
 export const characterOf = (fields: Partial<Character> = {}) => {

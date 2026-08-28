@@ -38,6 +38,15 @@ export type ShortcutOutcome =
   | { readonly outcome: 'walk'; readonly enabled: boolean }
   | { readonly outcome: 'included'; readonly nickname: string }
 
+export type CharacterShortcutOutcome =
+  | { readonly outcome: 'alreadyThere' }
+  | { readonly outcome: 'focusFailed'; readonly detail: string }
+  | { readonly outcome: 'focused' }
+  | { readonly outcome: 'foregroundUnknown'; readonly detail: string }
+  | { readonly outcome: 'noWindow' }
+  | { readonly outcome: 'notInRoster' }
+  | { readonly outcome: 'outsideGame' }
+
 export type QuickReplyFailure =
   | { readonly reason: 'clipboardNotGivenBack'; readonly detail: string }
   | { readonly reason: 'clipboardRefused'; readonly detail: string }
@@ -176,6 +185,11 @@ export type JournalEvent =
       readonly kind: 'shortcut'
       readonly action: ShortcutAction
       readonly outcome: ShortcutOutcome
+    }
+  | {
+      readonly kind: 'characterShortcut'
+      readonly nickname: string
+      readonly outcome: CharacterShortcutOutcome
     }
   | {
       readonly kind: 'notification'

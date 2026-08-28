@@ -107,6 +107,11 @@ pub enum JournalEvent {
         outcome: ShortcutOutcome,
     },
 
+    CharacterShortcut {
+        nickname: String,
+        outcome: CharacterShortcutOutcome,
+    },
+
     QuickReplyPasted {
         excerpt: String,
     },
@@ -481,6 +486,24 @@ pub enum ShortcutOutcome {
     NoWindow { nickname: String },
 
     FocusFailed { nickname: String, detail: String },
+
+    ForegroundUnknown { detail: String },
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(tag = "outcome", rename_all = "camelCase")]
+pub enum CharacterShortcutOutcome {
+    Focused,
+
+    AlreadyThere,
+
+    NotInRoster,
+
+    NoWindow,
+
+    OutsideGame,
+
+    FocusFailed { detail: String },
 
     ForegroundUnknown { detail: String },
 }
