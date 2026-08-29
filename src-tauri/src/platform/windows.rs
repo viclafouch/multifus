@@ -132,6 +132,8 @@ use windows::Win32::UI::WindowsAndMessaging::WM_APP;
 use windows::Win32::UI::WindowsAndMessaging::WM_LBUTTONDOWN;
 use windows::Win32::UI::WindowsAndMessaging::WM_LBUTTONUP;
 use windows::Win32::UI::WindowsAndMessaging::WM_QUIT;
+use windows::Win32::UI::WindowsAndMessaging::WM_RBUTTONDOWN;
+use windows::Win32::UI::WindowsAndMessaging::WM_RBUTTONUP;
 use windows::Win32::UI::WindowsAndMessaging::WM_SETICON;
 use windows::Win32::UI::WindowsAndMessaging::WM_SETTEXT;
 use windows::Win32::UI::WindowsAndMessaging::WNDENUMPROC;
@@ -1064,9 +1066,12 @@ fn low_level_hooks_timeout() -> Duration {
 }
 
 unsafe extern "system" fn on_mouse(code: i32, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
-    let message = u32::try_from(wparam.0)
-        .ok()
-        .filter(|message| *message == WM_LBUTTONDOWN || *message == WM_LBUTTONUP);
+    let message = u32::try_from(wparam.0).ok().filter(|message| {
+        matches!(
+            *message,
+            WM_LBUTTONDOWN | WM_LBUTTONUP | WM_RBUTTONDOWN | WM_RBUTTONUP
+        )
+    });
 
     if let Some(message) = message.filter(|_| code >= 0) {
         let started = Instant::now();
@@ -1098,6 +1103,8 @@ fn verdict_of(lparam: LPARAM, message: u32) -> Verdict {
         match message {
             WM_LBUTTONDOWN => watched.judge.press(&watched.gate, clicked_at(event.pt)),
             WM_LBUTTONUP => watched.judge.release(&watched.gate, &watched.sink),
+            WM_RBUTTONDOWN => watched.judge.press_right(&watched.gate),
+            WM_RBUTTONUP => watched.judge.release_right(),
             _ => Verdict::Pass,
         }
     })

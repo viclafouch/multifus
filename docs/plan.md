@@ -87,7 +87,9 @@ ce qu'elle coûte.
 - [ ] Aucun personnage connecté : la roue s'ouvre vide et le dit
 - [ ] La part de la fenêtre du dessus est peinte d'un ambre pâle, et le principal porte son étoile
 - [ ] La roue par-dessus la barre de sorts : rien ne s'allume dans le jeu derrière le disque, et tout y répond de nouveau la roue fermée
-- [ ] Le Déplacement rapide allumé : un clic gauche pendant la roue est mangé, et le clic d'après part du personnage choisi
+- [ ] Un clic sur une part, Déplacement rapide éteint puis allumé : la fenêtre passe devant, Multifus reste derrière, et le jeu n'a rien vu du clic
+- [ ] Un clic droit pendant la roue fait la même chose qu'un clic gauche
+- [ ] Un clic au centre du disque, puis hors du disque : la roue se ferme et personne ne bouge
 - [ ] La bannière se pose sur l'arrivée par la roue comme sur l'arrivée par un clic
 - [ ] Cmd+Tab pendant le maintien : la roue part au tour suivant
 - [ ] Sur le Mac, lâcher la lettre en gardant Ctrl et Maj : la roue se ferme

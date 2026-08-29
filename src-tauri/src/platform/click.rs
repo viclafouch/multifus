@@ -54,6 +54,7 @@ pub trait ClickWatcher: Send + Sync {
 pub struct ClickGate {
     switching: AtomicBool,
     held: AtomicBool,
+    held_back: AtomicU64,
     awaited: AtomicU64,
     watched: Mutex<HashSet<WindowId>>,
     arrival: (Mutex<bool>, Condvar),
@@ -78,7 +79,21 @@ impl ClickGate {
 
     #[must_use]
     pub fn is_switching(&self) -> bool {
-        self.switching.load(Ordering::Acquire) || self.held.load(Ordering::Acquire)
+        self.switching.load(Ordering::Acquire)
+    }
+
+    #[must_use]
+    pub fn is_held(&self) -> bool {
+        self.held.load(Ordering::Acquire)
+    }
+
+    #[must_use]
+    pub fn clicks_held_back(&self) -> u64 {
+        self.held_back.load(Ordering::Acquire)
+    }
+
+    fn hold_back(&self) {
+        self.held_back.fetch_add(1, Ordering::AcqRel);
     }
 
     pub fn close(&self) {
@@ -152,10 +167,18 @@ enum Press {
 #[derive(Debug, Default)]
 pub struct ClickJudge {
     pressed: Cell<Option<Press>>,
+    pressed_right: Cell<bool>,
 }
 
 impl ClickJudge {
     pub fn press(&self, gate: &ClickGate, clicked: Option<ClickedAt>) -> Verdict {
+        if gate.is_held() {
+            gate.hold_back();
+            self.pressed.set(Some(Press::Eaten));
+
+            return Verdict::Eat;
+        }
+
         let pressed = clicked
             .filter(|clicked| gate.watches(clicked.window))
             .map(|clicked| {
@@ -189,6 +212,25 @@ impl ClickJudge {
         (sink)(ClickReport::Clicked { clicked });
 
         Verdict::Pass
+    }
+
+    pub fn press_right(&self, gate: &ClickGate) -> Verdict {
+        if !gate.is_held() {
+            return Verdict::Pass;
+        }
+
+        gate.hold_back();
+        self.pressed_right.set(true);
+
+        Verdict::Eat
+    }
+
+    pub fn release_right(&self) -> Verdict {
+        if self.pressed_right.take() {
+            Verdict::Eat
+        } else {
+            Verdict::Pass
+        }
     }
 }
 
@@ -280,7 +322,7 @@ mod tests {
     }
 
     #[test]
-    fn the_wheel_holds_the_door_shut_whatever_a_switch_does_meanwhile() {
+    fn the_wheel_holds_a_door_of_its_own_that_no_switch_lets_go_of() {
         let gate = ClickGate::default();
 
         gate.hold(true);
@@ -288,13 +330,97 @@ mod tests {
         gate.open();
 
         assert!(
-            gate.is_switching(),
+            gate.is_held(),
             "the switch is over, and the wheel is still open under the hand"
         );
 
         gate.hold(false);
 
-        assert!(!gate.is_switching());
+        assert!(!gate.is_held());
+    }
+
+    #[test]
+    fn a_click_the_wheel_holds_back_is_eaten_wherever_it_lands_and_counted() {
+        let gate = ClickGate::default();
+        let (judge, sink, reported) = watching(&gate);
+
+        gate.hold(true);
+
+        let press = judge.press(&gate, Some(clicked_at(ELSEWHERE)));
+        let release = judge.release(&gate, &sink);
+
+        assert!(matches!(press, Verdict::Eat));
+        assert!(matches!(release, Verdict::Eat));
+        assert_eq!(
+            gate.clicks_held_back(),
+            1,
+            "the wheel reads this count, and closes on the click it names"
+        );
+        assert_eq!(
+            windows_of(&reported),
+            Vec::<u64>::new(),
+            "a click the wheel took walks nobody"
+        );
+    }
+
+    #[test]
+    fn a_click_the_wheel_took_is_eaten_whole_even_once_the_wheel_has_closed() {
+        let gate = ClickGate::default();
+        let (judge, sink, reported) = watching(&gate);
+
+        gate.hold(true);
+        judge.press(&gate, Some(clicked_at(CLICKED)));
+        gate.hold(false);
+
+        assert!(
+            matches!(judge.release(&gate, &sink), Verdict::Eat),
+            "the wheel closed on the press, and the game must not see the half left"
+        );
+        assert_eq!(windows_of(&reported), Vec::<u64>::new());
+    }
+
+    #[test]
+    fn the_wheel_only_counts_the_clicks_it_ate_itself() {
+        let gate = ClickGate::default();
+        let (judge, sink, _reported) = watching(&gate);
+
+        judge.press(&gate, Some(clicked_at(CLICKED)));
+        judge.release(&gate, &sink);
+
+        gate.close();
+        judge.press(&gate, Some(clicked_at(CLICKED)));
+        judge.release(&gate, &sink);
+
+        assert_eq!(gate.clicks_held_back(), 0);
+    }
+
+    #[test]
+    fn the_right_button_is_eaten_whole_while_the_wheel_holds_the_door() {
+        let gate = ClickGate::default();
+        let judge = ClickJudge::default();
+
+        gate.hold(true);
+
+        let press = judge.press_right(&gate);
+
+        gate.hold(false);
+
+        assert!(matches!(press, Verdict::Eat));
+        assert!(
+            matches!(judge.release_right(), Verdict::Eat),
+            "the wheel let go between the two halves, and the game sees neither"
+        );
+        assert_eq!(gate.clicks_held_back(), 1);
+    }
+
+    #[test]
+    fn the_right_button_is_left_alone_with_no_wheel_open() {
+        let gate = ClickGate::default();
+        let judge = ClickJudge::default();
+
+        assert!(matches!(judge.press_right(&gate), Verdict::Pass));
+        assert!(matches!(judge.release_right(), Verdict::Pass));
+        assert_eq!(gate.clicks_held_back(), 0);
     }
 
     #[test]

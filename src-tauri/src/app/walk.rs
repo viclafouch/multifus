@@ -14,6 +14,8 @@ use tauri::AppHandle;
 use tauri::Manager;
 
 use crate::app::banner;
+use crate::app::clicks;
+use crate::app::clicks::Asker;
 use crate::app::journal::JournalEvent;
 use crate::app::journal::WalkFrom;
 use crate::app::journal::WalkIdle;
@@ -26,9 +28,7 @@ use crate::app::view::BannerCharacter;
 use crate::platform::ClickGate;
 use crate::platform::ClickReport;
 use crate::platform::ClickSink;
-use crate::platform::ClickWatcher;
 use crate::platform::ClickedAt;
-use crate::platform::PlatformClickWatcher;
 use crate::platform::PlatformError;
 use crate::platform::WindowId;
 use crate::platform::WindowManager;
@@ -51,9 +51,7 @@ enum WalkStep {
 
 #[derive(Debug)]
 pub struct Walk {
-    gate: Arc<ClickGate>,
     plan: Mutex<WalkPlan>,
-    steps: Sender<WalkStep>,
 }
 
 impl Walk {
@@ -69,8 +67,8 @@ impl Walk {
         self.plan().next.get(&clicked).copied()
     }
 
-    fn remember(&self, plan: WalkPlan) -> bool {
-        self.gate.watch(&plan.watched);
+    fn remember(&self, gate: &ClickGate, plan: WalkPlan) -> bool {
+        gate.watch(&plan.watched);
 
         let mut held = self.plan();
         let no_window_left = !held.watched.is_empty() && plan.watched.is_empty();
@@ -83,18 +81,16 @@ impl Walk {
 
 pub fn setup(app: &AppHandle) {
     let (steps, taken) = mpsc::channel::<WalkStep>();
-    let gate = Arc::new(ClickGate::default());
 
     let spawned = thread::Builder::new()
         .name("multifus-walk".to_owned())
         .spawn({
             let app = app.clone();
-            let gate = Arc::clone(&gate);
 
             move || {
                 for step in taken {
                     if catch_unwind(AssertUnwindSafe(|| take(&app, step))).is_err() {
-                        gate.open();
+                        clicks::gate(&app).open();
 
                         lock(&app).log_unless_repeated(JournalEvent::Panicked { work: Work::Walk });
                     }
@@ -108,12 +104,11 @@ pub fn setup(app: &AppHandle) {
         });
     }
 
+    clicks::setup(app, |gate| sink_of(gate, steps));
+
     app.manage(Walk {
-        gate,
         plan: Mutex::default(),
-        steps,
     });
-    app.manage(PlatformClickWatcher::new());
 }
 
 pub fn set_enabled(app: &AppHandle, enabled: bool, from: WalkFrom) {
@@ -130,7 +125,11 @@ pub fn set_enabled(app: &AppHandle, enabled: bool, from: WalkFrom) {
             return;
         }
     } else {
-        app.state::<PlatformClickWatcher>().stop();
+        clicks::stop(app, Asker::Walk);
+
+        let _ = app
+            .state::<Walk>()
+            .remember(&clicks::gate(app), WalkPlan::default());
     }
 
     let here = enabled.then(|| who_is_here(app)).flatten();
@@ -150,10 +149,6 @@ fn who_is_here(app: &AppHandle) -> Option<BannerCharacter> {
     lock(app).banner_character_of(found.id())
 }
 
-pub fn hold_clicks(app: &AppHandle, held: bool) {
-    app.state::<Walk>().gate.hold(held);
-}
-
 pub fn toggle(app: &AppHandle, from: WalkFrom) {
     let enabled = lock(app).is_walk_enabled();
 
@@ -171,7 +166,7 @@ pub fn refresh(app: &AppHandle) -> bool {
         return false;
     };
 
-    if !app.state::<Walk>().remember(plan) {
+    if !app.state::<Walk>().remember(&clicks::gate(app), plan) {
         return false;
     }
 
@@ -181,18 +176,11 @@ pub fn refresh(app: &AppHandle) -> bool {
 }
 
 fn listen(app: &AppHandle) -> Result<(), PlatformError> {
-    let (gate, steps) = {
-        let walk = app.state::<Walk>();
-
-        (Arc::clone(&walk.gate), walk.steps.clone())
-    };
-
-    app.state::<PlatformClickWatcher>()
-        .start(Arc::clone(&gate), sink_of(gate, steps))?;
+    clicks::listen(app, Asker::Walk)?;
 
     let plan = lock(app).walk_plan();
 
-    let _ = app.state::<Walk>().remember(plan);
+    let _ = app.state::<Walk>().remember(&clicks::gate(app), plan);
 
     Ok(())
 }
@@ -282,17 +270,20 @@ impl Banner for AppBanner<'_> {
 struct Switch<'a> {
     windows: &'a dyn WindowManager,
     walk: &'a Walk,
+    gate: &'a ClickGate,
     state: &'a AppState,
     banner: &'a dyn Banner,
 }
 
 fn on_click(app: &AppHandle, clicked: ClickedAt) {
     let walk = app.state::<Walk>();
+    let gate = clicks::gate(app);
 
     switch_over(
         &Switch {
             windows: windows(app),
             walk: walk.inner(),
+            gate: &gate,
             state: app.state::<AppState>().inner(),
             banner: &AppBanner(app),
         },
@@ -302,7 +293,7 @@ fn on_click(app: &AppHandle, clicked: ClickedAt) {
 
 fn switch_over(switch: &Switch, clicked: ClickedAt) {
     let asked_at = Instant::now();
-    let gate = &switch.walk.gate;
+    let gate = switch.gate;
 
     let target = match aim(switch.windows, switch.walk, clicked) {
         Aim::Elsewhere | Aim::AlreadyThere => {
@@ -348,7 +339,6 @@ fn switch_over(switch: &Switch, clicked: ClickedAt) {
 
 #[cfg(test)]
 mod tests {
-    use std::sync::mpsc::Receiver;
 
     use tempfile::TempDir;
 
@@ -443,17 +433,10 @@ mod tests {
         }
     }
 
-    fn walk(plan: WalkPlan) -> (Walk, Receiver<WalkStep>) {
-        let (steps, taken) = mpsc::channel::<WalkStep>();
-
-        (
-            Walk {
-                gate: Arc::new(ClickGate::default()),
-                plan: Mutex::new(plan),
-                steps,
-            },
-            taken,
-        )
+    fn walk(plan: WalkPlan) -> Walk {
+        Walk {
+            plan: Mutex::new(plan),
+        }
     }
 
     fn plan_of(watched: &[u64], next: &[(u64, u64)]) -> WalkPlan {
@@ -465,7 +448,7 @@ mod tests {
 
     #[test]
     fn the_walk_only_answers_for_the_windows_the_scan_handed_it() {
-        let (walk, _taken) = walk(plan_of(&[1, 2], &[(1, 2), (2, 1)]));
+        let walk = walk(plan_of(&[1, 2], &[(1, 2), (2, 1)]));
 
         assert!(walk.watches(id(1)));
         assert!(!walk.watches(id(3)));
@@ -475,30 +458,50 @@ mod tests {
 
     #[test]
     fn the_walk_says_the_turn_where_the_last_window_it_watched_leaves_the_screen() {
-        let (walk, _taken) = walk(plan_of(&[1, 2], &[(1, 2), (2, 1)]));
+        let walk = walk(plan_of(&[1, 2], &[(1, 2), (2, 1)]));
+        let gate = ClickGate::default();
 
         assert!(
-            !walk.remember(plan_of(&[1], &[(1, 1)])),
+            !walk.remember(&gate, plan_of(&[1], &[(1, 1)])),
             "one client of the two is closed, and the other is still there to walk on"
         );
-        assert!(walk.remember(plan_of(&[], &[])));
+        assert!(walk.remember(&gate, plan_of(&[], &[])));
         assert!(
-            !walk.remember(plan_of(&[], &[])),
+            !walk.remember(&gate, plan_of(&[], &[])),
             "the walk is already off, and the turns that follow have nothing to say"
         );
     }
 
     #[test]
-    fn a_walk_turned_on_without_a_single_client_stays_on_and_waits() {
-        let (walk, _taken) = walk(plan_of(&[], &[]));
+    fn a_walk_put_out_leaves_no_window_behind_it() {
+        let walk = walk(plan_of(&[1, 2], &[(1, 2), (2, 1)]));
+        let gate = ClickGate::default();
 
-        assert!(!walk.remember(plan_of(&[], &[])));
-        assert!(!walk.remember(plan_of(&[1], &[(1, 1)])));
+        walk.remember(&gate, plan_of(&[1, 2], &[(1, 2), (2, 1)]));
+        walk.remember(&gate, WalkPlan::default());
+
+        assert!(
+            !walk.watches(id(1)),
+            "the walk is out, and a click on that window walks nobody"
+        );
+        assert!(
+            !gate.watches(id(1)),
+            "the door of a wheel opened later must not take that click for a walk"
+        );
+    }
+
+    #[test]
+    fn a_walk_turned_on_without_a_single_client_stays_on_and_waits() {
+        let walk = walk(plan_of(&[], &[]));
+        let gate = ClickGate::default();
+
+        assert!(!walk.remember(&gate, plan_of(&[], &[])));
+        assert!(!walk.remember(&gate, plan_of(&[1], &[(1, 1)])));
     }
 
     #[test]
     fn a_click_on_a_watched_window_with_nobody_in_the_cycle_has_nowhere_to_go() {
-        let (walk, _taken) = walk(plan_of(&[1, 2], &[]));
+        let walk = walk(plan_of(&[1, 2], &[]));
 
         assert!(walk.watches(id(1)));
         assert_eq!(walk.next_after(id(1)), None);
@@ -535,7 +538,7 @@ mod tests {
 
     #[test]
     fn a_click_on_a_watched_window_aims_at_the_next_character_of_the_cycle() {
-        let (walk, _taken) = walk(plan_of(&[1, 2], &[(1, 2), (2, 1)]));
+        let walk = walk(plan_of(&[1, 2], &[(1, 2), (2, 1)]));
         let windows = FakeWindowManager::showing(Desktop {
             under_click: Some(id(1)),
             ..Desktop::default()
@@ -549,7 +552,7 @@ mod tests {
 
     #[test]
     fn a_click_that_lands_outside_the_game_aims_nowhere() {
-        let (walk, _taken) = walk(plan_of(&[1, 2], &[(1, 2), (2, 1)]));
+        let walk = walk(plan_of(&[1, 2], &[(1, 2), (2, 1)]));
         let windows = FakeWindowManager::showing(Desktop::default());
 
         assert_eq!(aim(windows.as_ref(), &walk, clicked_at(1)), Aim::Elsewhere);
@@ -568,7 +571,7 @@ mod tests {
 
     #[test]
     fn a_click_with_nobody_left_in_the_cycle_says_so_rather_than_switching() {
-        let (walk, _taken) = walk(plan_of(&[1], &[]));
+        let walk = walk(plan_of(&[1], &[]));
         let windows = FakeWindowManager::showing(Desktop {
             under_click: Some(id(1)),
             ..Desktop::default()
@@ -582,7 +585,7 @@ mod tests {
 
     #[test]
     fn the_last_character_of_the_cycle_stays_where_it_is() {
-        let (walk, _taken) = walk(plan_of(&[1], &[(1, 1)]));
+        let walk = walk(plan_of(&[1], &[(1, 1)]));
         let windows = FakeWindowManager::showing(Desktop {
             under_click: Some(id(1)),
             ..Desktop::default()
@@ -622,15 +625,16 @@ mod tests {
     fn a_click_carries_the_player_to_the_next_window_once_the_game_has_had_it() {
         let directory = directory();
         let state = two_in_the_cycle(&directory);
-        let (walk, _taken) = walk(hold(&state).walk_plan());
+        let walk = walk(hold(&state).walk_plan());
+        let gate = Arc::new(ClickGate::default());
         let windows = FakeWindowManager::showing(Desktop {
             under_click: Some(id(1)),
-            tells_arrival: Some(Arc::clone(&walk.gate)),
+            tells_arrival: Some(Arc::clone(&gate)),
             ..Desktop::default()
         });
         let shown = FakeBanner::default();
 
-        walk.gate.close();
+        gate.close();
 
         let began_at = Instant::now();
 
@@ -638,6 +642,7 @@ mod tests {
             &Switch {
                 windows: windows.as_ref(),
                 walk: &walk,
+                gate: &gate,
                 state: &state,
                 banner: &shown,
             },
@@ -656,7 +661,7 @@ mod tests {
         );
         assert_eq!(shown.steps(), vec![Some(bravo())]);
         assert!(
-            !walk.gate.is_switching(),
+            !gate.is_switching(),
             "the door is open again for the next click"
         );
     }
@@ -665,14 +670,15 @@ mod tests {
     fn a_switch_the_system_never_finishes_is_awaited_up_to_the_ceiling_and_no_further() {
         let directory = directory();
         let state = two_in_the_cycle(&directory);
-        let (walk, _taken) = walk(hold(&state).walk_plan());
+        let walk = walk(hold(&state).walk_plan());
+        let gate = ClickGate::default();
         let windows = FakeWindowManager::showing(Desktop {
             under_click: Some(id(1)),
             ..Desktop::default()
         });
         let shown = FakeBanner::default();
 
-        walk.gate.close();
+        gate.close();
 
         let began_at = Instant::now();
 
@@ -680,6 +686,7 @@ mod tests {
             &Switch {
                 windows: windows.as_ref(),
                 walk: &walk,
+                gate: &gate,
                 state: &state,
                 banner: &shown,
             },
@@ -695,23 +702,24 @@ mod tests {
         );
         assert!(began_at.elapsed() >= SETTLE + SWITCH_CEILING);
         assert_eq!(shown.steps(), vec![Some(bravo())]);
-        assert!(!walk.gate.is_switching());
+        assert!(!gate.is_switching());
     }
 
     #[test]
     fn a_switch_the_system_refuses_is_not_waited_for() {
         let directory = directory();
         let state = two_in_the_cycle(&directory);
-        let (walk, _taken) = walk(hold(&state).walk_plan());
+        let walk = walk(hold(&state).walk_plan());
+        let gate = Arc::new(ClickGate::default());
         let windows = FakeWindowManager::showing(Desktop {
             under_click: Some(id(1)),
-            tells_arrival: Some(Arc::clone(&walk.gate)),
+            tells_arrival: Some(Arc::clone(&gate)),
             focus_refusal: Some(PlatformError::system("focusing", "the system said no")),
             ..Desktop::default()
         });
         let shown = FakeBanner::default();
 
-        walk.gate.close();
+        gate.close();
 
         let began_at = Instant::now();
 
@@ -719,6 +727,7 @@ mod tests {
             &Switch {
                 windows: windows.as_ref(),
                 walk: &walk,
+                gate: &gate,
                 state: &state,
                 banner: &shown,
             },
@@ -735,35 +744,38 @@ mod tests {
             began_at.elapsed() < SETTLE + SWITCH_CEILING,
             "a switch the system would not even take is not awaited"
         );
-        assert!(!walk.gate.is_switching());
+        assert!(!gate.is_switching());
     }
 
     #[test]
     fn a_click_that_walks_nowhere_opens_the_door_it_closed() {
         let directory = directory();
         let state = app_state(&directory, Settings::default());
-        let (last_of_the_cycle, _taken) = walk(plan_of(&[1], &[(1, 1)]));
-        let (nobody_in_the_cycle, _left) = walk(plan_of(&[1], &[]));
+        let last_of_the_cycle = walk(plan_of(&[1], &[(1, 1)]));
+        let nobody_in_the_cycle = walk(plan_of(&[1], &[]));
+        let one_door = ClickGate::default();
+        let the_other = ClickGate::default();
         let windows = FakeWindowManager::showing(Desktop {
             under_click: Some(id(1)),
             ..Desktop::default()
         });
         let shown = FakeBanner::default();
 
-        last_of_the_cycle.gate.close();
-        nobody_in_the_cycle.gate.close();
+        one_door.close();
+        the_other.close();
 
         switch_over(
             &Switch {
                 windows: windows.as_ref(),
                 walk: &last_of_the_cycle,
+                gate: &one_door,
                 state: &state,
                 banner: &shown,
             },
             clicked_at(1),
         );
 
-        assert!(!last_of_the_cycle.gate.is_switching());
+        assert!(!one_door.is_switching());
         assert_eq!(windows.asked(), Vec::new());
         assert_eq!(
             shown.steps(),
@@ -776,13 +788,14 @@ mod tests {
             &Switch {
                 windows: windows.as_ref(),
                 walk: &nobody_in_the_cycle,
+                gate: &the_other,
                 state: &state,
                 banner: &shown,
             },
             clicked_at(1),
         );
 
-        assert!(!nobody_in_the_cycle.gate.is_switching());
+        assert!(!the_other.is_switching());
         assert_eq!(windows.asked(), Vec::new());
         assert_eq!(
             shown.steps(),

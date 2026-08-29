@@ -1,5 +1,6 @@
 pub mod autostart;
 pub mod banner;
+pub mod clicks;
 pub mod commands;
 pub mod journal;
 pub mod journal_file;

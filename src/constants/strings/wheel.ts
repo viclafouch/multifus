@@ -4,7 +4,7 @@ export const WHEEL_STRINGS = {
   wheel: {
     title: 'La roue des personnages',
     subtitle:
-      'Maintenez vos touches dans le jeu : la roue s’ouvre au milieu de l’écran. Visez une tête, lâchez, la fenêtre passe devant.',
+      'Maintenez vos touches dans le jeu : la roue s’ouvre au milieu de l’écran. Visez une tête, lâchez ou cliquez, la fenêtre passe devant.',
     shortcutLabel: 'Raccourci',
     shortcutDescription: 'Depuis une fenêtre du jeu, et nulle part ailleurs.',
     unbound:

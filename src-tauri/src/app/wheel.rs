@@ -24,6 +24,8 @@ use tauri::WebviewWindow;
 use tauri::WebviewWindowBuilder;
 
 use crate::app::banner;
+use crate::app::clicks;
+use crate::app::clicks::Asker;
 use crate::app::journal::JournalEvent;
 use crate::app::journal::WheelOutcome;
 use crate::app::journal::Work;
@@ -33,7 +35,6 @@ use crate::app::state::windows;
 use crate::app::view::DisplayView;
 use crate::app::view::WheelSlice;
 use crate::app::view::WheelStep;
-use crate::app::walk;
 use crate::config::WHEEL_WIDEST;
 use crate::domain::Class;
 use crate::domain::Gender;
@@ -351,12 +352,12 @@ pub fn open(app: &AppHandle, here: WindowId) {
 
     wheel.lay(open);
 
-    walk::hold_clicks(app, true);
+    let clicks_before = hold_clicks(app);
 
     tell(app, &step);
     reveal(app);
 
-    follow_cursor(app, generation);
+    follow_cursor(app, generation, clicks_before);
 }
 
 pub fn release(app: &AppHandle) {
@@ -364,6 +365,10 @@ pub fn release(app: &AppHandle) {
         return;
     };
 
+    let_go(app, generation);
+}
+
+fn let_go(app: &AppHandle, generation: u64) {
     let at = cursor_of(app);
 
     let Some(open) = shut_if(app, generation) else {
@@ -375,6 +380,26 @@ pub fn release(app: &AppHandle) {
     };
 
     land(app, nickname, window);
+}
+
+fn hold_clicks(app: &AppHandle) -> u64 {
+    if let Err(error) = clicks::listen(app, Asker::Wheel) {
+        lock(app).log_unless_repeated(JournalEvent::WheelFailed {
+            detail: error.to_string(),
+        });
+    }
+
+    let gate = clicks::gate(app);
+    let clicks_before = gate.clicks_held_back();
+
+    gate.hold(true);
+
+    clicks_before
+}
+
+fn give_clicks_back(app: &AppHandle) {
+    clicks::gate(app).hold(false);
+    clicks::stop(app, Asker::Wheel);
 }
 
 pub fn follow_foreground(app: &AppHandle) {
@@ -443,7 +468,7 @@ fn raise_preview(app: &AppHandle, crowd: usize) -> Option<u64> {
 
     tell(app, &step);
     reveal(app);
-    follow_cursor(app, generation);
+    follow_cursor(app, generation, clicks::gate(app).clicks_held_back());
 
     Some(generation)
 }
@@ -457,7 +482,7 @@ fn shut_if(app: &AppHandle, generation: u64) -> Option<Open> {
     wipe(app, generation);
 
     if !open.previewing {
-        walk::hold_clicks(app, false);
+        give_clicks_back(app);
     }
 
     Some(open)
@@ -488,10 +513,18 @@ fn land(app: &AppHandle, nickname: String, window: WindowId) {
     banner::step(app, arrived);
 }
 
-fn follow_cursor(app: &AppHandle, generation: u64) {
+fn follow_cursor(app: &AppHandle, generation: u64, clicks_before: u64) {
     apart(app, move |app| {
+        let gate = clicks::gate(app);
+
         while app.state::<Wheel>().holds(generation) {
             thread::sleep(POLL);
+
+            if gate.clicks_held_back() != clicks_before {
+                let_go(app, generation);
+
+                return;
+            }
 
             let Some(at) = cursor_of(app) else {
                 continue;

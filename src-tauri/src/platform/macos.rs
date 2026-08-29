@@ -118,8 +118,10 @@ const MAX_BANNER_TEXTS: usize = 4;
 
 const STOP_CHECK_SECONDS: f64 = 0.25;
 
-const CLICK_MASK: CGEventMask =
-    (1 << CGEventType::LeftMouseDown.0) | (1 << CGEventType::LeftMouseUp.0);
+const CLICK_MASK: CGEventMask = (1 << CGEventType::LeftMouseDown.0)
+    | (1 << CGEventType::LeftMouseUp.0)
+    | (1 << CGEventType::RightMouseDown.0)
+    | (1 << CGEventType::RightMouseUp.0);
 
 const NOBODY: pid_t = -1;
 
@@ -868,6 +870,8 @@ impl WatchedClicks {
         match kind {
             CGEventType::LeftMouseDown => self.judge.press(&self.gate, self.window_clicked(event)),
             CGEventType::LeftMouseUp => self.judge.release(&self.gate, &self.sink),
+            CGEventType::RightMouseDown => self.judge.press_right(&self.gate),
+            CGEventType::RightMouseUp => self.judge.release_right(),
             CGEventType::TapDisabledByTimeout | CGEventType::TapDisabledByUserInput => {
                 self.resume();
 
