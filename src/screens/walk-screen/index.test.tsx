@@ -4,12 +4,7 @@ import type { Display } from '@/@types/display'
 import type { ShortcutBinding } from '@/@types/shortcuts'
 import type { BannerPlace } from '@/@types/walk'
 import { strings } from '@/constants/strings'
-import {
-  APPLE_AGENT,
-  displayOf,
-  pending,
-  WINDOWS_AGENT
-} from '@/test-doubles'
+import { APPLE_AGENT, displayOf, pending, WINDOWS_AGENT } from '@/test-doubles'
 
 const bridge = {
   setWalkEnabled: vi.fn(pending),
