@@ -144,7 +144,7 @@
   filter: drop-shadow(0 5px 16px oklch(0 0 0 / 0.6));
 }
 
-@utility wheel-plate {
+@utility wheel-disc {
   fill: oklch(0.14 0.007 66 / 0.96);
 }
 

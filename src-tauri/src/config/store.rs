@@ -372,7 +372,7 @@ mod tests {
         assert_eq!(
             store.load().settings.rune_table.transparency,
             RUNE_TABLE_CLEAREST,
-            "a transparency past the end would paint the plate darker than full"
+            "a transparency past the end would paint the table darker than full"
         );
     }
 

@@ -18,7 +18,7 @@ export type RuneFamily = {
   readonly rows: readonly RuneRow[]
 }
 
-export const PLATE_DRAWN_WIDTH = 320
+export const TABLE_DRAWN_WIDTH = 320
 
 export const RUNE_FAMILIES = [
   {

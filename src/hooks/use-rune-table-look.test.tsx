@@ -48,8 +48,8 @@ const tell = async (look: number) => {
   })
 }
 
-describe('le voile que Rust donne à la plaque', () => {
-  it('porte la plaque pleine tant que Rust n’a rien dit', () => {
+describe('le voile que Rust donne au tableau', () => {
+  it('porte le tableau plein tant que Rust n’a rien dit', () => {
     const { result } = renderHook(() => {
       return useRuneTableLook()
     })

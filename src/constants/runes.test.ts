@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { RuneFamily, RuneRow } from '@/constants/runes'
-import { PLATE_DRAWN_WIDTH, RUNE_FAMILIES } from '@/constants/runes'
+import { TABLE_DRAWN_WIDTH, RUNE_FAMILIES } from '@/constants/runes'
 import { strings } from '@/constants/strings'
 import SETTINGS_SOURCE from '../../src-tauri/src/config/settings.rs?raw'
 
@@ -68,7 +68,7 @@ describe('le tableau des poids de runes', () => {
   })
 
   it('est dessiné pour la plus étroite des largeurs que la jauge donne', () => {
-    expect(PLATE_DRAWN_WIDTH).toBe(
+    expect(TABLE_DRAWN_WIDTH).toBe(
       rustCount(SETTINGS_SOURCE, 'RUNE_TABLE_NARROWEST')
     )
   })
@@ -77,7 +77,7 @@ describe('le tableau des poids de runes', () => {
     expect(new Set(statsOf(ROWS)).size).toBe(ROWS.length)
   })
 
-  it('donne à chaque famille le nom que la plaque écrit', () => {
+  it('donne à chaque famille le nom que le tableau écrit', () => {
     const named = FAMILIES.map((family) => {
       return strings.runeTable.sheet.families[family.name]
     })

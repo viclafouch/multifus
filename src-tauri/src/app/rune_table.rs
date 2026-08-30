@@ -121,13 +121,13 @@ impl Mode {
 struct Posed {
     at: LogicalPosition<f64>,
     from: ScreenPoint,
-    plate: Plate,
+    size: TableSize,
 }
 
 #[derive(Debug, Default)]
 struct RuneTable {
     mode: Mutex<Option<Mode>>,
-    plate_ratio: Mutex<Option<f64>>,
+    table_ratio: Mutex<Option<f64>>,
     preview_offset: Mutex<Option<RuneOffset>>,
     posed: Mutex<Option<Posed>>,
     posing: Mutex<()>,
@@ -194,14 +194,14 @@ impl RuneTable {
 
     fn ratio(&self) -> Option<f64> {
         *self
-            .plate_ratio
+            .table_ratio
             .lock()
             .unwrap_or_else(PoisonError::into_inner)
     }
 
     fn measure(&self, ratio: f64) {
         *self
-            .plate_ratio
+            .table_ratio
             .lock()
             .unwrap_or_else(PoisonError::into_inner) = Some(ratio);
     }
@@ -355,29 +355,29 @@ fn follow_multifus(app: &AppHandle) {
     };
 
     let area = screen_under(app, frame).map(|screen| screen.area);
-    let plate = plate_of(app, area);
+    let size = table_size_of(app, area);
 
-    lay_over(app, frame, plate, middle_offset(app, frame, plate));
+    lay_over(app, frame, size, middle_offset(app, frame, size));
 }
 
-fn lay_over(app: &AppHandle, frame: ScreenFrame, plate: Plate, offset: RuneOffset) {
+fn lay_over(app: &AppHandle, frame: ScreenFrame, size: TableSize, offset: RuneOffset) {
     pose(
         app,
         Posed {
             at: placed(frame, offset),
             from: frame.origin,
-            plate,
+            size,
         },
     );
 }
 
-fn middle_offset(app: &AppHandle, frame: ScreenFrame, plate: Plate) -> RuneOffset {
+fn middle_offset(app: &AppHandle, frame: ScreenFrame, size: TableSize) -> RuneOffset {
     let table = app.state::<RuneTable>();
     let mut held = table.preview_offset();
 
     *held.get_or_insert(RuneOffset {
-        x: (frame.width - plate.width) / 2.0,
-        y: (frame.height - plate.height) / 2.0,
+        x: (frame.width - size.width) / 2.0,
+        y: (frame.height - size.height) / 2.0,
     })
 }
 
@@ -425,9 +425,9 @@ fn follow_game(app: &AppHandle) {
     }
 
     let area = screen.map(|screen| screen.area);
-    let plate = plate_of(app, area);
+    let size = table_size_of(app, area);
 
-    lay_over(app, frame, plate, kept_offset(app, frame, plate));
+    lay_over(app, frame, size, kept_offset(app, frame, size));
 }
 
 fn complain(app: &AppHandle, detail: &str) {
@@ -440,13 +440,13 @@ fn complain(app: &AppHandle, detail: &str) {
     veil(app);
 }
 
-fn kept_offset(app: &AppHandle, frame: ScreenFrame, plate: Plate) -> RuneOffset {
+fn kept_offset(app: &AppHandle, frame: ScreenFrame, size: TableSize) -> RuneOffset {
     if let Some(offset) = lock(app).rune_table_offset() {
         return offset;
     }
 
     let first = RuneOffset {
-        x: frame.width - plate.width - FIRST_MARGIN,
+        x: frame.width - size.width - FIRST_MARGIN,
         y: FIRST_MARGIN,
     };
 
@@ -459,7 +459,7 @@ fn kept_offset(app: &AppHandle, frame: ScreenFrame, plate: Plate) -> RuneOffset 
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-struct Plate {
+struct TableSize {
     width: f64,
     height: f64,
 }
@@ -481,7 +481,7 @@ struct WorkArea {
     height: f64,
 }
 
-fn plate_of(app: &AppHandle, area: Option<WorkArea>) -> Plate {
+fn table_size_of(app: &AppHandle, area: Option<WorkArea>) -> TableSize {
     let width = f64::from(lock(app).rune_table_width());
     let ratio = app.state::<RuneTable>().ratio().unwrap_or(GUESSED_RATIO);
 
@@ -496,8 +496,8 @@ fn fitted(width: f64, ratio: f64, area: Option<WorkArea>) -> f64 {
     width.min(area.height / ratio).floor()
 }
 
-fn grown(width: f64, ratio: f64) -> Plate {
-    Plate {
+fn grown(width: f64, ratio: f64) -> TableSize {
+    TableSize {
         width,
         height: (width * ratio).ceil(),
     }
@@ -520,7 +520,7 @@ fn pose(app: &AppHandle, wanted: Posed) {
     }
 
     let posed = window
-        .set_size(LogicalSize::new(wanted.plate.width, wanted.plate.height))
+        .set_size(LogicalSize::new(wanted.size.width, wanted.size.height))
         .and_then(|()| window.set_position(wanted.at))
         .and_then(|()| window.show());
 
@@ -848,8 +848,8 @@ mod tests {
         }
     }
 
-    fn plate() -> Plate {
-        Plate {
+    fn a_table_size() -> TableSize {
+        TableSize {
             width: 420.0,
             height: 640.0,
         }
@@ -859,7 +859,7 @@ mod tests {
         Posed {
             at: LogicalPosition::new(x, y),
             from: frame().origin,
-            plate: plate(),
+            size: a_table_size(),
         }
     }
 
@@ -891,7 +891,7 @@ mod tests {
                 }
             ),
             LogicalPosition::new(4100.0, 4060.0),
-            "a plate parked off the screen is a plate the hand meant to put away"
+            "a table parked off the screen is a table the hand meant to put away"
         );
     }
 
@@ -1108,7 +1108,7 @@ mod tests {
     }
 
     #[test]
-    fn a_drag_moves_the_plate_from_where_it_was_posed_last() {
+    fn a_drag_moves_the_table_from_where_it_was_posed_last() {
         assert_eq!(
             dragged(posed_at(300.0, 200.0), 40.0, -25.0),
             LogicalPosition::new(340.0, 175.0)
@@ -1116,11 +1116,11 @@ mod tests {
     }
 
     #[test]
-    fn a_drag_that_pushes_past_the_screen_carries_the_plate_off_it() {
+    fn a_drag_that_pushes_past_the_screen_carries_the_table_off_it() {
         assert_eq!(
             dragged(posed_at(1800.0, 300.0), 400.0, 0.0),
             LogicalPosition::new(2200.0, 300.0),
-            "the plate is put away past the edge, and the recall brings it back"
+            "the table is put away past the edge, and the recall brings it back"
         );
         assert_eq!(
             dragged(posed_at(20.0, 300.0), -400.0, 0.0),
@@ -1129,7 +1129,7 @@ mod tests {
     }
 
     #[test]
-    fn the_place_written_down_is_the_one_the_plate_landed_on() {
+    fn the_place_written_down_is_the_one_the_table_landed_on() {
         let posed = posed_at(1800.0, 300.0);
         let at = dragged(posed, 400.0, 0.0);
 
@@ -1245,11 +1245,11 @@ mod tests {
     }
 
     #[test]
-    fn the_gauge_pushed_to_the_end_leaves_a_plate_one_can_still_read() {
+    fn the_gauge_pushed_to_the_end_leaves_a_table_one_can_still_read() {
         assert_eq!(faded(0), 1.0);
         assert!(
             (faded(RUNE_TABLE_CLEAREST) - FAINTEST_LOOK).abs() < f64::EPSILON,
-            "a plate one cannot see at all is a plate worth closing, not fading"
+            "a table one cannot see at all is a table worth closing, not fading"
         );
         assert!((faded(50) - 0.6).abs() < f64::EPSILON);
     }
@@ -1263,12 +1263,12 @@ mod tests {
         assert!(!matches_a_shape(f64::INFINITY));
         assert!(
             !matches_a_shape(WILDEST_RATIO + 1.0),
-            "a plate taller than eight times its width is a measure that went wrong"
+            "a table taller than eight times its width is a measure that went wrong"
         );
     }
 
     #[test]
-    fn the_hand_on_the_plate_holds_the_thread_that_follows_the_game() {
+    fn the_hand_on_the_table_holds_the_thread_that_follows_the_game() {
         let table = RuneTable::default();
 
         assert!(!table.matches_under_the_hand());
@@ -1283,7 +1283,7 @@ mod tests {
     }
 
     #[test]
-    fn a_new_opening_takes_the_plate_out_of_a_hand_that_never_let_go() {
+    fn a_new_opening_takes_the_table_out_of_a_hand_that_never_let_go() {
         let table = RuneTable::default();
 
         table.take_in_hand();
@@ -1340,7 +1340,7 @@ mod tests {
     }
 
     #[test]
-    fn a_plate_nobody_has_measured_yet_is_cut_tall_rather_than_short() {
+    fn a_table_nobody_has_measured_yet_is_cut_tall_rather_than_short() {
         let table = RuneTable::default();
 
         assert_eq!(table.ratio(), None);
@@ -1356,12 +1356,12 @@ mod tests {
         assert_eq!(
             grained(2.0250004),
             grained(2.0249996),
-            "a hair of drift would resize the plate, which measures itself again"
+            "a hair of drift would resize the table, which measures itself again"
         );
     }
 
     #[test]
-    fn a_plate_taller_than_the_screen_is_cut_back_to_what_the_screen_holds() {
+    fn a_table_taller_than_the_screen_is_cut_back_to_what_the_screen_holds() {
         let short = WorkArea {
             height: 800.0,
             ..work_area()
@@ -1370,18 +1370,18 @@ mod tests {
         assert_eq!(
             fitted(560.0, 2.0, Some(short)),
             400.0,
-            "a plate the screen cannot hold whole is worth nothing to read"
+            "a table the screen cannot hold whole is worth nothing to read"
         );
         assert_eq!(
             fitted(320.0, 2.0, Some(short)),
             320.0,
-            "a plate that fits is left at the width the gauge asked for"
+            "a table that fits is left at the width the gauge asked for"
         );
         assert_eq!(fitted(560.0, 2.0, None), 560.0);
     }
 
     #[test]
-    fn a_wider_plate_is_a_taller_plate_of_the_same_shape() {
+    fn a_wider_table_is_a_taller_table_of_the_same_shape() {
         let narrow = grown(320.0, 2.025);
         let wide = grown(560.0, 2.025);
 
@@ -1394,11 +1394,11 @@ mod tests {
     }
 
     #[test]
-    fn a_plate_that_lands_on_half_a_point_is_cut_at_the_point_above() {
+    fn a_table_that_lands_on_half_a_point_is_cut_at_the_point_above() {
         assert_eq!(
             grown(330.0, 2.025).height,
             669.0,
-            "a plate cut short would lose the line of the bottom border"
+            "a table cut short would lose the line of the bottom border"
         );
     }
 }

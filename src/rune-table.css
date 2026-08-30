@@ -18,7 +18,7 @@
   }
 }
 
-@utility rune-plate {
+@utility rune-sheet {
   width: 100%;
   border: 1px solid color-mix(in oklch, var(--foreground), transparent 88%);
   border-radius: var(--radius-lg);

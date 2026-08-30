@@ -16,12 +16,12 @@ import {
 } from '@/lib/multifus'
 import { ignore } from '@/lib/utils'
 
-type PlatePanelProps = Readonly<{
+type PreviewPanelProps = Readonly<{
   runeTable: RuneTableStatus
   run: (action: Promise<Snapshot>) => void
 }>
 
-export const PlatePanel = ({ runeTable, run }: PlatePanelProps) => {
+export const PreviewPanel = ({ runeTable, run }: PreviewPanelProps) => {
   const size = useDraft(runeTable.width)
   const veil = useDraft(runeTable.transparency)
   const words = strings.runeTable

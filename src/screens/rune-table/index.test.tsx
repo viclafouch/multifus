@@ -112,7 +112,7 @@ describe('l’écran du tableau des runes', () => {
     expect(bridge.setRuneTableWidth).toHaveBeenCalledWith(440)
   })
 
-  it('porte la jauge de transparence, de la plaque pleine à la plaque fantôme', () => {
+  it('porte la jauge de transparence, du tableau plein au tableau fantôme', () => {
     show()
 
     expect(veil().getAttribute('min')).toBe('0')
@@ -121,7 +121,7 @@ describe('l’écran du tableau des runes', () => {
     expect(veil().getAttribute('aria-valuenow')).toBe('0')
   })
 
-  it('éclaircit la plaque à la touche, et ne l’enregistre qu’une fois lâchée', async () => {
+  it('éclaircit le tableau à la touche, et ne l’enregistre qu’une fois lâché', async () => {
     show()
 
     veil().focus()

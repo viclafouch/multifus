@@ -20,16 +20,16 @@ class WatchingResizeObserver implements ResizeObserver {
   disconnect = disconnect
 }
 
-type PlateProps = {
+type RuneTableProps = {
   readonly report: (ratio: number) => void
 }
 
-const Plate = ({ report }: PlateProps) => {
-  const plate = React.useRef<HTMLDivElement>(null)
+const RuneTable = ({ report }: RuneTableProps) => {
+  const table = React.useRef<HTMLDivElement>(null)
 
-  useMeasuredRatio(plate, report)
+  useMeasuredRatio(table, report)
 
-  return <div ref={plate}>Tableau des runes</div>
+  return <div ref={table}>Tableau des runes</div>
 }
 
 const standing = (width: number, height: number) => {
@@ -46,7 +46,7 @@ const resize = (observer: ResizeObserver) => {
   })
 }
 
-describe('la forme que la plaque dit d’elle-même', () => {
+describe('la forme que le tableau dit de lui-même', () => {
   afterEach(() => {
     watchers.length = 0
 
@@ -57,29 +57,29 @@ describe('la forme que la plaque dit d’elle-même', () => {
     const report = vi.fn()
     const measured = standing(WIDTH, 640)
 
-    render(<Plate report={report} />)
+    render(<RuneTable report={report} />)
     measured.mockRestore()
 
     expect(report).toHaveBeenCalledExactlyOnceWith(2)
   })
 
-  it('se tait sur une plaque que personne n’a encore posée', () => {
+  it('se tait sur un tableau que personne n’a encore posé', () => {
     const report = vi.fn()
     const measured = standing(0, 0)
 
-    render(<Plate report={report} />)
+    render(<RuneTable report={report} />)
     measured.mockRestore()
 
     expect(report).not.toHaveBeenCalled()
   })
 
-  it('remesure la plaque que la jauge vient de grossir', () => {
+  it('remesure le tableau que la jauge vient de grossir', () => {
     vi.stubGlobal('ResizeObserver', WatchingResizeObserver)
 
     const report = vi.fn()
     const narrow = standing(WIDTH, 640)
 
-    render(<Plate report={report} />)
+    render(<RuneTable report={report} />)
     narrow.mockRestore()
 
     const wide = standing(WIDTH * 2, 1400)
@@ -94,7 +94,7 @@ describe('la forme que la plaque dit d’elle-même', () => {
     vi.stubGlobal('ResizeObserver', WatchingResizeObserver)
 
     const measured = standing(WIDTH, 640)
-    const { unmount } = render(<Plate report={vi.fn()} />)
+    const { unmount } = render(<RuneTable report={vi.fn()} />)
 
     unmount()
     measured.mockRestore()

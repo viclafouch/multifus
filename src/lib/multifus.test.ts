@@ -630,7 +630,7 @@ describe('le pont vers Rust', () => {
     expect(listenedEvent()).toBe(rustConstant(WHEEL_SOURCE, 'WIPE_EVENT'))
   })
 
-  it('écoute le voile de la plaque sur le canal que rune_table.rs émet', async () => {
+  it('écoute le voile du tableau sur le canal que rune_table.rs émet', async () => {
     await multifus.onRuneTableLook(() => {})
 
     expect(listenedEvent()).toBe(rustConstant(RUNE_TABLE_SOURCE, 'LOOK_EVENT'))

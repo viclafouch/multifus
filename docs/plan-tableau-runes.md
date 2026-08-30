@@ -11,9 +11,27 @@ Un raccourci, `Ctrl+Maj+R` au départ, pose les poids des runes sur la fenêtre 
 jeu ; le même les retire. Le tableau se prend n'importe où et se pose où l'on
 veut, hors de l'écran compris, sa place revient au lancement suivant, et la croix
 le ferme. L'écran Tableau des runes, septième ligne de la barre de gauche, porte
-les deux jauges de la plaque, sa taille et sa transparence, l'interrupteur des
-autres fenêtres, le bouton d'aperçu et celui qui rappelle la plaque perdue. La
+les deux jauges du tableau, sa taille et sa transparence, l'interrupteur des
+autres fenêtres, le bouton d'aperçu et celui qui rappelle le tableau perdu. La
 barre système montre, cache, et rappelle.
+
+## « Plaque » n'est pas un mot de ce jeu
+
+Il s'était installé partout, dans les écrans, dans le code et dans ce fichier,
+pour dire la chose que le raccourci pose sur le jeu. Cette chose s'appelle le
+tableau des runes, et rien d'autre. `CONTEXT.md` le disait déjà et personne ne
+l'écoutait : « L'écran l'appelle « le tableau des runes » partout ».
+
+Le mot est parti de la prose et des identifiants. `Plate` devient `TableSize`,
+qui dit ce que la structure porte, deux nombres ; `PLATE_DRAWN_WIDTH` devient
+`TABLE_DRAWN_WIDTH` ; `PlatePanel` devient `PreviewPanel`, du titre qu'il porte
+déjà à l'écran, « L'aperçu » ; l'utilitaire CSS `rune-plate` devient
+`rune-sheet`, du nom du composant qu'il habille. Deux mots voisins partent avec :
+`wheel-plate` devient `wheel-disc`, la roue portant un disque, et deux tests
+disaient « la barre de plateau » pour la barre système.
+
+`CONTEXT.md` nomme maintenant « la plaque » parmi les mots à ne pas employer,
+à côté de « la table » et « les poids ».
 
 ## Ce qui reste douteux
 
@@ -37,10 +55,10 @@ demande les écrans à chaque tour, dix fois la seconde, ce qui alloue un vecteu
 et saute sur le fil principal ; `pose` paie en plus un `is_visible` sur le tour
 où rien ne bouge. Garder les écrans en mémoire les rendrait faux dès qu'on
 débranche un écran sans bouger la fenêtre, et le `is_visible` est ce qui rattrape
-une plaque que le système aurait cachée. Le prix est celui du dessin, mesuré et
+un tableau que le système aurait caché. Le prix est celui du dessin, mesuré et
 accepté ; c'est le blocage qui coûtait, et il est parti.
 
-**Deux écrans d'échelles différentes déplacent la plaque.** Le défaut est plus
+**Deux écrans d'échelles différentes déplacent le tableau.** Le défaut est plus
 large que ce qui était noté ici. Trois endroits convertissent, et aucun ne parle
 la même unité que le suivant :
 
@@ -50,7 +68,7 @@ la même unité que le suivant :
   échelle, alors que cette origine est un pixel du bureau virtuel, un espace
   unique et global : deux moniteurs à 150 % et 100 % rendent des coordonnées qui
   ne se recollent plus, et `screen_under` choisit le mauvais écran
-- `set_position` remultiplie par l'échelle de l'écran où se trouve **la plaque**
+- `set_position` remultiplie par l'échelle de l'écran où se trouve **le tableau**
 
 Sur le Mac le problème n'existe pas : l'Accessibilité et `NSScreen` partagent un
 espace de points global, et la division par écran de `logical_screen` est
@@ -60,7 +78,7 @@ défaut de Windows seul, et la correction ne peut pas être la même des deux c�
 **La recette est déjà dans le dépôt.** La roue ne convertit rien : elle lit
 `work_area()` en pixels, calcule dans `held_inside` en `PhysicalRect`, et pose
 en `PhysicalPosition`. Elle est juste sur Windows pour cette raison. Le tableau
-doit faire pareil : porter le cadre, le décalage gardé et la taille de la plaque
+doit faire pareil : porter le cadre, le décalage gardé et la taille du tableau
 en pixels, et ne convertir qu'au moment d'écrire dans `config.json`, pour qu'un
 décalage survive à un changement d'échelle. `screen_under` et `holds_point`
 rejoignent alors ceux de la roue, ce que [plan-overlay.md](./plan-overlay.md)
@@ -69,7 +87,7 @@ laisse ouvert.
 **Pas fait, et volontairement.** Ça réécrit le placement d'une fonctionnalité
 qui vient d'être vérifiée en jeu, et aucune des deux machines n'a deux écrans
 d'échelles différentes pour dire si la réécriture est juste. Le prix d'une
-erreur ici est une plaque qui se pose à côté sur le montage courant, contre un
+erreur ici est un tableau qui se pose à côté sur le montage courant, contre un
 défaut qui ne se voit sur aucun des deux. À faire sur une machine qui peut le
 prouver.
 
@@ -83,7 +101,7 @@ que l'écran Roue porte la même phrase, au caractère près.
 ## Ce que la relecture a trouvé et que je n'ai pas changé
 
 **Le survol des lignes.** La capture du pointeur retire d'elle-même le survol
-pendant le geste, donc rien ne change à l'écran quand on tire la plaque. Hors du
+pendant le geste, donc rien ne change à l'écran quand on tire le tableau. Hors du
 geste, le survol aide à suivre une ligne sur vingt, et il reste.
 
 **Les quatre fonctions en double dans le Rust.** `apart` et `said` ne diffèrent
@@ -100,14 +118,14 @@ a rien à corriger sans renoncer au panneau.
 - [ ] Le tableau posé se prend à la souris et suit : la page reçoit bien ses clics
 - [ ] Le premier clic sur le tableau démarre le tirage, sans en demander un deuxième
 - [ ] Le tableau ne disparaît pas quand Multifus cesse d'être devant
-- [ ] Pendant tout le tirage, rien n'est figé et la plaque ne traîne pas derrière la souris
+- [ ] Pendant tout le tirage, rien n'est figé et le tableau ne traîne pas derrière la souris
 - [ ] Le tirage suit la souris sans à-coup, un client en combat au premier plan
 - [ ] Une main qui traverse le tableau ne surligne pas une ligne ni un chiffre
 - [ ] Le raccourci dans le jeu montre le tableau, le même raccourci le cache
 - [ ] Le raccourci frappé dans Multifus, puis dans un navigateur : rien ne se passe
 - [ ] Le tableau poussé hors de l'écran, Multifus relancé : il est toujours dehors, et le bouton le ramène
 - [ ] Le tableau posé sur le deuxième écran, ce deuxième écran débranché, Multifus relancé : le tableau revient sur l'écran qui reste
-- [ ] Deux écrans d'échelles différentes : la plaque se pose au bon endroit, et la jauge la taille juste
+- [ ] Deux écrans d'échelles différentes : le tableau se pose au bon endroit, et la jauge le taille juste
 - [ ] La croix le ferme, et le raccourci le rouvre au même endroit
 - [ ] Le tableau se prend n'importe où, sur un chiffre comme sur un bord
 - [ ] Dofus reste au premier plan pendant tout le déplacement
@@ -116,24 +134,24 @@ a rien à corriger sans renoncer au panneau.
 - [ ] Un clic à côté du tableau arrive au jeu, tableau posé depuis une heure
 - [ ] Lâché puis Multifus relancé, le tableau revient à la place où on l'a laissé
 - [ ] La jauge poussée à 560 puis Multifus relancé, le tableau revient large
-- [ ] L'aperçu ouvert, la jauge poussée : la plaque grossit à chaque cran, sans attendre le relâchement
+- [ ] L'aperçu ouvert, la jauge poussée : le tableau grossit à chaque cran, sans attendre le relâchement
 - [ ] À 560, l'écriture est plus grosse qu'à 320, et les colonnes gardent leurs proportions
-- [ ] À 560 comme à 320, la plaque remplit la fenêtre sans bord vide ni bas coupé
+- [ ] À 560 comme à 320, le tableau remplit la fenêtre sans bord vide ni bas coupé
 - [ ] La jauge poussée d'un bout à l'autre : rien ne saute, rien ne clignote
 - [ ] La jauge poussée puis relâchée, Multifus relancé : la taille est la bonne
-- [ ] Une minute de tirage sans relâcher : Multifus répond toujours, la plaque suit toujours
+- [ ] Une minute de tirage sans relâcher : Multifus répond toujours, le tableau suit toujours
 - [ ] Interrupteur basculé tableau posé : l'effet est immédiat, sans fermer ni rouvrir
 - [ ] Aperçu ouvert, la barre système : tout se cache d'un coup, et la coche le dit
-- [ ] Aperçu déplacé puis la jauge poussée : la plaque grandit sur place, sans revenir au milieu
+- [ ] Aperçu déplacé puis la jauge poussée : le tableau grandit sur place, sans revenir au milieu
 - [ ] Le tableau posé, le client passé en plein écran : le tableau s'efface, et revient en fenêtre
 - [ ] Le tableau posé, le client simplement agrandi : le tableau reste, et ne s'efface pas
 - [ ] Sur Windows, barre des tâches en masquage automatique, le client en plein écran : le tableau s'efface tout de même
 - [ ] Multifus lancé : aucune des trois fenêtres cachées ne vole le focus au démarrage
-- [ ] Premier lancement, tableau ouvert : la plaque naît à sa taille, sans sauter
-- [ ] La jauge de transparence poussée, aperçu ouvert : la plaque s'éclaircit à chaque cran
-- [ ] À 100, la plaque se lit encore par-dessus le jeu, et le clic reste pour elle
+- [ ] Premier lancement, tableau ouvert : il naît à sa taille, sans sauter
+- [ ] La jauge de transparence poussée, aperçu ouvert : le tableau s'éclaircit à chaque cran
+- [ ] À 100, le tableau se lit encore par-dessus le jeu, et le clic reste pour lui
 - [ ] La transparence poussée puis relâchée, Multifus relancé : elle est la bonne
-- [ ] Une plaque à demi transparente se lit encore par-dessus un combat
+- [ ] Un tableau à demi transparent se lit encore par-dessus un combat
 - [ ] La fenêtre du jeu déplacée, le tableau suit sans traîner à l'œil
 - [ ] La fenêtre du jeu passée d'agrandie à petite, le tableau garde sa taille et déborde
 - [ ] Interrupteur éteint, on bascule sur une autre fenêtre du jeu : le tableau s'efface, et revient au retour
@@ -149,10 +167,10 @@ a rien à corriger sans renoncer au panneau.
 - [ ] La roue ouverte pendant que le tableau est posé : la roue passe devant, et le clic ne touche pas la croix
 - [ ] La barre système montre et cache le tableau, et sa coche dit l'état
 - [ ] Les vingt lignes se lisent à 320 de large sans que rien ne se coupe
-- [ ] La jauge poussée à fond : la plaque tient entière à l'écran, la dernière rune comprise
+- [ ] La jauge poussée à fond : le tableau tient entier à l'écran, la dernière rune comprise
 - [ ] Sur le petit écran, la jauge poussée à fond ne fait plus rien grandir passé un cran
 - [ ] Tous les poids portent le même blanc, du 0,25 au 100, et aucune ligne ne ressort
-- [ ] Sur un client agrandi, la plaque se pousse hors de l'écran et y reste au lancement suivant
+- [ ] Sur un client agrandi, le tableau se pousse hors de l'écran et y reste au lancement suivant
 - [ ] Le bouton de l'écran la ramène au coin haut droit de la fenêtre du jeu
 - [ ] La ligne de la barre système la ramène aussi, et ne paraît que tableau ouvert, sans que Multifus se fige
 - [ ] Les deux jauges n'écrivent qu'une fois lâchées : poussées puis Multifus tué au `Ctrl+C`, la valeur gardée est celle du dernier relâchement
@@ -162,7 +180,7 @@ a rien à corriger sans renoncer au panneau.
 
 - [ ] Le tableau posé, l'autorisation d'accessibilité retirée : le journal le dit une fois, pas cent
 - [ ] Le tableau reste devant après un changement de bureau
-- [ ] Sur un écran Retina, la plaque n'est ni deux fois trop grande ni deux fois trop petite
+- [ ] Sur un écran Retina, le tableau n'est ni deux fois trop grand ni deux fois trop petit
 - [ ] Le panneau se pose sans une ligne au journal : `hold_back_activation` n'a rien refusé
 - [ ] Le tableau reste au-dessus du jeu, et la roue passe toujours par-dessus lui
 
@@ -195,7 +213,7 @@ restant ouvert derrière. Le crochet est monté dans `app.tsx`, à côté de la
 navigation par la barre système.
 
 **Pas de `rune_table_step`.** La page n'a besoin d'aucune donnée : Rust taille la
-fenêtre, la plaque fait 100 % de large, et le seul mot qui remonte est sa
+fenêtre, le tableau fait 100 % de large, et le seul mot qui remonte est sa
 hauteur. Une commande de moins.
 
 **Le cadre est en points, pas en pixels.** Sur le Mac, l'Accessibilité parle déjà
@@ -226,7 +244,7 @@ fonction refuse et le dit au journal si la classe demandait plus de place que la
 fenêtre n'en tient. Deux réglages suivent : `hidesOnDeactivate` à faux, sans quoi
 un panneau disparaît dès que Multifus n'est plus devant, ce qui est tout le
 contraire de ce qu'on veut ; et `becomesKeyOnlyIfNeeded` à vrai, pour que le jour
-où la plaque portera un champ, le clavier lui vienne sans que le jeu perde la
+où le tableau portera un champ, le clavier lui vienne sans que le jeu perde la
 main.
 
 Il fallait aussi `accept_first_mouse(true)` : sans lui, le premier clic sur une
@@ -244,11 +262,11 @@ page.
 
 ## Ce que le tirage a coûté, et ce qu'il coûte maintenant
 
-**Pas de flou derrière la plaque.** Le plan demandait un fond « flouté derrière ».
+**Pas de flou derrière le tableau.** Le plan demandait un fond « flouté derrière ».
 `backdrop-filter` sur une fenêtre transparente échantillonne un fond que macOS ne
 rafraîchit pas quand la fenêtre se déplace : on traînait une image figée du jeu,
 avec la couleur qu'il avait au moment où le tirage a commencé. La ligne est
-partie. La plaque reste légèrement translucide par son fond seul, et le jeu se
+partie. Le tableau reste légèrement translucide par son fond seul, et le jeu se
 voit à travers pendant tout le déplacement.
 
 **Rien ne change à l'écran pendant le tirage.** Pas de curseur qui se referme,
@@ -259,13 +277,13 @@ lignes le temps du geste, ce qui tombe bien.
 deux allers-retours Accessibilité vers le client par image, à soixante images par
 seconde, sur un processus qui rend peut-être un combat. C'est ce qui donnait
 l'impression que rien ne suivait. Le geste se sert maintenant de ce que la
-dernière pose sait déjà, gardé dans `Posed` : où la plaque est, où était le coin
+dernière pose sait déjà, gardé dans `Posed` : où le tableau est, où était le coin
 de la fenêtre du jeu, quelle taille elle fait, et quelle zone de travail la
 retient. Une image de tirage coûte un message et un `set_position`, rien d'autre.
 Le fil de 100 ms recale tout, et comme le décalage écrit est celui de la place où
-la plaque a atterri, il n'y a rien à recaler.
+le tableau a atterri, il n'y a rien à recaler.
 
-**Une main qui court plus loin que l'écran n'écrit pas ce que la plaque n'a
+**Une main qui court plus loin que l'écran n'écrit pas ce que le tableau n'a
 jamais porté.** Le décalage gardé se calcule depuis la position bornée, pas depuis
 la position demandée.
 
@@ -279,11 +297,11 @@ comportement, la croix arrêtant déjà l'événement avant nous.
 
 ## La jauge, et ce qu'elle grossit
 
-Le plan ne réglait que la largeur, et la plaque s'étirait : les mêmes lettres,
+Le plan ne réglait que la largeur, et le tableau s'étirait : les mêmes lettres,
 les mêmes marges, des colonnes de plus en plus longues. La jauge grossit
-maintenant la plaque d'un bloc.
+maintenant le tableau d'un bloc.
 
-La plaque est dessinée pour 320 points, la borne la plus étroite. La page se met
+Le tableau est dessiné pour 320 points, la borne la plus étroite. La page se met
 à l'échelle de la fenêtre qu'on lui donne : `zoom` sur le corps de la page, égal
 à la largeur de la fenêtre divisée par 320, posé depuis un `ResizeObserver` sur
 la racine. La racine n'est pas mise à l'échelle, donc la mesure ne se mord pas la
@@ -296,9 +314,9 @@ forme ne dépend d'aucune échelle : le Rust la multiplie par la largeur voulue 
 arrondit vers le haut. Une seule mesure sert à toutes les tailles.
 
 **La jauge se voit pendant qu'on la pousse.** `size_rune_table` pose la taille et
-replace la plaque sans rien écrire sur le disque, à chaque cran ; le relâchement
+replace le tableau sans rien écrire sur le disque, à chaque cran ; le relâchement
 appelle `set_rune_table_width`, qui enregistre. C'est le même partage que le
-tirage de la plaque, `move_rune_table` puis `rune_table_settled`. `size` sort
+tirage du tableau, `move_rune_table` puis `rune_table_settled`. `size` sort
 tout de suite si la largeur n'a pas bougé, pour qu'une jauge tenue immobile ne
 demande rien à Dofus.
 
@@ -312,10 +330,10 @@ seconde pendant un tirage, les deux pouvaient se croiser et l'application se
 figeait pour de bon. La lecture se fait maintenant dans une variable, hors du
 verrou.
 
-**Le tirage suspend le suivi.** Tant que la main tient la plaque, le fil de
+**Le tirage suspend le suivi.** Tant que la main tient le tableau, le fil de
 100 ms ne pose plus rien : plus un seul appel d'Accessibilité, plus un seul
 getter bloquant en travers des `set_position`. `rune_table_settled` rend la
-plaque au suivi, et une nouvelle ouverture la rend aussi, pour qu'une page qui
+tableau au suivi, et une nouvelle ouverture le rend aussi, pour qu'une page qui
 meurt en plein geste ne fige pas le suivi pour toujours.
 
 **Les commandes qui parlent à Dofus sont `async`.** Six d'entre elles couraient
@@ -332,7 +350,7 @@ commandes et le fil à la file.
 **Un panic ne peut plus emporter l'application.** Le suivi est enveloppé, comme
 le fil l'était déjà. `clamp` sur une borne qui n'est pas un nombre paniquait :
 un écran dont l'échelle ne se lit pas ne rend plus de zone de travail, et le
-bornage laisse la plaque où elle a demandé.
+bornage laisse le tableau où il a demandé.
 
 **Une mesure absurde est refusée.** Une forme doit être finie, positive, et pas
 plus haute que huit fois sa largeur.
@@ -360,7 +378,7 @@ reposait le tableau sur le jeu. Le raccourci et la barre cachent tout d'un coup 
 se recentre, parce qu'il dérive du milieu à mesure qu'il grandit. Essayé, et
 retiré : effacer sa place à chaque cran la fait revenir au milieu sous la main de
 celui qui vient de la choisir, ce qui est bien pire qu'un aperçu décentré. La
-plaque grandit depuis son coin haut-gauche, qui ne bouge pas ; seul le bord de
+tableau grandit depuis son coin haut-gauche, qui ne bouge pas ; seul le bord de
 l'écran la retient, et il ne réécrit rien.
 
 **Le tableau ne se pose pas sur un client en plein écran.** Le texte le disait,
@@ -371,13 +389,13 @@ remplacée.
 près 2. La fenêtre naissait une fois et demie trop haute, se faisait border en
 haut de l'écran, puis sautait. La supposition vaut maintenant 2,1.
 
-## La plaque resserrée, et la butée de l'écran
+## Le tableau resserré, et la butée de l'écran
 
-La plaque mesurait 2,15 fois sa largeur : 1200 points de haut à 560, ce qu'aucun
+Le tableau mesurait 2,15 fois sa largeur : 1200 points de haut à 560, ce qu'aucun
 écran de 1080 ne tient. Elle est resserrée partout où la hauteur se paie sans
 rien apprendre : l'interligne du tableau, la moitié du blanc au-dessus et
 en dessous de chaque rune, le titre et sa version sur une ligne au lieu de deux,
-la poignée en moins, le curseur disant déjà qu'on peut prendre la plaque. Elle
+la poignée en moins, le curseur disant déjà qu'on peut le prendre. Elle
 tombe autour de 1,67 fois sa largeur, soit 930 points à 560.
 
 Ça ne suffit pas sur un écran de 900. `fitted` borne donc la largeur par ce que
@@ -394,25 +412,25 @@ Tout ce que le tableau tient porte maintenant le même blanc. Le tiret d'une run
 qui n'existe pas garde son gris : il ne dit pas un poids, il dit une absence.
 `runeHeat` disparaît avec ses paliers.
 
-## La plaque libre de l'écran, et le rappel
+## Le tableau libre de l'écran, et le rappel
 
-La zone de travail retenait la plaque entière : sur un client agrandi, le seul
+La zone de travail retenait le tableau entier : sur un client agrandi, le seul
 moyen de la mettre de côté était de la fermer. `held_inside` et `held_between`
 sont partis, `Posed` ne porte plus sa zone, et `placed` comme `dragged` posent la
-plaque là où la main la demande, hors de l'écran comprise. La butée de taille,
-elle, reste : `fitted` continue de refuser une plaque plus haute que l'écran, car
-une plaque coupée ne se lit pas, alors qu'une plaque rangée au bord se veut ainsi.
+tableau là où la main le demande, hors de l'écran comprise. La butée de taille,
+elle, reste : `fitted` continue de refuser un tableau plus haut que l'écran, car
+un tableau coupé ne se lit pas, alors qu'un tableau rangé au bord se veut ainsi.
 
 `recall` jette la place gardée dans `config.json` et rend la main à
-`kept_offset`, qui repose la plaque au coin haut droit de la fenêtre, à
+`kept_offset`, qui repose le tableau au coin haut droit de la fenêtre, à
 `FIRST_MARGIN` des deux bords, comme au premier jour. L'écran l'appelle au bouton
 de « Où il se montre », et la barre système à une ligne qui ne paraît que tableau
-ouvert : une plaque perdue de vue ne doit pas obliger à ouvrir Multifus.
+ouvert : un tableau perdu de vue ne doit pas obliger à ouvrir Multifus.
 
 ## Le wording relu en entier
 
 On sait que c'est du Retro, et celui qui lit ça forge depuis vingt ans. Le
-sous-titre « Poids 1.29 » de la plaque est parti avec l'utilitaire `rune-source`,
+sous-titre « Poids 1.29 » du tableau est parti avec l'utilitaire `rune-source`,
 et le titre prend la ligne entière. Le sous-titre de l'écran nomme la vraie gêne :
 casser sans quitter le jeu ni rouvrir un site. La note de la transparence ne dit
 plus ce que zéro fait, chiffre qu'on lit sur la jauge, et garde ce qu'on ne
@@ -439,8 +457,8 @@ même coupe (ce que l'aperçu montre, puis ce que chaque jauge fait), et son bou
 dit « Voir en vrai » et non « Aperçu ». Les deux écrans lisent la même constante,
 `TRY_IT`, pour que le bouton ne puisse plus diverger.
 
-Le panneau de la taille s'appelait « La plaque », mot du code, et sa description
-courait sur deux lignes contre le bouton, la seconde à moitié vide. Il s'appelle
+Le panneau de la taille s'appelait « La plaque », et sa description courait sur
+deux lignes contre le bouton, la seconde à moitié vide. Il s'appelle
 « À quoi il ressemble », qui répond à « Où il se montre » du panneau d'en
 dessous, et sa description tient sur une ligne : elle ne garde que ce que les
 jauges ne disent pas, le bouton d'aperçu et la touche qui le ferme. La note
@@ -452,7 +470,7 @@ dont il est question.
 ## La transparence
 
 Une seconde jauge, dans le même panneau que la taille, qui s'appelle maintenant
-« À quoi il ressemble ». Elle va de 0, la plaque telle qu'elle était, à 100, la plaque
+« À quoi il ressemble ». Elle va de 0, le tableau tel qu'il était, à 100, le tableau
 fantôme, par pas de 5. Le réglage voyage en pour cent dans `config.json` et
 traverse le pont en opacité : le Rust fait le calcul une fois, la page ne fait
 que le porter.
@@ -462,18 +480,18 @@ chemin que la roue emprunte déjà : une commande pour la première valeur, un
 évènement pour les suivantes. La jauge se voit donc à chaque cran, comme celle de
 la taille, et n'écrit sur le disque qu'au relâchement.
 
-À zéro, la plaque est franchement opaque : son fond ne porte plus l'alpha de 0,9
+À zéro, le tableau est franchement opaque : son fond ne porte plus l'alpha de 0,9
 qu'il avait en dur, sans quoi la jauge serait partie voilée et n'aurait jamais pu
 rendre le noir plein.
 
-À fond, la plaque ne s'en va plus. Elle s'en allait, et un cran qui ne montre
+À fond, le tableau ne s'en va plus. Elle s'en allait, et un cran qui ne montre
 rien ne sert à rien : on ferme le tableau à la croix ou au raccourci, pas en
 poussant une jauge. `faded` étale donc les cent crans sur la course de 1 à
 `FAINTEST_LOOK`, un cinquième de présence : le dernier cran rend ce que 80 rendait
 avant. Le chiffre affiché ne bouge pas, seule la course change.
 
 `matches_wiped_out` disparaît avec ce cran, et la fenêtre n'est plus cachée
-derrière le dos du suiveur. La plaque à son plus pâle prend toujours les clics.
+derrière le dos du suiveur. Le tableau à son plus pâle prend toujours les clics.
 Rien ne l'écrit sous la jauge : celui qui forge le verra au premier essai.
 
 ## Ce qui a été ajouté sans que le plan le demande
@@ -481,7 +499,7 @@ Rien ne l'écrit sous la jauge : celui qui forge le verra au premier essai.
 **Les deux notes du bas sont parties.** Le plan comptait quatre morceaux : un
 titre, le tableau, deux notes sur les cases vides et l'arrondi. Elles disaient
 une fois ce qu'on n'a pas besoin de relire, et coûtaient trois lignes de hauteur
-sur une plaque posée devant un combat. La plaque s'arrête à sa dernière rune.
+sur un tableau posé devant un combat. Il s'arrête à sa dernière rune.
 
 ## Ce que la dernière relecture a corrigé
 
@@ -502,7 +520,7 @@ l'agrandissement.
 
 **Cacher pouvait perdre contre le fil suiveur.** Le fil lisait le mode, partait
 poser, et un `hide` d'un autre fil cachait la fenêtre avant que le `show` du fil
-n'arrive. La génération étant devenue vieille, le fil sortait, et la plaque
+n'arrive. La génération étant devenue vieille, le fil sortait, et le tableau
 restait à l'écran sans personne pour la retirer. `veil_in_turn` prend le verrou
 de pose ; `veil` ne le prend pas, comme `pose`, puisque le suiveur le tient déjà.
 
@@ -525,7 +543,7 @@ sommeil et non après.
 
 ## L'aperçu qui clignotait sur Windows
 
-Le bouton « Voir en vrai » ouvrait la plaque, qui se fermait et se rouvrait dix
+Le bouton « Voir en vrai » ouvrait le tableau, qui se fermait et se rouvrait dix
 fois par seconde. Le tableau posé sur le jeu, lui, ne bronchait pas.
 
 Le suiveur demandait « Multifus est-il devant ? » à `is_focused()` de la fenêtre
@@ -533,15 +551,15 @@ principale. Sur Windows, cette réponse est le focus clavier du HWND de plus hau
 niveau, et wry le donne au WebView2 dès qu'il l'a : sa sous-classe appelle
 `MoveFocus` sur WM_SETFOCUS, la vue prend le focus dans sa fenêtre fille, et le
 parent reçoit WM_KILLFOCUS. tao met alors son drapeau à faux. Le suiveur en
-concluait que Multifus était parti, retirait la plaque, le focus revenait au
-parent, la plaque revenait, et ainsi de suite au rythme des 100 ms. Le tableau
+concluait que Multifus était parti, retirait le tableau, le focus revenait au
+parent, le tableau revenait, et ainsi de suite au rythme des 100 ms. Le tableau
 posé y échappe : il demande la fenêtre du jeu au premier plan, pas le focus de
 Multifus.
 
 La question posée est maintenant celle qu'on voulait poser :
 `platform::matches_frontmost`, la fenêtre de premier plan appartient-elle à notre
 processus. Sur Windows c'est `GetForegroundWindow` puis
-`GetWindowThreadProcessId` comparé au nôtre, et la plaque, qui porte
+`GetWindowThreadProcessId` comparé au nôtre, et le tableau, qui porte
 `WS_EX_NOACTIVATE`, ne peut pas fausser la réponse en passant devant. Sur le Mac
 c'est `NSRunningApplication::currentApplication().isActive()`, la même question à
 AppKit ; **non compilé**, la chaîne manquant sur la machine Windows.
@@ -555,7 +573,7 @@ réserve toujours quelque chose pour sa barre des menus, alors la règle tenait.
 
 Windows la casse des deux côtés. Une barre des tâches en masquage automatique ne
 réserve rien, et un écran secondaire qui ne porte pas de barre non plus : la
-règle ne s'arme jamais, et la plaque reste posée par-dessus un client en plein
+règle ne s'arme jamais, et le tableau reste posé par-dessus un client en plein
 écran. Et dans l'autre sens, `GetWindowRect` d'une fenêtre simplement agrandie
 déborde du moniteur d'environ huit pixels par côté, ses bordures de
 redimensionnement étant invisibles depuis Vista : `frame >= screen` est donc vrai
@@ -566,7 +584,7 @@ La règle ne suppose plus rien : une fenêtre est en plein écran quand son cadr
 **est** celui du moniteur, coin et taille, à un point près. Un client agrandi
 n'en est jamais un, ni sur le Mac où il s'arrête sous la barre des menus, ni sur
 Windows où il déborde. La zone de travail ne sert plus qu'à ce pour quoi elle est
-faite, borner la hauteur de la plaque, et `Screen` porte le coin du moniteur en
+faite, borner la hauteur du tableau, et `Screen` porte le coin du moniteur en
 plus de sa taille.
 
 ## Les trois overlays ne prennent plus le focus à leur naissance

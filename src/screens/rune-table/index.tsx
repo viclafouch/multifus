@@ -13,7 +13,7 @@ import { Switch } from '@/components/ui/switch'
 import { IS_APPLE } from '@/constants/keyboard'
 import { strings } from '@/constants/strings'
 import { recallRuneTable, setRuneTableEverywhere } from '@/lib/multifus'
-import { PlatePanel } from '@/screens/rune-table/plate-panel'
+import { PreviewPanel } from '@/screens/rune-table/preview-panel'
 
 type RuneTableScreenProps = Readonly<{
   runeTable: RuneTableStatus
@@ -49,7 +49,7 @@ export const RuneTableScreen = ({
           <ShortcutRecall accelerator={accelerator} />
         </FieldRow>
       </Panel>
-      <PlatePanel runeTable={runeTable} run={run} />
+      <PreviewPanel runeTable={runeTable} run={run} />
       <Panel>
         <PanelHeader
           title={words.whereTitle}

@@ -47,7 +47,7 @@ export const WheelDial = ({
         }
         className="absolute inset-0 size-full"
       >
-        <circle r={DIAL_RADIUS} className="wheel-plate" />
+        <circle r={DIAL_RADIUS} className="wheel-disc" />
         {slices.map((slice, index) => {
           return (
             <path

@@ -22,7 +22,7 @@ export const RuneSheet = ({ drag, look, onClose, ref }: RuneSheetProps) => {
       ref={ref}
       role="group"
       aria-label={words.title}
-      className="rune-plate"
+      className="rune-sheet"
       style={{ opacity: look }}
     >
       <header className="rune-crown">

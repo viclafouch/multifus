@@ -207,7 +207,7 @@ describe('la fenêtre de Multifus', () => {
     })
   })
 
-  it('suit la barre de plateau sans qu’on ait touché au rail', async () => {
+  it('suit la barre système sans qu’on ait touché au rail', async () => {
     await open(snapshotOf())
 
     act(() => {

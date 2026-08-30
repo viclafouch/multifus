@@ -45,7 +45,7 @@ describe('useTrayNavigation', () => {
     rust.open = null
   })
 
-  it('montre l’écran que la barre de plateau demande', async () => {
+  it('montre l’écran que la barre système demande', async () => {
     const show = vi.fn<(screen: ScreenName) => void>()
 
     renderHook(() => {

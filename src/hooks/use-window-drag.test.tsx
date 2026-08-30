@@ -4,12 +4,12 @@ import { DRAG_THRESHOLD, useWindowDrag } from '@/hooks/use-window-drag'
 
 const POINTER = 7
 
-type PlateProps = {
+type RuneTableProps = {
   readonly onMove: (byX: number, byY: number) => void
   readonly onSettle: () => void
 }
 
-const Plate = ({ onMove, onSettle }: PlateProps) => {
+const RuneTable = ({ onMove, onSettle }: RuneTableProps) => {
   const drag = useWindowDrag({ onMove, onSettle })
 
   return (
@@ -26,12 +26,12 @@ const Plate = ({ onMove, onSettle }: PlateProps) => {
   )
 }
 
-const plate = () => {
+const table = () => {
   return screen.getByRole('group', { name: 'Tableau des runes' })
 }
 
 const press = (screenX: number, screenY: number) => {
-  return fireEvent.pointerDown(plate(), {
+  return fireEvent.pointerDown(table(), {
     button: 0,
     pointerId: POINTER,
     screenX,
@@ -40,17 +40,17 @@ const press = (screenX: number, screenY: number) => {
 }
 
 const drag = (screenX: number, screenY: number) => {
-  fireEvent.pointerMove(plate(), { pointerId: POINTER, screenX, screenY })
+  fireEvent.pointerMove(table(), { pointerId: POINTER, screenX, screenY })
 }
 
 const release = (screenX: number, screenY: number) => {
-  fireEvent.pointerUp(plate(), { pointerId: POINTER, screenX, screenY })
+  fireEvent.pointerUp(table(), { pointerId: POINTER, screenX, screenY })
 }
 
 const show = () => {
   const onMove = vi.fn<(byX: number, byY: number) => void>()
   const onSettle = vi.fn<() => void>()
-  const { unmount } = render(<Plate onMove={onMove} onSettle={onSettle} />)
+  const { unmount } = render(<RuneTable onMove={onMove} onSettle={onSettle} />)
 
   return { onMove, onSettle, unmount }
 }
@@ -111,7 +111,7 @@ describe('le tirage d’une fenêtre posée', () => {
     expect(travelled).toBe(0)
   })
 
-  it('lâche la plaque d’une page qui s’en va au milieu du geste', () => {
+  it('lâche le tableau d’une page qui s’en va au milieu du geste', () => {
     const { onSettle, unmount } = show()
 
     press(100, 100)
@@ -172,12 +172,12 @@ describe('le tirage d’une fenêtre posée', () => {
 
     press(100, 100)
 
-    expect(plate().hasPointerCapture(POINTER)).toBe(true)
+    expect(table().hasPointerCapture(POINTER)).toBe(true)
 
     drag(160, 100)
     release(160, 100)
 
-    expect(plate().hasPointerCapture(POINTER)).toBe(false)
+    expect(table().hasPointerCapture(POINTER)).toBe(false)
   })
 
   it('laisse le clic à ce qui arrête la propagation', () => {
@@ -192,13 +192,13 @@ describe('le tirage d’une fenêtre posée', () => {
     drag(200, 200)
 
     expect(onMove).not.toHaveBeenCalled()
-    expect(plate().hasPointerCapture(POINTER)).toBe(false)
+    expect(table().hasPointerCapture(POINTER)).toBe(false)
   })
 
   it('ne répond qu’au bouton gauche', () => {
     const { onMove } = show()
 
-    fireEvent.pointerDown(plate(), {
+    fireEvent.pointerDown(table(), {
       button: 2,
       pointerId: POINTER,
       screenX: 100,
@@ -218,7 +218,7 @@ describe('le tirage d’une fenêtre posée', () => {
   it('laisse le navigateur faire du clic ce qu’il veut, hors du bouton gauche', () => {
     show()
 
-    const answered = fireEvent.pointerDown(plate(), {
+    const answered = fireEvent.pointerDown(table(), {
       button: 2,
       pointerId: POINTER,
       screenX: 100,
@@ -233,7 +233,7 @@ describe('le tirage d’une fenêtre posée', () => {
 
     press(100, 100)
     drag(160, 100)
-    fireEvent.pointerCancel(plate(), { pointerId: POINTER })
+    fireEvent.pointerCancel(table(), { pointerId: POINTER })
     drag(400, 100)
 
     await waitFor(() => {

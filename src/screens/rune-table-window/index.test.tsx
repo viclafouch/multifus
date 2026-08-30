@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { PLATE_DRAWN_WIDTH, RUNE_FAMILIES } from '@/constants/runes'
+import { TABLE_DRAWN_WIDTH, RUNE_FAMILIES } from '@/constants/runes'
 import { strings } from '@/constants/strings'
 import { pending } from '@/test-doubles'
 
@@ -27,21 +27,21 @@ const POINTER = 3
 
 const words = strings.runeTable.sheet
 
-const PLATE_HEIGHT = 647.4
+const TABLE_HEIGHT = 647.4
 
 const LOOK = 0.4
 
 const standing = (height: number) => {
   return vi
     .spyOn(HTMLElement.prototype, 'getBoundingClientRect')
-    .mockReturnValue(new DOMRect(0, 0, PLATE_DRAWN_WIDTH, height))
+    .mockReturnValue(new DOMRect(0, 0, TABLE_DRAWN_WIDTH, height))
 }
 
 const show = () => {
   render(<RuneTableWindow />)
 }
 
-const plate = () => {
+const table = () => {
   return screen.getByRole('group', { name: words.title })
 }
 
@@ -55,11 +55,11 @@ const takenAt = (element: Element, screenX: number, screenY: number) => {
 }
 
 const moveTo = (screenX: number, screenY: number) => {
-  fireEvent.pointerMove(plate(), { pointerId: POINTER, screenX, screenY })
+  fireEvent.pointerMove(table(), { pointerId: POINTER, screenX, screenY })
 }
 
 const letGo = (screenX: number, screenY: number) => {
-  fireEvent.pointerUp(plate(), { pointerId: POINTER, screenX, screenY })
+  fireEvent.pointerUp(table(), { pointerId: POINTER, screenX, screenY })
 }
 
 describe('le tableau des runes posé sur le jeu', () => {
@@ -89,13 +89,13 @@ describe('le tableau des runes posé sur le jeu', () => {
   })
 
   it('dit sa forme à Rust, qui en tire la hauteur de la fenêtre', () => {
-    const measured = standing(PLATE_HEIGHT)
+    const measured = standing(TABLE_HEIGHT)
 
     show()
     measured.mockRestore()
 
     expect(bridge.runeTableMeasured).toHaveBeenCalledWith(
-      PLATE_HEIGHT / PLATE_DRAWN_WIDTH
+      TABLE_HEIGHT / TABLE_DRAWN_WIDTH
     )
   })
 
@@ -115,7 +115,7 @@ describe('le tableau des runes posé sur le jeu', () => {
   it('n’écrit rien sur un clic net, sans un pixel de dérive', () => {
     show()
 
-    takenAt(plate(), 200, 200)
+    takenAt(table(), 200, 200)
     moveTo(201, 200)
     letGo(201, 200)
 
@@ -123,10 +123,10 @@ describe('le tableau des runes posé sur le jeu', () => {
     expect(bridge.runeTableSettled).not.toHaveBeenCalled()
   })
 
-  it('enregistre la place une fois la plaque lâchée', async () => {
+  it('enregistre la place une fois le tableau lâché', async () => {
     show()
 
-    takenAt(plate(), 200, 200)
+    takenAt(table(), 200, 200)
     moveTo(300, 200)
     letGo(300, 200)
 
@@ -152,7 +152,7 @@ describe('le tableau des runes posé sur le jeu', () => {
     show()
 
     await waitFor(() => {
-      expect(plate().getAttribute('style')).toContain(`opacity: ${LOOK}`)
+      expect(table().getAttribute('style')).toContain(`opacity: ${LOOK}`)
     })
   })
 

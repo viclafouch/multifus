@@ -1,5 +1,5 @@
 import React from 'react'
-import { PLATE_DRAWN_WIDTH } from '@/constants/runes'
+import { TABLE_DRAWN_WIDTH } from '@/constants/runes'
 import { useFittedZoom } from '@/hooks/use-fitted-zoom'
 import { useMeasuredRatio } from '@/hooks/use-measured-ratio'
 import { useRuneTableLook } from '@/hooks/use-rune-table-look'
@@ -30,12 +30,12 @@ const closeTable = () => {
 }
 
 export const RuneTableWindow = () => {
-  const plate = React.useRef<HTMLDivElement>(null)
+  const table = React.useRef<HTMLDivElement>(null)
   const drag = useWindowDrag({ onMove: moveTable, onSettle: settleTable })
   const look = useRuneTableLook()
 
-  useFittedZoom(PLATE_DRAWN_WIDTH)
-  useMeasuredRatio(plate, tellRatio)
+  useFittedZoom(TABLE_DRAWN_WIDTH)
+  useMeasuredRatio(table, tellRatio)
 
-  return <RuneSheet drag={drag} look={look} ref={plate} onClose={closeTable} />
+  return <RuneSheet drag={drag} look={look} ref={table} onClose={closeTable} />
 }

@@ -1890,7 +1890,7 @@ mod tests {
         assert_eq!(
             multifus_reloaded(&directory).rune_table_offset(),
             None,
-            "the plate is still under the hand, and nothing is kept yet"
+            "the table is still under the hand, and nothing is kept yet"
         );
 
         state.save();
