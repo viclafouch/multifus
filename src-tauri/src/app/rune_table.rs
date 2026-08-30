@@ -1,10 +1,10 @@
-use std::panic::catch_unwind;
 use std::panic::AssertUnwindSafe;
-use std::sync::atomic::AtomicBool;
-use std::sync::atomic::Ordering;
+use std::panic::catch_unwind;
 use std::sync::Mutex;
 use std::sync::MutexGuard;
 use std::sync::PoisonError;
+use std::sync::atomic::AtomicBool;
+use std::sync::atomic::Ordering;
 use std::thread;
 use std::time::Duration;
 
@@ -19,13 +19,13 @@ use tauri::WebviewWindow;
 use crate::app::journal::JournalEvent;
 use crate::app::journal::Work;
 use crate::app::main_window;
-use crate::app::overlay::holds_point;
 use crate::app::overlay::Generation;
 use crate::app::overlay::Overlay;
+use crate::app::overlay::holds_point;
 use crate::app::state::lock;
 use crate::app::state::windows;
-use crate::config::RuneOffset;
 use crate::config::RUNE_TABLE_CLEAREST;
+use crate::config::RuneOffset;
 use crate::platform;
 use crate::platform::ScreenFrame;
 use crate::platform::ScreenPoint;
@@ -306,14 +306,16 @@ fn tell_state(app: &AppHandle) {
 }
 
 fn follow_apart(app: &AppHandle, generation: u64) {
-    OVERLAY.apart(app, move |app| loop {
-        thread::sleep(FOLLOW);
+    OVERLAY.apart(app, move |app| {
+        loop {
+            thread::sleep(FOLLOW);
 
-        if !app.state::<RuneTable>().matches_latest(generation) || !is_open(app) {
-            return;
+            if !app.state::<RuneTable>().matches_latest(generation) || !is_open(app) {
+                return;
+            }
+
+            follow_foreground(app);
         }
-
-        follow_foreground(app);
     });
 }
 

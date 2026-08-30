@@ -61,7 +61,7 @@ impl ConfigStore {
                     "reading the configuration",
                     &self.path,
                     &error,
-                ))
+                ));
             }
         };
 
@@ -239,14 +239,14 @@ mod tests {
     use crate::config::settings::BannerCorner;
     use crate::config::settings::QuickReply;
     use crate::config::settings::QuickReplyId;
+    use crate::config::settings::RUNE_TABLE_CLEAREST;
     use crate::config::settings::Relay;
     use crate::config::settings::RuneOffset;
     use crate::config::settings::RuneTable;
     use crate::config::settings::Shortcuts;
     use crate::config::settings::Traces;
-    use crate::config::settings::Wheel;
-    use crate::config::settings::RUNE_TABLE_CLEAREST;
     use crate::config::settings::WHEEL_WIDEST;
+    use crate::config::settings::Wheel;
     use crate::domain::Character;
     use crate::domain::Class;
     use crate::domain::Gender;

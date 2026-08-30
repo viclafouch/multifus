@@ -57,15 +57,15 @@ use crate::config::ConfigStore;
 use crate::config::Loaded;
 use crate::config::QuickReply;
 use crate::config::QuickReplyId;
-use crate::config::RuneOffset;
-use crate::config::Settings;
-use crate::config::Shortcuts;
-use crate::config::Traces;
 use crate::config::RUNE_TABLE_CLEAREST;
 use crate::config::RUNE_TABLE_NARROWEST;
 use crate::config::RUNE_TABLE_STEP;
 use crate::config::RUNE_TABLE_VEIL_STEP;
 use crate::config::RUNE_TABLE_WIDEST;
+use crate::config::RuneOffset;
+use crate::config::Settings;
+use crate::config::Shortcuts;
+use crate::config::Traces;
 use crate::config::WHEEL_SMALLEST;
 use crate::config::WHEEL_STEP;
 use crate::config::WHEEL_WIDEST;
@@ -2902,11 +2902,13 @@ mod tests {
         state.remove_quick_reply(id);
 
         assert_eq!(state.quick_reply_text(id), None);
-        assert!(state
-            .snapshot()
-            .quick_replies
-            .iter()
-            .all(|quick_reply| quick_reply.id != id));
+        assert!(
+            state
+                .snapshot()
+                .quick_replies
+                .iter()
+                .all(|quick_reply| quick_reply.id != id)
+        );
     }
 
     #[test]
@@ -3516,9 +3518,11 @@ mod tests {
             state.snapshot().config.problem,
             Some(ConfigProblem::NotSaved { .. })
         ));
-        assert!(journalled(&state)
-            .iter()
-            .any(|event| matches!(event, JournalEvent::SaveFailed { .. })));
+        assert!(
+            journalled(&state)
+                .iter()
+                .any(|event| matches!(event, JournalEvent::SaveFailed { .. }))
+        );
 
         fs::remove_dir(&path).expect("the file's place is given back");
 

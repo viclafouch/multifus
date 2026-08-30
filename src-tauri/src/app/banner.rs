@@ -273,9 +273,9 @@ pub fn display_of(screen: &Monitor, primary: bool) -> DisplayView {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::test_doubles::game_window;
     use crate::test_doubles::Desktop;
     use crate::test_doubles::FakeWindowManager;
+    use crate::test_doubles::game_window;
 
     const SCALE: f64 = 1.0;
 

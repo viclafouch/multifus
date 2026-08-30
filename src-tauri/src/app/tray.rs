@@ -1,20 +1,20 @@
-use std::panic::catch_unwind;
 use std::panic::AssertUnwindSafe;
-use std::sync::mpsc;
-use std::sync::mpsc::Sender;
+use std::panic::catch_unwind;
 use std::sync::Mutex;
 use std::sync::MutexGuard;
 use std::sync::PoisonError;
+use std::sync::mpsc;
+use std::sync::mpsc::Sender;
 use std::thread;
 
+use tauri::AppHandle;
+use tauri::Manager;
+use tauri::Wry;
 use tauri::image::Image;
 use tauri::menu::Menu;
 use tauri::menu::MenuEvent;
 use tauri::menu::MenuItem;
 use tauri::menu::PredefinedMenuItem;
-use tauri::AppHandle;
-use tauri::Manager;
-use tauri::Wry;
 
 use crate::app::journal::JournalEvent;
 use crate::app::journal::Surface;
@@ -26,9 +26,9 @@ use crate::app::main_window;
 use crate::app::relay;
 use crate::app::rune_table;
 use crate::app::runtime;
+use crate::app::state::Multifus;
 use crate::app::state::lock;
 use crate::app::state::windows;
-use crate::app::state::Multifus;
 use crate::app::update;
 use crate::app::view::CharacterView;
 use crate::app::view::Screen;
@@ -521,11 +521,7 @@ fn hand_over(app: &AppHandle, work: TrayWork) {
 }
 
 fn switch_label(on: bool, undo: &'static str, redo: &'static str) -> &'static str {
-    if on {
-        undo
-    } else {
-        redo
-    }
+    if on { undo } else { redo }
 }
 
 fn screen_id(screen: Screen) -> &'static str {

@@ -2,10 +2,10 @@ use std::time::Duration;
 
 use reqwest::Client;
 use reqwest::RequestBuilder;
-use serde::de::DeserializeOwned;
-use serde::de::IgnoredAny;
 use serde::Deserialize;
 use serde::Serialize;
+use serde::de::DeserializeOwned;
+use serde::de::IgnoredAny;
 
 use crate::app::relay::secret::BotToken;
 

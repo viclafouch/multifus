@@ -268,9 +268,11 @@ mod tests {
         let json = serde_json::to_string(&character).expect("a character serialises");
 
         assert!(json.contains(r#""main":true"#), "{json}");
-        assert!(serde_json::from_str::<Character>(&json)
-            .expect("a character reads back")
-            .is_main());
+        assert!(
+            serde_json::from_str::<Character>(&json)
+                .expect("a character reads back")
+                .is_main()
+        );
     }
 
     #[test]

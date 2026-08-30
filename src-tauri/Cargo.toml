@@ -5,13 +5,19 @@ description = "Gestionnaire de fenêtres Dofus Retro en multicompte, macOS et Wi
 authors = ["Victor de la Fouchardiere <victor.delafouchardiere@gmail.com>"]
 license = "MIT"
 repository = "https://github.com/viclafouch/multifus"
-edition = "2021"
+edition = "2024"
 
 [lib]
 # The `_lib` suffix keeps the library name off the binary's, which only Windows minds: https://github.com/rust-lang/cargo/issues/8519
 name = "multifus_lib"
 # `rlib` alone, which is all `main.rs` links: the other two crate types are mobile entry points, and Multifus has no mobile build.
 crate-type = ["rlib"]
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = 3
+strip = true
 
 [build-dependencies]
 tauri-build = { version = "2", features = [] }

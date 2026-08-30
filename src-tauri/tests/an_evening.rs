@@ -8,6 +8,7 @@ use common::opened;
 use common::paint_everything;
 use common::reopened;
 
+use multifus_lib::app::Multifus;
 use multifus_lib::app::journal::JournalEvent;
 use multifus_lib::app::journal::Launch;
 use multifus_lib::app::journal::Outcome;
@@ -15,7 +16,6 @@ use multifus_lib::app::journal::Surface;
 use multifus_lib::app::state::Decision;
 use multifus_lib::app::state::ShortcutEffect;
 use multifus_lib::app::view::ShortcutAction;
-use multifus_lib::app::Multifus;
 use multifus_lib::domain::Class;
 use multifus_lib::domain::Gender;
 use multifus_lib::domain::NotificationKind;

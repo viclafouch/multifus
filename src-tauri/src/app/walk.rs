@@ -1,12 +1,12 @@
 use std::collections::HashMap;
-use std::panic::catch_unwind;
 use std::panic::AssertUnwindSafe;
-use std::sync::mpsc;
-use std::sync::mpsc::Sender;
+use std::panic::catch_unwind;
 use std::sync::Arc;
 use std::sync::Mutex;
 use std::sync::MutexGuard;
 use std::sync::PoisonError;
+use std::sync::mpsc;
+use std::sync::mpsc::Sender;
 use std::thread;
 use std::time::Instant;
 
@@ -20,20 +20,20 @@ use crate::app::journal::JournalEvent;
 use crate::app::journal::WalkFrom;
 use crate::app::journal::WalkIdle;
 use crate::app::journal::Work;
+use crate::app::state::AppState;
 use crate::app::state::hold;
 use crate::app::state::lock;
 use crate::app::state::windows;
-use crate::app::state::AppState;
 use crate::app::view::BannerCharacter;
 use crate::platform::ClickGate;
 use crate::platform::ClickReport;
 use crate::platform::ClickSink;
 use crate::platform::ClickedAt;
 use crate::platform::PlatformError;
-use crate::platform::WindowId;
-use crate::platform::WindowManager;
 use crate::platform::SETTLE;
 use crate::platform::SWITCH_CEILING;
+use crate::platform::WindowId;
+use crate::platform::WindowManager;
 
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
 pub struct WalkPlan {
@@ -349,13 +349,13 @@ mod tests {
     use crate::domain::Gender;
     use crate::domain::Roster;
     use crate::platform::ScreenPoint;
+    use crate::test_doubles::Asked;
+    use crate::test_doubles::Desktop;
+    use crate::test_doubles::FakeWindowManager;
     use crate::test_doubles::app_state;
     use crate::test_doubles::directory;
     use crate::test_doubles::game_window;
     use crate::test_doubles::journalled;
-    use crate::test_doubles::Asked;
-    use crate::test_doubles::Desktop;
-    use crate::test_doubles::FakeWindowManager;
 
     #[derive(Debug, Default)]
     struct FakeBanner {

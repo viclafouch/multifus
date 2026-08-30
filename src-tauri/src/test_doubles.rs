@@ -6,13 +6,13 @@ use std::time::Instant;
 
 use tempfile::TempDir;
 
-use crate::app::journal::JournalEvent;
-use crate::app::journal::Launch;
-use crate::app::state::hold;
-use crate::app::state::AppState;
-use crate::app::view::ScreenSaverView;
 use crate::app::Multifus;
 use crate::app::MultifusParams;
+use crate::app::journal::JournalEvent;
+use crate::app::journal::Launch;
+use crate::app::state::AppState;
+use crate::app::state::hold;
+use crate::app::view::ScreenSaverView;
 use crate::config::ConfigStore;
 use crate::config::Loaded;
 use crate::config::Settings;

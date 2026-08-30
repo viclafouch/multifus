@@ -441,8 +441,8 @@ pub enum ConfigProblem {
 mod tests {
     use std::time::Duration;
 
-    use serde_json::json;
     use serde_json::Value;
+    use serde_json::json;
 
     use super::*;
     use crate::app::journal::JournalEntry;

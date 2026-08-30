@@ -1,18 +1,18 @@
 use std::cell::OnceCell;
+use std::ffi::CStr;
 use std::ffi::c_float;
 use std::ffi::c_void;
-use std::ffi::CStr;
-use std::panic::catch_unwind;
 use std::panic::AssertUnwindSafe;
+use std::panic::catch_unwind;
 use std::ptr;
 use std::ptr::NonNull;
+use std::sync::Arc;
+use std::sync::Mutex;
+use std::sync::PoisonError;
 use std::sync::atomic::AtomicBool;
 use std::sync::atomic::AtomicI32;
 use std::sync::atomic::Ordering;
 use std::sync::mpsc;
-use std::sync::Arc;
-use std::sync::Mutex;
-use std::sync::PoisonError;
 use std::thread;
 use std::thread::JoinHandle;
 use std::time::Duration;
@@ -20,6 +20,7 @@ use std::time::Duration;
 use block2::RcBlock;
 use dispatch2::DispatchQueue;
 use libc::pid_t;
+use objc2::MainThreadMarker;
 use objc2::ffi::object_setClass;
 use objc2::msg_send;
 use objc2::rc::Retained;
@@ -27,14 +28,12 @@ use objc2::runtime::AnyClass;
 use objc2::runtime::AnyObject;
 use objc2::runtime::NSObjectProtocol;
 use objc2::runtime::ProtocolObject;
-use objc2::MainThreadMarker;
 use objc2_app_kit::NSApplicationActivationOptions;
 use objc2_app_kit::NSRunningApplication;
 use objc2_app_kit::NSScreen;
 use objc2_app_kit::NSWindowStyleMask;
 use objc2_app_kit::NSWorkspace;
 use objc2_app_kit::NSWorkspaceDidActivateApplicationNotification;
-use objc2_application_services::kAXTrustedCheckOptionPrompt;
 use objc2_application_services::AXError;
 use objc2_application_services::AXIsProcessTrusted;
 use objc2_application_services::AXIsProcessTrustedWithOptions;
@@ -42,11 +41,7 @@ use objc2_application_services::AXObserver;
 use objc2_application_services::AXUIElement;
 use objc2_application_services::AXValue;
 use objc2_application_services::AXValueType;
-use objc2_core_foundation::kCFBooleanFalse;
-use objc2_core_foundation::kCFBooleanTrue;
-use objc2_core_foundation::kCFPreferencesCurrentHost;
-use objc2_core_foundation::kCFPreferencesCurrentUser;
-use objc2_core_foundation::kCFRunLoopDefaultMode;
+use objc2_application_services::kAXTrustedCheckOptionPrompt;
 use objc2_core_foundation::CFArray;
 use objc2_core_foundation::CFBoolean;
 use objc2_core_foundation::CFDictionary;
@@ -61,6 +56,11 @@ use objc2_core_foundation::CGFloat;
 use objc2_core_foundation::CGPoint;
 use objc2_core_foundation::CGRect;
 use objc2_core_foundation::CGSize;
+use objc2_core_foundation::kCFBooleanFalse;
+use objc2_core_foundation::kCFBooleanTrue;
+use objc2_core_foundation::kCFPreferencesCurrentHost;
+use objc2_core_foundation::kCFPreferencesCurrentUser;
+use objc2_core_foundation::kCFRunLoopDefaultMode;
 use objc2_core_graphics::CGEvent;
 use objc2_core_graphics::CGEventFlags;
 use objc2_core_graphics::CGEventMask;
@@ -76,8 +76,9 @@ use objc2_foundation::NSNotification;
 use objc2_foundation::NSNotificationCenter;
 use objc2_foundation::NSString;
 
-use crate::domain::extract_nickname;
 use crate::domain::GameNotification;
+use crate::domain::extract_nickname;
+use crate::platform::Authorization;
 use crate::platform::click::ClickGate;
 use crate::platform::click::ClickJudge;
 use crate::platform::click::ClickReport;
@@ -100,7 +101,6 @@ use crate::platform::window::ScreenPoint;
 use crate::platform::window::ShortTitleReport;
 use crate::platform::window::WindowId;
 use crate::platform::window::WindowManager;
-use crate::platform::Authorization;
 
 const DOFUS_BUNDLE_ID: &str = "com.dofus.d1elauncher";
 
@@ -1515,7 +1515,7 @@ const SCREEN_SAVER_DOMAIN: &str = "com.apple.screensaver";
 const SCREEN_SAVER_IDLE_TIME: &str = "idleTime";
 
 #[link(name = "IOKit", kind = "framework")]
-extern "C" {
+unsafe extern "C" {
     fn IOPMAssertionCreateWithName(
         assertion_type: &CFString,
         assertion_level: IOPMAssertionLevel,
@@ -1821,7 +1821,7 @@ fn keyboard_type() -> u32 {
 }
 
 #[link(name = "Carbon", kind = "framework")]
-extern "C" {
+unsafe extern "C" {
     static kTISPropertyUnicodeKeyLayoutData: *const c_void;
 
     fn TISCopyCurrentKeyboardLayoutInputSource() -> *mut c_void;
@@ -1843,7 +1843,7 @@ extern "C" {
 }
 
 #[link(name = "CoreFoundation", kind = "framework")]
-extern "C" {
+unsafe extern "C" {
     fn CFDataGetBytePtr(data: *mut c_void) -> *const u8;
 
     fn CFRelease(value: *mut c_void);

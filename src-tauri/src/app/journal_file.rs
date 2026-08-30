@@ -1,9 +1,9 @@
 use std::path::PathBuf;
 
-use tauri::plugin::TauriPlugin;
 use tauri::AppHandle;
 use tauri::Manager;
 use tauri::Runtime;
+use tauri::plugin::TauriPlugin;
 use tauri_plugin_log::RotationStrategy;
 use tauri_plugin_log::Target;
 use tauri_plugin_log::TargetKind;

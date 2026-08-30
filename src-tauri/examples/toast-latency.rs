@@ -12,24 +12,16 @@ fn main() {
 mod bench {
     use std::collections::HashMap;
     use std::collections::HashSet;
+    use std::sync::Arc;
     use std::sync::atomic::AtomicBool;
     use std::sync::atomic::Ordering;
     use std::sync::mpsc;
-    use std::sync::Arc;
     use std::thread;
     use std::time::Duration;
     use std::time::Instant;
 
-    use windows::core::HSTRING;
     use windows::Data::Xml::Dom::XmlDocument;
     use windows::Foundation::TypedEventHandler;
-    use windows::Win32::System::Com::CoInitializeEx;
-    use windows::Win32::System::Com::COINIT_APARTMENTTHREADED;
-    use windows::Win32::UI::WindowsAndMessaging::DispatchMessageW;
-    use windows::Win32::UI::WindowsAndMessaging::PeekMessageW;
-    use windows::Win32::UI::WindowsAndMessaging::TranslateMessage;
-    use windows::Win32::UI::WindowsAndMessaging::MSG;
-    use windows::Win32::UI::WindowsAndMessaging::PM_REMOVE;
     use windows::UI::Notifications::KnownNotificationBindings;
     use windows::UI::Notifications::Management::UserNotificationListener;
     use windows::UI::Notifications::Management::UserNotificationListenerAccessStatus;
@@ -39,6 +31,14 @@ mod bench {
     use windows::UI::Notifications::ToastNotifier;
     use windows::UI::Notifications::UserNotification;
     use windows::UI::Notifications::UserNotificationChangedEventArgs;
+    use windows::Win32::System::Com::COINIT_APARTMENTTHREADED;
+    use windows::Win32::System::Com::CoInitializeEx;
+    use windows::Win32::UI::WindowsAndMessaging::DispatchMessageW;
+    use windows::Win32::UI::WindowsAndMessaging::MSG;
+    use windows::Win32::UI::WindowsAndMessaging::PM_REMOVE;
+    use windows::Win32::UI::WindowsAndMessaging::PeekMessageW;
+    use windows::Win32::UI::WindowsAndMessaging::TranslateMessage;
+    use windows::core::HSTRING;
 
     const POWERSHELL_APP_ID: &str =
         r"{1AC14E77-02E7-4E5D-B744-2EB1AE5198B7}\WindowsPowerShell\v1.0\powershell.exe";

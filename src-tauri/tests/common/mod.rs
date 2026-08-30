@@ -1,11 +1,11 @@
 use tempfile::TempDir;
 
+use multifus_lib::app::Multifus;
+use multifus_lib::app::MultifusParams;
 use multifus_lib::app::journal::Launch;
 use multifus_lib::app::state::ShortcutEffect;
 use multifus_lib::app::view::ScreenSaverView;
 use multifus_lib::app::view::ShortcutAction;
-use multifus_lib::app::Multifus;
-use multifus_lib::app::MultifusParams;
 use multifus_lib::config::ConfigStore;
 use multifus_lib::platform::GameWindow;
 use multifus_lib::platform::KeyLabels;

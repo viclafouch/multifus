@@ -1,5 +1,5 @@
-use std::panic::catch_unwind;
 use std::panic::AssertUnwindSafe;
+use std::panic::catch_unwind;
 use std::sync::Condvar;
 use std::sync::LazyLock;
 use std::sync::Mutex;
@@ -23,9 +23,6 @@ use crate::app::journal::Work;
 use crate::app::main_window;
 use crate::app::portraits;
 use crate::app::relay;
-use crate::app::state::hold;
-use crate::app::state::lock;
-use crate::app::state::windows;
 use crate::app::state::AppState;
 use crate::app::state::Decision;
 use crate::app::state::Multifus;
@@ -33,6 +30,9 @@ use crate::app::state::Painting;
 use crate::app::state::ScanChange;
 use crate::app::state::TracedWindow;
 use crate::app::state::WatcherState;
+use crate::app::state::hold;
+use crate::app::state::lock;
+use crate::app::state::windows;
 use crate::app::tray;
 use crate::app::view::ClientsView;
 use crate::app::view::Screen;
@@ -245,7 +245,7 @@ fn maximize_new_clients(turn: &Turn) -> bool {
         ClientsOnScreen::Unreadable { detail } => {
             return turn
                 .hold()
-                .log_unless_repeated(JournalEvent::ClientMaximizeFailed { detail })
+                .log_unless_repeated(JournalEvent::ClientMaximizeFailed { detail });
         }
     };
 
@@ -732,13 +732,13 @@ mod tests {
     use crate::domain::Gender;
     use crate::domain::Roster;
     use crate::platform::ShortTitleReport;
+    use crate::test_doubles::Asked;
+    use crate::test_doubles::Desktop;
+    use crate::test_doubles::FakeWindowManager;
     use crate::test_doubles::app_state;
     use crate::test_doubles::directory;
     use crate::test_doubles::game_window;
     use crate::test_doubles::journalled;
-    use crate::test_doubles::Asked;
-    use crate::test_doubles::Desktop;
-    use crate::test_doubles::FakeWindowManager;
 
     fn turn<'a>(windows: &'a FakeWindowManager, state: &'a AppState) -> Turn<'a> {
         Turn { windows, state }
@@ -914,9 +914,11 @@ mod tests {
 
         turn_over(&turn(&windows, &state), &mechanisms);
 
-        assert!(mechanisms
-            .set_going()
-            .contains(&TurnMechanism::SnapshotEmitted));
+        assert!(
+            mechanisms
+                .set_going()
+                .contains(&TurnMechanism::SnapshotEmitted)
+        );
     }
 
     #[test]
@@ -1510,9 +1512,11 @@ mod tests {
         apply_window_icons(&turn);
 
         assert!(!hold(&state).wore_portrait("Alpha"));
-        assert!(!journalled(&state)
-            .iter()
-            .any(|event| matches!(event, JournalEvent::WindowIconFailed { .. })));
+        assert!(
+            !journalled(&state)
+                .iter()
+                .any(|event| matches!(event, JournalEvent::WindowIconFailed { .. }))
+        );
     }
 
     #[test]

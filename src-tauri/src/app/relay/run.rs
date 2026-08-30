@@ -4,11 +4,11 @@ use std::sync::PoisonError;
 use std::time::Duration;
 
 use reqwest::Client;
-use tauri::async_runtime::channel;
-use tauri::async_runtime::Receiver;
-use tauri::async_runtime::Sender;
 use tauri::AppHandle;
 use tauri::Manager;
+use tauri::async_runtime::Receiver;
+use tauri::async_runtime::Sender;
+use tauri::async_runtime::channel;
 
 use crate::app::journal::JournalEvent;
 use crate::app::journal::NoticeCase;
@@ -20,9 +20,9 @@ use crate::app::relay::secret::BotToken;
 use crate::app::relay::telegram;
 use crate::app::relay::telegram::TelegramError;
 use crate::app::runtime;
-use crate::app::state::lock;
 use crate::app::state::ScanChange;
 use crate::app::state::StartId;
+use crate::app::state::lock;
 use crate::app::view::SwitchView;
 use crate::app::view::TestView;
 use crate::domain::GameNotification;

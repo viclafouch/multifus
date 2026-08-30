@@ -1,6 +1,6 @@
 use crate::domain::GameNotification;
-use crate::platform::error::Result;
 use crate::platform::Authorization;
+use crate::platform::error::Result;
 
 pub type NotificationSink = Box<dyn Fn(NotificationReport) + Send + 'static>;
 

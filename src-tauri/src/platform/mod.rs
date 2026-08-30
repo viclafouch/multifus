@@ -22,8 +22,8 @@ pub use display::DisplayKeeper;
 pub use display::ScreenSaverDelay;
 pub use error::PlatformError;
 pub use error::Result;
-pub use keyboard::key_labels;
 pub use keyboard::KeyLabels;
+pub use keyboard::key_labels;
 #[cfg(target_os = "macos")]
 pub use macos::hold_back_activation;
 #[cfg(target_os = "macos")]

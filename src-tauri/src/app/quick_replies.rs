@@ -7,9 +7,9 @@ use tauri_plugin_clipboard_manager::ClipboardExt;
 
 use crate::app::journal::JournalEvent;
 use crate::app::journal::QuickReplyFailure;
+use crate::app::state::AppState;
 use crate::app::state::hold;
 use crate::app::state::paste_sender;
-use crate::app::state::AppState;
 use crate::config::QuickReplyId;
 use crate::platform::Clipboard;
 use crate::platform::PasteSender;
@@ -222,9 +222,11 @@ mod tests {
             clipboard.read(),
             Some("une amulette du bouftou, 5000 kamas".to_owned())
         );
-        assert!(journalled(&state)
-            .iter()
-            .any(|event| matches!(event, JournalEvent::QuickReplyPasted { .. })));
+        assert!(
+            journalled(&state)
+                .iter()
+                .any(|event| matches!(event, JournalEvent::QuickReplyPasted { .. }))
+        );
     }
 
     #[test]

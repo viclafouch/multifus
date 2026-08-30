@@ -28,12 +28,12 @@ use tauri::Manager;
 use crate::app::view::ScreenSaverView;
 use crate::config::ConfigError;
 use crate::config::ConfigStore;
-use crate::platform::key_labels;
 use crate::platform::DisplayKeeper;
 use crate::platform::PlatformDisplayKeeper;
 use crate::platform::PlatformNotificationWatcher;
 use crate::platform::PlatformPasteSender;
 use crate::platform::PlatformWindowManager;
+use crate::platform::key_labels;
 
 pub use state::AppState;
 pub use state::Multifus;

@@ -1,6 +1,6 @@
 use std::collections::HashMap;
-use std::panic::catch_unwind;
 use std::panic::AssertUnwindSafe;
+use std::panic::catch_unwind;
 use std::sync::mpsc;
 use std::sync::mpsc::Sender;
 use std::thread;
@@ -11,6 +11,7 @@ use tauri_plugin_global_shortcut::GlobalShortcutExt;
 use tauri_plugin_global_shortcut::Shortcut;
 use tauri_plugin_global_shortcut::ShortcutState;
 
+use crate::app::Multifus;
 use crate::app::journal::CharacterShortcutOutcome;
 use crate::app::journal::JournalEvent;
 use crate::app::journal::QuickReplyFailure;
@@ -23,19 +24,18 @@ use crate::app::quick_replies;
 use crate::app::relay;
 use crate::app::rune_table;
 use crate::app::runtime;
-use crate::app::state::hold;
-use crate::app::state::lock;
-use crate::app::state::windows;
 use crate::app::state::AppState;
 use crate::app::state::CharacterAim;
 use crate::app::state::ShortcutEffect;
+use crate::app::state::hold;
+use crate::app::state::lock;
+use crate::app::state::windows;
 use crate::app::view::Binding;
 use crate::app::view::BindingView;
 use crate::app::view::ShortcutAction;
 use crate::app::view::ShortcutStatus;
 use crate::app::walk;
 use crate::app::wheel;
-use crate::app::Multifus;
 use crate::config::QuickReplyId;
 use crate::platform::GameWindow;
 use crate::platform::PlatformError;
@@ -441,13 +441,13 @@ mod tests {
     use crate::domain::Character;
     use crate::domain::Roster;
     use crate::platform::WindowId;
+    use crate::test_doubles::Asked;
+    use crate::test_doubles::Desktop;
+    use crate::test_doubles::FakeWindowManager;
     use crate::test_doubles::app_state;
     use crate::test_doubles::directory;
     use crate::test_doubles::game_window;
     use crate::test_doubles::journalled;
-    use crate::test_doubles::Asked;
-    use crate::test_doubles::Desktop;
-    use crate::test_doubles::FakeWindowManager;
 
     #[derive(Debug, Clone, PartialEq, Eq)]
     enum Mechanism {

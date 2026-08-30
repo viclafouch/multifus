@@ -1,6 +1,6 @@
 use crate::domain::extract_nickname;
-use crate::platform::error::Result;
 use crate::platform::Authorization;
+use crate::platform::error::Result;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct WindowId(u64);
