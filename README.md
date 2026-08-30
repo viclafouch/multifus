@@ -14,6 +14,7 @@ Une notification arrive dans le jeu, Multifus met devant vous la fenêtre du per
 - [x] Une touche par personnage si vous voulez, et sa fenêtre passe devant. Sur Windows, une touche de fonction se pose seule : F1 sur l'Eniripsa, F2 sur le Sacrieur
 - [x] Le Déplacement rapide : chaque clic gauche passe au personnage suivant, et vous emmenez toute votre team d'une map à l'autre sans lâcher la souris. Une bannière dit sur qui vous venez d'arriver
 - [x] La roue des personnages : maintenez `Ctrl+Maj+W` dans le jeu, votre team s'ouvre en disque au milieu de l'écran. Visez une tête de classe, lâchez, sa fenêtre passe devant
+- [x] Le tableau des runes : une combinaison pose les poids des runes par-dessus la fenêtre du jeu, à la taille et à la transparence que vous voulez. Vous le posez où vous voulez, il y revient au lancement suivant
 - [x] Des réponses rapides : une combinaison colle un texte tout prêt dans le chat, la touche Entrée reste la vôtre
 - [x] Vos messages privés sur votre téléphone par Telegram, tant que vous êtes loin du clavier
 - [x] Un client qui s'ouvre s'agrandit tout seul, une seule fois
