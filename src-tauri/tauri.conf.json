@@ -49,13 +49,24 @@
     "active": true,
     "targets": "all",
     "createUpdaterArtifacts": true,
+    "publisher": "Victor de la Fouchardiere",
+    "copyright": "© 2026 Victor de la Fouchardiere",
+    "category": "Utility",
+    "homepage": "https://github.com/viclafouch/multifus",
+    "license": "MIT",
+    "licenseFile": "../LICENSE",
+    "shortDescription": "Gestionnaire de fenêtres Dofus Retro en multicompte.",
+    "longDescription": "Multifus range les fenêtres de Dofus Retro quand on joue plusieurs personnages à la fois : bascule au raccourci, roue des personnages, déplacement rapide, tableau des runes et messages privés sur le téléphone.",
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
-    ]
+    ],
+    "macOS": {
+      "minimumSystemVersion": "11.0"
+    }
   },
   "plugins": {
     "updater": {
