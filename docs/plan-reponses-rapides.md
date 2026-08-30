@@ -55,7 +55,9 @@ pour ce qu'elle est, sans combinaison.
 
 ## À vérifier sur l'autre machine
 
-- [ ] La barre système ouvre bien l'écran depuis « Réponses rapides »
+- [ ] La barre de gauche et la barre système ouvrent toutes deux « Réponses rapides »
+- [ ] Le texte copié avant un collage revient dans le presse-papiers après
+- [ ] Le journal porte une ligne par collage
 - [ ] Une réponse qu'on vient d'ajouter dit « Sans touches, il ne se passera rien. », et plus « Un instant, Multifus s'en occupe. »
 - [ ] Une réponse sans texte se laisse écrire, et la ligne cesse de le dire
 - [ ] Une combinaison déjà prise par le Défilement est refusée par son nom, et

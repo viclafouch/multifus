@@ -26,7 +26,6 @@ import {
   WALK_IDLE_LINES,
   WORK_LABELS
 } from '@/constants/journal'
-import { strings } from '@/constants/strings'
 import {
   journalLine,
   journalTime,
@@ -565,7 +564,7 @@ const SHORTCUT_CASES = {
   readonly Case<'shortcut'>[]
 >
 
-const MAXIMIZE_ALL_SUBJECT = strings.maximize.all
+const MAXIMIZE_ALL_SUBJECT = 'Agrandir les fenêtres'
 
 const MAXIMIZE_ALL_CASES = {
   asked: [
@@ -1577,7 +1576,7 @@ describe('journalTranscript', () => {
         'Déplacement rapide : éteint',
         BINDINGS_LINE,
         'Configuration : /tmp/multifus/config.json',
-        `Mise à jour : ${strings.about.updateUpToDate}`,
+        'Mise à jour : Vous avez la dernière version.',
         'Entrées en mémoire : 2, 15/01/2026 09:05:03 → 15/01/2026 12:30:00',
         'Le fichier du journal sur le disque va plus loin en arrière que ces lignes.',
         '',

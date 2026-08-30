@@ -26,7 +26,7 @@ Rien n'a été mesuré sur le Mac. La bascule y paie plusieurs allers-retours
 Accessibilité vers un client qui rend peut-être un combat, et aucun banc ne dit
 ce qu'elle coûte.
 
-- [ ] Chronométrer une bascule sur le Mac, six clients ouverts, comme `toast-latency` chronomètre une notification sur Windows
+- [ ] Faire tourner `cargo run --release --example switch-latency` sur le Mac, six clients ouverts, et écrire le chiffre dans `plan-performances.md`
 - [ ] Chronométrer l'ouverture de la roue sur le Mac : elle lit le curseur par la boucle d'évènements, puis fait le tour des écrans. `monitor_from_point` ferait moins de travail, mais tao y compare des points logiques à un curseur physique, et il ne trouve rien sur un écran Retina
 
 ## Vérifier sur une vraie soirée, sur les deux machines
@@ -77,6 +77,10 @@ ce qu'elle coûte.
 
 ### La roue
 
+Le clic pendant la roue et son ouverture ont leurs propres lignes, dans
+[plan-roue-clic.md](./plan-roue-clic.md) et
+[plan-roue-ouverture.md](./plan-roue-ouverture.md). Ce qui suit est le reste.
+
 - [ ] Maintenir la combinaison de la roue hors du jeu : rien ne s'ouvre
 - [ ] Maintenir dans le jeu, ne pas bouger la souris, lâcher : personne ne bouge
 - [ ] Maintenir, aller sur une part, lâcher : la fenêtre passe devant, et le journal porte une ligne
@@ -87,15 +91,10 @@ ce qu'elle coûte.
 - [ ] Aucun personnage connecté : la roue s'ouvre vide et le dit
 - [ ] La part de la fenêtre du dessus est peinte d'un ambre pâle, et le principal porte son étoile
 - [ ] La roue par-dessus la barre de sorts : rien ne s'allume dans le jeu derrière le disque, et tout y répond de nouveau la roue fermée
-- [ ] Un clic sur une part, Déplacement rapide éteint puis allumé : la fenêtre passe devant, Multifus reste derrière, et le jeu n'a rien vu du clic
-- [ ] Un clic droit pendant la roue fait la même chose qu'un clic gauche
-- [ ] Un clic au centre du disque, puis hors du disque : la roue se ferme et personne ne bouge
 - [ ] La bannière se pose sur l'arrivée par la roue comme sur l'arrivée par un clic
 - [ ] Cmd+Tab pendant le maintien : la roue part au tour suivant
 - [ ] Sur le Mac, lâcher la lettre en gardant Ctrl et Maj : la roue se ferme
 - [ ] La jauge d'un bout à l'autre, 280 puis 360 : le dessin suit, et le bouton pose la vraie roue à la bonne taille au milieu de l'écran
-- [ ] La toute première ouverture après le lancement tombe au milieu, à la même place que les suivantes
-- [ ] Deux ouvertures de suite avec deux équipes différentes : la seconde ne montre à aucun moment celle d'avant
 - [ ] Un diamètre de 720 hérité d'une version d'avant revient à 360 au démarrage
 - [ ] Le dessin de l'écran montre six faux personnages même sans un client ouvert, et la jauge Personnages les compte de un à huit sans rien enregistrer
 - [ ] « Voir en vrai » pose les faux personnages même avec toute la team connectée, et le survol y allume les parts comme dans le jeu
@@ -105,22 +104,9 @@ ce qu'elle coûte.
 
 ### Le tableau des runes
 
-- [ ] La combinaison frappée dans le jeu pose le tableau, et la même le retire
-- [ ] Frappée hors du jeu, elle ne pose rien
-- [ ] Le tableau se prend n'importe où, sauf sur sa croix, et le jeu garde le premier plan pendant tout le geste
-- [ ] Un clic sec ne déplace rien et n'enregistre rien
-- [ ] La fenêtre du jeu déplacée, le tableau suit sans traîner à l'œil
-- [ ] Le tableau poussé hors de l'écran y reste, et le bouton « Remettre » le ramène en haut à droite du client
-- [ ] La ligne de la barre système le ramène aussi, sans que Multifus se fige
-- [ ] La barre système montre et cache le tableau, et sa coche dit l'état
-- [ ] Les deux jauges bougent l'aperçu à chaque cran, et n'écrivent qu'une fois lâchées
-- [ ] La jauge de taille poussée à fond : la plaque tient entière à l'écran, la dernière rune comprise
-- [ ] À 100 de transparence, la plaque se lit encore et prend toujours les clics
-- [ ] Tous les poids portent le même blanc, et aucune ligne ne ressort
-- [ ] Le tableau ne se pose pas sur un client en plein écran, et reste sur un client simplement agrandi
-- [ ] Sur un écran Retina et sur deux écrans d'échelles différentes, la plaque n'est ni deux fois trop grande ni deux fois trop petite
-- [ ] L'interrupteur des autres personnages bougé aperçu ouvert tient une fois l'aperçu fermé
-- [ ] Vider la combinaison dans l'écran Raccourcis : l'écran Tableau des runes le dit en tête
+Les soixante-cinq lignes sont dans
+[plan-tableau-runes.md](./plan-tableau-runes.md), qui est ce qu'on emporte sur
+l'autre machine. Ce qui en survivra revient ici quand ce fichier s'effacera.
 
 ### Agrandir tout
 
@@ -145,12 +131,8 @@ ce qu'elle coûte.
 
 ### Les réponses rapides
 
-- [ ] La barre de gauche et la barre système ouvrent toutes deux « Réponses rapides »
-- [ ] Une réponse rapide sans combinaison ne fait rien, et l'écran le dit
-- [ ] Une réponse rapide sans texte non plus, et l'écran le dit aussi
-- [ ] Une combinaison déjà prise par le Défilement est refusée par son nom
-- [ ] Le texte copié avant un collage revient dans le presse-papiers après
-- [ ] Le journal porte une ligne par collage
+Les sept lignes sont dans
+[plan-reponses-rapides.md](./plan-reponses-rapides.md).
 
 ### Les fenêtres et les notifications
 

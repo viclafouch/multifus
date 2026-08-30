@@ -201,7 +201,30 @@ recycle les identifiants de process, et une table gardée pourrait prendre un
 nouveau venu pour un client. Une seconde de mémoire suffit à ce qu'on voulait,
 et ne peut pas mentir.
 
-## Le banc
+## Le banc de la bascule du Mac
+
+`cargo run --release --example switch-latency [tours]` depuis `src-tauri`, avec
+les clients ouverts et l'Accessibilité accordée au binaire du banc, pas
+seulement à Multifus. Il fait passer chaque client au premier plan à tour de
+rôle, vingt fois par défaut, avec 400 ms de repos entre deux pour que le système
+ait fini de basculer, et rend la médiane, le neuvième décile, la pire et la
+moyenne.
+
+Il mesure `focus()`, c'est-à-dire ce que le raccourci paie : la fenêtre vivante,
+`AXRaise` et le passage au premier plan de l'application. Il ne mesure pas
+`focus_fast()`, qui est le chemin du Déplacement rapide, ni ce que la bascule
+coûte à un client qui rend un combat, ce qui demande d'être en combat.
+
+**Non compilé côté Mac** : la chaîne manque sur la machine Windows, et seule la
+branche « ce banc ne tourne que sur le Mac » y passe.
+
+L'ouverture de la roue n'a pas son banc. Elle lit le curseur par la boucle
+d'évènements de Tauri, ce qui demande un `AppHandle` : ça ne se mesure pas
+depuis un exemple, mais depuis l'application. Ce qu'il y aurait à chronométrer
+est `opening()` dans `wheel.rs`, du premier appel au curseur jusqu'à la fin du
+tour des écrans.
+
+## Le banc des notifications
 
 `cargo run --release --example toast-latency [nombre]` depuis `src-tauri`. Mode
 Concentration éteint, machine tranquille.

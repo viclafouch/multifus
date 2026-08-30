@@ -1,7 +1,9 @@
 # Le tableau des runes
 
-Écrit et testé. Ce qui reste tient dans les deux listes du bas, à faire sur les
-deux machines. Le fichier s'efface une fois qu'elles sont cochées.
+Écrit et testé. Ce qui reste à faire tient dans ce qui suit, jusqu'au trait :
+ce qui est douteux, ce qui n'est pas rangé, et les deux listes à cocher sur les
+machines. Sous le trait vit l'histoire, qui explique pourquoi le code est ainsi
+et ne demande rien. Le fichier s'efface une fois les listes cochées.
 
 ## Ce qui a été écrit
 
@@ -12,6 +14,164 @@ le ferme. L'écran Tableau des runes, septième ligne de la barre de gauche, por
 les deux jauges de la plaque, sa taille et sa transparence, l'interrupteur des
 autres fenêtres, le bouton d'aperçu et celui qui rappelle la plaque perdue. La
 barre système montre, cache, et rappelle.
+
+## Ce qui reste douteux
+
+**Dommages piège à 15 et 45.** Le seul chiffre de la source que le wiki
+JeuxOnLine ne recoupe pas. En Dofus 2 la simple pèse 5 et c'est la Pa qui pèse 15,
+ce qui ressemble à une recopie décalée. À vérifier en jeu.
+
+## Ce qu'il reste à ranger
+
+**`holds_point` et `screen_under` vivent en double dans le Rust**, en `i32` dans
+la roue et en `f64` ici. `apart` et `said` l'étaient aussi ; `overlay.rs` les a
+ramassés. Les deux qui restent demandent de toucher au placement de la roue, qui
+marche et qui a été vérifié en jeu, et de trancher entre les points et les
+pixels : c'est le chantier que [plan-overlay.md](./plan-overlay.md) laisse
+ouvert, pas celui du tableau.
+
+## Ce que la relecture a soulevé et que je laisse
+
+**Les deux tours d'Accessibilité et les trois sauts par tour.** `screen_under`
+demande les écrans à chaque tour, dix fois la seconde, ce qui alloue un vecteur
+et saute sur le fil principal ; `pose` paie en plus un `is_visible` sur le tour
+où rien ne bouge. Garder les écrans en mémoire les rendrait faux dès qu'on
+débranche un écran sans bouger la fenêtre, et le `is_visible` est ce qui rattrape
+une plaque que le système aurait cachée. Le prix est celui du dessin, mesuré et
+accepté ; c'est le blocage qui coûtait, et il est parti.
+
+**Deux écrans d'échelles différentes déplacent la plaque.** Le défaut est plus
+large que ce qui était noté ici. Trois endroits convertissent, et aucun ne parle
+la même unité que le suivant :
+
+- `window_frame` divise le cadre du client par l'échelle de **son** écran
+  (`window_scale`, `MonitorFromWindow` puis `GetDpiForMonitor`)
+- `logical_screen` divise l'origine de **chaque** moniteur par **sa propre**
+  échelle, alors que cette origine est un pixel du bureau virtuel, un espace
+  unique et global : deux moniteurs à 150 % et 100 % rendent des coordonnées qui
+  ne se recollent plus, et `screen_under` choisit le mauvais écran
+- `set_position` remultiplie par l'échelle de l'écran où se trouve **la plaque**
+
+Sur le Mac le problème n'existe pas : l'Accessibilité et `NSScreen` partagent un
+espace de points global, et la division par écran de `logical_screen` est
+précisément ce qui le retrouve depuis les pixels que tao rend. C'est donc un
+défaut de Windows seul, et la correction ne peut pas être la même des deux côtés.
+
+**La recette est déjà dans le dépôt.** La roue ne convertit rien : elle lit
+`work_area()` en pixels, calcule dans `held_inside` en `PhysicalRect`, et pose
+en `PhysicalPosition`. Elle est juste sur Windows pour cette raison. Le tableau
+doit faire pareil : porter le cadre, le décalage gardé et la taille de la plaque
+en pixels, et ne convertir qu'au moment d'écrire dans `config.json`, pour qu'un
+décalage survive à un changement d'échelle. `screen_under` et `holds_point`
+rejoignent alors ceux de la roue, ce que [plan-overlay.md](./plan-overlay.md)
+laisse ouvert.
+
+**Pas fait, et volontairement.** Ça réécrit le placement d'une fonctionnalité
+qui vient d'être vérifiée en jeu, et aucune des deux machines n'a deux écrans
+d'échelles différentes pour dire si la réécriture est juste. Le prix d'une
+erreur ici est une plaque qui se pose à côté sur le montage courant, contre un
+défaut qui ne se voit sur aucun des deux. À faire sur une machine qui peut le
+prouver.
+
+**`look` reste `look`.** Le pour cent que l'utilisateur pousse s'appelle
+`transparency`, l'opacité qui traverse le pont s'appelle `look` : deux noms pour
+deux unités, et les confondre coûterait plus qu'il ne rendrait.
+
+**« Depuis une fenêtre du jeu, et nulle part ailleurs »** garde ses mots parce
+que l'écran Roue porte la même phrase, au caractère près.
+
+## Ce que la relecture a trouvé et que je n'ai pas changé
+
+**Le survol des lignes.** La capture du pointeur retire d'elle-même le survol
+pendant le geste, donc rien ne change à l'écran quand on tire la plaque. Hors du
+geste, le survol aide à suivre une ligne sur vingt, et il reste.
+
+**Les quatre fonctions en double dans le Rust.** `apart` et `said` ne diffèrent
+que par l'évènement qu'elles écrivent au journal, `held_between` et `holds_point`
+par leur type. Les rassembler demande de toucher au placement de la roue, qui
+marche et qui a été vérifié en jeu.
+
+**`set_focusable` sur cette fenêtre paniquerait.** La variable d'instance de tao
+n'est plus dispatchée après l'échange de classe. Personne ne l'appelle, et il n'y
+a rien à corriger sans renoncer au panneau.
+
+## À vérifier sur les deux machines
+
+- [ ] Le tableau posé se prend à la souris et suit : la page reçoit bien ses clics
+- [ ] Le premier clic sur le tableau démarre le tirage, sans en demander un deuxième
+- [ ] Le tableau ne disparaît pas quand Multifus cesse d'être devant
+- [ ] Pendant tout le tirage, rien n'est figé et la plaque ne traîne pas derrière la souris
+- [ ] Le tirage suit la souris sans à-coup, un client en combat au premier plan
+- [ ] Une main qui traverse le tableau ne surligne pas une ligne ni un chiffre
+- [ ] Le raccourci dans le jeu montre le tableau, le même raccourci le cache
+- [ ] Le raccourci frappé dans Multifus, puis dans un navigateur : rien ne se passe
+- [ ] Le tableau poussé hors de l'écran, Multifus relancé : il est toujours dehors, et le bouton le ramène
+- [ ] Le tableau posé sur le deuxième écran, ce deuxième écran débranché, Multifus relancé : le tableau revient sur l'écran qui reste
+- [ ] Deux écrans d'échelles différentes : la plaque se pose au bon endroit, et la jauge la taille juste
+- [ ] La croix le ferme, et le raccourci le rouvre au même endroit
+- [ ] Le tableau se prend n'importe où, sur un chiffre comme sur un bord
+- [ ] Dofus reste au premier plan pendant tout le déplacement
+- [ ] La croix ferme et ne déplace jamais, même en la cliquant de travers
+- [ ] Un clic sec sur le tableau ne le fait pas dériver d'un pixel
+- [ ] Un clic à côté du tableau arrive au jeu, tableau posé depuis une heure
+- [ ] Lâché puis Multifus relancé, le tableau revient à la place où on l'a laissé
+- [ ] La jauge poussée à 560 puis Multifus relancé, le tableau revient large
+- [ ] L'aperçu ouvert, la jauge poussée : la plaque grossit à chaque cran, sans attendre le relâchement
+- [ ] À 560, l'écriture est plus grosse qu'à 320, et les colonnes gardent leurs proportions
+- [ ] À 560 comme à 320, la plaque remplit la fenêtre sans bord vide ni bas coupé
+- [ ] La jauge poussée d'un bout à l'autre : rien ne saute, rien ne clignote
+- [ ] La jauge poussée puis relâchée, Multifus relancé : la taille est la bonne
+- [ ] Une minute de tirage sans relâcher : Multifus répond toujours, la plaque suit toujours
+- [ ] Interrupteur basculé tableau posé : l'effet est immédiat, sans fermer ni rouvrir
+- [ ] Aperçu ouvert, la barre système : tout se cache d'un coup, et la coche le dit
+- [ ] Aperçu déplacé puis la jauge poussée : la plaque grandit sur place, sans revenir au milieu
+- [ ] Le tableau posé, le client passé en plein écran : le tableau s'efface, et revient en fenêtre
+- [ ] Le tableau posé, le client simplement agrandi : le tableau reste, et ne s'efface pas
+- [ ] Sur Windows, barre des tâches en masquage automatique, le client en plein écran : le tableau s'efface tout de même
+- [ ] Multifus lancé : aucune des trois fenêtres cachées ne vole le focus au démarrage
+- [ ] Premier lancement, tableau ouvert : la plaque naît à sa taille, sans sauter
+- [ ] La jauge de transparence poussée, aperçu ouvert : la plaque s'éclaircit à chaque cran
+- [ ] À 100, la plaque se lit encore par-dessus le jeu, et le clic reste pour elle
+- [ ] La transparence poussée puis relâchée, Multifus relancé : elle est la bonne
+- [ ] Une plaque à demi transparente se lit encore par-dessus un combat
+- [ ] La fenêtre du jeu déplacée, le tableau suit sans traîner à l'œil
+- [ ] La fenêtre du jeu passée d'agrandie à petite, le tableau garde sa taille et déborde
+- [ ] Interrupteur éteint, on bascule sur une autre fenêtre du jeu : le tableau s'efface, et revient au retour
+- [ ] Interrupteur allumé, on bascule : le tableau se montre sur les deux
+- [ ] On passe sur Chrome : le tableau s'efface. On revient dans le jeu : il revient
+- [ ] La fenêtre du jeu qui porte le tableau est fermée : le tableau s'efface, sans se fermer
+- [ ] Échap dans le jeu, tableau posé : le jeu reçoit Échap, le tableau ne bouge pas
+- [ ] L'aperçu s'ouvre au milieu de Multifus, se déplace, et ne garde pas sa place
+- [ ] L'aperçu ouvert reste posé, sans clignoter
+- [ ] L'aperçu se ferme à Échap et à la croix, et pas tout seul
+- [ ] On quitte Multifus pour le jeu, aperçu ouvert : il s'efface, et revient avec Multifus
+- [ ] L'aperçu ouvert par-dessus un tableau posé : à sa fermeture, le tableau reprend sa place
+- [ ] La roue ouverte pendant que le tableau est posé : la roue passe devant, et le clic ne touche pas la croix
+- [ ] La barre système montre et cache le tableau, et sa coche dit l'état
+- [ ] Les vingt lignes se lisent à 320 de large sans que rien ne se coupe
+- [ ] La jauge poussée à fond : la plaque tient entière à l'écran, la dernière rune comprise
+- [ ] Sur le petit écran, la jauge poussée à fond ne fait plus rien grandir passé un cran
+- [ ] Tous les poids portent le même blanc, du 0,25 au 100, et aucune ligne ne ressort
+- [ ] Sur un client agrandi, la plaque se pousse hors de l'écran et y reste au lancement suivant
+- [ ] Le bouton de l'écran la ramène au coin haut droit de la fenêtre du jeu
+- [ ] La ligne de la barre système la ramène aussi, et ne paraît que tableau ouvert, sans que Multifus se fige
+- [ ] Les deux jauges n'écrivent qu'une fois lâchées : poussées puis Multifus tué au `Ctrl+C`, la valeur gardée est celle du dernier relâchement
+- [ ] Vider la combinaison dans l'écran Raccourcis : l'écran Tableau des runes le dit en tête
+
+## À vérifier sur le Mac seulement
+
+- [ ] Le tableau posé, l'autorisation d'accessibilité retirée : le journal le dit une fois, pas cent
+- [ ] Le tableau reste devant après un changement de bureau
+- [ ] Sur un écran Retina, la plaque n'est ni deux fois trop grande ni deux fois trop petite
+- [ ] Le panneau se pose sans une ligne au journal : `hold_back_activation` n'a rien refusé
+- [ ] Le tableau reste au-dessus du jeu, et la roue passe toujours par-dessus lui
+
+---
+
+# Comment on en est arrivé là
+
+Rien à faire ici. Ce qui suit dit pourquoi le code est écrit comme il
+l'est, et quelles fautes ont été payées en route.
 
 ## Ce qui a changé en route
 
@@ -289,21 +449,6 @@ s'arrête à ses deux jauges. Le bouton du rappel porte le `RotateCcw` de l'écr
 À propos et de l'écran Raccourcis, la pastille de la ligne montrant, elle, ce
 dont il est question.
 
-## Ce que la relecture a trouvé et que je n'ai pas changé
-
-**Le survol des lignes.** La capture du pointeur retire d'elle-même le survol
-pendant le geste, donc rien ne change à l'écran quand on tire la plaque. Hors du
-geste, le survol aide à suivre une ligne sur vingt, et il reste.
-
-**Les quatre fonctions en double dans le Rust.** `apart` et `said` ne diffèrent
-que par l'évènement qu'elles écrivent au journal, `held_between` et `holds_point`
-par leur type. Les rassembler demande de toucher au placement de la roue, qui
-marche et qui a été vérifié en jeu.
-
-**`set_focusable` sur cette fenêtre paniquerait.** La variable d'instance de tao
-n'est plus dispatchée après l'échange de classe. Personne ne l'appelle, et il n'y
-a rien à corriger sans renoncer au panneau.
-
 ## La transparence
 
 Une seconde jauge, dans le même panneau que la taille, qui s'appelle maintenant
@@ -378,39 +523,6 @@ sous `zoom` relançait une pose, donc une mesure. `grained` arrondit au millièm
 **Le fil sortant tournait un tour de trop**, sa génération étant lue avant le
 sommeil et non après.
 
-## Ce qu'il reste à ranger
-
-**`holds_point` et `screen_under` vivent en double dans le Rust**, en `i32` dans
-la roue et en `f64` ici. `apart` et `said` l'étaient aussi ; `overlay.rs` les a
-ramassés. Les deux qui restent demandent de toucher au placement de la roue, qui
-marche et qui a été vérifié en jeu, et de trancher entre les points et les
-pixels : c'est le chantier que [plan-overlay.md](./plan-overlay.md) laisse
-ouvert, pas celui du tableau.
-
-## Ce que la relecture a soulevé et que je laisse
-
-**Les deux tours d'Accessibilité et les trois sauts par tour.** `screen_under`
-demande les écrans à chaque tour, dix fois la seconde, ce qui alloue un vecteur
-et saute sur le fil principal ; `pose` paie en plus un `is_visible` sur le tour
-où rien ne bouge. Garder les écrans en mémoire les rendrait faux dès qu'on
-débranche un écran sans bouger la fenêtre, et le `is_visible` est ce qui rattrape
-une plaque que le système aurait cachée. Le prix est celui du dessin, mesuré et
-accepté ; c'est le blocage qui coûtait, et il est parti.
-
-**Le point logique de Windows n'est pas celui de tao.** `window_scale` divise le
-cadre par l'échelle de l'écran du client, quand `set_position` le remultiplie par
-celle de l'écran où se trouve le tableau. Les deux ne diffèrent que sur un
-montage à deux écrans d'échelles différentes. Le corriger demande de poser en
-pixels, donc de porter la taille de la plaque en pixels aussi, et ça ne se teste
-pas sans une machine Windows. À vérifier là-bas avant de toucher.
-
-**`look` reste `look`.** Le pour cent que l'utilisateur pousse s'appelle
-`transparency`, l'opacité qui traverse le pont s'appelle `look` : deux noms pour
-deux unités, et les confondre coûterait plus qu'il ne rendrait.
-
-**« Depuis une fenêtre du jeu, et nulle part ailleurs »** garde ses mots parce
-que l'écran Roue porte la même phrase, au caractère près.
-
 ## L'aperçu qui clignotait sur Windows
 
 Le bouton « Voir en vrai » ouvrait la plaque, qui se fermait et se rouvrait dix
@@ -469,80 +581,3 @@ activer.
 `focused(false)` est posé dans `Overlay::build`, donc pour la bannière, la roue et
 le tableau d'un coup : aucun des trois ne doit prendre le focus, jamais. C'est la
 ceinture qui va avec les bretelles de `WS_EX_NOACTIVATE`.
-
-## Ce qui reste douteux
-
-**Dommages piège à 15 et 45.** Le seul chiffre de la source que le wiki
-JeuxOnLine ne recoupe pas. En Dofus 2 la simple pèse 5 et c'est la Pa qui pèse 15,
-ce qui ressemble à une recopie décalée. À vérifier en jeu.
-
-**Dommages piège reste le seul chiffre douteux.** Le reste de cette section est
-tranché, voir ci-dessous.
-
-## À vérifier sur les deux machines
-
-- [ ] Le tableau posé se prend à la souris et suit : la page reçoit bien ses clics
-- [ ] Le premier clic sur le tableau démarre le tirage, sans en demander un deuxième
-- [ ] Le tableau ne disparaît pas quand Multifus cesse d'être devant
-- [ ] Pendant tout le tirage, rien n'est figé et la plaque ne traîne pas derrière la souris
-- [ ] Le tirage suit la souris sans à-coup, un client en combat au premier plan
-- [ ] Une main qui traverse le tableau ne surligne pas une ligne ni un chiffre
-- [ ] Le raccourci dans le jeu montre le tableau, le même raccourci le cache
-- [ ] Le raccourci frappé dans Multifus, puis dans un navigateur : rien ne se passe
-- [ ] Le tableau poussé hors de l'écran, Multifus relancé : il est toujours dehors, et le bouton le ramène
-- [ ] Le tableau posé sur le deuxième écran, ce deuxième écran débranché, Multifus relancé : le tableau revient sur l'écran qui reste
-- [ ] La croix le ferme, et le raccourci le rouvre au même endroit
-- [ ] Le tableau se prend n'importe où, sur un chiffre comme sur un bord
-- [ ] Dofus reste au premier plan pendant tout le déplacement
-- [ ] La croix ferme et ne déplace jamais, même en la cliquant de travers
-- [ ] Un clic sec sur le tableau ne le fait pas dériver d'un pixel
-- [ ] Un clic à côté du tableau arrive au jeu, tableau posé depuis une heure
-- [ ] Lâché puis Multifus relancé, le tableau revient à la place où on l'a laissé
-- [ ] La jauge poussée à 560 puis Multifus relancé, le tableau revient large
-- [ ] L'aperçu ouvert, la jauge poussée : la plaque grossit à chaque cran, sans attendre le relâchement
-- [ ] À 560, l'écriture est plus grosse qu'à 320, et les colonnes gardent leurs proportions
-- [ ] À 560 comme à 320, la plaque remplit la fenêtre sans bord vide ni bas coupé
-- [ ] La jauge poussée d'un bout à l'autre : rien ne saute, rien ne clignote
-- [ ] La jauge poussée puis relâchée, Multifus relancé : la taille est la bonne
-- [ ] Une minute de tirage sans relâcher : Multifus répond toujours, la plaque suit toujours
-- [ ] Interrupteur basculé tableau posé : l'effet est immédiat, sans fermer ni rouvrir
-- [ ] Aperçu ouvert, la barre système : tout se cache d'un coup, et la coche le dit
-- [ ] Aperçu déplacé puis la jauge poussée : la plaque grandit sur place, sans revenir au milieu
-- [ ] Le tableau posé, le client passé en plein écran : le tableau s'efface, et revient en fenêtre
-- [ ] Le tableau posé, le client simplement agrandi : le tableau reste, et ne s'efface pas
-- [ ] Sur Windows, barre des tâches en masquage automatique, le client en plein écran : le tableau s'efface tout de même
-- [ ] Multifus lancé : aucune des trois fenêtres cachées ne vole le focus au démarrage
-- [ ] Premier lancement, tableau ouvert : la plaque naît à sa taille, sans sauter
-- [ ] La jauge de transparence poussée, aperçu ouvert : la plaque s'éclaircit à chaque cran
-- [ ] À 100, la plaque se lit encore par-dessus le jeu, et le clic reste pour elle
-- [ ] La transparence poussée puis relâchée, Multifus relancé : elle est la bonne
-- [ ] Une plaque à demi transparente se lit encore par-dessus un combat
-- [ ] La fenêtre du jeu déplacée, le tableau suit sans traîner à l'œil
-- [ ] La fenêtre du jeu passée d'agrandie à petite, le tableau garde sa taille et déborde
-- [ ] Interrupteur éteint, on bascule sur une autre fenêtre du jeu : le tableau s'efface, et revient au retour
-- [ ] Interrupteur allumé, on bascule : le tableau se montre sur les deux
-- [ ] On passe sur Chrome : le tableau s'efface. On revient dans le jeu : il revient
-- [ ] La fenêtre du jeu qui porte le tableau est fermée : le tableau s'efface, sans se fermer
-- [ ] Échap dans le jeu, tableau posé : le jeu reçoit Échap, le tableau ne bouge pas
-- [ ] L'aperçu s'ouvre au milieu de Multifus, se déplace, et ne garde pas sa place
-- [ ] L'aperçu ouvert reste posé, sans clignoter
-- [ ] L'aperçu se ferme à Échap et à la croix, et pas tout seul
-- [ ] On quitte Multifus pour le jeu, aperçu ouvert : il s'efface, et revient avec Multifus
-- [ ] L'aperçu ouvert par-dessus un tableau posé : à sa fermeture, le tableau reprend sa place
-- [ ] La roue ouverte pendant que le tableau est posé : la roue passe devant, et le clic ne touche pas la croix
-- [ ] La barre système montre et cache le tableau, et sa coche dit l'état
-- [ ] Les vingt lignes se lisent à 320 de large sans que rien ne se coupe
-- [ ] La jauge poussée à fond : la plaque tient entière à l'écran, la dernière rune comprise
-- [ ] Sur le petit écran, la jauge poussée à fond ne fait plus rien grandir passé un cran
-- [ ] Tous les poids portent le même blanc, du 0,25 au 100, et aucune ligne ne ressort
-- [ ] Sur un client agrandi, la plaque se pousse hors de l'écran et y reste au lancement suivant
-- [ ] Le bouton de l'écran la ramène au coin haut droit de la fenêtre du jeu
-- [ ] La ligne de la barre système la ramène aussi, et ne paraît que tableau ouvert
-
-## À vérifier sur le Mac seulement
-
-- [ ] Le tableau posé, l'autorisation d'accessibilité retirée : le journal le dit une fois, pas cent
-- [ ] Le tableau reste devant après un changement de bureau
-- [ ] Sur un écran Retina, la plaque n'est ni deux fois trop grande ni deux fois trop petite
-- [ ] Le panneau se pose sans une ligne au journal : `hold_back_activation` n'a rien refusé
-- [ ] Le tableau reste au-dessus du jeu, et la roue passe toujours par-dessus lui

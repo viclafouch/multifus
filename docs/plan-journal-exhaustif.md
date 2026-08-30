@@ -23,13 +23,23 @@ union ; aucun repli n'avait jamais servi. `tsc` passe sans qu'une seule branche
 ait été ajoutée. Le repli ne rattrapait rien, il empêchait seulement le
 compilateur de parler.
 
-## Ce qu'on n'a pas fait
+## Les tables de gabarits, tranchées : elles restent
 
-`journal.test.ts` fait 1623 lignes, dont environ 1340 de tables de gabarits qui
-réécrivent chaque phrase française mot pour mot. Ces tables ne prouvent pas
-qu'une phrase est juste, seulement qu'elle n'a pas changé d'un seul côté. Elles
-gardaient aussi l'exhaustivité, que le compilateur tient maintenant.
+`journal.test.ts` fait 1623 lignes, dont environ 1200 de tables qui réécrivent
+chaque phrase française mot pour mot. La question posée était de savoir si le
+compilateur les rendait inutiles.
 
-Les supprimer se discute, et ce n'est pas une conséquence mécanique de ce
-changement : une phrase vue par l'utilisateur qui change sans qu'on le veuille
-reste une régression, et la table la voit. À trancher à part.
+Non : les deux ne font pas le même travail. Le compilateur tient
+l'exhaustivité, que tout genre d'évènement soit traité. Les tables tiennent les
+mots, et le journal est ce que l'utilisateur lit le plus. Une phrase qui change
+sans qu'on le veuille reste une régression que rien d'autre ne voit.
+
+Elles valent parce qu'elles écrivent la phrase en toutes lettres, à côté du
+code qui la compose : deux sources, et le test échoue quand elles divergent.
+Deux cas lisaient la phrase dans `strings` au lieu de l'écrire, et ne prouvaient
+donc rien de ce qu'elles affichaient. Ils l'écrivent maintenant, et `strings`
+n'est plus importé par ce fichier.
+
+1200 lignes de données ne sont pas 1200 lignes de logique : elles se lisent
+d'un coup d'œil, elles ne se débuggent jamais, et les 173 cas tournent en une
+seconde.
