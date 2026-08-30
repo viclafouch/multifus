@@ -80,6 +80,10 @@ export const wheelSliceOf = (fields: Partial<WheelSlice> = {}) => {
   return { ...BLANK_SLICE, ...fields }
 }
 
+const DEMO_TEAM = Array.from({ length: 8 }, (_, rank) => {
+  return wheelSliceOf({ nickname: `Faux ${rank + 1}`, here: rank === 0 })
+})
+
 const BLANK_SNAPSHOT: Snapshot = {
   version: '0.0.0',
   system: 'test',
@@ -116,7 +120,7 @@ const BLANK_SNAPSHOT: Snapshot = {
     widest: 720,
     step: 20,
     deadZone: 0.32,
-    demo: []
+    demo: DEMO_TEAM
   },
   runeTable: {
     width: 420,
