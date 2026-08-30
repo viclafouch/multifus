@@ -19,11 +19,8 @@ versions déjà installées.
 
 ## Rattraper Dracoon sur la vitesse
 
-Ce qui reste de [plan-performances.md](./plan-performances.md), la scrutation
-des notifications étant faite. Les deux sont du Windows seul.
-
-- [ ] Déverrouiller le premier plan une fois au démarrage, `SPI_SETFOREGROUNDLOCKTIMEOUT` à zéro, et le rendre en quittant : chaque bascule cesse de payer `AttachThreadInput`
-- [ ] Mettre en cache le lien entre un identifiant de process et « c'est un client », pour cesser d'ouvrir un process par fenêtre visible à chaque tour
+Ce qui reste de [plan-performances.md](./plan-performances.md) : les trois
+points Windows sont faits.
 
 Rien n'a été mesuré sur le Mac. La bascule y paie plusieurs allers-retours
 Accessibilité vers un client qui rend peut-être un combat, et aucun banc ne dit
@@ -31,19 +28,6 @@ ce qu'elle coûte.
 
 - [ ] Chronométrer une bascule sur le Mac, six clients ouverts, comme `toast-latency` chronomètre une notification sur Windows
 - [ ] Chronométrer l'ouverture de la roue sur le Mac : elle lit le curseur par la boucle d'évènements, puis fait le tour des écrans. `monitor_from_point` ferait moins de travail, mais tao y compare des points logiques à un curseur physique, et il ne trouve rien sur un écran Retina
-
-## Un raccourci ne doit répondre que dans le jeu
-
-Deux actions répondent aujourd'hui de partout, le Déplacement rapide et Agrandir
-les fenêtres : `ShortcutAction::answers_anywhere` les laisse passer hors du jeu,
-et les messages privés partent avec. Multifus prend donc ces deux combinaisons
-dans tous les logiciels de la machine, un traitement de texte compris. C'est un
-défaut, pas un réglage.
-
-- [ ] `answers_anywhere` disparaît, et les huit actions ne répondent que fenêtre du jeu devant
-- [ ] `AnywhereAction` et son aiguillage s'en vont avec, dans `shortcuts.rs`
-- [ ] `CONTEXT.md` dit l'inverse dans **Frappe** : la phrase « sauf celles du Déplacement rapide et d'Agrandir tout, qui répondent de partout » tombe
-- [ ] Les tests qui gardaient cette exception disent maintenant la règle unique
 
 ## Vérifier sur une vraie soirée, sur les deux machines
 
@@ -77,15 +61,18 @@ défaut, pas un réglage.
 - [ ] La bannière porte « Déplacement rapide » tant qu'on n'est arrivé sur personne
 - [ ] Deux clients ouverts, Déplacement rapide allumé, fermer les deux : la case se décoche seule, la barre système dit ÉTEINT, la bannière part
 - [ ] Rouvrir un client : le Déplacement rapide reste éteint, et le raccourci le rallume
-- [ ] L'allumer au raccourci sans un seul client ouvert : il reste allumé
+- [ ] Le raccourci du Déplacement rapide frappé dans un traitement de texte : rien, et la touche arrive au texte
 - [ ] Laisser la team se déconnecter toute seule, les clients ouverts sur l'écran de connexion : le Déplacement rapide s'éteint, et la ligne du journal se lit sans mentir
 - [ ] Le tour ne marque pas d'à-coup pendant l'extinction
 
 ### Les raccourcis
 
-- [ ] La même combinaison frappée hors du jeu ne fait rien
+- [ ] Sur Windows, une bascule au raccourci répond aussi vite qu'avant, six clients ouverts
+- [ ] Multifus quitté proprement : le délai du premier plan revient à ce qu'il était, `HKCU\Control Panel\Desktop\ForegroundLockTimeout`
+
+- [ ] La même combinaison frappée hors du jeu ne fait rien, Déplacement rapide et Agrandir tout compris
 - [ ] « Remettre les touches d'origine » redonne les huit combinaisons
-- [ ] Ctrl+Maj+A n'est pris ni par Dofus Retro ni par un autre logiciel, et agrandit les clients depuis le bureau comme depuis le jeu
+- [ ] Ctrl+Maj+A n'est pris ni par Dofus Retro ni par un autre logiciel, et agrandit les clients depuis le jeu
 - [ ] Une touche posée sur un personnage le ramène devant, et « Remettre les touches d'origine » n'y touche pas
 
 ### La roue

@@ -201,6 +201,14 @@ impl WindowManager for FakeWindowManager {
             .collect()
     }
 
+    fn unlock_foreground(&self) -> Result<()> {
+        Ok(())
+    }
+
+    fn give_foreground_back(&self) -> Result<()> {
+        Ok(())
+    }
+
     fn focus(&self, window: WindowId) -> Result<()> {
         self.write_down(Asked::Focused(window));
 

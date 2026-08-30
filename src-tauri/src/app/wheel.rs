@@ -22,6 +22,7 @@ use crate::app::journal::JournalEvent;
 use crate::app::journal::WheelOutcome;
 use crate::app::journal::Work;
 use crate::app::main_window;
+use crate::app::overlay::holds_point;
 use crate::app::overlay::Acknowledged;
 use crate::app::overlay::Generation;
 use crate::app::overlay::Overlay;
@@ -731,16 +732,11 @@ fn screen_under(app: &AppHandle, x: f64, y: f64) -> Option<Monitor> {
         let corner = screen.position();
         let side = screen.size();
 
-        holds_point(corner.x, side.width, x) && holds_point(corner.y, side.height, y)
+        holds_point(f64::from(corner.x), f64::from(side.width), x)
+            && holds_point(f64::from(corner.y), f64::from(side.height), y)
     });
 
     under.or_else(|| app.primary_monitor().ok().flatten())
-}
-
-fn holds_point(edge: i32, room: u32, at: f64) -> bool {
-    let edge = f64::from(edge);
-
-    at >= edge && at < edge + f64::from(room)
 }
 
 fn framed(diameter: u32) -> f64 {
@@ -1027,13 +1023,6 @@ mod tests {
             held_inside(&cramped, size(), NO_HALO, (150.0, 150.0)),
             PhysicalPosition::new(0, 0)
         );
-    }
-
-    #[test]
-    fn a_screen_owns_its_left_edge_and_leaves_the_next_one_to_its_neighbour() {
-        assert!(holds_point(1920, 1920, 1920.0));
-        assert!(!holds_point(1920, 1920, 3840.0));
-        assert!(!holds_point(1920, 1920, 1919.0));
     }
 
     #[test]

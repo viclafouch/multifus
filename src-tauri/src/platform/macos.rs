@@ -756,6 +756,14 @@ impl WindowManager for AccessibilityWindowManager {
         Ok(bool_attribute(&game_window, AX_MINIMIZED)? == Some(true))
     }
 
+    fn unlock_foreground(&self) -> Result<()> {
+        Ok(())
+    }
+
+    fn give_foreground_back(&self) -> Result<()> {
+        Ok(())
+    }
+
     fn focus(&self, window: WindowId) -> Result<()> {
         let (application, element) = live_application(window)?;
 

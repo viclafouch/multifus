@@ -12,6 +12,7 @@ use std::sync::atomic::AtomicBool;
 use std::sync::atomic::Ordering;
 use std::sync::mpsc;
 use std::sync::Arc;
+use std::sync::LazyLock;
 use std::sync::Mutex;
 use std::sync::MutexGuard;
 use std::sync::PoisonError;
@@ -128,6 +129,9 @@ use windows::Win32::UI::WindowsAndMessaging::SM_CXICON;
 use windows::Win32::UI::WindowsAndMessaging::SM_CXSMICON;
 use windows::Win32::UI::WindowsAndMessaging::SPI_GETSCREENSAVEACTIVE;
 use windows::Win32::UI::WindowsAndMessaging::SPI_GETSCREENSAVETIMEOUT;
+use windows::Win32::UI::WindowsAndMessaging::SPIF_SENDCHANGE;
+use windows::Win32::UI::WindowsAndMessaging::SPI_GETFOREGROUNDLOCKTIMEOUT;
+use windows::Win32::UI::WindowsAndMessaging::SPI_SETFOREGROUNDLOCKTIMEOUT;
 use windows::Win32::UI::WindowsAndMessaging::SW_MAXIMIZE;
 use windows::Win32::UI::WindowsAndMessaging::SW_RESTORE;
 use windows::Win32::UI::WindowsAndMessaging::SYSTEM_PARAMETERS_INFO_ACTION;
@@ -263,6 +267,7 @@ impl IconSlot {
 pub struct Win32WindowManager {
     short: AtomicBool,
     icons: Mutex<HashMap<WindowId, WindowIcons>>,
+    foreground_lock: Mutex<Option<u32>>,
 }
 
 impl Win32WindowManager {
@@ -277,6 +282,12 @@ impl Win32WindowManager {
 
     fn shortens(&self) -> bool {
         self.short.load(Ordering::Relaxed)
+    }
+
+    fn foreground_lock(&self) -> MutexGuard<'_, Option<u32>> {
+        self.foreground_lock
+            .lock()
+            .unwrap_or_else(PoisonError::into_inner)
     }
 
     fn paint_slot(
@@ -382,44 +393,45 @@ impl WindowManager for Win32WindowManager {
             .collect()
     }
 
+    fn unlock_foreground(&self) -> Result<()> {
+        let Some(held) = system_parameter(SPI_GETFOREGROUNDLOCKTIMEOUT) else {
+            return Err(PlatformError::system(
+                "reading the foreground lock",
+                "the system did not say how long it holds the foreground",
+            ));
+        };
+
+        *self.foreground_lock() = Some(held);
+
+        write_foreground_lock(0)
+    }
+
+    fn give_foreground_back(&self) -> Result<()> {
+        let Some(held) = self.foreground_lock().take() else {
+            return Ok(());
+        };
+
+        write_foreground_lock(held)
+    }
+
     fn focus(&self, window: WindowId) -> Result<()> {
         let handle = live_game_window(window)?;
-        let _attached = AttachedInput::new(handle);
 
         if unsafe { IsIconic(handle) }.as_bool() {
             let _ = unsafe { ShowWindow(handle, SW_RESTORE) };
         }
 
-        let _ = unsafe { BringWindowToTop(handle) };
-
-        if unsafe { SetForegroundWindow(handle) }.as_bool() {
-            return Ok(());
-        }
-
-        Err(PlatformError::system(
-            "SetForegroundWindow",
-            "the system kept the focus where it was",
-        ))
+        brought_to_front(handle)
     }
 
     fn focus_fast(&self, window: WindowId) -> Result<()> {
         let handle = window_handle(window);
-        let _attached = AttachedInput::new(handle);
 
         if unsafe { IsIconic(handle) }.as_bool() {
             let _ = unsafe { ShowWindowAsync(handle, SW_RESTORE) };
         }
 
-        let _ = unsafe { BringWindowToTop(handle) };
-
-        if unsafe { SetForegroundWindow(handle) }.as_bool() {
-            return Ok(());
-        }
-
-        Err(PlatformError::system(
-            "SetForegroundWindow",
-            "the system kept the focus where it was",
-        ))
+        brought_to_front(handle)
     }
 
     fn client_windows(&self) -> Result<Vec<WindowId>> {
@@ -467,6 +479,8 @@ impl WindowManager for Win32WindowManager {
     }
 
     fn forget_closed_windows(&self) {
+        forget_the_processes();
+
         let mut icons = self.icons.lock().unwrap_or_else(PoisonError::into_inner);
         let closed = icons
             .keys()
@@ -842,8 +856,74 @@ fn live_game_window(window: WindowId) -> Result<HWND> {
     Ok(handle)
 }
 
+static DOFUS_PROCESSES: LazyLock<Mutex<HashMap<u32, bool>>> =
+    LazyLock::new(|| Mutex::new(HashMap::new()));
+
+fn brought_to_front(handle: HWND) -> Result<()> {
+    if raised(handle) {
+        return Ok(());
+    }
+
+    let _attached = AttachedInput::new(handle);
+
+    if raised(handle) {
+        return Ok(());
+    }
+
+    Err(PlatformError::system(
+        "SetForegroundWindow",
+        "the system kept the focus where it was",
+    ))
+}
+
+fn raised(handle: HWND) -> bool {
+    let _ = unsafe { BringWindowToTop(handle) };
+
+    unsafe { SetForegroundWindow(handle) }.as_bool()
+}
+
+fn write_foreground_lock(seconds: u32) -> Result<()> {
+    // SAFETY: this action reads its value from the pointer itself, and writes nothing.
+    unsafe {
+        SystemParametersInfoW(
+            SPI_SETFOREGROUNDLOCKTIMEOUT,
+            0,
+            Some(seconds as usize as *mut c_void),
+            SPIF_SENDCHANGE,
+        )
+    }
+    .map_err(|error| PlatformError::system("writing the foreground lock", error.to_string()))
+}
+
 fn runs_dofus(handle: HWND) -> bool {
-    executable_name(handle).is_some_and(|name| name.eq_ignore_ascii_case(DOFUS_EXECUTABLE))
+    let mut process = 0_u32;
+    unsafe { GetWindowThreadProcessId(handle, Some(&mut process)) };
+
+    if process == 0 {
+        return false;
+    }
+
+    let mut known = DOFUS_PROCESSES
+        .lock()
+        .unwrap_or_else(PoisonError::into_inner);
+
+    if let Some(answer) = known.get(&process) {
+        return *answer;
+    }
+
+    let answer =
+        executable_name(handle).is_some_and(|name| name.eq_ignore_ascii_case(DOFUS_EXECUTABLE));
+
+    known.insert(process, answer);
+
+    answer
+}
+
+fn forget_the_processes() {
+    DOFUS_PROCESSES
+        .lock()
+        .unwrap_or_else(PoisonError::into_inner)
+        .clear();
 }
 
 const DOTS_PER_INCH: f64 = 96.0;

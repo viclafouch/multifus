@@ -380,11 +380,12 @@ sommeil et non après.
 
 ## Ce qu'il reste à ranger
 
-**Trois fonctions vivent en double dans le Rust.** `holds_point` de
-`rune_table.rs` refait celle de `wheel.rs` en `f64` au lieu de `i32`, et `apart`
-et `said` en sont la troisième copie après `banner.rs` et `wheel.rs`. Les
-rassembler demande de toucher au placement de la roue, qui marche et qui a été
-vérifié en jeu : ça se fait à froid, pas en livrant le tableau.
+**`holds_point` et `screen_under` vivent en double dans le Rust**, en `i32` dans
+la roue et en `f64` ici. `apart` et `said` l'étaient aussi ; `overlay.rs` les a
+ramassés. Les deux qui restent demandent de toucher au placement de la roue, qui
+marche et qui a été vérifié en jeu, et de trancher entre les points et les
+pixels : c'est le chantier que [plan-overlay.md](./plan-overlay.md) laisse
+ouvert, pas celui du tableau.
 
 ## Ce que la relecture a soulevé et que je laisse
 

@@ -46,6 +46,11 @@ impl Acknowledged {
     }
 }
 
+#[must_use]
+pub fn holds_point(edge: f64, room: f64, at: f64) -> bool {
+    at >= edge && at < edge + room
+}
+
 pub struct Overlay {
     pub label: &'static str,
     pub page: &'static str,
@@ -126,6 +131,13 @@ impl Overlay {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_screen_holds_its_first_point_and_leaves_the_first_of_the_next_one() {
+        assert!(holds_point(1920.0, 1920.0, 1920.0));
+        assert!(!holds_point(1920.0, 1920.0, 3840.0));
+        assert!(!holds_point(1920.0, 1920.0, 1919.0));
+    }
 
     #[test]
     fn an_overlay_that_a_newer_one_replaced_no_longer_speaks_for_itself() {

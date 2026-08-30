@@ -172,9 +172,34 @@ systèmes ne racontent pas la même soirée.
 ## Ordre
 
 1. La scrutation des notifications, faite
-2. Le déverrouillage du premier plan, le plus large
-3. Le cache de process, le moins visible
+2. Le déverrouillage du premier plan, fait
+3. Le cache de process, fait
 4. Le banc de bascule du Mac, qui dira s'il y a un point 5
+
+## Ce que les points 2 et 3 ont donné
+
+**Le premier plan.** `unlock_foreground` et `give_foreground_back` entrent au
+trait `WindowManager`, à côté de `focus` : macOS rend `Ok(())`, comme il le fait
+déjà pour `set_window_group`. Windows lit `SPI_GETFOREGROUNDLOCKTIMEOUT`, le
+garde, et écrit zéro ; la sortie réécrit ce qu'il a lu. Le réglage vaut pour la
+session entière, alors Multifus tué au `Ctrl+C` le laisse à zéro : le démarrage
+suivant relit la valeur et gardera un zéro pour valeur d'origine. C'est la même
+faiblesse qu'une Trace, et elle se rattrape en le remettant à la main.
+
+`AttachThreadInput` n'est plus payé à l'aller : `brought_to_front` essaie
+`SetForegroundWindow` seul, et ne s'attache qu'à un refus. `focus` et
+`focus_fast` disaient la même chose à deux exemplaires, elles la disent une fois.
+
+**Le cache de process.** `runs_dofus` lit l'identifiant du process de la fenêtre
+et répond depuis une table, plutôt que d'ouvrir le process. La table se vide à
+chaque tour, dans `forget_closed_windows` : un `EnumWindows` ne paie donc qu'un
+`OpenProcess` par process distinct, et le `live_game_window` d'une bascule, qui
+suit le balayage de la seconde, ne paie rien.
+
+Vider la table à chaque tour plutôt que la garder est un choix : Windows
+recycle les identifiants de process, et une table gardée pourrait prendre un
+nouveau venu pour un client. Une seconde de mémoire suffit à ce qu'on voulait,
+et ne peut pas mentir.
 
 ## Le banc
 

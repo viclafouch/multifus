@@ -37,7 +37,7 @@ const ACTION_LABELS = {
   },
   walk: {
     label: 'Déplacement rapide',
-    description: 'Allume le clic qui emmène toute la team, même hors du jeu.',
+    description: 'Allume le clic qui emmène toute la team d’une map à l’autre.',
     mention: null
   },
   maximizeAll: {

@@ -157,6 +157,10 @@ pub trait WindowManager: Send + Sync {
 
     fn maximized_windows(&self, windows: &[WindowId]) -> Vec<WindowId>;
 
+    fn unlock_foreground(&self) -> Result<()>;
+
+    fn give_foreground_back(&self) -> Result<()>;
+
     fn focus(&self, window: WindowId) -> Result<()>;
 
     fn focus_fast(&self, window: WindowId) -> Result<()>;

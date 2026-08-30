@@ -20,6 +20,7 @@ use crate::app::journal::JournalEvent;
 use crate::app::journal::Work;
 use crate::app::main_window;
 use crate::app::overlay::Generation;
+use crate::app::overlay::holds_point;
 use crate::app::overlay::Overlay;
 use crate::app::state::lock;
 use crate::app::state::windows;
@@ -794,10 +795,6 @@ fn matches_same_edge(one: f64, other: f64) -> bool {
     (one - other).abs() <= EDGE_GRAIN
 }
 
-fn holds_point(edge: f64, room: f64, at: f64) -> bool {
-    at >= edge && at < edge + room
-}
-
 fn build(app: &AppHandle) {
     let width = f64::from(lock(app).rune_table_width());
 
@@ -1298,13 +1295,6 @@ mod tests {
             !table.matches_under_the_hand(),
             "a page that dies mid drag must not freeze the following for good"
         );
-    }
-
-    #[test]
-    fn a_screen_owns_its_left_edge_and_leaves_the_next_one_to_its_neighbour() {
-        assert!(holds_point(1920.0, 1920.0, 1920.0));
-        assert!(!holds_point(1920.0, 1920.0, 3840.0));
-        assert!(!holds_point(1920.0, 1920.0, 1919.0));
     }
 
     #[test]

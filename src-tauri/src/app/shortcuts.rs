@@ -29,7 +29,6 @@ use crate::app::state::windows;
 use crate::app::state::AppState;
 use crate::app::state::CharacterAim;
 use crate::app::state::ShortcutEffect;
-use crate::app::view::AnywhereAction;
 use crate::app::view::Binding;
 use crate::app::view::BindingView;
 use crate::app::view::ShortcutAction;
@@ -306,14 +305,6 @@ fn answer(press: &Press, struck: Struck) {
         Struck::Pressed(binding) => binding,
     };
 
-    if let Binding::Action { action } = binding {
-        if let Some(anywhere) = action.answers_anywhere() {
-            set_going(press.mechanisms, anywhere);
-
-            return;
-        }
-    }
-
     match press.windows.foreground_game_window() {
         Ok(Some(window)) => {
             press.mechanisms.stop_relay();
@@ -331,15 +322,14 @@ fn answer(press: &Press, struck: Struck) {
     }
 }
 
-fn set_going(mechanisms: &dyn Mechanisms, anywhere: AnywhereAction) {
-    match anywhere {
-        AnywhereAction::Walk => mechanisms.toggle_walk(),
-        AnywhereAction::MaximizeAll => mechanisms.maximize_all(),
-    }
-}
-
 fn act_on(press: &Press, binding: Binding, window: &GameWindow) {
     match binding {
+        Binding::Action {
+            action: ShortcutAction::Walk,
+        } => press.mechanisms.toggle_walk(),
+        Binding::Action {
+            action: ShortcutAction::MaximizeAll,
+        } => press.mechanisms.maximize_all(),
         Binding::Action {
             action: ShortcutAction::Wheel,
         } => press.mechanisms.open_wheel(window.id()),
@@ -654,10 +644,13 @@ mod tests {
     }
 
     #[test]
-    fn the_walk_shortcut_answers_where_no_other_one_does() {
+    fn the_walk_lights_up_from_the_game_and_moves_no_window() {
         let directory = directory();
         let state = app_state(&directory, Settings::default());
-        let windows = FakeWindowManager::showing(Desktop::default());
+        let windows = FakeWindowManager::showing(Desktop {
+            foreground: Some(game_window(1, "Alpha")),
+            ..Desktop::default()
+        });
         let mechanisms = FakeMechanisms::default();
 
         answering(
@@ -671,12 +664,12 @@ mod tests {
             },
         );
 
-        assert_eq!(mechanisms.set_going(), vec![Mechanism::WalkToggled]);
         assert_eq!(
-            journalled(&state),
-            Vec::new(),
-            "nobody is at the game, and the Walk is not refused for it"
+            mechanisms.set_going(),
+            vec![Mechanism::RelayStopped, Mechanism::WalkToggled],
+            "the player is at the game, so the private messages fall silent like on any other strike"
         );
+        assert_eq!(journalled(&state), Vec::new());
         assert_eq!(
             windows.asked(),
             Vec::new(),
@@ -685,33 +678,7 @@ mod tests {
     }
 
     #[test]
-    fn the_maximize_all_shortcut_answers_outside_the_game_and_leaves_the_relay_alone() {
-        let directory = directory();
-        let state = app_state(&directory, Settings::default());
-        let windows = FakeWindowManager::showing(Desktop::default());
-        let mechanisms = FakeMechanisms::default();
-
-        answering(
-            &Press {
-                windows: windows.as_ref(),
-                state: &state,
-                mechanisms: &mechanisms,
-            },
-            Binding::Action {
-                action: ShortcutAction::MaximizeAll,
-            },
-        );
-
-        assert_eq!(mechanisms.set_going(), vec![Mechanism::AllMaximized]);
-        assert_eq!(
-            journalled(&state),
-            Vec::new(),
-            "nobody is at the game, and the windows are widened all the same"
-        );
-    }
-
-    #[test]
-    fn an_action_that_answers_anywhere_is_the_only_one_the_bare_desktop_does_not_refuse() {
+    fn not_one_action_answers_to_a_bare_desktop() {
         for action in ShortcutAction::ALL {
             let directory = directory();
             let state = app_state(&directory, Settings::default());
@@ -727,15 +694,40 @@ mod tests {
                 Binding::Action { action },
             );
 
-            assert_eq!(
+            assert!(
                 mechanisms.set_going().is_empty(),
-                !action.answers_anywhere().is_some(),
-                "{action:?} disagrees with what it says of itself"
+                "{action:?} went off with nobody at the game"
             );
-            assert_eq!(
-                journalled(&state).is_empty(),
-                action.answers_anywhere().is_some(),
-                "{action:?} is refused outside the game, or it is not"
+            assert!(
+                !journalled(&state).is_empty(),
+                "{action:?} was refused outside the game without saying so"
+            );
+        }
+    }
+
+    #[test]
+    fn every_action_struck_in_the_game_answers_for_itself() {
+        for action in ShortcutAction::ALL {
+            let directory = directory();
+            let state = three_in_the_cycle(&directory);
+            let windows = FakeWindowManager::showing(Desktop {
+                foreground: Some(game_window(1, "Alpha")),
+                ..Desktop::default()
+            });
+            let mechanisms = FakeMechanisms::default();
+
+            answering(
+                &Press {
+                    windows: windows.as_ref(),
+                    state: &state,
+                    mechanisms: &mechanisms,
+                },
+                Binding::Action { action },
+            );
+
+            assert!(
+                !mechanisms.set_going().is_empty() || !journalled(&state).is_empty(),
+                "{action:?} struck at the game did nothing and said nothing"
             );
         }
     }

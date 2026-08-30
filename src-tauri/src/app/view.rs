@@ -330,29 +330,9 @@ impl ShortcutAction {
     ];
 
     #[must_use]
-    pub fn answers_anywhere(self) -> Option<AnywhereAction> {
-        match self {
-            Self::Walk => Some(AnywhereAction::Walk),
-            Self::MaximizeAll => Some(AnywhereAction::MaximizeAll),
-            Self::Next
-            | Self::Previous
-            | Self::Main
-            | Self::ToggleExcluded
-            | Self::Wheel
-            | Self::RuneTable => None,
-        }
-    }
-
-    #[must_use]
     pub fn matches_held(self) -> bool {
         matches!(self, Self::Wheel)
     }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AnywhereAction {
-    Walk,
-    MaximizeAll,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
@@ -809,16 +789,10 @@ mod tests {
             .collect::<Vec<_>>();
 
         assert_eq!(held, vec![ShortcutAction::Wheel]);
-        assert_eq!(
-            ShortcutAction::Wheel.answers_anywhere(),
-            None,
-            "the wheel opens in the game and nowhere else"
-        );
         assert!(
             !ShortcutAction::RuneTable.matches_held(),
             "the rune table answers to a key struck, and stays once it is let go"
         );
-        assert_eq!(ShortcutAction::RuneTable.answers_anywhere(), None);
     }
 
     #[test]

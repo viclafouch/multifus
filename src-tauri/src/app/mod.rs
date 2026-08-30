@@ -63,6 +63,8 @@ pub fn setup(app: &AppHandle) -> Result<(), ConfigError> {
         screen_saver: screen_saver(&keeper),
         taskbar_combines: windows.taskbar_combines().unwrap_or(true),
     })));
+    let _ = windows.unlock_foreground();
+
     app.manage::<WindowState>(windows);
     app.manage::<PasteState>(Arc::new(PlatformPasteSender::new()));
     app.manage::<WatcherState>(Mutex::new(PlatformNotificationWatcher::new()));

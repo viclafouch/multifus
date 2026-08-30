@@ -459,6 +459,7 @@ pub fn on_run_event(app: &AppHandle, event: RunEvent) {
         give_titles_back(&turn);
         give_icons_back(&turn);
         give_groups_back(&turn);
+        let _ = turn.windows.give_foreground_back();
 
         return;
     }

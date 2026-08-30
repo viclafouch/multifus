@@ -76,7 +76,7 @@ Les mots de Multifus, et rien d'autre. On en parle en français, on les écrit e
 
 **AutoFocus** (`AutoFocus`) : le mécanisme qui focus la fenêtre d'un personnage quand une notification de jeu le concerne. Il se tait pour un personnage exclu.
 
-**Frappe** (`Press`) : un appui sur une combinaison, et ce que Multifus en fait. Elle ne vaut que dans le jeu, sauf celles du Déplacement rapide et d'Agrandir tout, qui répondent de partout et laissent les messages privés partir.
+**Frappe** (`Press`) : un appui sur une combinaison, et ce que Multifus en fait. Elle ne vaut que dans le jeu, sans exception : hors du jeu, elle est refusée et le journal le dit.
 
 **Touche** (`key`) : une touche du clavier, gardée par sa **position** et jamais par sa lettre. `KeyW` nomme la position du W d'un QWERTY, et sur un AZERTY cette position porte un Z. Multifus arme la position, et écrit à l'écran la lettre que le clavier de l'utilisateur y a imprimée : sur un AZERTY, il affiche « Z » là où il garde `KeyW`. Le joueur lit ce qui est sur sa touche, et appuie dessus. Le Mac seul demande cette traduction, Carbon armant une position ; Windows résout déjà par la lettre, et la touche marquée W y déclenche. Les vingt-six lettres et onze signes suivent la disposition, les chiffres gardent leur chiffre : la rangée du haut d'un AZERTY rend `&` sans Maj, et personne n'appelle cette touche « esperluette ». Quand le système ne sait pas dire la lettre, la position s'écrit telle quelle.
 
