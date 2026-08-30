@@ -62,7 +62,7 @@ export const updateLine = (update: UpdateStatus) => {
       return strings.about.updateFailed(update.detail)
     }
     default: {
-      return ''
+      return update satisfies never
     }
   }
 }
@@ -87,7 +87,7 @@ export const pairingProblemLine = (problem: PairingProblem) => {
       return lines.network(problem.detail)
     }
     default: {
-      return lines.tokenBlank
+      return problem satisfies never
     }
   }
 }
@@ -167,7 +167,7 @@ export const shortcutStatusLine = (
       }
     }
     default: {
-      return null
+      return status satisfies never
     }
   }
 }

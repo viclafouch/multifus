@@ -170,7 +170,7 @@ const relayFailedLine = (reason: RelayFailure) => {
       return `Messages privés : Telegram n’a pas répondu (${reason.detail}).`
     }
     default: {
-      return 'Messages privés : échec.'
+      return reason satisfies never
     }
   }
 }
@@ -196,7 +196,7 @@ const quickReplyFailedLine = (reason: QuickReplyFailure) => {
       return `Réponse rapide collée, mais le presse-papiers d’avant n’a pas pu être rendu (${reason.detail}).`
     }
     default: {
-      return 'Réponse rapide non collée.'
+      return reason satisfies never
     }
   }
 }
@@ -226,7 +226,7 @@ const maximizeAllLine = ({ from, outcome }: MaximizeAllLineParams) => {
       return `${subject} : lecture des fenêtres impossible (${outcome.detail}).`
     }
     default: {
-      return `${subject}.`
+      return outcome satisfies never
     }
   }
 }
@@ -285,7 +285,7 @@ const rosterLine = (change: RosterChange) => {
         : `${change.nickname} n’est plus relayé.`
     }
     default: {
-      return ''
+      return change satisfies never
     }
   }
 }
@@ -334,7 +334,7 @@ const settingLine = (change: SettingChange) => {
       return `Envoi du texte des messages privés ${what}.`
     }
     default: {
-      return ''
+      return change satisfies never
     }
   }
 }
@@ -373,7 +373,7 @@ const boundCombinationLabel = (
       return `${combination} refusé (${status.detail})`
     }
     default: {
-      return combination
+      return status satisfies never
     }
   }
 }
@@ -483,7 +483,7 @@ const shortcutLine = ({ action, outcome }: ShortcutLineParams) => {
       return `${label} : impossible de savoir quelle fenêtre est au premier plan (${outcome.detail}).`
     }
     default: {
-      return label
+      return outcome satisfies never
     }
   }
 }
@@ -500,7 +500,7 @@ const wheelLine = (outcome: WheelOutcome) => {
       return `La roue : le système a refusé de ramener ${outcome.nickname} devant (${outcome.detail}).`
     }
     default: {
-      return ''
+      return outcome satisfies never
     }
   }
 }
@@ -539,7 +539,7 @@ const characterShortcutLine = ({
       return `${subject} : impossible de savoir quelle fenêtre est au premier plan (${outcome.detail}).`
     }
     default: {
-      return subject
+      return outcome satisfies never
     }
   }
 }
@@ -561,7 +561,7 @@ const trayLine = ({ nickname, outcome }: TrayLineParams) => {
       return `Barre système : le système a refusé de ramener ${nickname} au premier plan (${outcome.detail}).`
     }
     default: {
-      return nickname
+      return outcome satisfies never
     }
   }
 }
@@ -608,7 +608,7 @@ const notificationLine = ({
       return `${subject} : le système a refusé le passage au premier plan (${outcome.detail}).`
     }
     default: {
-      return subject
+      return outcome satisfies never
     }
   }
 }
@@ -716,7 +716,7 @@ const runLine = (
       return displayAwakeLine(event.held)
     }
     default: {
-      return ''
+      return event satisfies never
     }
   }
 }
@@ -774,7 +774,7 @@ const actionLine = (event: EventOf<ActionEventKind>) => {
       return wheelLine(event.outcome)
     }
     default: {
-      return ''
+      return event satisfies never
     }
   }
 }
