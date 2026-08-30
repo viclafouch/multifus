@@ -2638,7 +2638,10 @@ mod tests {
 
         state.set_relayed("Alpha", false);
 
-        assert!(!state.is_relay_ready(), "nobody is ticked, see ADR 0011");
+        assert!(
+            !state.is_relay_ready(),
+            "a paired bot with nobody ticked has nothing to relay"
+        );
     }
 
     #[test]

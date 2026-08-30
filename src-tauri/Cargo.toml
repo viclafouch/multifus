@@ -7,22 +7,16 @@ license = "MIT"
 repository = "https://github.com/viclafouch/multifus"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [lib]
-# The `_lib` suffix keeps the library name off the binary's, which only Windows
-# minds, see https://github.com/rust-lang/cargo/issues/8519.
+# The `_lib` suffix keeps the library name off the binary's, which only Windows minds: https://github.com/rust-lang/cargo/issues/8519
 name = "multifus_lib"
-# `rlib` alone, which is all `main.rs` links. `staticlib` and `cdylib` are the
-# mobile entry points of the scaffolder, and Multifus has none, see perimetre.md.
+# `rlib` alone, which is all `main.rs` links: the other two crate types are mobile entry points, and Multifus has no mobile build.
 crate-type = ["rlib"]
 
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
-# `tray-icon` is what step 8 stands on: without it the crate compiles and the
-# menu bar icon simply does not exist.
 tauri = { version = "2", features = ["tray-icon", "macos-private-api"] }
 tauri-plugin-opener = "2"
 tauri-plugin-global-shortcut = "2"
@@ -35,20 +29,14 @@ tauri-plugin-updater = "2"
 tauri-plugin-log = "2"
 tauri-plugin-os = "2"
 log = "0.4"
-# The three crates of step 11, and they cost three. `rustls-no-provider` is the
-# feature the updater already asks for; `keyring` takes no feature list, ADR 0009.
 reqwest = { version = "0.13", default-features = false, features = ["json", "rustls-no-provider"] }
 rustls = { version = "0.23", default-features = false, features = ["ring"] }
 keyring = "4"
 
 [dev-dependencies]
 tempfile = "3"
-# The mock store of the crate `keyring` stands on, so no test opens a real keychain.
 keyring-core = "1"
 
-# The Windows side of the boundary, and nothing else in the crate, talks to this.
-# Features land lot by lot, so that nothing compiles before it is called: lots A,
-# B and C have all landed theirs.
 [target.'cfg(target_os = "windows")'.dependencies]
 windows = { version = "0.62", features = [
   "Foundation",
@@ -61,43 +49,31 @@ windows = { version = "0.62", features = [
   "Win32_System_Registry",
   "Win32_System_Variant",
   "Win32_System_Threading",
-  # The paste combination of ADR 0012, and nothing else in the crate calls it.
   "Win32_UI_Input_KeyboardAndMouse",
   "Win32_UI_Accessibility",
-  # The scale of the screen a client sits on, which turns its frame into points.
   "Win32_UI_HiDpi",
   "Win32_Graphics_Gdi",
-  # The window icon of the portraits, and the taskbar group it stands in.
   "Win32_Storage_EnhancedStorage",
   "Win32_UI_Shell",
   "Win32_UI_Shell_PropertiesSystem",
   "Win32_UI_WindowsAndMessaging",
 ] }
 
-# The window of the icon test registers a class, and a class carries a brush.
 [target.'cfg(target_os = "windows")'.dev-dependencies]
 windows = { version = "0.62", features = ["Data_Xml_Dom"] }
 
-# The macOS side of the boundary, and nothing else in the crate, talks to these.
-# Feature sets are cut to what `platform::macos` calls, so that the Windows
-# build never sees them and the macOS build stays small.
 [target.'cfg(target_os = "macos")'.dependencies]
 libc = "0.2"
 objc2 = "0.6"
-# The hop to the main thread `NSScreen` demands, and nothing else in the crate.
 dispatch2 = "0.3"
-# What the foreground observer of the Walk takes its callback in.
 block2 = "0.6"
 objc2-app-kit = { version = "0.3", default-features = false, features = [
   "std",
   "libc",
   "block2",
   "NSRunningApplication",
-  # The work area a maximized window fills, which no Core Graphics call gives.
   "NSScreen",
-  # Who came to the front, which the Walk asks on every switch.
   "NSWorkspace",
-  # The panel the rune table wears, so a click on it never brings Multifus forward.
   "NSPanel",
   "NSResponder",
   "NSWindow",
@@ -108,26 +84,21 @@ objc2-application-services = { version = "0.3", default-features = false, featur
   "HIServices",
   "AXError",
   "AXUIElement",
-  # A window's position and size cross the API wrapped in one of these.
   "AXValue",
 ] }
-# The paste combination of ADR 0012, and nothing else in the crate calls it.
 objc2-core-graphics = { version = "0.3", default-features = false, features = [
   "std",
   "CGEvent",
   "CGEventSource",
   "CGEventTypes",
-  # What `CGEventCreateKeyboardEvent` sits behind, and the keycode type with it.
   "CGRemoteOperation",
 ] }
 objc2-core-foundation = { version = "0.3", default-features = false, features = [
   "std",
   "CFArray",
   "CFDictionary",
-  # The port the click tap listens on, and the source it gives the run loop.
   "CFMachPort",
   "CFNumber",
-  # The screen saver delay, which the display assertion does not cover.
   "CFPreferences",
   "CFRunLoop",
   "CFString",
@@ -136,8 +107,6 @@ objc2-foundation = { version = "0.3", default-features = false, features = [
   "std",
   "block2",
   "NSArray",
-  # What the workspace posts when an application comes to the front.
   "NSNotification",
   "NSString",
 ] }
-
