@@ -12,7 +12,7 @@ export type CaptureRejection =
   | 'pasteCombination'
   | 'unsupportedKey'
 
-export const FUNCTION_KEYS = Array.from({ length: 24 }, (_, index) => {
+const FUNCTION_KEYS = Array.from({ length: 24 }, (_, index) => {
   return `F${index + 1}`
 })
 

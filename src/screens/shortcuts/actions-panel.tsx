@@ -14,7 +14,7 @@ import { matchIsSameBinding } from '@/helpers/binding'
 import { shortcutStatusLine } from '@/helpers/wording'
 import type { ShortcutUndo } from '@/hooks/use-shortcut-undo'
 
-export type ActionsPanelActions = Readonly<{
+type ActionsPanelActions = Readonly<{
   handleCapture: (shortcut: ShortcutBinding, accelerator: string | null) => void
   handleDefaults: () => void
   handleOpen: (action: ShortcutAction) => void

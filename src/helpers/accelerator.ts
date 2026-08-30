@@ -9,7 +9,7 @@ import {
   PASTE_COMBINATION
 } from '@/constants/keyboard'
 
-export type CaptureResult =
+type CaptureResult =
   | { readonly status: 'captured'; readonly accelerator: string }
   | { readonly status: 'rejected'; readonly reason: CaptureRejection }
   | { readonly status: 'waiting' }
