@@ -8,7 +8,7 @@ const SCREEN_LABELS = {
   quickReplies: 'Réponses rapides',
   autoFocus: 'AutoFocus',
   walk: 'Déplacement rapide',
-  wheel: 'Roue',
+  wheel: 'Roue des personnages',
   runeTable: RUNE_TABLE_TITLE,
   relay: 'Messages privés',
   settings: 'Paramètres',
