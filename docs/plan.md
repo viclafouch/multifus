@@ -45,6 +45,12 @@ console.
 - [ ] Le presse-papiers copie encore, depuis l'écran des messages privés et depuis À propos
 - [ ] La mise à jour installée depuis Windows rend les titres, les têtes de classe, les boutons de la barre des tâches et le délai du premier plan
 
+### Ce que la montée des dépendances laisse ouvert
+
+- [ ] Le code Windows n'a pas été compilé ici : `cargo check --target x86_64-pc-windows-msvc` échoue, `ring` demandant un compilateur C pour Windows. La CI le compile sur `windows-latest`, et la publication en dépend
+- [ ] Tirer une ligne du roster par sa poignée, sur les deux machines : `@dnd-kit/react` suit le geste par des signaux, et le compilateur React mémoïse maintenant la ligne. Les tests la voient à travers un double, pas la vraie bibliothèque
+- [ ] Une soirée entière avec le compilateur React allumé : la roue, la bannière et le tableau des runes redessinent à chaque tour, et c'est là que le gain se verrait
+
 ### L'écran À propos
 
 - [ ] Le panneau du haut dit la vraie version, le vrai système et le vrai chemin, sur le Mac comme sur Windows
