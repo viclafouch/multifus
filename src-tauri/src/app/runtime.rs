@@ -127,33 +127,91 @@ impl<'a> Turn<'a> {
     }
 }
 
-fn tick(app: &AppHandle) {
-    let turn = Turn::of(app);
+trait TurnMechanisms {
+    fn follow_authorization(&self) -> bool;
 
-    let renamed = apply_short_titles(&turn);
-    let changed = scan(app);
-    let maximized = maximize_new_clients(&turn);
-    let painted = apply_window_icons(&turn);
-    let regrouped = follow_taskbar(&turn);
+    fn announce_relay(&self, change: &ScanChange);
 
-    let walk_stopped = walk::refresh(app);
+    fn follow_display(&self) -> bool;
 
-    wheel::follow_foreground(app);
+    fn refresh_walk(&self) -> bool;
 
-    follow_clients(app, &turn);
+    fn follow_wheel(&self);
 
-    if changed || maximized || renamed || painted || regrouped || walk_stopped {
-        emit_snapshot(app);
+    fn shows_main_window(&self) -> bool;
+
+    fn tell_clients(&self, counted: ClientsView) -> Result<(), String>;
+
+    fn emit_snapshot(&self);
+}
+
+struct AppTurnMechanisms<'a>(&'a AppHandle);
+
+impl TurnMechanisms for AppTurnMechanisms<'_> {
+    fn follow_authorization(&self) -> bool {
+        follow_authorization(self.0)
+    }
+
+    fn announce_relay(&self, change: &ScanChange) {
+        relay::run::announce(self.0, change);
+    }
+
+    fn follow_display(&self) -> bool {
+        relay::run::follow_display(self.0)
+    }
+
+    fn refresh_walk(&self) -> bool {
+        walk::refresh(self.0)
+    }
+
+    fn follow_wheel(&self) {
+        wheel::follow_foreground(self.0);
+    }
+
+    fn shows_main_window(&self) -> bool {
+        main_window::is_on_screen(self.0)
+    }
+
+    fn tell_clients(&self, counted: ClientsView) -> Result<(), String> {
+        self.0
+            .emit(CLIENTS_EVENT, counted)
+            .map_err(|error| error.to_string())
+    }
+
+    fn emit_snapshot(&self) {
+        emit_snapshot(self.0);
     }
 }
 
-fn scan(app: &AppHandle) -> bool {
-    let change = refresh_windows(&Turn::of(app));
-    let listening_changed = follow_authorization(app);
+fn tick(app: &AppHandle) {
+    turn_over(&Turn::of(app), &AppTurnMechanisms(app));
+}
 
-    relay::run::announce(app, &change);
+fn turn_over(turn: &Turn, mechanisms: &dyn TurnMechanisms) {
+    let renamed = apply_short_titles(turn);
+    let changed = scan(turn, mechanisms);
+    let maximized = maximize_new_clients(turn);
+    let painted = apply_window_icons(turn);
+    let regrouped = follow_taskbar(turn);
 
-    let display_changed = relay::run::follow_display(app);
+    let walk_stopped = mechanisms.refresh_walk();
+
+    mechanisms.follow_wheel();
+
+    follow_clients(turn, mechanisms);
+
+    if changed || maximized || renamed || painted || regrouped || walk_stopped {
+        mechanisms.emit_snapshot();
+    }
+}
+
+fn scan(turn: &Turn, mechanisms: &dyn TurnMechanisms) -> bool {
+    let change = refresh_windows(turn);
+    let listening_changed = mechanisms.follow_authorization();
+
+    mechanisms.announce_relay(&change);
+
+    let display_changed = mechanisms.follow_display();
 
     change.changed || listening_changed || display_changed
 }
@@ -224,8 +282,8 @@ pub fn watch_clients(app: &AppHandle, watching: bool) {
     lock(app).watch_clients(watching);
 }
 
-fn follow_clients(app: &AppHandle, turn: &Turn) {
-    if !turn.hold().watches_clients() || !main_window::is_on_screen(app) {
+fn follow_clients(turn: &Turn, mechanisms: &dyn TurnMechanisms) {
+    if !turn.hold().watches_clients() || !mechanisms.shows_main_window() {
         return;
     }
 
@@ -235,11 +293,9 @@ fn follow_clients(app: &AppHandle, turn: &Turn) {
         return;
     };
 
-    if let Err(error) = app.emit(CLIENTS_EVENT, changed) {
+    if let Err(detail) = mechanisms.tell_clients(changed) {
         turn.hold()
-            .log_unless_repeated(JournalEvent::ClientsCountFailed {
-                detail: error.to_string(),
-            });
+            .log_unless_repeated(JournalEvent::ClientsCountFailed { detail });
     }
 }
 
@@ -638,7 +694,7 @@ pub fn open_authorization_settings(app: &AppHandle) {
 }
 
 pub fn refresh(app: &AppHandle) {
-    scan(app);
+    scan(&Turn::of(app), &AppTurnMechanisms(app));
 }
 
 pub fn emit_snapshot(app: &AppHandle) -> Snapshot {
@@ -665,6 +721,7 @@ fn watcher(app: &AppHandle) -> MutexGuard<'_, PlatformNotificationWatcher> {
 #[cfg(test)]
 mod tests {
     use std::collections::HashSet;
+    use std::sync::Arc;
 
     use super::*;
     use crate::config::Settings;
@@ -684,6 +741,279 @@ mod tests {
 
     fn turn<'a>(windows: &'a FakeWindowManager, state: &'a AppState) -> Turn<'a> {
         Turn { windows, state }
+    }
+
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    enum TurnMechanism {
+        AuthorizationFollowed,
+        RelayAnnounced { relayed_gone: Vec<String> },
+        DisplayFollowed,
+        WalkRefreshed,
+        WheelFollowed,
+        MainWindowAsked,
+        ClientsTold(ClientsView),
+        SnapshotEmitted,
+    }
+
+    #[derive(Debug, Default)]
+    struct FakeTurnMechanisms {
+        set_going: Mutex<Vec<TurnMechanism>>,
+        listening_changed: bool,
+        display_changed: bool,
+        walk_stopped: bool,
+        main_window_on_screen: bool,
+        clients_refusal: Option<String>,
+    }
+
+    impl FakeTurnMechanisms {
+        fn watched() -> Self {
+            Self {
+                main_window_on_screen: true,
+                ..Self::default()
+            }
+        }
+
+        fn set_going(&self) -> Vec<TurnMechanism> {
+            self.set_going
+                .lock()
+                .unwrap_or_else(PoisonError::into_inner)
+                .clone()
+        }
+
+        fn write_down(&self, mechanism: TurnMechanism) {
+            self.set_going
+                .lock()
+                .unwrap_or_else(PoisonError::into_inner)
+                .push(mechanism);
+        }
+    }
+
+    impl TurnMechanisms for FakeTurnMechanisms {
+        fn follow_authorization(&self) -> bool {
+            self.write_down(TurnMechanism::AuthorizationFollowed);
+
+            self.listening_changed
+        }
+
+        fn announce_relay(&self, change: &ScanChange) {
+            self.write_down(TurnMechanism::RelayAnnounced {
+                relayed_gone: change.relayed_gone.clone(),
+            });
+        }
+
+        fn follow_display(&self) -> bool {
+            self.write_down(TurnMechanism::DisplayFollowed);
+
+            self.display_changed
+        }
+
+        fn refresh_walk(&self) -> bool {
+            self.write_down(TurnMechanism::WalkRefreshed);
+
+            self.walk_stopped
+        }
+
+        fn follow_wheel(&self) {
+            self.write_down(TurnMechanism::WheelFollowed);
+        }
+
+        fn shows_main_window(&self) -> bool {
+            self.write_down(TurnMechanism::MainWindowAsked);
+
+            self.main_window_on_screen
+        }
+
+        fn tell_clients(&self, counted: ClientsView) -> Result<(), String> {
+            self.write_down(TurnMechanism::ClientsTold(counted));
+
+            match &self.clients_refusal {
+                Some(detail) => Err(detail.clone()),
+                None => Ok(()),
+            }
+        }
+
+        fn emit_snapshot(&self) {
+            self.write_down(TurnMechanism::SnapshotEmitted);
+        }
+    }
+
+    fn still_turn() -> (Arc<FakeWindowManager>, FakeTurnMechanisms) {
+        (
+            FakeWindowManager::showing(Desktop::default()),
+            FakeTurnMechanisms::default(),
+        )
+    }
+
+    #[test]
+    fn a_turn_sets_its_mechanisms_going_in_the_order_it_is_written() {
+        let directory = directory();
+        let state = app_state(&directory, Settings::default());
+        let (windows, mechanisms) = still_turn();
+
+        turn_over(&turn(&windows, &state), &mechanisms);
+
+        assert_eq!(
+            mechanisms.set_going(),
+            vec![
+                TurnMechanism::AuthorizationFollowed,
+                TurnMechanism::RelayAnnounced {
+                    relayed_gone: Vec::new()
+                },
+                TurnMechanism::DisplayFollowed,
+                TurnMechanism::WalkRefreshed,
+                TurnMechanism::WheelFollowed,
+                TurnMechanism::SnapshotEmitted,
+            ]
+        );
+    }
+
+    #[test]
+    fn the_first_turn_learns_it_can_read_the_windows_and_says_so_only_once() {
+        let directory = directory();
+        let state = app_state(&directory, Settings::default());
+        let (windows, mechanisms) = still_turn();
+
+        turn_over(&turn(&windows, &state), &mechanisms);
+
+        assert!(
+            hold(&state).is_granted(),
+            "a scan that answered is what teaches Multifus the windows are readable"
+        );
+
+        turn_over(&turn(&windows, &state), &mechanisms);
+        turn_over(&turn(&windows, &state), &mechanisms);
+
+        let sent = mechanisms
+            .set_going()
+            .into_iter()
+            .filter(|mechanism| matches!(mechanism, TurnMechanism::SnapshotEmitted))
+            .count();
+
+        assert_eq!(
+            sent, 1,
+            "once the authorization is settled, a still turn has nothing to draw"
+        );
+    }
+
+    #[test]
+    fn a_window_that_appears_sends_the_snapshot_out() {
+        let directory = directory();
+        let state = app_state(
+            &directory,
+            Settings {
+                roster: alpha_and_bravo(),
+                ..Settings::default()
+            },
+        );
+        let windows = FakeWindowManager::showing(Desktop {
+            game_windows: vec![game_window(1, "Alpha")],
+            ..Desktop::default()
+        });
+        let mechanisms = FakeTurnMechanisms::default();
+
+        turn_over(&turn(&windows, &state), &mechanisms);
+
+        assert!(mechanisms
+            .set_going()
+            .contains(&TurnMechanism::SnapshotEmitted));
+    }
+
+    #[test]
+    fn a_single_step_that_wrote_something_is_enough_to_send_the_snapshot() {
+        let directory = directory();
+        let state = app_state(&directory, Settings::default());
+        let windows = FakeWindowManager::showing(Desktop::default());
+        let mechanisms = FakeTurnMechanisms {
+            walk_stopped: true,
+            ..FakeTurnMechanisms::default()
+        };
+
+        turn_over(&turn(&windows, &state), &mechanisms);
+
+        assert!(
+            mechanisms
+                .set_going()
+                .contains(&TurnMechanism::SnapshotEmitted),
+            "the walk turned itself off, and the screen has to say so"
+        );
+    }
+
+    #[test]
+    fn the_client_count_stays_home_while_nobody_is_watching_it() {
+        let directory = directory();
+        let state = app_state(&directory, Settings::default());
+        let (windows, mechanisms) = still_turn();
+
+        turn_over(&turn(&windows, &state), &mechanisms);
+
+        assert!(
+            !mechanisms
+                .set_going()
+                .contains(&TurnMechanism::MainWindowAsked),
+            "no screen asked for the count, so the turn does not even look"
+        );
+    }
+
+    #[test]
+    fn the_client_count_goes_out_once_and_not_again_for_the_same_count() {
+        let directory = directory();
+        let state = app_state(&directory, Settings::default());
+        let windows = FakeWindowManager::showing(Desktop::default());
+        let mechanisms = FakeTurnMechanisms::watched();
+
+        hold(&state).watch_clients(true);
+
+        turn_over(&turn(&windows, &state), &mechanisms);
+        turn_over(&turn(&windows, &state), &mechanisms);
+
+        let told = mechanisms
+            .set_going()
+            .into_iter()
+            .filter(|mechanism| matches!(mechanism, TurnMechanism::ClientsTold(_)))
+            .count();
+
+        assert_eq!(told, 1);
+    }
+
+    #[test]
+    fn a_client_count_that_cannot_be_sent_is_written_down_once() {
+        let directory = directory();
+        let state = app_state(&directory, Settings::default());
+        let windows = FakeWindowManager::showing(Desktop::default());
+        let mechanisms = FakeTurnMechanisms {
+            clients_refusal: Some("the window went away".to_owned()),
+            ..FakeTurnMechanisms::watched()
+        };
+
+        hold(&state).watch_clients(true);
+
+        turn_over(&turn(&windows, &state), &mechanisms);
+        turn_over(&turn(&windows, &state), &mechanisms);
+
+        let said = journalled(&state)
+            .into_iter()
+            .filter(|event| matches!(event, JournalEvent::ClientsCountFailed { .. }))
+            .count();
+
+        assert_eq!(said, 1);
+    }
+
+    #[test]
+    fn the_wheel_and_the_walk_are_touched_on_every_turn_whether_anything_moved_or_not() {
+        let directory = directory();
+        let state = app_state(&directory, Settings::default());
+        let (windows, mechanisms) = still_turn();
+
+        turn_over(&turn(&windows, &state), &mechanisms);
+        turn_over(&turn(&windows, &state), &mechanisms);
+
+        let followed = mechanisms
+            .set_going()
+            .into_iter()
+            .filter(|mechanism| matches!(mechanism, TurnMechanism::WheelFollowed))
+            .count();
+
+        assert_eq!(followed, 2);
     }
 
     fn alpha_and_bravo() -> Roster {
