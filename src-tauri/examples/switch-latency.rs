@@ -108,7 +108,7 @@ mod bench {
             .unwrap_or(ROUNDS)
     }
 
-    fn report(spent: &mut Vec<Duration>) {
+    fn report(spent: &mut [Duration]) {
         if spent.is_empty() {
             println!("Aucune bascule n'a abouti.");
 
