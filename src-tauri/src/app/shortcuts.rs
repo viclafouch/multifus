@@ -210,9 +210,7 @@ fn bind(
 fn struck_as(state: ShortcutState, binding: &Binding) -> Option<Struck> {
     match state {
         ShortcutState::Pressed => Some(Struck::Pressed(binding.clone())),
-        ShortcutState::Released => {
-            matches_held(binding).then(|| Struck::Released(binding.clone()))
-        }
+        ShortcutState::Released => matches_held(binding).then(|| Struck::Released(binding.clone())),
     }
 }
 
