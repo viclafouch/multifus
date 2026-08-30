@@ -31,6 +31,21 @@ ce qu'elle coûte.
 
 ## Vérifier sur une vraie soirée, sur les deux machines
 
+### Ce que le tour de la documentation Tauri a changé
+
+Une capacité refusée ne se lit ni dans le journal ni à l'écran : l'appel échoue et
+Multifus se tait. Ça se voit comme un écran qui reste vide ou un réglage qui ne
+prend pas, jamais comme une ligne. Au moindre doute, `tauri build --debug` ouvre la
+console.
+
+- [ ] Une soirée entière, les quatre fenêtres ouvertes : la politique de sécurité du contenu ne casse ni une police, ni une image, ni un appel
+- [ ] La roue, la bannière et le tableau des runes répondent avec `core:event:default` pour seule capacité
+- [ ] Le lancement : le Dock rebondit, rien ne s'affiche, puis la fenêtre arrive peinte, sans passer par le brun
+- [ ] Le lancement à la session, la barre système présente : rien ne s'ouvre, comme avant
+- [ ] L'écran À propos porte encore le système, `tauri_plugin_os::init()` retiré
+- [ ] Le presse-papiers copie encore, depuis l'écran des messages privés
+- [ ] La mise à jour installée depuis Windows rend les titres, les têtes de classe, les boutons de la barre des tâches et le délai du premier plan
+
 ### Les personnages, l'exclusion et le principal
 
 - [ ] Un combat sur un personnage exclu : aucune fenêtre ne bouge, et le journal porte « personnage exclu, sa fenêtre reste où elle est »
@@ -177,6 +192,7 @@ ce qu'elle coûte.
 
 ## Vérifier sur la machine Windows
 
+- [ ] Lancer Multifus deux fois et regarder ce qui casse : deux icônes dans la barre système, un raccourci qui refuse de s'armer, deux écrivains sur le même fichier de réglages. Si ça casse, prendre le greffon `single-instance`, que Tauri demande d'enregistrer avant tous les autres
 - [ ] Deux clients ouverts : le roster les voit, les huit raccourcis et l'AutoFocus répondent
 - [ ] Un combat sur un personnage exclu : sa notification disparaît du centre de notifications, et aucune fenêtre ne bouge
 - [ ] Un type décoché dans l'AutoFocus : même chose
