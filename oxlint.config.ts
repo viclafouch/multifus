@@ -21,9 +21,9 @@ export default defineConfig({
   extends: [typescript, react, hooks, jsxA11y, imports],
   ignorePatterns: [
     '**/node_modules/**',
-    'dist/**',
-    'src-tauri/**',
-    'scripts/*.cjs'
+    '**/dist/**',
+    'apps/desktop/src-tauri/**',
+    'apps/desktop/scripts/*.cjs'
   ],
   options: {
     typeAware: true,
@@ -31,7 +31,10 @@ export default defineConfig({
   },
   overrides: [
     {
-      files: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
+      files: [
+        'apps/desktop/src/**/*.test.ts',
+        'apps/desktop/src/**/*.test.tsx'
+      ],
       plugins: TEST_PLUGINS,
       rules: {
         ...vitest.rules,
@@ -42,13 +45,19 @@ export default defineConfig({
       }
     },
     {
-      files: ['src/lib/multifus.test.ts', 'src/test-doubles.ts'],
+      files: [
+        'apps/desktop/src/lib/multifus.test.ts',
+        'apps/desktop/src/test-doubles.ts'
+      ],
       rules: {
         'typescript/prefer-readonly-parameter-types': 'off'
       }
     },
     {
-      files: ['src/components/ui/**', 'src/lib/utils.ts'],
+      files: [
+        'apps/desktop/src/components/ui/**',
+        'apps/desktop/src/lib/utils.ts'
+      ],
       rules: {
         'typescript/prefer-readonly-parameter-types': 'off',
         'react/function-component-definition': 'off'
@@ -56,11 +65,11 @@ export default defineConfig({
     },
     {
       files: [
-        'src/app.tsx',
-        'src/components/**',
-        'src/hooks/**',
-        'src/screens/**',
-        'src/lib/drag.ts'
+        'apps/desktop/src/app.tsx',
+        'apps/desktop/src/components/**',
+        'apps/desktop/src/hooks/**',
+        'apps/desktop/src/screens/**',
+        'apps/desktop/src/lib/drag.ts'
       ],
       rules: {
         'typescript/prefer-readonly-parameter-types': 'off'

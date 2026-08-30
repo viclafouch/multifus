@@ -4,9 +4,9 @@
   "version": "0.1.0",
   "identifier": "com.viclafouch.multifus",
   "build": {
-    "beforeDevCommand": "npm run dev",
+    "beforeDevCommand": "pnpm dev",
     "devUrl": "http://localhost:1420",
-    "beforeBuildCommand": "npm run build",
+    "beforeBuildCommand": "pnpm build",
     "frontendDist": "../dist",
     "removeUnusedCommands": true
   },
@@ -54,7 +54,7 @@
     "category": "Utility",
     "homepage": "https://github.com/viclafouch/multifus",
     "license": "MIT",
-    "licenseFile": "../LICENSE",
+    "licenseFile": "../../../LICENSE",
     "shortDescription": "Gestionnaire de fenêtres Dofus Retro en multicompte.",
     "longDescription": "Multifus range les fenêtres de Dofus Retro quand on joue plusieurs personnages à la fois : bascule au raccourci, roue des personnages, déplacement rapide, tableau des runes et messages privés sur le téléphone.",
     "icon": [

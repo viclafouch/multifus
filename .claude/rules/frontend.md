@@ -1,5 +1,5 @@
 ---
-paths: ['src/**/*.{ts,tsx}']
+paths: ['apps/desktop/src/**/*.{ts,tsx}']
 ---
 
 ## Frontend design
@@ -13,12 +13,12 @@ paths: ['src/**/*.{ts,tsx}']
   - Dependencies in `useEffect` that would cause infinite loops without memoization
 - **NEVER return null in child components** - conditional rendering must happen in the parent, not inside the child. If a component might not render, the parent decides whether to render it at all. Child components should always render something when called.
 - **Use functional updates for state derived from previous state** - `setState(prev => !prev)` instead of `setState(!state)`. This avoids bugs with React's batching.
-- **Extract logic into custom hooks** - any useEffect, useState combo, or reusable logic should become a custom hook in `src/hooks/`. Keep components focused on rendering. Hooks go in dedicated files named `use-*.ts`.
+- **Extract logic into custom hooks** - any useEffect, useState combo, or reusable logic should become a custom hook in `apps/desktop/src/hooks/`. Keep components focused on rendering. Hooks go in dedicated files named `use-*.ts`.
 
 ### Libraries
 
 - ALWAYS use shadcn components instead of raw HTML elements, `<Input>` instead of `<input>`, `<Textarea>` instead of `<textarea>`, etc.
-- **Never modify code** in `src/components/ui` - run `npm run lint:fix` first (auto-fixes formatting), then rely on the override in `oxlint.config.ts` for the remaining errors
+- **Never modify code** in `apps/desktop/src/components/ui` - run `pnpm run lint:fix` first (auto-fixes formatting), then rely on the override in `oxlint.config.ts` for the remaining errors
 - **No margins on icons in buttons** - shadcn Button has built-in `gap` spacing
 
 ### Accessibility (WCAG 2.1 AA)
@@ -62,7 +62,7 @@ paths: ['src/**/*.{ts,tsx}']
 ### Tailwind CSS
 
 - **No arbitrary values in components** (e.g., `font-[Bricolage_Grotesque]`, `text-[14px]`)
-- Define custom utilities in global CSS (`src/index.css`) and reuse them
+- Define custom utilities in global CSS (`apps/desktop/src/index.css`) and reuse them
 - Keep styling consistent: one source of truth for design tokens (fonts, colors, spacing)
 - If a value is used more than once, it should be a utility class or CSS variable
 - **Prefer `gap`/`space-y`/`space-x`** over `mt-*`/`mb-*` for spacing between siblings
@@ -88,4 +88,4 @@ paths: ['src/**/*.{ts,tsx}']
 - **Respect `prefers-reduced-motion`**
 - **Standard durations**: 0.2s (fast), 0.3s (normal), 0.5s (slow)
 - **Standard easings**: `[0.4, 0, 0.2, 1]` (ease-out), `[0.4, 0, 1, 1]` (ease-in)
-- When CSS transitions or keyframes are used, add a named class and include it in the `@media (prefers-reduced-motion: reduce)` block of `src/index.css` with `transition: none`
+- When CSS transitions or keyframes are used, add a named class and include it in the `@media (prefers-reduced-motion: reduce)` block of `apps/desktop/src/index.css` with `transition: none`

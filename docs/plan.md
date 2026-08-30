@@ -5,7 +5,7 @@ se coche pas.
 
 ## Publier la première version
 
-- [ ] Dessiner le logo de Multifus, et remplacer celui du scaffolder Tauri dans `src-tauri/icons`
+- [ ] Dessiner le logo de Multifus, et remplacer celui du scaffolder Tauri dans `apps/desktop/src-tauri/icons`
 - [ ] Créer un certificat **Developer ID Application** sur developer.apple.com, et l'exporter en `.p12`
 - [ ] Poser les huit secrets du workflow `release` dans les réglages du dépôt : `APPLE_CERTIFICATE` (le `.p12` en base64), `APPLE_CERTIFICATE_PASSWORD`, `APPLE_SIGNING_IDENTITY`, `APPLE_ID`, `APPLE_PASSWORD` (un mot de passe d'application), `APPLE_TEAM_ID`, `TAURI_SIGNING_PRIVATE_KEY`, `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` (vide)
 - [ ] Trancher les Mac Intel : le workflow ne compile que `aarch64-apple-darwin`, et le README annonce Apple Silicon. Ajouter la cible `x86_64-apple-darwin`, ou s'en tenir là
@@ -23,16 +23,11 @@ La CI le compile sur `windows-latest`, et la publication en dépend.
 
 ## Passer le dépôt en monorepo
 
-Le site web présentera Multifus et donnera les deux téléchargements, celui du Mac
-et celui de Windows. Il vivra dans ce dépôt, à côté du logiciel. Le site lui-même
-aura son plan, dans `docs/plan-site.md` : ici, on prépare seulement la place où
-il se posera.
+Le déménagement est fait, et ce qu'il a décidé est dans `docs/plan-monorepo.md`.
+Reste ce que seule la CI peut confirmer.
 
-- [ ] Choisir l'outil de monorepo, et la raison : les espaces de travail npm suffisent peut-être, un orchestrateur de tâches se justifie s'il fait gagner du temps sur la CI
-- [ ] Descendre le logiciel dans son propre paquet, `src`, `src-tauri`, `index.html`, `banner.html`, `wheel.html`, `rune-table.html`, `public` et `scripts` compris
-- [ ] Suivre le déménagement partout où un chemin est écrit : `vite.config.ts`, `tsconfig.json`, `components.json`, `oxlint.config.ts`, `oxfmt.config.ts`, `.versionrc.json`, `.husky` et les trois workflows
-- [ ] Trancher la version : `commit-and-tag-version` numérote le logiciel, et le site n'a pas de version. Le `package.json` de la racine ne doit plus porter celle du logiciel
-- [ ] Ouvrir le paquet du site, vide, et écrire `docs/plan-site.md`
+- [ ] Vérifier que la CI passe : la compilation Windows, `projectPath: apps/desktop` donné aux deux `tauri-action`, et `pnpm install --frozen-lockfile` à la place de `npm ci`
+- [ ] Rouvrir Turborepo, et `packages/`, quand le site existera et qu'un paquet partagé reliera les deux applications
 
 ## Dire ce que la mise à jour apporte
 

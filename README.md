@@ -60,11 +60,13 @@ Dofus et Dofus Retro sont des marques déposées d'Ankama. Ce projet n'y est pas
 
 ## Développement
 
-Construit avec [Tauri](https://v2.tauri.app), React et TypeScript pour l'interface, Rust pour la couche système. Prérequis : [Rust](https://www.rust-lang.org/tools/install), Node 24, et les [prérequis Tauri](https://tauri.app/start/prerequisites/) de votre système. Les commandes sont les scripts de `package.json`, et `npm install` pose le hook git qui rejoue les contrôles de la CI à chaque commit : le format, les lints des deux langages, et les tests des deux côtés.
+Le dépôt est un monorepo pnpm : le logiciel dans `apps/desktop`, le site dans `apps/website`. Construit avec [Tauri](https://v2.tauri.app), React et TypeScript pour l'interface, Rust pour la couche système. Prérequis : [Rust](https://www.rust-lang.org/tools/install), Node 24, pnpm, et les [prérequis Tauri](https://tauri.app/start/prerequisites/) de votre système. Les commandes sont les scripts des `package.json`, et `pnpm install` pose le hook git qui rejoue les contrôles de la CI à chaque commit : le format, les lints des deux langages, et les tests des deux côtés.
 
-Une release se prépare par `npm run release`, qui écrit le changelog et pose le tag, puis se déclenche en poussant ce tag : le workflow compile, signe, notarise et dépose un brouillon qu'il reste à publier.
+Le format et les lints se lancent de la racine, `pnpm run check` les enchaîne tous avec les tests des deux langages. Le reste se lance depuis son paquet : `pnpm --filter @multifus/desktop dev` pour le serveur, `dev:app` pour le logiciel.
 
-Les vingt-quatre portraits de `src/assets/portraits` appartiennent à Ankama. Ils sont repris d'un outil communautaire, et ils vivent dans un dossier qu'un `git rm` suffit à retirer. Leurs vingt-quatre `.ico` de `src-tauri/icons/portraits`, que Rust embarque, en ont été tirés une fois pour toutes.
+Une release se prépare par `pnpm --filter @multifus/desktop release`, qui écrit le changelog et pose le tag, puis se déclenche en poussant ce tag : le workflow compile, signe, notarise et dépose un brouillon qu'il reste à publier.
+
+Les vingt-quatre portraits de `apps/desktop/src/assets/portraits` appartiennent à Ankama. Ils sont repris d'un outil communautaire, et ils vivent dans un dossier qu'un `git rm` suffit à retirer. Leurs vingt-quatre `.ico` de `apps/desktop/src-tauri/icons/portraits`, que Rust embarque, en ont été tirés une fois pour toutes.
 
 Les mots du projet sont dans [CONTEXT.md](./CONTEXT.md), ce qui reste à faire dans [docs/plan.md](./docs/plan.md).
 

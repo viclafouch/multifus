@@ -5,9 +5,9 @@ export default defineConfig({
   ...oxfmtConfig,
   ignorePatterns: [
     '**/node_modules/**',
-    'dist/**',
-    'src-tauri/**',
-    'package-lock.json',
-    'CHANGELOG.md'
+    '**/dist/**',
+    'apps/desktop/src-tauri/**',
+    'pnpm-lock.yaml',
+    '**/CHANGELOG.md'
   ]
 })

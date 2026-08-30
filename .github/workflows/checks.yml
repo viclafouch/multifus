@@ -19,10 +19,12 @@ jobs:
         with:
           persist-credentials: false
 
+      - uses: pnpm/action-setup@v4
+
       - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
-          cache: npm
+          cache: pnpm
 
       - uses: dtolnay/rust-toolchain@stable
         with:
@@ -30,22 +32,22 @@ jobs:
 
       - uses: swatinem/rust-cache@v2
         with:
-          workspaces: ./src-tauri -> target
+          workspaces: ./apps/desktop/src-tauri -> target
 
-      - run: npm ci
+      - run: pnpm install --frozen-lockfile
 
-      - run: npm audit --audit-level=high
+      - run: pnpm audit --audit-level high
 
-      - run: npm run lint
+      - run: pnpm run lint
 
-      - run: npm run format:check
+      - run: pnpm run format:check
 
-      - run: npm run test
+      - run: pnpm --filter @multifus/desktop run test
 
-      - run: npm run build
+      - run: pnpm --filter @multifus/desktop run build
 
-      - run: npm run format:rust:check
+      - run: pnpm --filter @multifus/desktop run format:rust:check
 
-      - run: npm run lint:rust
+      - run: pnpm --filter @multifus/desktop run lint:rust
 
-      - run: npm run test:rust
+      - run: pnpm --filter @multifus/desktop run test:rust

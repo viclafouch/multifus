@@ -23,17 +23,19 @@ jobs:
       - name: The tag and the bundle say the same version
         run: |
           tag="${GITHUB_REF_NAME#v}"
-          bundle="$(jq -r .version src-tauri/tauri.conf.json)"
+          bundle="$(jq -r .version apps/desktop/src-tauri/tauri.conf.json)"
 
           if [ "$tag" != "$bundle" ]; then
             echo "tag ${GITHUB_REF_NAME} against tauri.conf.json ${bundle}" >&2
             exit 1
           fi
 
+      - uses: pnpm/action-setup@v4
+
       - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
-          cache: npm
+          cache: pnpm
 
       - uses: dtolnay/rust-toolchain@stable
         with:
@@ -41,9 +43,9 @@ jobs:
 
       - uses: swatinem/rust-cache@v2
         with:
-          workspaces: ./src-tauri -> target
+          workspaces: ./apps/desktop/src-tauri -> target
 
-      - run: npm ci
+      - run: pnpm install --frozen-lockfile
 
       - uses: tauri-apps/tauri-action@v1
         env:
@@ -60,6 +62,7 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
+          projectPath: apps/desktop
           tagName: ${{ github.ref_name }}
           releaseName: Multifus ${{ github.ref_name }}
           releaseBody: 'Le détail des changements est dans le CHANGELOG.'
@@ -76,18 +79,20 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      - uses: pnpm/action-setup@v4
+
       - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
-          cache: npm
+          cache: pnpm
 
       - uses: dtolnay/rust-toolchain@stable
 
       - uses: swatinem/rust-cache@v2
         with:
-          workspaces: ./src-tauri -> target
+          workspaces: ./apps/desktop/src-tauri -> target
 
-      - run: npm ci
+      - run: pnpm install --frozen-lockfile
 
       - uses: tauri-apps/tauri-action@v1
         env:
@@ -96,6 +101,7 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
+          projectPath: apps/desktop
           tagName: ${{ github.ref_name }}
           releaseName: Multifus ${{ github.ref_name }}
           releaseBody: 'Le détail des changements est dans le CHANGELOG.'
