@@ -204,10 +204,8 @@ plaque grandit depuis son coin haut-gauche, qui ne bouge pas ; seul le bord de
 l'écran la retient, et il ne réécrit rien.
 
 **Le tableau ne se pose pas sur un client en plein écran.** Le texte le disait,
-rien ne le faisait. La fenêtre du jeu est dite en plein écran quand elle couvre
-l'écran entier, et seulement sur un écran qui réserve une place à la barre des
-menus ou à la barre des tâches : sans cette réserve, les deux mesures sont les
-mêmes et une supposition cacherait le tableau pour rien.
+rien ne le faisait. La règle d'alors est décrite plus bas, avec ce qui l'a
+remplacée.
 
 **La hauteur avant toute mesure.** La forme devinée valait 3, la vraie vaut à peu
 près 2. La fenêtre naissait une fois et demie trop haute, se faisait border en
@@ -435,6 +433,42 @@ processus. Sur Windows c'est `GetForegroundWindow` puis
 c'est `NSRunningApplication::currentApplication().isActive()`, la même question à
 AppKit ; **non compilé**, la chaîne manquant sur la machine Windows.
 
+## Le plein écran, mesuré et non plus deviné
+
+La règle d'origine était taillée pour AppKit : une fenêtre couvre l'écran entier,
+et seulement sur un écran qui réserve une place à la barre des menus ou à la
+barre des tâches, sans quoi l'égalité des deux mesures ne prouve rien. Le Mac
+réserve toujours quelque chose pour sa barre des menus, alors la règle tenait.
+
+Windows la casse des deux côtés. Une barre des tâches en masquage automatique ne
+réserve rien, et un écran secondaire qui ne porte pas de barre non plus : la
+règle ne s'arme jamais, et la plaque reste posée par-dessus un client en plein
+écran. Et dans l'autre sens, `GetWindowRect` d'une fenêtre simplement agrandie
+déborde du moniteur d'environ huit pixels par côté, ses bordures de
+redimensionnement étant invisibles depuis Vista : `frame >= screen` est donc vrai
+d'un client agrandi, et seule la hauteur de la barre des tâches empêchait encore
+le tableau de s'effacer. Ça tenait par une marge de quelques pixels.
+
+La règle ne suppose plus rien : une fenêtre est en plein écran quand son cadre
+**est** celui du moniteur, coin et taille, à un point près. Un client agrandi
+n'en est jamais un, ni sur le Mac où il s'arrête sous la barre des menus, ni sur
+Windows où il déborde. La zone de travail ne sert plus qu'à ce pour quoi elle est
+faite, borner la hauteur de la plaque, et `Screen` porte le coin du moniteur en
+plus de sa taille.
+
+## Les trois overlays ne prennent plus le focus à leur naissance
+
+`focused` vaut vrai par défaut chez Tauri, et le builder ne le contredisait pas.
+Sur Windows, wry appelle alors `MoveFocus` sur la vue à la construction : les
+trois fenêtres sont bâties au lancement, cachées, et demandent le focus. Le même
+défaut fait passer chaque `show()` par `SW_SHOW`, la variante qui active, au lieu
+de `SW_SHOWNOACTIVATE`. Rien de tel sur le Mac, où `orderFront:` ne peut pas
+activer.
+
+`focused(false)` est posé dans `Overlay::build`, donc pour la bannière, la roue et
+le tableau d'un coup : aucun des trois ne doit prendre le focus, jamais. C'est la
+ceinture qui va avec les bretelles de `WS_EX_NOACTIVATE`.
+
 ## Ce qui reste douteux
 
 **Dommages piège à 15 et 45.** Le seul chiffre de la source que le wiki
@@ -474,6 +508,9 @@ tranché, voir ci-dessous.
 - [ ] Aperçu ouvert, la barre système : tout se cache d'un coup, et la coche le dit
 - [ ] Aperçu déplacé puis la jauge poussée : la plaque grandit sur place, sans revenir au milieu
 - [ ] Le tableau posé, le client passé en plein écran : le tableau s'efface, et revient en fenêtre
+- [ ] Le tableau posé, le client simplement agrandi : le tableau reste, et ne s'efface pas
+- [ ] Sur Windows, barre des tâches en masquage automatique, le client en plein écran : le tableau s'efface tout de même
+- [ ] Multifus lancé : aucune des trois fenêtres cachées ne vole le focus au démarrage
 - [ ] Premier lancement, tableau ouvert : la plaque naît à sa taille, sans sauter
 - [ ] La jauge de transparence poussée, aperçu ouvert : la plaque s'éclaircit à chaque cran
 - [ ] À 100, la plaque se lit encore par-dessus le jeu, et le clic reste pour elle
@@ -503,7 +540,6 @@ tranché, voir ci-dessous.
 
 ## À vérifier sur le Mac seulement
 
-- [ ] Le tableau ne se pose pas sur un client en plein écran, et l'écran le disait
 - [ ] Le tableau posé, l'autorisation d'accessibilité retirée : le journal le dit une fois, pas cent
 - [ ] Le tableau reste devant après un changement de bureau
 - [ ] Sur un écran Retina, la plaque n'est ni deux fois trop grande ni deux fois trop petite

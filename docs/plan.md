@@ -130,7 +130,7 @@ défaut, pas un réglage.
 - [ ] La jauge de taille poussée à fond : la plaque tient entière à l'écran, la dernière rune comprise
 - [ ] À 100 de transparence, la plaque se lit encore et prend toujours les clics
 - [ ] Tous les poids portent le même blanc, et aucune ligne ne ressort
-- [ ] Le tableau ne se pose pas sur un client en plein écran
+- [ ] Le tableau ne se pose pas sur un client en plein écran, et reste sur un client simplement agrandi
 - [ ] Sur un écran Retina et sur deux écrans d'échelles différentes, la plaque n'est ni deux fois trop grande ni deux fois trop petite
 - [ ] L'interrupteur des autres personnages bougé aperçu ouvert tient une fois l'aperçu fermé
 - [ ] Vider la combinaison dans l'écran Raccourcis : l'écran Tableau des runes le dit en tête

@@ -67,6 +67,7 @@ Rien ne devait changer à l'écran. La construction des trois fenêtres a pourta
 - Sur le Mac, le tableau ne ramène pas Multifus devant : c'est le panneau non
   activant, et il est posé après la construction comme avant
 - Les trois se ferment et se rouvrent proprement, deux fois de suite
+- Multifus lancé, aucune des trois ne vole le focus : elles naissent `focused(false)`
 
 ## Ce qu'on n'a pas fait
 

@@ -83,6 +83,7 @@ impl Overlay {
             .always_on_top(true)
             .skip_taskbar(true)
             .focusable(false)
+            .focused(false)
             .accept_first_mouse(self.accepts_first_mouse)
             .resizable(false)
             .shadow(false)

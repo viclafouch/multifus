@@ -53,6 +53,8 @@ const FAINTEST_LOOK: f64 = 0.2;
 
 const RATIO_GRAIN: f64 = 1000.0;
 
+const EDGE_GRAIN: f64 = 1.0;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Anchor {
     Anywhere,
@@ -464,6 +466,8 @@ struct Plate {
 #[derive(Debug, Clone, Copy, PartialEq)]
 struct Screen {
     area: WorkArea,
+    x: f64,
+    y: f64,
     width: f64,
     height: f64,
 }
@@ -762,6 +766,7 @@ fn logical_screen(screen: &Monitor) -> Option<Screen> {
     }
 
     let area = screen.work_area();
+    let at = screen.position();
     let whole = screen.size();
 
     Some(Screen {
@@ -771,15 +776,22 @@ fn logical_screen(screen: &Monitor) -> Option<Screen> {
             width: f64::from(area.size.width) / scale,
             height: f64::from(area.size.height) / scale,
         },
+        x: f64::from(at.x) / scale,
+        y: f64::from(at.y) / scale,
         width: f64::from(whole.width) / scale,
         height: f64::from(whole.height) / scale,
     })
 }
 
 fn matches_full_screen(frame: ScreenFrame, screen: Screen) -> bool {
-    let reserved = screen.area.width < screen.width || screen.area.height < screen.height;
+    matches_same_edge(frame.origin.x, screen.x)
+        && matches_same_edge(frame.origin.y, screen.y)
+        && matches_same_edge(frame.width, screen.width)
+        && matches_same_edge(frame.height, screen.height)
+}
 
-    reserved && frame.width >= screen.width && frame.height >= screen.height
+fn matches_same_edge(one: f64, other: f64) -> bool {
+    (one - other).abs() <= EDGE_GRAIN
 }
 
 fn holds_point(edge: f64, room: f64, at: f64) -> bool {
@@ -1136,6 +1148,8 @@ mod tests {
     fn screen() -> Screen {
         Screen {
             area: work_area(),
+            x: 0.0,
+            y: 0.0,
             width: 1920.0,
             height: 1080.0,
         }
@@ -1167,7 +1181,7 @@ mod tests {
     }
 
     #[test]
-    fn a_screen_that_reserves_nothing_never_reads_as_full_screen() {
+    fn a_screen_that_reserves_nothing_still_reads_a_client_in_full_screen() {
         let bare = Screen {
             area: WorkArea {
                 x: 0.0,
@@ -1184,8 +1198,52 @@ mod tests {
         };
 
         assert!(
-            !matches_full_screen(filling, bare),
-            "with no menu bar and no dock the two are the same, and a guess would hide the table for good"
+            matches_full_screen(filling, bare),
+            "a taskbar that hides itself reserves nothing, and the client is in full screen all the same"
+        );
+    }
+
+    #[test]
+    fn a_client_grown_past_the_edges_of_the_screen_still_carries_the_table() {
+        let grown = ScreenFrame {
+            origin: ScreenPoint { x: -8.0, y: -8.0 },
+            width: 1936.0,
+            height: 1056.0,
+        };
+
+        assert!(
+            !matches_full_screen(grown, screen()),
+            "a window grown on Windows hangs over the screen by its invisible border"
+        );
+    }
+
+    #[test]
+    fn a_client_on_the_second_screen_reads_against_that_screen() {
+        let beside = Screen {
+            x: 1920.0,
+            y: 0.0,
+            area: WorkArea {
+                x: 1920.0,
+                ..work_area()
+            },
+            ..screen()
+        };
+        let filling = ScreenFrame {
+            origin: ScreenPoint { x: 1920.0, y: 0.0 },
+            width: 1920.0,
+            height: 1080.0,
+        };
+
+        assert!(matches_full_screen(filling, beside));
+        assert!(
+            !matches_full_screen(
+                ScreenFrame {
+                    origin: ScreenPoint { x: 0.0, y: 0.0 },
+                    ..filling
+                },
+                beside
+            ),
+            "a client filling the first screen is not in full screen on the second"
         );
     }
 
