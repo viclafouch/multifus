@@ -1,3 +1,6 @@
+use std::sync::atomic::AtomicBool;
+use std::sync::atomic::Ordering;
+
 use tauri::AppHandle;
 use tauri::Manager;
 use tauri::RunEvent;
@@ -14,12 +17,22 @@ pub const LABEL: &str = "main";
 
 pub const FROM_SESSION_ARG: &str = "--from-session";
 
-pub fn show_on_launch(app: &AppHandle) {
-    if launch() == Launch::Session && tray::is_present(app) {
+struct Awaited(AtomicBool);
+
+pub fn hold_until_ready(app: &AppHandle) {
+    let awaited = matches_awaited(launch(), tray::is_present(app));
+
+    app.manage(Awaited(AtomicBool::new(awaited)));
+}
+
+pub fn show_when_ready(app: &AppHandle, label: &str) {
+    if label != LABEL {
         return;
     }
 
-    show(app);
+    if app.state::<Awaited>().0.swap(false, Ordering::AcqRel) {
+        show(app);
+    }
 }
 
 #[must_use]
@@ -91,6 +104,10 @@ fn matches_session_launch(arguments: impl IntoIterator<Item = String>) -> bool {
         .any(|argument| argument == FROM_SESSION_ARG)
 }
 
+fn matches_awaited(launch: Launch, has_tray: bool) -> bool {
+    launch != Launch::Session || !has_tray
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -108,5 +125,17 @@ mod tests {
             BINARY.to_owned(),
             FROM_SESSION_ARG.to_owned(),
         ]));
+    }
+
+    #[test]
+    fn a_launch_by_hand_awaits_the_window() {
+        assert!(matches_awaited(Launch::ByHand, true));
+        assert!(matches_awaited(Launch::ByHand, false));
+    }
+
+    #[test]
+    fn the_session_awaits_the_window_only_without_a_tray() {
+        assert!(!matches_awaited(Launch::Session, true));
+        assert!(matches_awaited(Launch::Session, false));
     }
 }

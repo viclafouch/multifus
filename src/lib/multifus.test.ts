@@ -66,6 +66,8 @@ const listenedHandler = () => {
 const COMMAND_PATTERN =
   /#\[tauri::command(?:\([^)]*\))?\]\s*pub fn (\w+)\(([^)]*)\)/gu
 
+const INJECTED_PARAMETERS = ['app', 'window']
+
 const parametersOf = (signature: string) => {
   return signature
     .split(',')
@@ -73,7 +75,7 @@ const parametersOf = (signature: string) => {
       return parameter.split(':')[0].trim()
     })
     .filter((name) => {
-      return name.length > 0 && name !== 'app'
+      return name.length > 0 && !INJECTED_PARAMETERS.includes(name)
     })
 }
 

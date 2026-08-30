@@ -90,7 +90,7 @@ pub fn setup(app: &AppHandle) -> Result<(), ConfigError> {
 
     runtime::start(app.clone());
 
-    main_window::show_on_launch(app);
+    main_window::hold_until_ready(app);
 
     Ok(())
 }

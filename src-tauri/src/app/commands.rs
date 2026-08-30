@@ -1,4 +1,5 @@
 use tauri::AppHandle;
+use tauri::WebviewWindow;
 use tauri_plugin_opener::OpenerExt;
 
 use crate::app::autostart;
@@ -8,6 +9,7 @@ use crate::app::journal::RelayStop;
 use crate::app::journal::Surface;
 use crate::app::journal::WalkFrom;
 use crate::app::journal_file;
+use crate::app::main_window;
 use crate::app::relay;
 use crate::app::rune_table;
 use crate::app::runtime;
@@ -29,7 +31,9 @@ use crate::domain::Gender;
 use crate::domain::NotificationKind;
 
 #[tauri::command]
-pub fn snapshot(app: AppHandle) -> Snapshot {
+pub fn snapshot(app: AppHandle, window: WebviewWindow) -> Snapshot {
+    main_window::show_when_ready(&app, window.label());
+
     lock(&app).snapshot()
 }
 
