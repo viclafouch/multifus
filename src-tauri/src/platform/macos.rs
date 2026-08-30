@@ -578,6 +578,11 @@ fn matches_a_kind_of(worn: &AnyClass, wanted: &AnyClass) -> bool {
     false
 }
 
+#[must_use]
+pub fn matches_frontmost() -> bool {
+    NSRunningApplication::currentApplication().isActive()
+}
+
 pub fn hold_back_activation(ns_window: *mut c_void) -> Result<()> {
     if MainThreadMarker::new().is_none() {
         return Err(PlatformError::system(

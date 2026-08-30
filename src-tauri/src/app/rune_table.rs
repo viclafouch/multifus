@@ -27,7 +27,6 @@ use crate::app::state::lock;
 use crate::app::state::windows;
 use crate::config::RuneOffset;
 use crate::config::RUNE_TABLE_CLEAREST;
-#[cfg(target_os = "macos")]
 use crate::platform;
 use crate::platform::ScreenFrame;
 use crate::platform::ScreenPoint;
@@ -341,7 +340,7 @@ fn follow_multifus(app: &AppHandle) {
         return;
     };
 
-    let showing = main.is_visible().unwrap_or(false) && main.is_focused().unwrap_or(false);
+    let showing = main.is_visible().unwrap_or(false) && platform::matches_frontmost();
 
     let Some(frame) = own_frame(&main).filter(|_| showing) else {
         veil(app);

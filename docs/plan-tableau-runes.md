@@ -412,6 +412,29 @@ deux unités, et les confondre coûterait plus qu'il ne rendrait.
 **« Depuis une fenêtre du jeu, et nulle part ailleurs »** garde ses mots parce
 que l'écran Roue porte la même phrase, au caractère près.
 
+## L'aperçu qui clignotait sur Windows
+
+Le bouton « Voir en vrai » ouvrait la plaque, qui se fermait et se rouvrait dix
+fois par seconde. Le tableau posé sur le jeu, lui, ne bronchait pas.
+
+Le suiveur demandait « Multifus est-il devant ? » à `is_focused()` de la fenêtre
+principale. Sur Windows, cette réponse est le focus clavier du HWND de plus haut
+niveau, et wry le donne au WebView2 dès qu'il l'a : sa sous-classe appelle
+`MoveFocus` sur WM_SETFOCUS, la vue prend le focus dans sa fenêtre fille, et le
+parent reçoit WM_KILLFOCUS. tao met alors son drapeau à faux. Le suiveur en
+concluait que Multifus était parti, retirait la plaque, le focus revenait au
+parent, la plaque revenait, et ainsi de suite au rythme des 100 ms. Le tableau
+posé y échappe : il demande la fenêtre du jeu au premier plan, pas le focus de
+Multifus.
+
+La question posée est maintenant celle qu'on voulait poser :
+`platform::matches_frontmost`, la fenêtre de premier plan appartient-elle à notre
+processus. Sur Windows c'est `GetForegroundWindow` puis
+`GetWindowThreadProcessId` comparé au nôtre, et la plaque, qui porte
+`WS_EX_NOACTIVATE`, ne peut pas fausser la réponse en passant devant. Sur le Mac
+c'est `NSRunningApplication::currentApplication().isActive()`, la même question à
+AppKit ; **non compilé**, la chaîne manquant sur la machine Windows.
+
 ## Ce qui reste douteux
 
 **Dommages piège à 15 et 45.** Le seul chiffre de la source que le wiki
@@ -464,6 +487,7 @@ tranché, voir ci-dessous.
 - [ ] La fenêtre du jeu qui porte le tableau est fermée : le tableau s'efface, sans se fermer
 - [ ] Échap dans le jeu, tableau posé : le jeu reçoit Échap, le tableau ne bouge pas
 - [ ] L'aperçu s'ouvre au milieu de Multifus, se déplace, et ne garde pas sa place
+- [ ] L'aperçu ouvert reste posé, sans clignoter
 - [ ] L'aperçu se ferme à Échap et à la croix, et pas tout seul
 - [ ] On quitte Multifus pour le jeu, aperçu ouvert : il s'efface, et revient avec Multifus
 - [ ] L'aperçu ouvert par-dessus un tableau posé : à sa fermeture, le tableau reprend sa place

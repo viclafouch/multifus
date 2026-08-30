@@ -7,6 +7,7 @@ use std::iter::once;
 use std::panic::catch_unwind;
 use std::panic::AssertUnwindSafe;
 use std::path::Path;
+use std::process;
 use std::sync::atomic::AtomicBool;
 use std::sync::atomic::Ordering;
 use std::sync::mpsc;
@@ -862,6 +863,14 @@ fn window_scale(handle: HWND) -> f64 {
     }
 
     f64::from(across) / DOTS_PER_INCH
+}
+
+#[must_use]
+pub fn matches_frontmost() -> bool {
+    let mut owner = 0_u32;
+    unsafe { GetWindowThreadProcessId(GetForegroundWindow(), Some(&mut owner)) };
+
+    owner != 0 && owner == process::id()
 }
 
 fn logical_frame(rect: RECT, scale: f64) -> ScreenFrame {

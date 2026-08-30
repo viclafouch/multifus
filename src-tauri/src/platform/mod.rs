@@ -26,6 +26,8 @@ pub use keyboard::key_labels;
 pub use keyboard::KeyLabels;
 #[cfg(target_os = "macos")]
 pub use macos::hold_back_activation;
+#[cfg(target_os = "macos")]
+pub use macos::matches_frontmost;
 pub use notification::NotificationReport;
 pub use notification::NotificationSink;
 pub use notification::NotificationWatcher;
@@ -37,6 +39,8 @@ pub use window::ScreenPoint;
 pub use window::ShortTitleReport;
 pub use window::WindowId;
 pub use window::WindowManager;
+#[cfg(target_os = "windows")]
+pub use windows::matches_frontmost;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Authorization {
