@@ -28,8 +28,8 @@ export const NavRail = ({
   }).length
 
   return (
-    <nav className="flex w-rail shrink-0 flex-col border-r border-border bg-sidebar/70">
-      <div className="flex flex-col gap-2 px-5 pt-6 pb-7">
+    <nav className="flex w-rail min-h-0 shrink-0 flex-col border-r border-border bg-sidebar/70">
+      <div className="flex shrink-0 flex-col gap-2 px-5 pt-6 pb-7">
         <p className="flex items-baseline gap-2 font-display text-wordmark font-semibold tracking-title">
           <span className="size-1 shrink-0 -translate-y-1 rounded-full bg-primary" />
           {strings.app.name}
@@ -38,7 +38,7 @@ export const NavRail = ({
           v{version}
         </p>
       </div>
-      <ul className="flex flex-1 flex-col gap-0.5 px-3">
+      <ul className="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto px-3">
         {NAV_ITEMS.map(({ name, label, Icon }) => {
           return (
             <li key={name}>
@@ -51,7 +51,7 @@ export const NavRail = ({
           )
         })}
       </ul>
-      <div className="m-3 flex flex-col gap-1.5 rounded-lg border border-border/80 bg-background/40 px-3 py-2.5">
+      <div className="m-3 flex shrink-0 flex-col gap-1.5 rounded-lg border border-border/80 bg-background/40 px-3 py-2.5">
         <p className="flex items-center gap-2 text-note">
           <Lamp state={connected > 0 ? 'live' : 'offline'} />
           <span className="text-foreground/85">

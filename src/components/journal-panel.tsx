@@ -58,7 +58,7 @@ export const JournalPanel = ({ snapshot }: JournalPanelProps) => {
   }
 
   return (
-    <section className="shrink-0 border-t border-border bg-sidebar/80">
+    <section className="relative shrink-0 border-t border-border bg-sidebar">
       <div className="flex items-center pr-2.5">
         <h2 className="min-w-0 flex-1">
           <Button
