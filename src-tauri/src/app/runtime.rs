@@ -454,17 +454,21 @@ const GROUP_PREFIX: &str = "multifus.window.";
 
 pub fn on_run_event(app: &AppHandle, event: RunEvent) {
     if matches!(event, RunEvent::Exit) {
-        let turn = Turn::of(app);
-
-        give_titles_back(&turn);
-        give_icons_back(&turn);
-        give_groups_back(&turn);
-        let _ = turn.windows.give_foreground_back();
+        give_traces_back(app);
 
         return;
     }
 
     main_window::show_on_dock_click(app, event);
+}
+
+pub fn give_traces_back(app: &AppHandle) {
+    let turn = Turn::of(app);
+
+    give_titles_back(&turn);
+    give_icons_back(&turn);
+    give_groups_back(&turn);
+    let _ = turn.windows.give_foreground_back();
 }
 
 fn give_icons_back(turn: &Turn) {

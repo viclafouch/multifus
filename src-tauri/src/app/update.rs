@@ -53,7 +53,15 @@ pub fn check(app: &AppHandle) {
 }
 
 async fn look(app: &AppHandle) -> tauri_plugin_updater::Result<Option<Update>> {
-    app.updater()?.check().await
+    let handle = app.clone();
+
+    app.updater_builder()
+        .on_before_exit(move || {
+            runtime::give_traces_back(&handle);
+        })
+        .build()?
+        .check()
+        .await
 }
 
 pub fn install(app: &AppHandle) {
