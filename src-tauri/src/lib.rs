@@ -12,7 +12,6 @@ use crate::app::main_window;
 pub fn run() {
     tauri::Builder::default()
         .plugin(app::journal_file::plugin())
-        .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())

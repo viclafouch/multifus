@@ -6,6 +6,6 @@
     "rune-table"
   ],
   "permissions": [
-    "core:default"
+    "core:event:default"
   ]
 }

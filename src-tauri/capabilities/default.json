@@ -6,8 +6,7 @@
     "main"
   ],
   "permissions": [
-    "core:default",
-    "opener:default",
+    "core:event:default",
     "clipboard-manager:allow-write-text"
   ]
 }

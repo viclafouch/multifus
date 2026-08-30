@@ -6,6 +6,6 @@
     "wheel"
   ],
   "permissions": [
-    "core:default"
+    "core:event:default"
   ]
 }
