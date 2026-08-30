@@ -8,7 +8,7 @@ const host = process.env.TAURI_DEV_HOST ?? ''
 const isRemoteHost = host !== ''
 
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [react({ compiler: true }), tailwindcss()],
 
   resolve: {
     alias: {
