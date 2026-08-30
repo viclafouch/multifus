@@ -22,6 +22,8 @@ const bridge = {
   watchClients: vi.fn(pending),
   onClients: vi.fn(pending),
   dismissConfigProblem: vi.fn(pending),
+  revealJournal: vi.fn(pending),
+  revealConfig: vi.fn(pending),
   revealQuarantinedConfig: vi.fn(pending),
   closeRuneTable: vi.fn(pending)
 }

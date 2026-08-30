@@ -8,11 +8,9 @@ use tauri_plugin_log::RotationStrategy;
 use tauri_plugin_log::Target;
 use tauri_plugin_log::TargetKind;
 use tauri_plugin_log::TimezoneStrategy;
-use tauri_plugin_opener::OpenerExt;
 
 use crate::app::journal::JournalEntry;
-use crate::app::journal::JournalEvent;
-use crate::app::state::lock;
+use crate::app::links;
 
 const TARGET: &str = "journal";
 
@@ -51,14 +49,9 @@ pub fn append(entry: &JournalEntry) {
 }
 
 pub fn reveal(app: &AppHandle) {
-    let revealed = path(app).and_then(|path| {
-        app.opener()
-            .reveal_item_in_dir(path)
-            .map_err(|error| error.to_string())
-    });
-
-    if let Err(detail) = revealed {
-        lock(app).log(JournalEvent::OpenFailed { detail });
+    match path(app) {
+        Ok(path) => links::reveal(app, path),
+        Err(detail) => links::failed(app, detail),
     }
 }
 

@@ -6,11 +6,11 @@ import { FieldRow } from '@/components/layout/field-row'
 import { Panel } from '@/components/layout/panel'
 import { PanelHeader } from '@/components/layout/panel-header'
 import { Screen } from '@/components/layout/screen'
+import { LinkButton } from '@/components/link-button'
 import { Switch } from '@/components/ui/switch'
 import { strings } from '@/constants/strings'
-import { setSendBody } from '@/lib/multifus'
+import { openRelayLink, setSendBody } from '@/lib/multifus'
 import { BotPanel } from '@/screens/relay/bot-panel'
-import { LinkButton } from '@/screens/relay/link-button'
 import { PairingGuide } from '@/screens/relay/pairing-guide'
 import { RelayedList } from '@/screens/relay/relayed-list'
 import { ScreenSaverWarning } from '@/screens/relay/screen-saver-warning'
@@ -73,7 +73,12 @@ export const RelayScreen = ({ relay, characters, run }: RelayScreenProps) => {
         </FieldRow>
       </Panel>
       <div className="mt-3">
-        <LinkButton link="faq" label={strings.relay.help} />
+        <LinkButton
+          label={strings.relay.help}
+          onOpen={() => {
+            return openRelayLink('faq')
+          }}
+        />
       </div>
     </Screen>
   )

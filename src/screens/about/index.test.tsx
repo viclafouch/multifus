@@ -6,29 +6,34 @@ import { strings } from '@/constants/strings'
 const bridge = {
   checkUpdate: vi.fn(),
   installUpdate: vi.fn(),
-  reset: vi.fn()
+  openAboutLink: vi.fn(),
+  reset: vi.fn(),
+  revealConfig: vi.fn()
 }
 
 vi.mock(import('@/lib/multifus'), () => {
   return bridge
 })
 
-const { AboutScreen } = await import('@/screens/about-screen')
+const { AboutScreen } = await import('@/screens/about')
 
 const CONFIG_PATH = '/Users/joueur/Library/multifus/config.json'
 
 type ShowParams = {
   readonly update?: UpdateStatus
   readonly version?: string
+  readonly system?: string
 }
 
 const show = ({
   update = { kind: 'upToDate' },
-  version = '1.4.2'
+  version = '1.4.2',
+  system = 'macOS 26.0.0 (arm64)'
 }: ShowParams = {}) => {
   render(
     <AboutScreen
       version={version}
+      system={system}
       config={{ path: CONFIG_PATH, problem: null }}
       update={update}
       run={() => {}}
@@ -41,18 +46,72 @@ const buttonNamed = (label: string) => {
 }
 
 describe('l’écran À propos', () => {
-  it('dit la version et où sont rangés les réglages', () => {
-    show({ version: '1.4.2' })
+  it('dit ce qu’est Multifus', () => {
+    show()
+
+    expect(screen.getByText(strings.about.tagline)).not.toBeNull()
+  })
+
+  it('dit la version, le système et où sont rangés les réglages', () => {
+    show({ version: '1.4.2', system: 'Windows 10.0.26100 (x64)' })
 
     expect(screen.getByText('1.4.2')).not.toBeNull()
+    expect(screen.getByText('Windows 10.0.26100 (x64)')).not.toBeNull()
     expect(screen.getByText(CONFIG_PATH)).not.toBeNull()
   })
 
-  it('dit que Multifus ne touche pas au jeu', () => {
+  it('ouvre le dossier des réglages', () => {
+    bridge.revealConfig.mockResolvedValue(null)
     show()
 
-    expect(screen.getByText(strings.about.legalBody)).not.toBeNull()
-    expect(screen.getByText(strings.about.legalScope)).not.toBeNull()
+    fireEvent.click(buttonNamed(strings.about.configReveal))
+
+    expect(bridge.revealConfig).toHaveBeenCalledWith()
+  })
+
+  it('mène chaque mention légale par la phrase qui compte', () => {
+    show()
+
+    for (const { lead } of strings.about.legal) {
+      expect(screen.getByText(lead).tagName).toBe('STRONG')
+    }
+  })
+
+  it('dit Ankama, les paquets auxquels on ne touche pas, et internet', () => {
+    show()
+
+    const said = strings.about.legal
+      .map(({ lead, body }) => {
+        return `${lead} ${body}`
+      })
+      .join(' ')
+
+    for (const owned of ['Ankama', 'mémoire', 'paquets', 'clics']) {
+      expect(said).toContain(owned)
+    }
+  })
+
+  it('dit que Telegram ne part qu’à la demande', () => {
+    show()
+
+    const telegram = strings.about.legal.find(({ body }) => {
+      return body.includes('Telegram')
+    })
+
+    expect(telegram?.body).toContain('seulement si vous')
+  })
+
+  describe('le projet', () => {
+    it('mène au code source et à l’endroit où raconter un bug', () => {
+      bridge.openAboutLink.mockResolvedValue(null)
+      show()
+
+      fireEvent.click(buttonNamed(strings.about.sourceOpen))
+      fireEvent.click(buttonNamed(strings.about.issuesOpen))
+
+      expect(bridge.openAboutLink).toHaveBeenCalledWith('source')
+      expect(bridge.openAboutLink).toHaveBeenCalledWith('issues')
+    })
   })
 
   describe('la mise à jour', () => {
@@ -130,6 +189,7 @@ describe('l’écran À propos', () => {
       show()
 
       expect(screen.getByText(strings.about.resetBody)).not.toBeNull()
+      expect(strings.about.resetBody).toContain('Dofus Retro')
     })
 
     it('n’efface rien quand on annule', async () => {

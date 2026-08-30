@@ -91,7 +91,9 @@ pub fn run() {
             app::commands::install_update,
             app::commands::dismiss_config_problem,
             app::commands::reveal_journal,
+            app::commands::reveal_config,
             app::commands::reveal_quarantined_config,
+            app::commands::open_about_link,
         ])
         .build(tauri::generate_context!())
         .expect("error while building Multifus")

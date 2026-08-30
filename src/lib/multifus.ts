@@ -1,5 +1,6 @@
 import { invoke } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event'
+import type { AboutLink } from '@/@types/about'
 import type { Display } from '@/@types/display'
 import type { NotificationKind } from '@/@types/notification'
 import type { RelayLink } from '@/@types/relay'
@@ -366,6 +367,14 @@ export const revealJournal = async () => {
   return invoke<null>('reveal_journal')
 }
 
+export const revealConfig = async () => {
+  return invoke<null>('reveal_config')
+}
+
 export const revealQuarantinedConfig = async () => {
   return invoke<null>('reveal_quarantined_config')
+}
+
+export const openAboutLink = async (link: AboutLink) => {
+  return invoke<null>('open_about_link', { link })
 }

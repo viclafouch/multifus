@@ -1576,7 +1576,7 @@ describe('journalTranscript', () => {
         'Déplacement rapide : éteint',
         BINDINGS_LINE,
         'Configuration : /tmp/multifus/config.json',
-        'Mise à jour : Vous avez la dernière version.',
+        'Mise à jour : Vous êtes à jour.',
         'Entrées en mémoire : 2, 15/01/2026 09:05:03 → 15/01/2026 12:30:00',
         'Le fichier du journal sur le disque va plus loin en arrière que ces lignes.',
         '',

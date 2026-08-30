@@ -1,14 +1,14 @@
 use tauri::AppHandle;
 use tauri::WebviewWindow;
-use tauri_plugin_opener::OpenerExt;
 
 use crate::app::autostart;
 use crate::app::banner;
-use crate::app::journal::JournalEvent;
 use crate::app::journal::RelayStop;
 use crate::app::journal::Surface;
 use crate::app::journal::WalkFrom;
 use crate::app::journal_file;
+use crate::app::links;
+use crate::app::links::AboutLink;
 use crate::app::main_window;
 use crate::app::relay;
 use crate::app::rune_table;
@@ -508,16 +508,22 @@ pub fn reveal_journal(app: AppHandle) {
 }
 
 #[tauri::command]
+pub fn reveal_config(app: AppHandle) {
+    let path = lock(&app).config_path();
+
+    links::reveal(&app, path);
+}
+
+#[tauri::command]
 pub fn reveal_quarantined_config(app: AppHandle) {
     let Some(path) = lock(&app).quarantined_path().map(str::to_owned) else {
         return;
     };
 
-    if let Err(error) = app.opener().reveal_item_in_dir(path) {
-        lock(&app).log(JournalEvent::OpenFailed {
-            detail: error.to_string(),
-        });
+    links::reveal(&app, path);
+}
 
-        runtime::emit_snapshot(&app);
-    }
+#[tauri::command]
+pub fn open_about_link(app: AppHandle, link: AboutLink) {
+    links::open_about(&app, link);
 }

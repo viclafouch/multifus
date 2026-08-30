@@ -42,8 +42,7 @@ console.
 - [ ] La roue, la bannière et le tableau des runes répondent avec `core:event:default` pour seule capacité
 - [ ] Le lancement : le Dock rebondit, rien ne s'affiche, puis la fenêtre arrive peinte, sans passer par le brun
 - [ ] Le lancement à la session, la barre système présente : rien ne s'ouvre, comme avant
-- [ ] L'écran À propos porte encore le système, `tauri_plugin_os::init()` retiré
-- [ ] Le presse-papiers copie encore, depuis l'écran des messages privés
+- [ ] Le presse-papiers copie encore, depuis l'écran des messages privés et depuis À propos
 - [ ] La mise à jour installée depuis Windows rend les titres, les têtes de classe, les boutons de la barre des tâches et le délai du premier plan
 
 ### Les personnages, l'exclusion et le principal

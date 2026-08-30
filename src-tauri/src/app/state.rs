@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::collections::HashSet;
+use std::path::PathBuf;
 use std::sync::Arc;
 use std::sync::Mutex;
 use std::sync::MutexGuard;
@@ -266,7 +267,7 @@ impl Multifus {
                 listening: self.listening,
             },
             config: ConfigView {
-                path: self.store.path().display().to_string(),
+                path: self.config_path().display().to_string(),
                 problem: self.problem.clone(),
             },
             update: self.update.clone(),
@@ -349,6 +350,11 @@ impl Multifus {
 
     pub fn dismiss_problem(&mut self) {
         self.problem = None;
+    }
+
+    #[must_use]
+    pub fn config_path(&self) -> PathBuf {
+        self.store.path().to_path_buf()
     }
 
     #[must_use]

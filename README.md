@@ -54,7 +54,7 @@ Sur macOS, télécharger le DMG de la [dernière release](https://github.com/vic
 
 ## Ce qu'il ne fait pas
 
-Multifus ne lit pas la mémoire du client, ne simule aucune action de jeu, n'empêche pas la déconnexion pour inactivité et ne modifie aucun fichier. Il gère des fenêtres et lit des notifications système, rien d'autre. Les outils de type macro sont interdits par Ankama et restent hors de ce projet.
+Multifus ne lit pas la mémoire du client, ne touche à aucun de ses paquets, ne simule aucune action de jeu, n'empêche pas la déconnexion pour inactivité et ne modifie aucun fichier. Il gère des fenêtres et lit des notifications système, rien d'autre. Les outils de type macro sont interdits par Ankama et restent hors de ce projet.
 
 Dofus et Dofus Retro sont des marques déposées d'Ankama. Ce projet n'y est pas affilié.
 

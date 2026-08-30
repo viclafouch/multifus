@@ -1,22 +1,22 @@
 import { ExternalLink } from 'lucide-react'
-import type { RelayLink } from '@/@types/relay'
 import { Button } from '@/components/ui/button'
-import { openRelayLink } from '@/lib/multifus'
 import { ignore } from '@/lib/utils'
 
 type LinkButtonProps = Readonly<{
-  link: RelayLink
   label: string
+  onOpen: () => Promise<null>
 }>
 
-export const LinkButton = ({ link, label }: LinkButtonProps) => {
+export const LinkButton = ({ label, onOpen }: LinkButtonProps) => {
+  const handleClick = () => {
+    onOpen().catch(ignore)
+  }
+
   return (
     <Button
       variant="ghost"
       size="xs"
-      onClick={() => {
-        openRelayLink(link).catch(ignore)
-      }}
+      onClick={handleClick}
       className="text-muted-foreground hover:text-primary"
     >
       <ExternalLink aria-hidden />

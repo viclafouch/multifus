@@ -15,7 +15,7 @@ import {
   revealQuarantinedConfig
 } from '@/lib/multifus'
 import { ignore } from '@/lib/utils'
-import { AboutScreen } from '@/screens/about-screen'
+import { AboutScreen } from '@/screens/about'
 import { AuthorizationScreen } from '@/screens/authorization-screen'
 import { AutoFocusScreen } from '@/screens/auto-focus-screen'
 import { CharactersScreen } from '@/screens/characters-screen'
@@ -170,6 +170,7 @@ const CurrentScreen = ({ screen, snapshot, run }: CurrentScreenProps) => {
     return (
       <AboutScreen
         version={snapshot.version}
+        system={snapshot.system}
         config={snapshot.config}
         update={snapshot.update}
         run={run}

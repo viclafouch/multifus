@@ -1,9 +1,10 @@
 import React from 'react'
-import { ChevronDown, ChevronUp, FolderOpen } from 'lucide-react'
+import { ChevronDown, ChevronUp } from 'lucide-react'
 import type { JournalEntry } from '@/@types/journal'
 import type { QuickReply } from '@/@types/shortcuts'
 import type { Snapshot } from '@/@types/snapshot'
 import { CopyButton } from '@/components/copy-button'
+import { RevealButton } from '@/components/reveal-button'
 import { Button } from '@/components/ui/button'
 import { strings } from '@/constants/strings'
 import {
@@ -13,13 +14,8 @@ import {
   journalTranscript
 } from '@/helpers/journal'
 import { revealJournal } from '@/lib/multifus'
-import { ignore } from '@/lib/utils'
 
 const FOLLOW_MARGIN = 28
-
-const handleReveal = () => {
-  revealJournal().catch(ignore)
-}
 
 type JournalPanelProps = Readonly<{
   snapshot: Snapshot
@@ -90,16 +86,7 @@ export const JournalPanel = ({ snapshot }: JournalPanelProps) => {
             copiedLabel={strings.journal.copied}
           />
         )}
-        <Button
-          variant="ghost"
-          size="icon-xs"
-          onClick={handleReveal}
-          title={strings.journal.reveal}
-          aria-label={strings.journal.reveal}
-          className="text-muted-foreground/55 hover:text-foreground"
-        >
-          <FolderOpen aria-hidden strokeWidth={2} />
-        </Button>
+        <RevealButton label={strings.journal.reveal} onReveal={revealJournal} />
       </div>
       {isOpen ? (
         <ol

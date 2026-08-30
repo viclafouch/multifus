@@ -1,5 +1,6 @@
 import type { RelayLink } from '@/@types/relay'
-import { LinkButton } from '@/screens/relay/link-button'
+import { LinkButton } from '@/components/link-button'
+import { openRelayLink } from '@/lib/multifus'
 
 type StepProps = Readonly<{
   rank: number
@@ -23,7 +24,12 @@ export const Step = ({ rank, title, body, link, action }: StepProps) => {
         <p className="max-w-prose text-note text-muted-foreground">{body}</p>
       </div>
       {link === undefined || action === undefined ? null : (
-        <LinkButton link={link} label={action} />
+        <LinkButton
+          label={action}
+          onOpen={() => {
+            return openRelayLink(link)
+          }}
+        />
       )}
     </li>
   )

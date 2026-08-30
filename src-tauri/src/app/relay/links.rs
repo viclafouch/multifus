@@ -1,10 +1,7 @@
 use serde::Deserialize;
 use tauri::AppHandle;
-use tauri_plugin_opener::OpenerExt;
 
-use crate::app::journal::JournalEvent;
-use crate::app::runtime;
-use crate::app::state::lock;
+use crate::app::links::open_url;
 
 const WEB_URL: &str = "https://web.telegram.org";
 
@@ -32,15 +29,7 @@ impl RelayLink {
 }
 
 pub fn open(app: &AppHandle, link: RelayLink) {
-    let opened = app.opener().open_url(link.url(), None::<&str>);
-
-    if let Err(error) = opened {
-        lock(app).log(JournalEvent::OpenFailed {
-            detail: error.to_string(),
-        });
-
-        runtime::emit_snapshot(app);
-    }
+    open_url(app, link.url());
 }
 
 #[cfg(test)]

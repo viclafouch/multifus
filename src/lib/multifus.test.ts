@@ -512,9 +512,21 @@ const CALLS = [
     }
   },
   {
+    name: 'revealConfig',
+    run: () => {
+      return multifus.revealConfig()
+    }
+  },
+  {
     name: 'revealQuarantinedConfig',
     run: () => {
       return multifus.revealQuarantinedConfig()
+    }
+  },
+  {
+    name: 'openAboutLink',
+    run: () => {
+      return multifus.openAboutLink('source')
     }
   }
 ] as const satisfies readonly Call[]

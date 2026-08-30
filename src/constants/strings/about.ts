@@ -1,32 +1,63 @@
+type LegalParagraph = {
+  readonly lead: string
+  readonly body: string
+}
+
+const LEGAL_PARAGRAPHS = [
+  {
+    lead: 'Multifus n’a rien à voir avec Ankama.',
+    body: 'Dofus, Dofus Retro et les têtes de classe appartiennent à Ankama.'
+  },
+  {
+    lead: 'Multifus ne touche pas au jeu.',
+    body: 'Ni sa mémoire, ni ses fichiers, ni ses paquets : il range vos fenêtres, lit les notifications et prend vos clics.'
+  },
+  {
+    lead: 'Rien ne quitte votre ordinateur sans vous.',
+    body: 'Multifus cherche ses mises à jour, et relaie vos messages privés seulement si vous reliez Telegram.'
+  }
+] as const satisfies readonly LegalParagraph[]
+
 export const ABOUT_STRINGS = {
   about: {
     title: 'À propos',
+    tagline:
+      'Le multicompte confortable sur Dofus Retro : Multifus range vos fenêtres, vous jouez.',
     version: 'Version',
+    system: 'Système',
     configPath: 'Vos réglages',
+    configCopy: 'Copier le chemin',
+    configCopied: 'Chemin copié',
+    configReveal: 'Montrer le fichier des réglages',
+    projectTitle: 'Le projet',
+    projectDescription: 'Gratuit, sans compte et sans publicité.',
     updateTitle: 'Mise à jour',
     updateChecking: 'Vérification en cours…',
-    updateUpToDate: 'Vous avez la dernière version.',
+    updateUpToDate: 'Vous êtes à jour.',
     updateAvailable: (version: string) => {
-      return `La version ${version} est disponible. Multifus se relancera une fois installée, sans toucher à vos clients Dofus Retro.`
+      return `La version ${version} est prête. Multifus se relancera tout seul, sans toucher à vos clients.`
     },
-    updateInstalling: 'Téléchargement, puis Multifus se relancera.',
+    updateInstalling: 'Téléchargement en cours…',
     updateFailed: (detail: string) => {
-      return `La mise à jour n’a pas abouti : ${detail}`
+      return `La mise à jour a échoué : ${detail}`
     },
     check: 'Vérifier',
     install: 'Installer',
+    sourceLabel: 'Comment Multifus est développé',
+    sourceDescription: 'Le code est public, rien n’est caché.',
+    sourceOpen: 'Aller voir',
+    issuesLabel: 'Signaler un problème',
+    issuesDescription: 'Un bug, une idée : c’est ici que ça se raconte.',
+    issuesOpen: 'Aller le dire',
     legalTitle: 'Mentions légales',
-    legalBody:
-      'Multifus est un projet personnel indépendant, sans aucun lien avec Ankama. Dofus et Dofus Retro sont des marques déposées d’Ankama.',
-    legalScope:
-      'Multifus ne touche pas au jeu : il ne lit pas sa mémoire, ne joue jamais à votre place et ne modifie aucun de ses fichiers. Il déplace des fenêtres, et il écoute les notifications du système.',
+    legal: LEGAL_PARAGRAPHS,
     resetTitle: 'Tout remettre à neuf',
     resetBody:
-      'Roster vidé, sexes oubliés, raccourcis et AutoFocus d’origine. Vos personnages Dofus Retro, eux, ne risquent rien.',
+      'Multifus repart comme au premier lancement. Vos personnages Dofus Retro ne risquent rien.',
     reset: 'Tout réinitialiser',
     resetConfirmTitle: 'Tout remettre à neuf ?',
     resetConfirmBody:
-      'Votre roster et vos sexes seront perdus. Vos personnages connectés réapparaîtront dans la seconde, sans leur sexe et dans le désordre.',
+      'Réglages, roster et raccourcis repartent d’origine. Vos personnages connectés reviendront dans la seconde, sans sexe ni classe.',
     resetConfirm: 'Réinitialiser',
     cancel: 'Annuler'
   }
