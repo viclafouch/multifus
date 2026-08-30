@@ -45,6 +45,14 @@ console.
 - [ ] Le presse-papiers copie encore, depuis l'écran des messages privés et depuis À propos
 - [ ] La mise à jour installée depuis Windows rend les titres, les têtes de classe, les boutons de la barre des tâches et le délai du premier plan
 
+### L'écran À propos
+
+- [ ] Le panneau du haut dit la vraie version, le vrai système et le vrai chemin, sur le Mac comme sur Windows
+- [ ] Le bouton du dossier ouvre le Finder sur `config.json`, l'Explorateur sur Windows
+- [ ] « Aller voir » et « Aller le dire » ouvrent le navigateur par défaut, Multifus restant où il est
+- [ ] Le navigateur absent ou refusé : le journal porte une ligne, et rien ne casse
+- [ ] La ligne de démarrage du journal se lit « sur macOS 26.0.0 (arm64) »
+
 ### Les personnages, l'exclusion et le principal
 
 - [ ] Un combat sur un personnage exclu : aucune fenêtre ne bouge, et le journal porte « personnage exclu, sa fenêtre reste où elle est »
