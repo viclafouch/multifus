@@ -60,7 +60,7 @@ Dofus et Dofus Retro sont des marques déposées d'Ankama. Ce projet n'y est pas
 
 ## Développement
 
-Construit avec [Tauri](https://v2.tauri.app), React et TypeScript pour l'interface, Rust pour la couche système. Prérequis : [Rust](https://www.rust-lang.org/tools/install), Node 24, et les [prérequis Tauri](https://tauri.app/start/prerequisites/) de votre système. Les commandes sont les scripts de `package.json`, et `npm install` pose les hooks git qui font passer `npm run lint` à chaque commit.
+Construit avec [Tauri](https://v2.tauri.app), React et TypeScript pour l'interface, Rust pour la couche système. Prérequis : [Rust](https://www.rust-lang.org/tools/install), Node 24, et les [prérequis Tauri](https://tauri.app/start/prerequisites/) de votre système. Les commandes sont les scripts de `package.json`, et `npm install` pose le hook git qui rejoue les contrôles de la CI à chaque commit : le format, les lints des deux langages, et les tests des deux côtés.
 
 Une release se prépare par `npm run release`, qui écrit le changelog et pose le tag, puis se déclenche en poussant ce tag : le workflow compile, signe, notarise et dépose un brouillon qu'il reste à publier.
 
