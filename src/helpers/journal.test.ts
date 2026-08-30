@@ -1275,6 +1275,12 @@ const JOURNAL_CASES = {
       line: `${DETAILED_LINES.bannerFailed} : ${DETAIL}`
     }
   ],
+  runeTableFailed: [
+    {
+      event: { kind: 'runeTableFailed', detail: DETAIL },
+      line: `${DETAILED_LINES.runeTableFailed} : ${DETAIL}`
+    }
+  ],
   wheelFailed: [
     {
       event: { kind: 'wheelFailed', detail: DETAIL },
@@ -1367,6 +1373,17 @@ const SNAPSHOT = {
     step: 20,
     deadZone: 0.32,
     demo: []
+  },
+  runeTable: {
+    width: 420,
+    narrowest: 320,
+    widest: 560,
+    step: 20,
+    transparency: 0,
+    clearest: 100,
+    veilStep: 5,
+    everywhere: false,
+    previewing: false
   },
   journal: [
     { id: 1, at: MORNING, event: { kind: 'listening' } },

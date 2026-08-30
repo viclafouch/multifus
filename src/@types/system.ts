@@ -36,4 +36,11 @@ export type Launch = 'byHand' | 'session'
 
 export type Surface = 'shortcut' | 'tray' | 'window'
 
-export type Work = 'banner' | 'scan' | 'shortcuts' | 'tray' | 'walk' | 'wheel'
+export type Work =
+  | 'banner'
+  | 'runeTable'
+  | 'scan'
+  | 'shortcuts'
+  | 'tray'
+  | 'walk'
+  | 'wheel'

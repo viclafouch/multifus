@@ -22,6 +22,7 @@ pub enum Work {
     Walk,
     Banner,
     Wheel,
+    RuneTable,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -251,6 +252,10 @@ pub enum JournalEvent {
     },
 
     WheelFailed {
+        detail: String,
+    },
+
+    RuneTableFailed {
         detail: String,
     },
 

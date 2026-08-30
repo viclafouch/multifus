@@ -118,6 +118,17 @@ const BLANK_SNAPSHOT: Snapshot = {
     deadZone: 0.32,
     demo: []
   },
+  runeTable: {
+    width: 420,
+    narrowest: 320,
+    widest: 560,
+    step: 20,
+    transparency: 0,
+    clearest: 100,
+    veilStep: 5,
+    everywhere: false,
+    previewing: false
+  },
   journal: []
 }
 

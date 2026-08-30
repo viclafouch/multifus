@@ -4,6 +4,7 @@ import { clearMocks, mockIPC } from '@tauri-apps/api/mocks'
 import * as multifus from '@/lib/multifus'
 import BANNER_SOURCE from '../../src-tauri/src/app/banner.rs?raw'
 import COMMANDS_SOURCE from '../../src-tauri/src/app/commands.rs?raw'
+import RUNE_TABLE_SOURCE from '../../src-tauri/src/app/rune_table.rs?raw'
 import RUNTIME_SOURCE from '../../src-tauri/src/app/runtime.rs?raw'
 import WHEEL_SOURCE from '../../src-tauri/src/app/wheel.rs?raw'
 import HANDLER_SOURCE from '../../src-tauri/src/lib.rs?raw'
@@ -311,6 +312,78 @@ const CALLS = [
     }
   },
   {
+    name: 'setRuneTableWidth',
+    run: () => {
+      return multifus.setRuneTableWidth(480)
+    }
+  },
+  {
+    name: 'sizeRuneTable',
+    run: () => {
+      return multifus.sizeRuneTable(480)
+    }
+  },
+  {
+    name: 'fadeRuneTable',
+    run: () => {
+      return multifus.fadeRuneTable(40)
+    }
+  },
+  {
+    name: 'setRuneTableTransparency',
+    run: () => {
+      return multifus.setRuneTableTransparency(40)
+    }
+  },
+  {
+    name: 'runeTableLook',
+    run: () => {
+      return multifus.runeTableLook()
+    }
+  },
+  {
+    name: 'setRuneTableEverywhere',
+    run: () => {
+      return multifus.setRuneTableEverywhere(true)
+    }
+  },
+  {
+    name: 'previewRuneTable',
+    run: () => {
+      return multifus.previewRuneTable()
+    }
+  },
+  {
+    name: 'closeRuneTable',
+    run: () => {
+      return multifus.closeRuneTable()
+    }
+  },
+  {
+    name: 'moveRuneTable',
+    run: () => {
+      return multifus.moveRuneTable(12, -4)
+    }
+  },
+  {
+    name: 'runeTableSettled',
+    run: () => {
+      return multifus.runeTableSettled()
+    }
+  },
+  {
+    name: 'recallRuneTable',
+    run: () => {
+      return multifus.recallRuneTable()
+    }
+  },
+  {
+    name: 'runeTableMeasured',
+    run: () => {
+      return multifus.runeTableMeasured(2.025)
+    }
+  },
+  {
     name: 'setWakesMinimized',
     run: () => {
       return multifus.setWakesMinimized(false)
@@ -451,7 +524,8 @@ const LISTENERS = [
   'onClients',
   'onWheelStep',
   'onWheelAim',
-  'onWheelWipe'
+  'onWheelWipe',
+  'onRuneTableLook'
 ]
 
 const lastCall = async (call: Call) => {
@@ -554,6 +628,12 @@ describe('le pont vers Rust', () => {
     await multifus.onWheelWipe(() => {})
 
     expect(listenedEvent()).toBe(rustConstant(WHEEL_SOURCE, 'WIPE_EVENT'))
+  })
+
+  it('écoute le voile de la plaque sur le canal que rune_table.rs émet', async () => {
+    await multifus.onRuneTableLook(() => {})
+
+    expect(listenedEvent()).toBe(rustConstant(RUNE_TABLE_SOURCE, 'LOOK_EVENT'))
   })
 
   it('écoute la taille des clients sur le canal que le tour émet', async () => {

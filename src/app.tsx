@@ -6,15 +6,21 @@ import { JournalPanel } from '@/components/journal-panel'
 import { KeyLabelsProvider } from '@/components/key-labels-provider'
 import { NavRail } from '@/components/nav-rail'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { useEscape } from '@/hooks/use-escape'
 import { useMultifus } from '@/hooks/use-multifus'
 import { useTrayNavigation } from '@/hooks/use-tray-navigation'
-import { dismissConfigProblem, revealQuarantinedConfig } from '@/lib/multifus'
+import {
+  closeRuneTable,
+  dismissConfigProblem,
+  revealQuarantinedConfig
+} from '@/lib/multifus'
 import { AboutScreen } from '@/screens/about-screen'
 import { AuthorizationScreen } from '@/screens/authorization-screen'
 import { AutoFocusScreen } from '@/screens/auto-focus-screen'
 import { CharactersScreen } from '@/screens/characters-screen'
 import { QuickRepliesScreen } from '@/screens/quick-replies'
 import { RelayScreen } from '@/screens/relay'
+import { RuneTableScreen } from '@/screens/rune-table'
 import { SettingsScreen } from '@/screens/settings'
 import { ShortcutsScreen } from '@/screens/shortcuts'
 import { WalkScreen } from '@/screens/walk-screen'
@@ -25,6 +31,10 @@ export const App = () => {
   const [screen, setScreen] = React.useState<ScreenName>('characters')
 
   useTrayNavigation(setScreen)
+
+  useEscape(snapshot?.runeTable.previewing ?? false, () => {
+    run(closeRuneTable())
+  })
 
   if (snapshot === null) {
     return <Backdrop />
@@ -115,6 +125,16 @@ const CurrentScreen = ({ screen, snapshot, run }: CurrentScreenProps) => {
     return (
       <WheelScreen
         wheel={snapshot.wheel}
+        shortcuts={snapshot.shortcuts}
+        run={run}
+      />
+    )
+  }
+
+  if (screen === 'runeTable') {
+    return (
+      <RuneTableScreen
+        runeTable={snapshot.runeTable}
         shortcuts={snapshot.shortcuts}
         run={run}
       />

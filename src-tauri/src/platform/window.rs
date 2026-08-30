@@ -133,6 +133,13 @@ pub struct ScreenPoint {
     pub y: f64,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct ScreenFrame {
+    pub origin: ScreenPoint,
+    pub width: f64,
+    pub height: f64,
+}
+
 pub trait WindowManager: Send + Sync {
     fn authorization(&self) -> Result<Authorization>;
 
@@ -143,6 +150,8 @@ pub trait WindowManager: Send + Sync {
     fn foreground_game_window(&self) -> Result<Option<GameWindow>>;
 
     fn window_at(&self, at: ScreenPoint) -> Result<Option<WindowId>>;
+
+    fn window_frame(&self, window: WindowId) -> Result<Option<ScreenFrame>>;
 
     fn is_minimized(&self, window: WindowId) -> Result<bool>;
 

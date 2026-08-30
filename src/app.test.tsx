@@ -22,7 +22,8 @@ const bridge = {
   watchClients: vi.fn(pending),
   onClients: vi.fn(pending),
   dismissConfigProblem: vi.fn(pending),
-  revealQuarantinedConfig: vi.fn(pending)
+  revealQuarantinedConfig: vi.fn(pending),
+  closeRuneTable: vi.fn(pending)
 }
 
 vi.mock(import('@/lib/multifus'), () => {
@@ -66,6 +67,7 @@ const ARRIVALS = [
   { name: 'autoFocus', mark: strings.autoFocus.subtitle },
   { name: 'walk', mark: strings.walk.subtitle },
   { name: 'wheel', mark: strings.wheel.subtitle },
+  { name: 'runeTable', mark: strings.runeTable.subtitle },
   { name: 'relay', mark: strings.relay.subtitle },
   { name: 'settings', mark: strings.settings.subtitle },
   { name: 'about', mark: strings.about.legalTitle }
@@ -93,7 +95,7 @@ describe('la fenêtre de Multifus', () => {
     expect(screen.getByText(strings.characters.emptyTitle)).not.toBeNull()
   })
 
-  it('porte les neuf écrans, et la version de Multifus', async () => {
+  it('porte les dix écrans, et la version de Multifus', async () => {
     await open(snapshotOf({ version: '1.4.2' }))
 
     for (const label of Object.values(strings.nav)) {
@@ -112,6 +114,27 @@ describe('la fenêtre de Multifus', () => {
       expect(screen.getByText(mark)).not.toBeNull()
       expect(currentEntry()).toBe(strings.nav[name])
     }
+  })
+
+  it('ferme l’aperçu du tableau des runes à Échap, quel que soit l’écran ouvert', async () => {
+    await open(
+      snapshotOf({
+        runeTable: { ...snapshotOf().runeTable, previewing: true }
+      })
+    )
+
+    navigateTo('settings')
+    fireEvent.keyDown(window, { key: 'Escape' })
+
+    expect(bridge.closeRuneTable).toHaveBeenCalledExactlyOnceWith()
+  })
+
+  it('laisse Échap tranquille tant qu’aucun aperçu n’est ouvert', async () => {
+    await open(snapshotOf())
+
+    fireEvent.keyDown(window, { key: 'Escape' })
+
+    expect(bridge.closeRuneTable).not.toHaveBeenCalled()
   })
 
   it('revient aux personnages', async () => {

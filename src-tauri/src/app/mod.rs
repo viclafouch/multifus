@@ -8,6 +8,7 @@ pub mod main_window;
 pub mod portraits;
 pub mod quick_replies;
 pub mod relay;
+pub mod rune_table;
 pub mod runtime;
 pub mod shortcuts;
 pub mod state;
@@ -72,6 +73,8 @@ pub fn setup(app: &AppHandle) -> Result<(), ConfigError> {
     walk::setup(app);
 
     wheel::setup(app);
+
+    rune_table::setup(app);
 
     shortcuts::start(app);
     shortcuts::apply(app);

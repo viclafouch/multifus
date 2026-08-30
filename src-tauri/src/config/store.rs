@@ -179,7 +179,7 @@ fn write_whole_file(path: &Path, bytes: &[u8]) -> Result<()> {
         .map_err(|error| ConfigError::io("flushing", path, &error))
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Loaded {
     pub settings: Settings,
     pub failure: Option<ConfigError>,
@@ -199,6 +199,10 @@ impl Loaded {
 
     fn read(mut settings: Settings) -> Self {
         settings.wheel.set_diameter(settings.wheel.diameter);
+        settings.rune_table.set_width(settings.rune_table.width);
+        settings
+            .rune_table
+            .set_transparency(settings.rune_table.transparency);
 
         Self {
             settings,
@@ -236,9 +240,12 @@ mod tests {
     use crate::config::settings::QuickReply;
     use crate::config::settings::QuickReplyId;
     use crate::config::settings::Relay;
+    use crate::config::settings::RuneOffset;
+    use crate::config::settings::RuneTable;
     use crate::config::settings::Shortcuts;
     use crate::config::settings::Traces;
     use crate::config::settings::Wheel;
+    use crate::config::settings::RUNE_TABLE_CLEAREST;
     use crate::config::settings::WHEEL_WIDEST;
     use crate::domain::Character;
     use crate::domain::Class;
@@ -279,6 +286,7 @@ mod tests {
                 walk: Shortcut::new("Alt+KeyD"),
                 maximize_all: Shortcut::new("Alt+KeyA"),
                 wheel: Shortcut::new("Alt+KeyW"),
+                rune_table: Shortcut::new("Alt+KeyR"),
             },
             maximize_on_launch: true,
             short_titles: true,
@@ -300,6 +308,12 @@ mod tests {
                 screen: Some("DISPLAY2".to_owned()),
             },
             wheel: Wheel { diameter: 300 },
+            rune_table: RuneTable {
+                width: 480,
+                transparency: 25,
+                offset: Some(RuneOffset { x: 32.0, y: 24.0 }),
+                everywhere: true,
+            },
             start_at_login: true,
             traces: Traces {
                 portraits: HashSet::from(["Alpha".to_owned()]),
@@ -340,6 +354,26 @@ mod tests {
         store.save(&settings).expect("the configuration is written");
 
         assert_eq!(store.load().settings.wheel.diameter, WHEEL_WIDEST);
+    }
+
+    #[test]
+    fn a_rune_table_veiled_past_the_gauge_comes_back_within_its_ends() {
+        let (_directory, store) = store();
+        let settings = Settings {
+            rune_table: RuneTable {
+                transparency: RUNE_TABLE_CLEAREST * 9,
+                ..a_settled_configuration().rune_table
+            },
+            ..a_settled_configuration()
+        };
+
+        store.save(&settings).expect("the configuration is written");
+
+        assert_eq!(
+            store.load().settings.rune_table.transparency,
+            RUNE_TABLE_CLEAREST,
+            "a transparency past the end would paint the plate darker than full"
+        );
     }
 
     #[test]

@@ -21,6 +21,7 @@ use crate::app::journal::WalkFrom;
 use crate::app::journal::Work;
 use crate::app::quick_replies;
 use crate::app::relay;
+use crate::app::rune_table;
 use crate::app::runtime;
 use crate::app::state::hold;
 use crate::app::state::lock;
@@ -240,6 +241,8 @@ trait Mechanisms {
     fn open_wheel(&self, here: WindowId);
 
     fn release_wheel(&self);
+
+    fn toggle_rune_table(&self, here: WindowId);
 }
 
 struct AppMechanisms<'a>(&'a AppHandle);
@@ -267,6 +270,10 @@ impl Mechanisms for AppMechanisms<'_> {
 
     fn release_wheel(&self) {
         wheel::release(self.0);
+    }
+
+    fn toggle_rune_table(&self, here: WindowId) {
+        rune_table::toggle(self.0, Some(here));
     }
 }
 
@@ -338,6 +345,9 @@ fn act_on(press: &Press, binding: Binding, window: &GameWindow) {
         Binding::Action {
             action: ShortcutAction::Wheel,
         } => press.mechanisms.open_wheel(window.id()),
+        Binding::Action {
+            action: ShortcutAction::RuneTable,
+        } => press.mechanisms.toggle_rune_table(window.id()),
         Binding::Action { action } => {
             let Some(effect) = hold(press.state).decide_shortcut(action, window.nickname()) else {
                 return;
@@ -459,6 +469,7 @@ mod tests {
         QuickReplyPasted(QuickReplyId),
         WheelOpened(WindowId),
         WheelReleased,
+        RuneTableToggled(WindowId),
     }
 
     #[derive(Debug, Default)]
@@ -505,6 +516,10 @@ mod tests {
 
         fn release_wheel(&self) {
             self.write_down(Mechanism::WheelReleased);
+        }
+
+        fn toggle_rune_table(&self, here: WindowId) {
+            self.write_down(Mechanism::RuneTableToggled(here));
         }
     }
 
@@ -1046,6 +1061,69 @@ mod tests {
             windows.asked(),
             Vec::new(),
             "opening the wheel moves no window on its own"
+        );
+    }
+
+    #[test]
+    fn the_rune_table_is_posed_on_the_window_the_player_struck_the_keys_from() {
+        let directory = directory();
+        let state = three_in_the_cycle(&directory);
+        let windows = FakeWindowManager::showing(Desktop {
+            foreground: Some(game_window(3, "Charlie")),
+            ..Desktop::default()
+        });
+        let mechanisms = FakeMechanisms::default();
+
+        answering(
+            &Press {
+                windows: windows.as_ref(),
+                state: &state,
+                mechanisms: &mechanisms,
+            },
+            Binding::Action {
+                action: ShortcutAction::RuneTable,
+            },
+        );
+
+        assert_eq!(
+            mechanisms.set_going(),
+            vec![
+                Mechanism::RelayStopped,
+                Mechanism::RuneTableToggled(WindowId::from_raw(3)),
+            ]
+        );
+        assert_eq!(
+            windows.asked(),
+            Vec::new(),
+            "posing the rune table moves no window on its own"
+        );
+    }
+
+    #[test]
+    fn the_rune_table_struck_outside_the_game_never_shows_itself_and_says_so() {
+        let directory = directory();
+        let state = app_state(&directory, Settings::default());
+        let windows = FakeWindowManager::showing(Desktop::default());
+        let mechanisms = FakeMechanisms::default();
+
+        answering(
+            &Press {
+                windows: windows.as_ref(),
+                state: &state,
+                mechanisms: &mechanisms,
+            },
+            Binding::Action {
+                action: ShortcutAction::RuneTable,
+            },
+        );
+
+        assert_eq!(mechanisms.set_going(), Vec::new());
+        assert_eq!(
+            journalled(&state),
+            vec![JournalEvent::Shortcut {
+                action: ShortcutAction::RuneTable,
+                outcome: ShortcutOutcome::OutsideGame,
+            }]
         );
     }
 

@@ -24,6 +24,7 @@ use crate::app::journal::Work;
 use crate::app::journal_file;
 use crate::app::main_window;
 use crate::app::relay;
+use crate::app::rune_table;
 use crate::app::runtime;
 use crate::app::state::lock;
 use crate::app::state::windows;
@@ -33,6 +34,7 @@ use crate::app::view::CharacterView;
 use crate::app::view::Screen;
 use crate::app::walk;
 use crate::platform::PlatformError;
+use crate::platform::WindowId;
 
 const MENU_CHARACTERS: &str = "Personnages";
 const MENU_SHORTCUTS: &str = "Raccourcis";
@@ -40,6 +42,7 @@ const MENU_QUICK_REPLIES: &str = "Réponses rapides";
 const MENU_AUTO_FOCUS_SCREEN: &str = "AutoFocus";
 const MENU_WALK_SCREEN: &str = "Déplacement rapide";
 const MENU_WHEEL_SCREEN: &str = "Roue";
+const MENU_RUNE_TABLE_SCREEN: &str = "Tableau des runes";
 const MENU_RELAY: &str = "Messages privés";
 const MENU_SETTINGS: &str = "Paramètres";
 const MENU_ABOUT: &str = "À propos";
@@ -50,6 +53,9 @@ const MENU_MAXIMIZE_ALL: &str = "Agrandir les fenêtres";
 const MENU_AUTO_FOCUS_ON: &str = "Activer l'AutoFocus";
 const MENU_WALK_ON: &str = "Activer le Déplacement rapide";
 const MENU_WALK_OFF: &str = "Désactiver le Déplacement rapide";
+const MENU_RUNE_TABLE_ON: &str = "Montrer le tableau des runes";
+const MENU_RUNE_TABLE_OFF: &str = "Cacher le tableau des runes";
+const MENU_RUNE_TABLE_HOME: &str = "Remettre le tableau à sa position initiale";
 const MENU_AUTO_FOCUS_OFF: &str = "Désactiver l'AutoFocus";
 const MENU_WAKE_MINIMIZED: &str = "Aller chercher les fenêtres réduites";
 const MENU_LEAVE_MINIMIZED: &str = "Laisser les fenêtres réduites";
@@ -82,6 +88,10 @@ const AUTO_FOCUS_ID: &str = "multifus://auto-focus";
 
 const WALK_ID: &str = "multifus://walk";
 
+const RUNE_TABLE_ID: &str = "multifus://rune-table";
+
+const RUNE_TABLE_HOME_ID: &str = "multifus://rune-table-home";
+
 const WAKE_MINIMIZED_ID: &str = "multifus://wake-minimized";
 
 const UPDATE_ID: &str = "multifus://update";
@@ -99,6 +109,8 @@ const CHARACTER_PREFIX: &str = "multifus://character/";
 enum TrayWork {
     Focus { nickname: String },
     MaximizeAll,
+    RuneTable,
+    RecallRuneTable,
 }
 
 type TrayQueue = Sender<TrayWork>;
@@ -110,6 +122,7 @@ struct Contents {
     entries: Vec<Entry>,
     auto_focus: bool,
     walk: bool,
+    rune_table: bool,
     wakes_minimized: bool,
     granted: bool,
     update: Option<String>,
@@ -142,6 +155,7 @@ fn contents(state: &Multifus) -> Contents {
         entries: entries(&state.connected()),
         auto_focus: state.is_auto_focus_enabled(),
         walk: state.is_walk_enabled(),
+        rune_table: state.is_rune_table_open(),
         wakes_minimized: state.wakes_minimized(),
         granted: state.is_granted(),
         update: state.available_update(),
@@ -312,6 +326,24 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
 
     menu.append(&MenuItem::with_id(
         app,
+        RUNE_TABLE_ID,
+        switch_label(contents.rune_table, MENU_RUNE_TABLE_OFF, MENU_RUNE_TABLE_ON),
+        true,
+        None::<&str>,
+    )?)?;
+
+    if contents.rune_table {
+        menu.append(&MenuItem::with_id(
+            app,
+            RUNE_TABLE_HOME_ID,
+            MENU_RUNE_TABLE_HOME,
+            true,
+            None::<&str>,
+        )?)?;
+    }
+
+    menu.append(&MenuItem::with_id(
+        app,
         WAKE_MINIMIZED_ID,
         switch_label(
             contents.wakes_minimized,
@@ -429,6 +461,18 @@ fn on_menu_event(app: &AppHandle, event: MenuEvent) {
         return;
     }
 
+    if id == RUNE_TABLE_ID {
+        hand_over(app, TrayWork::RuneTable);
+
+        return;
+    }
+
+    if id == RUNE_TABLE_HOME_ID {
+        hand_over(app, TrayWork::RecallRuneTable);
+
+        return;
+    }
+
     if id == WAKE_MINIMIZED_ID {
         lock(app).toggle_wakes_minimized();
 
@@ -464,6 +508,14 @@ fn on_menu_event(app: &AppHandle, event: MenuEvent) {
     }
 }
 
+fn foreground_game_window(app: &AppHandle) -> Option<WindowId> {
+    windows(app)
+        .foreground_game_window()
+        .ok()
+        .flatten()
+        .map(|window| window.id())
+}
+
 fn hand_over(app: &AppHandle, work: TrayWork) {
     drop(app.state::<TrayQueue>().send(work));
 }
@@ -484,6 +536,7 @@ fn screen_id(screen: Screen) -> &'static str {
         Screen::AutoFocus => "autoFocus",
         Screen::Walk => "walk",
         Screen::Wheel => "wheel",
+        Screen::RuneTable => "runeTable",
         Screen::Relay => "relay",
         Screen::Settings => "settings",
         Screen::About => "about",
@@ -504,6 +557,7 @@ fn screen_label(screen: Screen) -> &'static str {
         Screen::AutoFocus => MENU_AUTO_FOCUS_SCREEN,
         Screen::Walk => MENU_WALK_SCREEN,
         Screen::Wheel => MENU_WHEEL_SCREEN,
+        Screen::RuneTable => MENU_RUNE_TABLE_SCREEN,
         Screen::Relay => MENU_RELAY,
         Screen::Settings => MENU_SETTINGS,
         Screen::About => MENU_ABOUT,
@@ -544,6 +598,12 @@ fn carry_out(app: &AppHandle, work: &TrayWork) {
 
             runtime::emit_snapshot(app);
         }
+        TrayWork::RuneTable => {
+            rune_table::toggle(app, foreground_game_window(app));
+
+            runtime::emit_snapshot(app);
+        }
+        TrayWork::RecallRuneTable => rune_table::recall(app),
     }
 }
 
@@ -752,6 +812,7 @@ mod tests {
             entries: Vec::new(),
             auto_focus: true,
             walk: false,
+            rune_table: false,
             wakes_minimized: true,
             granted: true,
             update: None,

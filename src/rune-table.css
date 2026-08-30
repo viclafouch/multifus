@@ -1,0 +1,144 @@
+@import 'tailwindcss';
+
+@import '@fontsource-variable/inter';
+
+@import '@fontsource/ibm-plex-mono/400.css';
+
+@import '@fontsource/ibm-plex-mono/500.css';
+
+@import './theme.css';
+
+@layer base {
+  html,
+  body {
+    @apply overflow-hidden bg-transparent font-sans text-foreground antialiased;
+
+    user-select: none;
+    cursor: default;
+  }
+}
+
+@utility rune-plate {
+  width: 100%;
+  border: 1px solid color-mix(in oklch, var(--foreground), transparent 88%);
+  border-radius: var(--radius-lg);
+  background-color: oklch(0.14 0.007 66);
+  box-shadow: 0 10px 30px -8px oklch(0 0 0 / 0.7);
+  padding-bottom: calc(var(--spacing) * 1.5);
+  cursor: grab;
+  overflow: hidden;
+}
+
+@utility rune-crown {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--spacing) * 2);
+  padding: calc(var(--spacing) * 1.5) calc(var(--spacing) * 2)
+    calc(var(--spacing) * 1.5) calc(var(--spacing) * 3);
+  border-bottom: 1px solid
+    color-mix(in oklch, var(--foreground), transparent 92%);
+}
+
+@utility rune-grid {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-note);
+  line-height: 1.3;
+}
+
+@utility rune-head {
+  padding: calc(var(--spacing) * 1) calc(var(--spacing) * 2);
+  font-size: var(--text-micro);
+  font-weight: 400;
+  letter-spacing: var(--tracking-micro);
+  text-align: left;
+  text-transform: uppercase;
+  color: color-mix(in oklch, var(--muted-foreground), transparent 25%);
+
+  &[data-weight] {
+    text-align: right;
+  }
+
+  &:first-child {
+    padding-left: calc(var(--spacing) * 3.5);
+  }
+
+  &:last-child {
+    padding-right: calc(var(--spacing) * 3);
+  }
+}
+
+@utility rune-family {
+  --tone: var(--muted-foreground);
+
+  &[data-family='heavy'] {
+    --tone: oklch(0.6 0.11 26);
+  }
+
+  &[data-family='damage'] {
+    --tone: oklch(0.64 0.1 62);
+  }
+
+  &[data-family='resistance'] {
+    --tone: oklch(0.6 0.08 216);
+  }
+
+  &[data-family='secondary'] {
+    --tone: oklch(0.62 0.09 156);
+  }
+
+  &[data-family='primary'] {
+    --tone: oklch(0.6 0.09 292);
+  }
+}
+
+@utility rune-clan {
+  padding: calc(var(--spacing) * 1.25) calc(var(--spacing) * 3)
+    calc(var(--spacing) * 0.75);
+  border-left: 2px solid var(--tone);
+  font-size: var(--text-micro);
+  font-weight: 500;
+  letter-spacing: var(--tracking-micro);
+  text-align: left;
+  text-transform: uppercase;
+  color: var(--tone);
+}
+
+@utility rune-line {
+  transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    background-color: color-mix(in oklch, var(--primary), transparent 92%);
+  }
+}
+
+@utility rune-stat {
+  padding: calc(var(--spacing) * 0.5) calc(var(--spacing) * 2)
+    calc(var(--spacing) * 0.5) calc(var(--spacing) * 3);
+  border-left: 2px solid color-mix(in oklch, var(--tone), transparent 60%);
+  font-weight: 400;
+  text-align: left;
+  color: var(--foreground);
+}
+
+@utility rune-cell {
+  padding: calc(var(--spacing) * 0.5) calc(var(--spacing) * 2);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  color: var(--foreground);
+
+  &[data-missing] {
+    color: color-mix(in oklch, var(--muted-foreground), transparent 55%);
+  }
+}
+
+@utility rune-unit {
+  padding: calc(var(--spacing) * 0.5) calc(var(--spacing) * 3)
+    calc(var(--spacing) * 0.5) calc(var(--spacing) * 2);
+  font-family: var(--font-mono);
+  font-size: var(--text-mini);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  color: var(--foreground);
+}

@@ -1,4 +1,5 @@
 import type { ScreenName } from '@/@types/snapshot'
+import { RUNE_TABLE_TITLE } from '@/constants/strings/rune-table'
 import { matchIsPlural } from '@/helpers/format'
 
 const SCREEN_LABELS = {
@@ -8,6 +9,7 @@ const SCREEN_LABELS = {
   autoFocus: 'AutoFocus',
   walk: 'Déplacement rapide',
   wheel: 'Roue',
+  runeTable: RUNE_TABLE_TITLE,
   relay: 'Messages privés',
   settings: 'Paramètres',
   about: 'À propos'

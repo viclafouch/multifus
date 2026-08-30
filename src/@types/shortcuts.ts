@@ -3,6 +3,7 @@ export type ShortcutAction =
   | 'maximizeAll'
   | 'next'
   | 'previous'
+  | 'runeTable'
   | 'toggleExcluded'
   | 'walk'
   | 'wheel'

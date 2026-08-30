@@ -47,6 +47,7 @@ pub struct Snapshot {
     pub relay: RelayView,
     pub walk: WalkView,
     pub wheel: WheelView,
+    pub rune_table: RuneTableView,
     pub journal: Vec<JournalEntry>,
 }
 
@@ -98,6 +99,20 @@ pub struct WheelView {
     pub step: u32,
     pub dead_zone: f64,
     pub demo: Vec<WheelSlice>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RuneTableView {
+    pub width: u32,
+    pub narrowest: u32,
+    pub widest: u32,
+    pub step: u32,
+    pub transparency: u32,
+    pub clearest: u32,
+    pub veil_step: u32,
+    pub everywhere: bool,
+    pub previewing: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
@@ -254,19 +269,21 @@ pub enum Screen {
     AutoFocus,
     Walk,
     Wheel,
+    RuneTable,
     Relay,
     Settings,
     About,
 }
 
 impl Screen {
-    pub const ALL: [Self; 9] = [
+    pub const ALL: [Self; 10] = [
         Self::Characters,
         Self::Shortcuts,
         Self::QuickReplies,
         Self::AutoFocus,
         Self::Walk,
         Self::Wheel,
+        Self::RuneTable,
         Self::Relay,
         Self::Settings,
         Self::About,
@@ -297,10 +314,11 @@ pub enum ShortcutAction {
     Walk,
     MaximizeAll,
     Wheel,
+    RuneTable,
 }
 
 impl ShortcutAction {
-    pub const ALL: [Self; 7] = [
+    pub const ALL: [Self; 8] = [
         Self::Next,
         Self::Previous,
         Self::Main,
@@ -308,6 +326,7 @@ impl ShortcutAction {
         Self::Walk,
         Self::MaximizeAll,
         Self::Wheel,
+        Self::RuneTable,
     ];
 
     #[must_use]
@@ -319,7 +338,8 @@ impl ShortcutAction {
             | Self::Previous
             | Self::Main
             | Self::ToggleExcluded
-            | Self::Wheel => None,
+            | Self::Wheel
+            | Self::RuneTable => None,
         }
     }
 
@@ -548,6 +568,7 @@ mod tests {
                 dead_zone: 0.32,
                 demo: vec![slice()],
             },
+            rune_table: rune_table(),
             journal: vec![JournalEntry {
                 id: 1,
                 at: 0,
@@ -571,6 +592,20 @@ mod tests {
             relayed: true,
             shortcut: Some("F1".to_owned()),
             shortcut_status: ShortcutStatus::Registered,
+        }
+    }
+
+    fn rune_table() -> RuneTableView {
+        RuneTableView {
+            width: 420,
+            narrowest: 320,
+            widest: 560,
+            step: 20,
+            transparency: 0,
+            clearest: 100,
+            veil_step: 5,
+            everywhere: false,
+            previewing: false,
         }
     }
 
@@ -603,6 +638,7 @@ mod tests {
                 "paintPortraits",
                 "quickReplies",
                 "relay",
+                "runeTable",
                 "shortTitles",
                 "shortcuts",
                 "startAtLogin",
@@ -721,7 +757,25 @@ mod tests {
     }
 
     #[test]
-    fn the_seven_actions_travel_under_the_names_the_shortcuts_screen_uses() {
+    fn the_rune_table_hands_the_screen_its_gauge_its_switch_and_whether_it_is_previewing() {
+        assert_eq!(
+            json_of(&rune_table()),
+            json!({
+                "width": 420,
+                "narrowest": 320,
+                "widest": 560,
+                "step": 20,
+                "transparency": 0,
+                "clearest": 100,
+                "veilStep": 5,
+                "everywhere": false,
+                "previewing": false,
+            })
+        );
+    }
+
+    #[test]
+    fn the_eight_actions_travel_under_the_names_the_shortcuts_screen_uses() {
         let actions = ShortcutAction::ALL
             .into_iter()
             .map(|action| {
@@ -742,6 +796,7 @@ mod tests {
                 "walk",
                 "maximizeAll",
                 "wheel",
+                "runeTable",
             ]
         );
     }
@@ -759,6 +814,11 @@ mod tests {
             None,
             "the wheel opens in the game and nowhere else"
         );
+        assert!(
+            !ShortcutAction::RuneTable.matches_held(),
+            "the rune table answers to a key struck, and stays once it is let go"
+        );
+        assert_eq!(ShortcutAction::RuneTable.answers_anywhere(), None);
     }
 
     #[test]
@@ -1187,7 +1247,7 @@ mod tests {
     }
 
     #[test]
-    fn the_nine_screens_travel_under_the_names_the_rail_answers_to() {
+    fn the_ten_screens_travel_under_the_names_the_rail_answers_to() {
         let screens = Screen::ALL.map(|screen| json_of(&screen));
 
         assert_eq!(
@@ -1199,6 +1259,7 @@ mod tests {
                 json!("autoFocus"),
                 json!("walk"),
                 json!("wheel"),
+                json!("runeTable"),
                 json!("relay"),
                 json!("settings"),
                 json!("about"),

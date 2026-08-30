@@ -170,6 +170,7 @@ export type JournalEvent =
   | { readonly kind: 'walkListeningLost' }
   | { readonly kind: 'bannerFailed'; readonly detail: string }
   | { readonly kind: 'wheelFailed'; readonly detail: string }
+  | { readonly kind: 'runeTableFailed'; readonly detail: string }
   | { readonly kind: 'wheelPicked'; readonly outcome: WheelOutcome }
   | { readonly kind: 'walkSwitchFailed'; readonly detail: string }
   | { readonly kind: 'windowFailed'; readonly detail: string }

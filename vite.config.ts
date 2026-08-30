@@ -21,7 +21,8 @@ export default defineConfig({
       input: {
         main: path.resolve(import.meta.dirname, './index.html'),
         banner: path.resolve(import.meta.dirname, './banner.html'),
-        wheel: path.resolve(import.meta.dirname, './wheel.html')
+        wheel: path.resolve(import.meta.dirname, './wheel.html'),
+        runeTable: path.resolve(import.meta.dirname, './rune-table.html')
       }
     }
   },

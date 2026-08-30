@@ -7,7 +7,7 @@ use crate::domain::NotificationKind;
 use crate::domain::Roster;
 use crate::domain::Shortcut;
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Settings {
     pub roster: Roster,
@@ -17,6 +17,7 @@ pub struct Settings {
     pub relay: Relay,
     pub banner: Banner,
     pub wheel: Wheel,
+    pub rune_table: RuneTable,
     pub maximize_on_launch: bool,
     pub short_titles: bool,
     pub paint_portraits: bool,
@@ -50,6 +51,7 @@ impl Default for Settings {
             relay: Relay::default(),
             banner: Banner::default(),
             wheel: Wheel::default(),
+            rune_table: RuneTable::default(),
             maximize_on_launch: false,
             short_titles: false,
             paint_portraits: true,
@@ -118,6 +120,57 @@ impl Wheel {
     }
 }
 
+pub const RUNE_TABLE_NARROWEST: u32 = 320;
+pub const RUNE_TABLE_WIDEST: u32 = 560;
+pub const RUNE_TABLE_STEP: u32 = 20;
+
+pub const RUNE_TABLE_CLEAREST: u32 = 100;
+pub const RUNE_TABLE_VEIL_STEP: u32 = 5;
+
+const DEFAULT_RUNE_TABLE_WIDTH: u32 = 420;
+
+const DEFAULT_RUNE_TABLE_TRANSPARENCY: u32 = 0;
+
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct RuneTable {
+    pub width: u32,
+    pub transparency: u32,
+    pub offset: Option<RuneOffset>,
+    pub everywhere: bool,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+pub struct RuneOffset {
+    pub x: f64,
+    pub y: f64,
+}
+
+impl Default for RuneTable {
+    fn default() -> Self {
+        Self {
+            width: DEFAULT_RUNE_TABLE_WIDTH,
+            transparency: DEFAULT_RUNE_TABLE_TRANSPARENCY,
+            offset: None,
+            everywhere: false,
+        }
+    }
+}
+
+impl RuneTable {
+    pub fn set_width(&mut self, width: u32) {
+        let steps = width.saturating_add(RUNE_TABLE_STEP / 2) / RUNE_TABLE_STEP;
+
+        self.width = (steps * RUNE_TABLE_STEP).clamp(RUNE_TABLE_NARROWEST, RUNE_TABLE_WIDEST);
+    }
+
+    pub fn set_transparency(&mut self, transparency: u32) {
+        let steps = transparency.saturating_add(RUNE_TABLE_VEIL_STEP / 2) / RUNE_TABLE_VEIL_STEP;
+
+        self.transparency = (steps * RUNE_TABLE_VEIL_STEP).min(RUNE_TABLE_CLEAREST);
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Shortcuts {
@@ -128,6 +181,7 @@ pub struct Shortcuts {
     pub walk: Option<Shortcut>,
     pub maximize_all: Option<Shortcut>,
     pub wheel: Option<Shortcut>,
+    pub rune_table: Option<Shortcut>,
 }
 
 const DEFAULT_NEXT: &str = "Control+Shift+Right";
@@ -137,6 +191,7 @@ const DEFAULT_TOGGLE_EXCLUDED: &str = "Control+Shift+Down";
 const DEFAULT_WALK: &str = "Control+Shift+KeyD";
 const DEFAULT_MAXIMIZE_ALL: &str = "Control+Shift+KeyA";
 const DEFAULT_WHEEL: &str = "Control+Shift+KeyW";
+const DEFAULT_RUNE_TABLE: &str = "Control+Shift+KeyR";
 
 impl Default for Shortcuts {
     fn default() -> Self {
@@ -148,6 +203,7 @@ impl Default for Shortcuts {
             walk: Shortcut::new(DEFAULT_WALK),
             maximize_all: Shortcut::new(DEFAULT_MAXIMIZE_ALL),
             wheel: Shortcut::new(DEFAULT_WHEEL),
+            rune_table: Shortcut::new(DEFAULT_RUNE_TABLE),
         }
     }
 }
@@ -368,7 +424,7 @@ mod tests {
     }
 
     #[test]
-    fn the_seven_shortcuts_are_bound_by_default_and_all_differ() {
+    fn the_eight_shortcuts_are_bound_by_default_and_all_differ() {
         let shortcuts = Shortcuts::default();
         let bound = [
             shortcuts.next.as_ref(),
@@ -378,20 +434,21 @@ mod tests {
             shortcuts.walk.as_ref(),
             shortcuts.maximize_all.as_ref(),
             shortcuts.wheel.as_ref(),
+            shortcuts.rune_table.as_ref(),
         ]
         .into_iter()
         .flatten()
         .map(Shortcut::as_str)
         .collect::<Vec<_>>();
 
-        assert_eq!(bound.len(), 7);
+        assert_eq!(bound.len(), 8);
 
         let mut unique = bound.clone();
         unique.sort_unstable();
         unique.dedup();
         assert_eq!(
             unique.len(),
-            7,
+            8,
             "two actions share a combination: {bound:?}"
         );
     }
@@ -401,6 +458,13 @@ mod tests {
         assert_eq!(
             Shortcuts::default().wheel.as_ref().map(Shortcut::as_str),
             Some("Control+Shift+KeyW")
+        );
+        assert_eq!(
+            Shortcuts::default()
+                .rune_table
+                .as_ref()
+                .map(Shortcut::as_str),
+            Some("Control+Shift+KeyR")
         );
     }
 
@@ -432,6 +496,58 @@ mod tests {
     }
 
     #[test]
+    fn the_rune_table_starts_on_one_window_at_a_width_of_its_own() {
+        let rune_table = RuneTable::default();
+
+        assert_eq!(rune_table.width, DEFAULT_RUNE_TABLE_WIDTH);
+        assert!((RUNE_TABLE_NARROWEST..=RUNE_TABLE_WIDEST).contains(&DEFAULT_RUNE_TABLE_WIDTH));
+        assert_eq!(rune_table.offset, None);
+        assert!(!rune_table.everywhere);
+        assert_eq!(
+            serde_json::from_str::<RuneTable>("{}").expect("a rune table with nothing in it"),
+            rune_table
+        );
+    }
+
+    #[test]
+    fn a_width_lands_on_a_step_of_the_gauge_and_never_leaves_its_ends() {
+        let mut rune_table = RuneTable::default();
+
+        rune_table.set_width(0);
+        assert_eq!(rune_table.width, RUNE_TABLE_NARROWEST);
+
+        rune_table.set_width(u32::MAX);
+        assert_eq!(rune_table.width, RUNE_TABLE_WIDEST);
+
+        rune_table.set_width(433);
+        assert_eq!(rune_table.width, 440);
+
+        rune_table.set_width(400);
+        assert_eq!(rune_table.width, 400);
+    }
+
+    #[test]
+    fn the_place_of_the_rune_table_crosses_the_file_as_two_numbers() {
+        let rune_table = RuneTable {
+            width: 480,
+            transparency: 25,
+            offset: Some(RuneOffset { x: 24.5, y: -12.0 }),
+            everywhere: true,
+        };
+
+        let json = serde_json::to_string(&rune_table).expect("a rune table serialises");
+
+        assert_eq!(
+            json,
+            r#"{"width":480,"transparency":25,"offset":{"x":24.5,"y":-12.0},"everywhere":true}"#
+        );
+        assert_eq!(
+            serde_json::from_str::<RuneTable>(&json).expect("a rune table reads back"),
+            rune_table
+        );
+    }
+
+    #[test]
     fn a_shortcut_is_stored_as_the_plain_text_the_plugin_reads() {
         let shortcuts = Shortcuts {
             next: Shortcut::new("Alt+Tab"),
@@ -441,6 +557,7 @@ mod tests {
             walk: None,
             maximize_all: None,
             wheel: None,
+            rune_table: None,
         };
 
         let json = serde_json::to_string(&shortcuts).expect("shortcuts serialise");

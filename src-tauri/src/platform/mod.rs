@@ -24,12 +24,15 @@ pub use error::PlatformError;
 pub use error::Result;
 pub use keyboard::key_labels;
 pub use keyboard::KeyLabels;
+#[cfg(target_os = "macos")]
+pub use macos::hold_back_activation;
 pub use notification::NotificationReport;
 pub use notification::NotificationSink;
 pub use notification::NotificationWatcher;
 pub use paste::Clipboard;
 pub use paste::PasteSender;
 pub use window::GameWindow;
+pub use window::ScreenFrame;
 pub use window::ScreenPoint;
 pub use window::ShortTitleReport;
 pub use window::WindowId;

@@ -104,7 +104,7 @@ const fieldOfCharacter = (nickname: string) => {
   })
 }
 
-describe('l’écran des raccourcis, les sept actions', () => {
+describe('l’écran des raccourcis, les huit actions', () => {
   const all = ALL_ACTIONS.map((action) => {
     return shortcut(action)
   })

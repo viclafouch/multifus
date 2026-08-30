@@ -2,6 +2,7 @@ import type { JournalEntry } from '@/@types/journal'
 import type { AutoFocusSwitch } from '@/@types/notification'
 import type { RelayStatus } from '@/@types/relay'
 import type { Character } from '@/@types/roster'
+import type { RuneTableStatus } from '@/@types/rune'
 import type { QuickReply, ShortcutBinding } from '@/@types/shortcuts'
 import type {
   Authorization,
@@ -26,6 +27,7 @@ export type ScreenName =
   | 'characters'
   | 'quickReplies'
   | 'relay'
+  | 'runeTable'
   | 'settings'
   | 'shortcuts'
   | 'walk'
@@ -53,5 +55,6 @@ export type Snapshot = {
   readonly relay: RelayStatus
   readonly walk: WalkStatus
   readonly wheel: WheelSize
+  readonly runeTable: RuneTableStatus
   readonly journal: readonly JournalEntry[]
 }

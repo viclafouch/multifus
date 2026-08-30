@@ -2,6 +2,7 @@ import type { ShortcutAction, ShortcutStatus } from '@/@types/shortcuts'
 import type { CaptureRejection } from '@/constants/keyboard'
 import { IS_APPLE } from '@/constants/keyboard'
 import { MAXIMIZE_STRINGS } from '@/constants/strings/maximize'
+import { RUNE_TABLE_TITLE } from '@/constants/strings/rune-table'
 
 const HELD = 'au maintien'
 
@@ -49,6 +50,12 @@ const ACTION_LABELS = {
     description:
       'La team s’ouvre au milieu de l’écran, vous visez une tête, vous lâchez.',
     mention: HELD
+  },
+  runeTable: {
+    label: RUNE_TABLE_TITLE,
+    description:
+      'Affiche les poids des runes par-dessus le jeu. Les mêmes touches les retirent.',
+    mention: null
   }
 } as const satisfies Record<ShortcutAction, ActionLabel>
 

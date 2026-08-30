@@ -55,6 +55,7 @@ export const TONES = {
   walkSwitchFailed: 'warning',
   bannerFailed: 'warning',
   wheelFailed: 'warning',
+  runeTableFailed: 'warning',
   clientMaximized: 'good',
   clientMaximizeFailed: 'warning',
   clientsCountFailed: 'warning',
@@ -187,6 +188,7 @@ export const DETAILED_LINES = {
     'Déplacement rapide : la fenêtre suivante n’est pas passée devant',
   bannerFailed: 'La bannière du Déplacement rapide n’a pas suivi',
   wheelFailed: 'La roue n’a pas suivi',
+  runeTableFailed: 'Le tableau des runes n’a pas suivi',
   saveFailed: 'Configuration non enregistrée',
   configNotSetAside:
     'Configuration illisible et impossible à déplacer, le prochain enregistrement l’écrasera',
@@ -242,5 +244,6 @@ export const WORK_LABELS = {
   tray: 'La réponse à un clic dans la barre système',
   walk: 'La bascule du Déplacement rapide',
   banner: 'La bannière du Déplacement rapide',
-  wheel: 'La roue'
+  wheel: 'La roue',
+  runeTable: 'Le tableau des runes'
 } as const satisfies Record<Work, string>

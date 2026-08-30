@@ -211,6 +211,67 @@ export const onWheelWipe = async (handle: (generation: number) => void) => {
 
 type WheelWipeEvent = { readonly payload: number }
 
+export const sizeRuneTable = async (width: number) => {
+  return invoke<null>('size_rune_table', { width })
+}
+
+export const setRuneTableWidth = async (width: number) => {
+  return invoke<Snapshot>('set_rune_table_width', { width })
+}
+
+export const fadeRuneTable = async (transparency: number) => {
+  return invoke<null>('fade_rune_table', { transparency })
+}
+
+export const setRuneTableTransparency = async (transparency: number) => {
+  return invoke<Snapshot>('set_rune_table_transparency', { transparency })
+}
+
+export const runeTableLook = async () => {
+  return invoke<number>('rune_table_look')
+}
+
+const RUNE_TABLE_LOOK_EVENT = 'multifus://rune-table-look'
+
+export const onRuneTableLook = async (handle: (look: number) => void) => {
+  return listen<number>(
+    RUNE_TABLE_LOOK_EVENT,
+    ({ payload }: RuneTableLookEvent) => {
+      handle(payload)
+    }
+  )
+}
+
+type RuneTableLookEvent = { readonly payload: number }
+
+export const setRuneTableEverywhere = async (everywhere: boolean) => {
+  return invoke<Snapshot>('set_rune_table_everywhere', { everywhere })
+}
+
+export const previewRuneTable = async () => {
+  return invoke<Snapshot>('preview_rune_table')
+}
+
+export const closeRuneTable = async () => {
+  return invoke<Snapshot>('close_rune_table')
+}
+
+export const moveRuneTable = async (byX: number, byY: number) => {
+  return invoke<null>('move_rune_table', { byX, byY })
+}
+
+export const runeTableSettled = async () => {
+  return invoke<null>('rune_table_settled')
+}
+
+export const recallRuneTable = async () => {
+  return invoke<Snapshot>('recall_rune_table')
+}
+
+export const runeTableMeasured = async (ratio: number) => {
+  return invoke<null>('rune_table_measured', { ratio })
+}
+
 export const setWakesMinimized = async (wakes: boolean) => {
   return invoke<Snapshot>('set_wakes_minimized', { wakes })
 }

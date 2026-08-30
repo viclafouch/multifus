@@ -8,6 +8,7 @@ import { MAXIMIZE_STRINGS } from '@/constants/strings/maximize'
 import { NAV_RAIL_STRINGS } from '@/constants/strings/nav-rail'
 import { QUICK_REPLIES_STRINGS } from '@/constants/strings/quick-replies'
 import { RELAY_STRINGS } from '@/constants/strings/relay'
+import { RUNE_TABLE_STRINGS } from '@/constants/strings/rune-table'
 import { SETTINGS_STRINGS } from '@/constants/strings/settings'
 import { SHORTCUTS_STRINGS } from '@/constants/strings/shortcuts'
 import { WALK_STRINGS } from '@/constants/strings/walk'
@@ -22,6 +23,7 @@ export const strings = {
   ...AUTO_FOCUS_STRINGS,
   ...WALK_STRINGS,
   ...WHEEL_STRINGS,
+  ...RUNE_TABLE_STRINGS,
   ...RELAY_STRINGS,
   ...SETTINGS_STRINGS,
   ...ABOUT_STRINGS,

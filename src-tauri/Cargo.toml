@@ -64,6 +64,9 @@ windows = { version = "0.62", features = [
   # The paste combination of ADR 0012, and nothing else in the crate calls it.
   "Win32_UI_Input_KeyboardAndMouse",
   "Win32_UI_Accessibility",
+  # The scale of the screen a client sits on, which turns its frame into points.
+  "Win32_UI_HiDpi",
+  "Win32_Graphics_Gdi",
   # The window icon of the portraits, and the taskbar group it stands in.
   "Win32_Storage_EnhancedStorage",
   "Win32_UI_Shell",
@@ -73,7 +76,7 @@ windows = { version = "0.62", features = [
 
 # The window of the icon test registers a class, and a class carries a brush.
 [target.'cfg(target_os = "windows")'.dev-dependencies]
-windows = { version = "0.62", features = ["Win32_Graphics_Gdi", "Data_Xml_Dom"] }
+windows = { version = "0.62", features = ["Data_Xml_Dom"] }
 
 # The macOS side of the boundary, and nothing else in the crate, talks to these.
 # Feature sets are cut to what `platform::macos` calls, so that the Windows
@@ -94,6 +97,10 @@ objc2-app-kit = { version = "0.3", default-features = false, features = [
   "NSScreen",
   # Who came to the front, which the Walk asks on every switch.
   "NSWorkspace",
+  # The panel the rune table wears, so a click on it never brings Multifus forward.
+  "NSPanel",
+  "NSResponder",
+  "NSWindow",
 ] }
 objc2-application-services = { version = "0.3", default-features = false, features = [
   "std",

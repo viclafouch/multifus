@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::sync::Arc;
 use std::sync::Mutex;
 use std::sync::PoisonError;
@@ -21,6 +22,7 @@ use crate::platform::GameWindow;
 use crate::platform::KeyLabels;
 use crate::platform::PlatformError;
 use crate::platform::Result;
+use crate::platform::ScreenFrame;
 use crate::platform::ScreenPoint;
 use crate::platform::ShortTitleReport;
 use crate::platform::WindowId;
@@ -53,6 +55,7 @@ pub struct Desktop {
     pub minimized: Vec<WindowId>,
     pub maximized: Vec<WindowId>,
     pub under_click: Option<WindowId>,
+    pub frames: HashMap<WindowId, ScreenFrame>,
     pub tells_arrival: Option<Arc<ClickGate>>,
     pub taskbar_combines: bool,
     pub short_titles: ShortTitleReport,
@@ -74,6 +77,7 @@ impl Default for Desktop {
             minimized: Vec::new(),
             maximized: Vec::new(),
             under_click: None,
+            frames: HashMap::new(),
             tells_arrival: None,
             taskbar_combines: true,
             short_titles: ShortTitleReport::default(),
@@ -175,6 +179,12 @@ impl WindowManager for FakeWindowManager {
 
     fn window_at(&self, _at: ScreenPoint) -> Result<Option<WindowId>> {
         Ok(self.desktop().under_click)
+    }
+
+    fn window_frame(&self, window: WindowId) -> Result<Option<ScreenFrame>> {
+        let desktop = self.desktop();
+
+        unless_refused(desktop.scan_refusal, desktop.frames.get(&window).copied())
     }
 
     fn is_minimized(&self, window: WindowId) -> Result<bool> {

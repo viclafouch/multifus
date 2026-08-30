@@ -32,6 +32,19 @@ ce qu'elle coûte.
 - [ ] Chronométrer une bascule sur le Mac, six clients ouverts, comme `toast-latency` chronomètre une notification sur Windows
 - [ ] Chronométrer l'ouverture de la roue sur le Mac : elle lit le curseur par la boucle d'évènements, puis fait le tour des écrans. `monitor_from_point` ferait moins de travail, mais tao y compare des points logiques à un curseur physique, et il ne trouve rien sur un écran Retina
 
+## Un raccourci ne doit répondre que dans le jeu
+
+Deux actions répondent aujourd'hui de partout, le Déplacement rapide et Agrandir
+les fenêtres : `ShortcutAction::answers_anywhere` les laisse passer hors du jeu,
+et les messages privés partent avec. Multifus prend donc ces deux combinaisons
+dans tous les logiciels de la machine, un traitement de texte compris. C'est un
+défaut, pas un réglage.
+
+- [ ] `answers_anywhere` disparaît, et les huit actions ne répondent que fenêtre du jeu devant
+- [ ] `AnywhereAction` et son aiguillage s'en vont avec, dans `shortcuts.rs`
+- [ ] `CONTEXT.md` dit l'inverse dans **Frappe** : la phrase « sauf celles du Déplacement rapide et d'Agrandir tout, qui répondent de partout » tombe
+- [ ] Les tests qui gardaient cette exception disent maintenant la règle unique
+
 ## Vérifier sur une vraie soirée, sur les deux machines
 
 ### Les personnages, l'exclusion et le principal
@@ -71,7 +84,7 @@ ce qu'elle coûte.
 ### Les raccourcis
 
 - [ ] La même combinaison frappée hors du jeu ne fait rien
-- [ ] « Remettre les touches d'origine » redonne les sept combinaisons
+- [ ] « Remettre les touches d'origine » redonne les huit combinaisons
 - [ ] Ctrl+Maj+A n'est pris ni par Dofus Retro ni par un autre logiciel, et agrandit les clients depuis le bureau comme depuis le jeu
 - [ ] Une touche posée sur un personnage le ramène devant, et « Remettre les touches d'origine » n'y touche pas
 
@@ -102,6 +115,25 @@ ce qu'elle coûte.
 - [ ] La jauge Personnages à trois, puis « Voir en vrai » : la vraie roue en porte trois
 - [ ] Relâcher sur une part de l'aperçu ne ramène aucune fenêtre devant, et le journal se tait
 - [ ] Vider la combinaison dans l'écran Raccourcis : l'écran Roue le dit en tête, et le maintien ne fait plus rien
+
+### Le tableau des runes
+
+- [ ] La combinaison frappée dans le jeu pose le tableau, et la même le retire
+- [ ] Frappée hors du jeu, elle ne pose rien
+- [ ] Le tableau se prend n'importe où, sauf sur sa croix, et le jeu garde le premier plan pendant tout le geste
+- [ ] Un clic sec ne déplace rien et n'enregistre rien
+- [ ] La fenêtre du jeu déplacée, le tableau suit sans traîner à l'œil
+- [ ] Le tableau poussé hors de l'écran y reste, et le bouton « Remettre » le ramène en haut à droite du client
+- [ ] La ligne de la barre système le ramène aussi, sans que Multifus se fige
+- [ ] La barre système montre et cache le tableau, et sa coche dit l'état
+- [ ] Les deux jauges bougent l'aperçu à chaque cran, et n'écrivent qu'une fois lâchées
+- [ ] La jauge de taille poussée à fond : la plaque tient entière à l'écran, la dernière rune comprise
+- [ ] À 100 de transparence, la plaque se lit encore et prend toujours les clics
+- [ ] Tous les poids portent le même blanc, et aucune ligne ne ressort
+- [ ] Le tableau ne se pose pas sur un client en plein écran
+- [ ] Sur un écran Retina et sur deux écrans d'échelles différentes, la plaque n'est ni deux fois trop grande ni deux fois trop petite
+- [ ] L'interrupteur des autres personnages bougé aperçu ouvert tient une fois l'aperçu fermé
+- [ ] Vider la combinaison dans l'écran Raccourcis : l'écran Tableau des runes le dit en tête
 
 ### Agrandir tout
 
@@ -154,7 +186,7 @@ ce qu'elle coûte.
 
 ## Vérifier sur la machine Windows
 
-- [ ] Deux clients ouverts : le roster les voit, les sept raccourcis et l'AutoFocus répondent
+- [ ] Deux clients ouverts : le roster les voit, les huit raccourcis et l'AutoFocus répondent
 - [ ] Un combat sur un personnage exclu : sa notification disparaît du centre de notifications, et aucune fenêtre ne bouge
 - [ ] Un type décoché dans l'AutoFocus : même chose
 - [ ] Une soirée entière : le centre de notifications ne garde rien de Dofus

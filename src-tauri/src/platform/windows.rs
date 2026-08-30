@@ -31,7 +31,10 @@ use windows::Win32::Foundation::HWND;
 use windows::Win32::Foundation::LPARAM;
 use windows::Win32::Foundation::LRESULT;
 use windows::Win32::Foundation::POINT;
+use windows::Win32::Foundation::RECT;
 use windows::Win32::Foundation::WPARAM;
+use windows::Win32::Graphics::Gdi::MonitorFromWindow;
+use windows::Win32::Graphics::Gdi::MONITOR_DEFAULTTONEAREST;
 use windows::Win32::Storage::EnhancedStorage::PKEY_AppUserModel_ID;
 use windows::Win32::System::Com::CoInitializeEx;
 use windows::Win32::System::Com::CoTaskMemAlloc;
@@ -57,6 +60,8 @@ use windows::Win32::System::Variant::VT_LPWSTR;
 use windows::Win32::UI::Accessibility::SetWinEventHook;
 use windows::Win32::UI::Accessibility::UnhookWinEvent;
 use windows::Win32::UI::Accessibility::HWINEVENTHOOK;
+use windows::Win32::UI::HiDpi::GetDpiForMonitor;
+use windows::Win32::UI::HiDpi::MDT_EFFECTIVE_DPI;
 use windows::Win32::UI::Input::KeyboardAndMouse::SendInput;
 use windows::Win32::UI::Input::KeyboardAndMouse::INPUT;
 use windows::Win32::UI::Input::KeyboardAndMouse::INPUT_0;
@@ -81,6 +86,7 @@ use windows::Win32::UI::WindowsAndMessaging::GetForegroundWindow;
 use windows::Win32::UI::WindowsAndMessaging::GetMessageW;
 use windows::Win32::UI::WindowsAndMessaging::GetSystemMetrics;
 use windows::Win32::UI::WindowsAndMessaging::GetWindow;
+use windows::Win32::UI::WindowsAndMessaging::GetWindowRect;
 use windows::Win32::UI::WindowsAndMessaging::GetWindowTextLengthW;
 use windows::Win32::UI::WindowsAndMessaging::GetWindowTextW;
 use windows::Win32::UI::WindowsAndMessaging::GetWindowThreadProcessId;
@@ -164,6 +170,7 @@ use crate::platform::window::icon_image;
 use crate::platform::window::matches_short_title;
 use crate::platform::window::title_suffix;
 use crate::platform::window::GameWindow;
+use crate::platform::window::ScreenFrame;
 use crate::platform::window::ScreenPoint;
 use crate::platform::window::ShortTitleReport;
 use crate::platform::window::WindowId;
@@ -336,6 +343,17 @@ impl WindowManager for Win32WindowManager {
             x: at.x as i32,
             y: at.y as i32,
         }))
+    }
+
+    fn window_frame(&self, window: WindowId) -> Result<Option<ScreenFrame>> {
+        let handle = live_game_window(window)?;
+        let mut rect = RECT::default();
+
+        // SAFETY: `rect` is a live pointer for the duration of the call.
+        unsafe { GetWindowRect(handle, &raw mut rect) }
+            .map_err(|error| PlatformError::system("reading a window frame", error.to_string()))?;
+
+        Ok(Some(logical_frame(rect, window_scale(handle))))
     }
 
     fn foreground_game_window(&self) -> Result<Option<GameWindow>> {
@@ -825,6 +843,36 @@ fn live_game_window(window: WindowId) -> Result<HWND> {
 
 fn runs_dofus(handle: HWND) -> bool {
     executable_name(handle).is_some_and(|name| name.eq_ignore_ascii_case(DOFUS_EXECUTABLE))
+}
+
+const DOTS_PER_INCH: f64 = 96.0;
+
+fn window_scale(handle: HWND) -> f64 {
+    // SAFETY: the handle names a window the caller has just found alive.
+    let screen = unsafe { MonitorFromWindow(handle, MONITOR_DEFAULTTONEAREST) };
+    let mut across = 0_u32;
+    let mut down = 0_u32;
+
+    // SAFETY: the monitor comes from the call above, and both counts are live.
+    let read =
+        unsafe { GetDpiForMonitor(screen, MDT_EFFECTIVE_DPI, &raw mut across, &raw mut down) };
+
+    if read.is_err() || across == 0 {
+        return 1.0;
+    }
+
+    f64::from(across) / DOTS_PER_INCH
+}
+
+fn logical_frame(rect: RECT, scale: f64) -> ScreenFrame {
+    ScreenFrame {
+        origin: ScreenPoint {
+            x: f64::from(rect.left) / scale,
+            y: f64::from(rect.top) / scale,
+        },
+        width: f64::from(rect.right - rect.left) / scale,
+        height: f64::from(rect.bottom - rect.top) / scale,
+    }
 }
 
 fn executable_name(handle: HWND) -> Option<String> {

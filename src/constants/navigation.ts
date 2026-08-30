@@ -1,6 +1,7 @@
 import type { LucideIcon } from 'lucide-react'
 import {
   Footprints,
+  Gem,
   Info,
   Keyboard,
   MessageSquareQuote,
@@ -30,6 +31,7 @@ export const NAV_ITEMS = [
   { name: 'autoFocus', label: strings.nav.autoFocus, Icon: Zap },
   { name: 'walk', label: strings.nav.walk, Icon: Footprints },
   { name: 'wheel', label: strings.nav.wheel, Icon: Target },
+  { name: 'runeTable', label: strings.nav.runeTable, Icon: Gem },
   { name: 'relay', label: strings.nav.relay, Icon: Send },
   { name: 'settings', label: strings.nav.settings, Icon: SlidersHorizontal },
   { name: 'about', label: strings.nav.about, Icon: Info }

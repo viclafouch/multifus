@@ -35,6 +35,7 @@ use crate::app::view::ConfigView;
 use crate::app::view::PairingView;
 use crate::app::view::QuickReplyView;
 use crate::app::view::RelayView;
+use crate::app::view::RuneTableView;
 use crate::app::view::ScreenSaverView;
 use crate::app::view::ShortcutAction;
 use crate::app::view::ShortcutStatus;
@@ -56,9 +57,15 @@ use crate::config::ConfigStore;
 use crate::config::Loaded;
 use crate::config::QuickReply;
 use crate::config::QuickReplyId;
+use crate::config::RuneOffset;
 use crate::config::Settings;
 use crate::config::Shortcuts;
 use crate::config::Traces;
+use crate::config::RUNE_TABLE_CLEAREST;
+use crate::config::RUNE_TABLE_NARROWEST;
+use crate::config::RUNE_TABLE_STEP;
+use crate::config::RUNE_TABLE_VEIL_STEP;
+use crate::config::RUNE_TABLE_WIDEST;
 use crate::config::WHEEL_SMALLEST;
 use crate::config::WHEEL_STEP;
 use crate::config::WHEEL_WIDEST;
@@ -116,6 +123,8 @@ pub struct Multifus {
     screen_saver: ScreenSaverView,
     walk_enabled: bool,
     banner_character: Option<BannerCharacter>,
+    rune_table_open: bool,
+    rune_table_previewing: bool,
     journal: Journal,
 }
 
@@ -196,6 +205,8 @@ impl Multifus {
             screen_saver,
             walk_enabled: false,
             banner_character: None,
+            rune_table_open: false,
+            rune_table_previewing: false,
             journal,
         }
     }
@@ -273,6 +284,17 @@ impl Multifus {
                 step: WHEEL_STEP,
                 dead_zone: wheel::DEAD_ZONE,
                 demo: wheel::demo_slices(wheel::demo_crowd()),
+            },
+            rune_table: RuneTableView {
+                width: self.settings.rune_table.width,
+                narrowest: RUNE_TABLE_NARROWEST,
+                widest: RUNE_TABLE_WIDEST,
+                step: RUNE_TABLE_STEP,
+                transparency: self.settings.rune_table.transparency,
+                clearest: RUNE_TABLE_CLEAREST,
+                veil_step: RUNE_TABLE_VEIL_STEP,
+                everywhere: self.settings.rune_table.everywhere,
+                previewing: self.rune_table_previewing,
             },
             relay: RelayView {
                 paired: self.settings.relay.chat_id.is_some(),
@@ -530,6 +552,7 @@ impl Multifus {
             ShortcutAction::Walk => &mut self.settings.shortcuts.walk,
             ShortcutAction::MaximizeAll => &mut self.settings.shortcuts.maximize_all,
             ShortcutAction::Wheel => &mut self.settings.shortcuts.wheel,
+            ShortcutAction::RuneTable => &mut self.settings.shortcuts.rune_table,
         };
 
         *slot = shortcut;
@@ -960,6 +983,56 @@ impl Multifus {
         }
 
         WheelPlan { slices, windows }
+    }
+
+    #[must_use]
+    pub fn rune_table_width(&self) -> u32 {
+        self.settings.rune_table.width
+    }
+
+    pub fn set_rune_table_width(&mut self, width: u32) {
+        self.settings.rune_table.set_width(width);
+    }
+
+    #[must_use]
+    pub fn rune_table_transparency(&self) -> u32 {
+        self.settings.rune_table.transparency
+    }
+
+    pub fn set_rune_table_transparency(&mut self, transparency: u32) {
+        self.settings.rune_table.set_transparency(transparency);
+    }
+
+    #[must_use]
+    pub fn rune_table_everywhere(&self) -> bool {
+        self.settings.rune_table.everywhere
+    }
+
+    pub fn set_rune_table_everywhere(&mut self, everywhere: bool) {
+        self.settings.rune_table.everywhere = everywhere;
+    }
+
+    #[must_use]
+    pub fn rune_table_offset(&self) -> Option<RuneOffset> {
+        self.settings.rune_table.offset
+    }
+
+    pub fn set_rune_table_offset(&mut self, offset: RuneOffset) {
+        self.settings.rune_table.offset = Some(offset);
+    }
+
+    pub fn clear_rune_table_offset(&mut self) {
+        self.settings.rune_table.offset = None;
+    }
+
+    #[must_use]
+    pub fn is_rune_table_open(&self) -> bool {
+        self.rune_table_open
+    }
+
+    pub fn set_rune_table_shown(&mut self, open: bool, previewing: bool) {
+        self.rune_table_open = open;
+        self.rune_table_previewing = previewing;
     }
 
     #[must_use]
@@ -1408,7 +1481,10 @@ impl Multifus {
             }
             ShortcutAction::Main => Some(self.aim_at_main(current)),
             ShortcutAction::ToggleExcluded => Some(self.toggle_foreground(current)),
-            ShortcutAction::Walk | ShortcutAction::MaximizeAll | ShortcutAction::Wheel => None,
+            ShortcutAction::Walk
+            | ShortcutAction::MaximizeAll
+            | ShortcutAction::Wheel
+            | ShortcutAction::RuneTable => None,
         }
     }
 
@@ -1521,6 +1597,7 @@ fn shortcut_in(shortcuts: &Shortcuts, action: ShortcutAction) -> Option<&Shortcu
         ShortcutAction::Walk => shortcuts.walk.as_ref(),
         ShortcutAction::MaximizeAll => shortcuts.maximize_all.as_ref(),
         ShortcutAction::Wheel => shortcuts.wheel.as_ref(),
+        ShortcutAction::RuneTable => shortcuts.rune_table.as_ref(),
     }
 }
 
@@ -1782,6 +1859,112 @@ mod tests {
 
         assert_eq!(state.wheel_diameter(), 300);
         assert_eq!(multifus_reloaded(&directory).wheel_diameter(), 300);
+    }
+
+    #[test]
+    fn the_gauge_and_the_switch_of_the_rune_table_outlive_a_restart() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        assert_eq!(state.rune_table_width(), 420);
+        assert!(!state.rune_table_everywhere());
+        assert_eq!(state.rune_table_offset(), None);
+
+        state.set_rune_table_width(540);
+        state.set_rune_table_everywhere(true);
+        state.save();
+
+        let reloaded = multifus_reloaded(&directory);
+
+        assert_eq!(reloaded.rune_table_width(), 540);
+        assert!(reloaded.rune_table_everywhere());
+    }
+
+    #[test]
+    fn the_place_of_the_rune_table_is_only_written_down_once_the_hand_lets_go() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        state.set_rune_table_offset(RuneOffset { x: 24.0, y: 40.0 });
+
+        assert_eq!(
+            multifus_reloaded(&directory).rune_table_offset(),
+            None,
+            "the plate is still under the hand, and nothing is kept yet"
+        );
+
+        state.save();
+
+        assert_eq!(
+            multifus_reloaded(&directory).rune_table_offset(),
+            Some(RuneOffset { x: 24.0, y: 40.0 })
+        );
+    }
+
+    #[test]
+    fn a_rune_table_called_back_forgets_the_place_it_was_pushed_to() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        state.set_rune_table_offset(RuneOffset { x: 4000.0, y: 40.0 });
+        state.save();
+
+        state.clear_rune_table_offset();
+        state.save();
+
+        assert_eq!(
+            multifus_reloaded(&directory).rune_table_offset(),
+            None,
+            "with nothing kept, the table is laid at the corner of the window again"
+        );
+    }
+
+    #[test]
+    fn a_width_kept_from_a_version_before_the_gauge_comes_back_inside_it() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        state.set_rune_table_width(u32::MAX);
+        state.save();
+
+        assert_eq!(state.rune_table_width(), 560);
+        assert_eq!(multifus_reloaded(&directory).rune_table_width(), 560);
+    }
+
+    #[test]
+    fn the_size_of_the_rune_table_is_only_written_down_once_the_gauge_is_let_go() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        state.set_rune_table_width(540);
+
+        assert_eq!(
+            multifus_reloaded(&directory).rune_table_width(),
+            420,
+            "the gauge is still under the hand, and the file is not written every step"
+        );
+
+        state.save();
+
+        assert_eq!(multifus_reloaded(&directory).rune_table_width(), 540);
+    }
+
+    #[test]
+    fn the_rune_table_says_whether_it_is_posed_and_forgets_it_at_the_next_launch() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        assert!(!state.is_rune_table_open());
+
+        state.set_rune_table_shown(true, false);
+
+        assert!(state.is_rune_table_open());
+        assert!(!state.snapshot().rune_table.previewing);
+
+        state.set_rune_table_shown(true, true);
+
+        assert!(state.snapshot().rune_table.previewing);
+        assert!(!multifus_reloaded(&directory).is_rune_table_open());
     }
 
     #[test]
@@ -2096,13 +2279,21 @@ mod tests {
         let mut state = multifus(&directory);
         state.apply_windows(&[window(1, "Alpha")]);
 
-        for action in ShortcutAction::ALL {
-            assert_eq!(
-                state.decide_shortcut(action, "Alpha").is_none(),
-                action.answers_anywhere().is_some() || action.matches_held(),
-                "{action:?} disagrees with what it says of itself"
-            );
-        }
+        let deciding_nothing = ShortcutAction::ALL
+            .into_iter()
+            .filter(|action| state.decide_shortcut(*action, "Alpha").is_none())
+            .collect::<Vec<_>>();
+
+        assert_eq!(
+            deciding_nothing,
+            vec![
+                ShortcutAction::Walk,
+                ShortcutAction::MaximizeAll,
+                ShortcutAction::Wheel,
+                ShortcutAction::RuneTable,
+            ],
+            "these four set a mechanism going, and no window moves for them"
+        );
     }
 
     #[test]
@@ -2588,7 +2779,7 @@ mod tests {
     }
 
     #[test]
-    fn the_seven_actions_come_before_the_characters_and_the_quick_replies() {
+    fn the_eight_actions_come_before_the_characters_and_the_quick_replies() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
         state.apply_windows(&[window(1, "Alpha")]);
@@ -2599,7 +2790,7 @@ mod tests {
 
         let bindings = state.bindings();
 
-        assert_eq!(bindings.len(), 10);
+        assert_eq!(bindings.len(), 11);
         assert_eq!(
             bindings.first().map(|(binding, _)| binding.clone()),
             Some(Binding::Action {

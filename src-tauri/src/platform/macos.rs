@@ -1,6 +1,7 @@
 use std::cell::OnceCell;
 use std::ffi::c_float;
 use std::ffi::c_void;
+use std::ffi::CStr;
 use std::panic::catch_unwind;
 use std::panic::AssertUnwindSafe;
 use std::ptr;
@@ -19,13 +20,18 @@ use std::time::Duration;
 use block2::RcBlock;
 use dispatch2::DispatchQueue;
 use libc::pid_t;
+use objc2::ffi::object_setClass;
+use objc2::msg_send;
 use objc2::rc::Retained;
+use objc2::runtime::AnyClass;
+use objc2::runtime::AnyObject;
 use objc2::runtime::NSObjectProtocol;
 use objc2::runtime::ProtocolObject;
 use objc2::MainThreadMarker;
 use objc2_app_kit::NSApplicationActivationOptions;
 use objc2_app_kit::NSRunningApplication;
 use objc2_app_kit::NSScreen;
+use objc2_app_kit::NSWindowStyleMask;
 use objc2_app_kit::NSWorkspace;
 use objc2_app_kit::NSWorkspaceDidActivateApplicationNotification;
 use objc2_application_services::kAXTrustedCheckOptionPrompt;
@@ -89,6 +95,7 @@ use crate::platform::notification::NotificationSink;
 use crate::platform::notification::NotificationWatcher;
 use crate::platform::paste::PasteSender;
 use crate::platform::window::GameWindow;
+use crate::platform::window::ScreenFrame;
 use crate::platform::window::ScreenPoint;
 use crate::platform::window::ShortTitleReport;
 use crate::platform::window::WindowId;
@@ -551,6 +558,83 @@ fn on_main_thread<T: Send>(work: impl FnOnce(MainThreadMarker) -> T + Send) -> O
     done
 }
 
+const POSING_A_PANEL: &str = "posing a window as a panel";
+
+const NS_PANEL: &CStr = c"NSPanel";
+
+const NS_WINDOW: &CStr = c"NSWindow";
+
+fn matches_a_kind_of(worn: &AnyClass, wanted: &AnyClass) -> bool {
+    let mut climbed = Some(worn);
+
+    while let Some(step) = climbed {
+        if std::ptr::eq(step, wanted) {
+            return true;
+        }
+
+        climbed = step.superclass();
+    }
+
+    false
+}
+
+pub fn hold_back_activation(ns_window: *mut c_void) -> Result<()> {
+    if MainThreadMarker::new().is_none() {
+        return Err(PlatformError::system(
+            POSING_A_PANEL,
+            "AppKit answers on the main thread only",
+        ));
+    }
+
+    let Some(window) = NonNull::new(ns_window.cast::<AnyObject>()) else {
+        return Err(PlatformError::system(
+            POSING_A_PANEL,
+            "the window has no handle",
+        ));
+    };
+
+    let Some(panel) = AnyClass::get(NS_PANEL) else {
+        return Err(PlatformError::system(POSING_A_PANEL, "NSPanel is missing"));
+    };
+
+    let Some(plain) = AnyClass::get(NS_WINDOW) else {
+        return Err(PlatformError::system(POSING_A_PANEL, "NSWindow is missing"));
+    };
+
+    if panel.instance_size() > plain.instance_size() {
+        return Err(PlatformError::system(
+            POSING_A_PANEL,
+            "NSPanel holds room of its own, over what NSWindow holds",
+        ));
+    }
+
+    // SAFETY: the handle names the window Tauri has just built, alive for this call.
+    let worn = unsafe { window.as_ref() }.class();
+
+    if !matches_a_kind_of(worn, plain) {
+        return Err(PlatformError::system(
+            POSING_A_PANEL,
+            "the handle names something that is not a window of AppKit",
+        ));
+    }
+
+    // SAFETY: the window is an NSWindow, and NSPanel asks for no more room than one.
+    unsafe { object_setClass(window.as_ptr(), panel) };
+
+    // SAFETY: the three selectors are NSWindow's own, and the mask is the window's.
+    unsafe {
+        let worn: usize = msg_send![window.as_ptr(), styleMask];
+        let _: () = msg_send![
+            window.as_ptr(),
+            setStyleMask: worn | NSWindowStyleMask::NonactivatingPanel.0
+        ];
+        let _: () = msg_send![window.as_ptr(), setHidesOnDeactivate: false];
+        let _: () = msg_send![window.as_ptr(), setBecomesKeyOnlyIfNeeded: true];
+    }
+
+    Ok(())
+}
+
 #[derive(Debug, Default)]
 pub struct AccessibilityWindowManager;
 
@@ -617,6 +701,30 @@ impl WindowManager for AccessibilityWindowManager {
         }
 
         Ok(u64::try_from(pid).ok().map(WindowId::from_raw))
+    }
+
+    fn window_frame(&self, window: WindowId) -> Result<Option<ScreenFrame>> {
+        let (_, element) = live_application(window)?;
+
+        let Some(game_window) = client_window_element(&element)? else {
+            return Ok(None);
+        };
+
+        let (Some(position), Some(size)) = (
+            point_attribute(&game_window, AX_POSITION)?,
+            size_attribute(&game_window, AX_SIZE)?,
+        ) else {
+            return Ok(None);
+        };
+
+        Ok(Some(ScreenFrame {
+            origin: ScreenPoint {
+                x: position.x,
+                y: position.y,
+            },
+            width: size.width,
+            height: size.height,
+        }))
     }
 
     fn foreground_game_window(&self) -> Result<Option<GameWindow>> {

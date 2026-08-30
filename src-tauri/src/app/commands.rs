@@ -9,6 +9,7 @@ use crate::app::journal::Surface;
 use crate::app::journal::WalkFrom;
 use crate::app::journal_file;
 use crate::app::relay;
+use crate::app::rune_table;
 use crate::app::runtime;
 use crate::app::shortcuts;
 use crate::app::state::lock;
@@ -258,6 +259,89 @@ pub fn wheel_step(app: AppHandle) -> Option<WheelStep> {
 #[tauri::command]
 pub fn wheel_wiped(app: AppHandle, generation: u64) {
     wheel::wiped(&app, generation);
+}
+
+#[tauri::command(async)]
+pub fn size_rune_table(app: AppHandle, width: u32) {
+    rune_table::size(&app, width);
+}
+
+#[tauri::command(async)]
+pub fn set_rune_table_width(app: AppHandle, width: u32) -> Snapshot {
+    rune_table::size(&app, width);
+
+    lock(&app).save();
+
+    runtime::emit_snapshot(&app)
+}
+
+#[tauri::command(async)]
+pub fn fade_rune_table(app: AppHandle, transparency: u32) {
+    rune_table::fade(&app, transparency);
+}
+
+#[tauri::command(async)]
+pub fn set_rune_table_transparency(app: AppHandle, transparency: u32) -> Snapshot {
+    rune_table::fade(&app, transparency);
+
+    lock(&app).save();
+
+    runtime::emit_snapshot(&app)
+}
+
+#[tauri::command]
+pub fn rune_table_look(app: AppHandle) -> f64 {
+    rune_table::look(&app)
+}
+
+#[tauri::command(async)]
+pub fn set_rune_table_everywhere(app: AppHandle, everywhere: bool) -> Snapshot {
+    {
+        let mut state = lock(&app);
+
+        state.set_rune_table_everywhere(everywhere);
+        state.save();
+    }
+
+    rune_table::spread(&app, everywhere);
+
+    runtime::emit_snapshot(&app)
+}
+
+#[tauri::command(async)]
+pub fn preview_rune_table(app: AppHandle) -> Snapshot {
+    rune_table::preview(&app);
+
+    runtime::emit_snapshot(&app)
+}
+
+#[tauri::command(async)]
+pub fn close_rune_table(app: AppHandle) -> Snapshot {
+    rune_table::close(&app);
+
+    runtime::emit_snapshot(&app)
+}
+
+#[tauri::command]
+pub fn move_rune_table(app: AppHandle, by_x: f64, by_y: f64) {
+    rune_table::shift(&app, by_x, by_y);
+}
+
+#[tauri::command]
+pub fn rune_table_settled(app: AppHandle) {
+    rune_table::settled(&app);
+}
+
+#[tauri::command(async)]
+pub fn recall_rune_table(app: AppHandle) -> Snapshot {
+    rune_table::recall(&app);
+
+    runtime::emit_snapshot(&app)
+}
+
+#[tauri::command(async)]
+pub fn rune_table_measured(app: AppHandle, ratio: f64) {
+    rune_table::measured(&app, ratio);
 }
 
 #[tauri::command]

@@ -1,5 +1,7 @@
 import { matchIsPlural } from '@/helpers/format'
 
+export const TRY_IT = 'Voir en vrai'
+
 export const WHEEL_STRINGS = {
   wheel: {
     title: 'La roue des personnages',
@@ -21,7 +23,7 @@ export const WHEEL_STRINGS = {
       return matchIsPlural(crowd) ? `À ${crowd}` : 'Tout seul'
     },
     drawingLabel: 'La roue au milieu de votre écran',
-    tryIt: 'Voir en vrai',
+    tryIt: TRY_IT,
     nobody: 'Personne de connecté'
   }
 } as const
