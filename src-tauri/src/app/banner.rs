@@ -1,25 +1,20 @@
-use std::panic::catch_unwind;
-use std::panic::AssertUnwindSafe;
-use std::sync::atomic::AtomicU64;
-use std::sync::atomic::Ordering;
 use std::thread;
 use std::time::Duration;
 
 use tauri::AppHandle;
 use tauri::Emitter;
-use tauri::EventTarget;
 use tauri::LogicalSize;
 use tauri::Manager;
 use tauri::Monitor;
 use tauri::PhysicalPosition;
 use tauri::PhysicalRect;
 use tauri::PhysicalSize;
-use tauri::WebviewUrl;
 use tauri::WebviewWindow;
-use tauri::WebviewWindowBuilder;
 
 use crate::app::journal::JournalEvent;
 use crate::app::journal::Work;
+use crate::app::overlay::Generation;
+use crate::app::overlay::Overlay;
 use crate::app::state::lock;
 use crate::app::state::windows;
 use crate::app::view::BannerCharacter;
@@ -29,31 +24,24 @@ use crate::config::Banner;
 use crate::config::BannerCorner;
 use crate::platform::WindowManager;
 
-const LABEL: &str = "banner";
-
 const STEP_EVENT: &str = "multifus://banner";
-
-const PAGE: &str = "banner.html";
 
 const WIDTH: f64 = 250.0;
 const HEIGHT: f64 = 64.0;
 
 const PREVIEW: Duration = Duration::from_millis(2500);
 
+const OVERLAY: Overlay = Overlay {
+    label: "banner",
+    page: "banner.html",
+    thread: "multifus-banner",
+    work: Work::Banner,
+    failed: |detail| JournalEvent::BannerFailed { detail },
+    accepts_first_mouse: false,
+};
+
 #[derive(Debug, Default)]
-struct BannerGeneration {
-    latest: AtomicU64,
-}
-
-impl BannerGeneration {
-    fn next(&self) -> u64 {
-        self.latest.fetch_add(1, Ordering::AcqRel) + 1
-    }
-
-    fn matches_latest(&self, generation: u64) -> bool {
-        self.latest.load(Ordering::Acquire) == generation
-    }
-}
+struct BannerGeneration(Generation);
 
 pub fn setup(app: &AppHandle) {
     app.manage(BannerGeneration::default());
@@ -74,7 +62,7 @@ pub fn follow_walk(app: &AppHandle, enabled: bool, inside_game: bool) {
 }
 
 pub fn follow_foreground(app: &AppHandle, inside_game: bool) {
-    let Some(window) = app.get_webview_window(LABEL) else {
+    let Some(window) = OVERLAY.window(app) else {
         return;
     };
 
@@ -88,11 +76,7 @@ pub fn follow_foreground(app: &AppHandle, inside_game: bool) {
         window.hide()
     };
 
-    if let Err(error) = followed {
-        lock(app).log_unless_repeated(JournalEvent::BannerFailed {
-            detail: error.to_string(),
-        });
-    }
+    OVERLAY.said(app, followed);
 }
 
 pub fn step(app: &AppHandle, character: Option<BannerCharacter>) {
@@ -108,19 +92,13 @@ pub fn step(app: &AppHandle, character: Option<BannerCharacter>) {
 }
 
 fn tell(app: &AppHandle, step: BannerStep) {
-    let sent = app.emit_to(EventTarget::webview_window(LABEL), STEP_EVENT, step);
-
-    if let Err(error) = sent {
-        lock(app).log_unless_repeated(JournalEvent::BannerFailed {
-            detail: error.to_string(),
-        });
-    }
+    OVERLAY.said(app, app.emit_to(OVERLAY.target(), STEP_EVENT, step));
 }
 
 pub fn preview(app: &AppHandle) {
     let generation = next_generation(app);
 
-    apart(app, move |app| {
+    OVERLAY.apart(app, move |app| {
         raise(app, generation, true);
 
         thread::sleep(PREVIEW);
@@ -144,37 +122,17 @@ fn matches_inside_game(windows: &dyn WindowManager) -> bool {
 }
 
 fn raise_apart(app: &AppHandle, generation: u64, inside_game: bool) {
-    apart(app, move |app| {
+    OVERLAY.apart(app, move |app| {
         raise(app, generation, inside_game);
     });
 }
 
-fn apart(app: &AppHandle, work: impl FnOnce(&AppHandle) + Send + 'static) {
-    let spawned = thread::Builder::new()
-        .name("multifus-banner".to_owned())
-        .spawn({
-            let app = app.clone();
-
-            move || {
-                if catch_unwind(AssertUnwindSafe(|| work(&app))).is_err() {
-                    lock(&app).log_unless_repeated(JournalEvent::Panicked { work: Work::Banner });
-                }
-            }
-        });
-
-    if let Err(error) = spawned {
-        lock(app).log_unless_repeated(JournalEvent::BannerFailed {
-            detail: error.to_string(),
-        });
-    }
-}
-
 fn next_generation(app: &AppHandle) -> u64 {
-    app.state::<BannerGeneration>().next()
+    app.state::<BannerGeneration>().0.next()
 }
 
 fn matches_current(app: &AppHandle, generation: u64) -> bool {
-    app.state::<BannerGeneration>().matches_latest(generation)
+    app.state::<BannerGeneration>().0.matches_latest(generation)
 }
 
 fn raise(app: &AppHandle, generation: u64, inside_game: bool) {
@@ -182,7 +140,7 @@ fn raise(app: &AppHandle, generation: u64, inside_game: bool) {
         return;
     }
 
-    let Some(window) = app.get_webview_window(LABEL).or_else(|| build(app)) else {
+    let Some(window) = OVERLAY.window(app).or_else(|| build(app)) else {
         return;
     };
 
@@ -201,9 +159,7 @@ fn raise(app: &AppHandle, generation: u64, inside_game: bool) {
     });
 
     if let Err(error) = raised {
-        lock(app).log_unless_repeated(JournalEvent::BannerFailed {
-            detail: error.to_string(),
-        });
+        OVERLAY.complain(app, error.to_string());
 
         return;
     }
@@ -220,48 +176,17 @@ fn raise(app: &AppHandle, generation: u64, inside_game: bool) {
 }
 
 fn close(app: &AppHandle) {
-    let Some(window) = app.get_webview_window(LABEL) else {
+    let Some(window) = OVERLAY.window(app) else {
         return;
     };
 
-    if let Err(error) = window.close() {
-        lock(app).log_unless_repeated(JournalEvent::BannerFailed {
-            detail: error.to_string(),
-        });
-    }
+    OVERLAY.said(app, window.close());
 }
 
 fn build(app: &AppHandle) -> Option<WebviewWindow> {
-    let built = WebviewWindowBuilder::new(app, LABEL, WebviewUrl::App(PAGE.into()))
-        .title("Multifus")
-        .inner_size(WIDTH, HEIGHT)
-        .decorations(false)
-        .transparent(true)
-        .always_on_top(true)
-        .skip_taskbar(true)
-        .focusable(false)
-        .resizable(false)
-        .shadow(false)
-        .visible(false)
-        .visible_on_all_workspaces(true)
-        .build();
+    let window = OVERLAY.build(app, LogicalSize::new(WIDTH, HEIGHT))?;
 
-    let window = match built {
-        Ok(window) => window,
-        Err(error) => {
-            lock(app).log_unless_repeated(JournalEvent::BannerFailed {
-                detail: error.to_string(),
-            });
-
-            return None;
-        }
-    };
-
-    if let Err(error) = window.set_ignore_cursor_events(true) {
-        lock(app).log_unless_repeated(JournalEvent::BannerFailed {
-            detail: error.to_string(),
-        });
-    }
+    OVERLAY.said(app, window.set_ignore_cursor_events(true));
 
     Some(window)
 }
@@ -380,20 +305,6 @@ mod tests {
             !matches_inside_game(windows.as_ref()),
             "the player left the game, so the banner has nothing to sit on"
         );
-    }
-
-    #[test]
-    fn a_preview_that_a_newer_one_replaced_no_longer_speaks_for_the_banner() {
-        let generation = BannerGeneration::default();
-        let first = generation.next();
-        let second = generation.next();
-
-        assert!(generation.matches_latest(second));
-        assert!(
-            !generation.matches_latest(first),
-            "the preview that was asked for first must not close the one showing now"
-        );
-        assert_ne!(first, second);
     }
 
     #[test]

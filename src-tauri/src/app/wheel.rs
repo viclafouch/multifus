@@ -1,8 +1,4 @@
 use std::f64::consts::TAU;
-use std::panic::catch_unwind;
-use std::panic::AssertUnwindSafe;
-use std::sync::atomic::AtomicU64;
-use std::sync::atomic::Ordering;
 use std::sync::Mutex;
 use std::sync::MutexGuard;
 use std::sync::PoisonError;
@@ -12,16 +8,12 @@ use std::time::Instant;
 
 use tauri::AppHandle;
 use tauri::Emitter;
-use tauri::EventTarget;
 use tauri::LogicalSize;
 use tauri::Manager;
 use tauri::Monitor;
 use tauri::PhysicalPosition;
 use tauri::PhysicalRect;
 use tauri::PhysicalSize;
-use tauri::WebviewUrl;
-use tauri::WebviewWindow;
-use tauri::WebviewWindowBuilder;
 
 use crate::app::banner;
 use crate::app::clicks;
@@ -30,6 +22,9 @@ use crate::app::journal::JournalEvent;
 use crate::app::journal::WheelOutcome;
 use crate::app::journal::Work;
 use crate::app::main_window;
+use crate::app::overlay::Acknowledged;
+use crate::app::overlay::Generation;
+use crate::app::overlay::Overlay;
 use crate::app::state::lock;
 use crate::app::state::windows;
 use crate::app::view::DisplayView;
@@ -41,15 +36,20 @@ use crate::domain::Gender;
 use crate::platform::PlatformError;
 use crate::platform::WindowId;
 
-const LABEL: &str = "wheel";
+const OVERLAY: Overlay = Overlay {
+    label: "wheel",
+    page: "wheel.html",
+    thread: "multifus-wheel",
+    work: Work::Wheel,
+    failed: |detail| JournalEvent::WheelFailed { detail },
+    accepts_first_mouse: false,
+};
 
 const STEP_EVENT: &str = "multifus://wheel";
 
 const AIM_EVENT: &str = "multifus://wheel-aim";
 
 const WIPE_EVENT: &str = "multifus://wheel-wipe";
-
-const PAGE: &str = "wheel.html";
 
 const PREVIEW: Duration = Duration::from_millis(2500);
 
@@ -150,9 +150,7 @@ impl Open {
         }
 
         let hovered = match at {
-            Some((x, y)) if self.stirred || self.dial.stirred(x, y) => {
-                self.dial.aimed_at(x, y)
-            }
+            Some((x, y)) if self.stirred || self.dial.stirred(x, y) => self.dial.aimed_at(x, y),
             Some(_) => None,
             None => self.hovered,
         }?;
@@ -165,27 +163,27 @@ impl Open {
 
 #[derive(Debug, Default)]
 pub struct Wheel {
-    latest: AtomicU64,
-    wiped: AtomicU64,
+    latest: Generation,
+    wiped: Acknowledged,
     gesture: Mutex<()>,
     open: Mutex<Option<Open>>,
 }
 
 impl Wheel {
     fn next(&self) -> u64 {
-        self.latest.fetch_add(1, Ordering::AcqRel) + 1
+        self.latest.next()
     }
 
     fn matches_latest(&self, generation: u64) -> bool {
-        self.latest.load(Ordering::Acquire) == generation
+        self.latest.matches_latest(generation)
     }
 
     fn set_wiped(&self, generation: u64) {
-        self.wiped.fetch_max(generation, Ordering::AcqRel);
+        self.wiped.acknowledge(generation);
     }
 
     fn matches_wiped(&self, generation: u64) -> bool {
-        self.wiped.load(Ordering::Acquire) >= generation
+        self.wiped.matches_acknowledged(generation)
     }
 
     fn gesture(&self) -> MutexGuard<'_, ()> {
@@ -418,7 +416,7 @@ pub fn follow_foreground(app: &AppHandle) {
 }
 
 pub fn preview(app: &AppHandle, crowd: usize) {
-    apart(app, move |app| {
+    OVERLAY.apart(app, move |app| {
         let Some(generation) = raise_preview(app, crowd) else {
             return;
         };
@@ -514,7 +512,7 @@ fn land(app: &AppHandle, nickname: String, window: WindowId) {
 }
 
 fn follow_cursor(app: &AppHandle, generation: u64, clicks_before: u64) {
-    apart(app, move |app| {
+    OVERLAY.apart(app, move |app| {
         let gate = clicks::gate(app);
 
         while app.state::<Wheel>().holds(generation) {
@@ -537,57 +535,21 @@ fn follow_cursor(app: &AppHandle, generation: u64, clicks_before: u64) {
     });
 }
 
-fn apart(app: &AppHandle, work: impl FnOnce(&AppHandle) + Send + 'static) -> bool {
-    let spawned = thread::Builder::new()
-        .name("multifus-wheel".to_owned())
-        .spawn({
-            let app = app.clone();
-
-            move || {
-                if catch_unwind(AssertUnwindSafe(|| work(&app))).is_err() {
-                    lock(&app).log_unless_repeated(JournalEvent::Panicked { work: Work::Wheel });
-                }
-            }
-        });
-
-    if let Err(error) = spawned {
-        lock(app).log_unless_repeated(JournalEvent::WheelFailed {
-            detail: error.to_string(),
-        });
-
-        return false;
-    }
-
-    true
-}
-
 fn tell(app: &AppHandle, step: &WheelStep) {
-    said(app, app.emit_to(target(), STEP_EVENT, step));
+    OVERLAY.said(app, app.emit_to(OVERLAY.target(), STEP_EVENT, step));
 }
 
 fn point_at(app: &AppHandle, hovered: Option<usize>) {
-    said(app, app.emit_to(target(), AIM_EVENT, hovered));
-}
-
-fn target() -> EventTarget {
-    EventTarget::webview_window(LABEL)
-}
-
-fn said(app: &AppHandle, told: tauri::Result<()>) {
-    if let Err(error) = told {
-        lock(app).log_unless_repeated(JournalEvent::WheelFailed {
-            detail: error.to_string(),
-        });
-    }
+    OVERLAY.said(app, app.emit_to(OVERLAY.target(), AIM_EVENT, hovered));
 }
 
 fn reveal(app: &AppHandle) {
-    let Some(window) = app.get_webview_window(LABEL) else {
+    let Some(window) = OVERLAY.window(app) else {
         return;
     };
 
-    said(app, window.set_ignore_cursor_events(false));
-    said(app, window.show());
+    OVERLAY.said(app, window.set_ignore_cursor_events(false));
+    OVERLAY.said(app, window.show());
 }
 
 pub fn wiped(app: &AppHandle, generation: u64) {
@@ -595,14 +557,14 @@ pub fn wiped(app: &AppHandle, generation: u64) {
 }
 
 fn wipe(app: &AppHandle, generation: u64) {
-    let Some(window) = app.get_webview_window(LABEL) else {
+    let Some(window) = OVERLAY.window(app) else {
         return;
     };
 
-    said(app, window.set_ignore_cursor_events(true));
-    said(app, app.emit_to(target(), WIPE_EVENT, generation));
+    OVERLAY.said(app, window.set_ignore_cursor_events(true));
+    OVERLAY.said(app, app.emit_to(OVERLAY.target(), WIPE_EVENT, generation));
 
-    let hiding = apart(app, move |app| {
+    let hiding = OVERLAY.apart(app, move |app| {
         hide_once_empty(app, generation);
     });
 
@@ -636,11 +598,11 @@ fn wait_to_hide(app: &AppHandle, generation: u64) {
 }
 
 fn hide(app: &AppHandle) {
-    let Some(window) = app.get_webview_window(LABEL) else {
+    let Some(window) = OVERLAY.window(app) else {
         return;
     };
 
-    said(app, window.hide());
+    OVERLAY.said(app, window.hide());
 }
 
 fn cursor_of(app: &AppHandle) -> Option<(f64, f64)> {
@@ -702,13 +664,8 @@ struct Placing {
     origin: (f64, f64),
 }
 
-fn place(
-    app: &AppHandle,
-    diameter: u32,
-    slices: usize,
-    placing: Option<Placing>,
-) -> Option<Dial> {
-    let window = app.get_webview_window(LABEL)?;
+fn place(app: &AppHandle, diameter: u32, slices: usize, placing: Option<Placing>) -> Option<Dial> {
+    let window = OVERLAY.window(app)?;
     let Placing {
         middle: (middle_x, middle_y),
         origin: (origin_x, origin_y),
@@ -791,32 +748,13 @@ fn framed(diameter: u32) -> f64 {
 }
 
 fn build(app: &AppHandle) {
-    let built = WebviewWindowBuilder::new(app, LABEL, WebviewUrl::App(PAGE.into()))
-        .title("Multifus")
-        .inner_size(framed(WHEEL_WIDEST), framed(WHEEL_WIDEST))
-        .decorations(false)
-        .transparent(true)
-        .always_on_top(true)
-        .skip_taskbar(true)
-        .focusable(false)
-        .resizable(false)
-        .shadow(false)
-        .visible(false)
-        .visible_on_all_workspaces(true)
-        .build();
+    let widest = framed(WHEEL_WIDEST);
 
-    let window: WebviewWindow = match built {
-        Ok(window) => window,
-        Err(error) => {
-            lock(app).log_unless_repeated(JournalEvent::WheelFailed {
-                detail: error.to_string(),
-            });
-
-            return;
-        }
+    let Some(window) = OVERLAY.build(app, LogicalSize::new(widest, widest)) else {
+        return;
     };
 
-    said(app, window.set_ignore_cursor_events(true));
+    OVERLAY.said(app, window.set_ignore_cursor_events(true));
 }
 
 #[cfg(test)]

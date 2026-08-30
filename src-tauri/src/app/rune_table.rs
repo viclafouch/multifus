@@ -1,7 +1,6 @@
 use std::panic::catch_unwind;
 use std::panic::AssertUnwindSafe;
 use std::sync::atomic::AtomicBool;
-use std::sync::atomic::AtomicU64;
 use std::sync::atomic::Ordering;
 use std::sync::Mutex;
 use std::sync::MutexGuard;
@@ -11,18 +10,17 @@ use std::time::Duration;
 
 use tauri::AppHandle;
 use tauri::Emitter;
-use tauri::EventTarget;
 use tauri::LogicalPosition;
 use tauri::LogicalSize;
 use tauri::Manager;
 use tauri::Monitor;
-use tauri::WebviewUrl;
 use tauri::WebviewWindow;
-use tauri::WebviewWindowBuilder;
 
 use crate::app::journal::JournalEvent;
 use crate::app::journal::Work;
 use crate::app::main_window;
+use crate::app::overlay::Generation;
+use crate::app::overlay::Overlay;
 use crate::app::state::lock;
 use crate::app::state::windows;
 use crate::config::RuneOffset;
@@ -32,9 +30,14 @@ use crate::platform::ScreenFrame;
 use crate::platform::ScreenPoint;
 use crate::platform::WindowId;
 
-const LABEL: &str = "rune-table";
-
-const PAGE: &str = "rune-table.html";
+const OVERLAY: Overlay = Overlay {
+    label: "rune-table",
+    page: "rune-table.html",
+    thread: "multifus-rune-table",
+    work: Work::RuneTable,
+    failed: |detail| JournalEvent::RuneTableFailed { detail },
+    accepts_first_mouse: true,
+};
 
 const LOOK_EVENT: &str = "multifus://rune-table-look";
 
@@ -127,7 +130,7 @@ struct RuneTable {
     posing: Mutex<()>,
     complained: AtomicBool,
     under_the_hand: AtomicBool,
-    generation: AtomicU64,
+    generation: Generation,
 }
 
 impl RuneTable {
@@ -145,7 +148,7 @@ impl RuneTable {
         self.complained.store(false, Ordering::Release);
         self.under_the_hand.store(false, Ordering::Release);
 
-        self.generation.fetch_add(1, Ordering::AcqRel) + 1
+        self.generation.next()
     }
 
     fn take_in_hand(&self) {
@@ -165,7 +168,7 @@ impl RuneTable {
     }
 
     fn matches_latest(&self, generation: u64) -> bool {
-        self.generation.load(Ordering::Acquire) == generation
+        self.generation.matches_latest(generation)
     }
 
     fn hold_the_anchor(&self, window: WindowId) -> Option<Anchor> {
@@ -300,7 +303,7 @@ fn tell_state(app: &AppHandle) {
 }
 
 fn follow_apart(app: &AppHandle, generation: u64) {
-    apart(app, move |app| loop {
+    OVERLAY.apart(app, move |app| loop {
         thread::sleep(FOLLOW);
 
         if !app.state::<RuneTable>().matches_latest(generation) || !is_open(app) {
@@ -500,7 +503,7 @@ fn placed(frame: ScreenFrame, offset: RuneOffset) -> LogicalPosition<f64> {
 }
 
 fn pose(app: &AppHandle, wanted: Posed) {
-    let Some(window) = app.get_webview_window(LABEL) else {
+    let Some(window) = OVERLAY.window(app) else {
         return;
     };
 
@@ -518,7 +521,7 @@ fn pose(app: &AppHandle, wanted: Posed) {
 
     *table.posed() = posed.is_ok().then_some(wanted);
 
-    said(app, posed);
+    OVERLAY.said(app, posed);
 }
 
 fn veil_in_turn(app: &AppHandle) {
@@ -529,14 +532,14 @@ fn veil_in_turn(app: &AppHandle) {
 }
 
 fn veil(app: &AppHandle) {
-    let Some(window) = app.get_webview_window(LABEL) else {
+    let Some(window) = OVERLAY.window(app) else {
         return;
     };
 
     *app.state::<RuneTable>().posed() = None;
 
     if window.is_visible().unwrap_or(false) {
-        said(app, window.hide());
+        OVERLAY.said(app, window.hide());
     }
 }
 
@@ -550,7 +553,7 @@ pub fn shift(app: &AppHandle, by_x: f64, by_y: f64) {
 
     table.take_in_hand();
 
-    let Some(window) = app.get_webview_window(LABEL) else {
+    let Some(window) = OVERLAY.window(app) else {
         return;
     };
 
@@ -567,7 +570,7 @@ pub fn shift(app: &AppHandle, by_x: f64, by_y: f64) {
     let moved = window.set_position(at);
 
     if moved.is_err() {
-        said(app, moved);
+        OVERLAY.said(app, moved);
 
         return;
     }
@@ -694,9 +697,9 @@ fn faded(transparency: u32) -> f64 {
 }
 
 fn tell_look(app: &AppHandle) {
-    let told = app.emit_to(EventTarget::webview_window(LABEL), LOOK_EVENT, look(app));
+    let told = app.emit_to(OVERLAY.target(), LOOK_EVENT, look(app));
 
-    said(app, told);
+    OVERLAY.said(app, told);
 }
 
 pub fn spread(app: &AppHandle, everywhere: bool) {
@@ -783,62 +786,14 @@ fn holds_point(edge: f64, room: f64, at: f64) -> bool {
     at >= edge && at < edge + room
 }
 
-fn apart(app: &AppHandle, work: impl FnOnce(&AppHandle) + Send + 'static) {
-    let spawned = thread::Builder::new()
-        .name("multifus-rune-table".to_owned())
-        .spawn({
-            let app = app.clone();
-
-            move || {
-                if catch_unwind(AssertUnwindSafe(|| work(&app))).is_err() {
-                    lock(&app).log_unless_repeated(JournalEvent::Panicked {
-                        work: Work::RuneTable,
-                    });
-                }
-            }
-        });
-
-    if let Err(error) = spawned {
-        lock(app).log_unless_repeated(JournalEvent::RuneTableFailed {
-            detail: error.to_string(),
-        });
-    }
-}
-
-fn said(app: &AppHandle, told: tauri::Result<()>) {
-    if let Err(error) = told {
-        lock(app).log_unless_repeated(JournalEvent::RuneTableFailed {
-            detail: error.to_string(),
-        });
-    }
-}
-
 fn build(app: &AppHandle) {
     let width = f64::from(lock(app).rune_table_width());
 
-    let built = WebviewWindowBuilder::new(app, LABEL, WebviewUrl::App(PAGE.into()))
-        .title("Multifus")
-        .inner_size(width, width * GUESSED_RATIO)
-        .decorations(false)
-        .transparent(true)
-        .always_on_top(true)
-        .skip_taskbar(true)
-        .focusable(false)
-        .accept_first_mouse(true)
-        .resizable(false)
-        .shadow(false)
-        .visible(false)
-        .visible_on_all_workspaces(true)
-        .build();
+    let Some(window) = OVERLAY.build(app, LogicalSize::new(width, width * GUESSED_RATIO)) else {
+        return;
+    };
 
-    match built {
-        Ok(window) => hold_back_activation(app, &window),
-        Err(error) => {
-            lock(app).log_unless_repeated(JournalEvent::RuneTableFailed {
-                detail: error.to_string(),
-            });
-        }
-    }
+    hold_back_activation(app, &window);
 }
 
 #[cfg(target_os = "macos")]
@@ -851,7 +806,7 @@ fn hold_back_activation(app: &AppHandle, window: &WebviewWindow) {
         });
 
     if let Err(detail) = held_back {
-        lock(app).log_unless_repeated(JournalEvent::RuneTableFailed { detail });
+        OVERLAY.complain(app, detail);
     }
 }
 

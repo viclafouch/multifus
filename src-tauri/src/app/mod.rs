@@ -5,6 +5,7 @@ pub mod commands;
 pub mod journal;
 pub mod journal_file;
 pub mod main_window;
+pub mod overlay;
 pub mod portraits;
 pub mod quick_replies;
 pub mod relay;
