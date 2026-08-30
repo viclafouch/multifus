@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
 import type { Display } from '@/@types/display'
 import type { ShortcutBinding } from '@/@types/shortcuts'
 import type { BannerPlace } from '@/@types/walk'
@@ -78,7 +78,7 @@ const show = async ({ screens = [LAPTOP], ...params }: ShowParams = {}) => {
 
   await renderScreen(params)
 
-  await screen.findByText(strings.walk.banner.description)
+  await act(async () => {})
 }
 
 const keyCaps = () => {

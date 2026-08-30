@@ -27,6 +27,7 @@ type JournalPanelProps = Readonly<{
 
 export const JournalPanel = ({ snapshot }: JournalPanelProps) => {
   const entries = snapshot.journal
+  const lineCount = entries.length
   const [isOpen, setIsOpen] = React.useState(false)
   const list = React.useRef<HTMLOListElement>(null)
   const isFollowing = React.useRef(true)
@@ -34,12 +35,17 @@ export const JournalPanel = ({ snapshot }: JournalPanelProps) => {
   React.useEffect(() => {
     const element = list.current
 
-    if (element === null || !isFollowing.current) {
+    if (
+      !isOpen ||
+      lineCount === 0 ||
+      element === null ||
+      !isFollowing.current
+    ) {
       return
     }
 
     element.scrollTop = element.scrollHeight
-  }, [entries, isOpen])
+  }, [isOpen, lineCount])
 
   const handleScroll = (event: React.UIEvent<HTMLOListElement>) => {
     const { scrollTop, scrollHeight, clientHeight } = event.currentTarget
