@@ -14,6 +14,7 @@ import {
   dismissConfigProblem,
   revealQuarantinedConfig
 } from '@/lib/multifus'
+import { ignore } from '@/lib/utils'
 import { AboutScreen } from '@/screens/about-screen'
 import { AuthorizationScreen } from '@/screens/authorization-screen'
 import { AutoFocusScreen } from '@/screens/auto-focus-screen'
@@ -59,7 +60,7 @@ export const App = () => {
                   problem={snapshot.config.problem}
                   quarantined={quarantinedPath(snapshot.config.problem)}
                   onReveal={() => {
-                    revealQuarantinedConfig().catch(ignoreOpenFailure)
+                    revealQuarantinedConfig().catch(ignore)
                   }}
                   onDismiss={() => {
                     run(dismissConfigProblem())
@@ -199,5 +200,3 @@ const Backdrop = () => {
 const quarantinedPath = (problem: ConfigProblem) => {
   return problem.kind === 'malformed' ? problem.quarantined : null
 }
-
-const ignoreOpenFailure = () => {}

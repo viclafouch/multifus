@@ -5,6 +5,7 @@ import { Screen } from '@/components/layout/screen'
 import { Button } from '@/components/ui/button'
 import { strings } from '@/constants/strings'
 import { openAuthorizationSettings, requestAuthorization } from '@/lib/multifus'
+import { ignore } from '@/lib/utils'
 
 type AuthorizationScreenProps = Readonly<{
   run: (action: Promise<Snapshot>) => void
@@ -35,7 +36,7 @@ export const AuthorizationScreen = ({ run }: AuthorizationScreenProps) => {
           variant="outline"
           size="sm"
           onClick={() => {
-            openAuthorizationSettings().catch(ignoreOpenFailure)
+            openAuthorizationSettings().catch(ignore)
           }}
         >
           <ExternalLink aria-hidden />
@@ -45,5 +46,3 @@ export const AuthorizationScreen = ({ run }: AuthorizationScreenProps) => {
     </Screen>
   )
 }
-
-const ignoreOpenFailure = () => {}

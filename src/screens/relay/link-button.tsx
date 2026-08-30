@@ -2,8 +2,7 @@ import { ExternalLink } from 'lucide-react'
 import type { RelayLink } from '@/@types/relay'
 import { Button } from '@/components/ui/button'
 import { openRelayLink } from '@/lib/multifus'
-
-const ignoreOpenFailure = () => {}
+import { ignore } from '@/lib/utils'
 
 type LinkButtonProps = Readonly<{
   link: RelayLink
@@ -16,7 +15,7 @@ export const LinkButton = ({ link, label }: LinkButtonProps) => {
       variant="ghost"
       size="xs"
       onClick={() => {
-        openRelayLink(link).catch(ignoreOpenFailure)
+        openRelayLink(link).catch(ignore)
       }}
       className="text-muted-foreground hover:text-primary"
     >

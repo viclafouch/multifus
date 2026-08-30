@@ -13,8 +13,13 @@ import {
   journalTranscript
 } from '@/helpers/journal'
 import { revealJournal } from '@/lib/multifus'
+import { ignore } from '@/lib/utils'
 
 const FOLLOW_MARGIN = 28
+
+const handleReveal = () => {
+  revealJournal().catch(ignore)
+}
 
 type JournalPanelProps = Readonly<{
   snapshot: Snapshot
@@ -48,10 +53,6 @@ export const JournalPanel = ({ snapshot }: JournalPanelProps) => {
     setIsOpen((current) => {
       return !current
     })
-  }
-
-  const handleReveal = () => {
-    revealJournal().catch(ignoreRevealFailure)
   }
 
   return (
@@ -125,8 +126,6 @@ type JournalLineProps = Readonly<{
   entry: JournalEntry
   quickReplies: readonly QuickReply[]
 }>
-
-const ignoreRevealFailure = () => {}
 
 const JournalLine = ({ entry, quickReplies }: JournalLineProps) => {
   return (
