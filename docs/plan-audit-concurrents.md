@@ -75,16 +75,6 @@ protège du geste de Multifus, pas de celui du jeu.
 devant au début d'un tour, ou est-ce qu'il fait seulement clignoter son bouton
 dans la barre des tâches. C'est un essai sur Windows, pas une lecture de code.
 
-### 4. Le jeton Telegram et les redirections
-
-`telegram.rs` met le jeton dans le chemin de l'adresse, et `reqwest` suit
-jusqu'à dix redirections par défaut. `api.telegram.org` ne redirige pas ; un
-proxy ou un DNS hostile, si. Une ligne ferme la porte :
-`.redirect(reqwest::redirect::Policy::none())` dans `client()`.
-
-Le reste est déjà correct : `error.without_url()` retire l'adresse des
-messages, et `Debug` ne montre jamais le jeton.
-
 ## Ce qu'ils ont de bien, et qu'on ne prend pas
 
 ### La notification macOS qui reste à l'écran

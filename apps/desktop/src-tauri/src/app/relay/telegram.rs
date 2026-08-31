@@ -2,6 +2,7 @@ use std::time::Duration;
 
 use reqwest::Client;
 use reqwest::RequestBuilder;
+use reqwest::redirect::Policy;
 use serde::Deserialize;
 use serde::Serialize;
 use serde::de::DeserializeOwned;
@@ -46,7 +47,11 @@ fn url(token: &BotToken, method: &str) -> String {
 }
 
 pub fn client() -> Result<Client> {
-    Client::builder().timeout(TIMEOUT).build().map_err(stripped)
+    Client::builder()
+        .timeout(TIMEOUT)
+        .redirect(Policy::none())
+        .build()
+        .map_err(stripped)
 }
 
 async fn ask<T: DeserializeOwned>(request: RequestBuilder) -> Result<T> {
