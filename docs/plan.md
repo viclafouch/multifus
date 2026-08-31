@@ -23,10 +23,10 @@ La CI le compile sur `windows-latest`, et la publication en dépend.
 
 ## Passer le dépôt en monorepo
 
-Le déménagement est fait, et ce qu'il a décidé est dans `docs/plan-monorepo.md`.
-Reste ce que seule la CI peut confirmer.
+Le déménagement est fait, et la CI est verte sur les deux systèmes.
 
-- [ ] Vérifier que la CI passe : la compilation Windows, `projectPath: apps/desktop` donné aux deux `tauri-action`, et `pnpm install --frozen-lockfile` à la place de `npm ci`
+- [ ] Purger le cache Cargo au premier `cargo` après le déménagement, sur le Mac comme sur Windows : depuis `apps/desktop/src-tauri`, `rm -rf target/debug/build/tauri-* target/debug/build/multifus-*`. Les artefacts de `tauri-build` gardent les chemins absolus de l'ancien emplacement, et `cargo` réclame un fichier qui n'existe plus
+- [ ] Vérifier `projectPath: apps/desktop` sur les deux `tauri-action` à la première publication : `ci.yml` ne les lance pas, seul un tag `v*` le fait
 - [ ] Rouvrir Turborepo, et `packages/`, quand le site existera et qu'un paquet partagé reliera les deux applications
 
 ## Dire ce que la mise à jour apporte
