@@ -27,5 +27,10 @@ fenêtre a un raccourci clavier, ou elle n'existe pas.
 Le serveur de dev tourne déjà, je le lance moi-même. Personne n'a multifus
 installé : casser est permis, sans migration, et on pousse sur `main`.
 
+La CI audite les dépendances Rust avec `cargo-deny`, qui n'est pas dans le
+dépôt : `cargo install cargo-deny --locked` pour lancer `pnpm --filter
+@multifus/desktop run deny:rust` ici. Le hook de commit ne le lance pas, il
+faudrait le réseau à chaque commit.
+
 Le skill `/frontend-design` avant de dessiner un écran, et Tauri v2 :
 `https://v2.tauri.app/llms.txt`.

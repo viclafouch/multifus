@@ -75,20 +75,7 @@ protège du geste de Multifus, pas de celui du jeu.
 devant au début d'un tour, ou est-ce qu'il fait seulement clignoter son bouton
 dans la barre des tâches. C'est un essai sur Windows, pas une lecture de code.
 
-### 4. Rien n'audite les dépendances Rust
-
-`checks.yml` lance `pnpm audit --audit-level high` : c'est npm seul. ROrganizer
-a un `deny.toml` commenté ligne par ligne et lance
-`cargo deny check advisories bans sources licenses`. Ce qu'il refuse : un crate
-yanké, un registre autre que crates.io, une dépendance git, une licence hors
-liste.
-
-Notre arbre Rust est plus gros que le sien : tauri, reqwest, rustls, ring,
-keyring. À faire : un `deny.toml` dans `apps/desktop/src-tauri`, avec les deux
-cibles `aarch64-apple-darwin` et `x86_64-pc-windows-msvc`, et une étape de plus
-dans `checks.yml`.
-
-### 5. Une fenêtre de jeu figée gèle le tour jusqu'à six secondes
+### 4. Une fenêtre de jeu figée gèle le tour jusqu'à six secondes
 
 Chaque lecture d'un attribut d'accessibilité est un message synchrone vers
 l'application visée. Le délai par défaut est de six secondes. Un client Dofus
@@ -99,7 +86,7 @@ Ni nous ni Focus Retro n'appelons `AXUIElementSetMessagingTimeout`. À faire :
 l'appeler une fois sur chaque élément d'application, à 500 ms par exemple. Rien
 ne change quand tout va bien, et un client figé ne coûte plus qu'un demi-tour.
 
-### 6. Le jeton Telegram et les redirections
+### 5. Le jeton Telegram et les redirections
 
 `telegram.rs` met le jeton dans le chemin de l'adresse, et `reqwest` suit
 jusqu'à dix redirections par défaut. `api.telegram.org` ne redirige pas ; un

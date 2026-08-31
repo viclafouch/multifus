@@ -1,0 +1,39 @@
+[graph]
+targets = ["aarch64-apple-darwin", "x86_64-pc-windows-msvc"]
+all-features = false
+
+[advisories]
+db-urls = ["https://github.com/RustSec/advisory-db"]
+yanked = "deny"
+unmaintained = "all"
+ignore = [
+  { id = "RUSTSEC-2025-0075", reason = "unic-common, pulled by tauri through urlpattern" },
+  { id = "RUSTSEC-2025-0080", reason = "unic-char-range, pulled by tauri through urlpattern" },
+  { id = "RUSTSEC-2025-0081", reason = "unic-ucd-version, pulled by tauri through urlpattern" },
+  { id = "RUSTSEC-2025-0098", reason = "unic-char-property, pulled by tauri through urlpattern" },
+  { id = "RUSTSEC-2025-0100", reason = "unic-ucd-ident, pulled by tauri through urlpattern" },
+]
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+allow-git = []
+
+[bans]
+multiple-versions = "warn"
+wildcards = "deny"
+deny = []
+
+[licenses]
+confidence-threshold = 0.93
+allow = [
+  "Apache-2.0",
+  "BSD-3-Clause",
+  "BSL-1.0",
+  "ISC",
+  "MIT",
+  "MPL-2.0",
+  "Unicode-3.0",
+  "Zlib",
+]
