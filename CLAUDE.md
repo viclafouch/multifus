@@ -1,11 +1,13 @@
 Gestionnaire de fenêtres Dofus Retro en multicompte, macOS et Windows.
 
 Monorepo pnpm : le logiciel dans `apps/desktop`, le site dans `apps/website`.
-Le format et les lints se lancent de la racine, le reste depuis son paquet.
 Rien n'est partagé encore, `packages/` s'ouvrira quand le site le demandera.
 
 - [CONTEXT.md](./CONTEXT.md) : les mots du projet, à employer partout, code compris.
 - [docs/plan.md](./docs/plan.md) : ce qui reste à faire. Une ligne faite s'enlève.
+- [docs/concurrents.md](./docs/concurrents.md) : qui sont les autres, ce qu'ils
+  font, lequel auditer. Le détail est dans `docs/concurrents.html`, à ouvrir dans
+  un navigateur. Ces deux-là restent, ils ne s'effacent pas une fois lus.
 
 Une fonctionnalité ou un bug se travaille dans `docs/plan-<sujet>.md` : le lire
 avant de coder, l'ouvrir s'il manque, y noter ce qu'on trouve et ce qu'on décide,

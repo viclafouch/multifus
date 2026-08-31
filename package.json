@@ -14,6 +14,7 @@
   },
   "type": "module",
   "scripts": {
+    "dev:app": "pnpm --filter @multifus/desktop dev:app",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix && oxfmt",
     "format": "oxfmt",

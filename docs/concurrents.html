@@ -1,0 +1,3116 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Multifus · Dossier concurrence · Dofus Retro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..900,0..100,0..1;1,9..144,300..900,0..100,0..1&family=Karla:ital,wght@0,300..800;1,300..800&family=JetBrains+Mono:wght@300;400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --paper: #efe6d3;
+        --paper-2: #e6dac2;
+        --paper-3: #f7f1e4;
+        --ink: #1f1810;
+        --ink-2: #4a3d2d;
+        --muted: #8a7a62;
+        --rule: #c9b998;
+        --amber: #b4711c;
+        --amber-hi: #e0a13c;
+        --verd: #3c6b58;
+        --ember: #a63a26;
+        --shadow:
+          0 1px 0 rgba(31, 24, 16, 0.06),
+          0 18px 44px -28px rgba(31, 24, 16, 0.5);
+        --disp: 'Fraunces', Georgia, serif;
+        --body: 'Karla', system-ui, sans-serif;
+        --mono: 'JetBrains Mono', ui-monospace, monospace;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: var(--body);
+        font-size: 16.5px;
+        line-height: 1.62;
+        -webkit-font-smoothing: antialiased;
+        overflow-x: hidden;
+      }
+      body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 60;
+        opacity: 0.42;
+        mix-blend-mode: multiply;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+      }
+      body::after {
+        content: '';
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 59;
+        background:
+          radial-gradient(
+            120% 80% at 50% -10%,
+            rgba(224, 161, 60, 0.16),
+            transparent 60%
+          ),
+          radial-gradient(
+            90% 60% at 100% 110%,
+            rgba(60, 107, 88, 0.12),
+            transparent 60%
+          );
+      }
+      .wrap {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 0 clamp(18px, 4vw, 46px);
+        position: relative;
+        z-index: 1;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: underline;
+        text-decoration-color: rgba(180, 113, 28, 0.55);
+        text-decoration-thickness: 1.5px;
+        text-underline-offset: 3px;
+        transition:
+          background-color 0.18s,
+          text-decoration-color 0.18s,
+          color 0.18s;
+      }
+      a:hover {
+        background: rgba(224, 161, 60, 0.26);
+        text-decoration-color: var(--amber);
+      }
+      a[target]::after {
+        content: '↗';
+        font-family: var(--mono);
+        font-size: 0.72em;
+        vertical-align: 0.28em;
+        margin-left: 0.22em;
+        color: var(--amber);
+        opacity: 0.75;
+        text-decoration: none;
+        display: inline-block;
+      }
+
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-family: var(--disp);
+        font-weight: 700;
+        margin: 0;
+        line-height: 1.02;
+        letter-spacing: -0.02em;
+        font-variation-settings:
+          'SOFT' 22,
+          'WONK' 1,
+          'opsz' 100;
+      }
+      .kicker {
+        font-family: var(--mono);
+        font-size: 11px;
+        letter-spacing: 0.28em;
+        text-transform: uppercase;
+        color: var(--amber);
+        font-weight: 600;
+      }
+      .num {
+        font-family: var(--mono);
+        font-variant-numeric: tabular-nums;
+      }
+      em.w {
+        font-style: italic;
+        font-variation-settings:
+          'SOFT' 60,
+          'WONK' 1;
+      }
+
+      header.hero {
+        padding: clamp(46px, 9vw, 104px) 0 34px;
+        position: relative;
+      }
+      .hero .rail {
+        position: absolute;
+        left: calc(50% - 590px + 10px);
+        top: 120px;
+        writing-mode: vertical-rl;
+        font-family: var(--mono);
+        font-size: 10.5px;
+        letter-spacing: 0.34em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      @media (max-width: 1300px) {
+        .hero .rail {
+          display: none;
+        }
+      }
+      .hero h1 {
+        font-size: clamp(46px, 10vw, 124px);
+        font-weight: 800;
+        max-width: 16ch;
+      }
+      .hero h1 .amber {
+        color: var(--amber);
+      }
+      .hero h1 .out {
+        -webkit-text-stroke: 1.6px var(--ink);
+        color: transparent;
+      }
+      .lede {
+        font-size: clamp(17px, 2.1vw, 21.5px);
+        max-width: 62ch;
+        margin: 28px 0 0;
+        color: var(--ink-2);
+      }
+
+      .facts {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
+        gap: 1px;
+        background: var(--rule);
+        border: 1px solid var(--rule);
+        margin-top: 52px;
+      }
+      .fact {
+        background: var(--paper-3);
+        padding: 20px 18px;
+      }
+      .fact b {
+        display: block;
+        font-family: var(--disp);
+        font-size: clamp(30px, 4.4vw, 46px);
+        font-weight: 800;
+        line-height: 1;
+        color: var(--amber);
+      }
+      .fact span {
+        display: block;
+        font-size: 12.5px;
+        color: var(--muted);
+        margin-top: 9px;
+        line-height: 1.4;
+      }
+
+      section {
+        padding: clamp(56px, 8vw, 104px) 0;
+        border-top: 1px solid var(--rule);
+      }
+      .shead {
+        display: flex;
+        align-items: baseline;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-bottom: 12px;
+      }
+      .shead .idx {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--amber);
+        letter-spacing: 0.2em;
+      }
+      .shead h2 {
+        font-size: clamp(30px, 5.2vw, 60px);
+        font-weight: 700;
+      }
+      .sub {
+        color: var(--ink-2);
+        max-width: 68ch;
+        margin: 14px 0 40px;
+        font-size: 16.5px;
+      }
+
+      .rank {
+        border-top: 1px solid var(--rule);
+      }
+      .row {
+        display: grid;
+        grid-template-columns: minmax(170px, 1.6fr) 3fr minmax(84px, auto);
+        gap: clamp(10px, 2vw, 26px);
+        align-items: center;
+        padding: 13px 0;
+        border-bottom: 1px solid var(--rule);
+        transition: background 0.25s;
+      }
+      .row:hover {
+        background: rgba(224, 161, 60, 0.09);
+      }
+      .row .nm {
+        font-weight: 700;
+        font-size: 15px;
+        display: flex;
+        align-items: baseline;
+        gap: 9px;
+        flex-wrap: wrap;
+      }
+      .row .nm small {
+        font-weight: 400;
+        font-size: 11.5px;
+        color: var(--muted);
+        font-family: var(--mono);
+      }
+      .row .nm .src {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--amber);
+        text-decoration: none;
+        border: 1px solid rgba(180, 113, 28, 0.4);
+        padding: 1px 5px;
+        border-radius: 2px;
+      }
+      .row .nm .src:hover {
+        background: var(--amber);
+        color: var(--paper-3);
+        border-color: var(--amber);
+      }
+      .row .nm .src::after {
+        content: none;
+      }
+      .bar {
+        height: 11px;
+        background: var(--paper-2);
+        position: relative;
+        overflow: hidden;
+        border: 1px solid var(--rule);
+      }
+      .bar i {
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 0;
+        background: repeating-linear-gradient(
+          115deg,
+          var(--amber) 0 5px,
+          var(--amber-hi) 5px 10px
+        );
+        transition: width 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .row.us .bar i {
+        background: repeating-linear-gradient(
+          115deg,
+          var(--verd) 0 5px,
+          #5b8f79 5px 10px
+        );
+      }
+      .row.dead .bar i {
+        background: repeating-linear-gradient(
+          115deg,
+          #b4a48a 0 5px,
+          #c6b79e 5px 10px
+        );
+      }
+      .row .dl {
+        font-family: var(--mono);
+        font-size: 13.5px;
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .tablewrap {
+        border: 1px solid var(--rule);
+        background: var(--paper-3);
+        overflow-x: auto;
+        box-shadow: var(--shadow);
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        min-width: 1020px;
+        font-size: 14px;
+      }
+      thead th {
+        position: sticky;
+        top: 0;
+        background: var(--ink);
+        color: var(--paper);
+        z-index: 3;
+        font-family: var(--mono);
+        font-size: 10.5px;
+        letter-spacing: 0.11em;
+        text-transform: uppercase;
+        font-weight: 600;
+        padding: 14px 8px;
+        text-align: center;
+        vertical-align: bottom;
+        line-height: 1.4;
+      }
+      thead th:first-child {
+        text-align: left;
+        left: 0;
+        z-index: 5;
+        padding-left: 16px;
+        min-width: 246px;
+      }
+      thead th.usc {
+        background: var(--verd);
+      }
+      thead th.rival {
+        background: #3a2d1e;
+      }
+      thead th a {
+        color: var(--paper);
+        text-decoration-color: rgba(224, 161, 60, 0.75);
+      }
+      thead th a:hover {
+        background: rgba(224, 161, 60, 0.3);
+      }
+      thead th a::after {
+        color: var(--amber-hi);
+        opacity: 0.9;
+      }
+      tbody th {
+        text-align: left;
+        font-weight: 600;
+        font-size: 14px;
+        padding: 11px 16px;
+        position: sticky;
+        left: 0;
+        background: var(--paper-3);
+        z-index: 2;
+        border-right: 1px solid var(--rule);
+      }
+      tbody td {
+        text-align: center;
+        padding: 11px 8px;
+        border-right: 1px solid rgba(201, 185, 152, 0.5);
+      }
+      tbody tr {
+        border-top: 1px solid var(--rule);
+      }
+      tbody tr:hover th,
+      tbody tr:hover td {
+        background: rgba(224, 161, 60, 0.13);
+      }
+      tbody td.us {
+        background: rgba(60, 107, 88, 0.09);
+      }
+      tbody tr:hover td.us {
+        background: rgba(60, 107, 88, 0.19);
+      }
+      tr.grp th {
+        background: var(--paper-2);
+        font-family: var(--mono);
+        font-size: 10.5px;
+        letter-spacing: 0.19em;
+        text-transform: uppercase;
+        color: var(--amber);
+        padding: 9px 16px;
+      }
+      tr.grp td {
+        background: var(--paper-2);
+      }
+      .m {
+        font-family: var(--mono);
+        font-size: 15px;
+        line-height: 1;
+      }
+      .yes {
+        color: var(--verd);
+        font-weight: 800;
+      }
+      .no {
+        color: #bcac91;
+      }
+      .part {
+        color: var(--amber);
+      }
+      .unk {
+        color: #bcac91;
+        font-size: 12px;
+      }
+      .bad {
+        color: var(--ember);
+        font-weight: 700;
+      }
+      td small {
+        display: block;
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--muted);
+        margin-top: 3px;
+      }
+      .legend {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 16px;
+        letter-spacing: 0.04em;
+      }
+
+      .grid {
+        display: grid;
+        gap: 1px;
+        background: var(--rule);
+        border: 1px solid var(--rule);
+        box-shadow: var(--shadow);
+      }
+      .g3 {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      }
+      .g2 {
+        grid-template-columns: repeat(auto-fill, minmax(390px, 1fr));
+      }
+      .card {
+        background: var(--paper-3);
+        padding: 24px 22px 22px;
+        transition: background 0.3s;
+      }
+      .card:hover {
+        background: #fbf7ee;
+      }
+      .card .top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+      .card h3 {
+        font-size: 23px;
+        font-weight: 700;
+        line-height: 1.1;
+        max-width: 20ch;
+      }
+      .card p {
+        margin: 0 0 14px;
+        font-size: 14.5px;
+        color: var(--ink-2);
+        line-height: 1.55;
+      }
+      .pill {
+        font-family: var(--mono);
+        font-size: 9.5px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        padding: 4px 8px;
+        border: 1px solid currentColor;
+        border-radius: 2px;
+        white-space: nowrap;
+        font-weight: 600;
+      }
+      .p-plan {
+        color: var(--verd);
+      }
+      .p-dig {
+        color: var(--amber);
+      }
+      .from {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--muted);
+        padding-top: 12px;
+        border-top: 1px dashed var(--rule);
+        letter-spacing: 0.02em;
+        line-height: 1.8;
+      }
+      .from b {
+        color: var(--ink-2);
+        font-weight: 600;
+      }
+
+      .dos {
+        background: var(--paper-3);
+        padding: 24px 22px;
+      }
+      .dos h3 {
+        font-size: 25px;
+        font-weight: 700;
+        margin-bottom: 6px;
+      }
+      .dos h3 a {
+        text-decoration-thickness: 2px;
+        text-underline-offset: 5px;
+      }
+      .links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+      .links a {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        text-decoration: none;
+        border: 1px solid var(--rule);
+        background: var(--paper-2);
+        color: var(--ink-2);
+        padding: 4px 9px;
+        border-radius: 2px;
+        font-weight: 600;
+      }
+      .links a:hover {
+        background: var(--amber);
+        border-color: var(--amber);
+        color: var(--paper-3);
+      }
+      .links a::after {
+        content: none;
+      }
+      .meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin: 0 0 15px;
+      }
+      .tag {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.07em;
+        padding: 4px 8px;
+        background: var(--paper-2);
+        border: 1px solid var(--rule);
+        color: var(--ink-2);
+        border-radius: 2px;
+      }
+      .tag.live {
+        background: rgba(60, 107, 88, 0.14);
+        border-color: var(--verd);
+        color: var(--verd);
+        font-weight: 600;
+      }
+      .tag.slow {
+        background: rgba(180, 113, 28, 0.13);
+        border-color: var(--amber);
+        color: var(--amber);
+        font-weight: 600;
+      }
+      .tag.dead {
+        background: rgba(166, 58, 38, 0.11);
+        border-color: var(--ember);
+        color: var(--ember);
+        font-weight: 600;
+      }
+      .tag.risk {
+        background: var(--ember);
+        border-color: var(--ember);
+        color: #fff;
+        font-weight: 700;
+      }
+      .dos p {
+        margin: 0 0 12px;
+        font-size: 14.5px;
+        color: var(--ink-2);
+        line-height: 1.58;
+      }
+      .dos .verdict {
+        font-size: 13.5px;
+        padding-top: 12px;
+        border-top: 1px dashed var(--rule);
+        color: var(--ink);
+      }
+      .dos .verdict b {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--amber);
+        display: block;
+        margin-bottom: 4px;
+      }
+
+      .moat {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1px;
+        background: var(--rule);
+        border: 1px solid var(--rule);
+      }
+      .moat div {
+        background: var(--ink);
+        color: var(--paper);
+        padding: 22px 20px;
+      }
+      .moat div b {
+        display: block;
+        font-family: var(--disp);
+        font-size: 19px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        color: var(--amber-hi);
+      }
+      .moat div span {
+        font-size: 13.5px;
+        color: #cfc3ab;
+        line-height: 1.55;
+      }
+      .moat div a {
+        color: #e8dcc4;
+        text-decoration-color: rgba(224, 161, 60, 0.6);
+      }
+      .moat div a:hover {
+        background: rgba(224, 161, 60, 0.25);
+        color: #fff;
+      }
+
+      .callout {
+        border-left: 3px solid var(--ember);
+        background: rgba(166, 58, 38, 0.06);
+        padding: 20px 24px;
+        margin: 32px 0;
+        font-size: 15px;
+        color: var(--ink-2);
+      }
+      .callout b {
+        color: var(--ember);
+      }
+      .callout.ok {
+        border-color: var(--verd);
+        background: rgba(60, 107, 88, 0.07);
+      }
+      .callout.ok b {
+        color: var(--verd);
+      }
+      .callout.rule {
+        border-color: var(--amber);
+        background: rgba(180, 113, 28, 0.07);
+      }
+      .callout.rule b {
+        color: var(--amber);
+      }
+
+      .famille {
+        margin-bottom: 38px;
+      }
+      .famille h4 {
+        font-family: var(--mono);
+        font-size: 11px;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--amber);
+        font-weight: 600;
+        padding-bottom: 9px;
+        border-bottom: 2px solid var(--ink);
+        margin-bottom: 0;
+      }
+      .famille h4 span {
+        color: var(--muted);
+        font-weight: 400;
+        letter-spacing: 0.1em;
+      }
+      .site {
+        display: grid;
+        grid-template-columns: minmax(210px, 1fr) minmax(150px, 0.8fr) minmax(
+            240px,
+            1.8fr
+          );
+        gap: clamp(10px, 2vw, 24px);
+        padding: 11px 2px;
+        border-bottom: 1px solid var(--rule);
+        align-items: baseline;
+        transition: background 0.22s;
+      }
+      .site:hover {
+        background: rgba(224, 161, 60, 0.11);
+      }
+      .site .dm {
+        font-family: var(--mono);
+        font-size: 12.5px;
+        word-break: break-word;
+      }
+      .site .dm a {
+        text-decoration-color: rgba(180, 113, 28, 0.45);
+      }
+      .site .who {
+        font-size: 14px;
+        font-weight: 700;
+      }
+      .site .why {
+        font-size: 13.5px;
+        color: var(--ink-2);
+        line-height: 1.5;
+      }
+      @media (max-width: 720px) {
+        .site {
+          grid-template-columns: 1fr;
+          gap: 3px;
+          padding: 14px 2px;
+        }
+      }
+
+      footer {
+        border-top: 1px solid var(--rule);
+        padding: 44px 0 70px;
+        font-family: var(--mono);
+        font-size: 11.5px;
+        color: var(--muted);
+        line-height: 1.9;
+      }
+      footer code {
+        background: var(--paper-2);
+        padding: 1px 5px;
+        border: 1px solid var(--rule);
+      }
+
+      .rv {
+        opacity: 0;
+        transform: translateY(22px);
+        transition:
+          opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+          transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .rv.on {
+        opacity: 1;
+        transform: none;
+      }
+      header .rv {
+        transition-delay: calc(var(--i, 0) * 90ms);
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .rv {
+          opacity: 1;
+          transform: none;
+        }
+        .bar i {
+          transition: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="hero">
+      <div class="rail">Multifus · veille concurrence · 31 août 2026</div>
+      <div class="wrap">
+        <p class="kicker rv" style="--i: 0">
+          Dofus Retro · Gestion de fenêtres · État du marché
+        </p>
+        <h1 class="rv" style="--i: 1">
+          Un seul <span class="amber">jumeau</span>.<br /><span class="out"
+            >Et</span
+          >
+          il est sur Windows.
+        </h1>
+        <p class="lede rv" style="--i: 2">
+          Tous les gestionnaires de fenêtres pour Dofus Retro et Dofus 1.29, ce
+          qu'ils savent faire, ce qu'ils ne savent pas, et ce qui vaut d'être
+          repris. Chaque nom est cliquable : site officiel ou code source. Ce
+          dossier est relu à chaque version, il ne se périme pas tout seul.
+        </p>
+
+        <div class="facts rv" style="--i: 3">
+          <div class="fact">
+            <b>2</b
+            ><span
+              >outils tournent sur macOS et Windows.
+              <a
+                href="https://alacroix.github.io/focusretro/"
+                target="_blank"
+                rel="noopener"
+                >Focus Retro</a
+              >, et nous</span
+            >
+          </div>
+          <div class="fact">
+            <b>1</b
+            ><span
+              >concurrent couvre les mêmes sept événements que nous,
+              <a
+                href="https://github.com/Slyss42/Dracoon"
+                target="_blank"
+                rel="noopener"
+                >Dracoon</a
+              >, et il est Windows seul</span
+            >
+          </div>
+          <div class="fact">
+            <b>4&nbsp;714</b
+            ><span
+              >téléchargements pour le plus populaire,
+              <a href="https://www.dosoft.fr/fr" target="_blank" rel="noopener"
+                >Dosoft</a
+              >. Le marché est minuscule</span
+            >
+          </div>
+          <div class="fact">
+            <b>4</b
+            ><span
+              >sites vendent un « open source » dont le dépôt ne contient aucun
+              code</span
+            >
+          </div>
+          <div class="fact">
+            <b>0</b
+            ><span
+              >concurrent signé et notarisé. Le nôtre le sera au premier
+              jour</span
+            >
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ══════════════ 01 ══════════════ -->
+    <section>
+      <div class="wrap">
+        <div class="shead rv">
+          <span class="idx">01</span>
+          <h2>Le paysage, en <em class="w">téléchargements</em></h2>
+        </div>
+        <p class="sub rv">
+          Total cumulé sur toutes les versions publiées sur GitHub, relevé le 31
+          août 2026. C'est la seule mesure honnête dont on dispose. Elle ne dit
+          rien de nAiO, de Xixou, de Retro Toolbox ni de Dofus Console, qui
+          distribuent ailleurs : ceux-là pèsent probablement plus lourd que ce
+          tableau ne le laisse croire.
+        </p>
+
+        <div class="rank rv" id="rank">
+          <div class="row" data-v="4714">
+            <div class="nm">
+              <a href="https://www.dosoft.fr/fr" target="_blank" rel="noopener"
+                >Dosoft</a
+              >
+              <a
+                class="src"
+                href="https://github.com/luframecode/dosoft"
+                target="_blank"
+                rel="noopener"
+                >code</a
+              >
+              <small>windows · au ralenti</small>
+            </div>
+            <div class="bar"><i></i></div>
+            <div class="dl">4 714</div>
+          </div>
+
+          <div class="row" data-v="4154">
+            <div class="nm">
+              <a
+                href="https://alacroix.github.io/focusretro/"
+                target="_blank"
+                rel="noopener"
+                >Focus Retro</a
+              >
+              <a
+                class="src"
+                href="https://github.com/alacroix/focusretro"
+                target="_blank"
+                rel="noopener"
+                >code</a
+              >
+              <small>mac + windows · au ralenti</small>
+            </div>
+            <div class="bar"><i></i></div>
+            <div class="dl">4 154</div>
+          </div>
+
+          <div class="row dead" data-v="2958">
+            <div class="nm">
+              <a
+                href="https://github.com/DetroitApps/RetroMultiManager"
+                target="_blank"
+                rel="noopener"
+                >Retro Multi Manager</a
+              >
+              <small>archivé</small>
+            </div>
+            <div class="bar"><i></i></div>
+            <div class="dl">2 958</div>
+          </div>
+
+          <div class="row" data-v="1928">
+            <div class="nm">
+              <a
+                href="https://github.com/Slyss42/Dracoon"
+                target="_blank"
+                rel="noopener"
+                >Dracoon</a
+              >
+              <small>windows · vivant · notre jumeau</small>
+            </div>
+            <div class="bar"><i></i></div>
+            <div class="dl">1 928</div>
+          </div>
+
+          <div class="row" data-v="574">
+            <div class="nm">
+              <a
+                href="https://www.organizer-dofus.com/"
+                target="_blank"
+                rel="noopener"
+                >Organizer-Dofus</a
+              >
+              <a
+                class="src"
+                href="https://github.com/valyriaa/DofusOrganizer"
+                target="_blank"
+                rel="noopener"
+                >code</a
+              >
+              <small>figé depuis décembre 2025</small>
+            </div>
+            <div class="bar"><i></i></div>
+            <div class="dl">574</div>
+          </div>
+
+          <div class="row" data-v="330">
+            <div class="nm">
+              <a
+                href="https://rorganizer.loulouw-labs.fr/"
+                target="_blank"
+                rel="noopener"
+                >ROrganizer</a
+              >
+              <a
+                class="src"
+                href="https://github.com/Loulouw/ROrganizer"
+                target="_blank"
+                rel="noopener"
+                >code</a
+              >
+              <small>windows · vivant · Rust</small>
+            </div>
+            <div class="bar"><i></i></div>
+            <div class="dl">330</div>
+          </div>
+
+          <div class="row dead" data-v="209">
+            <div class="nm">
+              <a
+                href="https://github.com/keytrap-x86/Dofus.Retro.Supertools"
+                target="_blank"
+                rel="noopener"
+                >Dofus Retro Supertools</a
+              >
+              <small>mort depuis 2023</small>
+            </div>
+            <div class="bar"><i></i></div>
+            <div class="dl">209</div>
+          </div>
+
+          <div class="row" data-v="146">
+            <div class="nm">
+              <a
+                href="https://multixi-dofus.com/"
+                target="_blank"
+                rel="noopener"
+                >Multixi</a
+              >
+              <a
+                class="src"
+                href="https://github.com/Chrixii/Multixi"
+                target="_blank"
+                rel="noopener"
+                >dépôt vide</a
+              >
+              <small>aucun code publié</small>
+            </div>
+            <div class="bar"><i></i></div>
+            <div class="dl">146</div>
+          </div>
+
+          <div class="row" data-v="74">
+            <div class="nm">
+              <a
+                href="https://www.dofus-helper.com/"
+                target="_blank"
+                rel="noopener"
+                >Dofus Helper</a
+              >
+              <a
+                class="src"
+                href="https://github.com/Dofus-Helper/Dofus-Helper"
+                target="_blank"
+                rel="noopener"
+                >dépôt vide</a
+              >
+              <small>aucun code publié</small>
+            </div>
+            <div class="bar"><i></i></div>
+            <div class="dl">74</div>
+          </div>
+
+          <div class="row" data-v="55">
+            <div class="nm">
+              <a
+                href="https://dofus-tabs-macos.vercel.app"
+                target="_blank"
+                rel="noopener"
+                >Dofus Tabs macOS</a
+              >
+              <a
+                class="src"
+                href="https://github.com/Marti-Ferret/dofus-tabs-macos"
+                target="_blank"
+                rel="noopener"
+                >code</a
+              >
+              <small>mac seul</small>
+            </div>
+            <div class="bar"><i></i></div>
+            <div class="dl">55</div>
+          </div>
+
+          <div class="row" data-v="23">
+            <div class="nm">
+              <a
+                href="https://github.com/Madgique/dofus-multi-organizer"
+                target="_blank"
+                rel="noopener"
+                >Dofus Multi Organizer</a
+              >
+              <small>windows</small>
+            </div>
+            <div class="bar"><i></i></div>
+            <div class="dl">23</div>
+          </div>
+
+          <div class="row" data-v="20">
+            <div class="nm">
+              <a
+                href="https://ducrosr.github.io/Dofus-Unity-Retro-Window-Manager-StreamDeck-Overlay/"
+                target="_blank"
+                rel="noopener"
+                >Ducrosr Window Manager</a
+              >
+              <a
+                class="src"
+                href="https://github.com/Ducrosr/Dofus-Unity-Retro-Window-Manager-StreamDeck-Overlay"
+                target="_blank"
+                rel="noopener"
+                >code</a
+              >
+              <small>bêta permanente</small>
+            </div>
+            <div class="bar"><i></i></div>
+            <div class="dl">20</div>
+          </div>
+
+          <div class="row" data-v="19">
+            <div class="nm">
+              <a
+                href="https://github.com/Celldwaller/minobot"
+                target="_blank"
+                rel="noopener"
+                >Minobot</a
+              >
+              <small>hors CGU</small>
+            </div>
+            <div class="bar"><i></i></div>
+            <div class="dl">19</div>
+          </div>
+
+          <div class="row" data-v="19">
+            <div class="nm">
+              <a
+                href="https://github.com/scaryztw/DofusPouletFlemmards"
+                target="_blank"
+                rel="noopener"
+                >DofusPouletFlemmards</a
+              >
+              <small>hors CGU</small>
+            </div>
+            <div class="bar"><i></i></div>
+            <div class="dl">19</div>
+          </div>
+
+          <div class="row" data-v="12">
+            <div class="nm">
+              <a
+                href="https://github.com/Skylli202/Skyfus-app"
+                target="_blank"
+                rel="noopener"
+                >Skyfus</a
+              >
+              <small>mort depuis 2024</small>
+            </div>
+            <div class="bar"><i></i></div>
+            <div class="dl">12</div>
+          </div>
+
+          <div class="row" data-v="2">
+            <div class="nm">
+              <a
+                href="https://minutesback.github.io/multi-tofu/"
+                target="_blank"
+                rel="noopener"
+                >multi-tofu</a
+              >
+              <a
+                class="src"
+                href="https://github.com/MinutesBack/multi-tofu"
+                target="_blank"
+                rel="noopener"
+                >code</a
+              >
+              <small>mac seul · né en août 2026</small>
+            </div>
+            <div class="bar"><i></i></div>
+            <div class="dl">2</div>
+          </div>
+
+          <div class="row us" data-v="0">
+            <div class="nm">
+              <a
+                href="https://github.com/viclafouch/multifus"
+                target="_blank"
+                rel="noopener"
+                >Multifus</a
+              >
+              <small>pas encore publié</small>
+            </div>
+            <div class="bar"><i></i></div>
+            <div class="dl">0</div>
+          </div>
+
+          <div class="row" data-v="0">
+            <div class="nm">
+              <a href="https://naio.fr/" target="_blank" rel="noopener">nAiO</a
+              >,
+              <a href="https://xixou.io/" target="_blank" rel="noopener"
+                >Xixou</a
+              >,
+              <a href="https://retro-toolbox.fr/" target="_blank" rel="noopener"
+                >Retro Toolbox</a
+              >,
+              <a
+                href="https://dofus-console.com/en/"
+                target="_blank"
+                rel="noopener"
+                >Dofus Console</a
+              >
+              <small>hors GitHub</small>
+            </div>
+            <div class="bar"><i></i></div>
+            <div class="dl">n. m.</div>
+          </div>
+        </div>
+
+        <div class="callout rv">
+          <b>Ce que ces chiffres racontent.</b> Le premier du marché a été
+          téléchargé moins de cinq mille fois. Aucun outil n'a d'avance
+          imprenable, aucun n'a de communauté verrouillée, et la moitié du haut
+          du classement est morte ou au ralenti. Un outil sérieux, publié sur
+          les deux systèmes, prend la place en une saison.
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════ 02 ══════════════ -->
+    <section>
+      <div class="wrap">
+        <div class="shead rv">
+          <span class="idx">02</span>
+          <h2>Face à face</h2>
+        </div>
+        <p class="sub rv">
+          Les huit outils qui comptent, contre nous. La colonne Dracoon a été
+          refaite en lisant son code, pas sa page de présentation : son fichier
+          de traduction et ses modules disent bien plus que son README, qui
+          n'annonce que trois fonctions sur quinze.
+        </p>
+
+        <div class="tablewrap rv">
+          <table>
+            <thead>
+              <tr>
+                <th>Fonctionnalité</th>
+                <th class="usc">
+                  <a
+                    href="https://github.com/viclafouch/multifus"
+                    target="_blank"
+                    rel="noopener"
+                    >Multifus</a
+                  >
+                </th>
+                <th class="rival">
+                  <a
+                    href="https://github.com/Slyss42/Dracoon"
+                    target="_blank"
+                    rel="noopener"
+                    >Dracoon</a
+                  >
+                </th>
+                <th class="rival">
+                  <a
+                    href="https://alacroix.github.io/focusretro/"
+                    target="_blank"
+                    rel="noopener"
+                    >Focus<br />Retro</a
+                  >
+                </th>
+                <th>
+                  <a
+                    href="https://rorganizer.loulouw-labs.fr/"
+                    target="_blank"
+                    rel="noopener"
+                    >ROrga-<br />nizer</a
+                  >
+                </th>
+                <th>
+                  <a
+                    href="https://www.dosoft.fr/fr"
+                    target="_blank"
+                    rel="noopener"
+                    >Dosoft</a
+                  >
+                </th>
+                <th>
+                  <a
+                    href="https://retro-toolbox.fr/"
+                    target="_blank"
+                    rel="noopener"
+                    >Retro<br />Toolbox</a
+                  >
+                </th>
+                <th>
+                  <a
+                    href="https://github.com/keytrap-x86/Dofus.Retro.Supertools"
+                    target="_blank"
+                    rel="noopener"
+                    >Super-<br />tools</a
+                  >
+                </th>
+                <th>
+                  <a href="https://naio.fr/" target="_blank" rel="noopener"
+                    >nAiO<br />Organizer</a
+                  >
+                </th>
+                <th>
+                  <a href="https://xixou.io/" target="_blank" rel="noopener"
+                    >Xixou<br />Switcher</a
+                  >
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="grp">
+                <th>Systèmes</th>
+                <td colspan="9"></td>
+              </tr>
+              <tr>
+                <th>macOS</th>
+                <td class="us"><span class="m yes">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+              </tr>
+              <tr>
+                <th>Windows</th>
+                <td class="us"><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+              </tr>
+
+              <tr class="grp">
+                <th>Bascule et fenêtres</th>
+                <td colspan="9"></td>
+              </tr>
+              <tr>
+                <th>Défilement suivant / précédent</th>
+                <td class="us"><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+              </tr>
+              <tr>
+                <th>Une touche par personnage</th>
+                <td class="us"><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m unk">?</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m unk">?</span></td>
+              </tr>
+              <tr>
+                <th>Retour au personnage principal</th>
+                <td class="us"><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m unk">?</span></td>
+              </tr>
+              <tr>
+                <th>Retour à la fenêtre d'où l'on vient</th>
+                <td class="us"><span class="m no">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m unk">?</span></td>
+              </tr>
+              <tr>
+                <th>Roue des personnages</th>
+                <td class="us"><span class="m yes">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+              </tr>
+              <tr>
+                <th>Déplacement rapide au clic gauche</th>
+                <td class="us"><span class="m yes">●</span></td>
+                <td>
+                  <span class="m yes">●</span><small>délai réglable</small>
+                </td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+              </tr>
+              <tr>
+                <th>Bouton de souris comme raccourci</th>
+                <td class="us"><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m unk">?</span></td>
+              </tr>
+              <tr>
+                <th>Grille, ou split 2 et 4 fenêtres</th>
+                <td class="us"><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m part">◐</span><small>par écran</small></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+              </tr>
+              <tr>
+                <th>Agrandissement à l'ouverture</th>
+                <td class="us"><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+              </tr>
+              <tr>
+                <th>Compositions d'équipe enregistrées</th>
+                <td class="us"><span class="m no">●</span></td>
+                <td>
+                  <span class="m yes">●</span><small>presets nommés</small>
+                </td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m part">◐</span></td>
+                <td>
+                  <span class="m part">◐</span><small>profils de split</small>
+                </td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m unk">?</span></td>
+              </tr>
+
+              <tr class="grp">
+                <th>AutoFocus</th>
+                <td colspan="9"></td>
+              </tr>
+              <tr>
+                <th>AutoFocus sur notification du jeu</th>
+                <td class="us"><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m yes">●</span></td>
+              </tr>
+              <tr>
+                <th>Événements couverts</th>
+                <td class="us">
+                  <b class="num" style="color: var(--verd)">7</b
+                  ><small
+                    >combat, échange, groupe,<br />craft, MP, défi,
+                    percepteur</small
+                  >
+                </td>
+                <td>
+                  <b class="num">7</b
+                  ><small
+                    >combat, échange, groupe,<br />MP, défi, craft, pvp</small
+                  >
+                </td>
+                <td><span class="num">1</span><small>combat</small></td>
+                <td><span class="no">·</span></td>
+                <td><span class="no">·</span></td>
+                <td><span class="num">5</span></td>
+                <td><span class="num">3</span></td>
+                <td><span class="no">·</span></td>
+                <td><span class="m unk">?</span></td>
+              </tr>
+              <tr>
+                <th>Exclure un personnage du défilement</th>
+                <td class="us"><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+              </tr>
+              <tr>
+                <th>Sauter les tours d'un Sadida qui pousse</th>
+                <td class="us"><span class="m no">●</span></td>
+                <td>
+                  <span class="m yes">●</span><small>mode Dradidas</small>
+                </td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+              </tr>
+
+              <tr class="grp">
+                <th>Reconnaître ses fenêtres</th>
+                <td colspan="9"></td>
+              </tr>
+              <tr>
+                <th>Portrait de classe sur la fenêtre</th>
+                <td class="us">
+                  <span class="m yes">●</span><small>24 portraits</small>
+                </td>
+                <td><span class="m yes">●</span><small>24 portraits</small></td>
+                <td><span class="m part">◐</span><small>icône libre</small></td>
+                <td>
+                  <span class="m bad">✕</span><small>déclaré impossible</small>
+                </td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m part">◐</span><small>icône libre</small></td>
+                <td><span class="m no">●</span></td>
+              </tr>
+              <tr>
+                <th>Titre de fenêtre raccourci</th>
+                <td class="us"><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+              </tr>
+              <tr>
+                <th>Bannière du personnage à la bascule</th>
+                <td class="us"><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+              </tr>
+              <tr>
+                <th>Couleur libre par compte</th>
+                <td class="us"><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+              </tr>
+
+              <tr class="grp">
+                <th>Ce que personne d'autre ne fait</th>
+                <td colspan="9"></td>
+              </tr>
+              <tr>
+                <th>Messages renvoyés sur le téléphone</th>
+                <td class="us">
+                  <span class="m yes">●</span><small>telegram</small>
+                </td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+              </tr>
+              <tr>
+                <th>Réponses toutes prêtes</th>
+                <td class="us"><span class="m yes">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+              </tr>
+              <tr>
+                <th>Tableau des runes posé sur le jeu</th>
+                <td class="us"><span class="m yes">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td>
+                  <span class="m part">◐</span
+                  ><small>la table, pas la pose</small>
+                </td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+              </tr>
+              <tr>
+                <th>Exclure tous les hommes ou toutes les femmes</th>
+                <td class="us"><span class="m yes">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+              </tr>
+
+              <tr class="grp">
+                <th>Confiance</th>
+                <td colspan="9"></td>
+              </tr>
+              <tr>
+                <th>Code source réellement publié</th>
+                <td class="us"><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td>
+                  <span class="m part">◐</span><small>source available</small>
+                </td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+              </tr>
+              <tr>
+                <th>Licence libre</th>
+                <td class="us">
+                  <span class="m yes">●</span><small>MIT</small>
+                </td>
+                <td><span class="m yes">●</span><small>MIT</small></td>
+                <td><span class="m yes">●</span><small>MIT</small></td>
+                <td><span class="m yes">●</span><small>Apache 2</small></td>
+                <td><span class="m yes">●</span><small>Apache 2</small></td>
+                <td><span class="m bad">✕</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m bad">✕</span></td>
+                <td><span class="m bad">✕</span></td>
+              </tr>
+              <tr>
+                <th>Binaire signé par l'éditeur du système</th>
+                <td class="us">
+                  <span class="m yes">●</span><small>apple, notarisé</small>
+                </td>
+                <td>
+                  <span class="m bad">✕</span><small>alerte windows</small>
+                </td>
+                <td>
+                  <span class="m part">◐</span><small>attestation github</small>
+                </td>
+                <td>
+                  <span class="m bad">✕</span><small>alerte smartscreen</small>
+                </td>
+                <td><span class="m no">●</span></td>
+                <td>
+                  <span class="m bad">✕</span
+                  ><small>faux positifs antivirus</small>
+                </td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+              </tr>
+              <tr>
+                <th>Mise à jour proposée dans l'application</th>
+                <td class="us"><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m unk">?</span></td>
+                <td><span class="m unk">?</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m unk">?</span></td>
+              </tr>
+              <tr>
+                <th>Téléchargement sans compte</th>
+                <td class="us"><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td>
+                  <span class="m bad">✕</span><small>compte obligatoire</small>
+                </td>
+              </tr>
+              <tr>
+                <th>Interface en plusieurs langues</th>
+                <td class="us">
+                  <span class="m bad">✕</span><small>français seul</small>
+                </td>
+                <td><span class="m yes">●</span><small>fr en es</small></td>
+                <td><span class="m yes">●</span><small>fr en es</small></td>
+                <td><span class="m yes">●</span><small>fr en es</small></td>
+                <td><span class="m part">◐</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+                <td><span class="m no">●</span></td>
+              </tr>
+
+              <tr class="grp">
+                <th>Respect des CGU d'Ankama</th>
+                <td colspan="9"></td>
+              </tr>
+              <tr>
+                <th>Ne fait que gérer des fenêtres</th>
+                <td class="us"><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td>
+                  <span class="m bad">✕</span
+                  ><small>connexion automatique</small>
+                </td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+              </tr>
+              <tr>
+                <th>Aucune diffusion de frappe ni macro</th>
+                <td class="us"><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+                <td><span class="m yes">●</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="legend">
+          <span><span class="yes">●</span> oui</span>
+          <span><span class="part">◐</span> à moitié</span>
+          <span><span class="no">●</span> non</span>
+          <span
+            ><span class="bad">✕</span> non, et c'est un point faible
+            reconnu</span
+          >
+          <span><span class="unk">?</span> non documenté, code non publié</span>
+        </div>
+
+        <div class="callout rv">
+          <b>La leçon de Dracoon.</b> Son README n'annonce que le tri des
+          fenêtres, les raccourcis et l'auto-focus. Son code en dit quinze :
+          mode Déplacement au clic gauche par crochet souris bas niveau,
+          bannière réglable, personnage principal, retour arrière, exclusion,
+          presets d'équipe, vingt-quatre portraits par classe et par sexe, titre
+          court, agrandissement, mise à jour intégrée, trois langues, thème, et
+          un mode Sadida. Un concurrent ne se juge jamais sur sa page d'accueil.
+        </div>
+
+        <div class="callout rv">
+          <b>Et une mise en garde sur les comparatifs des autres.</b>
+          <a
+            href="https://alacroix.github.io/focusretro/"
+            target="_blank"
+            rel="noopener"
+            >Focus Retro</a
+          >
+          publie le sien et y coche « pas d'auto-focus » en face de Dracoon.
+          C'est faux, et c'est même l'argument principal de Dracoon. Le même
+          tableau se donne l'exclusivité de l'open source alors que Dracoon,
+          <a
+            href="https://github.com/luframecode/dosoft"
+            target="_blank"
+            rel="noopener"
+            >Dosoft</a
+          >
+          et
+          <a
+            href="https://github.com/Loulouw/ROrganizer"
+            target="_blank"
+            rel="noopener"
+            >ROrganizer</a
+          >
+          publient tous leur code. Personne ici ne compare honnêtement. Notre
+          tableau doit se vérifier ligne par ligne.
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════ 03 ══════════════ -->
+    <section>
+      <div class="wrap">
+        <div class="shead rv">
+          <span class="idx">03</span>
+          <h2>Ce qu'ils ont, et que <em class="w">nous n'avons pas</em></h2>
+        </div>
+        <p class="sub rv">
+          Ce qui reste après le tri. La pastille verte dit qu'une ligne est déjà
+          au plan, la pastille ambre qu'il faut aller regarder de plus près
+          avant de décider.
+        </p>
+
+        <div class="callout rule rv">
+          <b>Ce qui a été écarté d'office.</b> Tout ce qui interroge un service
+          extérieur, prix d'hôtel de vente, suivi d'archimonstres, base de
+          recettes. Et tout ce qui oblige le joueur à recopier son jeu dans
+          l'outil, initiative, niveau, serveur, équipement. Multifus lit le
+          titre d'une fenêtre et les notifications du système, et cela doit
+          suffire : le jour où l'on demande à l'utilisateur de saisir ce que le
+          jeu affiche déjà, on a perdu.
+        </div>
+
+        <div class="grid g3 rv">
+          <div class="card">
+            <div class="top">
+              <h3>La grille, et le split</h3>
+              <span class="pill p-plan">Au plan</span>
+            </div>
+            <p>
+              Poser deux ou quatre fenêtres côte à côte sur chaque écran, avec
+              des dispositions qu'on enregistre. On surveille ses paysans ou ses
+              archimonstres sans basculer une seule fois. Nous n'agrandissons
+              qu'à plein écran de travail, et c'est tout.
+            </p>
+            <p class="from">
+              <b>Chez</b>
+              <a href="https://retro-toolbox.fr/" target="_blank" rel="noopener"
+                >Retro Toolbox</a
+              >
+              (profils, mode sans bordure),
+              <a
+                href="https://alacroix.github.io/focusretro/"
+                target="_blank"
+                rel="noopener"
+                >Focus Retro</a
+              >,
+              <a href="https://www.dosoft.fr/fr" target="_blank" rel="noopener"
+                >Dosoft</a
+              >
+              (par écran),
+              <a
+                href="https://dofus-console.com/en/"
+                target="_blank"
+                rel="noopener"
+                >Dofus Console</a
+              >
+              (grille, pile, cascade)
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="top">
+              <h3>La couleur libre par compte</h3>
+              <span class="pill p-plan">Au plan</span>
+            </div>
+            <p>
+              Une couleur choisie par le joueur, en plus du portrait de classe.
+              Quand on mène quatre Sadidas, le portrait ne distingue plus rien,
+              et le sexe ne règle que la moitié du problème. Focus Retro pousse
+              la couleur jusque dans le bouton de la barre des tâches.
+            </p>
+            <p class="from">
+              <b>Chez</b>
+              <a
+                href="https://alacroix.github.io/focusretro/"
+                target="_blank"
+                rel="noopener"
+                >Focus Retro</a
+              >, seul à le faire
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="top">
+              <h3>L'interface en trois langues</h3>
+              <span class="pill p-plan">Au plan</span>
+            </div>
+            <p>
+              Français, anglais, espagnol, sur la langue du système. Nos trois
+              concurrents sérieux le font déjà, et la communauté hispanophone de
+              Dofus Retro est nombreuse et mal servie. Dracoon range ses cent
+              vingt-six chaînes dans un seul fichier, ce qui donne une idée du
+              volume à traduire.
+            </p>
+            <p class="from">
+              <b>Chez</b>
+              <a
+                href="https://github.com/Slyss42/Dracoon"
+                target="_blank"
+                rel="noopener"
+                >Dracoon</a
+              >,
+              <a
+                href="https://rorganizer.loulouw-labs.fr/"
+                target="_blank"
+                rel="noopener"
+                >ROrganizer</a
+              >,
+              <a
+                href="https://alacroix.github.io/focusretro/"
+                target="_blank"
+                rel="noopener"
+                >Focus Retro</a
+              >. Voir aussi
+              <a
+                href="https://github.com/NicolasIrarrazabal/DofusTabs"
+                target="_blank"
+                rel="noopener"
+                >DofusTabs</a
+              >, écrit en espagnol
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="top">
+              <h3>Les compositions d'équipe</h3>
+              <span class="pill p-dig">À creuser</span>
+            </div>
+            <p>
+              Enregistrer un ordre de défilement sous un nom, et le rappeler
+              d'un clic. Team de donjon, team de percepteur, team de chasse.
+              Aujourd'hui on range ses lignes à la main et on recommence à
+              chaque changement de composition.
+            </p>
+            <p class="from">
+              <b>Chez</b>
+              <a
+                href="https://github.com/Slyss42/Dracoon"
+                target="_blank"
+                rel="noopener"
+                >Dracoon</a
+              >, sous le nom de presets
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="top">
+              <h3>Le retour à la fenêtre d'où l'on vient</h3>
+              <span class="pill p-dig">À creuser</span>
+            </div>
+            <p>
+              Un raccourci qui ramène sur la fenêtre précédemment au premier
+              plan, quel que soit l'ordre du défilement. Ce n'est pas notre
+              personnage principal, qui est fixe : c'est un aller-retour entre
+              deux personnages, utile en échange ou en pose de percepteur.
+            </p>
+            <p class="from">
+              <b>Chez</b>
+              <a
+                href="https://github.com/Slyss42/Dracoon"
+                target="_blank"
+                rel="noopener"
+                >Dracoon</a
+              >, en quatrième raccourci
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="top">
+              <h3>Le mode Sadida</h3>
+              <span class="pill p-dig">À creuser</span>
+            </div>
+            <p>
+              On désigne ses Sadidas et un nombre de tours. Au raccourci,
+              l'AutoFocus cesse de ramener ce personnage devant pendant ce
+              nombre de tours de combat, le temps qu'il pousse sa Puissance
+              Sylvestre. Rien n'est envoyé au jeu, seul l'AutoFocus se tait.
+              C'est la seule idée du marché qui vienne vraiment d'un joueur.
+            </p>
+            <p class="from">
+              <b>Chez</b>
+              <a
+                href="https://github.com/Slyss42/Dracoon"
+                target="_blank"
+                rel="noopener"
+                >Dracoon</a
+              >, sous le nom de mode Dradidas
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="top">
+              <h3>Le bouton de souris comme raccourci</h3>
+              <span class="pill p-dig">À creuser</span>
+            </div>
+            <p>
+              Assigner un bouton latéral de souris à un personnage, au lieu
+              d'une touche. Reste à savoir si cela vaut du travail : la plupart
+              des souris à boutons latéraux savent déjà envoyer une touche à
+              leur place, depuis leur propre logiciel. À vérifier avant de coder
+              quoi que ce soit.
+            </p>
+            <p class="from">
+              <b>Chez</b>
+              <a
+                href="https://rorganizer.loulouw-labs.fr/"
+                target="_blank"
+                rel="noopener"
+                >ROrganizer</a
+              >
+              (touche ou bouton, au choix),
+              <a
+                href="https://alacroix.github.io/focusretro/"
+                target="_blank"
+                rel="noopener"
+                >Focus Retro</a
+              >
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="top">
+              <h3>L'attestation de compilation</h3>
+              <span class="pill p-dig">À creuser</span>
+            </div>
+            <p>
+              GitHub signe une preuve, à chaque version, que le fichier
+              téléchargé a bien été produit par la machine d'intégration à
+              partir du code public, et non posé à la main par quelqu'un. Ça ne
+              dit pas que le logiciel est bon, ça dit que le binaire correspond
+              au code affiché. Un joueur peut le vérifier lui-même avec une
+              commande. Reste à savoir si ça ajoute quoi que ce soit quand on
+              est déjà signé et notarisé par Apple.
+            </p>
+            <p class="from">
+              <b>Chez</b>
+              <a
+                href="https://github.com/alacroix/focusretro/releases"
+                target="_blank"
+                rel="noopener"
+                >Focus Retro</a
+              >, seul à le faire
+            </p>
+          </div>
+        </div>
+
+        <div class="callout rv">
+          <b>Ce qu'on ne prendra pas, et qu'il faut savoir refuser.</b> La
+          connexion automatique des comptes, qui tape les mots de passe à votre
+          place, chez
+          <a
+            href="https://github.com/keytrap-x86/Dofus.Retro.Supertools"
+            target="_blank"
+            rel="noopener"
+            >Supertools</a
+          >
+          et
+          <a
+            href="https://github.com/DetroitApps/RetroMultiManager"
+            target="_blank"
+            rel="noopener"
+            >Retro Multi Manager</a
+          >. La diffusion des frappes et du clic sur toute l'équipe, chez
+          <a href="https://dofus-console.com/en/" target="_blank" rel="noopener"
+            >Dofus Console</a
+          >,
+          <a
+            href="https://github.com/Celldwaller/minobot"
+            target="_blank"
+            rel="noopener"
+            >Minobot</a
+          >,
+          <a
+            href="https://github.com/Skylli202/Skyfus-app"
+            target="_blank"
+            rel="noopener"
+            >Skyfus</a
+          >
+          et
+          <a href="https://www.dosoft-dofus.com/" target="_blank" rel="noopener"
+            >Doframe</a
+          >. Le passage de tour automatique et l'acceptation automatique des
+          échanges, chez Minobot et
+          <a
+            href="https://github.com/scaryztw/DofusPouletFlemmards"
+            target="_blank"
+            rel="noopener"
+            >DofusPouletFlemmards</a
+          >. La règle d'Ankama est qu'une touche vaut une action, et ce sont
+          justement les fonctions que ces outils mettent en avant.
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════ 04 ══════════════ -->
+    <section>
+      <div class="wrap">
+        <div class="shead rv">
+          <span class="idx">04</span>
+          <h2>Dossiers</h2>
+        </div>
+        <p class="sub rv">
+          Un par outil qui compte. Maintenance, versionnage, popularité, et ce
+          qu'il faut en retenir. Les boutons mènent au site officiel et au
+          dépôt.
+        </p>
+
+        <div class="grid g2 rv">
+          <div class="dos">
+            <h3>
+              <a
+                href="https://github.com/Slyss42/Dracoon"
+                target="_blank"
+                rel="noopener"
+                >Dracoon</a
+              >
+            </h3>
+            <div class="links">
+              <a
+                href="https://github.com/Slyss42/Dracoon"
+                target="_blank"
+                rel="noopener"
+                >Code source</a
+              >
+              <a
+                href="https://github.com/Slyss42/Dracoon/releases"
+                target="_blank"
+                rel="noopener"
+                >Versions</a
+              >
+              <a
+                href="https://youtu.be/6R7pPM_5euM"
+                target="_blank"
+                rel="noopener"
+                >Vidéo de l'auteur</a
+              >
+            </div>
+            <div class="meta">
+              <span class="tag live">Vivant</span
+              ><span class="tag">v4.0.2 · 19 août 2026</span
+              ><span class="tag">6 versions</span
+              ><span class="tag">1 928 téléch.</span
+              ><span class="tag">20 ★ · 12 forks</span
+              ><span class="tag">windows</span
+              ><span class="tag">Python · PyQt6</span
+              ><span class="tag">MIT</span>
+            </div>
+            <p>
+              Notre jumeau, et le concurrent qu'il faut suivre de près. Même
+              AutoFocus sur les mêmes sept événements, même mode de déplacement
+              au clic gauche avec sa bannière, même personnage principal, même
+              exclusion, mêmes vingt-quatre portraits par classe et par sexe,
+              même titre court, même agrandissement. Il a en plus les
+              compositions d'équipe, le retour arrière, trois langues et un mode
+              Sadida. Il n'a ni roue, ni Telegram, ni réponses prêtes, ni
+              tableau des runes, et il est Windows seul.
+            </p>
+            <p class="verdict">
+              <b>À retenir</b>L'auteur dit en clair que tout est écrit avec de
+              l'IA. Il gagne des étoiles vite, il livre vite, et son seul vrai
+              retard sur nous est le Mac. C'est lui qu'il faut auditer après
+              Focus Retro.
+            </p>
+          </div>
+
+          <div class="dos">
+            <h3>
+              <a
+                href="https://alacroix.github.io/focusretro/"
+                target="_blank"
+                rel="noopener"
+                >Focus Retro</a
+              >
+            </h3>
+            <div class="links">
+              <a
+                href="https://alacroix.github.io/focusretro/"
+                target="_blank"
+                rel="noopener"
+                >Site</a
+              >
+              <a
+                href="https://github.com/alacroix/focusretro"
+                target="_blank"
+                rel="noopener"
+                >Code source</a
+              >
+              <a
+                href="https://github.com/alacroix/focusretro/releases"
+                target="_blank"
+                rel="noopener"
+                >Versions</a
+              >
+            </div>
+            <div class="meta">
+              <span class="tag slow">Au ralenti</span
+              ><span class="tag">v0.7.0 · 6 avril 2026</span
+              ><span class="tag">16 versions</span
+              ><span class="tag">4 154 téléch.</span><span class="tag">6 ★</span
+              ><span class="tag">mac + windows</span
+              ><span class="tag">Rust</span><span class="tag">MIT</span>
+            </div>
+            <p>
+              Le seul autre outil sur les deux systèmes, et le seul écrit avec
+              le même soin de présentation que nous. Roue des personnages,
+              grille, icônes et couleurs par compte, boîte des messages privés,
+              trois langues, attestations de compilation signées. Le versionnage
+              est propre mais il n'a jamais passé la version 0.7, et rien n'est
+              sorti depuis avril.
+            </p>
+            <p class="verdict">
+              <b>À retenir</b>La couleur par compte, la grille, les
+              attestations. Son AutoFocus ne couvre que le combat, là où nous en
+              couvrons sept. Cinq mois de silence nous laissent la place. Audit
+              comparé à mener en priorité.
+            </p>
+          </div>
+
+          <div class="dos">
+            <h3>
+              <a href="https://www.dosoft.fr/fr" target="_blank" rel="noopener"
+                >Dosoft</a
+              >
+            </h3>
+            <div class="links">
+              <a href="https://www.dosoft.fr/fr" target="_blank" rel="noopener"
+                >Site</a
+              >
+              <a
+                href="https://github.com/luframecode/dosoft"
+                target="_blank"
+                rel="noopener"
+                >Code source</a
+              >
+              <a
+                href="https://www.dosoft-dofus.com/"
+                target="_blank"
+                rel="noopener"
+                >Doframe</a
+              >
+            </div>
+            <div class="meta">
+              <span class="tag slow">Au ralenti</span
+              ><span class="tag">v1.2.1 · 5 avril 2026</span
+              ><span class="tag">5 versions</span
+              ><span class="tag">4 714 téléch.</span
+              ><span class="tag">8 ★ · 8 forks</span
+              ><span class="tag">windows</span><span class="tag">Python</span
+              ><span class="tag">Apache 2</span>
+            </div>
+            <p>
+              Le plus téléchargé du marché, et pourtant écrit d'abord pour Dofus
+              Unity : le Retro est un bonus. Sa roue de personnages a inspiré
+              celle de Focus Retro, et il répartit l'équipe sur plusieurs
+              écrans. Pas d'AutoFocus du tout : il ne fait que basculer vite.
+            </p>
+            <p class="verdict">
+              <b>À retenir</b>La popularité se gagne avec une bascule rapide et
+              une roue, pas avec une longue liste. Sa version musclée, Doframe,
+              ajoute macros et multi-clic et sort des CGU : la confusion entre
+              les deux noms nous sert.
+            </p>
+          </div>
+
+          <div class="dos">
+            <h3>
+              <a href="https://retro-toolbox.fr/" target="_blank" rel="noopener"
+                >Retro Toolbox</a
+              >
+            </h3>
+            <div class="links">
+              <a href="https://retro-toolbox.fr/" target="_blank" rel="noopener"
+                >Site</a
+              >
+              <a
+                href="https://github.com/Webn-Benjamin/retro_toolbox"
+                target="_blank"
+                rel="noopener"
+                >Code source</a
+              >
+            </div>
+            <div class="meta">
+              <span class="tag live">Vivant</span
+              ><span class="tag">v2.2 · juin 2026</span
+              ><span class="tag">non mesurable</span
+              ><span class="tag">windows</span><span class="tag">Python</span
+              ><span class="tag dead">source available</span>
+            </div>
+            <p>
+              Le plus riche sur la partie fenêtres : AutoFocus sur cinq
+              événements, split 2 ou 4 fenêtres avec profils enregistrables,
+              agrandissement et titres raccourcis à l'ouverture, retour au
+              personnage principal. Il y greffe tout un compagnon de métier qui
+              sort de notre périmètre. Écrit par un développeur web, joueur
+              depuis 2007.
+            </p>
+            <p class="verdict">
+              <b>À retenir</b>Son split est le meilleur du marché et c'est ce
+              qui nous manque. Fragile sur la forme : Windows seul, licence qui
+              interdit la redistribution donc pas open source, et signalé en
+              faux positif par les antivirus.
+            </p>
+          </div>
+
+          <div class="dos">
+            <h3>
+              <a
+                href="https://rorganizer.loulouw-labs.fr/"
+                target="_blank"
+                rel="noopener"
+                >ROrganizer</a
+              >
+            </h3>
+            <div class="links">
+              <a
+                href="https://rorganizer.loulouw-labs.fr/"
+                target="_blank"
+                rel="noopener"
+                >Site</a
+              >
+              <a
+                href="https://github.com/Loulouw/ROrganizer"
+                target="_blank"
+                rel="noopener"
+                >Code source</a
+              >
+              <a
+                href="https://github.com/Loulouw/ROrganizer/releases"
+                target="_blank"
+                rel="noopener"
+                >Versions</a
+              >
+            </div>
+            <div class="meta">
+              <span class="tag live">Vivant</span
+              ><span class="tag">v1.3.2 · 17 août 2026</span
+              ><span class="tag">6 versions</span
+              ><span class="tag">330 téléch.</span><span class="tag">10 ★</span
+              ><span class="tag">windows</span><span class="tag">Rust</span
+              ><span class="tag">Apache 2</span>
+            </div>
+            <p>
+              Se présente comme l'héritier libre de nAiO, et il est écrit en
+              Rust comme nous. Détection automatique des comptes Unity, Retro et
+              Expérimental, une touche ou un bouton de souris par compte,
+              glisser-déposer, thèmes clair et sombre, trois langues, barre
+              système. Aucun AutoFocus : c'est un pur commutateur.
+            </p>
+            <p class="verdict">
+              <b>À retenir</b>Le bouton de souris. Il déclare lui-même deux
+              faiblesses que nous n'avons pas : il ne sait pas afficher les
+              icônes de classe en Retro, et son binaire n'est pas signé, donc
+              SmartScreen l'accuse à chaque installation.
+            </p>
+          </div>
+
+          <div class="dos">
+            <h3>
+              <a href="https://naio.fr/" target="_blank" rel="noopener"
+                >nAiO Organizer</a
+              >
+            </h3>
+            <div class="links">
+              <a href="https://naio.fr/" target="_blank" rel="noopener">Site</a>
+            </div>
+            <div class="meta">
+              <span class="tag slow">Vétéran</span
+              ><span class="tag">depuis 2010</span
+              ><span class="tag">non mesurable</span
+              ><span class="tag">windows</span
+              ><span class="tag dead">fermé</span>
+            </div>
+            <p>
+              L'ancêtre, et la référence à laquelle tout le monde se compare
+              encore seize ans après. Connexion des comptes, ordre des fenêtres,
+              raccourcis, icônes. Fermé, sans dépôt, et il faut souvent le
+              lancer en administrateur pour qu'il fonctionne sous Windows 11.
+            </p>
+            <p class="verdict">
+              <b>À retenir</b>Sa base installée est énorme et invisible dans les
+              chiffres. Se dire « comme nAiO, mais ouvert et sur Mac » est le
+              raccourci le plus court vers la moitié de ce marché.
+            </p>
+          </div>
+
+          <div class="dos">
+            <h3>
+              <a href="https://xixou.io/" target="_blank" rel="noopener"
+                >Xixou Switcher</a
+              >
+            </h3>
+            <div class="links">
+              <a href="https://xixou.io/" target="_blank" rel="noopener"
+                >Site</a
+              >
+            </div>
+            <div class="meta">
+              <span class="tag live">Vivant</span
+              ><span class="tag dead">compte obligatoire</span
+              ><span class="tag dead">fermé</span
+              ><span class="tag">non mesurable</span
+              ><span class="tag">windows</span>
+            </div>
+            <p>
+              Un commutateur adossé au plus gros site communautaire Dofus Retro.
+              Le logiciel n'est qu'une pièce d'un écosystème, et il faut créer
+              un compte pour le télécharger.
+            </p>
+            <p class="verdict">
+              <b>À retenir</b>La distribution bat la fonctionnalité. Il gagne
+              des utilisateurs par son audience, pas par ses qualités. Le compte
+              obligatoire est notre meilleur contre-argument.
+            </p>
+          </div>
+
+          <div class="dos">
+            <h3>
+              <a
+                href="https://dofus-console.com/en/"
+                target="_blank"
+                rel="noopener"
+                >Dofus Console</a
+              >
+            </h3>
+            <div class="links">
+              <a
+                href="https://dofus-console.com/en/"
+                target="_blank"
+                rel="noopener"
+                >Site</a
+              >
+            </div>
+            <div class="meta">
+              <span class="tag">annoncé open source</span
+              ><span class="tag dead">dépôt introuvable</span
+              ><span class="tag risk">hors CGU</span
+              ><span class="tag">windows</span><span class="tag">Rust</span>
+            </div>
+            <p>
+              Beau site, promesses fortes : dispositions en grille, pile et
+              cascade, système d'extensions, API de script. Mais son argument
+              central est la diffusion des frappes et des clics du meneur vers
+              toute l'équipe, ce qui viole la règle d'une touche pour une
+              action. Et le code annoncé reste introuvable.
+            </p>
+            <p class="verdict">
+              <b>À retenir</b>Ses dispositions de fenêtres sont bonnes à
+              prendre, sa diffusion d'entrées est à laisser. La confusion des
+              deux dans un même produit est ce que nous refusons.
+            </p>
+          </div>
+
+          <div class="dos">
+            <h3>
+              <a
+                href="https://github.com/keytrap-x86/Dofus.Retro.Supertools"
+                target="_blank"
+                rel="noopener"
+                >Dofus Retro Supertools</a
+              >
+            </h3>
+            <div class="links">
+              <a
+                href="https://github.com/keytrap-x86/Dofus.Retro.Supertools"
+                target="_blank"
+                rel="noopener"
+                >Code source</a
+              >
+            </div>
+            <div class="meta">
+              <span class="tag dead">Mort</span
+              ><span class="tag">1 version · avril 2023</span
+              ><span class="tag">209 téléch.</span><span class="tag">10 ★</span
+              ><span class="tag">windows</span><span class="tag">C#</span
+              ><span class="tag risk">hors CGU</span>
+            </div>
+            <p>
+              Trois ans sans un commit. Il faisait pourtant l'AutoFocus sur
+              trois événements avant tout le monde. Sa fonction phare, la
+              connexion automatique de tous les personnages, tape les
+              identifiants à la place du joueur : cela sort du cadre, et cela
+              demande de lui confier ses mots de passe.
+            </p>
+            <p class="verdict">
+              <b>À retenir</b>La preuve qu'un outil peut mourir en gardant ses
+              étoiles. Ne jamais toucher aux identifiants, et le dire clairement
+              sur notre page.
+            </p>
+          </div>
+
+          <div class="dos">
+            <h3>
+              <a
+                href="https://github.com/DetroitApps/RetroMultiManager"
+                target="_blank"
+                rel="noopener"
+                >Retro Multi Manager</a
+              >
+            </h3>
+            <div class="links">
+              <a
+                href="https://github.com/DetroitApps/RetroMultiManager"
+                target="_blank"
+                rel="noopener"
+                >Code source</a
+              >
+              <a
+                href="https://github.com/DetroitApps/RetroMultiManager/releases"
+                target="_blank"
+                rel="noopener"
+                >Versions</a
+              >
+            </div>
+            <div class="meta">
+              <span class="tag dead">Archivé</span
+              ><span class="tag">1.2.1 · décembre 2020</span
+              ><span class="tag">10 versions</span
+              ><span class="tag">2 958 téléch.</span
+              ><span class="tag">11 ★</span><span class="tag">AutoHotkey</span
+              ><span class="tag">GPL 3</span>
+            </div>
+            <p>
+              Troisième au classement des téléchargements, et fermé par son
+              auteur. Écrit en AutoHotkey, avec des positions de curseur codées
+              en dur : il ne marche donc qu'à certaines résolutions, et il faut
+              relever soi-même les coordonnées pour les autres.
+            </p>
+            <p class="verdict">
+              <b>À retenir</b>Trois mille téléchargements orphelins, sur un
+              outil lié à une résolution d'écran. La barre est basse, et elle
+              est libre.
+            </p>
+          </div>
+
+          <div class="dos">
+            <h3>Le réseau des faux open source</h3>
+            <div class="links">
+              <a
+                href="https://multixi-dofus.com/"
+                target="_blank"
+                rel="noopener"
+                >Multixi</a
+              >
+              <a
+                href="https://github.com/Chrixii/Multixi"
+                target="_blank"
+                rel="noopener"
+                >Son dépôt vide</a
+              >
+              <a
+                href="https://www.dofus-helper.com/"
+                target="_blank"
+                rel="noopener"
+                >Dofus Helper</a
+              >
+              <a
+                href="https://github.com/Dofus-Helper/Dofus-Helper"
+                target="_blank"
+                rel="noopener"
+                >Son dépôt vide</a
+              >
+              <a
+                href="https://www.multix-dofus.com/dofus-multicompte"
+                target="_blank"
+                rel="noopener"
+                >MultiX</a
+              >
+              <a
+                href="https://www.dofus-switcher.com/"
+                target="_blank"
+                rel="noopener"
+                >Dofus Switcher</a
+              >
+            </div>
+            <div class="meta">
+              <span class="tag risk">À ne pas installer</span
+              ><span class="tag">220 téléch. cumulés</span
+              ><span class="tag dead">aucun code</span
+              ><span class="tag dead">aucun versionnage</span>
+            </div>
+            <p>
+              Quatre sites, la même page, la même promesse mot pour mot, et le
+              même « gratuit et open source » en gros. Vérification faite : les
+              deux premiers dépôts ne contiennent qu'un fichier de présentation,
+              des captures d'écran et une archive compilée, sans une ligne de
+              code. Les deux autres dépôts n'existent pas, leurs liens tombent
+              en 404. Aucun numéro de version, une seule archive déposée et
+              jamais mise à jour.
+            </p>
+            <p class="verdict">
+              <b>À retenir</b>Le mot « open source » ne vaut rien tant qu'on n'a
+              pas ouvert le dépôt. C'est notre argument le plus fort auprès d'un
+              joueur qui hésite, et il se démontre en trois clics devant lui.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════ 05 ══════════════ -->
+    <section>
+      <div class="wrap">
+        <div class="shead rv">
+          <span class="idx">05</span>
+          <h2>Ce qui nous reste en propre</h2>
+        </div>
+        <p class="sub rv">
+          Après relecture du code de Dracoon, la liste a maigri. Ce qui suit
+          tient encore, et c'est là-dessus que la page d'accueil du site doit
+          reposer.
+        </p>
+
+        <div class="moat rv">
+          <div>
+            <b>Les deux systèmes</b
+            ><span
+              >macOS et Windows.
+              <a
+                href="https://github.com/Slyss42/Dracoon"
+                target="_blank"
+                rel="noopener"
+                >Dracoon</a
+              >
+              nous égale sur presque tout et reste sur Windows. Seul
+              <a
+                href="https://alacroix.github.io/focusretro/"
+                target="_blank"
+                rel="noopener"
+                >Focus Retro</a
+              >
+              nous suit sur Mac, avec un seul événement d'AutoFocus.</span
+            >
+          </div>
+          <div>
+            <b>Le Déplacement rapide sur Mac</b
+            ><span
+              >Un clic gauche, le personnage suivant, toute la team change de
+              map sans lâcher la souris. Dracoon le fait sur Windows, personne
+              ne le fait sur Mac.</span
+            >
+          </div>
+          <div>
+            <b>La roue sur les deux systèmes</b
+            ><span
+              >Dosoft et Focus Retro ont une roue, aucun des deux ne la couple à
+              un AutoFocus à sept événements.</span
+            >
+          </div>
+          <div>
+            <b>Le renvoi sur téléphone</b
+            ><span
+              >Les messages privés arrivent sur Telegram quand on s'éloigne du
+              clavier. Aucun autre outil ne sort de la machine.</span
+            >
+          </div>
+          <div>
+            <b>Les réponses toutes prêtes</b
+            ><span
+              >Une combinaison colle un texte dans le chat, la touche Entrée
+              reste au joueur. La limite est tenue là où d'autres la
+              franchissent.</span
+            >
+          </div>
+          <div>
+            <b>Le tableau des runes posé sur le jeu</b
+            ><span
+              >Les poids par-dessus la fenêtre, à la taille et à la transparence
+              voulues, à sa place au lancement suivant.
+              <a href="https://retro-toolbox.fr/" target="_blank" rel="noopener"
+                >Retro Toolbox</a
+              >
+              a la table, pas la pose.</span
+            >
+          </div>
+          <div>
+            <b>Les sigils</b
+            ><span
+              >Exclure tous les hommes, ou toutes les femmes, d'un clic. Dracoon
+              connaît le sexe de chaque personnage et n'en fait rien.</span
+            >
+          </div>
+          <div>
+            <b>Signé et notarisé</b
+            ><span
+              >Aucun avertissement à l'installation. Dracoon prévient que
+              Windows va s'inquiéter,
+              <a
+                href="https://github.com/Loulouw/ROrganizer"
+                target="_blank"
+                rel="noopener"
+                >ROrganizer</a
+              >
+              avoue son alerte SmartScreen,
+              <a href="https://retro-toolbox.fr/" target="_blank" rel="noopener"
+                >Retro Toolbox</a
+              >
+              ses faux positifs antivirus.</span
+            >
+          </div>
+        </div>
+
+        <div class="callout ok rv">
+          <b>La phrase à tenir.</b> Deux systèmes, sept événements, zéro macro,
+          code ouvert et binaire signé. Aucun concurrent n'aligne les quatre.
+          Dracoon tient les sept événements et le code ouvert, mais Windows seul
+          et un binaire que Windows accuse. Focus Retro tient les deux systèmes
+          et le code ouvert, mais un seul événement. Retro Toolbox tient les
+          événements, mais Windows seul et pas de licence libre.
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════ 06 ══════════════ -->
+    <section>
+      <div class="wrap">
+        <div class="shead rv">
+          <span class="idx">06</span>
+          <h2>La veille, <em class="w">tous les sites</em></h2>
+        </div>
+        <p class="sub rv">
+          Toutes les adresses de gestionnaires de fenêtres Dofus, bonnes ou
+          mauvaises, à mettre en favoris. Le jugement sur le logiciel ne dit
+          rien du site : le réseau des faux open source a les plus belles pages
+          du lot, et nAiO, qui tient la moitié du marché depuis 2010, distribue
+          depuis un forum. Toutes ces adresses répondaient le 31 août 2026.
+        </p>
+
+        <div class="rv">
+          <div class="famille">
+            <h4>Sites produits <span>· la concurrence directe</span></h4>
+            <div class="site">
+              <div class="dm">
+                <a
+                  href="https://www.dosoft.fr/fr"
+                  target="_blank"
+                  rel="noopener"
+                  >dosoft.fr</a
+                >
+              </div>
+              <div class="who">Dosoft</div>
+              <div class="why">
+                Le site produit le plus abouti du lot. Français et anglais,
+                Discord, cagnotte, licence Apache affichée en clair
+              </div>
+            </div>
+            <div class="site">
+              <div class="dm">
+                <a
+                  href="https://retro-toolbox.fr/"
+                  target="_blank"
+                  rel="noopener"
+                  >retro-toolbox.fr</a
+                >
+              </div>
+              <div class="who">Retro Toolbox</div>
+              <div class="why">
+                La page la plus dense : tout le produit sur un seul défilement,
+                section par section, avec captures
+              </div>
+            </div>
+            <div class="site">
+              <div class="dm">
+                <a
+                  href="https://rorganizer.loulouw-labs.fr/"
+                  target="_blank"
+                  rel="noopener"
+                  >rorganizer.loulouw-labs.fr</a
+                >
+              </div>
+              <div class="who">ROrganizer</div>
+              <div class="why">
+                Sobre, trois langues, sous-domaine d'un label personnel. Le ton
+                le plus proche du nôtre
+              </div>
+            </div>
+            <div class="site">
+              <div class="dm">
+                <a
+                  href="https://www.organizer-dofus.com/"
+                  target="_blank"
+                  rel="noopener"
+                  >organizer-dofus.com</a
+                >
+              </div>
+              <div class="who">Organizer-Dofus</div>
+              <div class="why">
+                Refuse les lecteurs automatiques, à ouvrir dans un vrai
+                navigateur
+              </div>
+            </div>
+            <div class="site">
+              <div class="dm">
+                <a
+                  href="https://dofus-console.com/en/"
+                  target="_blank"
+                  rel="noopener"
+                  >dofus-console.com</a
+                >
+              </div>
+              <div class="who">Dofus Console</div>
+              <div class="why">
+                Le plus commercial : chiffres en gros, 13 Mo, Rust, extensions.
+                Refuse aussi les lecteurs automatiques
+              </div>
+            </div>
+            <div class="site">
+              <div class="dm">
+                <a
+                  href="https://www.dosoft-dofus.com/"
+                  target="_blank"
+                  rel="noopener"
+                  >dosoft-dofus.com</a
+                >
+              </div>
+              <div class="who">Doframe</div>
+              <div class="why">
+                Page de vente de la version musclée de Dosoft. Domaine déposé en
+                mars 2026, réputation encore nulle
+              </div>
+            </div>
+            <div class="site">
+              <div class="dm">
+                <a
+                  href="https://dosoft-organizer-dofus.netlify.app/"
+                  target="_blank"
+                  rel="noopener"
+                  >dosoft-organizer-dofus.netlify.app</a
+                >
+              </div>
+              <div class="who">Clone de Dosoft</div>
+              <div class="why">
+                Une copie sur Netlify, ni signée ni revendiquée. À quoi
+                ressemble le vol de nom
+              </div>
+            </div>
+            <div class="site">
+              <div class="dm">
+                <a
+                  href="https://www.dracoon-dofus.com/"
+                  target="_blank"
+                  rel="noopener"
+                  >dracoon-dofus.com</a
+                >
+              </div>
+              <div class="who">Dracoon</div>
+              <div class="why">
+                Site tiers qui capte le nom d'un outil qui n'en a pas. L'auteur
+                de Dracoon met en garde contre lui
+              </div>
+            </div>
+            <div class="site">
+              <div class="dm">
+                <a
+                  href="https://appsgard.com/squadmaster"
+                  target="_blank"
+                  rel="noopener"
+                  >appsgard.com/squadmaster</a
+                >
+              </div>
+              <div class="who">SquadMaster</div>
+              <div class="why">
+                Page produit logée dans un portail d'applications, pas de
+                domaine propre
+              </div>
+            </div>
+            <div class="site">
+              <div class="dm">
+                <a href="https://naio.fr/" target="_blank" rel="noopener"
+                  >naio.fr</a
+                >
+              </div>
+              <div class="who">nAiO</div>
+              <div class="why">
+                Un forum de 2010, et le téléchargement se fait dans un fil de
+                discussion. Contre-exemple parfait
+              </div>
+            </div>
+            <div class="site">
+              <div class="dm">
+                <a href="https://xixou.io/" target="_blank" rel="noopener"
+                  >xixou.io</a
+                >
+              </div>
+              <div class="who">Xixou Switcher</div>
+              <div class="why">
+                Fan-site complet, le logiciel n'y est qu'une pièce. Compte
+                obligatoire pour télécharger
+              </div>
+            </div>
+          </div>
+
+          <div class="famille">
+            <h4>
+              Le réseau des faux open source
+              <span>· quatre pages jumelles</span>
+            </h4>
+            <div class="site">
+              <div class="dm">
+                <a
+                  href="https://multixi-dofus.com/"
+                  target="_blank"
+                  rel="noopener"
+                  >multixi-dofus.com</a
+                >
+              </div>
+              <div class="who">Multixi</div>
+              <div class="why">
+                Next.js et Tailwind, la page la plus léchée des quatre
+              </div>
+            </div>
+            <div class="site">
+              <div class="dm">
+                <a
+                  href="https://www.dofus-helper.com/"
+                  target="_blank"
+                  rel="noopener"
+                  >dofus-helper.com</a
+                >
+              </div>
+              <div class="who">Dofus Helper</div>
+              <div class="why">
+                Le lien « Built with v0 » traîne encore en bas de page : générée
+                par l'outil de Vercel
+              </div>
+            </div>
+            <div class="site">
+              <div class="dm">
+                <a
+                  href="https://www.multix-dofus.com/dofus-multicompte"
+                  target="_blank"
+                  rel="noopener"
+                  >multix-dofus.com</a
+                >
+              </div>
+              <div class="who">MultiX</div>
+              <div class="why">
+                Même gabarit, même promesse. Son lien vers le code tombe en 404
+              </div>
+            </div>
+            <div class="site">
+              <div class="dm">
+                <a
+                  href="https://www.dofus-switcher.com/"
+                  target="_blank"
+                  rel="noopener"
+                  >dofus-switcher.com</a
+                >
+              </div>
+              <div class="who">Dofus Switcher</div>
+              <div class="why">
+                Même gabarit encore. Son lien vers le code tombe aussi en 404
+              </div>
+            </div>
+          </div>
+
+          <div class="famille">
+            <h4>Pages de projet <span>· GitHub Pages et Vercel</span></h4>
+            <div class="site">
+              <div class="dm">
+                <a
+                  href="https://alacroix.github.io/focusretro/"
+                  target="_blank"
+                  rel="noopener"
+                  >alacroix.github.io/focusretro</a
+                >
+              </div>
+              <div class="who">Focus Retro</div>
+              <div class="why">
+                La référence à battre : comparatif intégré, captures,
+                avertissement de sécurité, deux systèmes
+              </div>
+            </div>
+            <div class="site">
+              <div class="dm">
+                <a
+                  href="https://minutesback.github.io/multi-tofu/"
+                  target="_blank"
+                  rel="noopener"
+                  >minutesback.github.io/multi-tofu</a
+                >
+              </div>
+              <div class="who">multi-tofu</div>
+              <div class="why">
+                Une page pour un outil Mac né en août 2026. Voir comment on se
+                lance à zéro
+              </div>
+            </div>
+            <div class="site">
+              <div class="dm">
+                <a
+                  href="https://ducrosr.github.io/Dofus-Unity-Retro-Window-Manager-StreamDeck-Overlay/"
+                  target="_blank"
+                  rel="noopener"
+                  >ducrosr.github.io</a
+                >
+              </div>
+              <div class="who">Ducrosr Window Manager</div>
+              <div class="why">
+                Page GitHub sur une adresse à rallonge, ce qu'un nom mal choisi
+                coûte
+              </div>
+            </div>
+            <div class="site">
+              <div class="dm">
+                <a
+                  href="https://dofus-tabs-macos.vercel.app/"
+                  target="_blank"
+                  rel="noopener"
+                  >dofus-tabs-macos.vercel.app</a
+                >
+              </div>
+              <div class="who">Dofus Tabs macOS</div>
+              <div class="why">
+                Landing Vercel, l'un des rares outils Mac du marché
+              </div>
+            </div>
+            <div class="site">
+              <div class="dm">
+                <a
+                  href="https://dofus-organizer.vercel.app/"
+                  target="_blank"
+                  rel="noopener"
+                  >dofus-organizer.vercel.app</a
+                >
+              </div>
+              <div class="who">Dofus Organizer</div>
+              <div class="why">
+                En espagnol, pour voir comment le marché hispanophone se parle à
+                lui-même
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="wrap">
+        Relevé du 31 août 2026. Sources : interfaces de programmation GitHub,
+        code source et sites officiels des outils.<br />
+        Téléchargements : somme des ressources de toutes les versions publiées
+        sur GitHub. Les outils distribués hors GitHub ne sont pas mesurables.<br />
+        Les cases « non documenté » concernent les outils fermés : leur absence
+        de fonctionnalité n'est pas prouvée, seulement non démontrée.<br />
+        La liste courte pour les sessions suivantes est dans
+        <code>docs/concurrents.md</code>.<br />
+        Dofus et Dofus Retro sont des marques déposées d'Ankama. Multifus n'y
+        est pas affilié.
+      </div>
+    </footer>
+
+    <script>
+      const io = new IntersectionObserver(
+        (es) => {
+          es.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.classList.add('on')
+              io.unobserve(e.target)
+            }
+          })
+        },
+        { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }
+      )
+      document.querySelectorAll('.rv').forEach((el) => io.observe(el))
+
+      const rankIo = new IntersectionObserver(
+        (es) => {
+          es.forEach((e) => {
+            if (!e.isIntersecting) return
+            const rows = [...e.target.querySelectorAll('.row')]
+            const max = Math.max(...rows.map((r) => +r.dataset.v))
+            rows.forEach((r, i) => {
+              const w = max ? (+r.dataset.v / max) * 100 : 0
+              setTimeout(() => {
+                r.querySelector('.bar i').style.width =
+                  Math.max(w, +r.dataset.v ? 1.2 : 0) + '%'
+              }, i * 65)
+            })
+            rankIo.unobserve(e.target)
+          })
+        },
+        { threshold: 0.15 }
+      )
+      const rank = document.getElementById('rank')
+      if (rank) rankIo.observe(rank)
+
+      requestAnimationFrame(() =>
+        document
+          .querySelectorAll('header .rv')
+          .forEach((el) => el.classList.add('on'))
+      )
+    </script>
+  </body>
+</html>
