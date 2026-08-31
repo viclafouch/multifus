@@ -46,6 +46,8 @@ pub enum JournalEvent {
         launch: Launch,
     },
 
+    LaunchedAgain,
+
     ConfigLoadFailed {
         detail: String,
         quarantined: Option<String>,

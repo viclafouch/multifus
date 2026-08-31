@@ -131,6 +131,7 @@ export type JournalEvent =
   | { readonly kind: 'configNotSetAside'; readonly detail: string }
   | { readonly kind: 'displayAwake'; readonly held: boolean }
   | { readonly kind: 'displayAwakeFailed'; readonly detail: string }
+  | { readonly kind: 'launchedAgain' }
   | { readonly kind: 'listening' }
   | { readonly kind: 'listeningFailed'; readonly detail: string }
   | { readonly kind: 'listeningLost'; readonly detail: string }

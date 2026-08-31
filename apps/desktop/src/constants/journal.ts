@@ -31,6 +31,7 @@ type PlainEventKind = Exclude<
 
 export const TONES = {
   started: 'neutral',
+  launchedAgain: 'neutral',
   listening: 'good',
   listeningFailed: 'warning',
   listeningLost: 'warning',
@@ -207,6 +208,7 @@ type WithoutPayload<Event> = Event extends { readonly kind: string }
   : never
 
 export const PLAIN_LINES = {
+  launchedAgain: 'Multifus tournait déjà : le second lancement s’arrête là.',
   listening: 'Écoute des notifications démarrée.',
   clientMaximized:
     'Un client Dofus vient d’ouvrir : sa fenêtre a été agrandie à l’écran.',

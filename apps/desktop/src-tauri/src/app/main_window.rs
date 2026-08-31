@@ -10,6 +10,9 @@ use tauri::Wry;
 
 use crate::app::journal::JournalEvent;
 use crate::app::journal::Launch;
+use crate::app::runtime;
+use crate::app::state::AppState;
+use crate::app::state::hold;
 use crate::app::state::lock;
 use crate::app::tray;
 
@@ -53,6 +56,22 @@ pub fn show_on_dock_click(app: &AppHandle, event: RunEvent) {
 
 #[cfg(not(target_os = "macos"))]
 pub fn show_on_dock_click(_app: &AppHandle, _event: RunEvent) {}
+
+pub fn show_on_second_launch(app: &AppHandle, arguments: Vec<String>) {
+    let Some(state) = app.try_state::<AppState>() else {
+        return;
+    };
+
+    hold(&state).log(JournalEvent::LaunchedAgain);
+
+    runtime::emit_snapshot(app);
+
+    if matches_session_launch(arguments) {
+        return;
+    }
+
+    show(app);
+}
 
 pub fn show(app: &AppHandle) {
     let Some(window) = app.get_webview_window(LABEL) else {

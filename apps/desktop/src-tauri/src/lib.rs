@@ -11,6 +11,11 @@ use crate::app::main_window;
 
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_single_instance::init(
+            |app, arguments, _cwd| {
+                main_window::show_on_second_launch(app, arguments);
+            },
+        ))
         .plugin(app::journal_file::plugin())
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_opener::init())

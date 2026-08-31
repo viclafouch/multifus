@@ -904,6 +904,9 @@ const JOURNAL_CASES = {
       line: 'Multifus 0.1.0 a démarré sur macOS 26.0 (arm64), lancé à la main.'
     }
   ],
+  launchedAgain: [
+    { event: { kind: 'launchedAgain' }, line: PLAIN_LINES.launchedAgain }
+  ],
   listening: [{ event: { kind: 'listening' }, line: PLAIN_LINES.listening }],
   listeningFailed: [
     {
