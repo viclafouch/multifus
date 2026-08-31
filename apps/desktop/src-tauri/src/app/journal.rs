@@ -70,6 +70,10 @@ pub enum JournalEvent {
         detail: String,
     },
 
+    ListeningLost {
+        detail: String,
+    },
+
     NotificationUnreadable {
         detail: String,
     },

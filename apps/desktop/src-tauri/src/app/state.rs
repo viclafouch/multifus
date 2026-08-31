@@ -3620,6 +3620,40 @@ mod tests {
     }
 
     #[test]
+    fn an_ecoute_that_dies_is_written_down_and_puts_multifus_back_in_line_to_listen() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        state.set_listening(true);
+
+        state.log_unless_repeated(JournalEvent::ListeningLost {
+            detail: "the notification centre of macOS restarted".to_owned(),
+        });
+        state.set_listening(false);
+
+        assert!(
+            !state.is_listening(),
+            "the scan reads this to know it has an ecoute to start again"
+        );
+        assert!(!state.snapshot().authorization.listening);
+        assert!(journalled(&state).contains(&JournalEvent::ListeningLost {
+            detail: "the notification centre of macOS restarted".to_owned(),
+        }));
+
+        state.set_listening(true);
+
+        let said = journalled(&state)
+            .into_iter()
+            .filter(|event| matches!(event, JournalEvent::Listening))
+            .count();
+
+        assert_eq!(
+            said, 2,
+            "the ecoute that comes back says so, as the first did"
+        );
+    }
+
+    #[test]
     fn the_corner_and_the_screen_of_the_banner_outlive_the_run_that_chose_them() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);

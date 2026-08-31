@@ -586,7 +586,19 @@ fn on_report(app: &AppHandle, report: NotificationReport) {
     match report {
         NotificationReport::Heard(notification) => on_notification(app, notification),
         NotificationReport::Unreadable { detail } => on_unreadable(app, detail),
+        NotificationReport::ListeningLost { detail } => on_listening_lost(app, detail),
     }
+}
+
+fn on_listening_lost(app: &AppHandle, detail: String) {
+    {
+        let mut state = lock(app);
+
+        state.log_unless_repeated(JournalEvent::ListeningLost { detail });
+        state.set_listening(false);
+    }
+
+    emit_snapshot(app);
 }
 
 fn on_notification(app: &AppHandle, notification: GameNotification) {

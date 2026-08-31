@@ -33,6 +33,7 @@ export const TONES = {
   started: 'neutral',
   listening: 'good',
   listeningFailed: 'warning',
+  listeningLost: 'warning',
   notificationUnreadable: 'warning',
   panicked: 'warning',
   characterOnline: 'neutral',
@@ -170,6 +171,7 @@ type DetailedEventKind = Exclude<
 
 export const DETAILED_LINES = {
   listeningFailed: 'Écoute des notifications impossible',
+  listeningLost: 'Écoute des notifications perdue, Multifus la reprend',
   notificationUnreadable: 'Notification impossible à lire',
   shortcutsFailed: 'Les raccourcis ne sont pas fiables',
   trayFailed: 'La barre système n’est pas fiable',

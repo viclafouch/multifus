@@ -34,6 +34,7 @@ use objc2_app_kit::NSScreen;
 use objc2_app_kit::NSWindowStyleMask;
 use objc2_app_kit::NSWorkspace;
 use objc2_app_kit::NSWorkspaceDidActivateApplicationNotification;
+use objc2_app_kit::NSWorkspaceDidTerminateApplicationNotification;
 use objc2_application_services::AXError;
 use objc2_application_services::AXIsProcessTrusted;
 use objc2_application_services::AXIsProcessTrustedWithOptions;
@@ -74,6 +75,7 @@ use objc2_core_graphics::CGEventType;
 use objc2_core_graphics::CGKeyCode;
 use objc2_foundation::NSNotification;
 use objc2_foundation::NSNotificationCenter;
+use objc2_foundation::NSNotificationName;
 use objc2_foundation::NSString;
 
 use crate::domain::GameNotification;
@@ -1033,16 +1035,30 @@ impl WatchedClicks {
     }
 }
 
-struct ForegroundWatch {
+struct WorkspaceWatch {
     centre: Retained<NSNotificationCenter>,
     observer: Retained<ProtocolObject<dyn NSObjectProtocol>>,
 }
 
-impl Drop for ForegroundWatch {
+impl Drop for WorkspaceWatch {
     fn drop(&mut self) {
         // SAFETY: the observer is the one this centre handed out, and nothing else holds it.
         unsafe { self.centre.removeObserver(self.observer.as_ref()) };
     }
+}
+
+fn watch_workspace(name: &NSNotificationName, told: impl Fn() + 'static) -> WorkspaceWatch {
+    let told = RcBlock::new(move |_: NonNull<NSNotification>| {
+        drop(catch_unwind(AssertUnwindSafe(&told)));
+    });
+
+    let centre = NSWorkspace::sharedWorkspace().notificationCenter();
+
+    // SAFETY: both the name and the block are the ones the API documents, retired on drop.
+    let observer =
+        unsafe { centre.addObserverForName_object_queue_usingBlock(Some(name), None, None, &told) };
+
+    WorkspaceWatch { centre, observer }
 }
 
 fn watch_clicks(
@@ -1135,32 +1151,17 @@ fn watch_foreground(
     gate: &Arc<ClickGate>,
     sink: &ClickSink,
     front: &Arc<AtomicI32>,
-) -> ForegroundWatch {
-    let told = RcBlock::new({
-        let gate = Arc::clone(gate);
-        let sink = Arc::clone(sink);
-        let front = Arc::clone(front);
+) -> WorkspaceWatch {
+    let gate = Arc::clone(gate);
+    let sink = Arc::clone(sink);
+    let front = Arc::clone(front);
 
-        move |_: NonNull<NSNotification>| {
-            drop(catch_unwind(AssertUnwindSafe(|| {
-                report_foreground(&gate, &sink, &front);
-            })));
-        }
-    });
+    // SAFETY: a constant of the framework, alive for the whole process.
+    let name = unsafe { NSWorkspaceDidActivateApplicationNotification };
 
-    let centre = NSWorkspace::sharedWorkspace().notificationCenter();
-
-    // SAFETY: both the name and the block are the ones the API documents, retired on drop.
-    let observer = unsafe {
-        centre.addObserverForName_object_queue_usingBlock(
-            Some(NSWorkspaceDidActivateApplicationNotification),
-            None,
-            None,
-            &told,
-        )
-    };
-
-    ForegroundWatch { centre, observer }
+    watch_workspace(name, move || {
+        report_foreground(&gate, &sink, &front);
+    })
 }
 
 fn report_foreground(gate: &ClickGate, sink: &ClickSink, front: &AtomicI32) {
@@ -1357,13 +1358,40 @@ fn watch(
 
     run_loop.add_source(Some(&source), mode);
 
+    let gone = Arc::new(AtomicBool::new(false));
+    let watching = watch_notification_centre(pid, &gone);
+
     if ready.send(Ok(())).is_ok() {
-        while running.load(Ordering::Relaxed) {
+        while running.load(Ordering::Relaxed) && !gone.load(Ordering::Acquire) {
             CFRunLoop::run_in_mode(mode, STOP_CHECK_SECONDS, false);
         }
     }
 
+    drop(watching);
     run_loop.remove_source(Some(&source), mode);
+
+    if gone.load(Ordering::Acquire) {
+        sink(NotificationReport::ListeningLost {
+            detail: CENTRE_GONE.to_owned(),
+        });
+    }
+}
+
+const CENTRE_GONE: &str = "the notification centre of macOS restarted";
+
+fn watch_notification_centre(pid: pid_t, gone: &Arc<AtomicBool>) -> WorkspaceWatch {
+    let gone = Arc::clone(gone);
+
+    // SAFETY: a constant of the framework, alive for the whole process.
+    let name = unsafe { NSWorkspaceDidTerminateApplicationNotification };
+
+    watch_workspace(name, move || {
+        if notification_centre_pid().is_ok_and(|running| running == pid) {
+            return;
+        }
+
+        gone.store(true, Ordering::Release);
+    })
 }
 
 fn create_observer(pid: pid_t, refcon: *mut c_void) -> Result<CFRetained<AXObserver>> {

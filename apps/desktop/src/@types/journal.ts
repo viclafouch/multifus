@@ -133,6 +133,7 @@ export type JournalEvent =
   | { readonly kind: 'displayAwakeFailed'; readonly detail: string }
   | { readonly kind: 'listening' }
   | { readonly kind: 'listeningFailed'; readonly detail: string }
+  | { readonly kind: 'listeningLost'; readonly detail: string }
   | { readonly kind: 'notificationUnreadable'; readonly detail: string }
   | { readonly kind: 'openFailed'; readonly detail: string }
   | { readonly kind: 'panicked'; readonly work: Work }

@@ -1472,7 +1472,16 @@ fn watch(
     drop(ready.send(Ok(())));
 
     while running.load(Ordering::Relaxed) {
-        let read_cost = poll(&listener, sink, toasts).unwrap_or_default();
+        let read_cost = match poll(&listener, sink, toasts) {
+            Ok(read_cost) => read_cost,
+            Err(error) => {
+                sink(NotificationReport::ListeningLost {
+                    detail: error.to_string(),
+                });
+
+                return;
+            }
+        };
 
         dismiss_queued(&listener, toasts);
         wait(running, read_cost);

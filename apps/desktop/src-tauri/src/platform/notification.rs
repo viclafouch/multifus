@@ -9,6 +9,8 @@ pub enum NotificationReport {
     Heard(GameNotification),
 
     Unreadable { detail: String },
+
+    ListeningLost { detail: String },
 }
 
 pub trait NotificationWatcher: Send + Sync {

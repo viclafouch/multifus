@@ -911,6 +911,12 @@ const JOURNAL_CASES = {
       line: `${DETAILED_LINES.listeningFailed} : ${DETAIL}`
     }
   ],
+  listeningLost: [
+    {
+      event: { kind: 'listeningLost', detail: DETAIL },
+      line: `${DETAILED_LINES.listeningLost} : ${DETAIL}`
+    }
+  ],
   notificationUnreadable: [
     {
       event: { kind: 'notificationUnreadable', detail: DETAIL },
