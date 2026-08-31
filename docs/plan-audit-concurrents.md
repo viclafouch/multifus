@@ -75,18 +75,7 @@ protège du geste de Multifus, pas de celui du jeu.
 devant au début d'un tour, ou est-ce qu'il fait seulement clignoter son bouton
 dans la barre des tâches. C'est un essai sur Windows, pas une lecture de code.
 
-### 4. Une fenêtre de jeu figée gèle le tour jusqu'à six secondes
-
-Chaque lecture d'un attribut d'accessibilité est un message synchrone vers
-l'application visée. Le délai par défaut est de six secondes. Un client Dofus
-qui ne répond plus tient donc le tour tout ce temps, et avec lui les têtes de
-classe, les titres courts et le défilement.
-
-Ni nous ni Focus Retro n'appelons `AXUIElementSetMessagingTimeout`. À faire :
-l'appeler une fois sur chaque élément d'application, à 500 ms par exemple. Rien
-ne change quand tout va bien, et un client figé ne coûte plus qu'un demi-tour.
-
-### 5. Le jeton Telegram et les redirections
+### 4. Le jeton Telegram et les redirections
 
 `telegram.rs` met le jeton dans le chemin de l'adresse, et `reqwest` suit
 jusqu'à dix redirections par défaut. `api.telegram.org` ne redirige pas ; un

@@ -108,6 +108,8 @@ const DOFUS_BUNDLE_ID: &str = "com.dofus.d1elauncher";
 
 const NOTIFICATION_CENTRE_BUNDLE_ID: &str = "com.apple.notificationcenterui";
 
+const ACCESSIBILITY_WAIT: Duration = Duration::from_millis(500);
+
 const AX_TITLE: &str = "AXTitle";
 const AX_MAIN_WINDOW: &str = "AXMainWindow";
 const AX_MINIMIZED: &str = "AXMinimized";
@@ -648,8 +650,21 @@ pub struct AccessibilityWindowManager;
 impl AccessibilityWindowManager {
     #[must_use]
     pub fn new(_short_titles: bool) -> Self {
+        let _ = bound_the_accessibility_wait();
+
         Self
     }
+}
+
+fn bound_the_accessibility_wait() -> Result<()> {
+    // SAFETY: the system-wide element needs no argument and is always valid.
+    let system = unsafe { AXUIElement::new_system_wide() };
+
+    // SAFETY: the wait is positive, which is all the call refuses.
+    let status =
+        unsafe { system.set_messaging_timeout(ACCESSIBILITY_WAIT.as_secs_f32() as c_float) };
+
+    ax_result(status, "bounding the accessibility wait")
 }
 
 impl WindowManager for AccessibilityWindowManager {
@@ -1945,6 +1960,16 @@ mod tests {
         let watcher = BannerNotificationWatcher::new();
 
         assert_eq!(watcher.dismiss("Alpha"), Ok(()));
+    }
+
+    #[test]
+    fn a_frozen_client_holds_the_turn_for_the_wait_and_not_a_second_longer() {
+        assert!(
+            !ACCESSIBILITY_WAIT.is_zero(),
+            "a wait of zero gives the turn back to the wait of the system"
+        );
+
+        assert_eq!(bound_the_accessibility_wait(), Ok(()));
     }
 
     #[test]
