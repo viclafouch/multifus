@@ -111,9 +111,6 @@ Cinq restent à creuser avant de décider :
 - Le mode Sadida, chez Dracoon. La seule idée du marché qui vienne d'un joueur.
 - Le bouton de souris comme raccourci, chez ROrganizer et Focus Retro. Vérifier
   d'abord si le logiciel de la souris ne le fait pas déjà à notre place.
-- L'attestation de compilation GitHub, chez Focus Retro : une preuve signée que
-  le binaire vient bien du code public. Vérifier ce qu'elle ajoute quand on est
-  déjà signé et notarisé par Apple.
 
 ## Ce que nous refusons
 
