@@ -55,9 +55,9 @@ journalise ligne par ligne :
 Nous ne lisons que le premier. Quand un joueur dit « l'AutoFocus ne marche
 pas », notre journal ne sait pas répondre.
 
-À faire : lire les trois autres au démarrage de l'écoute et à chaque
-`ListeningLost`, et dire lequel est fermé. Sur le Mac, l'équivalent est le mode
-de concentration et l'autorisation de notification de Dofus lui-même.
+Le sujet est passé dans [plan-accueil.md](./plan-accueil.md), qui le prend en
+entier : les contrôles, ce que le Mac ne sait pas lire, et l'écran qui les
+montre.
 
 ### 3. Le personnage exclu vole quand même le premier plan
 
