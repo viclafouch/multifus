@@ -16,27 +16,10 @@ une IA, comme Dracoon, et il est propre.
 
 ### 1. Le tour attend une seconde, les autres écoutent le système
 
-ROrganizer (`src/win/watcher.rs`) pose un `SetWinEventHook` sur
-`EVENT_OBJECT_CREATE`, `DESTROY` et `NAMECHANGE`, et rassemble la rafale en un
-seul balayage après 150 ms. Notre tour dort une seconde, et `wake()` n'arrive
-que de la fenêtre de Multifus (`app/commands.rs`).
-
-Un client qui s'ouvre attend jusqu'à une seconde sa tête de classe, son titre
-court et sa place dans le défilement. Un personnage qui se connecte reste
-déconnecté aussi longtemps.
-
-Le tour n'est pas à jeter : il pose et il reprend, c'est sa raison d'être. Il
-suffit de le réveiller. Nous avons déjà le condvar `wake()`, et déjà un thread
-à hooks WinEvent (`hook_foreground`). À faire :
-
-- Windows : hooker `EVENT_OBJECT_CREATE`, `DESTROY` et `NAMECHANGE` et appeler
-  `wake()`. Attention, le hook actuel ne vit que pendant l'écoute des clics :
-  celui-ci doit tenir tout le temps que Multifus tourne.
-- macOS : `NSWorkspaceDidLaunchApplicationNotification` et
-  `DidTerminateApplicationNotification` appellent `wake()`. Le mécanisme
-  `watch_workspace` existe déjà dans `platform/macos.rs`.
-- Garder la seconde comme plancher : elle rattrape ce que les événements ne
-  disent pas, un titre changé sans `NAMECHANGE` par exemple.
+Le sujet est passé dans [plan-reveil-du-tour.md](./plan-reveil-du-tour.md), qui
+le prend en entier : le bruit de `NAMECHANGE`, le fil à hooks qui doit tenir
+tout le temps, l'observateur de titre sur le Mac, et le repos minimum entre deux
+tours.
 
 ### 2. Quatre réglages Windows éteignent l'AutoFocus, et nous n'en disons rien
 
