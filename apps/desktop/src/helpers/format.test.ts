@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { screenSaverDelay } from '@/helpers/format'
-
-const NO_BREAK_SPACE = '\u00A0'
+import { focusDuration, screenSaverDelay } from '@/helpers/format'
+import { NARROW_NO_BREAK_SPACE, NO_BREAK_SPACE } from '@/test-doubles'
 
 const ONE_MINUTE = 60
 const ONE_HOUR = 3600
+
+const ONE_MILLISECOND = 1000
 
 describe('screenSaverDelay', () => {
   it('dit une heure ronde en heures', () => {
@@ -35,5 +36,29 @@ describe('screenSaverDelay', () => {
     const delay = screenSaverDelay(90)
 
     expect(delay).toBe('2 minutes')
+  })
+})
+
+describe('focusDuration', () => {
+  it('garde une décimale à un focus plus court qu’une milliseconde', () => {
+    expect(focusDuration(340)).toBe(`0,3${NARROW_NO_BREAK_SPACE}ms`)
+  })
+
+  it('garde cette décimale tant que le focus reste sous dix millisecondes', () => {
+    expect(focusDuration(4.2 * ONE_MILLISECOND)).toBe(
+      `4,2${NARROW_NO_BREAK_SPACE}ms`
+    )
+  })
+
+  it('arrondit à la milliseconde au-delà, où la décimale ne dit plus rien', () => {
+    expect(focusDuration(12.4 * ONE_MILLISECOND)).toBe(
+      `12${NARROW_NO_BREAK_SPACE}ms`
+    )
+  })
+
+  it('reste en millisecondes quand le focus dure une seconde entière', () => {
+    expect(focusDuration(2000 * ONE_MILLISECOND)).toBe(
+      `2${NARROW_NO_BREAK_SPACE}000${NARROW_NO_BREAK_SPACE}ms`
+    )
   })
 })

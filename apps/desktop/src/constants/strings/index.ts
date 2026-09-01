@@ -3,6 +3,7 @@ import { AUTHORIZATION_STRINGS } from '@/constants/strings/authorization'
 import { AUTO_FOCUS_STRINGS } from '@/constants/strings/auto-focus'
 import { CHARACTERS_STRINGS } from '@/constants/strings/characters'
 import { CONFIG_NOTICE_STRINGS } from '@/constants/strings/config-notice'
+import { ERROR_BOUNDARY_STRINGS } from '@/constants/strings/error-boundary'
 import { JOURNAL_PANEL_STRINGS } from '@/constants/strings/journal-panel'
 import { MAXIMIZE_STRINGS } from '@/constants/strings/maximize'
 import { NAV_RAIL_STRINGS } from '@/constants/strings/nav-rail'
@@ -29,5 +30,6 @@ export const strings = {
   ...ABOUT_STRINGS,
   ...CONFIG_NOTICE_STRINGS,
   ...MAXIMIZE_STRINGS,
-  ...JOURNAL_PANEL_STRINGS
+  ...JOURNAL_PANEL_STRINGS,
+  ...ERROR_BOUNDARY_STRINGS
 } as const

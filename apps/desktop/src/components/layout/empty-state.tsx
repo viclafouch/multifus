@@ -1,4 +1,30 @@
 import React from 'react'
+import { cn } from '@/lib/utils'
+
+type MarkTone = 'primary' | 'destructive'
+
+const MARK_TONES = {
+  primary: 'border-primary/25 bg-primary/8 text-primary',
+  destructive: 'border-destructive/25 bg-destructive/8 text-destructive'
+} as const satisfies Record<MarkTone, string>
+
+type EmptyStateMarkProps = Readonly<{
+  tone: MarkTone
+  children: React.ReactNode
+}>
+
+export const EmptyStateMark = ({ tone, children }: EmptyStateMarkProps) => {
+  return (
+    <span
+      className={cn(
+        'mb-2 flex size-11 items-center justify-center rounded-full border',
+        MARK_TONES[tone]
+      )}
+    >
+      {children}
+    </span>
+  )
+}
 
 type EmptyStateProps = Readonly<{
   title: string

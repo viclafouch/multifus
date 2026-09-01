@@ -1,6 +1,6 @@
 import { ExternalLink, Lock } from 'lucide-react'
 import type { Snapshot } from '@/@types/snapshot'
-import { EmptyState } from '@/components/layout/empty-state'
+import { EmptyState, EmptyStateMark } from '@/components/layout/empty-state'
 import { Screen } from '@/components/layout/screen'
 import { Button } from '@/components/ui/button'
 import { strings } from '@/constants/strings'
@@ -19,9 +19,9 @@ export const AuthorizationScreen = ({ run }: AuthorizationScreenProps) => {
         body={strings.authorization.body}
         hint={strings.authorization.patience}
         mark={
-          <span className="mb-2 flex size-11 items-center justify-center rounded-full border border-primary/25 bg-primary/8 text-primary">
+          <EmptyStateMark tone="primary">
             <Lock className="size-mark" strokeWidth={1.75} aria-hidden />
-          </span>
+          </EmptyStateMark>
         }
       >
         <Button

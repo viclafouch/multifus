@@ -9,7 +9,7 @@ export type NotificationOutcome =
   | { readonly outcome: 'bodyUnread' }
   | { readonly outcome: 'excluded' }
   | { readonly outcome: 'focusFailed'; readonly detail: string }
-  | { readonly outcome: 'focused' }
+  | { readonly outcome: 'focused'; readonly focusMicros: number }
   | { readonly outcome: 'kindDisabled' }
   | { readonly outcome: 'kindUnknown' }
   | { readonly outcome: 'leftMinimized' }

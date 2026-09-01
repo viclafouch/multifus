@@ -467,9 +467,13 @@ pub enum WalkIdle {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
-#[serde(tag = "outcome", rename_all = "camelCase")]
+#[serde(
+    tag = "outcome",
+    rename_all = "camelCase",
+    rename_all_fields = "camelCase"
+)]
 pub enum Outcome {
-    Focused,
+    Focused { focus_micros: u64 },
 
     KindDisabled,
 
@@ -680,7 +684,9 @@ mod tests {
         let event = JournalEvent::Notification {
             nickname: "Alpha".to_owned(),
             notification_kind: Some(NotificationKind::PrivateMessage),
-            outcome: Outcome::Focused,
+            outcome: Outcome::Focused {
+                focus_micros: 12_000,
+            },
         };
 
         assert_eq!(

@@ -32,6 +32,7 @@ import {
   journalTone,
   journalTranscript
 } from '@/helpers/journal'
+import { NARROW_NO_BREAK_SPACE } from '@/test-doubles'
 
 type EventOf<Kind extends JournalEvent['kind']> = Extract<
   JournalEvent,
@@ -727,18 +728,18 @@ const NOTIFICATION_CASES = {
         kind: 'notification',
         nickname: NICKNAME,
         notificationKind: 'private_message',
-        outcome: { outcome: 'focused' }
+        outcome: { outcome: 'focused', focusMicros: 12_400 }
       },
-      line: 'Message privé pour Alpha : fenêtre ramenée au premier plan.'
+      line: `Message privé pour Alpha : fenêtre ramenée au premier plan en 12${NARROW_NO_BREAK_SPACE}ms.`
     },
     {
       event: {
         kind: 'notification',
         nickname: NICKNAME,
         notificationKind: null,
-        outcome: { outcome: 'focused' }
+        outcome: { outcome: 'focused', focusMicros: 340 }
       },
-      line: 'Notification pour Alpha : fenêtre ramenée au premier plan.'
+      line: `Notification pour Alpha : fenêtre ramenée au premier plan en 0,3${NARROW_NO_BREAK_SPACE}ms.`
     }
   ],
   kindDisabled: [
@@ -1468,7 +1469,7 @@ describe('journalTone', () => {
   it('salue une notification qui a ramené une fenêtre', () => {
     const event = {
       ...NOTIFIED,
-      outcome: { outcome: 'focused' }
+      outcome: { outcome: 'focused', focusMicros: 12_400 }
     } as const
 
     const tone = journalTone(event)

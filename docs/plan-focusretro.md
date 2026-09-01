@@ -415,18 +415,44 @@ Il l'a écrit parce qu'il a rencontré la panne que nous venons de corriger : se
 types de traces s'appellent `notification_center_restart` et
 `listener_reconnect`.
 
-Chez nous le journal dit maintenant que l'écoute est tombée et repartie, mais il
-ne dit toujours pas combien de temps une bascule a pris. C'est l'instrument qui
-manque aux deux mesures notées plus haut, et il tient dans un `Instant` posé à
-l'arrivée de la notification et lu après le focus, porté sur la ligne de journal
-qui existe déjà.
+Notre journal en dit maintenant quelque chose. `Outcome::Focused` porte un
+`focus_micros`, compté par un `Instant` posé à l'arrivée de la notification et lu
+quand le système accepte le focus. La ligne se lit « Message privé pour Alpha :
+fenêtre ramenée au premier plan en 12 ms », l'interface faisant les
+millisecondes avec `Intl` : une décimale sous dix millisecondes, l'entier
+au-delà. Pas de panneau de débogage ni de seuil de couleur, le journal suffit à
+répondre quand un joueur trouve ça lent.
 
-### La fenêtre blanche, un manque chez nous
+**Ce que ce nombre ne dit pas, et pourquoi.** Ce n'est pas une bascule au sens de
+[CONTEXT.md](../CONTEXT.md), qui la veut finie quand le système la donne pour
+finie ; c'est un focus, celui de l'entrée Focus, arrêté quand l'appel rend la
+main. Sur le Mac, `activateWithOptions` rendant `true` dit que la demande est
+prise, pas que la fenêtre est dessinée ; `SetForegroundWindow` de même.
 
-Il a un `ErrorBoundary` autour de son interface. Nous n'en avons aucun : si un
-rendu React lève, notre fenêtre devient blanche, sans un mot et sans rien à
-cliquer. Multifus vit dans la barre système, donc le joueur ne saura même pas
-qu'il faut le quitter et le relancer.
+La vraie fin existe pourtant dans le dépôt : `ClickGate::expect` puis
+`await_arrival(SWITCH_CEILING)`, nourris par `NSWorkspaceDidActivateApplication`
+et `EVENT_SYSTEM_FOREGROUND`, et le Déplacement rapide s'en sert déjà. Elle n'est
+pas branchée ici, et ce n'est pas un oubli : `watch_foreground` vit dans le fil
+du tap de clics, qui ne tourne que pendant le Déplacement rapide ou la roue.
+Pendant un AutoFocus ordinaire personne n'appelle `note_foreground`, donc
+`await_arrival` expirerait à 250 ms à chaque notification, et bloquerait le fil
+de l'écoute d'autant.
+
+Mesurer la vraie fin demande donc de tenir le guetteur de premier plan en
+permanence. C'est une décision à part, à prendre avec le point 2 de
+[plan-audit-concurrents.md](./plan-audit-concurrents.md), qui veut ce même
+guetteur pour une autre raison. En attendant, le nombre du journal est celui
+qu'on sait prendre sans rien coûter, et il est nommé pour ce qu'il est.
+
+### La fenêtre blanche, comblée
+
+Il a un `ErrorBoundary` autour de son interface, et nous aussi désormais :
+`components/error-boundary.tsx` autour de l'`App`. Un rendu qui lève donne un
+écran qui dit que Multifus tourne toujours, montre le message de l'erreur à
+recopier, et offre de recharger l'écran ou d'ouvrir le journal. Les trois
+fenêtres posées par-dessus le jeu, la roue, la bannière et le tableau des runes,
+n'en ont pas : leur racine est à part, et un panneau d'erreur au milieu d'un
+combat serait pire que le carré blanc.
 
 ### Ce qui est pareil, ou meilleur chez nous
 
@@ -434,9 +460,10 @@ Mêmes outils : oxlint et oxfmt des deux côtés, lefthook chez lui contre husky
 chez nous. `removeUnusedCommands` et `macOSPrivateApi`, on les a déjà.
 
 Notre politique de sécurité de contenu est plus fournie que la sienne, et on a en
-plus une politique séparée pour le serveur de développement. Il a quatre
-directives qu'on n'a pas, dont deux qui ne retombent pas sur `default-src` et
-valent donc d'être écrites : `base-uri 'self'` et `form-action 'self'`.
+plus une politique séparée pour le serveur de développement. Il avait quatre
+directives qu'on n'avait pas, dont deux qui ne retombent pas sur `default-src` :
+`base-uri 'self'` et `form-action 'self'` sont maintenant écrites dans les deux
+politiques.
 
 Son site vit dans `docs/` sur GitHub Pages, avec Tailwind, un `sitemap.xml`, un
 `robots.txt`, une image de partage et un script Lighthouse. Ses captures sont en
@@ -464,20 +491,19 @@ Son site vit dans `docs/` sur GitHub Pages, avec Tailwind, un `sitemap.xml`, un
       après chaque `tauri-action`, plus `id-token: write` et `attestations: write`
       sur les deux tâches. **À vérifier à la première publication** : les chemins
       des paquets, et que la commande de vérification répond
-- [ ] Mettre la commande de vérification sur le site et dans le README :
+- [ ] Mettre la commande de vérification sur le site, le README la porte déjà :
       `gh attestation verify <fichier> --repo viclafouch/multifus`
-- [ ] Poser un `ErrorBoundary` autour de l'interface
-- [ ] Porter la durée d'une bascule sur la ligne de journal de la notification
-- [ ] Ajouter `base-uri 'self'` et `form-action 'self'` à la politique de
-      sécurité de contenu
-- [ ] Vérifier sur la machine de test qu'un client Dofus figé retient bien le
-      fil de scan sur macOS, et poser `AXUIElementSetMessagingTimeout` si oui
+- [ ] Vérifier sur le Mac qu'un client Dofus figé ne retient plus le fil de scan.
+      `set_messaging_timeout` est posé à une demi-seconde dans `platform/macos.rs`,
+      l'essai reste à faire
+- [ ] Trancher si le guetteur de premier plan tient en permanence, ce qui
+      donnerait la vraie fin d'une bascule au journal, et l'exclusion contre le
+      jeu qui passe devant tout seul. Voir plus haut, et le point 2 de
+      [plan-audit-concurrents.md](./plan-audit-concurrents.md)
 - [ ] Relever ce que coûte `GetNotificationsAsync` sur la machine Windows, et
       plafonner le repos si `read_cost * REST_PER_READ` dépasse jamais 150 ms
 - [ ] Trancher : range-t-on les notifications de Dofus qu'on a lues mais sur
       lesquelles on n'a pas agi
-- [ ] Dire dans le README qu'une touche posée sur un personnage est prise partout,
-      pas seulement au-dessus du jeu
 
 ## Ce qu'on a regardé et écarté
 

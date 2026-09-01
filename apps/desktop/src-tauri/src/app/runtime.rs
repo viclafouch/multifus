@@ -8,6 +8,7 @@ use std::sync::PoisonError;
 use std::sync::TryLockError;
 use std::thread;
 use std::time::Duration;
+use std::time::Instant;
 
 use tauri::AppHandle;
 use tauri::Emitter;
@@ -643,6 +644,8 @@ fn on_listening_lost(app: &AppHandle, detail: String) {
 }
 
 fn on_notification(app: &AppHandle, notification: GameNotification) {
+    let heard = Instant::now();
+
     let Some(nickname) = notification.nickname().map(str::to_owned) else {
         return;
     };
@@ -658,8 +661,10 @@ fn on_notification(app: &AppHandle, notification: GameNotification) {
             Outcome::BodyUnread
         }
         Decision::Ignored(outcome) => outcome,
-        Decision::Focus(window) => focus(windows(app), window),
-        Decision::FocusUnlessMinimized(window) => focus_unless_minimized(windows(app), window),
+        Decision::Focus(window) => focus(windows(app), window, heard),
+        Decision::FocusUnlessMinimized(window) => {
+            focus_unless_minimized(windows(app), window, heard)
+        }
     };
 
     lock(app).log(JournalEvent::Notification {
@@ -691,19 +696,29 @@ fn dismiss(app: &AppHandle, nickname: &str) {
     drop(watcher.dismiss(nickname));
 }
 
-fn focus(windows: &dyn WindowManager, window: WindowId) -> Outcome {
+fn focus(windows: &dyn WindowManager, window: WindowId, heard: Instant) -> Outcome {
     match windows.focus(window) {
-        Ok(()) => Outcome::Focused,
+        Ok(()) => Outcome::Focused {
+            focus_micros: micros_since(heard),
+        },
         Err(error) => refused(&error),
     }
 }
 
-fn focus_unless_minimized(windows: &dyn WindowManager, window: WindowId) -> Outcome {
+fn focus_unless_minimized(
+    windows: &dyn WindowManager,
+    window: WindowId,
+    heard: Instant,
+) -> Outcome {
     match windows.is_minimized(window) {
         Ok(true) => Outcome::LeftMinimized,
-        Ok(false) => focus(windows, window),
+        Ok(false) => focus(windows, window, heard),
         Err(error) => refused(&error),
     }
+}
+
+fn micros_since(started: Instant) -> u64 {
+    u64::try_from(started.elapsed().as_micros()).unwrap_or(u64::MAX)
 }
 
 fn refused(error: &PlatformError) -> Outcome {
@@ -1752,16 +1767,16 @@ mod tests {
         });
 
         assert_eq!(
-            focus(windows.as_ref(), WindowId::from_raw(1)),
+            focus(windows.as_ref(), WindowId::from_raw(1), Instant::now()),
             Outcome::NoWindow
         );
 
         windows.show(Desktop::default());
 
-        assert_eq!(
-            focus(windows.as_ref(), WindowId::from_raw(1)),
-            Outcome::Focused
-        );
+        assert!(matches!(
+            focus(windows.as_ref(), WindowId::from_raw(1), Instant::now()),
+            Outcome::Focused { .. }
+        ));
     }
 
     #[test]
@@ -1772,17 +1787,44 @@ mod tests {
         });
 
         assert_eq!(
-            focus_unless_minimized(windows.as_ref(), WindowId::from_raw(1)),
+            focus_unless_minimized(windows.as_ref(), WindowId::from_raw(1), Instant::now()),
             Outcome::LeftMinimized
         );
-        assert_eq!(
-            focus_unless_minimized(windows.as_ref(), WindowId::from_raw(2)),
-            Outcome::Focused
-        );
+        assert!(matches!(
+            focus_unless_minimized(windows.as_ref(), WindowId::from_raw(2), Instant::now()),
+            Outcome::Focused { .. }
+        ));
         assert_eq!(
             windows.asked(),
             vec![Asked::Focused(WindowId::from_raw(2))],
             "a window left minimized is never touched"
+        );
+    }
+
+    #[test]
+    fn a_focus_is_counted_from_the_notification_and_not_from_the_call() {
+        let windows = FakeWindowManager::showing(Desktop::default());
+        let heard = Instant::now() - Duration::from_millis(40);
+
+        let Outcome::Focused { focus_micros } =
+            focus(windows.as_ref(), WindowId::from_raw(1), heard)
+        else {
+            panic!("a desktop that says yes gives a focus");
+        };
+
+        assert!(focus_micros >= 40_000);
+    }
+
+    #[test]
+    fn a_focus_the_system_refuses_carries_no_duration() {
+        let windows = FakeWindowManager::showing(Desktop {
+            focus_refusal: Some(PlatformError::WindowGone),
+            ..Desktop::default()
+        });
+
+        assert_eq!(
+            focus(windows.as_ref(), WindowId::from_raw(1), Instant::now()),
+            Outcome::NoWindow
         );
     }
 }

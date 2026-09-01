@@ -8,6 +8,9 @@ import type { WheelSlice } from '@/@types/wheel'
 export const APPLE_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)'
 export const WINDOWS_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
 
+export const NO_BREAK_SPACE = '\u00A0'
+export const NARROW_NO_BREAK_SPACE = '\u202F'
+
 export function pending(): Promise<never> {
   return new Promise(() => {})
 }

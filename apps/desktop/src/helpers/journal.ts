@@ -41,7 +41,7 @@ import {
   WORK_LABELS
 } from '@/constants/journal'
 import { strings } from '@/constants/strings'
-import { matchIsPlural } from '@/helpers/format'
+import { matchIsPlural, focusDuration } from '@/helpers/format'
 import { bindingLabel, updateLine } from '@/helpers/wording'
 
 export const journalTime = (milliseconds: number) => {
@@ -584,7 +584,7 @@ const notificationLine = ({
 
   switch (outcome.outcome) {
     case 'focused': {
-      return `${subject} : fenêtre ramenée au premier plan.`
+      return `${subject} : fenêtre ramenée au premier plan en ${focusDuration(outcome.focusMicros)}.`
     }
     case 'kindDisabled': {
       return `${subject} : ce type est désactivé, rien n’a été fait.`
