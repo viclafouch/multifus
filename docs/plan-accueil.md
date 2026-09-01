@@ -3,6 +3,11 @@
 Ce que voit quelqu'un qui vient d'installer Multifus, et pourquoi il repart en
 croyant que le logiciel est cassé.
 
+Ce chantier passe en dernier, tranché le 1er septembre 2026. Il est gros, six
+étapes et deux systèmes, et tout ce qui l'attend se livre plus vite que lui. Les
+relevés qu'il demandait sont pourtant faits, et écrits plus bas : ils ne se
+reprennent pas.
+
 ## Le problème
 
 Aujourd'hui, Multifus demande une autorisation et une seule. Sur le Mac,
@@ -54,22 +59,23 @@ qu'un identifiant écrit en dur, et c'est ce qu'il faut reprendre.
 | Ce qu'il faut                             | Multifus peut le lire                                                  |
 | ----------------------------------------- | ---------------------------------------------------------------------- |
 | Accessibilité                             | oui, `AXIsProcessTrustedWithOptions`                                   |
-| Surveillance de la saisie                 | à vérifier, voir plus bas                                              |
 | Notifications autorisées pour Dofus Retro | non, aucune API publique ne donne les réglages d'une autre application |
 | Concentration éteinte                     | non, plus d'API publique depuis macOS 12                               |
 | Notifications allumées dans le jeu        | non                                                                    |
 
-Un contrôle sur cinq, peut-être deux. Le Mac ne laisse pas une application lire
-les réglages de notification d'une autre, et l'état de Concentration n'est
-lisible que par des fichiers privés qui changent à chaque version : un binaire
-notarisé n'a rien à faire là-dedans.
+Un contrôle sur quatre. Le Mac ne laisse pas une application lire les réglages
+de notification d'une autre, et l'état de Concentration n'est lisible que par
+des fichiers privés qui changent à chaque version : un binaire notarisé n'a rien
+à faire là-dedans.
 
-**À vérifier avant de dessiner** : est-ce que le tap d'événements de Multifus
-(`CGEventTapCreate`, dans `platform/macos.rs`) réclame la Surveillance de la
-saisie en plus de l'Accessibilité. Un tap qui modifie l'événement se contente en
-principe de l'Accessibilité, un tap qui écoute demande la Surveillance. Focus
-Retro appelle `CGPreflightListenEventAccess` ; nous n'appelons rien. Si la
-réponse est oui, c'est une étape de plus, et elle est contrôlable.
+**La Surveillance de la saisie n'est pas demandée**, essayé le 1er septembre 2026. Le tap de Multifus se crée avec `CGEventTapOptions::Default`, un tap actif
+qui peut avaler le clic, et macOS ne réclame pour lui que l'Accessibilité. Le
+relevé : autorisation retirée par `tccutil reset Accessibility
+com.viclafouch.multifus`, l'Accessibilité seule rendue, puis le Déplacement
+rapide armé sur deux clients. Le tap s'est créé, le journal ne porte aucun
+`CGEventTapCreate` refusé, et Surveillance de la saisie est resté vide. Focus
+Retro appelle `CGPreflightListenEventAccess` et demande donc deux autorisations
+au joueur ; l'accueil du Mac n'a qu'une porte à faire ouvrir.
 
 ## La preuve par l'écoute
 
@@ -107,8 +113,11 @@ Dans cet ordre, parce que chacune dépend de la précédente.
    les notifications générales, et celles de Dofus. Sur le Mac, la même étape
    existe mais elle n'est pas contrôlée : elle explique et elle montre.
 4. **Le Mode Concentration.** Contrôlé sur Windows, expliqué sur le Mac.
-5. **Le réglage dans le jeu.** Aucun contrôle nulle part. Une capture d'écran de
-   l'option, dans le jeu, et rien d'autre.
+5. **Le réglage dans le jeu.** Aucun contrôle nulle part. Le chemin, relevé le
+   1er septembre 2026 : Options, onglet **Général**, section **Divers**, la case
+   **Notifications en arrière-plan**. Le client est le même sur les deux
+   systèmes, et le libellé aussi. Une capture cadrée sur cette case, et rien
+   d'autre.
 6. **L'essai.** La preuve par l'écoute.
 
 Une étape porte trois états, et jamais un de plus :
@@ -191,10 +200,6 @@ d'accueil, pas plus.
 
 Dans l'ordre, chaque ligne étant livrable seule.
 
-- [ ] Répondre à la question de la Surveillance de la saisie sur le Mac, à
-      l'essai, et le noter ici
-- [ ] Relever le libellé exact du réglage de notification dans Dofus Retro, et
-      son chemin dans les options du jeu, sur les deux systèmes
 - [ ] Relever l'AUMID de Dofus sur Windows, et vérifier que le parcours des
       sous-clés le trouve
 - [ ] Côté Rust, remplacer `AuthorizationView { granted, listening }` par la
