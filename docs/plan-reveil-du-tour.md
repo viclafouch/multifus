@@ -96,28 +96,35 @@ main sans écrire quand le titre est déjà court, `lengthen` de même quand il 
 déjà long. Un renommage coûte un tour de plus, une seule fois, et c'est un tour
 qu'on voulait de toute façon.
 
-## Ce qu'il faut essayer
+## Ce qui est essayé
 
-Le code a été écrit sur le Mac. Sur Windows il n'a jamais été compilé ni lancé :
-seulement type-checké contre le vrai crate `windows` pour la cible msvc, dans une
-caisse jetable hors du dépôt. Premier geste sur Windows, avant tout essai :
-`pnpm --filter @multifus/desktop run lint:rust` puis les tests.
+Le Mac est passé, le 1er septembre 2026. Le client qui s'ouvre est agrandi tout
+de suite, le personnage qui se connecte passe connecté tout de suite, le client
+qui se ferme passe déconnecté de même, et Multifus au repos une heure à côté
+d'un navigateur ne prend rien au processeur. L'`AXObserver` tient, et la boucle
+qui brûlait un cœur ne le brûle plus.
 
-Ensuite, sur les deux machines, parce que rien de tout ça ne se prouve par un
-test.
+## Ce qu'il faut essayer sur Windows
 
-- Ouvrir un client : la fenêtre doit être agrandie tout de suite, et sur Windows
-  porter la tête de classe et le titre court sans attendre la seconde.
+Le code Windows n'a jamais été compilé ni lancé : seulement type-checké contre
+le vrai crate `windows` pour la cible msvc, dans une caisse jetable hors du
+dépôt. Premier geste, avant tout essai : `pnpm --filter @multifus/desktop run
+lint:rust` puis les tests.
+
+Ensuite, parce que rien de tout ça ne se prouve par un test.
+
+- Ouvrir un client : la fenêtre doit être agrandie tout de suite, et porter la
+  tête de classe et le titre court sans attendre la seconde.
 - Connecter un personnage : la ligne doit passer connectée tout de suite.
 - Fermer un client : la ligne doit passer déconnectée tout de suite.
 - Laisser tourner Multifus une heure avec un navigateur ouvert, et regarder la
   consommation : si le tour part plus souvent qu'avant sans qu'aucun client ne
   bouge, le filtre est mauvais.
-- Windows seulement : ouvrir et fermer des menus dans d'autres applications, et
-  vérifier que le tour ne part pas. C'est le filtre de `DESTROY` qu'on essaie.
+- Ouvrir et fermer des menus dans d'autres applications, et vérifier que le tour
+  ne part pas. C'est le filtre de `DESTROY` qu'on essaie.
 
 ## À trancher une fois essayé
 
 Est-ce que le tour réveillé doit tout faire, ou seulement relire les fenêtres.
-Il fait tout, c'est ce qu'il sait faire ; à ne découper que si les essais
-montrent que ça coûte trop cher.
+Il fait tout, et le Mac n'y voit rien coûter. À ne découper que si les essais
+Windows disent le contraire.
