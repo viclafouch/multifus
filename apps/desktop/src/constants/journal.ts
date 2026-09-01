@@ -42,6 +42,7 @@ export const TONES = {
   roster: 'neutral',
   setting: 'neutral',
   scanFailed: 'warning',
+  wakesFailed: 'warning',
   saveFailed: 'warning',
   openFailed: 'warning',
   configLoadFailed: 'warning',
@@ -180,6 +181,8 @@ export const DETAILED_LINES = {
   snapshotFailed: 'La fenêtre n’a pas reçu le tableau de bord',
   startAtLoginFailed: 'Démarrage avec la session impossible',
   scanFailed: 'Lecture des fenêtres impossible',
+  wakesFailed:
+    'Le tour ne sera pas prévenu par le système, il passera une fois par seconde',
   clientMaximizeFailed: 'Agrandissement de la fenêtre d’un client impossible',
   clientsCountFailed:
     'Le compte des fenêtres du jeu n’est pas arrivé à l’écran',

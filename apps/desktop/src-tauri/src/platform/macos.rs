@@ -1,4 +1,6 @@
 use std::cell::OnceCell;
+use std::collections::HashMap;
+use std::collections::HashSet;
 use std::ffi::CStr;
 use std::ffi::c_float;
 use std::ffi::c_void;
@@ -34,6 +36,7 @@ use objc2_app_kit::NSScreen;
 use objc2_app_kit::NSWindowStyleMask;
 use objc2_app_kit::NSWorkspace;
 use objc2_app_kit::NSWorkspaceDidActivateApplicationNotification;
+use objc2_app_kit::NSWorkspaceDidLaunchApplicationNotification;
 use objc2_app_kit::NSWorkspaceDidTerminateApplicationNotification;
 use objc2_application_services::AXError;
 use objc2_application_services::AXIsProcessTrusted;
@@ -51,6 +54,9 @@ use objc2_core_foundation::CFNumber;
 use objc2_core_foundation::CFPreferencesCopyValue;
 use objc2_core_foundation::CFRetained;
 use objc2_core_foundation::CFRunLoop;
+use objc2_core_foundation::CFRunLoopMode;
+use objc2_core_foundation::CFRunLoopRunResult;
+use objc2_core_foundation::CFRunLoopSource;
 use objc2_core_foundation::CFString;
 use objc2_core_foundation::CFType;
 use objc2_core_foundation::CGFloat;
@@ -97,6 +103,8 @@ use crate::platform::notification::NotificationReport;
 use crate::platform::notification::NotificationSink;
 use crate::platform::notification::NotificationWatcher;
 use crate::platform::paste::PasteSender;
+use crate::platform::wake::WakeSink;
+use crate::platform::wake::WakeWatcher;
 use crate::platform::window::GameWindow;
 use crate::platform::window::ScreenFrame;
 use crate::platform::window::ScreenPoint;
@@ -122,6 +130,8 @@ const AX_VALUE: &str = "AXValue";
 const AX_FRONTMOST: &str = "AXFrontmost";
 const AX_STATIC_TEXT_ROLE: &str = "AXStaticText";
 const AX_CREATED_NOTIFICATION: &str = "AXCreated";
+const AX_WINDOW_CREATED_NOTIFICATION: &str = "AXWindowCreated";
+const AX_TITLE_CHANGED_NOTIFICATION: &str = "AXTitleChanged";
 
 const MAX_BANNER_DEPTH: usize = 8;
 
@@ -1347,7 +1357,13 @@ fn watch(
 ) {
     let refcon: *mut c_void = ptr::from_ref(&sink).cast_mut().cast();
 
-    let observer = match create_observer(pid, refcon) {
+    let observer = match create_observer(
+        pid,
+        on_banner_created,
+        &[AX_CREATED_NOTIFICATION],
+        refcon,
+        "creating the banner observer",
+    ) {
         Ok(observer) => observer,
         Err(error) => {
             drop(ready.send(Err(error)));
@@ -1409,33 +1425,309 @@ fn watch_notification_centre(pid: pid_t, gone: &Arc<AtomicBool>) -> WorkspaceWat
     })
 }
 
-fn create_observer(pid: pid_t, refcon: *mut c_void) -> Result<CFRetained<AXObserver>> {
+#[derive(Debug, Default)]
+pub struct AccessibilityWakeWatcher {
+    listening: Mutex<Option<WakeListening>>,
+}
+
+#[derive(Debug)]
+struct WakeListening {
+    running: Arc<AtomicBool>,
+    run_loop: LiveRunLoop,
+    thread: JoinHandle<()>,
+}
+
+impl AccessibilityWakeWatcher {
+    #[must_use]
+    pub fn new() -> Self {
+        Self::default()
+    }
+}
+
+impl WakeWatcher for AccessibilityWakeWatcher {
+    fn start(&self, sink: WakeSink) -> Result<()> {
+        let mut listening = self
+            .listening
+            .lock()
+            .unwrap_or_else(PoisonError::into_inner);
+
+        if listening.is_some() {
+            return Ok(());
+        }
+
+        if !accessibility_authorization().is_granted() {
+            return Err(PlatformError::AuthorizationDenied);
+        }
+
+        let running = Arc::new(AtomicBool::new(true));
+        let (told, ready) = mpsc::channel();
+
+        let thread = thread::Builder::new()
+            .name("multifus-client-watcher".to_owned())
+            .spawn({
+                let running = Arc::clone(&running);
+
+                move || watch_the_clients(&sink, &running, &told)
+            })
+            .map_err(|error| {
+                PlatformError::system("starting the client watcher", error.to_string())
+            })?;
+
+        let run_loop = ready.recv().unwrap_or_else(|_| {
+            Err(PlatformError::system(
+                "starting the client watcher",
+                "the watcher thread stopped before it was listening",
+            ))
+        });
+
+        match run_loop {
+            Ok(run_loop) => {
+                *listening = Some(WakeListening {
+                    running,
+                    run_loop,
+                    thread,
+                });
+
+                Ok(())
+            }
+            Err(error) => {
+                running.store(false, Ordering::Relaxed);
+
+                drop(thread.join());
+
+                Err(error)
+            }
+        }
+    }
+
+    fn stop(&self) {
+        let Some(listening) = self
+            .listening
+            .lock()
+            .unwrap_or_else(PoisonError::into_inner)
+            .take()
+        else {
+            return;
+        };
+
+        listening.running.store(false, Ordering::Relaxed);
+        listening.run_loop.0.wake_up();
+
+        drop(listening.thread.join());
+    }
+}
+
+impl Drop for AccessibilityWakeWatcher {
+    fn drop(&mut self) {
+        self.stop();
+    }
+}
+
+#[derive(Debug)]
+struct WatchedClient {
+    source: CFRetained<CFRunLoopSource>,
+
+    #[expect(
+        dead_code,
+        reason = "the source is the observer's, and stops firing when the observer goes"
+    )]
+    observer: CFRetained<AXObserver>,
+}
+
+fn watch_the_clients(
+    sink: &WakeSink,
+    running: &AtomicBool,
+    told: &mpsc::Sender<Result<LiveRunLoop>>,
+) {
+    let Some(run_loop) = CFRunLoop::current() else {
+        drop(told.send(Err(PlatformError::system(
+            "starting the client watcher",
+            "this thread has no run loop",
+        ))));
+
+        return;
+    };
+
+    // SAFETY: a constant of the framework, alive for the whole process.
+    let mode = unsafe { kCFRunLoopDefaultMode };
+
+    let refcon: *mut c_void = ptr::from_ref(sink).cast_mut().cast();
+    let mut watched: HashMap<pid_t, WatchedClient> = HashMap::new();
+    let coming_and_going = watch_the_clients_coming_and_going(sink);
+
+    if told.send(Ok(LiveRunLoop(run_loop.clone()))).is_ok() {
+        while running.load(Ordering::Relaxed) {
+            follow_the_clients(&mut watched, &run_loop, mode, refcon);
+
+            wait_for_an_event(mode);
+        }
+    }
+
+    for (_, client) in watched.drain() {
+        run_loop.remove_source(Some(&client.source), mode);
+    }
+
+    drop(coming_and_going);
+}
+
+fn wait_for_an_event(mode: Option<&CFRunLoopMode>) {
+    if CFRunLoop::run_in_mode(mode, STOP_CHECK_SECONDS, false) == CFRunLoopRunResult::Finished {
+        thread::sleep(Duration::from_secs_f64(STOP_CHECK_SECONDS));
+    }
+}
+
+fn follow_the_clients(
+    watched: &mut HashMap<pid_t, WatchedClient>,
+    run_loop: &CFRunLoop,
+    mode: Option<&CFRunLoopMode>,
+    refcon: *mut c_void,
+) {
+    let open = client_pids();
+
+    watched.retain(|pid, client| {
+        let still_there = open.contains(pid);
+
+        if !still_there {
+            run_loop.remove_source(Some(&client.source), mode);
+        }
+
+        still_there
+    });
+
+    for pid in open {
+        if watched.contains_key(&pid) {
+            continue;
+        }
+
+        let Ok(client) = watch_client(pid, run_loop, mode, refcon) else {
+            continue;
+        };
+
+        watched.insert(pid, client);
+    }
+}
+
+fn client_pids() -> HashSet<pid_t> {
+    dofus_applications()
+        .iter()
+        .map(|application| application.processIdentifier())
+        .collect()
+}
+
+fn watch_client(
+    pid: pid_t,
+    run_loop: &CFRunLoop,
+    mode: Option<&CFRunLoopMode>,
+    refcon: *mut c_void,
+) -> Result<WatchedClient> {
+    let observer = create_observer(
+        pid,
+        on_client_changed,
+        &[
+            AX_WINDOW_CREATED_NOTIFICATION,
+            AX_TITLE_CHANGED_NOTIFICATION,
+        ],
+        refcon,
+        "watching a client",
+    )?;
+
+    // SAFETY: the observer was just created and is alive for the whole body.
+    let source = unsafe { observer.run_loop_source() };
+
+    run_loop.add_source(Some(&source), mode);
+
+    Ok(WatchedClient { source, observer })
+}
+
+fn watch_the_clients_coming_and_going(sink: &WakeSink) -> Vec<WorkspaceWatch> {
+    // SAFETY: both are constants of the framework, alive for the whole process.
+    let names = unsafe {
+        [
+            NSWorkspaceDidLaunchApplicationNotification,
+            NSWorkspaceDidTerminateApplicationNotification,
+        ]
+    };
+
+    let known = Arc::new(Mutex::new(client_pids()));
+
+    names
+        .into_iter()
+        .map(|name| {
+            let sink = Arc::clone(sink);
+            let known = Arc::clone(&known);
+
+            watch_workspace(name, move || {
+                let open = client_pids();
+                let mut known = known.lock().unwrap_or_else(PoisonError::into_inner);
+
+                if *known == open {
+                    return;
+                }
+
+                *known = open;
+
+                drop(known);
+
+                sink();
+            })
+        })
+        .collect()
+}
+
+unsafe extern "C-unwind" fn on_client_changed(
+    _observer: NonNull<AXObserver>,
+    _element: NonNull<AXUIElement>,
+    _notification: NonNull<CFString>,
+    refcon: *mut c_void,
+) {
+    if refcon.is_null() {
+        return;
+    }
+
+    // SAFETY: `refcon` is the sink `watch_the_clients` holds, dropped after the observers.
+    let sink: &WakeSink = unsafe { &*refcon.cast::<WakeSink>() };
+
+    drop(catch_unwind(AssertUnwindSafe(|| sink())));
+}
+
+type AXObserverTold = unsafe extern "C-unwind" fn(
+    NonNull<AXObserver>,
+    NonNull<AXUIElement>,
+    NonNull<CFString>,
+    *mut c_void,
+);
+
+fn create_observer(
+    pid: pid_t,
+    told: AXObserverTold,
+    notifications: &[&str],
+    refcon: *mut c_void,
+    operation: &'static str,
+) -> Result<CFRetained<AXObserver>> {
     let mut observer: *mut AXObserver = ptr::null_mut();
 
     // SAFETY: the callback has the signature the API documents, and `observer` is live.
-    let status =
-        unsafe { AXObserver::create(pid, Some(on_banner_created), NonNull::from(&mut observer)) };
+    let status = unsafe { AXObserver::create(pid, Some(told), NonNull::from(&mut observer)) };
 
-    ax_result(status, "creating the banner observer")?;
+    ax_result(status, operation)?;
 
-    let observer = NonNull::new(observer).ok_or_else(|| {
-        PlatformError::system(
-            "creating the banner observer",
-            "the system returned nothing",
-        )
-    })?;
+    let observer = NonNull::new(observer)
+        .ok_or_else(|| PlatformError::system(operation, "the system returned nothing"))?;
 
     // SAFETY: `AXObserverCreate` follows the Create rule, so this is ours.
     let observer = unsafe { CFRetained::from_raw(observer) };
 
-    // SAFETY: the pid is the notification centre's, just reported as running.
+    // SAFETY: the pid is the one the caller just read off a running application.
     let application = unsafe { AXUIElement::new_application(pid) };
-    let notification = CFString::from_str(AX_CREATED_NOTIFICATION);
 
-    // SAFETY: `refcon` points at the sink, which outlives the observer.
-    let status = unsafe { observer.add_notification(&application, &notification, refcon) };
+    for name in notifications {
+        let notification = CFString::from_str(name);
 
-    ax_result(status, "observing the banners")?;
+        // SAFETY: `refcon` points at the sink, which outlives the observer.
+        let status = unsafe { observer.add_notification(&application, &notification, refcon) };
+
+        ax_result(status, operation)?;
+    }
 
     Ok(observer)
 }
@@ -1894,6 +2186,8 @@ unsafe extern "C" {
 
 #[cfg(test)]
 mod tests {
+    use std::time::Instant;
+
     use super::*;
 
     fn area() -> CGRect {
@@ -2027,5 +2321,34 @@ mod tests {
                 Err(PlatformError::AuthorizationDenied)
             );
         }
+    }
+
+    #[test]
+    fn a_run_loop_with_nothing_to_wait_on_is_slept_on_rather_than_spun_on() {
+        // SAFETY: a constant of the framework, alive for the whole process.
+        let mode = unsafe { kCFRunLoopDefaultMode };
+        let start = Instant::now();
+
+        wait_for_an_event(mode);
+
+        assert!(
+            start.elapsed() >= Duration::from_secs_f64(STOP_CHECK_SECONDS),
+            "a run loop with no source to wait on hands the thread straight back, and the \
+             watcher would spin on a whole core for as long as no client is open"
+        );
+    }
+
+    #[test]
+    fn a_watcher_asked_to_listen_twice_listens_once_and_stops_on_the_first_ask() {
+        let watcher = AccessibilityWakeWatcher::new();
+
+        if watcher.start(Arc::new(|| {})) == Err(PlatformError::AuthorizationDenied) {
+            return;
+        }
+
+        assert_eq!(watcher.start(Arc::new(|| {})), Ok(()));
+
+        watcher.stop();
+        watcher.stop();
     }
 }

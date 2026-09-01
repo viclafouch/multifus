@@ -14,14 +14,7 @@ une IA, comme Dracoon, et il est propre.
 
 ## Ce qu'il faut faire
 
-### 1. Le tour attend une seconde, les autres écoutent le système
-
-Le sujet est passé dans [plan-reveil-du-tour.md](./plan-reveil-du-tour.md), qui
-le prend en entier : le bruit de `NAMECHANGE`, le fil à hooks qui doit tenir
-tout le temps, l'observateur de titre sur le Mac, et le repos minimum entre deux
-tours.
-
-### 2. Quatre réglages Windows éteignent l'AutoFocus, et nous n'en disons rien
+### 1. Quatre réglages Windows éteignent l'AutoFocus, et nous n'en disons rien
 
 Dracoon (`src/core/autofocus.py`) fait un diagnostic au démarrage, et il le
 journalise ligne par ligne :
@@ -42,7 +35,7 @@ Le sujet est passé dans [plan-accueil.md](./plan-accueil.md), qui le prend en
 entier : les contrôles, ce que le Mac ne sait pas lire, et l'écran qui les
 montre.
 
-### 3. Le personnage exclu vole quand même le premier plan
+### 2. Le personnage exclu vole quand même le premier plan
 
 Retro Toolbox a `tabs/accounts/focus_guard.py`, et son en-tête dit : « Dofus
 force parfois le focus sur sa fenêtre quand c'est son tour de jeu. » Il écoute

@@ -38,6 +38,8 @@ Les mots de Multifus, et rien d'autre. On en parle en français, on les écrit e
 
 **Tour** (`Turn`) : un passage de Multifus sur les fenêtres du jeu, une fois par seconde. Il lit ce qui est à l'écran, pose ce qui manque, et reprend ce qui n'a plus lieu d'être.
 
+**Réveil** (`wake`) : ce qui fait partir un tour avant l'heure. Le système prévient Multifus qu'une fenêtre du jeu vient d'apparaître, de changer de titre ou de disparaître, et le tour part tout de suite au lieu d'attendre la seconde. Un réveil demandé pendant qu'un tour tourne n'est jamais perdu, il sert le tour suivant, et une rafale de réveils ne vaut qu'un tour. La seconde reste sous tout ça : elle rattrape ce qu'aucun événement ne dit, un titre changé sans que le système prévienne, une autorisation retirée, un client tué de force. Entre deux tours il y a toujours un repos, réveil compris, pour qu'une rafale ne les fasse pas se suivre sans reprendre souffle.
+
 **Visée** (`Aim`) : ce qu'un clic gauche vaut au Déplacement rapide. Le clic tombe hors du jeu, ou sur une fenêtre que le tour n'a pas donnée, ou personne n'est dans le défilement, ou le suivant est celui sur lequel on est déjà, ou bien il désigne la fenêtre où aller.
 
 **Porte** (`ClickGate`) : ce qui décide, au moment du clic, si le clic compte. Fermée le temps d'une bascule, elle mange les clics qui arrivent trop tôt sur une fenêtre de jeu. Tenue le temps d'une roue, elle mange les deux boutons où qu'ils tombent, et elle les compte : la roue lit ce compte et se ferme au premier.

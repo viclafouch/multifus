@@ -1,149 +1,123 @@
 # Réveiller le tour
 
-Le tour dort une seconde entre deux passages, quoi que fasse le système. On veut
-qu'un événement du système le réveille, et que la seconde ne serve plus que de
+Le tour dormait une seconde entre deux passages, quoi que fasse le système. Un
+événement du système le réveille maintenant, et la seconde ne sert plus que de
 filet.
 
-Vient de l'audit des concurrents : ROrganizer (`src/win/watcher.rs`, sur le
-bureau) ne dort pas, il écoute `SetWinEventHook` et rassemble la rafale en
-150 ms.
+Le code est écrit sur les deux systèmes. Rien n'est prouvé : ce fichier ne garde
+que les essais à faire et ce qu'on a mesuré pour décider.
 
-## Ce que le joueur voit
+## Ce qu'on a mesuré avant d'écrire
 
-Il lance un client Dofus. Pendant jusqu'à une seconde, la fenêtre garde l'icône
-du jeu au lieu de la tête de classe, son titre reste long, elle n'est pas dans
-le défilement donc le raccourci la saute, et l'agrandissement à l'ouverture ne
-l'a pas encore touchée.
+Le plan partait de l'idée que le tour est cher et que la seconde nous en
+protège. C'est faux, mesuré sur le Mac, Accessibilité accordée :
 
-Pareil quand un personnage se connecte : il reste déconnecté dans la liste
-jusqu'au tour suivant. Huit clients au lancement d'une session, c'est huit fois
-ce délai, l'un après l'autre.
+- Lire le titre des fenêtres d'une application coûte **0,3 à 0,9 ms**, le lien
+  avec cette application une fois chaud.
+- La toute première lecture d'un processus coûte **30 ms**, une seule fois.
+- L'appel d'inventaire des applications Dofus coûte **230 µs**.
 
-Rien n'est cassé, tout arrive. C'est le genre de lenteur qu'on ne signale jamais
-et qui fait qu'un outil semble moins vif qu'un autre.
+Un tour à huit clients coûte donc de l'ordre de dix à trente millisecondes. Le
+gain des crochets n'est pas d'économiser le tour, il est de le déclencher plus
+tôt. Baisser la seconde à 250 ms aurait donné la même latence pour une ligne,
+contre quelques pour cent d'un cœur ; les crochets donnent la même latence pour
+presque rien. C'est ce qui a été choisi.
 
-## Ce que le code fait aujourd'hui
+## Ce que le plan disait de faux
 
-Dans `app/runtime.rs` :
+**« Ce que le joueur voit » ne valait que pour Windows.** `apply_short_titles`
+et `set_window_icon` sont des coquilles vides sur le Mac. L'icône du jeu au lieu
+de la tête de classe, le titre long, le bouton de la barre des tâches : rien de
+tout ça n'existe sur le Mac. Ce qui s'y voit, c'est la fenêtre pas encore
+agrandie et le personnage pas encore connecté.
 
-- `SCAN_INTERVAL` vaut une seconde.
-- `NEXT_TURN` est un `Mutex<bool>` et un `Condvar`.
-- `wait_for_next_turn()` attend le drapeau ou l'échéance, puis remet le drapeau
-  à faux.
-- `wake()` lève le drapeau et réveille le fil.
+**La route « minimum » du Mac ne donnait pas ce qu'on lui prêtait.**
+`NSWorkspaceDidLaunchApplication` part quand le processus a fini de se lancer,
+avant que le client dessine sa fenêtre. Elle couvre le client qui se ferme, et
+presque rien du client qui s'ouvre. Il n'y avait pas de demi-mesure : c'est
+l'`AXObserver` ou rien.
 
-`wake()` n'est appelé que depuis `app/commands.rs`, c'est-à-dire depuis la
-fenêtre de Multifus. Aucun événement du système ne l'appelle.
+**Les trois codes d'événement Windows ne se suivent pas.** `CREATE` vaut 0x8000,
+`DESTROY` 0x8001, mais `NAMECHANGE` 0x800C. Une seule plage aurait pris treize
+sortes d'événements, dont `SHOW`, `HIDE`, `REORDER` et `FOCUS` : le déluge que
+le plan voulait justement éviter. Le `const assert` de ROrganizer ne vérifie que
+l'ordre, pas la contiguïté, et ROrganizer prend bien la plage large. Multifus
+pose deux crochets.
 
-Le mécanisme est donc déjà là et il est correct : un `wake()` pendant qu'un tour
-tourne n'est pas perdu, le drapeau reste levé et le tour suivant part tout de
-suite.
+## Ce qui est écrit
 
-## Ce qu'on ne change pas
+**Le repos minimum.** `TurnAlarm` dans `app/runtime.rs` : 150 ms entre la fin
+d'un tour et le départ du suivant, réveil compris, pris sur la seconde et non
+ajouté à elle. Le drapeau reste levé pendant ce repos, aucun réveil ne se perd.
+Six tests.
 
-Le tour reste. Il pose les traces et il les reprend, c'est sa raison d'être, et
-il rattrape ce qu'aucun événement ne dit : un titre changé sans que le système
-prévienne, une autorisation retirée, un client tué de force.
+**Le Mac.** `AccessibilityWakeWatcher` dans `platform/macos.rs`. Un fil à
+demeure avec sa boucle, un `AXObserver` par client sur `AXWindowCreated` et
+`AXTitleChanged`, posé et retiré par un appel d'inventaire toutes les 250 ms,
+qui rattrape aussi un observateur que le système a refusé de poser. Deux
+observateurs d'espace de travail réveillent le tour quand la liste des clients
+change.
 
-La seconde reste aussi, comme plancher. On ajoute des réveils, on n'enlève pas
-le battement.
+**Windows.** `WinEventWakeWatcher` dans `platform/windows.rs`. Un fil à demeure
+avec sa boucle de messages, deux crochets, `CREATE`/`DESTROY` et `NAMECHANGE`,
+filtrés sur `OBJID_WINDOW`, `CHILDID_SELF` puis `runs_dofus`.
 
-## Windows
+**`DESTROY` a été tranché.** Pas de réveil sans filtre : chaque menu, chaque
+infobulle, chaque liste déroulante de la machine est une fenêtre qui meurt, et
+le tour serait parti sans arrêt. Le guetteur tient la liste des fenêtres du jeu,
+semée à l'ouverture par l'énumération et tenue à jour par `CREATE` et
+`NAMECHANGE`, et ne réveille que pour celles-là. Le plan proposait de commencer
+sans filtre et de mesurer ; ça n'a pas été fait, la mesure demandant de vivre
+une soirée entière avec un tour qui part à chaque menu.
 
-Poser un `SetWinEventHook` sur `EVENT_OBJECT_CREATE`, `EVENT_OBJECT_DESTROY` et
-`EVENT_OBJECT_NAMECHANGE`, avec `WINEVENT_OUTOFCONTEXT | WINEVENT_SKIPOWNPROCESS`.
-Les trois codes se suivent, un seul appel couvre la plage, et ROrganizer le
-vérifie par un `const assert`.
+Ce filtre écarte les fenêtres des autres applications, pas celles du jeu : tout
+ce qu'ouvre un processus Dofus entre dans la liste, et sa mort réveille donc le
+tour. C'est voulu, une fenêtre du jeu qui s'en va valant un tour.
 
-**Le hook doit vivre tout le temps.** Celui d'aujourd'hui, `hook_foreground()`
-dans `platform/windows.rs`, est posé par le fil `multifus-clicks`, qui ne tourne
-que Déplacement rapide allumé ou roue ouverte. Il faut un fil à demeure, avec sa
-boucle de messages, ou déplacer les deux hooks sur un fil commun qui ne s'arrête
-jamais.
+**Le fil de souris n'a pas été touché.** Deux fils séparés : le crochet de
+souris a un budget que Windows lui compte, et un crochet de fenêtre bavard n'a
+pas à le manger.
 
-**Le bruit est le vrai piège.** `EVENT_OBJECT_NAMECHANGE` part pour toutes les
-fenêtres de la machine. Un navigateur qui change de titre à chaque seconde
-réveillerait le tour à chaque seconde, et on aurait remplacé un battement d'une
-seconde par un battement continu. Il faut filtrer dans le callback :
+## Le piège qu'on a failli poser
 
-- `id_object == OBJID_WINDOW` et `id_child == CHILDID_SELF`, comme le fait déjà
-  `on_foreground` ;
-- puis `runs_dofus(handle)`, qui est déjà écrit et qui garde un cache par pid.
+Sans client Dofus ouvert, la boucle du Mac n'a aucune source, et
+`CFRunLoopRunInMode` rend alors la main aussitôt. Mesuré : **414 100 tours de
+boucle en 600 ms**, soit un cœur entier brûlé en permanence, dans l'état où
+Multifus passe le plus clair de son temps. La boucle dort maintenant quand le
+système lui rend la main sans rien à attendre, et un test le garde.
 
-**`EVENT_OBJECT_DESTROY` ne se filtre pas pareil.** La fenêtre est morte quand
-l'événement arrive, `runs_dofus` ne peut plus répondre. Deux sorties : réveiller
-sans filtrer sur ce code seul, une fenêtre qui se ferme étant assez rare, ou
-tenir la liste des fenêtres Dofus connues et ne réveiller que pour celles-là.
-Commencer par la première, mesurer.
+Windows n'a pas ce piège, `GetMessageW` bloquant jusqu'au message suivant.
 
-## macOS
-
-Deux routes, et la seconde est celle qui vaut le coup.
-
-**Le minimum.** `NSWorkspaceDidLaunchApplicationNotification` et
-`DidTerminateApplicationNotification`, filtrés sur `DOFUS_BUNDLE_ID`, appellent
-`wake()`. `watch_workspace(name, told)` existe déjà dans `platform/macos.rs`, et
-`WorkspaceWatch` retire l'observateur en se relâchant. Attention, le même
-problème qu'à Windows : les observateurs d'aujourd'hui vivent dans l'écoute des
-clics, il en faut un qui tienne tout le temps.
-
-Ça couvre le client qui s'ouvre et celui qui se ferme. Ça ne couvre pas le
-personnage qui se connecte, qui n'est qu'un changement de titre.
-
-**La bonne route.** Un `AXObserver` par application Dofus, sur
-`kAXTitleChangedNotification` et `kAXWindowCreatedNotification`. La machinerie
-est déjà écrite pour les bannières : `create_observer(pid, refcon)`,
-`observer.add_notification(...)`, `observer.run_loop_source()`, autour de la
-ligne 1350 de `platform/macos.rs`. Il faut la reprendre pour les clients, un
-observateur par pid, posé quand une application Dofus apparaît et relâché quand
-elle s'en va, ce que les deux notifications d'espace de travail disent déjà.
-
-Avec ça, le Mac voit la connexion d'un personnage aussi vite que Windows.
-
-## Le plancher entre deux tours
-
-`wake()` n'a pas de repos minimum. Une rafale d'événements, et le tour tourne
-sans discontinuer : chaque tour lit toutes les fenêtres par l'Accessibilité ou
-par Win32, ce n'est pas gratuit.
-
-À ajouter dans `wait_for_next_turn()` : un repos minimum, 150 ms comme
-ROrganizer, entre la fin d'un tour et le départ du suivant, réveil compris. Le
-drapeau reste levé pendant ce repos, rien n'est perdu, le tour part juste un
-peu plus tard.
-
-C'est la seule modification du cœur. Elle se fait et se teste seule, avant
-d'écrire une seule ligne de plateforme.
-
-## Ce qu'il faut construire
-
-- [ ] Le repos minimum dans `wait_for_next_turn()`, avec ses tests
-- [ ] macOS : l'observateur d'espace de travail à demeure, filtré sur le bundle
-      de Dofus, qui appelle `wake()`
-- [ ] macOS : l'`AXObserver` par client sur le titre et la création de fenêtre
-- [ ] Windows : le fil à hooks qui ne s'arrête jamais, et le hook de
-      `CREATE`, `DESTROY` et `NAMECHANGE` filtré sur Dofus
-- [ ] Windows : décider quoi faire de `DESTROY`, qu'on ne peut pas filtrer
-- [ ] Retirer la ligne de `docs/plan-audit-concurrents.md` une fois les deux
-      systèmes livrés
+L'autre piège, écarté après lecture : sur Windows, Multifus écrit lui-même les
+titres courts, et ce `WM_SETTEXT` part depuis le processus du jeu, que
+`WINEVENT_SKIPOWNPROCESS` ne saute donc pas. Le tour se réveillerait lui-même
+sans fin si le renommage n'était pas idempotent. Il l'est : `shorten` rend la
+main sans écrire quand le titre est déjà court, `lengthen` de même quand il est
+déjà long. Un renommage coûte un tour de plus, une seule fois, et c'est un tour
+qu'on voulait de toute façon.
 
 ## Ce qu'il faut essayer
 
-Sur les deux machines, parce que rien de tout ça ne se prouve par un test.
+Le code a été écrit sur le Mac. Sur Windows il n'a jamais été compilé ni lancé :
+seulement type-checké contre le vrai crate `windows` pour la cible msvc, dans une
+caisse jetable hors du dépôt. Premier geste sur Windows, avant tout essai :
+`pnpm --filter @multifus/desktop run lint:rust` puis les tests.
 
-- Ouvrir un client : la tête de classe et le titre court doivent arriver tout de
-  suite, plus au bout d'une seconde.
+Ensuite, sur les deux machines, parce que rien de tout ça ne se prouve par un
+test.
+
+- Ouvrir un client : la fenêtre doit être agrandie tout de suite, et sur Windows
+  porter la tête de classe et le titre court sans attendre la seconde.
 - Connecter un personnage : la ligne doit passer connectée tout de suite.
-  Sur le Mac, cet essai échoue si seule la route `NSWorkspace` est faite.
 - Fermer un client : la ligne doit passer déconnectée tout de suite.
-- Laisser tourner Multifus une heure avec un navigateur ouvert, et regarder le
-  journal et la consommation : si le tour part plus souvent qu'avant sans
-  qu'aucun client ne bouge, le filtre est mauvais.
+- Laisser tourner Multifus une heure avec un navigateur ouvert, et regarder la
+  consommation : si le tour part plus souvent qu'avant sans qu'aucun client ne
+  bouge, le filtre est mauvais.
+- Windows seulement : ouvrir et fermer des menus dans d'autres applications, et
+  vérifier que le tour ne part pas. C'est le filtre de `DESTROY` qu'on essaie.
 
-## À trancher
+## À trancher une fois essayé
 
-- Windows : un fil commun pour le hook de souris et les hooks de fenêtre, ou
-  deux fils. Le premier est plus simple à arrêter, le second évite qu'un hook
-  bavard retarde l'autre.
-- Est-ce que le tour réveillé doit tout faire, ou seulement relire les fenêtres
-  et laisser le reste au battement d'une seconde. Commencer par tout faire,
-  c'est ce que le tour sait faire, et ne découper que si ça coûte trop cher.
+Est-ce que le tour réveillé doit tout faire, ou seulement relire les fenêtres.
+Il fait tout, c'est ce qu'il sait faire ; à ne découper que si les essais
+montrent que ça coûte trop cher.

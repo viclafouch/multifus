@@ -1,7 +1,7 @@
 use std::panic::AssertUnwindSafe;
 use std::panic::catch_unwind;
+use std::sync::Arc;
 use std::sync::Condvar;
-use std::sync::LazyLock;
 use std::sync::Mutex;
 use std::sync::MutexGuard;
 use std::sync::PoisonError;
@@ -45,13 +45,53 @@ use crate::platform::NotificationSink;
 use crate::platform::NotificationWatcher;
 use crate::platform::PlatformError;
 use crate::platform::PlatformNotificationWatcher;
+use crate::platform::PlatformWakeWatcher;
+use crate::platform::WakeWatcher;
 use crate::platform::WindowId;
 use crate::platform::WindowManager;
 
 const SCAN_INTERVAL: Duration = Duration::from_secs(1);
 
-static NEXT_TURN: LazyLock<(Mutex<bool>, Condvar)> =
-    LazyLock::new(|| (Mutex::new(false), Condvar::new()));
+const TURN_REST: Duration = Duration::from_millis(150);
+
+static NEXT_TURN: TurnAlarm = TurnAlarm::new();
+
+struct TurnAlarm {
+    asked: Mutex<bool>,
+    alarm: Condvar,
+}
+
+impl TurnAlarm {
+    const fn new() -> Self {
+        Self {
+            asked: Mutex::new(false),
+            alarm: Condvar::new(),
+        }
+    }
+
+    fn wake(&self) {
+        *self.asked.lock().unwrap_or_else(PoisonError::into_inner) = true;
+
+        self.alarm.notify_one();
+    }
+
+    fn wait(&self, rest: Duration, interval: Duration) {
+        thread::sleep(rest);
+
+        let mut guard = self.asked.lock().unwrap_or_else(PoisonError::into_inner);
+
+        if !*guard {
+            let (waited, _) = self
+                .alarm
+                .wait_timeout(guard, interval.saturating_sub(rest))
+                .unwrap_or_else(PoisonError::into_inner);
+
+            guard = waited;
+        }
+
+        *guard = false;
+    }
+}
 
 #[cfg(target_os = "macos")]
 const AUTHORIZATION_SETTINGS_URL: &str =
@@ -64,7 +104,11 @@ pub const SNAPSHOT_EVENT: &str = "multifus://snapshot";
 
 pub const NAVIGATE_EVENT: &str = "multifus://navigate";
 
+struct Wakes(PlatformWakeWatcher);
+
 pub fn start(app: AppHandle) {
+    app.manage(Wakes(PlatformWakeWatcher::new()));
+
     let spawned = thread::Builder::new()
         .name("multifus-window-scan".to_owned())
         .spawn({
@@ -87,26 +131,11 @@ pub fn start(app: AppHandle) {
 }
 
 fn wait_for_next_turn() {
-    let (asked, alarm) = &*NEXT_TURN;
-    let mut guard = asked.lock().unwrap_or_else(PoisonError::into_inner);
-
-    if !*guard {
-        let (waited, _) = alarm
-            .wait_timeout(guard, SCAN_INTERVAL)
-            .unwrap_or_else(PoisonError::into_inner);
-
-        guard = waited;
-    }
-
-    *guard = false;
+    NEXT_TURN.wait(TURN_REST, SCAN_INTERVAL);
 }
 
 pub fn wake() {
-    let (asked, alarm) = &*NEXT_TURN;
-
-    *asked.lock().unwrap_or_else(PoisonError::into_inner) = true;
-
-    alarm.notify_one();
+    NEXT_TURN.wake();
 }
 
 struct Turn<'a> {
@@ -184,7 +213,19 @@ impl TurnMechanisms for AppTurnMechanisms<'_> {
 }
 
 fn tick(app: &AppHandle) {
+    listen_for_wakes(app);
+
     turn_over(&Turn::of(app), &AppTurnMechanisms(app));
+}
+
+fn listen_for_wakes(app: &AppHandle) {
+    let Err(error) = app.state::<Wakes>().0.start(Arc::new(wake)) else {
+        return;
+    };
+
+    lock(app).log_unless_repeated(JournalEvent::WakesFailed {
+        detail: error.to_string(),
+    });
 }
 
 fn turn_over(turn: &Turn, mechanisms: &dyn TurnMechanisms) {
@@ -738,7 +779,7 @@ fn watcher(app: &AppHandle) -> MutexGuard<'_, PlatformNotificationWatcher> {
 #[cfg(test)]
 mod tests {
     use std::collections::HashSet;
-    use std::sync::Arc;
+    use std::time::Instant;
 
     use super::*;
     use crate::config::Settings;
@@ -758,6 +799,100 @@ mod tests {
 
     fn turn<'a>(windows: &'a FakeWindowManager, state: &'a AppState) -> Turn<'a> {
         Turn { windows, state }
+    }
+
+    const A_REST: Duration = Duration::from_millis(40);
+
+    const AN_INTERVAL: Duration = Duration::from_millis(400);
+
+    #[test]
+    fn a_turn_nobody_asked_for_waits_the_whole_interval() {
+        let alarm = TurnAlarm::new();
+        let start = Instant::now();
+
+        alarm.wait(A_REST, AN_INTERVAL);
+
+        assert!(
+            start.elapsed() >= AN_INTERVAL,
+            "the beat is the interval, rest included"
+        );
+    }
+
+    #[test]
+    fn a_wake_during_a_turn_is_kept_and_starts_the_next_one() {
+        let alarm = TurnAlarm::new();
+
+        alarm.wake();
+
+        let start = Instant::now();
+
+        alarm.wait(A_REST, AN_INTERVAL);
+
+        assert!(
+            start.elapsed() < AN_INTERVAL,
+            "a wake asked for before the wait is not lost"
+        );
+    }
+
+    #[test]
+    fn a_wake_never_starts_a_turn_before_the_rest_is_over() {
+        let alarm = TurnAlarm::new();
+
+        alarm.wake();
+
+        let start = Instant::now();
+
+        alarm.wait(A_REST, AN_INTERVAL);
+
+        assert!(
+            start.elapsed() >= A_REST,
+            "a burst of wakes may not run the turns back to back"
+        );
+    }
+
+    #[test]
+    fn a_wake_landing_during_the_rest_is_kept() {
+        let alarm = Arc::new(TurnAlarm::new());
+        let waking = Arc::clone(&alarm);
+        let woken = thread::spawn(move || {
+            thread::sleep(A_REST / 2);
+            waking.wake();
+        });
+        let start = Instant::now();
+
+        alarm.wait(A_REST, AN_INTERVAL);
+
+        assert!(
+            start.elapsed() < AN_INTERVAL,
+            "the rest holds a wake back, it never eats it"
+        );
+
+        drop(woken.join());
+    }
+
+    #[test]
+    fn a_turn_that_ran_on_a_wake_leaves_no_wake_behind_it() {
+        let alarm = TurnAlarm::new();
+
+        alarm.wake();
+        alarm.wait(A_REST, AN_INTERVAL);
+
+        let start = Instant::now();
+
+        alarm.wait(A_REST, AN_INTERVAL);
+
+        assert!(
+            start.elapsed() >= AN_INTERVAL,
+            "a wake serves one turn, not every turn after it"
+        );
+    }
+
+    #[test]
+    fn the_rest_never_outlasts_the_beat_it_is_taken_from() {
+        assert!(
+            TURN_REST < SCAN_INTERVAL,
+            "a rest longer than the beat would leave the turn no beat at all"
+        );
     }
 
     #[derive(Debug, Clone, PartialEq, Eq)]

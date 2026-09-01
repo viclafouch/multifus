@@ -153,6 +153,7 @@ export type JournalEvent =
   | { readonly kind: 'roster'; readonly change: RosterChange }
   | { readonly kind: 'saveFailed'; readonly detail: string }
   | { readonly kind: 'scanFailed'; readonly detail: string }
+  | { readonly kind: 'wakesFailed'; readonly detail: string }
   | { readonly kind: 'setting'; readonly change: SettingChange }
   | {
       readonly kind: 'shortcutsBound'

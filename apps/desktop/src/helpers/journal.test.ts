@@ -1035,6 +1035,12 @@ const JOURNAL_CASES = {
       line: `${DETAILED_LINES.scanFailed} : ${DETAIL}`
     }
   ],
+  wakesFailed: [
+    {
+      event: { kind: 'wakesFailed', detail: DETAIL },
+      line: `${DETAILED_LINES.wakesFailed} : ${DETAIL}`
+    }
+  ],
   saveFailed: [
     {
       event: { kind: 'saveFailed', detail: DETAIL },

@@ -4,6 +4,7 @@ pub mod error;
 pub mod keyboard;
 pub mod notification;
 pub mod paste;
+pub mod wake;
 pub mod window;
 
 #[cfg(target_os = "macos")]
@@ -33,6 +34,8 @@ pub use notification::NotificationSink;
 pub use notification::NotificationWatcher;
 pub use paste::Clipboard;
 pub use paste::PasteSender;
+pub use wake::WakeSink;
+pub use wake::WakeWatcher;
 pub use window::GameWindow;
 pub use window::ScreenFrame;
 pub use window::ScreenPoint;
@@ -79,3 +82,8 @@ pub type PlatformPasteSender = windows::SendInputPasteSender;
 pub type PlatformClickWatcher = macos::MouseTapClickWatcher;
 #[cfg(target_os = "windows")]
 pub type PlatformClickWatcher = windows::MouseHookClickWatcher;
+
+#[cfg(target_os = "macos")]
+pub type PlatformWakeWatcher = macos::AccessibilityWakeWatcher;
+#[cfg(target_os = "windows")]
+pub type PlatformWakeWatcher = windows::WinEventWakeWatcher;

@@ -63,6 +63,7 @@ use windows::Win32::System::Variant::VT_LPWSTR;
 use windows::Win32::UI::Accessibility::HWINEVENTHOOK;
 use windows::Win32::UI::Accessibility::SetWinEventHook;
 use windows::Win32::UI::Accessibility::UnhookWinEvent;
+use windows::Win32::UI::Accessibility::WINEVENTPROC;
 use windows::Win32::UI::HiDpi::GetDpiForMonitor;
 use windows::Win32::UI::HiDpi::MDT_EFFECTIVE_DPI;
 use windows::Win32::UI::Input::KeyboardAndMouse::INPUT;
@@ -83,6 +84,9 @@ use windows::Win32::UI::WindowsAndMessaging::CallNextHookEx;
 use windows::Win32::UI::WindowsAndMessaging::CreateIconFromResourceEx;
 use windows::Win32::UI::WindowsAndMessaging::DestroyIcon;
 use windows::Win32::UI::WindowsAndMessaging::DispatchMessageW;
+use windows::Win32::UI::WindowsAndMessaging::EVENT_OBJECT_CREATE;
+use windows::Win32::UI::WindowsAndMessaging::EVENT_OBJECT_DESTROY;
+use windows::Win32::UI::WindowsAndMessaging::EVENT_OBJECT_NAMECHANGE;
 use windows::Win32::UI::WindowsAndMessaging::EVENT_SYSTEM_FOREGROUND;
 use windows::Win32::UI::WindowsAndMessaging::EnumWindows;
 use windows::Win32::UI::WindowsAndMessaging::GA_ROOT;
@@ -172,6 +176,8 @@ use crate::platform::notification::NotificationReport;
 use crate::platform::notification::NotificationSink;
 use crate::platform::notification::NotificationWatcher;
 use crate::platform::paste::PasteSender;
+use crate::platform::wake::WakeSink;
+use crate::platform::wake::WakeWatcher;
 use crate::platform::window::GameWindow;
 use crate::platform::window::ScreenFrame;
 use crate::platform::window::ScreenPoint;
@@ -1180,12 +1186,20 @@ fn hook_mouse() -> Result<HHOOK> {
 }
 
 fn hook_foreground() -> Option<HWINEVENTHOOK> {
+    hook_events(
+        EVENT_SYSTEM_FOREGROUND,
+        EVENT_SYSTEM_FOREGROUND,
+        Some(on_foreground),
+    )
+}
+
+fn hook_events(first: u32, last: u32, told: WINEVENTPROC) -> Option<HWINEVENTHOOK> {
     let hook = unsafe {
         SetWinEventHook(
-            EVENT_SYSTEM_FOREGROUND,
-            EVENT_SYSTEM_FOREGROUND,
+            first,
+            last,
             None,
-            Some(on_foreground),
+            told,
             0,
             0,
             WINEVENT_OUTOFCONTEXT | WINEVENT_SKIPOWNPROCESS,
@@ -1302,6 +1316,184 @@ unsafe extern "system" fn on_foreground(
         watched.gate.note_foreground(window);
 
         (watched.sink)(ClickReport::Foreground { window });
+    });
+}
+
+struct Waking {
+    sink: WakeSink,
+    clients: HashSet<WindowId>,
+}
+
+impl Waking {
+    fn notices(
+        &mut self,
+        event: u32,
+        window: WindowId,
+        is_a_client: impl FnOnce() -> bool,
+    ) -> bool {
+        if event == EVENT_OBJECT_DESTROY {
+            return self.clients.remove(&window);
+        }
+
+        if !is_a_client() {
+            return false;
+        }
+
+        self.clients.insert(window);
+
+        true
+    }
+}
+
+thread_local! {
+    static WAKING: RefCell<Option<Waking>> = const { RefCell::new(None) };
+}
+
+#[derive(Debug, Default)]
+pub struct WinEventWakeWatcher {
+    hooked: Mutex<Option<Hooked>>,
+}
+
+impl WinEventWakeWatcher {
+    #[must_use]
+    pub fn new() -> Self {
+        Self::default()
+    }
+}
+
+impl WakeWatcher for WinEventWakeWatcher {
+    fn start(&self, sink: WakeSink) -> Result<()> {
+        let mut hooked = self.hooked.lock().unwrap_or_else(PoisonError::into_inner);
+
+        if hooked.is_some() {
+            return Ok(());
+        }
+
+        let (told, listening) = mpsc::channel::<Result<u32>>();
+
+        let handle = thread::Builder::new()
+            .name("multifus-window-events".to_owned())
+            .spawn(move || {
+                watch_the_windows(sink, &told);
+            })
+            .map_err(|error| PlatformError::system("the window event thread", error.to_string()))?;
+
+        match listening.recv() {
+            Ok(Ok(thread)) => {
+                *hooked = Some(Hooked { thread, handle });
+
+                Ok(())
+            }
+            Ok(Err(error)) => {
+                drop(handle.join());
+
+                Err(error)
+            }
+            Err(error) => Err(PlatformError::system(
+                "the window event thread",
+                error.to_string(),
+            )),
+        }
+    }
+
+    fn stop(&self) {
+        let taken = self
+            .hooked
+            .lock()
+            .unwrap_or_else(PoisonError::into_inner)
+            .take();
+
+        let Some(hooked) = taken else {
+            return;
+        };
+
+        let _ = unsafe { PostThreadMessageW(hooked.thread, WM_QUIT, WPARAM(0), LPARAM(0)) };
+
+        drop(hooked.handle.join());
+    }
+}
+
+impl Drop for WinEventWakeWatcher {
+    fn drop(&mut self) {
+        self.stop();
+    }
+}
+
+fn watch_the_windows(sink: WakeSink, told: &mpsc::Sender<Result<u32>>) {
+    let mut clients = Vec::new();
+
+    drop(enumerate(Some(collect_client_window), &mut clients));
+
+    WAKING.with_borrow_mut(|waking| {
+        *waking = Some(Waking {
+            sink,
+            clients: clients.into_iter().collect(),
+        });
+    });
+
+    let appearing = hook_events(
+        EVENT_OBJECT_CREATE,
+        EVENT_OBJECT_DESTROY,
+        Some(on_window_event),
+    );
+    let renaming = hook_events(
+        EVENT_OBJECT_NAMECHANGE,
+        EVENT_OBJECT_NAMECHANGE,
+        Some(on_window_event),
+    );
+
+    if appearing.is_none() && renaming.is_none() {
+        drop(told.send(Err(PlatformError::system(
+            "SetWinEventHook",
+            "the system refused to hand Multifus the window events",
+        ))));
+
+        WAKING.with_borrow_mut(|waking| {
+            *waking = None;
+        });
+
+        return;
+    }
+
+    drop(told.send(Ok(unsafe { GetCurrentThreadId() })));
+
+    let mut message = MSG::default();
+
+    while unsafe { GetMessageW(&mut message, None, 0, 0) }.0 > 0 {
+        let _ = unsafe { TranslateMessage(&message) };
+        unsafe { DispatchMessageW(&message) };
+    }
+
+    for hook in [appearing, renaming].into_iter().flatten() {
+        let _ = unsafe { UnhookWinEvent(hook) };
+    }
+
+    WAKING.with_borrow_mut(|waking| {
+        *waking = None;
+    });
+}
+
+unsafe extern "system" fn on_window_event(
+    _hook: HWINEVENTHOOK,
+    event: u32,
+    handle: HWND,
+    object: i32,
+    child: i32,
+    _thread: u32,
+    _time: u32,
+) {
+    if object != OBJID_WINDOW.0 || !u32::try_from(child).is_ok_and(|child| child == CHILDID_SELF) {
+        return;
+    }
+
+    WAKING.with_borrow_mut(|waking| {
+        let Some(waking) = waking.as_mut() else {
+            return;
+        };
+
+        if waking.notices(event, window_id(handle), || runs_dofus(handle)) {
+            (waking.sink)();
+        }
     });
 }
 
@@ -1934,6 +2126,52 @@ mod tests {
             class_icon(window.handle, IconSlot::Small),
             NO_ICON,
             "a class with no small icon still holds the one the system drew for it"
+        );
+    }
+
+    fn waking() -> Waking {
+        Waking {
+            sink: Arc::new(|| {}),
+            clients: HashSet::new(),
+        }
+    }
+
+    #[test]
+    fn a_window_the_game_owns_wakes_the_turn_and_is_remembered() {
+        let mut waking = waking();
+        let window = WindowId::from_raw(1);
+
+        assert!(waking.notices(EVENT_OBJECT_CREATE, window, || { true }));
+        assert!(waking.clients.contains(&window));
+    }
+
+    #[test]
+    fn a_window_the_game_does_not_own_is_left_alone() {
+        let mut waking = waking();
+        let window = WindowId::from_raw(1);
+
+        assert!(!waking.notices(EVENT_OBJECT_NAMECHANGE, window, || { false }));
+        assert!(
+            waking.clients.is_empty(),
+            "a browser renaming a tab teaches the watcher nothing"
+        );
+    }
+
+    #[test]
+    fn a_window_that_dies_wakes_the_turn_only_if_it_was_the_game() {
+        let mut waking = waking();
+        let mine = WindowId::from_raw(1);
+        let a_menu = WindowId::from_raw(2);
+
+        assert!(waking.notices(EVENT_OBJECT_CREATE, mine, || { true }));
+        assert!(
+            !waking.notices(EVENT_OBJECT_DESTROY, a_menu, || { true }),
+            "the system cannot be asked what a dead window ran, so only the known ones count"
+        );
+        assert!(waking.notices(EVENT_OBJECT_DESTROY, mine, || { false }));
+        assert!(
+            !waking.notices(EVENT_OBJECT_DESTROY, mine, || { false }),
+            "a window dies once"
         );
     }
 }

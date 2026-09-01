@@ -184,6 +184,10 @@ pub enum JournalEvent {
         detail: String,
     },
 
+    WakesFailed {
+        detail: String,
+    },
+
     SaveFailed {
         detail: String,
     },
