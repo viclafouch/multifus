@@ -15,8 +15,10 @@ GitHub n'est pas mesurable, et pèse souvent plus lourd qu'il n'y paraît.
 2. **Dracoon**, notre jumeau fonctionnel sur Windows. Son `README` ment par
    omission : il annonce trois fonctions, le code en porte quinze. Lire
    `src/core/` et `src/ressources/i18n.json`, jamais la page d'accueil.
-3. **Retro Toolbox**, pour son split 2 et 4 fenêtres, le seul manque que tous
-   les concurrents nous opposent.
+3. **Retro Toolbox**, pour son split 2 et 4 fenêtres. Le seul manque que tous
+   les concurrents nous opposent, et Victor l'a refusé le 1er septembre 2026 :
+   Multifus ne rangera pas les fenêtres côte à côte. Ne pas le reproposer à la
+   prochaine veille ; il reste à auditer pour le reste.
 
 ## Les huit qui comptent
 
