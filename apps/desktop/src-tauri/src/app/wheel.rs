@@ -36,6 +36,7 @@ use crate::domain::Class;
 use crate::domain::Gender;
 use crate::platform::PlatformError;
 use crate::platform::WindowId;
+use crate::platform::matches_game_in_front;
 
 const OVERLAY: Overlay = Overlay {
     label: "wheel",
@@ -406,10 +407,7 @@ pub fn follow_foreground(app: &AppHandle) {
         return;
     };
 
-    if windows(app)
-        .foreground_game_window()
-        .is_ok_and(|found| found.is_some())
-    {
+    if matches_game_in_front(windows(app)) {
         return;
     }
 

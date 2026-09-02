@@ -34,6 +34,7 @@ pub use notification::NotificationSink;
 pub use notification::NotificationWatcher;
 pub use paste::Clipboard;
 pub use paste::PasteSender;
+pub use wake::Wake;
 pub use wake::WakeSink;
 pub use wake::WakeWatcher;
 pub use window::GameWindow;
@@ -42,6 +43,7 @@ pub use window::ScreenPoint;
 pub use window::ShortTitleReport;
 pub use window::WindowId;
 pub use window::WindowManager;
+pub use window::matches_game_in_front;
 #[cfg(target_os = "windows")]
 pub use windows::matches_frontmost;
 

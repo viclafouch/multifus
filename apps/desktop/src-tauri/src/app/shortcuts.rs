@@ -41,6 +41,7 @@ use crate::platform::GameWindow;
 use crate::platform::PlatformError;
 use crate::platform::WindowId;
 use crate::platform::WindowManager;
+use crate::platform::matches_game_in_front;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Struck {
@@ -48,10 +49,16 @@ pub enum Struck {
     Released(Binding),
 }
 
-pub type ShortcutQueue = Sender<Struck>;
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Told {
+    Struck(Struck),
+    ForegroundChanged,
+}
+
+pub type ShortcutQueue = Sender<Told>;
 
 pub fn start(app: &AppHandle) {
-    let (queue, bindings) = mpsc::channel::<Struck>();
+    let (queue, told) = mpsc::channel::<Told>();
 
     let spawned = thread::Builder::new()
         .name("multifus-shortcuts".to_owned())
@@ -59,8 +66,8 @@ pub fn start(app: &AppHandle) {
             let app = app.clone();
 
             move || {
-                for struck in bindings {
-                    if catch_unwind(AssertUnwindSafe(|| on_struck(&app, struck))).is_err() {
+                for order in told {
+                    if catch_unwind(AssertUnwindSafe(|| on_told(&app, order))).is_err() {
                         lock(&app).log_unless_repeated(JournalEvent::Panicked {
                             work: Work::Shortcuts,
                         });
@@ -85,20 +92,67 @@ pub fn suspend(app: &AppHandle) {
 }
 
 fn forget(app: &AppHandle, state: &mut Multifus) {
-    if let Err(error) = app.global_shortcut().unregister_all() {
-        state.log_unless_repeated(JournalEvent::ShortcutsFailed {
-            detail: error.to_string(),
-        });
+    match app.global_shortcut().unregister_all() {
+        Ok(()) => state.arm_shortcuts(false),
+        Err(error) => {
+            state.log_unless_repeated(JournalEvent::ShortcutsFailed {
+                detail: error.to_string(),
+            });
+        }
     }
 }
 
 pub fn apply(app: &AppHandle) {
+    let game_in_front = matches_game_in_front(windows(app));
     let mut state = lock(app);
 
+    // The system only tells a refusal to whoever asks for the combination, and the screen is read from outside the game.
+    arm(app, &mut state);
+
+    if !game_in_front {
+        forget(app, &mut state);
+    }
+}
+
+pub fn note_foreground(app: &AppHandle) {
+    tell(app, Told::ForegroundChanged);
+}
+
+fn follow_foreground(app: &AppHandle) {
+    let game_in_front = matches_game_in_front(windows(app));
+    let mut state = lock(app);
+
+    match arming(state.shortcuts_armed(), game_in_front) {
+        Arming::Leave => return,
+        Arming::Take => arm(app, &mut state),
+        Arming::HandBack => forget(app, &mut state),
+    }
+
+    drop(state);
+
+    runtime::wake();
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Arming {
+    Take,
+    HandBack,
+    Leave,
+}
+
+fn arming(armed: bool, game_in_front: bool) -> Arming {
+    match (armed, game_in_front) {
+        (false, true) => Arming::Take,
+        (true, false) => Arming::HandBack,
+        _ => Arming::Leave,
+    }
+}
+
+fn arm(app: &AppHandle, state: &mut Multifus) {
     let wanted = state.bindings();
     let held = state.held();
 
-    forget(app, &mut state);
+    forget(app, state);
 
     let mut claimed = HashMap::new();
     let mut statuses = vec![ShortcutStatus::Unbound; wanted.len()];
@@ -119,14 +173,21 @@ pub fn apply(app: &AppHandle) {
         })
         .collect::<Vec<_>>();
 
-    let told = bindings
+    let worth_telling = bindings
         .iter()
         .filter(|bound| is_worth_telling(bound))
         .cloned()
         .collect();
 
-    state.remember_bound(&bindings);
-    state.log_unless_repeated(JournalEvent::ShortcutsBound { bindings: told });
+    let learnt = state.remember_bound(&bindings);
+
+    state.arm_shortcuts(true);
+
+    if learnt {
+        state.log(JournalEvent::ShortcutsBound {
+            bindings: worth_telling,
+        });
+    }
 }
 
 fn claiming_order(
@@ -190,7 +251,7 @@ fn bind(
         .global_shortcut()
         .on_shortcut(shortcut, move |_, _, event| {
             if let Some(struck) = struck_as(event.state(), &struck_binding) {
-                fire(&handler_app, struck);
+                tell(&handler_app, Told::Struck(struck));
             }
         });
 
@@ -217,8 +278,8 @@ fn matches_held(binding: &Binding) -> bool {
     matches!(binding, Binding::Action { action } if action.matches_held())
 }
 
-fn fire(app: &AppHandle, struck: Struck) {
-    let _ = app.state::<ShortcutQueue>().send(struck);
+fn tell(app: &AppHandle, told: Told) {
+    let _ = app.state::<ShortcutQueue>().send(told);
 }
 
 enum Refusal {
@@ -278,6 +339,13 @@ struct Press<'a> {
     windows: &'a dyn WindowManager,
     state: &'a AppState,
     mechanisms: &'a dyn Mechanisms,
+}
+
+fn on_told(app: &AppHandle, told: Told) {
+    match told {
+        Told::Struck(struck) => on_struck(app, struck),
+        Told::ForegroundChanged => follow_foreground(app),
+    }
 }
 
 fn on_struck(app: &AppHandle, struck: Struck) {
@@ -547,6 +615,57 @@ mod tests {
             .expect("this action decides something of the window in front");
 
         act(windows, effect)
+    }
+
+    #[test]
+    fn the_combinations_are_taken_from_the_system_over_the_game_and_nowhere_else() {
+        let windows = FakeWindowManager::showing(Desktop::default());
+
+        assert!(
+            !matches_game_in_front(windows.as_ref()),
+            "on a bare desktop the keys belong to whoever the player is writing to"
+        );
+
+        windows.show(Desktop {
+            foreground: Some(game_window(1, "Alpha")),
+            ..Desktop::default()
+        });
+
+        assert!(matches_game_in_front(windows.as_ref()));
+
+        windows.show(Desktop {
+            scan_refusal: Some(PlatformError::AuthorizationDenied),
+            ..Desktop::default()
+        });
+
+        assert!(
+            !matches_game_in_front(windows.as_ref()),
+            "a foreground the system will not name is not the game"
+        );
+    }
+
+    #[test]
+    fn the_combinations_are_taken_on_the_way_into_the_game_and_handed_back_on_the_way_out() {
+        assert_eq!(arming(false, true), Arming::Take);
+        assert_eq!(arming(true, false), Arming::HandBack);
+        assert_eq!(
+            arming(true, true),
+            Arming::Leave,
+            "a window of the game passing to another one asks the system for nothing"
+        );
+        assert_eq!(arming(false, false), Arming::Leave);
+    }
+
+    #[test]
+    fn a_handing_back_the_system_refused_is_asked_again_rather_than_believed() {
+        let refused = true;
+
+        assert_eq!(
+            arming(refused, false),
+            Arming::HandBack,
+            "a refused unregister leaves the combinations armed, so the next foreground asks the \
+             system again instead of leaving them taken for good"
+        );
     }
 
     #[test]

@@ -26,7 +26,8 @@ const ACTION_LABELS = {
   },
   main: {
     label: 'Personnage principal',
-    description: 'Ramène devant votre personnage principal, où que vous soyez.',
+    description:
+      'Ramène devant votre personnage principal, d’où que vous veniez dans le jeu.',
     mention: null
   },
   toggleExcluded: {
@@ -73,8 +74,8 @@ const STATUS_LINES = {
 
 const REJECTION_LINES = {
   noModifier: IS_APPLE
-    ? 'Ajoutez Ctrl, Alt ou Maj. Seule, cette touche serait prise dans tous vos logiciels.'
-    : 'Ajoutez Ctrl, Alt ou Maj, ou prenez une touche de fonction : F1, F2, F5… Seule, cette touche serait prise dans tous vos logiciels.',
+    ? 'Ajoutez Ctrl, Alt ou Maj. Seule, cette touche partirait dès que vous écrivez dans le jeu.'
+    : 'Ajoutez Ctrl, Alt ou Maj, ou prenez une touche de fonction : F1, F2, F5… Seule, cette touche partirait dès que vous écrivez dans le jeu.',
   unsupportedKey: 'Cette touche ne peut pas servir de raccourci.',
   pasteCombination:
     'C’est le raccourci pour coller sur votre ordinateur. Prenez-en un autre.'
@@ -103,8 +104,8 @@ export const SHORTCUTS_STRINGS = {
     },
     charactersTitle: 'Un personnage, une touche',
     charactersDescription: IS_APPLE
-      ? 'Ctrl+Maj+1 sur l’Eniripsa, Ctrl+Maj+2 sur le Sacrieur : sa fenêtre passe devant, où que vous soyez.'
-      : 'F1 sur l’Eniripsa, F2 sur le Sacrieur : sa fenêtre passe devant, où que vous soyez.',
+      ? 'Ctrl+Maj+1 sur l’Eniripsa, Ctrl+Maj+2 sur le Sacrieur : sa fenêtre passe devant, d’où que vous veniez dans le jeu.'
+      : 'F1 sur l’Eniripsa, F2 sur le Sacrieur : sa fenêtre passe devant, d’où que vous veniez dans le jeu.',
     charactersEmpty:
       'Entrez en jeu, et vos personnages se posent ici tout seuls.',
     characterEdit: (nickname: string) => {

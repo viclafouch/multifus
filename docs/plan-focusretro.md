@@ -254,30 +254,28 @@ Rien à prendre.
 
 ## 6. Les raccourcis
 
-C'est le seul endroit où sa technique, plus lourde, achète quelque chose que la
-nôtre ne peut pas faire.
-
 |                                                | Multifus                                                                  | Focus Retro                                          |
 | ---------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------- |
 | Mécanique                                      | `tauri-plugin-global-shortcut`, donc le registre de raccourcis du système | `CGEventTap` sur macOS, `WH_KEYBOARD_LL` sur Windows |
 | Permission macOS en plus                       | aucune                                                                    | **Surveillance des entrées**                         |
 | Ne part qu'au-dessus du jeu                    | toujours, et le refus est journalisé                                      | en option, et sa propre fenêtre compte aussi         |
-| Rend la touche à l'application quand il refuse | **impossible**                                                            | oui                                                  |
+| Rend la touche à l'application quand il refuse | il ne la prend qu'au-dessus du jeu, donc il n'a rien à rendre             | oui, il la prend partout et la rend                  |
 
 Notre garde est plus stricte que la sienne : `answer` interroge
 `foreground_game_window()` avant tout et journalise `OutsideGame` quand la
 frappe n'est pas au-dessus d'un client. Chez lui c'est un réglage.
 
-Mais avec un raccourci enregistré auprès du système, la touche est mangée avant
-qu'on soit appelé. Un joueur qui pose F1 sur son Eniripsa perd F1 partout
-ailleurs : dans le navigateur, dans l'explorateur. Son crochet clavier, lui,
-rend l'événement intact quand la garde refuse.
+Cette lecture concluait ici qu'un raccourci enregistré auprès du système mange
+la touche avant qu'on soit appelé, qu'il fallait un crochet bas niveau pour la
+rendre, et donc qu'on ne la rendrait pas. Elle avait manqué la troisième route,
+et un `Shift+Digit1` posé sur une réponse rapide a fini par manger le chiffre 1
+dans le navigateur. Multifus ne prend maintenant la combinaison au système que
+pendant que le jeu est devant, et la rend en sortant : aucune permission de
+plus, et la touche n'est plus jamais perdue ailleurs.
 
-Pour rattraper ça il faudrait un crochet bas niveau des deux côtés, donc la
-permission Surveillance des entrées sur macOS, une surface qui lit toutes les
-frappes du système y compris les mots de passe, et huit cents lignes de code par
-plateforme. Contre la perte de F1 hors du jeu. **Non.** À écrire dans le README
-plutôt qu'à corriger, pour que le joueur sache ce qu'il pose.
+Son crochet clavier garde un avantage que nous n'aurons pas : il décide au
+moment de la frappe, donc il n'a pas de course entre l'activation d'une fenêtre
+et l'armement.
 
 ---
 

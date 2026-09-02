@@ -58,6 +58,13 @@ impl GameWindow {
 }
 
 #[must_use]
+pub fn matches_game_in_front(windows: &dyn WindowManager) -> bool {
+    windows
+        .foreground_game_window()
+        .is_ok_and(|found| found.is_some())
+}
+
+#[must_use]
 pub fn matches_short_title(title: &str) -> Option<&str> {
     let nickname = title.trim();
 

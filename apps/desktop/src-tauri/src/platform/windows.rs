@@ -176,6 +176,7 @@ use crate::platform::notification::NotificationReport;
 use crate::platform::notification::NotificationSink;
 use crate::platform::notification::NotificationWatcher;
 use crate::platform::paste::PasteSender;
+use crate::platform::wake::Wake;
 use crate::platform::wake::WakeSink;
 use crate::platform::wake::WakeWatcher;
 use crate::platform::window::GameWindow;
@@ -1302,7 +1303,7 @@ unsafe extern "system" fn on_foreground(
     _thread: u32,
     _time: u32,
 ) {
-    if object != OBJID_WINDOW.0 || !u32::try_from(child).is_ok_and(|child| child == CHILDID_SELF) {
+    if !matches_a_whole_window(object, child) {
         return;
     }
 
@@ -1441,12 +1442,21 @@ fn watch_the_windows(sink: WakeSink, told: &mpsc::Sender<Result<u32>>) {
         EVENT_OBJECT_NAMECHANGE,
         Some(on_window_event),
     );
+    let switching = hook_events(
+        EVENT_SYSTEM_FOREGROUND,
+        EVENT_SYSTEM_FOREGROUND,
+        Some(on_foreground_event),
+    );
+
+    let hooks = [appearing, renaming, switching];
 
     if appearing.is_none() && renaming.is_none() {
         drop(told.send(Err(PlatformError::system(
             "SetWinEventHook",
             "the system refused to hand Multifus the window events",
         ))));
+
+        unhook(hooks);
 
         WAKING.with_borrow_mut(|waking| {
             *waking = None;
@@ -1464,13 +1474,21 @@ fn watch_the_windows(sink: WakeSink, told: &mpsc::Sender<Result<u32>>) {
         unsafe { DispatchMessageW(&message) };
     }
 
-    for hook in [appearing, renaming].into_iter().flatten() {
-        let _ = unsafe { UnhookWinEvent(hook) };
-    }
+    unhook(hooks);
 
     WAKING.with_borrow_mut(|waking| {
         *waking = None;
     });
+}
+
+fn unhook(hooks: [Option<HWINEVENTHOOK>; 3]) {
+    for hook in hooks.into_iter().flatten() {
+        let _ = unsafe { UnhookWinEvent(hook) };
+    }
+}
+
+fn matches_a_whole_window(object: i32, child: i32) -> bool {
+    object == OBJID_WINDOW.0 && u32::try_from(child).is_ok_and(|child| child == CHILDID_SELF)
 }
 
 unsafe extern "system" fn on_window_event(
@@ -1482,7 +1500,7 @@ unsafe extern "system" fn on_window_event(
     _thread: u32,
     _time: u32,
 ) {
-    if object != OBJID_WINDOW.0 || !u32::try_from(child).is_ok_and(|child| child == CHILDID_SELF) {
+    if !matches_a_whole_window(object, child) {
         return;
     }
 
@@ -1492,8 +1510,30 @@ unsafe extern "system" fn on_window_event(
         };
 
         if waking.notices(event, window_id(handle), || runs_dofus(handle)) {
-            (waking.sink)();
+            (waking.sink)(Wake::GameWindows);
         }
+    });
+}
+
+unsafe extern "system" fn on_foreground_event(
+    _hook: HWINEVENTHOOK,
+    _event: u32,
+    _handle: HWND,
+    object: i32,
+    child: i32,
+    _thread: u32,
+    _time: u32,
+) {
+    if !matches_a_whole_window(object, child) {
+        return;
+    }
+
+    WAKING.with_borrow(|waking| {
+        let Some(waking) = waking.as_ref() else {
+            return;
+        };
+
+        (waking.sink)(Wake::Foreground);
     });
 }
 

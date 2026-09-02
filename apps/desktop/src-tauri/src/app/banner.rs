@@ -22,7 +22,7 @@ use crate::app::view::BannerStep;
 use crate::app::view::DisplayView;
 use crate::config::Banner;
 use crate::config::BannerCorner;
-use crate::platform::WindowManager;
+use crate::platform::matches_game_in_front;
 
 const STEP_EVENT: &str = "multifus://banner";
 
@@ -108,17 +108,11 @@ pub fn preview(app: &AppHandle) {
         }
 
         if lock(app).is_walk_enabled() {
-            follow_foreground(app, matches_inside_game(windows(app)));
+            follow_foreground(app, matches_game_in_front(windows(app)));
         } else {
             close(app);
         }
     });
-}
-
-fn matches_inside_game(windows: &dyn WindowManager) -> bool {
-    windows
-        .foreground_game_window()
-        .is_ok_and(|found| found.is_some())
 }
 
 fn raise_apart(app: &AppHandle, generation: u64, inside_game: bool) {
@@ -297,12 +291,12 @@ mod tests {
             ..Desktop::default()
         });
 
-        assert!(matches_inside_game(windows.as_ref()));
+        assert!(matches_game_in_front(windows.as_ref()));
 
         windows.show(Desktop::default());
 
         assert!(
-            !matches_inside_game(windows.as_ref()),
+            !matches_game_in_front(windows.as_ref()),
             "the player left the game, so the banner has nothing to sit on"
         );
     }

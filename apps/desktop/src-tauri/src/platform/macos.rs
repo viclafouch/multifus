@@ -103,6 +103,7 @@ use crate::platform::notification::NotificationReport;
 use crate::platform::notification::NotificationSink;
 use crate::platform::notification::NotificationWatcher;
 use crate::platform::paste::PasteSender;
+use crate::platform::wake::Wake;
 use crate::platform::wake::WakeSink;
 use crate::platform::wake::WakeWatcher;
 use crate::platform::window::GameWindow;
@@ -1554,6 +1555,7 @@ fn watch_the_clients(
     let refcon: *mut c_void = ptr::from_ref(sink).cast_mut().cast();
     let mut watched: HashMap<pid_t, WatchedClient> = HashMap::new();
     let coming_and_going = watch_the_clients_coming_and_going(sink);
+    let foreground = watch_the_foreground(sink);
 
     if told.send(Ok(LiveRunLoop(run_loop.clone()))).is_ok() {
         while running.load(Ordering::Relaxed) {
@@ -1568,6 +1570,7 @@ fn watch_the_clients(
     }
 
     drop(coming_and_going);
+    drop(foreground);
 }
 
 fn wait_for_an_event(mode: Option<&CFRunLoopMode>) {
@@ -1668,10 +1671,21 @@ fn watch_the_clients_coming_and_going(sink: &WakeSink) -> Vec<WorkspaceWatch> {
 
                 drop(known);
 
-                sink();
+                sink(Wake::GameWindows);
             })
         })
         .collect()
+}
+
+fn watch_the_foreground(sink: &WakeSink) -> WorkspaceWatch {
+    let sink = Arc::clone(sink);
+
+    // SAFETY: a constant of the framework, alive for the whole process.
+    let name = unsafe { NSWorkspaceDidActivateApplicationNotification };
+
+    watch_workspace(name, move || {
+        sink(Wake::Foreground);
+    })
 }
 
 unsafe extern "C-unwind" fn on_client_changed(
@@ -1687,7 +1701,7 @@ unsafe extern "C-unwind" fn on_client_changed(
     // SAFETY: `refcon` is the sink `watch_the_clients` holds, dropped after the observers.
     let sink: &WakeSink = unsafe { &*refcon.cast::<WakeSink>() };
 
-    drop(catch_unwind(AssertUnwindSafe(|| sink())));
+    drop(catch_unwind(AssertUnwindSafe(|| sink(Wake::GameWindows))));
 }
 
 type AXObserverTold = unsafe extern "C-unwind" fn(
@@ -2342,11 +2356,11 @@ mod tests {
     fn a_watcher_asked_to_listen_twice_listens_once_and_stops_on_the_first_ask() {
         let watcher = AccessibilityWakeWatcher::new();
 
-        if watcher.start(Arc::new(|| {})) == Err(PlatformError::AuthorizationDenied) {
+        if watcher.start(Arc::new(|_| {})) == Err(PlatformError::AuthorizationDenied) {
             return;
         }
 
-        assert_eq!(watcher.start(Arc::new(|| {})), Ok(()));
+        assert_eq!(watcher.start(Arc::new(|_| {})), Ok(()));
 
         watcher.stop();
         watcher.stop();

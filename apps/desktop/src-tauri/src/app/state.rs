@@ -103,6 +103,7 @@ pub struct Multifus {
     settings: Settings,
     shortcut_statuses: HashMap<Binding, ShortcutStatus>,
     held: HashMap<Binding, String>,
+    shortcuts_armed: bool,
     windows: HashMap<String, WindowId>,
     windows_seen: HashMap<String, WindowId>,
     seen_client_windows: Option<HashSet<WindowId>>,
@@ -185,6 +186,7 @@ impl Multifus {
             settings,
             shortcut_statuses: HashMap::new(),
             held: HashMap::new(),
+            shortcuts_armed: false,
             windows: HashMap::new(),
             windows_seen: HashMap::new(),
             seen_client_windows: None,
@@ -530,11 +532,23 @@ impl Multifus {
         self.held.clone()
     }
 
-    pub fn remember_bound(&mut self, bindings: &[BindingView]) {
-        self.shortcut_statuses = bindings
+    #[must_use]
+    pub fn shortcuts_armed(&self) -> bool {
+        self.shortcuts_armed
+    }
+
+    pub fn arm_shortcuts(&mut self, armed: bool) {
+        self.shortcuts_armed = armed;
+    }
+
+    pub fn remember_bound(&mut self, bindings: &[BindingView]) -> bool {
+        let statuses = bindings
             .iter()
             .map(|bound| (bound.binding.clone(), bound.status.clone()))
-            .collect();
+            .collect::<HashMap<_, _>>();
+        let learnt = statuses != self.shortcut_statuses;
+
+        self.shortcut_statuses = statuses;
 
         self.held = bindings
             .iter()
@@ -545,6 +559,8 @@ impl Multifus {
                     .then(|| (bound.binding.clone(), accelerator))
             })
             .collect();
+
+        learnt
     }
 
     pub fn set_shortcut(&mut self, action: ShortcutAction, accelerator: Option<String>) {
@@ -2785,6 +2801,35 @@ mod tests {
 
         assert_eq!(quick_reply.accelerator, None);
         assert_eq!(quick_reply.status, ShortcutStatus::Unbound);
+    }
+
+    #[test]
+    fn handing_the_combinations_back_to_the_system_leaves_the_screen_what_it_shows() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        let binding = Binding::Action {
+            action: ShortcutAction::Next,
+        };
+        let bound = vec![BindingView {
+            binding: binding.clone(),
+            accelerator: Some("F5".to_owned()),
+            status: ShortcutStatus::Registered,
+        }];
+
+        assert!(
+            state.remember_bound(&bound),
+            "the first answer of the system is always news"
+        );
+        assert!(
+            !state.remember_bound(&bound),
+            "the same answer twice is not worth a line of the journal"
+        );
+
+        state.arm_shortcuts(false);
+
+        assert_eq!(state.status_of(&binding), ShortcutStatus::Registered);
+        assert_eq!(state.held().get(&binding), Some(&"F5".to_owned()));
+        assert!(!state.shortcuts_armed());
     }
 
     #[test]

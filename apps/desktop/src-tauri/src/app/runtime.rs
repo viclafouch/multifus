@@ -24,6 +24,7 @@ use crate::app::journal::Work;
 use crate::app::main_window;
 use crate::app::portraits;
 use crate::app::relay;
+use crate::app::shortcuts;
 use crate::app::state::AppState;
 use crate::app::state::Decision;
 use crate::app::state::Multifus;
@@ -47,6 +48,7 @@ use crate::platform::NotificationWatcher;
 use crate::platform::PlatformError;
 use crate::platform::PlatformNotificationWatcher;
 use crate::platform::PlatformWakeWatcher;
+use crate::platform::Wake;
 use crate::platform::WakeWatcher;
 use crate::platform::WindowId;
 use crate::platform::WindowManager;
@@ -139,6 +141,13 @@ pub fn wake() {
     NEXT_TURN.wake();
 }
 
+fn on_wake(app: &AppHandle, waking: Wake) {
+    match waking {
+        Wake::GameWindows => wake(),
+        Wake::Foreground => shortcuts::note_foreground(app),
+    }
+}
+
 struct Turn<'a> {
     windows: &'a dyn WindowManager,
     state: &'a AppState,
@@ -158,6 +167,8 @@ impl<'a> Turn<'a> {
 }
 
 trait TurnMechanisms {
+    fn follow_shortcuts(&self);
+
     fn follow_authorization(&self) -> bool;
 
     fn announce_relay(&self, change: &ScanChange);
@@ -178,6 +189,10 @@ trait TurnMechanisms {
 struct AppTurnMechanisms<'a>(&'a AppHandle);
 
 impl TurnMechanisms for AppTurnMechanisms<'_> {
+    fn follow_shortcuts(&self) {
+        shortcuts::note_foreground(self.0);
+    }
+
     fn follow_authorization(&self) -> bool {
         follow_authorization(self.0)
     }
@@ -220,7 +235,15 @@ fn tick(app: &AppHandle) {
 }
 
 fn listen_for_wakes(app: &AppHandle) {
-    let Err(error) = app.state::<Wakes>().0.start(Arc::new(wake)) else {
+    let sink = {
+        let app = app.clone();
+
+        move |waking| {
+            on_wake(&app, waking);
+        }
+    };
+
+    let Err(error) = app.state::<Wakes>().0.start(Arc::new(sink)) else {
         return;
     };
 
@@ -230,6 +253,8 @@ fn listen_for_wakes(app: &AppHandle) {
 }
 
 fn turn_over(turn: &Turn, mechanisms: &dyn TurnMechanisms) {
+    mechanisms.follow_shortcuts();
+
     let renamed = apply_short_titles(turn);
     let changed = scan(turn, mechanisms);
     let maximized = maximize_new_clients(turn);
@@ -912,6 +937,7 @@ mod tests {
 
     #[derive(Debug, Clone, PartialEq, Eq)]
     enum TurnMechanism {
+        ShortcutsFollowed,
         AuthorizationFollowed,
         RelayAnnounced { relayed_gone: Vec<String> },
         DisplayFollowed,
@@ -956,6 +982,10 @@ mod tests {
     }
 
     impl TurnMechanisms for FakeTurnMechanisms {
+        fn follow_shortcuts(&self) {
+            self.write_down(TurnMechanism::ShortcutsFollowed);
+        }
+
         fn follow_authorization(&self) -> bool {
             self.write_down(TurnMechanism::AuthorizationFollowed);
 
@@ -1022,6 +1052,7 @@ mod tests {
         assert_eq!(
             mechanisms.set_going(),
             vec![
+                TurnMechanism::ShortcutsFollowed,
                 TurnMechanism::AuthorizationFollowed,
                 TurnMechanism::RelayAnnounced {
                     relayed_gone: Vec::new()

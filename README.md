@@ -11,7 +11,7 @@ Une notification arrive dans le jeu, Multifus met devant vous la fenêtre du per
 - [x] Un raccourci pour exclure un personnage : il sort du défilement, et sa fenêtre ne passe plus devant sur une notification
 - [x] Un sexe par personnage, et deux sigils qui excluent ou réintègrent tous vos hommes, ou toutes vos femmes, d'un clic
 - [x] Un raccourci qui vous ramène sur votre personnage principal, d'où que vous veniez dans le jeu
-- [x] Une touche par personnage si vous voulez, et sa fenêtre passe devant. Sur les deux systèmes, cette touche est prise partout et pas seulement au-dessus du jeu : tant que Multifus tourne, elle ramène le personnage même depuis votre navigateur, alors choisissez-la loin de ce que vous tapez ailleurs. Sur Windows, une touche de fonction se pose seule : F1 sur l'Eniripsa, F2 sur le Sacrieur
+- [x] Une touche par personnage si vous voulez, et sa fenêtre passe devant. Elle ne vous est prise qu'au-dessus du jeu : dans votre navigateur ou votre éditeur, elle reste la vôtre et écrit ce qu'elle a toujours écrit. Sur Windows, une touche de fonction se pose seule : F1 sur l'Eniripsa, F2 sur le Sacrieur
 - [x] Le Déplacement rapide : chaque clic gauche passe au personnage suivant, et vous emmenez toute votre team d'une map à l'autre sans lâcher la souris. Une bannière dit sur qui vous venez d'arriver
 - [x] La roue des personnages : maintenez `Ctrl+Maj+W` dans le jeu, votre team s'ouvre en disque au milieu de l'écran. Visez une tête de classe, lâchez, sa fenêtre passe devant
 - [x] Le tableau des runes : une combinaison pose les poids des runes par-dessus la fenêtre du jeu, à la taille et à la transparence que vous voulez. Vous le posez où vous voulez, il y revient au lancement suivant
