@@ -2175,7 +2175,7 @@ mod tests {
 
     fn waking() -> Waking {
         Waking {
-            sink: Arc::new(|| {}),
+            sink: Arc::new(|_| {}),
             clients: HashSet::new(),
         }
     }
