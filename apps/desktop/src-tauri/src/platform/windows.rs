@@ -2034,6 +2034,7 @@ mod tests {
     use windows::core::PCWSTR;
 
     use super::*;
+    use crate::domain::Color;
 
     const PAINTED_CLASS: PCWSTR = w!("MultifusPaintedWindow");
 
@@ -2124,8 +2125,11 @@ mod tests {
         unsafe { DefWindowProcW(handle, message, wide, long) }
     }
 
-    fn portrait() -> &'static [u8] {
-        include_bytes!("../../icons/portraits/iop_m.ico").as_slice()
+    fn wearing(ring: Option<[u8; 3]>) -> WindowIcon<'static> {
+        WindowIcon {
+            portrait: include_bytes!("../../icons/portraits/iop_m.ico").as_slice(),
+            ring,
+        }
     }
 
     #[test]
@@ -2137,7 +2141,7 @@ mod tests {
             let held = class_icon(window.handle, slot);
 
             manager
-                .paint_slot(window.handle, window.id(), slot, Some(portrait()))
+                .paint_slot(window.handle, window.id(), slot, Some(wearing(None)))
                 .expect("a portrait the window takes");
 
             let painted = window.worn(slot);
@@ -2154,6 +2158,32 @@ mod tests {
                 held,
                 "{slot:?} wears the icon of its class again, and not nothing"
             );
+        }
+    }
+
+    #[test]
+    fn a_window_wears_a_portrait_ringed_with_the_colour_of_its_character() {
+        let window = PaintedWindow::open();
+        let manager = Win32WindowManager::new(false);
+        let ring = Some(Color::Sky.rgb());
+
+        for slot in [IconSlot::Small, IconSlot::Big] {
+            let held = class_icon(window.handle, slot);
+
+            manager
+                .paint_slot(window.handle, window.id(), slot, Some(wearing(ring)))
+                .expect("a ringed portrait the window takes");
+
+            let painted = window.worn(slot);
+
+            assert_ne!(painted, NO_ICON, "{slot:?} wears the ringed portrait");
+            assert_ne!(painted, held, "{slot:?} left the icon of its class");
+
+            manager
+                .paint_slot(window.handle, window.id(), slot, None)
+                .expect("an icon the window takes back");
+
+            assert_eq!(window.worn(slot), held, "{slot:?} gives the ring back");
         }
     }
 
