@@ -1,6 +1,6 @@
 import type { NotificationKind } from '@/@types/notification'
 import type { NoticeCase, RelayFailure, RelayStop } from '@/@types/relay'
-import type { Class, Gender } from '@/@types/roster'
+import type { Class, Color, Gender } from '@/@types/roster'
 import type { BoundCombination, ShortcutAction } from '@/@types/shortcuts'
 import type { Launch, Surface, Work } from '@/@types/system'
 import type { WalkFrom, WalkIdle } from '@/@types/walk'
@@ -85,6 +85,11 @@ export type RosterChange =
       readonly kind: 'classAssigned'
       readonly nickname: string
       readonly class: Class | null
+    }
+  | {
+      readonly kind: 'colorAssigned'
+      readonly nickname: string
+      readonly color: Color | null
     }
   | {
       readonly kind: 'relayed'

@@ -5,6 +5,7 @@ pub mod shortcut;
 
 pub use character::Character;
 pub use character::Class;
+pub use character::Color;
 pub use character::Gender;
 pub use character::Portrait;
 pub use notification::GameNotification;

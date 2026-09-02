@@ -42,6 +42,7 @@ const character = (nickname: string): Character => {
     nickname,
     gender: 'male',
     class: 'iop',
+    color: null,
     main: false,
     excluded: false,
     online: true,

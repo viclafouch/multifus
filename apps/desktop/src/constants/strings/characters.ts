@@ -1,4 +1,19 @@
-import type { Class, Gender } from '@/@types/roster'
+import type { Class, Color, Gender } from '@/@types/roster'
+
+const COLOR_LABELS = {
+  red: 'Rouge',
+  orange: 'Orange',
+  earth: 'Terre',
+  yellow: 'Jaune',
+  green: 'Vert',
+  pine: 'Sapin',
+  turquoise: 'Turquoise',
+  sky: 'Ciel',
+  blue: 'Bleu',
+  lavender: 'Lavande',
+  violet: 'Violet',
+  pink: 'Rose'
+} as const satisfies Record<Color, string>
 
 const CLASS_LABELS = {
   feca: 'Féca',
@@ -39,6 +54,12 @@ const INCLUDE_GROUP_LABELS = {
   male: 'Réintégrer tous les hommes',
   female: 'Réintégrer toutes les femmes'
 } as const satisfies Record<Gender, string>
+
+type ColorTakenLabelParams = Readonly<{
+  nickname: string
+  label: string
+  holder: string
+}>
 
 type EmptyStep = Readonly<{
   title: string
@@ -100,6 +121,7 @@ export const CHARACTERS_STRINGS = {
       return `Retirer ${nickname} du roster`
     },
     classes: CLASS_LABELS,
+    colors: COLOR_LABELS,
     genders: GENDER_LABELS,
     classMissing: 'Classe à choisir',
     genderMissing: 'Sexe à choisir',
@@ -109,20 +131,21 @@ export const CHARACTERS_STRINGS = {
     genderPick: (nickname: string) => {
       return `Choisir le sexe de ${nickname}`
     },
-    portraitChange: (nickname: string) => {
-      return `Changer la classe ou le sexe de ${nickname}`
+    characterChange: (nickname: string) => {
+      return `Changer la classe, le sexe ou la couleur de ${nickname}`
     },
-    portraitChangeShort: 'Modifier',
-    classDialogClose: 'Fermer sans rien changer',
-    classDialogGender: 'Sexe',
-    classDialogClasses: 'Classe',
-    classDialogWhich: (label: string) => {
+    characterChangeShort: 'Modifier',
+    dialogClose: 'Fermer sans rien changer',
+    dialogGender: 'Sexe',
+    dialogClasses: 'Classe',
+    dialogColors: 'Couleur',
+    dialogWhich: (label: string) => {
       return `${label} : homme ou femme ?`
     },
-    classDialogBack: 'Changer de classe',
-    classDialogWindowKeepsIcon:
+    dialogBack: 'Changer de classe',
+    dialogWindowKeepsIcon:
       'Sur macOS, la tête reste ici : le client garde son logo Dofus.',
-    classDialogPortraitOff:
+    dialogPortraitOff:
       'La tête de classe est coupée dans les Paramètres : le client garde son logo Dofus.',
     classGenderLabel: (label: string, gender: Gender) => {
       return gender === 'male' ? `${label} homme` : `${label} femme`
@@ -133,6 +156,19 @@ export const CHARACTERS_STRINGS = {
     },
     classLabel: (nickname: string, label: string) => {
       return `Marquer ${nickname} comme ${label}`
+    },
+    noColorLabel: (nickname: string) => {
+      return `Retirer la couleur de ${nickname}`
+    },
+    colorLabel: (nickname: string, label: string) => {
+      return `Marquer ${nickname} en ${label}`
+    },
+    colorTakenLabel: ({ nickname, label, holder }: ColorTakenLabelParams) => {
+      return `Marquer ${nickname} en ${label}, déjà pris par ${holder}`
+    },
+    colorNone: 'Aucune couleur',
+    colorTakenBy: (holder: string) => {
+      return `déjà pris par ${holder}`
     },
     exclusionTitle: 'Exclusion',
     exclusionDescription:

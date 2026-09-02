@@ -8,6 +8,7 @@ import { characterOf } from '@/test-doubles'
 const bridge = {
   removeCharacter: vi.fn(),
   setClass: vi.fn(),
+  setColor: vi.fn(),
   setGender: vi.fn(),
   setGenderExcluded: vi.fn(),
   setMain: vi.fn(),
@@ -251,7 +252,7 @@ describe('l’écran des personnages', () => {
     ).not.toBeNull()
     expect(
       screen.getByRole('button', {
-        name: strings.characters.portraitChange('Bravo')
+        name: strings.characters.characterChange('Bravo')
       })
     ).not.toBeNull()
   })
@@ -263,7 +264,67 @@ describe('l’écran des personnages', () => {
 
     expect(bridge.setMain).toHaveBeenCalledWith('Alpha', true)
   })
+})
 
+describe('la couleur, dans l’écran des personnages', () => {
+  it('montre la couleur du personnage, sans jamais la nommer', () => {
+    show([
+      characterOf({ nickname: 'Alpha', class: 'iop', color: 'turquoise' }),
+      characterOf({ nickname: 'Bravo', class: 'iop', color: null })
+    ])
+
+    expect(rows()[0].querySelector('.stripe')?.classList).toContain(
+      'tint-turquoise'
+    )
+    expect(rows()[1].querySelector('.stripe')).toBeNull()
+    expect(
+      within(rows()[0]).getByText(`Iop · ${strings.characters.online}`)
+    ).not.toBeNull()
+    expect(within(rows()[0]).queryByText(/Turquoise/u)).toBeNull()
+  })
+
+  it('pose la couleur choisie dans la modale', () => {
+    show([characterOf({ nickname: 'Alpha' })])
+
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: strings.characters.characterChange('Alpha')
+      })
+    )
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: strings.characters.colorLabel('Alpha', 'Ciel')
+      })
+    )
+
+    expect(bridge.setColor).toHaveBeenCalledWith('Alpha', 'sky')
+  })
+
+  it('montre à chacun les couleurs que les autres portent déjà', () => {
+    show([
+      characterOf({ nickname: 'Alpha', color: null }),
+      characterOf({ nickname: 'Bravo', color: 'sky' })
+    ])
+
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: strings.characters.characterChange('Alpha')
+      })
+    )
+
+    expect(
+      screen.getByRole('button', {
+        name: strings.characters.colorTakenLabel({
+          nickname: 'Alpha',
+          label: 'Ciel',
+          holder: 'Bravo'
+        })
+      })
+    ).not.toBeNull()
+  })
+})
+
+describe('le personnage principal', () => {
   it('reprend le principal à celui qui l’est', () => {
     show([characterOf({ nickname: 'Alpha', main: true })])
 

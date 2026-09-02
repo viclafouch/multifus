@@ -27,6 +27,7 @@ use crate::app::wheel;
 use crate::config::BannerCorner;
 use crate::config::QuickReplyId;
 use crate::domain::Class;
+use crate::domain::Color;
 use crate::domain::Gender;
 use crate::domain::NotificationKind;
 
@@ -59,6 +60,15 @@ pub fn set_gender(app: AppHandle, nickname: String, gender: Option<Gender>) -> S
 #[tauri::command]
 pub fn set_class(app: AppHandle, nickname: String, class: Option<Class>) -> Snapshot {
     lock(&app).set_class(&nickname, class);
+
+    runtime::wake();
+
+    runtime::emit_snapshot(&app)
+}
+
+#[tauri::command]
+pub fn set_color(app: AppHandle, nickname: String, color: Option<Color>) -> Snapshot {
+    lock(&app).set_color(&nickname, color);
 
     runtime::wake();
 

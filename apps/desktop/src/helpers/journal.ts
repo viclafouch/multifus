@@ -266,6 +266,13 @@ const rosterLine = (change: RosterChange) => {
 
       return `${change.nickname} est assigné comme ${strings.characters.classes[change.class]}.`
     }
+    case 'colorAssigned': {
+      if (change.color === null) {
+        return `Couleur retirée à ${change.nickname}.`
+      }
+
+      return `${change.nickname} est marqué en ${strings.characters.colors[change.color]}.`
+    }
     case 'reordered': {
       return change.order.length === 0
         ? 'Ordre du défilement modifié, roster vide.'

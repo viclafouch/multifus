@@ -1,9 +1,10 @@
 import React from 'react'
 import { GripVertical } from 'lucide-react'
 import { useSortable } from '@dnd-kit/react/sortable'
-import type { Character, Class, Gender, Portrait } from '@/@types/roster'
+import type { Character, Class, Color, Gender, Portrait } from '@/@types/roster'
+import { CharacterDialog } from '@/components/character-dialog'
 import { CharacterMedallion } from '@/components/character-medallion'
-import { ClassDialog } from '@/components/class-dialog'
+import { ColorStripe } from '@/components/color-stripe'
 import { MainToggle } from '@/components/main-toggle'
 import { RemoveButton } from '@/components/remove-button'
 import { Button } from '@/components/ui/button'
@@ -14,11 +15,12 @@ import {
   TooltipTrigger
 } from '@/components/ui/tooltip'
 import { strings } from '@/constants/strings'
+import type { ColorHolders } from '@/helpers/colors'
 import { matchIsInCycle } from '@/helpers/cycle'
 import { portraitFor } from '@/helpers/portrait'
 import {
-  characterPortraitLabel,
-  characterPortraitTooltip,
+  characterMarksLabel,
+  characterMarksTooltip,
   characterState,
   characterSubLine
 } from '@/helpers/wording'
@@ -30,6 +32,7 @@ type RowActions = Readonly<{
   handleSetMain: (nickname: string, main: boolean) => void
   handleSetGender: (nickname: string, gender: Gender | null) => void
   handleSetClass: (nickname: string, characterClass: Class | null) => void
+  handleSetColor: (nickname: string, color: Color | null) => void
   handleSetPortrait: (nickname: string, portrait: Portrait) => void
   handleRemove: (nickname: string) => void
 }>
@@ -39,6 +42,7 @@ type CharacterRowProps = Readonly<{
   rank: number | null
   index: number
   paintPortraits: boolean
+  takenColors: ColorHolders
   actions: RowActions
 }>
 
@@ -47,14 +51,15 @@ export const CharacterRow = ({
   rank,
   index,
   paintPortraits,
+  takenColors,
   actions
 }: CharacterRowProps) => {
   const { nickname, main, excluded, online } = character
   const { ref, handleRef, isDragging } = useSortable({ id: nickname, index })
   const [isEntering, setIsEntering] = React.useState(true)
   const [isDialogOpen, setIsDialogOpen] = React.useState(false)
-  const portraitLabel = characterPortraitLabel(character)
-  const portraitTooltip = characterPortraitTooltip(character)
+  const marksLabel = characterMarksLabel(character)
+  const marksTooltip = characterMarksTooltip(character)
 
   return (
     <li
@@ -71,6 +76,12 @@ export const CharacterRow = ({
       }}
       className="transition-row group relative flex h-row items-center gap-3 rounded-lg border border-transparent px-2 hover:border-border hover:bg-card/70 data-excluded:border-destructive/25 data-excluded:bg-destructive/8 data-excluded:hover:border-destructive/45 data-excluded:hover:bg-destructive/14 data-dragging:border-primary/35 data-dragging:bg-card data-dragging:shadow-lg data-entering:rise data-offline:dimmed"
     >
+      {character.color === null ? null : (
+        <ColorStripe
+          color={character.color}
+          className="absolute inset-y-2 left-0"
+        />
+      )}
       <Button
         ref={handleRef}
         variant="ghost"
@@ -91,7 +102,7 @@ export const CharacterRow = ({
       <Tooltip>
         <TooltipTrigger
           render={<Button variant="ghost" />}
-          aria-label={portraitLabel}
+          aria-label={marksLabel}
           className="group/portrait size-fit shrink-0 rounded-full border-0 p-0.5"
           onClick={() => {
             setIsDialogOpen(true)
@@ -102,7 +113,7 @@ export const CharacterRow = ({
             state={characterState(character)}
           />
         </TooltipTrigger>
-        <TooltipContent>{portraitTooltip}</TooltipContent>
+        <TooltipContent>{marksTooltip}</TooltipContent>
       </Tooltip>
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <p className="selectable truncate text-row font-medium group-data-excluded:text-destructive group-data-excluded:line-through group-data-excluded:decoration-destructive/80">
@@ -138,9 +149,10 @@ export const CharacterRow = ({
           />
         )}
       </span>
-      <ClassDialog
+      <CharacterDialog
         character={character}
         paintPortraits={paintPortraits}
+        takenColors={takenColors}
         isOpen={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         onSetGender={(gender) => {
@@ -148,6 +160,9 @@ export const CharacterRow = ({
         }}
         onSetClass={(characterClass) => {
           actions.handleSetClass(nickname, characterClass)
+        }}
+        onSetColor={(color) => {
+          actions.handleSetColor(nickname, color)
         }}
         onSetPortrait={(portrait) => {
           actions.handleSetPortrait(nickname, portrait)

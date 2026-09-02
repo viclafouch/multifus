@@ -33,6 +33,7 @@ use crate::app::view::WheelSlice;
 use crate::app::view::WheelStep;
 use crate::config::WHEEL_WIDEST;
 use crate::domain::Class;
+use crate::domain::Color;
 use crate::domain::Gender;
 use crate::platform::PlatformError;
 use crate::platform::WindowId;
@@ -238,6 +239,7 @@ struct DemoCharacter {
     nickname: &'static str,
     class: Class,
     gender: Gender,
+    color: Option<Color>,
     main: bool,
 }
 
@@ -246,48 +248,56 @@ const DEMO_TEAM: [DemoCharacter; 8] = [
         nickname: "Zoubidou",
         class: Class::Iop,
         gender: Gender::Male,
+        color: Some(Color::Red),
         main: false,
     },
     DemoCharacter {
         nickname: "Kaelis",
         class: Class::Cra,
         gender: Gender::Female,
+        color: Some(Color::Sky),
         main: false,
     },
     DemoCharacter {
         nickname: "Mamiheal",
         class: Class::Eniripsa,
         gender: Gender::Female,
+        color: Some(Color::Pink),
         main: true,
     },
     DemoCharacter {
         nickname: "Grobill",
         class: Class::Sacrieur,
         gender: Gender::Male,
+        color: None,
         main: false,
     },
     DemoCharacter {
         nickname: "Sadidette",
         class: Class::Sadida,
         gender: Gender::Female,
+        color: Some(Color::Green),
         main: false,
     },
     DemoCharacter {
         nickname: "Tic-Tac",
         class: Class::Xelor,
         gender: Gender::Male,
+        color: Some(Color::Lavender),
         main: false,
     },
     DemoCharacter {
         nickname: "Bouclette",
         class: Class::Feca,
         gender: Gender::Female,
+        color: Some(Color::Yellow),
         main: false,
     },
     DemoCharacter {
         nickname: "Nyko",
         class: Class::Sram,
         gender: Gender::Male,
+        color: Some(Color::Blue),
         main: false,
     },
 ];
@@ -302,6 +312,7 @@ pub fn demo_slices(crowd: usize) -> Vec<WheelSlice> {
             nickname: character.nickname.to_owned(),
             class: Some(character.class),
             gender: Some(character.gender),
+            color: character.color,
             main: character.main,
             here: rank == 0,
         })
@@ -1189,6 +1200,7 @@ mod tests {
             nickname: nickname.to_owned(),
             class: None,
             gender: None,
+            color: None,
             main: false,
             here: false,
         }

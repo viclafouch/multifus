@@ -183,10 +183,12 @@ use crate::platform::window::GameWindow;
 use crate::platform::window::ScreenFrame;
 use crate::platform::window::ScreenPoint;
 use crate::platform::window::ShortTitleReport;
+use crate::platform::window::WindowIcon;
 use crate::platform::window::WindowId;
 use crate::platform::window::WindowManager;
 use crate::platform::window::icon_image;
 use crate::platform::window::matches_short_title;
+use crate::platform::window::ringed_image;
 use crate::platform::window::title_suffix;
 
 const DOFUS_EXECUTABLE: &str = "Dofus Retro.exe";
@@ -302,7 +304,7 @@ impl Win32WindowManager {
         handle: HWND,
         window: WindowId,
         slot: IconSlot,
-        icon: Option<&[u8]>,
+        icon: Option<WindowIcon<'_>>,
     ) -> Result<()> {
         let ours = match icon {
             Some(icon) => create_icon(icon, slot.side())?,
@@ -476,7 +478,7 @@ impl WindowManager for Win32WindowManager {
         written
     }
 
-    fn set_window_icon(&self, window: WindowId, icon: Option<&[u8]>) -> Result<()> {
+    fn set_window_icon(&self, window: WindowId, icon: Option<WindowIcon<'_>>) -> Result<()> {
         let handle = live_game_window(window)?;
 
         let small = self.paint_slot(handle, window, IconSlot::Small, icon);
@@ -531,10 +533,12 @@ impl WindowManager for Win32WindowManager {
     }
 }
 
-fn create_icon(icon: &[u8], side: u32) -> Result<usize> {
-    let image = icon_image(icon, side).ok_or_else(|| {
+fn create_icon(icon: WindowIcon<'_>, side: u32) -> Result<usize> {
+    let image = icon_image(icon.portrait, side).ok_or_else(|| {
         PlatformError::system("reading a portrait", "the icon holds no image to draw")
     })?;
+    let ringed = icon.ring.and_then(|ring| ringed_image(image, ring));
+    let image = ringed.as_deref().unwrap_or(image);
     let side = i32::try_from(side).unwrap_or(i32::MAX);
 
     // SAFETY: the slice is alive for the call, and holds the image bits the directory points at.

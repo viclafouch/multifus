@@ -81,6 +81,45 @@ describe('la roue dessinée', () => {
     expect(marked).toStrictEqual([true, false, false])
   })
 
+  it('teinte la part du personnage de sa couleur, et laisse l’ambre aux autres', () => {
+    const container = draw({
+      slices: [
+        wheelSliceOf({ nickname: 'Alpha', color: 'sky', here: true }),
+        wheelSliceOf({ nickname: 'Bravo', color: 'pine' }),
+        wheelSliceOf({ nickname: 'Charlie', color: null })
+      ]
+    })
+    const slices = slicesOf(container)
+
+    expect(slices[0].classList.contains('tint-sky')).toBe(true)
+    expect(slices[1].classList.contains('tint-pine')).toBe(true)
+    expect(
+      [...slices[2].classList].some((name) => {
+        return name.startsWith('tint-')
+      })
+    ).toBe(false)
+  })
+
+  it('teinte chaque part dès le repos, sans rien attendre du survol', () => {
+    const slices = slicesOf(
+      draw({
+        slices: [
+          wheelSliceOf({ nickname: 'Alpha', color: 'sky' }),
+          wheelSliceOf({ nickname: 'Bravo', color: 'pine' })
+        ],
+        hovered: null
+      })
+    )
+
+    expect(
+      slices.map((slice) => {
+        return slice.hasAttribute('data-hovered')
+      })
+    ).toStrictEqual([false, false])
+    expect(slices[0].classList.contains('tint-sky')).toBe(true)
+    expect(slices[1].classList.contains('tint-pine')).toBe(true)
+  })
+
   it('pose la tête de la fenêtre du dessus au centre', () => {
     const faces = draw().querySelectorAll('.wheel-face img')
 

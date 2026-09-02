@@ -1,6 +1,7 @@
 import { Footprints } from 'lucide-react'
 import type { BannerStep } from '@/@types/walk'
 import { CharacterMedallion } from '@/components/character-medallion'
+import { ColorStripe } from '@/components/color-stripe'
 import { CORNER_PLACEMENT } from '@/constants/banner'
 import { strings } from '@/constants/strings'
 import { portraitFor } from '@/helpers/portrait'
@@ -33,6 +34,12 @@ export const BannerPill = ({ step }: BannerPillProps) => {
             data-from={placement.fromLeft ? 'left' : 'right'}
             className="step flex min-w-0 items-center gap-2.5"
           >
+            {step.character.color === null ? null : (
+              <ColorStripe
+                color={step.character.color}
+                className="h-medallion"
+              />
+            )}
             <CharacterMedallion
               portrait={portraitFor(step.character)}
               state="live"

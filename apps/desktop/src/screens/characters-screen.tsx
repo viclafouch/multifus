@@ -1,5 +1,5 @@
 import { DragDropProvider } from '@dnd-kit/react'
-import type { Character, Class, Gender, Portrait } from '@/@types/roster'
+import type { Character, Class, Color, Gender, Portrait } from '@/@types/roster'
 import type { Snapshot } from '@/@types/snapshot'
 import { CharacterRow } from '@/components/character-row'
 import { EmptyRoster } from '@/components/empty-roster'
@@ -9,6 +9,7 @@ import { PanelHeader } from '@/components/layout/panel-header'
 import { Screen } from '@/components/layout/screen'
 import { GENDERS } from '@/constants/roster'
 import { strings } from '@/constants/strings'
+import { colorHolders } from '@/helpers/colors'
 import {
   genderGroupOf,
   genderlessNicknames,
@@ -20,6 +21,7 @@ import { DRAG_ACCESSIBILITY, DRAG_MODIFIERS } from '@/lib/drag'
 import {
   removeCharacter,
   setClass,
+  setColor,
   setGender,
   setGenderExcluded,
   setMain,
@@ -52,6 +54,9 @@ export const CharactersScreen = ({
     handleSetClass: (nickname: string, characterClass: Class | null) => {
       run(setClass(nickname, characterClass))
     },
+    handleSetColor: (nickname: string, color: Color | null) => {
+      run(setColor(nickname, color))
+    },
     handleSetPortrait: (nickname: string, portrait: Portrait) => {
       run(
         setClass(nickname, portrait.class).then(() => {
@@ -73,6 +78,7 @@ export const CharactersScreen = ({
   }
 
   const note = missingGenderLine(genderlessNicknames(characters))
+  const takenColors = colorHolders(characters)
 
   return (
     <Screen
@@ -122,6 +128,7 @@ export const CharactersScreen = ({
                   rank={rankOf(cycle.rows, character)}
                   index={index}
                   paintPortraits={paintPortraits}
+                  takenColors={takenColors}
                   actions={actions}
                 />
               )

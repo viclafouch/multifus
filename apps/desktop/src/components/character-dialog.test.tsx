@@ -10,6 +10,7 @@ import {
 import type { Character } from '@/@types/roster'
 import { CLASS_PORTRAITS } from '@/constants/classes'
 import { strings } from '@/constants/strings'
+import { colorHolders } from '@/helpers/colors'
 import { APPLE_AGENT, WINDOWS_AGENT, characterOf } from '@/test-doubles'
 
 const REOPEN = 'Rouvrir'
@@ -18,21 +19,24 @@ type OpenParams = {
   readonly character?: Character
   readonly paintPortraits?: boolean
   readonly agent?: string
+  readonly roster?: readonly Character[]
 }
 
 const open = async ({
   character: subject = characterOf({ gender: null, class: null }),
   paintPortraits = true,
-  agent = WINDOWS_AGENT
+  agent = WINDOWS_AGENT,
+  roster = []
 }: OpenParams = {}) => {
   vi.resetModules()
   vi.stubGlobal('navigator', { userAgent: agent })
 
-  const { ClassDialog } = await import('@/components/class-dialog')
+  const { CharacterDialog } = await import('@/components/character-dialog')
 
   const handlers = {
     handleSetGender: vi.fn<(gender: Character['gender']) => void>(),
     handleSetClass: vi.fn(),
+    handleSetColor: vi.fn<(color: Character['color']) => void>(),
     handleSetPortrait: vi.fn()
   }
 
@@ -49,13 +53,15 @@ const open = async ({
         >
           {REOPEN}
         </button>
-        <ClassDialog
+        <CharacterDialog
           character={subject}
           paintPortraits={paintPortraits}
+          takenColors={colorHolders(roster)}
           isOpen={isOpen}
           onOpenChange={setIsOpen}
           onSetGender={handlers.handleSetGender}
           onSetClass={handlers.handleSetClass}
+          onSetColor={handlers.handleSetColor}
           onSetPortrait={handlers.handleSetPortrait}
         />
       </>
@@ -86,6 +92,272 @@ const portraitOf = (name: string) => {
     .getByRole('presentation')
     .getAttribute('src')
 }
+
+const colorButton = (label: string) => {
+  return screen.getByRole('button', {
+    name: strings.characters.colorLabel('Alpha', label)
+  })
+}
+
+const pickColor = (label: string) => {
+  fireEvent.click(colorButton(label))
+}
+
+const swatchOf = (button: HTMLElement) => {
+  return button.querySelector('.swatch')
+}
+
+const readout = () => {
+  const legend = screen.getByText(strings.characters.dialogColors)
+
+  return legend.nextElementSibling?.textContent ?? null
+}
+
+describe('la couleur, dans la modale', () => {
+  it('offre les douze couleurs et le retrait de la couleur', async () => {
+    await open()
+
+    for (const label of Object.values(strings.characters.colors)) {
+      expect(
+        screen.getByRole('button', {
+          name: strings.characters.colorLabel('Alpha', label)
+        })
+      ).not.toBeNull()
+    }
+
+    expect(
+      screen.getByRole('button', {
+        name: strings.characters.noColorLabel('Alpha')
+      })
+    ).not.toBeNull()
+  })
+
+  it('pose la couleur choisie', async () => {
+    const handlers = await open()
+
+    pickColor(strings.characters.colors.turquoise)
+
+    expect(handlers.handleSetColor).toHaveBeenCalledWith('turquoise')
+  })
+
+  it('retire la couleur posée', async () => {
+    const handlers = await open({
+      character: characterOf({ color: 'turquoise' })
+    })
+
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: strings.characters.noColorLabel('Alpha')
+      })
+    )
+
+    expect(handlers.handleSetColor).toHaveBeenCalledWith(null)
+  })
+
+  it('reste ouverte, pour qu’on voie la couleur se poser', async () => {
+    await open()
+
+    pickColor(strings.characters.colors.pink)
+
+    expect(screen.queryByRole('dialog')).not.toBeNull()
+  })
+
+  it('marque la couleur du personnage, et elle seule', async () => {
+    await open({ character: characterOf({ color: 'pink' }) })
+
+    expect(
+      screen
+        .getByRole('button', {
+          name: strings.characters.colorLabel('Alpha', 'Rose')
+        })
+        .getAttribute('aria-pressed')
+    ).toBe('true')
+    expect(
+      screen
+        .getByRole('button', {
+          name: strings.characters.colorLabel('Alpha', 'Bleu')
+        })
+        .getAttribute('aria-pressed')
+    ).toBe('false')
+  })
+
+  it('marque « Aucune » quand le personnage n’a pas de couleur', async () => {
+    await open()
+
+    expect(
+      screen
+        .getByRole('button', {
+          name: strings.characters.noColorLabel('Alpha')
+        })
+        .getAttribute('aria-pressed')
+    ).toBe('true')
+  })
+
+  it('dit qui porte déjà une couleur, sans la refuser', async () => {
+    const handlers = await open({
+      roster: [characterOf({ nickname: 'Bravo', color: 'sky' })]
+    })
+    const taken = screen.getByRole('button', {
+      name: strings.characters.colorTakenLabel({
+        nickname: 'Alpha',
+        label: 'Ciel',
+        holder: 'Bravo'
+      })
+    })
+
+    fireEvent.click(taken)
+
+    expect(handlers.handleSetColor).toHaveBeenCalledWith('sky')
+  })
+
+  it('ne se compte pas lui-même comme voleur de sa couleur', async () => {
+    await open({
+      character: characterOf({ nickname: 'Alpha', color: 'sky' }),
+      roster: [characterOf({ nickname: 'Alpha', color: 'sky' })]
+    })
+
+    expect(
+      screen.getByRole('button', {
+        name: strings.characters.colorLabel('Alpha', 'Ciel')
+      })
+    ).not.toBeNull()
+    expect(readout()).toBe('Ciel')
+  })
+})
+
+describe('la couleur, ce que la modale en dit', () => {
+  it('nomme la couleur du personnage tant qu’on ne survole rien', async () => {
+    await open({ character: characterOf({ color: 'turquoise' }) })
+
+    expect(readout()).toBe('Turquoise')
+  })
+
+  it('dit qu’il n’y a aucune couleur quand il n’y en a pas', async () => {
+    await open()
+
+    expect(readout()).toBe(strings.characters.colorNone)
+  })
+
+  it('nomme la couleur survolée, puis rend la parole à celle du personnage', async () => {
+    await open({ character: characterOf({ color: 'turquoise' }) })
+    const sky = colorButton('Ciel')
+
+    fireEvent.pointerEnter(sky)
+
+    expect(readout()).toBe('Ciel')
+
+    fireEvent.pointerLeave(sky)
+
+    expect(readout()).toBe('Turquoise')
+  })
+
+  it('nomme la couleur atteinte au clavier, sans souris', async () => {
+    await open({ character: characterOf({ color: 'turquoise' }) })
+    const sky = colorButton('Ciel')
+
+    fireEvent.focus(sky)
+
+    expect(readout()).toBe('Ciel')
+
+    fireEvent.blur(sky)
+
+    expect(readout()).toBe('Turquoise')
+  })
+
+  it('dit qui porte déjà la couleur survolée', async () => {
+    await open({ roster: [characterOf({ nickname: 'Bravo', color: 'sky' })] })
+
+    fireEvent.pointerEnter(
+      screen.getByRole('button', {
+        name: strings.characters.colorTakenLabel({
+          nickname: 'Alpha',
+          label: 'Ciel',
+          holder: 'Bravo'
+        })
+      })
+    )
+
+    expect(readout()).toBe(`Ciel · ${strings.characters.colorTakenBy('Bravo')}`)
+  })
+
+  it('allume la pastille du personnage, et elle seule', async () => {
+    await open({ character: characterOf({ color: 'turquoise' }) })
+
+    expect(swatchOf(colorButton('Turquoise'))?.hasAttribute('data-worn')).toBe(
+      true
+    )
+    expect(swatchOf(colorButton('Ciel'))?.hasAttribute('data-worn')).toBe(false)
+  })
+
+  it('allume le retrait quand le personnage n’a pas de couleur', async () => {
+    await open()
+    const none = screen.getByRole('button', {
+      name: strings.characters.noColorLabel('Alpha')
+    })
+
+    expect(swatchOf(none)?.hasAttribute('data-worn')).toBe(true)
+  })
+
+  it('marque la pastille survolée, et la rend en partant', async () => {
+    await open()
+    const sky = colorButton('Ciel')
+
+    expect(swatchOf(sky)?.hasAttribute('data-hovered')).toBe(false)
+
+    fireEvent.pointerEnter(sky)
+
+    expect(swatchOf(sky)?.hasAttribute('data-hovered')).toBe(true)
+    expect(swatchOf(colorButton('Rose'))?.hasAttribute('data-hovered')).toBe(
+      false
+    )
+
+    fireEvent.pointerLeave(sky)
+
+    expect(swatchOf(sky)?.hasAttribute('data-hovered')).toBe(false)
+  })
+
+  it('creuse la pastille qu’un autre porte déjà', async () => {
+    await open({ roster: [characterOf({ nickname: 'Bravo', color: 'sky' })] })
+    const taken = screen.getByRole('button', {
+      name: strings.characters.colorTakenLabel({
+        nickname: 'Alpha',
+        label: 'Ciel',
+        holder: 'Bravo'
+      })
+    })
+
+    expect(swatchOf(taken)?.hasAttribute('data-taken')).toBe(true)
+    expect(swatchOf(colorButton('Rose'))?.hasAttribute('data-taken')).toBe(
+      false
+    )
+  })
+
+  it('porte le liseré du personnage en tête de la modale', async () => {
+    await open({ character: characterOf({ color: 'violet' }) })
+
+    expect(document.querySelector('.stripe')?.classList).toContain(
+      'tint-violet'
+    )
+  })
+
+  it('ne porte aucun liseré pour un personnage sans couleur', async () => {
+    await open()
+
+    expect(document.querySelector('.stripe')).toBeNull()
+  })
+
+  it('dit Aucune couleur en survolant le retrait', async () => {
+    await open({ character: characterOf({ color: 'turquoise' }) })
+
+    fireEvent.pointerEnter(
+      screen.getByRole('button', {
+        name: strings.characters.noColorLabel('Alpha')
+      })
+    )
+
+    expect(readout()).toBe(strings.characters.colorNone)
+  })
+})
 
 describe('la modale de classe, à l’ouverture', () => {
   it('offre le sexe, les douze classes et le retrait de la classe', async () => {
@@ -203,7 +475,7 @@ describe('la modale de classe, quand le sexe manque encore', () => {
     expect(handlers.handleSetPortrait).not.toHaveBeenCalled()
     expect(
       screen.getByText(
-        strings.characters.classDialogWhich(strings.characters.classes.iop)
+        strings.characters.dialogWhich(strings.characters.classes.iop)
       )
     ).not.toBeNull()
   })
@@ -272,7 +544,7 @@ describe('la modale de classe, quand le sexe manque encore', () => {
 
     pickClass(strings.characters.classes.iop)
     fireEvent.click(
-      screen.getByRole('button', { name: strings.characters.classDialogBack })
+      screen.getByRole('button', { name: strings.characters.dialogBack })
     )
 
     expect(handlers.handleSetPortrait).not.toHaveBeenCalled()
@@ -328,7 +600,7 @@ describe('la modale de classe, quand on referme sans répondre', () => {
 
     fireEvent.click(
       screen.getByRole('button', {
-        name: strings.characters.classDialogClose
+        name: strings.characters.dialogClose
       })
     )
 
@@ -344,7 +616,7 @@ describe('la modale de classe, quand on referme sans répondre', () => {
     pickClass(strings.characters.classes.iop)
     fireEvent.click(
       screen.getByRole('button', {
-        name: strings.characters.classDialogClose
+        name: strings.characters.dialogClose
       })
     )
     await closed()
@@ -361,7 +633,7 @@ describe('la modale de classe, quand on referme sans répondre', () => {
     ).not.toBeNull()
     expect(
       screen.queryByText(
-        strings.characters.classDialogWhich(strings.characters.classes.iop)
+        strings.characters.dialogWhich(strings.characters.classes.iop)
       )
     ).toBeNull()
   })
@@ -372,7 +644,7 @@ describe('la modale de classe, ce qu’elle prévient', () => {
     await open({ agent: APPLE_AGENT })
 
     expect(
-      screen.getByText(strings.characters.classDialogWindowKeepsIcon)
+      screen.getByText(strings.characters.dialogWindowKeepsIcon)
     ).not.toBeNull()
   })
 
@@ -380,18 +652,16 @@ describe('la modale de classe, ce qu’elle prévient', () => {
     await open({ agent: WINDOWS_AGENT, paintPortraits: false })
 
     expect(
-      screen.getByText(strings.characters.classDialogPortraitOff)
+      screen.getByText(strings.characters.dialogPortraitOff)
     ).not.toBeNull()
   })
 
   it('ne prévient de rien quand la tête va bien se poser', async () => {
     await open({ agent: WINDOWS_AGENT, paintPortraits: true })
 
+    expect(screen.queryByText(strings.characters.dialogPortraitOff)).toBeNull()
     expect(
-      screen.queryByText(strings.characters.classDialogPortraitOff)
-    ).toBeNull()
-    expect(
-      screen.queryByText(strings.characters.classDialogWindowKeepsIcon)
+      screen.queryByText(strings.characters.dialogWindowKeepsIcon)
     ).toBeNull()
   })
 })

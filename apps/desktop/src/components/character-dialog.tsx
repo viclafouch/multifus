@@ -1,8 +1,10 @@
 import React from 'react'
 import { Ban, ChevronLeft, X } from 'lucide-react'
-import type { Character, Class, Gender, Portrait } from '@/@types/roster'
+import type { Character, Class, Color, Gender, Portrait } from '@/@types/roster'
 import { CharacterMedallion } from '@/components/character-medallion'
 import { ClassVignette } from '@/components/class-vignette'
+import { ColorGrid } from '@/components/color-grid'
+import { ColorStripe } from '@/components/color-stripe'
 import { GenderSigil } from '@/components/gender-sigil'
 import { Legend } from '@/components/layout/legend'
 import { Button } from '@/components/ui/button'
@@ -17,30 +19,35 @@ import {
 import { CLASSES, CLASS_PORTRAITS } from '@/constants/classes'
 import { GENDERS } from '@/constants/roster'
 import { strings } from '@/constants/strings'
+import type { ColorHolders } from '@/helpers/colors'
 import { portraitFor } from '@/helpers/portrait'
-import { characterState, classDialogNote } from '@/helpers/wording'
+import { characterState, dialogNote } from '@/helpers/wording'
 
 const UNANSWERED_GENDER = 'male'
 
-type ClassDialogProps = Readonly<{
+type CharacterDialogProps = Readonly<{
   character: Character
   paintPortraits: boolean
+  takenColors: ColorHolders
   isOpen: boolean
   onOpenChange: (isOpen: boolean) => void
   onSetGender: (gender: Gender | null) => void
   onSetClass: (characterClass: Class | null) => void
+  onSetColor: (color: Color | null) => void
   onSetPortrait: (portrait: Portrait) => void
 }>
 
-export const ClassDialog = ({
+export const CharacterDialog = ({
   character,
   paintPortraits,
+  takenColors,
   isOpen,
   onOpenChange,
   onSetGender,
   onSetClass,
+  onSetColor,
   onSetPortrait
-}: ClassDialogProps) => {
+}: CharacterDialogProps) => {
   const { nickname, gender } = character
   const words = strings.characters
   const [asked, setAsked] = React.useState<Class | null>(null)
@@ -78,6 +85,9 @@ export const ClassDialog = ({
     >
       <DialogContent showCloseButton={false} className="gap-5 sm:max-w-md">
         <DialogHeader className="flex-row items-center gap-3">
+          {character.color === null ? null : (
+            <ColorStripe color={character.color} className="h-medallion" />
+          )}
           <CharacterMedallion
             portrait={portraitFor(character)}
             state={characterState(character)}
@@ -88,59 +98,67 @@ export const ClassDialog = ({
             </DialogTitle>
             {asked === null ? null : (
               <DialogDescription className="text-note">
-                {words.classDialogWhich(words.classes[asked])}
+                {words.dialogWhich(words.classes[asked])}
               </DialogDescription>
             )}
           </div>
           <DialogClose
-            aria-label={words.classDialogClose}
+            aria-label={words.dialogClose}
             className="absolute top-4 right-4"
             render={<Button variant="ghost" size="icon-sm" />}
           >
             <X aria-hidden strokeWidth={2} />
           </DialogClose>
         </DialogHeader>
-        {asked === null ? (
-          <ClassStep
-            character={character}
-            note={classDialogNote(paintPortraits)}
-            onPickClass={handlePickClass}
-            onSetGender={onSetGender}
-          />
-        ) : (
-          <GenderStep
-            asked={asked}
-            onPickGender={handlePickGender}
-            onGoBack={() => {
-              setAsked(null)
-            }}
-          />
-        )}
+        <div className="dialog-body -mx-1 flex flex-col gap-5 overflow-y-auto px-1">
+          {asked === null ? (
+            <MarksStep
+              character={character}
+              takenColors={takenColors}
+              note={dialogNote(paintPortraits)}
+              onPickClass={handlePickClass}
+              onPickColor={onSetColor}
+              onSetGender={onSetGender}
+            />
+          ) : (
+            <GenderStep
+              asked={asked}
+              onPickGender={handlePickGender}
+              onGoBack={() => {
+                setAsked(null)
+              }}
+            />
+          )}
+        </div>
       </DialogContent>
     </Dialog>
   )
 }
 
-type ClassStepProps = Readonly<{
+type MarksStepProps = Readonly<{
   character: Character
+  takenColors: ColorHolders
   note: string | null
   onPickClass: (characterClass: Class | null) => void
+  onPickColor: (color: Color | null) => void
   onSetGender: (gender: Gender | null) => void
 }>
 
-const ClassStep = ({
+const MarksStep = ({
   character,
+  takenColors,
   note,
   onPickClass,
+  onPickColor,
   onSetGender
-}: ClassStepProps) => {
+}: MarksStepProps) => {
   const { nickname, gender } = character
   const words = strings.characters
 
   return (
     <>
       <div className="flex flex-col gap-2">
-        <Legend>{words.classDialogGender}</Legend>
+        <Legend>{words.dialogGender}</Legend>
         <ul className="flex gap-2">
           {GENDERS.map((candidate) => {
             return (
@@ -167,8 +185,8 @@ const ClassStep = ({
         </ul>
       </div>
       <div className="flex flex-col gap-2">
-        <Legend>{words.classDialogClasses}</Legend>
-        <ul className="grid grid-cols-4 gap-1.5">
+        <Legend>{words.dialogClasses}</Legend>
+        <ul className="grid grid-cols-5 gap-1.5">
           {CLASSES.map((candidate) => {
             return (
               <li key={candidate}>
@@ -209,6 +227,12 @@ const ClassStep = ({
           </li>
         </ul>
       </div>
+      <ColorGrid
+        nickname={nickname}
+        color={character.color}
+        takenColors={takenColors}
+        onPickColor={onPickColor}
+      />
       {note === null ? null : (
         <p className="border-t border-border/60 pt-3.5 text-note text-muted-foreground">
           {note}
@@ -265,7 +289,7 @@ const GenderStep = ({ asked, onPickGender, onGoBack }: GenderStepProps) => {
         onClick={onGoBack}
       >
         <ChevronLeft aria-hidden strokeWidth={2} />
-        {words.classDialogBack}
+        {words.dialogBack}
       </Button>
     </>
   )

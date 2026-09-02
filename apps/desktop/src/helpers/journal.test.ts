@@ -175,6 +175,22 @@ const ROSTER_CASES = {
       line: 'Classe retirée à Alpha.'
     }
   ],
+  colorAssigned: [
+    {
+      event: {
+        kind: 'roster',
+        change: { kind: 'colorAssigned', nickname: NICKNAME, color: 'sky' }
+      },
+      line: 'Alpha est marqué en Ciel.'
+    },
+    {
+      event: {
+        kind: 'roster',
+        change: { kind: 'colorAssigned', nickname: NICKNAME, color: null }
+      },
+      line: 'Couleur retirée à Alpha.'
+    }
+  ],
   genderAssigned: [
     {
       event: {

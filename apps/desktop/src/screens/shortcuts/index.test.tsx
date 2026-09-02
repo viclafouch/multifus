@@ -404,6 +404,20 @@ describe('l’écran des raccourcis, un personnage une touche', () => {
     expect(fieldOfCharacter('Bravo')).not.toBeNull()
   })
 
+  it('montre la couleur de chaque personnage au bord de sa ligne', () => {
+    show({
+      characters: [
+        characterOf({ nickname: 'Alpha', color: 'earth' }),
+        characterOf({ nickname: 'Bravo', color: null })
+      ]
+    })
+
+    const stripes = [...document.querySelectorAll('.stripe')]
+
+    expect(stripes).toHaveLength(1)
+    expect(stripes[0].classList).toContain('tint-earth')
+  })
+
   it('dit où les personnages arrivent quand le roster est vide', () => {
     show({ characters: [] })
 

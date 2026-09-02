@@ -1,4 +1,4 @@
-import type { Class, Gender } from '@/@types/roster'
+import type { Class, Color, Gender } from '@/@types/roster'
 
 export type WalkFrom =
   | 'listeningLost'
@@ -27,6 +27,7 @@ export type BannerCharacter = {
   readonly nickname: string
   readonly class: Class | null
   readonly gender: Gender | null
+  readonly color: Color | null
 }
 
 export type BannerStep = {

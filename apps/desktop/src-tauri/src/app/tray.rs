@@ -655,6 +655,7 @@ mod tests {
             nickname: nickname.to_owned(),
             gender: None,
             class: None,
+            color: None,
             main: false,
             excluded,
             online: true,

@@ -76,6 +76,8 @@
   --spacing-glyph: 15px;
   --spacing-sigil: 38px;
   --spacing-mark: 18px;
+  --spacing-stripe: 4px;
+  --spacing-swatch: 26px;
 
   --tracking-micro: 0.12em;
   --tracking-title: -0.012em;
@@ -123,6 +125,109 @@
   --live: oklch(0.79 0.16 152);
   --idle: oklch(0.79 0.16 58);
   --blocked: oklch(0.7 0.19 25);
+
+  --red: oklch(0.6 0.223 8);
+  --orange: oklch(0.68 0.207 42);
+  --earth: oklch(0.54 0.13 46);
+  --yellow: oklch(0.9 0.197 110);
+  --green: oklch(0.62 0.211 142);
+  --pine: oklch(0.52 0.11 166);
+  --turquoise: oklch(0.66 0.113 202);
+  --sky: oklch(0.8 0.143 222);
+  --blue: oklch(0.56 0.243 262);
+  --lavender: oklch(0.7 0.186 300);
+  --violet: oklch(0.59 0.285 320);
+  --pink: oklch(0.74 0.205 344);
+}
+
+@utility tint-red {
+  --tint: var(--red);
+}
+
+@utility tint-orange {
+  --tint: var(--orange);
+}
+
+@utility tint-earth {
+  --tint: var(--earth);
+}
+
+@utility tint-yellow {
+  --tint: var(--yellow);
+}
+
+@utility tint-green {
+  --tint: var(--green);
+}
+
+@utility tint-pine {
+  --tint: var(--pine);
+}
+
+@utility tint-turquoise {
+  --tint: var(--turquoise);
+}
+
+@utility tint-sky {
+  --tint: var(--sky);
+}
+
+@utility tint-blue {
+  --tint: var(--blue);
+}
+
+@utility tint-lavender {
+  --tint: var(--lavender);
+}
+
+@utility tint-violet {
+  --tint: var(--violet);
+}
+
+@utility tint-pink {
+  --tint: var(--pink);
+}
+
+@utility dialog-body {
+  max-height: calc(100vh - 9rem);
+}
+
+@utility stripe {
+  background-color: var(--tint);
+}
+
+@utility tint-none {
+  --tint: var(--muted-foreground);
+}
+
+@utility swatch {
+  background-color: var(--tint);
+  border-color: color-mix(in oklch, var(--tint), white 30%);
+  transition: box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &[data-bare] {
+    background-color: transparent;
+    border-style: dashed;
+    border-color: var(--border);
+  }
+
+  &[data-taken] {
+    background-color: transparent;
+    border-width: 5px;
+    border-color: var(--tint);
+  }
+
+  &[data-hovered] {
+    box-shadow: 0 0 0 2px
+      color-mix(in oklch, var(--foreground), transparent 58%);
+  }
+
+  &[data-worn] {
+    box-shadow:
+      0 0 0 2px var(--popover),
+      0 0 0 4px var(--tint),
+      0 0 12px -2px color-mix(in oklch, var(--tint), transparent 45%);
+  }
 }
 
 @utility medallion-live {
@@ -160,15 +265,17 @@
 }
 
 @utility wheel-slice {
-  fill: oklch(0.235 0.009 66);
+  --slice-ink: color-mix(in oklch, var(--tint, var(--primary)), black 45%);
+
+  fill: var(--slice-ink);
   transition: fill 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
   &[data-here] {
-    fill: color-mix(in oklch, var(--primary), oklch(0.235 0.009 66) 80%);
+    fill: color-mix(in oklch, var(--slice-ink), white 9%);
   }
 
   &[data-hovered] {
-    fill: color-mix(in oklch, var(--primary), oklch(0.235 0.009 66) 52%);
+    fill: color-mix(in oklch, var(--slice-ink), white 18%);
   }
 }
 

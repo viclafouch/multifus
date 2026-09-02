@@ -13,6 +13,7 @@ const ALPHA = {
   nickname: 'Alpha',
   gender: 'male',
   class: 'iop',
+  color: null,
   main: false,
   excluded: false,
   online: true,

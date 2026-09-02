@@ -110,6 +110,7 @@ use crate::platform::window::GameWindow;
 use crate::platform::window::ScreenFrame;
 use crate::platform::window::ScreenPoint;
 use crate::platform::window::ShortTitleReport;
+use crate::platform::window::WindowIcon;
 use crate::platform::window::WindowId;
 use crate::platform::window::WindowManager;
 
@@ -890,7 +891,7 @@ impl WindowManager for AccessibilityWindowManager {
         Ok(ShortTitleReport::default())
     }
 
-    fn set_window_icon(&self, _window: WindowId, _icon: Option<&[u8]>) -> Result<()> {
+    fn set_window_icon(&self, _window: WindowId, _icon: Option<WindowIcon<'_>>) -> Result<()> {
         Ok(())
     }
 

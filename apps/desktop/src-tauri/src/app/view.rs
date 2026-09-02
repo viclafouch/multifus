@@ -6,6 +6,7 @@ use crate::app::journal::RelayFailure;
 use crate::config::BannerCorner;
 use crate::config::QuickReplyId;
 use crate::domain::Class;
+use crate::domain::Color;
 use crate::domain::Gender;
 use crate::domain::NotificationKind;
 use crate::platform::KeyLabels;
@@ -131,6 +132,7 @@ pub struct WheelSlice {
     pub nickname: String,
     pub class: Option<Class>,
     pub gender: Option<Gender>,
+    pub color: Option<Color>,
     pub main: bool,
     pub here: bool,
 }
@@ -149,6 +151,7 @@ pub struct BannerCharacter {
     pub nickname: String,
     pub class: Option<Class>,
     pub gender: Option<Gender>,
+    pub color: Option<Color>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -296,6 +299,7 @@ pub struct CharacterView {
     pub nickname: String,
     pub gender: Option<Gender>,
     pub class: Option<Class>,
+    pub color: Option<Color>,
     pub main: bool,
     pub excluded: bool,
     pub online: bool,
@@ -488,6 +492,7 @@ mod tests {
             nickname: "Bravo".to_owned(),
             class: Some(Class::Cra),
             gender: Some(Gender::Female),
+            color: Some(Color::Sky),
             main: false,
             here: true,
         }
@@ -566,6 +571,7 @@ mod tests {
             nickname: "Alpha".to_owned(),
             gender: Some(Gender::Male),
             class: Some(Class::Iop),
+            color: None,
             main: false,
             excluded: false,
             online: true,
@@ -642,6 +648,7 @@ mod tests {
                 "nickname": "Alpha",
                 "gender": "male",
                 "class": "iop",
+                "color": null,
                 "main": false,
                 "excluded": false,
                 "online": true,
@@ -697,6 +704,54 @@ mod tests {
         );
         assert_eq!(json_of(&Gender::Male), json!("male"));
         assert_eq!(json_of(&Gender::Female), json!("female"));
+    }
+
+    #[test]
+    fn the_twelve_colours_travel_under_the_names_the_theme_declares() {
+        let colors = Color::ALL
+            .into_iter()
+            .map(|color| {
+                json_of(&color)
+                    .as_str()
+                    .expect("a colour is a word")
+                    .to_owned()
+            })
+            .collect::<Vec<_>>();
+
+        assert_eq!(
+            colors,
+            [
+                "red",
+                "orange",
+                "earth",
+                "yellow",
+                "green",
+                "pine",
+                "turquoise",
+                "sky",
+                "blue",
+                "lavender",
+                "violet",
+                "pink",
+            ]
+        );
+    }
+
+    #[test]
+    fn a_character_nobody_has_coloured_crosses_as_nothing_rather_than_as_a_gap() {
+        let bare = CharacterView {
+            color: None,
+            ..character()
+        };
+
+        assert_eq!(json_of(&bare)["color"], Value::Null);
+        assert_eq!(
+            json_of(&CharacterView {
+                color: Some(Color::Earth),
+                ..character()
+            })["color"],
+            json!("earth")
+        );
     }
 
     #[test]
@@ -1127,6 +1182,7 @@ mod tests {
                     "nickname": "Bravo",
                     "class": "cra",
                     "gender": "female",
+                    "color": "sky",
                     "main": false,
                     "here": true,
                 }],
@@ -1143,6 +1199,7 @@ mod tests {
                 nickname: "Bravo".to_owned(),
                 class: Some(Class::Cra),
                 gender: Some(Gender::Female),
+                color: Some(Color::Violet),
                 main: true,
                 here: false,
             }],
@@ -1159,6 +1216,7 @@ mod tests {
                     "nickname": "Bravo",
                     "class": "cra",
                     "gender": "female",
+                    "color": "violet",
                     "main": true,
                     "here": false,
                 }],
@@ -1190,6 +1248,7 @@ mod tests {
                 nickname: "Alpha".to_owned(),
                 class: Some(Class::Cra),
                 gender: Some(Gender::Female),
+                color: Some(Color::Pine),
             }),
             previewing: false,
         };
@@ -1202,6 +1261,7 @@ mod tests {
                     "nickname": "Alpha",
                     "class": "cra",
                     "gender": "female",
+                    "color": "pine",
                 },
                 "previewing": false,
             })

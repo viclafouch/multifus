@@ -9,12 +9,12 @@ import type { TonedLine } from '@/helpers/wording'
 import {
   authorizationLine,
   bindingLabel,
-  characterPortraitLabel,
-  characterPortraitTooltip,
+  characterMarksLabel,
+  characterMarksTooltip,
   characterPresenceSubLine,
   characterStateLine,
   characterSubLine,
-  classDialogNote,
+  dialogNote,
   genderGroupHint,
   missingGenderLine,
   pairingProblemLine,
@@ -125,6 +125,7 @@ const ONLINE_CHARACTER = {
   nickname: 'Alpha',
   gender: 'male',
   class: null,
+  color: null,
   main: false,
   excluded: false,
   online: true,
@@ -267,11 +268,26 @@ describe('characterSubLine', () => {
 
     expect(line).toBe(`Iop · ${strings.characters.online}`)
   })
+
+  it('ne nomme jamais la couleur : elle se voit, elle ne se lit pas', () => {
+    const character = {
+      ...ONLINE_CHARACTER,
+      class: 'iop',
+      color: 'pine'
+    } as const
+
+    expect(characterSubLine(character)).toBe(
+      `Iop · ${strings.characters.online}`
+    )
+    expect(characterPresenceSubLine(character)).toBe(
+      `Iop · ${strings.characters.online}`
+    )
+  })
 })
 
-describe('characterPortraitLabel', () => {
+describe('characterMarksLabel', () => {
   it('invite à choisir la classe tant qu’elle manque', () => {
-    const label = characterPortraitLabel(ONLINE_CHARACTER)
+    const label = characterMarksLabel(ONLINE_CHARACTER)
 
     expect(label).toBe(strings.characters.classPick('Alpha'))
   })
@@ -283,7 +299,7 @@ describe('characterPortraitLabel', () => {
       gender: null
     } as const
 
-    const label = characterPortraitLabel(character)
+    const label = characterMarksLabel(character)
 
     expect(label).toBe(strings.characters.genderPick('Alpha'))
   })
@@ -291,15 +307,15 @@ describe('characterPortraitLabel', () => {
   it('propose de changer le portrait une fois complet', () => {
     const character = { ...ONLINE_CHARACTER, class: 'iop' } as const
 
-    const label = characterPortraitLabel(character)
+    const label = characterMarksLabel(character)
 
-    expect(label).toBe(strings.characters.portraitChange('Alpha'))
+    expect(label).toBe(strings.characters.characterChange('Alpha'))
   })
 })
 
-describe('characterPortraitTooltip', () => {
+describe('characterMarksTooltip', () => {
   it('invite à choisir la classe tant qu’elle manque', () => {
-    const tooltip = characterPortraitTooltip(ONLINE_CHARACTER)
+    const tooltip = characterMarksTooltip(ONLINE_CHARACTER)
 
     expect(tooltip).toBe(strings.characters.classPick('Alpha'))
   })
@@ -307,9 +323,9 @@ describe('characterPortraitTooltip', () => {
   it('dit seulement Modifier une fois le portrait complet', () => {
     const character = { ...ONLINE_CHARACTER, class: 'iop' } as const
 
-    const tooltip = characterPortraitTooltip(character)
+    const tooltip = characterMarksTooltip(character)
 
-    expect(tooltip).toBe(strings.characters.portraitChangeShort)
+    expect(tooltip).toBe(strings.characters.characterChangeShort)
   })
 })
 
@@ -431,15 +447,13 @@ describe('characterStateLine', () => {
   })
 })
 
-describe('classDialogNote', () => {
+describe('dialogNote', () => {
   it('says nothing while the head goes to the taskbar', () => {
     expect(IS_APPLE).toBe(false)
-    expect(classDialogNote(true)).toBeNull()
+    expect(dialogNote(true)).toBeNull()
   })
 
   it('says where the head went once somebody cut it', () => {
-    expect(classDialogNote(false)).toBe(
-      strings.characters.classDialogPortraitOff
-    )
+    expect(dialogNote(false)).toBe(strings.characters.dialogPortraitOff)
   })
 })

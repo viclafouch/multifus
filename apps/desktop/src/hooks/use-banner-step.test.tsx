@@ -33,7 +33,9 @@ const stepOf = (nickname: string | null): BannerStep => {
   return {
     corner: 'bottomRight',
     character:
-      nickname === null ? null : { nickname, class: 'iop', gender: 'male' },
+      nickname === null
+        ? null
+        : { nickname, class: 'iop', gender: 'male', color: null },
     previewing: false
   }
 }

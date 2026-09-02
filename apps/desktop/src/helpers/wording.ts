@@ -1,5 +1,5 @@
 import type { PairingProblem } from '@/@types/relay'
-import type { Character, Gender } from '@/@types/roster'
+import type { Character, Color, Gender } from '@/@types/roster'
 import type {
   Binding,
   QuickReply,
@@ -290,33 +290,45 @@ export const characterSubLine = (character: Character) => {
   return prefixed(MISSING_PART_LINES[missing], state)
 }
 
-export const characterPortraitLabel = (character: Character) => {
+export const characterMarksLabel = (character: Character) => {
   const missing = missingPart(character)
 
   if (missing === null) {
-    return strings.characters.portraitChange(character.nickname)
+    return strings.characters.characterChange(character.nickname)
   }
 
   return MISSING_PART_LABELS[missing](character.nickname)
 }
 
-export const characterPortraitTooltip = (character: Character) => {
+export const characterMarksTooltip = (character: Character) => {
   const missing = missingPart(character)
 
   if (missing === null) {
-    return strings.characters.portraitChangeShort
+    return strings.characters.characterChangeShort
   }
 
   return MISSING_PART_LABELS[missing](character.nickname)
 }
 
-export const classDialogNote = (paintPortraits: boolean) => {
+export const colorReadout = (color: Color | null, holder: string | null) => {
+  if (color === null) {
+    return strings.characters.colorNone
+  }
+
+  const label = strings.characters.colors[color]
+
+  return holder === null
+    ? label
+    : prefixed(label, strings.characters.colorTakenBy(holder))
+}
+
+export const dialogNote = (paintPortraits: boolean) => {
   if (IS_APPLE) {
-    return strings.characters.classDialogWindowKeepsIcon
+    return strings.characters.dialogWindowKeepsIcon
   }
 
   if (!paintPortraits) {
-    return strings.characters.classDialogPortraitOff
+    return strings.characters.dialogPortraitOff
   }
 
   return null

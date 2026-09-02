@@ -1,4 +1,4 @@
-import type { Class, Gender } from '@/@types/roster'
+import type { Class, Color, Gender } from '@/@types/roster'
 
 export type WheelSize = {
   readonly diameter: number
@@ -13,6 +13,7 @@ export type WheelSlice = {
   readonly nickname: string
   readonly class: Class | null
   readonly gender: Gender | null
+  readonly color: Color | null
   readonly main: boolean
   readonly here: boolean
 }

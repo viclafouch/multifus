@@ -37,6 +37,7 @@ pub fn run() {
             app::commands::open_authorization_settings,
             app::commands::set_gender,
             app::commands::set_class,
+            app::commands::set_color,
             app::commands::toggle_excluded,
             app::commands::set_main,
             app::commands::set_gender_excluded,

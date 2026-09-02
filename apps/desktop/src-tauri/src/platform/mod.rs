@@ -41,6 +41,7 @@ pub use window::GameWindow;
 pub use window::ScreenFrame;
 pub use window::ScreenPoint;
 pub use window::ShortTitleReport;
+pub use window::WindowIcon;
 pub use window::WindowId;
 pub use window::WindowManager;
 pub use window::matches_game_in_front;

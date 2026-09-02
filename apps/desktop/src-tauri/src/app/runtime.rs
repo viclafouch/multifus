@@ -41,6 +41,7 @@ use crate::app::view::Screen;
 use crate::app::view::Snapshot;
 use crate::app::walk;
 use crate::app::wheel;
+use crate::domain::Color;
 use crate::domain::GameNotification;
 use crate::platform::NotificationReport;
 use crate::platform::NotificationSink;
@@ -50,6 +51,7 @@ use crate::platform::PlatformNotificationWatcher;
 use crate::platform::PlatformWakeWatcher;
 use crate::platform::Wake;
 use crate::platform::WakeWatcher;
+use crate::platform::WindowIcon;
 use crate::platform::WindowId;
 use crate::platform::WindowManager;
 
@@ -499,8 +501,13 @@ fn paint_window(turn: &Turn, painting: &Painting) -> Result<(), PlatformError> {
     let Painting { window, look, .. } = painting;
 
     if look.portrait.is_some() || wore_portrait {
-        turn.windows
-            .set_window_icon(*window, look.portrait.map(portraits::icon_of))?;
+        turn.windows.set_window_icon(
+            *window,
+            look.portrait.map(|portrait| WindowIcon {
+                portrait: portraits::icon_of(portrait),
+                ring: look.color.map(Color::rgb),
+            }),
+        )?;
     }
 
     if look.ungrouped || was_ungrouped {
@@ -1636,6 +1643,45 @@ mod tests {
     }
 
     #[test]
+    fn the_colour_of_a_character_is_handed_to_his_window_with_his_class_head() {
+        let directory = directory();
+        let state = app_state(
+            &directory,
+            Settings {
+                roster: Roster::from_characters(vec![
+                    Character::new("Alpha")
+                        .with_gender(Gender::Male)
+                        .with_class(Class::Iop)
+                        .with_color(Color::Sky),
+                ]),
+                ..Settings::default()
+            },
+        );
+        let windows = FakeWindowManager::showing(Desktop {
+            game_windows: vec![game_window(1, "Alpha")],
+            ..Desktop::default()
+        });
+        let turn = turn(&windows, &state);
+
+        refresh_windows(&turn);
+        apply_window_icons(&turn);
+
+        let posed = windows.asked();
+
+        assert!(
+            posed.iter().any(|asked| matches!(
+                asked,
+                Asked::Icon {
+                    window,
+                    icon: Some(_),
+                    ring: Some(ring),
+                } if *window == WindowId::from_raw(1) && *ring == Color::Sky.rgb()
+            )),
+            "{posed:?}"
+        );
+    }
+
+    #[test]
     fn the_class_head_is_posed_and_the_taskbar_button_set_apart() {
         let directory = directory();
         let state = app_state(
@@ -1662,7 +1708,8 @@ mod tests {
                 asked,
                 Asked::Icon {
                     window,
-                    icon: Some(_)
+                    icon: Some(_),
+                    ring: None,
                 } if *window == WindowId::from_raw(1)
             )),
             "{posed:?}"
@@ -1751,6 +1798,7 @@ mod tests {
         assert!(windows.asked().contains(&Asked::Icon {
             window: WindowId::from_raw(1),
             icon: None,
+            ring: None,
         }));
         assert!(windows.asked().contains(&Asked::Group {
             window: WindowId::from_raw(1),

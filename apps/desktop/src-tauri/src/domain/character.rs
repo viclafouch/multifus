@@ -45,6 +45,58 @@ impl Class {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum Color {
+    Red,
+    Orange,
+    Earth,
+    Yellow,
+    Green,
+    Pine,
+    Turquoise,
+    Sky,
+    Blue,
+    Lavender,
+    Violet,
+    Pink,
+}
+
+impl Color {
+    pub const ALL: [Self; 12] = [
+        Self::Red,
+        Self::Orange,
+        Self::Earth,
+        Self::Yellow,
+        Self::Green,
+        Self::Pine,
+        Self::Turquoise,
+        Self::Sky,
+        Self::Blue,
+        Self::Lavender,
+        Self::Violet,
+        Self::Pink,
+    ];
+
+    #[must_use]
+    pub fn rgb(self) -> [u8; 3] {
+        match self {
+            Self::Red => [228, 35, 102],
+            Self::Orange => [251, 94, 0],
+            Self::Earth => [170, 82, 34],
+            Self::Yellow => [231, 232, 0],
+            Self::Green => [12, 163, 0],
+            Self::Pine => [0, 124, 90],
+            Self::Turquoise => [0, 166, 176],
+            Self::Sky => [33, 209, 255],
+            Self::Blue => [17, 99, 255],
+            Self::Lavender => [177, 126, 255],
+            Self::Violet => [193, 0, 226],
+            Self::Pink => [255, 108, 202],
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct Portrait {
     pub class: Class,
     pub gender: Gender,
@@ -60,6 +112,8 @@ pub struct Character {
     pub gender: Option<Gender>,
     #[serde(default)]
     pub class: Option<Class>,
+    #[serde(default)]
+    pub color: Option<Color>,
     #[serde(default)]
     pub main: bool,
     #[serde(default)]
@@ -79,6 +133,7 @@ impl Character {
             nickname: nickname.into(),
             gender: None,
             class: None,
+            color: None,
             main: false,
             shortcut: None,
             relayed: true,
@@ -96,6 +151,12 @@ impl Character {
     #[must_use]
     pub fn with_class(mut self, class: Class) -> Self {
         self.class = Some(class);
+        self
+    }
+
+    #[must_use]
+    pub fn with_color(mut self, color: Color) -> Self {
+        self.color = Some(color);
         self
     }
 
@@ -235,6 +296,62 @@ mod tests {
         assert_eq!(Class::ALL.len(), 12);
         assert_eq!(Class::ALL.first(), Some(&Class::Feca));
         assert_eq!(Class::ALL.last(), Some(&Class::Pandawa));
+    }
+
+    #[test]
+    fn nobody_carries_a_colour_until_one_is_given_to_him() {
+        assert_eq!(Character::new("Alpha").color, None);
+        assert_eq!(
+            Character::new("Alpha").with_color(Color::Sky).color,
+            Some(Color::Sky)
+        );
+    }
+
+    #[test]
+    fn a_colour_travels_to_the_file_in_lowercase_and_comes_back() {
+        let character = Character::new("Alpha").with_color(Color::Turquoise);
+
+        let json = serde_json::to_string(&character).expect("a character serialises");
+
+        assert!(json.contains(r#""color":"turquoise""#), "{json}");
+        assert_eq!(
+            serde_json::from_str::<Character>(&json)
+                .expect("a character reads back")
+                .color,
+            Some(Color::Turquoise)
+        );
+    }
+
+    #[test]
+    fn a_character_written_before_the_colours_existed_has_none() {
+        let stored = r#"{"nickname":"Alpha","gender":"male","class":"iop","relayed":true}"#;
+
+        let character = serde_json::from_str::<Character>(stored)
+            .expect("a character from an earlier version still loads");
+
+        assert_eq!(character.color, None);
+        assert_eq!(character.class, Some(Class::Iop));
+    }
+
+    #[test]
+    fn the_twelve_colours_go_round_the_circle_and_none_repeats() {
+        let mut seen = Vec::new();
+
+        for color in Color::ALL {
+            assert!(!seen.contains(&color.rgb()), "{color:?} repeats a colour");
+            seen.push(color.rgb());
+        }
+
+        assert_eq!(Color::ALL.len(), 12);
+        assert_eq!(Color::ALL.first(), Some(&Color::Red));
+        assert_eq!(Color::ALL.last(), Some(&Color::Pink));
+    }
+
+    #[test]
+    fn the_colours_the_icon_paints_are_the_ones_the_theme_declares() {
+        assert_eq!(Color::Red.rgb(), [228, 35, 102]);
+        assert_eq!(Color::Yellow.rgb(), [231, 232, 0]);
+        assert_eq!(Color::Pink.rgb(), [255, 108, 202]);
     }
 
     #[test]

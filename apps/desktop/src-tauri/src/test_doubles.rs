@@ -25,6 +25,7 @@ use crate::platform::Result;
 use crate::platform::ScreenFrame;
 use crate::platform::ScreenPoint;
 use crate::platform::ShortTitleReport;
+use crate::platform::WindowIcon;
 use crate::platform::WindowId;
 use crate::platform::WindowManager;
 
@@ -39,6 +40,7 @@ pub enum Asked {
     Icon {
         window: WindowId,
         icon: Option<Vec<u8>>,
+        ring: Option<[u8; 3]>,
     },
     Group {
         window: WindowId,
@@ -248,10 +250,11 @@ impl WindowManager for FakeWindowManager {
         unless_refused(desktop.short_titles_refusal, desktop.short_titles)
     }
 
-    fn set_window_icon(&self, window: WindowId, icon: Option<&[u8]>) -> Result<()> {
+    fn set_window_icon(&self, window: WindowId, icon: Option<WindowIcon<'_>>) -> Result<()> {
         self.write_down(Asked::Icon {
             window,
-            icon: icon.map(<[u8]>::to_vec),
+            icon: icon.map(|worn| worn.portrait.to_vec()),
+            ring: icon.and_then(|worn| worn.ring),
         });
 
         unless_refused(self.desktop().icon_refusal, ())

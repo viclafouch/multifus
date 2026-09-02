@@ -389,6 +389,7 @@ mod tests {
             nickname: "Bravo".to_owned(),
             class: Some(Class::Cra),
             gender: Some(Gender::Female),
+            color: None,
         }
     }
 

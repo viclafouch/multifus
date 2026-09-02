@@ -30,7 +30,6 @@ signatures et les constantes fausses avant que la CI ne les voie.
 
 Les manques retenus après la veille de [concurrents.md](./concurrents.md).
 
-- [ ] Une couleur choisie par personnage, en plus du portrait de classe, pour distinguer quatre Sadidas que le portrait ne sépare plus. Focus Retro la porte jusque dans le bouton de la barre des tâches
 - [ ] L'interface en anglais et en espagnol, sur la langue du système. Dracoon, ROrganizer et Focus Retro le font déjà, et la communauté hispanophone n'a rien
 
 ## Passer le dépôt en monorepo

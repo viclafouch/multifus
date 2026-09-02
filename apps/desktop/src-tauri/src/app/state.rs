@@ -72,6 +72,7 @@ use crate::config::WHEEL_STEP;
 use crate::config::WHEEL_WIDEST;
 use crate::domain::Character;
 use crate::domain::Class;
+use crate::domain::Color;
 use crate::domain::Gender;
 use crate::domain::NotificationKind;
 use crate::domain::Portrait;
@@ -399,6 +400,22 @@ impl Multifus {
         self.save();
     }
 
+    pub fn set_color(&mut self, nickname: &str, color: Option<Color>) {
+        let Some(character) = self.settings.roster.get_mut(nickname) else {
+            return;
+        };
+
+        character.color = color;
+
+        self.log(JournalEvent::Roster {
+            change: RosterChange::ColorAssigned {
+                nickname: nickname.to_owned(),
+                color,
+            },
+        });
+        self.save();
+    }
+
     pub fn toggle_excluded(&mut self, nickname: &str) {
         let change = match self.settings.roster.toggle_excluded(nickname) {
             Some(true) => RosterChange::Excluded {
@@ -491,6 +508,7 @@ impl Multifus {
             nickname: character.nickname.clone(),
             gender: character.gender,
             class: character.class,
+            color: character.color,
             main: character.main,
             excluded: character.excluded,
             online: character.online,
@@ -773,12 +791,15 @@ impl Multifus {
             return WindowLook::default();
         };
 
+        let portrait = self
+            .settings
+            .paint_portraits
+            .then(|| character.portrait())
+            .flatten();
+
         WindowLook {
-            portrait: self
-                .settings
-                .paint_portraits
-                .then(|| character.portrait())
-                .flatten(),
+            portrait,
+            color: portrait.and(character.color),
             ungrouped: self.settings.ungroup_taskbar && self.taskbar_combines,
         }
     }
@@ -970,6 +991,7 @@ impl Multifus {
             nickname: character.nickname.clone(),
             class: character.class,
             gender: character.gender,
+            color: character.color,
         })
     }
 
@@ -998,6 +1020,7 @@ impl Multifus {
                 nickname: character.nickname.clone(),
                 class: character.class,
                 gender: character.gender,
+                color: character.color,
                 main: character.main,
                 here: Some(window) == here,
             });
@@ -1630,6 +1653,7 @@ fn nickname_of(character: Option<&Character>) -> Option<String> {
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub struct WindowLook {
     pub portrait: Option<Portrait>,
+    pub color: Option<Color>,
     pub ungrouped: bool,
 }
 
@@ -1998,6 +2022,7 @@ mod tests {
             nickname: "Alpha".to_owned(),
             class: None,
             gender: None,
+            color: None,
         }));
         state.set_banner_character(None);
 
@@ -3163,6 +3188,94 @@ mod tests {
     }
 
     #[test]
+    fn a_colour_is_written_on_a_character_and_taken_back() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha")]);
+
+        state.set_color("Alpha", Some(Color::Sky));
+
+        assert_eq!(state.snapshot().characters[0].color, Some(Color::Sky));
+
+        state.set_color("Alpha", None);
+
+        assert_eq!(state.snapshot().characters[0].color, None);
+        assert!(
+            journalled(&state).contains(&JournalEvent::Roster {
+                change: RosterChange::ColorAssigned {
+                    nickname: "Alpha".to_owned(),
+                    color: Some(Color::Sky)
+                }
+            }),
+            "{:?}",
+            journalled(&state)
+        );
+    }
+
+    #[test]
+    fn a_colour_asked_of_a_nickname_the_roster_does_not_hold_changes_nothing() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha")]);
+
+        state.set_color("Echo", Some(Color::Sky));
+
+        assert_eq!(state.snapshot().characters[0].color, None);
+        assert!(!journalled(&state).iter().any(|event| {
+            matches!(
+                event,
+                JournalEvent::Roster {
+                    change: RosterChange::ColorAssigned { .. }
+                }
+            )
+        }));
+    }
+
+    #[test]
+    fn a_colour_reaches_the_window_only_behind_a_portrait() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha")]);
+
+        state.set_color("Alpha", Some(Color::Sky));
+
+        assert_eq!(
+            state.looks_to_paint()[0].look.color,
+            None,
+            "no class, no icon of ours, so nowhere to put the ring"
+        );
+
+        state.set_class("Alpha", Some(Class::Iop));
+        state.set_gender("Alpha", Some(Gender::Male));
+
+        assert_eq!(state.looks_to_paint()[0].look.color, Some(Color::Sky));
+    }
+
+    #[test]
+    fn a_window_is_repainted_when_its_colour_changes() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        state.apply_windows(&[window(1, "Alpha")]);
+        state.set_class("Alpha", Some(Class::Iop));
+        state.set_gender("Alpha", Some(Gender::Male));
+
+        let painting = state.looks_to_paint().remove(0);
+        state.remember_painted(&painting);
+
+        assert_eq!(state.looks_to_paint(), Vec::new());
+
+        state.set_color("Alpha", Some(Color::Pink));
+
+        assert_eq!(
+            state
+                .looks_to_paint()
+                .first()
+                .map(|next| { next.look.color }),
+            Some(Some(Color::Pink))
+        );
+    }
+
+    #[test]
     fn a_window_is_painted_once_and_repainted_when_its_portrait_changes() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
@@ -3189,6 +3302,7 @@ mod tests {
                         class: Class::Iop,
                         gender: Gender::Male
                     }),
+                    color: None,
                     ungrouped: false,
                 }
             )]
@@ -3213,6 +3327,7 @@ mod tests {
                     class: Class::Iop,
                     gender: Gender::Male,
                 }),
+                color: None,
                 ungrouped: false,
             },
         );
@@ -3252,6 +3367,7 @@ mod tests {
                 1,
                 WindowLook {
                     portrait: None,
+                    color: None,
                     ungrouped: true,
                 }
             )]
@@ -3304,6 +3420,7 @@ mod tests {
                     class: Class::Iop,
                     gender: Gender::Male,
                 }),
+                color: None,
                 ungrouped: false,
             },
         );
@@ -3324,6 +3441,7 @@ mod tests {
             1,
             WindowLook {
                 portrait: None,
+                color: None,
                 ungrouped: true,
             },
         ));
@@ -3352,6 +3470,7 @@ mod tests {
                     class: Class::Iop,
                     gender: Gender::Male,
                 }),
+                color: None,
                 ungrouped: false,
             },
         ));
@@ -3392,6 +3511,7 @@ mod tests {
                     class: Class::Iop,
                     gender: Gender::Male,
                 }),
+                color: None,
                 ungrouped: false,
             },
         );
@@ -3429,6 +3549,7 @@ mod tests {
                     class: Class::Iop,
                     gender: Gender::Male,
                 }),
+                color: None,
                 ungrouped: false,
             },
         );
@@ -3460,6 +3581,7 @@ mod tests {
                     class: Class::Iop,
                     gender: Gender::Male,
                 }),
+                color: None,
                 ungrouped: false,
             },
         ));

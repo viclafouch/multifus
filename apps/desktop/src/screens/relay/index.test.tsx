@@ -353,6 +353,20 @@ describe('l’écran des messages privés, les personnages relayés', () => {
     expect(screen.queryByText(strings.relay.emptyBody)).toBeNull()
   })
 
+  it('montre la couleur de chaque personnage au bord de sa ligne', () => {
+    show({
+      characters: [
+        characterOf({ nickname: 'Alpha', color: 'violet' }),
+        characterOf({ nickname: 'Bravo', color: null })
+      ]
+    })
+
+    const [alpha, bravo] = relayedRows()
+
+    expect(alpha.querySelector('.stripe')?.classList).toContain('tint-violet')
+    expect(bravo.querySelector('.stripe')).toBeNull()
+  })
+
   it('relaie un personnage quand on coche sa ligne', () => {
     show({ characters: [characterOf({ nickname: 'Alpha', relayed: false })] })
 

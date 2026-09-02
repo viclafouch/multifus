@@ -58,7 +58,7 @@ GitHub n'est pas mesurable, et pèse souvent plus lourd qu'il n'y paraît.
 | Portrait de classe sur la fenêtre   | o            | o                   | ~             | non, déclaré impossible | -        | -              | -          | ~    | -     |
 | Titre de fenêtre raccourci          | o            | o                   | -             | -                       | -        | o              | -          | -    | -     |
 | Bannière du personnage              | o            | o                   | -             | -                       | -        | -              | -          | -    | -     |
-| Couleur libre par compte            | -            | -                   | o             | -                       | -        | -              | -          | -    | -     |
+| Couleur par personnage              | o            | o                   | o             | -                       | -        | -              | -          | -    | -     |
 | Messages renvoyés sur téléphone     | o            | -                   | -             | -                       | -        | -              | -          | -    | -     |
 | Réponses toutes prêtes              | o            | -                   | -             | -                       | -        | -              | -          | -    | -     |
 | Tableau des runes posé sur le jeu   | o            | -                   | -             | -                       | -        | ~              | -          | -    | -     |

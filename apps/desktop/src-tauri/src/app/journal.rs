@@ -8,6 +8,7 @@ use crate::app::journal_file;
 use crate::app::view::BindingView;
 use crate::app::view::ShortcutAction;
 use crate::domain::Class;
+use crate::domain::Color;
 use crate::domain::Gender;
 use crate::domain::NotificationKind;
 
@@ -317,6 +318,11 @@ pub enum RosterChange {
     ClassAssigned {
         nickname: String,
         class: Option<Class>,
+    },
+
+    ColorAssigned {
+        nickname: String,
+        color: Option<Color>,
     },
 
     Reordered {

@@ -88,17 +88,59 @@ describe('la bannière', () => {
 
   it('porte le pseudo du personnage sur lequel on vient d’arriver', async () => {
     await posted(
-      stepOf({ character: { nickname: 'Alpha', class: 'iop', gender: 'male' } })
+      stepOf({
+        character: {
+          nickname: 'Alpha',
+          class: 'iop',
+          gender: 'male',
+          color: null
+        }
+      })
     )
 
     expect(screen.getByText('Alpha')).not.toBeNull()
     expect(screen.queryByText(strings.walk.banner.waiting)).toBeNull()
   })
 
+  it('porte le liseré de la couleur du personnage', async () => {
+    await posted(
+      stepOf({
+        character: {
+          nickname: 'Alpha',
+          class: 'iop',
+          gender: 'male',
+          color: 'sky'
+        }
+      })
+    )
+
+    expect(document.querySelector('.stripe')?.classList).toContain('tint-sky')
+  })
+
+  it('ne porte pas de liseré pour un personnage sans couleur', async () => {
+    await posted(
+      stepOf({
+        character: {
+          nickname: 'Alpha',
+          class: 'iop',
+          gender: 'male',
+          color: null
+        }
+      })
+    )
+
+    expect(document.querySelector('.stripe')).toBeNull()
+  })
+
   it('porte la tête de classe du personnage', async () => {
     await posted(
       stepOf({
-        character: { nickname: 'Alpha', class: 'cra', gender: 'female' }
+        character: {
+          nickname: 'Alpha',
+          class: 'cra',
+          gender: 'female',
+          color: null
+        }
       })
     )
 
@@ -107,7 +149,14 @@ describe('la bannière', () => {
 
   it('porte le pseudo même sans classe ni sexe', async () => {
     await posted(
-      stepOf({ character: { nickname: 'Alpha', class: null, gender: null } })
+      stepOf({
+        character: {
+          nickname: 'Alpha',
+          class: null,
+          gender: null,
+          color: null
+        }
+      })
     )
 
     expect(screen.getByText('Alpha')).not.toBeNull()
@@ -116,11 +165,25 @@ describe('la bannière', () => {
 
   it('suit le pas suivant', async () => {
     await posted(
-      stepOf({ character: { nickname: 'Alpha', class: 'iop', gender: 'male' } })
+      stepOf({
+        character: {
+          nickname: 'Alpha',
+          class: 'iop',
+          gender: 'male',
+          color: null
+        }
+      })
     )
 
     step(
-      stepOf({ character: { nickname: 'Bravo', class: 'iop', gender: 'male' } })
+      stepOf({
+        character: {
+          nickname: 'Bravo',
+          class: 'iop',
+          gender: 'male',
+          color: null
+        }
+      })
     )
 
     expect(screen.getByText('Bravo')).not.toBeNull()
@@ -129,7 +192,14 @@ describe('la bannière', () => {
 
   it('revient à Déplacement rapide quand on quitte le jeu', async () => {
     await posted(
-      stepOf({ character: { nickname: 'Alpha', class: 'iop', gender: 'male' } })
+      stepOf({
+        character: {
+          nickname: 'Alpha',
+          class: 'iop',
+          gender: 'male',
+          color: null
+        }
+      })
     )
 
     step(stepOf())

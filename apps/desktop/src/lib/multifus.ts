@@ -4,7 +4,7 @@ import type { AboutLink } from '@/@types/about'
 import type { Display } from '@/@types/display'
 import type { NotificationKind } from '@/@types/notification'
 import type { RelayLink } from '@/@types/relay'
-import type { Class, Gender } from '@/@types/roster'
+import type { Class, Color, Gender } from '@/@types/roster'
 import type { QuickReplyId, ShortcutAction } from '@/@types/shortcuts'
 import type { Clients, ScreenName, Snapshot } from '@/@types/snapshot'
 import type { BannerCorner, BannerStep } from '@/@types/walk'
@@ -51,6 +51,10 @@ export const setClass = async (
   characterClass: Class | null
 ) => {
   return invoke<Snapshot>('set_class', { nickname, class: characterClass })
+}
+
+export const setColor = async (nickname: string, color: Color | null) => {
+  return invoke<Snapshot>('set_color', { nickname, color })
 }
 
 export const toggleExcluded = async (nickname: string) => {

@@ -158,6 +158,12 @@ const CALLS = [
     }
   },
   {
+    name: 'setColor',
+    run: () => {
+      return multifus.setColor(NICKNAME, 'sky')
+    }
+  },
+  {
     name: 'toggleExcluded',
     run: () => {
       return multifus.toggleExcluded(NICKNAME)
