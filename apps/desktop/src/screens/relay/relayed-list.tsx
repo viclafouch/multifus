@@ -1,9 +1,13 @@
+import { t } from '@lingui/core/macro'
 import type { Character } from '@/@types/roster'
 import type { Snapshot } from '@/@types/snapshot'
 import { CharacterLine } from '@/components/character-line'
 import { Switch } from '@/components/ui/switch'
-import { strings } from '@/constants/strings'
 import { setRelayed } from '@/lib/multifus'
+
+const relayToggleLabel = (nickname: string) => {
+  return t`Relayer ${nickname}`
+}
 
 type RelayedListProps = Readonly<{
   characters: readonly Character[]
@@ -18,7 +22,7 @@ export const RelayedList = ({ characters, run }: RelayedListProps) => {
           <CharacterLine key={character.nickname} character={character}>
             <Switch
               checked={character.relayed}
-              aria-label={strings.relay.characterToggle(character.nickname)}
+              aria-label={relayToggleLabel(character.nickname)}
               onCheckedChange={(relayed) => {
                 run(setRelayed(character.nickname, relayed))
               }}

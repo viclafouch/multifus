@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
+import { i18n } from '@lingui/core'
 import type { RuneFamily, RuneRow } from '@/constants/runes'
 import { TABLE_DRAWN_WIDTH, RUNE_FAMILIES } from '@/constants/runes'
-import { strings } from '@/constants/strings'
 import SETTINGS_SOURCE from '../../src-tauri/src/config/settings.rs?raw'
 
 const rustCount = (source: string, name: string) => {
@@ -31,7 +31,7 @@ const ROWS = FAMILIES.flatMap((family) => {
 
 const rowOf = (stat: string) => {
   const found = ROWS.find((row) => {
-    return row.stat === stat
+    return i18n._(row.stat) === stat
   })
 
   if (found === undefined) {
@@ -43,8 +43,12 @@ const rowOf = (stat: string) => {
 
 const statsOf = (rows: readonly RuneRow[]) => {
   return rows.map((row) => {
-    return row.stat
+    return i18n._(row.stat)
   })
+}
+
+const weightsOf = ({ simple, pa, ra, unit }: RuneRow) => {
+  return { simple, pa, ra, unit }
 }
 
 const stepsOf = (row: RuneRow): readonly number[] => {
@@ -79,7 +83,7 @@ describe('le tableau des poids de runes', () => {
 
   it('donne à chaque famille le nom que le tableau écrit', () => {
     const named = FAMILIES.map((family) => {
-      return strings.runeTable.sheet.families[family.name]
+      return i18n._(family.label)
     })
 
     expect(named).toStrictEqual([
@@ -108,15 +112,13 @@ describe('le tableau des poids de runes', () => {
   })
 
   it('garde les chiffres arrondis vers le haut de la vitalité et des pods', () => {
-    expect(rowOf('Vitalité')).toStrictEqual({
-      stat: 'Vitalité',
+    expect(weightsOf(rowOf('Vitalité'))).toStrictEqual({
       simple: 1,
       pa: 3,
       ra: 8,
       unit: 0.25
     })
-    expect(rowOf('Pods')).toStrictEqual({
-      stat: 'Pods',
+    expect(weightsOf(rowOf('Pods'))).toStrictEqual({
       simple: 3,
       pa: 8,
       ra: 25,
@@ -127,7 +129,7 @@ describe('le tableau des poids de runes', () => {
   it('n’arrondit que les lignes dont l’unité porte une virgule', () => {
     const rounded = ROWS.filter((row) => {
       return ROUNDED_UP_STATS.some((stat) => {
-        return stat === row.stat
+        return stat === i18n._(row.stat)
       })
     })
 

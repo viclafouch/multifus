@@ -1,7 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import type { JournalEntry } from '@/@types/journal'
-import { strings } from '@/constants/strings'
 import { journalTime } from '@/helpers/journal'
 import { pending, snapshotOf } from '@/test-doubles'
 
@@ -59,13 +58,13 @@ describe('le journal', () => {
   it('compte ce qu’il a à dire, replié', () => {
     show(ENTRIES)
 
-    expect(screen.getByText(strings.journal.entries(2))).not.toBeNull()
+    expect(screen.getByText('2 entrées')).not.toBeNull()
   })
 
   it('compte une entrée au singulier', () => {
     show([ENTRIES[0]])
 
-    expect(screen.getByText(strings.journal.entries(1))).not.toBeNull()
+    expect(screen.getByText('1 entrée')).not.toBeNull()
   })
 
   it('déroule les lignes et leur heure quand on l’ouvre', () => {
@@ -93,14 +92,14 @@ describe('le journal', () => {
 
     fireEvent.click(toggle())
 
-    expect(screen.getByText(strings.journal.empty)).not.toBeNull()
+    expect(screen.getByText('Rien à signaler pour l’instant.')).not.toBeNull()
   })
 
   it('n’offre de copier que lorsqu’il a quelque chose à dire', () => {
     show([])
 
     expect(
-      screen.queryByRole('button', { name: strings.journal.copy })
+      screen.queryByRole('button', { name: 'Copier le journal' })
     ).toBeNull()
   })
 
@@ -108,7 +107,7 @@ describe('le journal', () => {
     show(ENTRIES)
 
     expect(
-      screen.getByRole('button', { name: strings.journal.copy })
+      screen.getByRole('button', { name: 'Copier le journal' })
     ).not.toBeNull()
   })
 
@@ -116,7 +115,7 @@ describe('le journal', () => {
     show([])
 
     fireEvent.click(
-      screen.getByRole('button', { name: strings.journal.reveal })
+      screen.getByRole('button', { name: 'Montrer le fichier du journal' })
     )
 
     expect(bridge.revealJournal).toHaveBeenCalledWith()

@@ -2,7 +2,6 @@ import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import type { RuneTableStatus } from '@/@types/rune'
 import type { ShortcutBinding } from '@/@types/shortcuts'
-import { strings } from '@/constants/strings'
 import { pending, snapshotOf } from '@/test-doubles'
 
 const bridge = {
@@ -20,8 +19,6 @@ vi.mock(import('@/lib/multifus'), () => {
 })
 
 const { RuneTableScreen } = await import('@/screens/rune-table')
-
-const words = strings.runeTable
 
 const RUNE_TABLE: RuneTableStatus = snapshotOf().runeTable
 
@@ -68,11 +65,11 @@ const gaugeNamed = (label: string) => {
 }
 
 const gauge = () => {
-  return gaugeNamed(words.sizeLabel)
+  return gaugeNamed('Taille')
 }
 
 const veil = () => {
-  return gaugeNamed(words.veilLabel)
+  return gaugeNamed('Transparence')
 }
 
 describe('l’écran du tableau des runes', () => {
@@ -80,14 +77,22 @@ describe('l’écran du tableau des runes', () => {
     show()
 
     expect(screen.getByText('Ctrl')).not.toBeNull()
-    expect(screen.queryByText(strings.shortcuts.held)).toBeNull()
-    expect(screen.queryByText(words.unbound)).toBeNull()
+    expect(screen.queryByText('au maintien')).toBeNull()
+    expect(
+      screen.queryByText(
+        'Sans touches, le tableau ne s’affiche plus. Posez-en dans l’écran Raccourcis.'
+      )
+    ).toBeNull()
   })
 
   it('dit en tête que le tableau ne s’affiche plus sans combinaison', () => {
     show({ shortcuts: [runeTableShortcut(null)] })
 
-    expect(screen.getByText(words.unbound)).not.toBeNull()
+    expect(
+      screen.getByText(
+        'Sans touches, le tableau ne s’affiche plus. Posez-en dans l’écran Raccourcis.'
+      )
+    ).not.toBeNull()
   })
 
   it('porte la jauge de largeur, ses bornes et la valeur du moment', () => {
@@ -97,7 +102,7 @@ describe('l’écran du tableau des runes', () => {
     expect(gauge().getAttribute('max')).toBe('560')
     expect(gauge().getAttribute('step')).toBe('20')
     expect(gauge().getAttribute('aria-valuenow')).toBe('420')
-    expect(screen.getByText(words.sizeValue(420))).not.toBeNull()
+    expect(screen.getByText('420 px')).not.toBeNull()
   })
 
   it('pousse la taille à l’aperçu à la touche, et l’enregistre une fois lâchée', async () => {
@@ -106,7 +111,7 @@ describe('l’écran du tableau des runes', () => {
     gauge().focus()
     fireEvent.keyDown(gauge(), { key: 'ArrowRight' })
 
-    await screen.findByText(words.sizeValue(440))
+    await screen.findByText('440 px')
 
     expect(bridge.sizeRuneTable).toHaveBeenCalledWith(440)
     expect(bridge.setRuneTableWidth).toHaveBeenCalledWith(440)
@@ -127,7 +132,7 @@ describe('l’écran du tableau des runes', () => {
     veil().focus()
     fireEvent.keyDown(veil(), { key: 'ArrowRight' })
 
-    await screen.findByText(words.veilValue(5))
+    await screen.findByText('5 %')
 
     expect(bridge.fadeRuneTable).toHaveBeenCalledWith(5)
     expect(bridge.setRuneTableTransparency).toHaveBeenCalledWith(5)
@@ -137,7 +142,7 @@ describe('l’écran du tableau des runes', () => {
     show()
 
     const everywhere = screen.getByRole('switch', {
-      name: words.everywhereLabel
+      name: 'Afficher sur tous les personnages connectés'
     })
 
     expect(everywhere.getAttribute('aria-checked')).toBe('false')
@@ -150,7 +155,11 @@ describe('l’écran du tableau des runes', () => {
   it('éteint l’interrupteur allumé', () => {
     show({ runeTable: { ...RUNE_TABLE, everywhere: true } })
 
-    fireEvent.click(screen.getByRole('switch', { name: words.everywhereLabel }))
+    fireEvent.click(
+      screen.getByRole('switch', {
+        name: 'Afficher sur tous les personnages connectés'
+      })
+    )
 
     expect(bridge.setRuneTableEverywhere).toHaveBeenCalledWith(false)
   })
@@ -158,7 +167,7 @@ describe('l’écran du tableau des runes', () => {
   it('pose le vrai tableau au bouton, et n’en offre pas un second', () => {
     show()
 
-    const posers = screen.getAllByRole('button', { name: words.tryIt })
+    const posers = screen.getAllByRole('button', { name: 'Voir en vrai' })
 
     fireEvent.click(posers[0])
 
@@ -169,7 +178,7 @@ describe('l’écran du tableau des runes', () => {
   it('rappelle le tableau poussé hors de l’écran au coin du client', () => {
     show()
 
-    fireEvent.click(screen.getByRole('button', { name: words.recall }))
+    fireEvent.click(screen.getByRole('button', { name: 'Remettre' }))
 
     expect(bridge.recallRuneTable).toHaveBeenCalledExactlyOnceWith()
   })

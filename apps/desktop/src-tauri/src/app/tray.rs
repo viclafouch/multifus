@@ -33,46 +33,127 @@ use crate::app::update;
 use crate::app::view::CharacterView;
 use crate::app::view::Screen;
 use crate::app::walk;
+use crate::config::Language;
 use crate::platform::PlatformError;
 use crate::platform::WindowId;
 
-const MENU_CHARACTERS: &str = "Personnages";
-const MENU_SHORTCUTS: &str = "Raccourcis";
-const MENU_QUICK_REPLIES: &str = "Réponses rapides";
-const MENU_AUTO_FOCUS_SCREEN: &str = "AutoFocus";
-const MENU_WALK_SCREEN: &str = "Déplacement rapide";
-const MENU_WHEEL_SCREEN: &str = "Roue des personnages";
-const MENU_RUNE_TABLE_SCREEN: &str = "Tableau des runes";
-const MENU_RELAY: &str = "Messages privés";
-const MENU_SETTINGS: &str = "Paramètres";
-const MENU_ABOUT: &str = "À propos";
-const MENU_QUIT: &str = "Quitter Multifus";
-const MENU_NOBODY: &str = "Aucun personnage connecté";
-const MENU_EXCLUDED: &str = " (exclu)";
-const MENU_MAXIMIZE_ALL: &str = "Agrandir les fenêtres";
-const MENU_AUTO_FOCUS_ON: &str = "Activer l'AutoFocus";
-const MENU_WALK_ON: &str = "Activer le Déplacement rapide";
-const MENU_WALK_OFF: &str = "Désactiver le Déplacement rapide";
-const MENU_RUNE_TABLE_ON: &str = "Montrer le tableau des runes";
-const MENU_RUNE_TABLE_OFF: &str = "Cacher le tableau des runes";
-const MENU_RUNE_TABLE_HOME: &str = "Remettre le tableau à sa position initiale";
-const MENU_AUTO_FOCUS_OFF: &str = "Désactiver l'AutoFocus";
-const MENU_WAKE_MINIMIZED: &str = "Aller chercher les fenêtres réduites";
-const MENU_LEAVE_MINIMIZED: &str = "Laisser les fenêtres réduites";
-const MENU_RELAY_SETUP: &str = "Configurer les messages privés…";
-const MENU_RELAY_ON: &str = "Recevoir mes messages privés";
-const MENU_RELAY_OFF: &str = "Ne plus les recevoir";
-const MENU_DENIED: &str = "Autorisation manquante";
-const MENU_JOURNAL: &str = "Montrer le journal";
-
-fn update_label(version: &str) -> String {
-    format!("Installer la mise à jour {version}")
+struct MenuWords {
+    characters: &'static str,
+    shortcuts: &'static str,
+    quick_replies: &'static str,
+    auto_focus_screen: &'static str,
+    walk_screen: &'static str,
+    wheel_screen: &'static str,
+    rune_table_screen: &'static str,
+    relay: &'static str,
+    settings: &'static str,
+    about: &'static str,
+    quit: &'static str,
+    nobody: &'static str,
+    excluded: &'static str,
+    maximize_all: &'static str,
+    auto_focus_on: &'static str,
+    auto_focus_off: &'static str,
+    walk_on: &'static str,
+    walk_off: &'static str,
+    rune_table_on: &'static str,
+    rune_table_off: &'static str,
+    rune_table_home: &'static str,
+    wake_minimized: &'static str,
+    leave_minimized: &'static str,
+    relay_setup: &'static str,
+    relay_on: &'static str,
+    relay_off: &'static str,
+    denied: &'static str,
+    open_settings: &'static str,
+    journal: &'static str,
 }
 
-#[cfg(target_os = "macos")]
-const MENU_OPEN_SETTINGS: &str = "Ouvrir Réglages Système";
-#[cfg(not(target_os = "macos"))]
-const MENU_OPEN_SETTINGS: &str = "Ouvrir les réglages du système";
+const FRENCH_MENU: MenuWords = MenuWords {
+    characters: "Personnages",
+    shortcuts: "Raccourcis",
+    quick_replies: "Réponses rapides",
+    auto_focus_screen: "AutoFocus",
+    walk_screen: "Déplacement rapide",
+    wheel_screen: "Roue des personnages",
+    rune_table_screen: "Tableau des runes",
+    relay: "Messages privés",
+    settings: "Paramètres",
+    about: "À propos",
+    quit: "Quitter Multifus",
+    nobody: "Aucun personnage connecté",
+    excluded: " (exclu)",
+    maximize_all: "Agrandir les fenêtres",
+    auto_focus_on: "Activer l'AutoFocus",
+    auto_focus_off: "Désactiver l'AutoFocus",
+    walk_on: "Activer le Déplacement rapide",
+    walk_off: "Désactiver le Déplacement rapide",
+    rune_table_on: "Montrer le tableau des runes",
+    rune_table_off: "Cacher le tableau des runes",
+    rune_table_home: "Remettre le tableau à sa position initiale",
+    wake_minimized: "Aller chercher les fenêtres réduites",
+    leave_minimized: "Laisser les fenêtres réduites",
+    relay_setup: "Configurer les messages privés…",
+    relay_on: "Recevoir mes messages privés",
+    relay_off: "Ne plus les recevoir",
+    denied: "Autorisation manquante",
+    open_settings: if cfg!(target_os = "macos") {
+        "Ouvrir Réglages Système"
+    } else {
+        "Ouvrir les réglages du système"
+    },
+    journal: "Montrer le journal",
+};
+
+const ENGLISH_MENU: MenuWords = MenuWords {
+    characters: "Characters",
+    shortcuts: "Shortcuts",
+    quick_replies: "Quick replies",
+    auto_focus_screen: "AutoFocus",
+    walk_screen: "Quick move",
+    wheel_screen: "Character wheel",
+    rune_table_screen: "Rune table",
+    relay: "Private messages",
+    settings: "Settings",
+    about: "About",
+    quit: "Quit Multifus",
+    nobody: "Nobody online",
+    excluded: " (set aside)",
+    maximize_all: "Maximize the windows",
+    auto_focus_on: "Turn AutoFocus on",
+    auto_focus_off: "Turn AutoFocus off",
+    walk_on: "Turn Quick move on",
+    walk_off: "Turn Quick move off",
+    rune_table_on: "Show the rune table",
+    rune_table_off: "Hide the rune table",
+    rune_table_home: "Put the table back where it started",
+    wake_minimized: "Go and fetch minimized windows",
+    leave_minimized: "Leave minimized windows alone",
+    relay_setup: "Set up private messages…",
+    relay_on: "Get my private messages",
+    relay_off: "Stop getting them",
+    denied: "Permission missing",
+    open_settings: if cfg!(target_os = "macos") {
+        "Open System Settings"
+    } else {
+        "Open the system settings"
+    },
+    journal: "Show the log",
+};
+
+fn words(language: Language) -> &'static MenuWords {
+    match language {
+        Language::Fr => &FRENCH_MENU,
+        Language::En => &ENGLISH_MENU,
+    }
+}
+
+fn update_label(version: &str, language: Language) -> String {
+    match language {
+        Language::Fr => format!("Installer la mise à jour {version}"),
+        Language::En => format!("Install update {version}"),
+    }
+}
 
 const TRAY_ID: &str = "multifus";
 
@@ -119,6 +200,7 @@ type ShownMenu = Mutex<Option<Contents>>;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 struct Contents {
+    language: Language,
     entries: Vec<Entry>,
     auto_focus: bool,
     walk: bool,
@@ -142,17 +224,21 @@ struct Entry {
     label: String,
 }
 
-fn tooltip(connected: usize) -> String {
-    match connected {
-        0 => "Multifus, aucun personnage connecté".to_owned(),
-        1 => "Multifus, 1 personnage connecté".to_owned(),
-        count => format!("Multifus, {count} personnages connectés"),
+fn tooltip(connected: usize, language: Language) -> String {
+    match (language, connected) {
+        (Language::Fr, 0) => "Multifus, aucun personnage connecté".to_owned(),
+        (Language::Fr, 1) => "Multifus, 1 personnage connecté".to_owned(),
+        (Language::Fr, count) => format!("Multifus, {count} personnages connectés"),
+        (Language::En, 0) => "Multifus, nobody online".to_owned(),
+        (Language::En, 1) => "Multifus, 1 character online".to_owned(),
+        (Language::En, count) => format!("Multifus, {count} characters online"),
     }
 }
 
 fn contents(state: &Multifus) -> Contents {
     Contents {
-        entries: entries(&state.connected()),
+        language: state.language(),
+        entries: entries(&state.connected(), state.language()),
         auto_focus: state.is_auto_focus_enabled(),
         walk: state.is_walk_enabled(),
         rune_table: state.is_rune_table_open(),
@@ -171,21 +257,25 @@ fn relay_item(state: &Multifus) -> RelayItem {
     }
 }
 
-fn relay_label(item: RelayItem) -> &'static str {
+fn relay_label(item: RelayItem, language: Language) -> &'static str {
+    let words = words(language);
+
     match item {
-        RelayItem::NotReady => MENU_RELAY_SETUP,
-        RelayItem::Off => MENU_RELAY_ON,
-        RelayItem::On => MENU_RELAY_OFF,
+        RelayItem::NotReady => words.relay_setup,
+        RelayItem::Off => words.relay_on,
+        RelayItem::On => words.relay_off,
     }
 }
 
-fn entries(connected: &[CharacterView]) -> Vec<Entry> {
+fn entries(connected: &[CharacterView], language: Language) -> Vec<Entry> {
+    let aside = words(language).excluded;
+
     connected
         .iter()
         .map(|character| Entry {
             nickname: character.nickname.clone(),
             label: if character.excluded {
-                format!("{}{MENU_EXCLUDED}", character.nickname)
+                format!("{}{aside}", character.nickname)
             } else {
                 character.nickname.clone()
             },
@@ -211,7 +301,7 @@ pub fn setup(app: &AppHandle) {
     let built = tauri::tray::TrayIconBuilder::with_id(TRAY_ID)
         .icon(tray_image())
         .icon_as_template(cfg!(target_os = "macos"))
-        .tooltip(tooltip(0))
+        .tooltip(tooltip(0, lock(app).language()))
         .on_menu_event(on_menu_event)
         .build(app);
 
@@ -247,7 +337,7 @@ pub fn refresh(app: &AppHandle) {
 
     let built = build_menu(app, &wanted).and_then(|menu| {
         icon.set_menu(Some(menu))?;
-        icon.set_tooltip(Some(tooltip(wanted.entries.len())))
+        icon.set_tooltip(Some(tooltip(wanted.entries.len(), wanted.language)))
     });
 
     if built.is_err() {
@@ -259,19 +349,20 @@ pub fn refresh(app: &AppHandle) {
 
 fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> {
     let menu = Menu::new(app)?;
+    let words = words(contents.language);
 
     if !contents.granted {
         menu.append(&MenuItem::with_id(
             app,
             DENIED_ID,
-            MENU_DENIED,
+            words.denied,
             false,
             None::<&str>,
         )?)?;
         menu.append(&MenuItem::with_id(
             app,
             OPEN_SETTINGS_ID,
-            MENU_OPEN_SETTINGS,
+            words.open_settings,
             true,
             None::<&str>,
         )?)?;
@@ -282,7 +373,7 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
         menu.append(&MenuItem::with_id(
             app,
             NOBODY_ID,
-            MENU_NOBODY,
+            words.nobody,
             false,
             None::<&str>,
         )?)?;
@@ -301,7 +392,7 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
     menu.append(&MenuItem::with_id(
         app,
         MAXIMIZE_ALL_ID,
-        MENU_MAXIMIZE_ALL,
+        words.maximize_all,
         true,
         None::<&str>,
     )?)?;
@@ -311,7 +402,11 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
     menu.append(&MenuItem::with_id(
         app,
         AUTO_FOCUS_ID,
-        switch_label(contents.auto_focus, MENU_AUTO_FOCUS_OFF, MENU_AUTO_FOCUS_ON),
+        switch_label(
+            contents.auto_focus,
+            words.auto_focus_off,
+            words.auto_focus_on,
+        ),
         true,
         None::<&str>,
     )?)?;
@@ -319,7 +414,7 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
     menu.append(&MenuItem::with_id(
         app,
         WALK_ID,
-        switch_label(contents.walk, MENU_WALK_OFF, MENU_WALK_ON),
+        switch_label(contents.walk, words.walk_off, words.walk_on),
         true,
         None::<&str>,
     )?)?;
@@ -327,7 +422,11 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
     menu.append(&MenuItem::with_id(
         app,
         RUNE_TABLE_ID,
-        switch_label(contents.rune_table, MENU_RUNE_TABLE_OFF, MENU_RUNE_TABLE_ON),
+        switch_label(
+            contents.rune_table,
+            words.rune_table_off,
+            words.rune_table_on,
+        ),
         true,
         None::<&str>,
     )?)?;
@@ -336,7 +435,7 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
         menu.append(&MenuItem::with_id(
             app,
             RUNE_TABLE_HOME_ID,
-            MENU_RUNE_TABLE_HOME,
+            words.rune_table_home,
             true,
             None::<&str>,
         )?)?;
@@ -347,8 +446,8 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
         WAKE_MINIMIZED_ID,
         switch_label(
             contents.wakes_minimized,
-            MENU_LEAVE_MINIMIZED,
-            MENU_WAKE_MINIMIZED,
+            words.leave_minimized,
+            words.wake_minimized,
         ),
         true,
         None::<&str>,
@@ -357,7 +456,7 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
     menu.append(&MenuItem::with_id(
         app,
         RELAY_ID,
-        relay_label(contents.relay),
+        relay_label(contents.relay, contents.language),
         true,
         None::<&str>,
     )?)?;
@@ -368,7 +467,7 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
         menu.append(&MenuItem::with_id(
             app,
             format!("{SCREEN_PREFIX}{}", screen_id(screen)),
-            screen_label(screen),
+            screen_label(screen, contents.language),
             true,
             None::<&str>,
         )?)?;
@@ -377,7 +476,7 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
     menu.append(&MenuItem::with_id(
         app,
         JOURNAL_ID,
-        MENU_JOURNAL,
+        words.journal,
         true,
         None::<&str>,
     )?)?;
@@ -388,7 +487,7 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
         menu.append(&MenuItem::with_id(
             app,
             UPDATE_ID,
-            update_label(version),
+            update_label(version, contents.language),
             true,
             None::<&str>,
         )?)?;
@@ -397,7 +496,7 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
     menu.append(&MenuItem::with_id(
         app,
         QUIT_ID,
-        MENU_QUIT,
+        words.quit,
         true,
         None::<&str>,
     )?)?;
@@ -545,18 +644,20 @@ fn screen_of(name: &str) -> Option<Screen> {
         .find(|screen| screen_id(*screen) == name)
 }
 
-fn screen_label(screen: Screen) -> &'static str {
+fn screen_label(screen: Screen, language: Language) -> &'static str {
+    let words = words(language);
+
     match screen {
-        Screen::Characters => MENU_CHARACTERS,
-        Screen::Shortcuts => MENU_SHORTCUTS,
-        Screen::QuickReplies => MENU_QUICK_REPLIES,
-        Screen::AutoFocus => MENU_AUTO_FOCUS_SCREEN,
-        Screen::Walk => MENU_WALK_SCREEN,
-        Screen::Wheel => MENU_WHEEL_SCREEN,
-        Screen::RuneTable => MENU_RUNE_TABLE_SCREEN,
-        Screen::Relay => MENU_RELAY,
-        Screen::Settings => MENU_SETTINGS,
-        Screen::About => MENU_ABOUT,
+        Screen::Characters => words.characters,
+        Screen::Shortcuts => words.shortcuts,
+        Screen::QuickReplies => words.quick_replies,
+        Screen::AutoFocus => words.auto_focus_screen,
+        Screen::Walk => words.walk_screen,
+        Screen::Wheel => words.wheel_screen,
+        Screen::RuneTable => words.rune_table_screen,
+        Screen::Relay => words.relay,
+        Screen::Settings => words.settings,
+        Screen::About => words.about,
     }
 }
 
@@ -723,7 +824,10 @@ mod tests {
 
     #[test]
     fn the_menu_names_every_connected_character_and_says_which_are_set_aside() {
-        let listed = entries(&[connected("Alpha", false), connected("Bravo", true)]);
+        let listed = entries(
+            &[connected("Alpha", false), connected("Bravo", true)],
+            Language::Fr,
+        );
 
         assert_eq!(
             listed,
@@ -742,23 +846,34 @@ mod tests {
 
     #[test]
     fn the_tooltip_counts_the_characters_and_agrees_with_itself() {
-        assert_eq!(tooltip(0), "Multifus, aucun personnage connecté");
-        assert_eq!(tooltip(1), "Multifus, 1 personnage connecté");
-        assert_eq!(tooltip(6), "Multifus, 6 personnages connectés");
+        assert_eq!(
+            tooltip(0, Language::Fr),
+            "Multifus, aucun personnage connecté"
+        );
+        assert_eq!(tooltip(1, Language::Fr), "Multifus, 1 personnage connecté");
+        assert_eq!(
+            tooltip(6, Language::Fr),
+            "Multifus, 6 personnages connectés"
+        );
+        assert_eq!(tooltip(0, Language::En), "Multifus, nobody online");
+        assert_eq!(tooltip(1, Language::En), "Multifus, 1 character online");
+        assert_eq!(tooltip(6, Language::En), "Multifus, 6 characters online");
     }
 
     #[test]
     fn a_switch_of_the_menu_offers_the_gesture_that_undoes_what_is_on() {
+        let french = words(Language::Fr);
+
         assert_eq!(
-            switch_label(true, MENU_WALK_OFF, MENU_WALK_ON),
+            switch_label(true, french.walk_off, french.walk_on),
             "Désactiver le Déplacement rapide"
         );
         assert_eq!(
-            switch_label(false, MENU_WALK_OFF, MENU_WALK_ON),
+            switch_label(false, french.walk_off, french.walk_on),
             "Activer le Déplacement rapide"
         );
         assert_eq!(
-            switch_label(true, MENU_LEAVE_MINIMIZED, MENU_WAKE_MINIMIZED),
+            switch_label(true, french.leave_minimized, french.wake_minimized),
             "Laisser les fenêtres réduites"
         );
     }
@@ -767,14 +882,18 @@ mod tests {
     fn every_screen_of_the_rail_is_named_once_in_the_menu_and_read_back() {
         for screen in Screen::ALL {
             assert_eq!(screen_of(screen_id(screen)), Some(screen));
-            assert!(!screen_label(screen).is_empty());
         }
 
         let ids = Screen::ALL.map(screen_id);
-        let labels = Screen::ALL.map(screen_label);
 
         assert_eq!(ids.len(), ids.iter().collect::<HashSet<_>>().len());
-        assert_eq!(labels.len(), labels.iter().collect::<HashSet<_>>().len());
+
+        for language in Language::ALL {
+            let labels = Screen::ALL.map(|screen| screen_label(screen, language));
+
+            assert!(labels.iter().all(|label| !label.is_empty()));
+            assert_eq!(labels.len(), labels.iter().collect::<HashSet<_>>().len());
+        }
     }
 
     #[test]
@@ -786,12 +905,17 @@ mod tests {
 
     #[test]
     fn the_update_line_names_the_version_it_is_about_to_install() {
-        assert_eq!(update_label("0.2.0"), "Installer la mise à jour 0.2.0");
+        assert_eq!(
+            update_label("0.2.0", Language::Fr),
+            "Installer la mise à jour 0.2.0"
+        );
+        assert_eq!(update_label("0.2.0", Language::En), "Install update 0.2.0");
     }
 
     #[test]
     fn the_relay_item_says_a_different_thing_for_each_of_its_three_states() {
-        let labels = [RelayItem::NotReady, RelayItem::Off, RelayItem::On].map(relay_label);
+        let labels = [RelayItem::NotReady, RelayItem::Off, RelayItem::On]
+            .map(|item| relay_label(item, Language::Fr));
 
         assert_eq!(
             labels,
@@ -804,8 +928,9 @@ mod tests {
     }
 
     #[test]
-    fn a_running_relay_is_never_offered_as_something_to_switch_on() {
-        let mut contents = Contents {
+    fn a_menu_shown_in_one_language_is_rebuilt_when_the_other_is_picked() {
+        let french = Contents {
+            language: Language::Fr,
             entries: Vec::new(),
             auto_focus: true,
             walk: false,
@@ -816,7 +941,34 @@ mod tests {
             relay: RelayItem::NotReady,
         };
 
-        assert_eq!(relay_label(contents.relay), MENU_RELAY_SETUP);
+        assert_ne!(
+            french,
+            Contents {
+                language: Language::En,
+                ..french.clone()
+            },
+            "the language has to move the comparison, or the menu stays in French"
+        );
+    }
+
+    #[test]
+    fn a_running_relay_is_never_offered_as_something_to_switch_on() {
+        let mut contents = Contents {
+            language: Language::Fr,
+            entries: Vec::new(),
+            auto_focus: true,
+            walk: false,
+            rune_table: false,
+            wakes_minimized: true,
+            granted: true,
+            update: None,
+            relay: RelayItem::NotReady,
+        };
+
+        assert_eq!(
+            relay_label(contents.relay, contents.language),
+            "Configurer les messages privés…"
+        );
 
         contents.relay = RelayItem::On;
 

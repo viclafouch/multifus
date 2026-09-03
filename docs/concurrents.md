@@ -37,39 +37,39 @@ GitHub n'est pas mesurable, et pèse souvent plus lourd qu'il n'y paraît.
 
 `o` oui, `~` à moitié, `-` non, `?` non documenté et code non publié.
 
-|                                     | Multifus     | Dracoon             | Focus Retro   | ROrganizer              | Dosoft   | Retro Toolbox  | Supertools | nAiO | Xixou |
-| ----------------------------------- | ------------ | ------------------- | ------------- | ----------------------- | -------- | -------------- | ---------- | ---- | ----- |
-| macOS                               | o            | -                   | o             | -                       | -        | -              | -          | -    | -     |
-| Windows                             | o            | o                   | o             | o                       | o        | o              | o          | o    | o     |
-| Défilement suivant, précédent       | o            | o                   | o             | o                       | o        | o              | o          | o    | o     |
-| Une touche par personnage           | o            | o                   | o             | o                       | o        | o              | ?          | o    | ?     |
-| Retour au personnage principal      | o            | o                   | -             | -                       | -        | o              | -          | -    | ?     |
-| Retour à la fenêtre d'où l'on vient | -            | o                   | -             | -                       | -        | -              | -          | -    | ?     |
-| Roue des personnages                | o            | -                   | o             | -                       | o        | -              | -          | -    | -     |
-| Déplacement rapide au clic gauche   | o            | o                   | -             | -                       | -        | -              | -          | -    | -     |
-| Bouton de souris comme raccourci    | -            | -                   | o             | o                       | -        | -              | -          | -    | ?     |
-| Grille ou split 2 et 4 fenêtres     | -            | -                   | o             | -                       | ~        | o              | -          | -    | -     |
-| Agrandissement à l'ouverture        | o            | o                   | -             | -                       | -        | o              | -          | -    | -     |
-| Compositions d'équipe enregistrées  | -            | o                   | -             | -                       | ~        | ~              | -          | -    | ?     |
-| AutoFocus sur notification          | o            | o                   | o             | -                       | -        | o              | o          | -    | o     |
-| Événements couverts                 | 7            | 7                   | 1             | 0                       | 0        | 5              | 3          | 0    | ?     |
-| Exclure un personnage               | o            | o                   | -             | -                       | -        | -              | -          | -    | -     |
-| Sauter les tours d'un Sadida        | -            | o                   | -             | -                       | -        | -              | -          | -    | -     |
-| Portrait de classe sur la fenêtre   | o            | o                   | ~             | non, déclaré impossible | -        | -              | -          | ~    | -     |
-| Titre de fenêtre raccourci          | o            | o                   | -             | -                       | -        | o              | -          | -    | -     |
-| Bannière du personnage              | o            | o                   | -             | -                       | -        | -              | -          | -    | -     |
-| Couleur par personnage              | o            | o                   | o             | -                       | -        | -              | -          | -    | -     |
-| Messages renvoyés sur téléphone     | o            | -                   | -             | -                       | -        | -              | -          | -    | -     |
-| Réponses toutes prêtes              | o            | -                   | -             | -                       | -        | -              | -          | -    | -     |
-| Tableau des runes posé sur le jeu   | o            | -                   | -             | -                       | -        | ~              | -          | -    | -     |
-| Exclure tous les hommes ou femmes   | o            | -                   | -             | -                       | -        | -              | -          | -    | -     |
-| Code source publié                  | o            | o                   | o             | o                       | o        | ~              | o          | -    | -     |
-| Licence libre                       | MIT          | MIT                 | MIT           | Apache 2                | Apache 2 | non            | non        | non  | non   |
-| Binaire signé                       | o            | non, alerte Windows | ~ attestation | non, SmartScreen        | -        | non, antivirus | -          | -    | -     |
-| Mise à jour dans l'application      | o            | o                   | o             | ?                       | ?        | o              | o          | o    | ?     |
-| Téléchargement sans compte          | o            | o                   | o             | o                       | o        | o              | o          | o    | non   |
-| Plusieurs langues                   | non, fr seul | fr en es            | fr en es      | fr en es                | ~        | -              | -          | -    | -     |
-| Ne fait que gérer des fenêtres      | o            | o                   | o             | o                       | o        | o              | non        | o    | o     |
+|                                     | Multifus | Dracoon             | Focus Retro   | ROrganizer              | Dosoft   | Retro Toolbox  | Supertools | nAiO | Xixou |
+| ----------------------------------- | -------- | ------------------- | ------------- | ----------------------- | -------- | -------------- | ---------- | ---- | ----- |
+| macOS                               | o        | -                   | o             | -                       | -        | -              | -          | -    | -     |
+| Windows                             | o        | o                   | o             | o                       | o        | o              | o          | o    | o     |
+| Défilement suivant, précédent       | o        | o                   | o             | o                       | o        | o              | o          | o    | o     |
+| Une touche par personnage           | o        | o                   | o             | o                       | o        | o              | ?          | o    | ?     |
+| Retour au personnage principal      | o        | o                   | -             | -                       | -        | o              | -          | -    | ?     |
+| Retour à la fenêtre d'où l'on vient | -        | o                   | -             | -                       | -        | -              | -          | -    | ?     |
+| Roue des personnages                | o        | -                   | o             | -                       | o        | -              | -          | -    | -     |
+| Déplacement rapide au clic gauche   | o        | o                   | -             | -                       | -        | -              | -          | -    | -     |
+| Bouton de souris comme raccourci    | -        | -                   | o             | o                       | -        | -              | -          | -    | ?     |
+| Grille ou split 2 et 4 fenêtres     | -        | -                   | o             | -                       | ~        | o              | -          | -    | -     |
+| Agrandissement à l'ouverture        | o        | o                   | -             | -                       | -        | o              | -          | -    | -     |
+| Compositions d'équipe enregistrées  | -        | o                   | -             | -                       | ~        | ~              | -          | -    | ?     |
+| AutoFocus sur notification          | o        | o                   | o             | -                       | -        | o              | o          | -    | o     |
+| Événements couverts                 | 7        | 7                   | 1             | 0                       | 0        | 5              | 3          | 0    | ?     |
+| Exclure un personnage               | o        | o                   | -             | -                       | -        | -              | -          | -    | -     |
+| Sauter les tours d'un Sadida        | -        | o                   | -             | -                       | -        | -              | -          | -    | -     |
+| Portrait de classe sur la fenêtre   | o        | o                   | ~             | non, déclaré impossible | -        | -              | -          | ~    | -     |
+| Titre de fenêtre raccourci          | o        | o                   | -             | -                       | -        | o              | -          | -    | -     |
+| Bannière du personnage              | o        | o                   | -             | -                       | -        | -              | -          | -    | -     |
+| Couleur par personnage              | o        | o                   | o             | -                       | -        | -              | -          | -    | -     |
+| Messages renvoyés sur téléphone     | o        | -                   | -             | -                       | -        | -              | -          | -    | -     |
+| Réponses toutes prêtes              | o        | -                   | -             | -                       | -        | -              | -          | -    | -     |
+| Tableau des runes posé sur le jeu   | o        | -                   | -             | -                       | -        | ~              | -          | -    | -     |
+| Exclure tous les hommes ou femmes   | o        | -                   | -             | -                       | -        | -              | -          | -    | -     |
+| Code source publié                  | o        | o                   | o             | o                       | o        | ~              | o          | -    | -     |
+| Licence libre                       | MIT      | MIT                 | MIT           | Apache 2                | Apache 2 | non            | non        | non  | non   |
+| Binaire signé                       | o        | non, alerte Windows | ~ attestation | non, SmartScreen        | -        | non, antivirus | -          | -    | -     |
+| Mise à jour dans l'application      | o        | o                   | o             | ?                       | ?        | o              | o          | o    | ?     |
+| Téléchargement sans compte          | o        | o                   | o             | o                       | o        | o              | o          | o    | non   |
+| Plusieurs langues                   | fr en    | fr en es            | fr en es      | fr en es                | ~        | -              | -          | -    | -     |
+| Ne fait que gérer des fenêtres      | o        | o                   | o             | o                       | o        | o              | non        | o    | o     |
 
 ## Ce que fait Dracoon, et que son README tait
 

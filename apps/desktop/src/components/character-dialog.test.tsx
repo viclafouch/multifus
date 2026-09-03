@@ -1,5 +1,6 @@
 import React from 'react'
 import { describe, expect, it, vi } from 'vitest'
+import { i18n } from '@lingui/core'
 import {
   fireEvent,
   render,
@@ -9,9 +10,14 @@ import {
 } from '@testing-library/react'
 import type { Character } from '@/@types/roster'
 import { CLASS_PORTRAITS } from '@/constants/classes'
-import { strings } from '@/constants/strings'
+import { CLASS_LABELS, COLOR_LABELS } from '@/constants/roster'
 import { colorHolders } from '@/helpers/colors'
-import { APPLE_AGENT, WINDOWS_AGENT, characterOf } from '@/test-doubles'
+import {
+  APPLE_AGENT,
+  WINDOWS_AGENT,
+  characterOf,
+  speakFrench
+} from '@/test-doubles'
 
 const REOPEN = 'Rouvrir'
 
@@ -30,6 +36,8 @@ const open = async ({
 }: OpenParams = {}) => {
   vi.resetModules()
   vi.stubGlobal('navigator', { userAgent: agent })
+
+  await speakFrench()
 
   const { CharacterDialog } = await import('@/components/character-dialog')
 
@@ -76,7 +84,7 @@ const open = async ({
 const pickClass = (label: string) => {
   fireEvent.click(
     screen.getByRole('button', {
-      name: strings.characters.classLabel('Alpha', label)
+      name: `Marquer Alpha comme ${label}`
     })
   )
 }
@@ -95,7 +103,7 @@ const portraitOf = (name: string) => {
 
 const colorButton = (label: string) => {
   return screen.getByRole('button', {
-    name: strings.characters.colorLabel('Alpha', label)
+    name: `Marquer Alpha en ${label}`
   })
 }
 
@@ -108,7 +116,7 @@ const swatchOf = (button: HTMLElement) => {
 }
 
 const readout = () => {
-  const legend = screen.getByText(strings.characters.dialogColors)
+  const legend = screen.getByText('Couleur')
 
   return legend.nextElementSibling?.textContent ?? null
 }
@@ -117,17 +125,19 @@ describe('la couleur, dans la modale', () => {
   it('offre les douze couleurs et le retrait de la couleur', async () => {
     await open()
 
-    for (const label of Object.values(strings.characters.colors)) {
+    for (const label of Object.values(COLOR_LABELS).map((colour) => {
+      return i18n._(colour)
+    })) {
       expect(
         screen.getByRole('button', {
-          name: strings.characters.colorLabel('Alpha', label)
+          name: `Marquer Alpha en ${label}`
         })
       ).not.toBeNull()
     }
 
     expect(
       screen.getByRole('button', {
-        name: strings.characters.noColorLabel('Alpha')
+        name: 'Retirer la couleur de Alpha'
       })
     ).not.toBeNull()
   })
@@ -135,7 +145,7 @@ describe('la couleur, dans la modale', () => {
   it('pose la couleur choisie', async () => {
     const handlers = await open()
 
-    pickColor(strings.characters.colors.turquoise)
+    pickColor('Turquoise')
 
     expect(handlers.handleSetColor).toHaveBeenCalledWith('turquoise')
   })
@@ -147,7 +157,7 @@ describe('la couleur, dans la modale', () => {
 
     fireEvent.click(
       screen.getByRole('button', {
-        name: strings.characters.noColorLabel('Alpha')
+        name: 'Retirer la couleur de Alpha'
       })
     )
 
@@ -157,7 +167,7 @@ describe('la couleur, dans la modale', () => {
   it('reste ouverte, pour qu’on voie la couleur se poser', async () => {
     await open()
 
-    pickColor(strings.characters.colors.pink)
+    pickColor('Rose')
 
     expect(screen.queryByRole('dialog')).not.toBeNull()
   })
@@ -168,14 +178,14 @@ describe('la couleur, dans la modale', () => {
     expect(
       screen
         .getByRole('button', {
-          name: strings.characters.colorLabel('Alpha', 'Rose')
+          name: `Marquer Alpha en Rose`
         })
         .getAttribute('aria-pressed')
     ).toBe('true')
     expect(
       screen
         .getByRole('button', {
-          name: strings.characters.colorLabel('Alpha', 'Bleu')
+          name: `Marquer Alpha en Bleu`
         })
         .getAttribute('aria-pressed')
     ).toBe('false')
@@ -187,7 +197,7 @@ describe('la couleur, dans la modale', () => {
     expect(
       screen
         .getByRole('button', {
-          name: strings.characters.noColorLabel('Alpha')
+          name: 'Retirer la couleur de Alpha'
         })
         .getAttribute('aria-pressed')
     ).toBe('true')
@@ -198,11 +208,7 @@ describe('la couleur, dans la modale', () => {
       roster: [characterOf({ nickname: 'Bravo', color: 'sky' })]
     })
     const taken = screen.getByRole('button', {
-      name: strings.characters.colorTakenLabel({
-        nickname: 'Alpha',
-        label: 'Ciel',
-        holder: 'Bravo'
-      })
+      name: 'Marquer Alpha en Ciel, déjà pris par Bravo'
     })
 
     fireEvent.click(taken)
@@ -218,7 +224,7 @@ describe('la couleur, dans la modale', () => {
 
     expect(
       screen.getByRole('button', {
-        name: strings.characters.colorLabel('Alpha', 'Ciel')
+        name: `Marquer Alpha en Ciel`
       })
     ).not.toBeNull()
     expect(readout()).toBe('Ciel')
@@ -235,7 +241,7 @@ describe('la couleur, ce que la modale en dit', () => {
   it('dit qu’il n’y a aucune couleur quand il n’y en a pas', async () => {
     await open()
 
-    expect(readout()).toBe(strings.characters.colorNone)
+    expect(readout()).toBe('Aucune couleur')
   })
 
   it('nomme la couleur survolée, puis rend la parole à celle du personnage', async () => {
@@ -269,15 +275,11 @@ describe('la couleur, ce que la modale en dit', () => {
 
     fireEvent.pointerEnter(
       screen.getByRole('button', {
-        name: strings.characters.colorTakenLabel({
-          nickname: 'Alpha',
-          label: 'Ciel',
-          holder: 'Bravo'
-        })
+        name: 'Marquer Alpha en Ciel, déjà pris par Bravo'
       })
     )
 
-    expect(readout()).toBe(`Ciel · ${strings.characters.colorTakenBy('Bravo')}`)
+    expect(readout()).toBe(`Ciel · déjà pris par Bravo`)
   })
 
   it('allume la pastille du personnage, et elle seule', async () => {
@@ -292,7 +294,7 @@ describe('la couleur, ce que la modale en dit', () => {
   it('allume le retrait quand le personnage n’a pas de couleur', async () => {
     await open()
     const none = screen.getByRole('button', {
-      name: strings.characters.noColorLabel('Alpha')
+      name: 'Retirer la couleur de Alpha'
     })
 
     expect(swatchOf(none)?.hasAttribute('data-worn')).toBe(true)
@@ -319,11 +321,7 @@ describe('la couleur, ce que la modale en dit', () => {
   it('creuse la pastille qu’un autre porte déjà', async () => {
     await open({ roster: [characterOf({ nickname: 'Bravo', color: 'sky' })] })
     const taken = screen.getByRole('button', {
-      name: strings.characters.colorTakenLabel({
-        nickname: 'Alpha',
-        label: 'Ciel',
-        holder: 'Bravo'
-      })
+      name: 'Marquer Alpha en Ciel, déjà pris par Bravo'
     })
 
     expect(swatchOf(taken)?.hasAttribute('data-taken')).toBe(true)
@@ -351,11 +349,11 @@ describe('la couleur, ce que la modale en dit', () => {
 
     fireEvent.pointerEnter(
       screen.getByRole('button', {
-        name: strings.characters.noColorLabel('Alpha')
+        name: 'Retirer la couleur de Alpha'
       })
     )
 
-    expect(readout()).toBe(strings.characters.colorNone)
+    expect(readout()).toBe('Aucune couleur')
   })
 })
 
@@ -363,23 +361,21 @@ describe('la modale de classe, à l’ouverture', () => {
   it('offre le sexe, les douze classes et le retrait de la classe', async () => {
     await open()
 
-    for (const label of Object.values(strings.characters.classes)) {
+    for (const label of Object.values(CLASS_LABELS).map((each) => {
+      return i18n._(each)
+    })) {
       expect(
         screen.getByRole('button', {
-          name: strings.characters.classLabel('Alpha', label)
+          name: `Marquer Alpha comme ${label}`
         })
       ).not.toBeNull()
     }
 
-    expect(
-      screen.getByRole('button', { name: strings.characters.genders.male })
-    ).not.toBeNull()
-    expect(
-      screen.getByRole('button', { name: strings.characters.genders.female })
-    ).not.toBeNull()
+    expect(screen.getByRole('button', { name: 'Homme' })).not.toBeNull()
+    expect(screen.getByRole('button', { name: 'Femme' })).not.toBeNull()
     expect(
       screen.getByRole('button', {
-        name: strings.characters.noClassLabel('Alpha')
+        name: 'Retirer la classe de Alpha'
       })
     ).not.toBeNull()
   })
@@ -396,7 +392,7 @@ describe('la modale de classe, quand le sexe est déjà connu', () => {
   it('pose la classe et s’en va, sans rien demander de plus', async () => {
     const handlers = await open({ character: known })
 
-    pickClass(strings.characters.classes.cra)
+    pickClass('Crâ')
 
     expect(handlers.handleSetClass).toHaveBeenCalledWith('cra')
     expect(handlers.handleSetPortrait).not.toHaveBeenCalled()
@@ -407,14 +403,10 @@ describe('la modale de classe, quand le sexe est déjà connu', () => {
     await open({ character: known })
 
     expect(
-      screen
-        .getByRole('button', { name: strings.characters.genders.female })
-        .getAttribute('aria-pressed')
+      screen.getByRole('button', { name: 'Femme' }).getAttribute('aria-pressed')
     ).toBe('true')
     expect(
-      screen
-        .getByRole('button', { name: strings.characters.genders.male })
-        .getAttribute('aria-pressed')
+      screen.getByRole('button', { name: 'Homme' }).getAttribute('aria-pressed')
     ).toBe('false')
   })
 
@@ -424,10 +416,7 @@ describe('la modale de classe, quand le sexe est déjà connu', () => {
     expect(
       screen
         .getByRole('button', {
-          name: strings.characters.classLabel(
-            'Alpha',
-            strings.characters.classes.iop
-          )
+          name: `Marquer Alpha comme Iop`
         })
         .getAttribute('aria-pressed')
     ).toBe('true')
@@ -436,19 +425,15 @@ describe('la modale de classe, quand le sexe est déjà connu', () => {
   it('dessine les vignettes au sexe du personnage', async () => {
     await open({ character: known })
 
-    expect(
-      portraitOf(
-        strings.characters.classLabel('Alpha', strings.characters.classes.cra)
-      )
-    ).toBe(CLASS_PORTRAITS.cra.female)
+    expect(portraitOf(`Marquer Alpha comme Crâ`)).toBe(
+      CLASS_PORTRAITS.cra.female
+    )
   })
 
   it('change le sexe sans refermer, la classe reste à choisir', async () => {
     const handlers = await open({ character: known })
 
-    fireEvent.click(
-      screen.getByRole('button', { name: strings.characters.genders.male })
-    )
+    fireEvent.click(screen.getByRole('button', { name: 'Homme' }))
 
     expect(handlers.handleSetGender).toHaveBeenCalledWith('male')
     expect(screen.getByRole('dialog')).not.toBeNull()
@@ -457,9 +442,7 @@ describe('la modale de classe, quand le sexe est déjà connu', () => {
   it('retire le sexe quand on reclique sur celui du personnage', async () => {
     const handlers = await open({ character: known })
 
-    fireEvent.click(
-      screen.getByRole('button', { name: strings.characters.genders.female })
-    )
+    fireEvent.click(screen.getByRole('button', { name: 'Femme' }))
 
     expect(handlers.handleSetGender).toHaveBeenCalledWith(null)
   })
@@ -469,50 +452,29 @@ describe('la modale de classe, quand le sexe manque encore', () => {
   it('demande homme ou femme avant de poser la classe', async () => {
     const handlers = await open()
 
-    pickClass(strings.characters.classes.iop)
+    pickClass('Iop')
 
     expect(handlers.handleSetClass).not.toHaveBeenCalled()
     expect(handlers.handleSetPortrait).not.toHaveBeenCalled()
-    expect(
-      screen.getByText(
-        strings.characters.dialogWhich(strings.characters.classes.iop)
-      )
-    ).not.toBeNull()
+    expect(screen.getByText('Iop : homme ou femme ?')).not.toBeNull()
   })
 
   it('montre les deux portraits de la classe demandée', async () => {
     await open()
 
-    pickClass(strings.characters.classes.iop)
+    pickClass('Iop')
 
-    expect(
-      portraitOf(
-        strings.characters.classGenderLabel(
-          strings.characters.classes.iop,
-          'male'
-        )
-      )
-    ).toBe(CLASS_PORTRAITS.iop.male)
-    expect(
-      portraitOf(
-        strings.characters.classGenderLabel(
-          strings.characters.classes.iop,
-          'female'
-        )
-      )
-    ).toBe(CLASS_PORTRAITS.iop.female)
+    expect(portraitOf('Iop homme')).toBe(CLASS_PORTRAITS.iop.male)
+    expect(portraitOf('Iop femme')).toBe(CLASS_PORTRAITS.iop.female)
   })
 
   it('pose la classe et le sexe d’un seul geste, et s’en va', async () => {
     const handlers = await open()
 
-    pickClass(strings.characters.classes.iop)
+    pickClass('Iop')
     fireEvent.click(
       screen.getByRole('button', {
-        name: strings.characters.classGenderLabel(
-          strings.characters.classes.iop,
-          'female'
-        )
+        name: 'Iop femme'
       })
     )
 
@@ -527,14 +489,11 @@ describe('la modale de classe, quand le sexe manque encore', () => {
   it('range les douze classes hors de vue le temps de la question', async () => {
     await open()
 
-    pickClass(strings.characters.classes.iop)
+    pickClass('Iop')
 
     expect(
       screen.queryByRole('button', {
-        name: strings.characters.classLabel(
-          'Alpha',
-          strings.characters.classes.cra
-        )
+        name: `Marquer Alpha comme Crâ`
       })
     ).toBeNull()
   })
@@ -542,19 +501,14 @@ describe('la modale de classe, quand le sexe manque encore', () => {
   it('revient aux classes sans rien avoir posé', async () => {
     const handlers = await open()
 
-    pickClass(strings.characters.classes.iop)
-    fireEvent.click(
-      screen.getByRole('button', { name: strings.characters.dialogBack })
-    )
+    pickClass('Iop')
+    fireEvent.click(screen.getByRole('button', { name: 'Changer de classe' }))
 
     expect(handlers.handleSetPortrait).not.toHaveBeenCalled()
     expect(handlers.handleSetClass).not.toHaveBeenCalled()
     expect(
       screen.getByRole('button', {
-        name: strings.characters.classLabel(
-          'Alpha',
-          strings.characters.classes.cra
-        )
+        name: `Marquer Alpha comme Crâ`
       })
     ).not.toBeNull()
   })
@@ -562,11 +516,7 @@ describe('la modale de classe, quand le sexe manque encore', () => {
   it('dessine les vignettes en homme, faute de réponse', async () => {
     await open()
 
-    expect(
-      portraitOf(
-        strings.characters.classLabel('Alpha', strings.characters.classes.cra)
-      )
-    ).toBe(CLASS_PORTRAITS.cra.male)
+    expect(portraitOf(`Marquer Alpha comme Crâ`)).toBe(CLASS_PORTRAITS.cra.male)
   })
 
   it('retire la classe sans demander le sexe', async () => {
@@ -574,7 +524,7 @@ describe('la modale de classe, quand le sexe manque encore', () => {
 
     fireEvent.click(
       screen.getByRole('button', {
-        name: strings.characters.noClassLabel('Alpha')
+        name: 'Retirer la classe de Alpha'
       })
     )
 
@@ -585,9 +535,7 @@ describe('la modale de classe, quand le sexe manque encore', () => {
   it('pose le sexe seul, et laisse la modale ouverte pour la classe', async () => {
     const handlers = await open()
 
-    fireEvent.click(
-      screen.getByRole('button', { name: strings.characters.genders.male })
-    )
+    fireEvent.click(screen.getByRole('button', { name: 'Homme' }))
 
     expect(handlers.handleSetGender).toHaveBeenCalledWith('male')
     expect(screen.getByRole('dialog')).not.toBeNull()
@@ -600,7 +548,7 @@ describe('la modale de classe, quand on referme sans répondre', () => {
 
     fireEvent.click(
       screen.getByRole('button', {
-        name: strings.characters.dialogClose
+        name: 'Fermer sans rien changer'
       })
     )
 
@@ -613,10 +561,10 @@ describe('la modale de classe, quand on referme sans répondre', () => {
   it('oublie la question posée, et rouvre sur les classes', async () => {
     await open()
 
-    pickClass(strings.characters.classes.iop)
+    pickClass('Iop')
     fireEvent.click(
       screen.getByRole('button', {
-        name: strings.characters.dialogClose
+        name: 'Fermer sans rien changer'
       })
     )
     await closed()
@@ -625,17 +573,10 @@ describe('la modale de classe, quand on referme sans répondre', () => {
 
     expect(
       screen.getByRole('button', {
-        name: strings.characters.classLabel(
-          'Alpha',
-          strings.characters.classes.cra
-        )
+        name: `Marquer Alpha comme Crâ`
       })
     ).not.toBeNull()
-    expect(
-      screen.queryByText(
-        strings.characters.dialogWhich(strings.characters.classes.iop)
-      )
-    ).toBeNull()
+    expect(screen.queryByText('Iop : homme ou femme ?')).toBeNull()
   })
 })
 
@@ -644,7 +585,9 @@ describe('la modale de classe, ce qu’elle prévient', () => {
     await open({ agent: APPLE_AGENT })
 
     expect(
-      screen.getByText(strings.characters.dialogWindowKeepsIcon)
+      screen.getByText(
+        'Sur macOS, la tête reste ici : le client garde son logo Dofus.'
+      )
     ).not.toBeNull()
   })
 
@@ -652,16 +595,24 @@ describe('la modale de classe, ce qu’elle prévient', () => {
     await open({ agent: WINDOWS_AGENT, paintPortraits: false })
 
     expect(
-      screen.getByText(strings.characters.dialogPortraitOff)
+      screen.getByText(
+        'La tête de classe est coupée dans les Paramètres : le client garde son logo Dofus.'
+      )
     ).not.toBeNull()
   })
 
   it('ne prévient de rien quand la tête va bien se poser', async () => {
     await open({ agent: WINDOWS_AGENT, paintPortraits: true })
 
-    expect(screen.queryByText(strings.characters.dialogPortraitOff)).toBeNull()
     expect(
-      screen.queryByText(strings.characters.dialogWindowKeepsIcon)
+      screen.queryByText(
+        'La tête de classe est coupée dans les Paramètres : le client garde son logo Dofus.'
+      )
+    ).toBeNull()
+    expect(
+      screen.queryByText(
+        'Sur macOS, la tête reste ici : le client garde son logo Dofus.'
+      )
     ).toBeNull()
   })
 })

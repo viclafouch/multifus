@@ -1,7 +1,9 @@
-const WEIGHT_FORMAT = new Intl.NumberFormat('fr-FR', {
-  maximumFractionDigits: 2
-})
+import { i18n } from '@lingui/core'
+
+const WEIGHT_DECIMALS = 2
 
 export const runeWeight = (weight: number) => {
-  return WEIGHT_FORMAT.format(weight)
+  return new Intl.NumberFormat(i18n.locale, {
+    maximumFractionDigits: WEIGHT_DECIMALS
+  }).format(weight)
 }

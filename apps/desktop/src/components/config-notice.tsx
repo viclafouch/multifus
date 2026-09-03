@@ -1,8 +1,8 @@
 import { FolderOpen, TriangleAlert } from 'lucide-react'
+import { t } from '@lingui/core/macro'
 import type { ConfigProblem } from '@/@types/system'
 import { Button } from '@/components/ui/button'
-import { strings } from '@/constants/strings'
-import { CONFIG_PROBLEM_LINES } from '@/helpers/wording'
+import { configProblemLines } from '@/helpers/wording'
 
 type ConfigNoticeProps = Readonly<{
   problem: ConfigProblem
@@ -17,7 +17,7 @@ export const ConfigNotice = ({
   onReveal,
   onDismiss
 }: ConfigNoticeProps) => {
-  const { title, body } = CONFIG_PROBLEM_LINES[problem.kind]
+  const { title, body } = configProblemLines(problem.kind)
 
   return (
     <div className="flex items-start gap-3 border-b border-destructive/25 bg-destructive/8 px-7 py-3">
@@ -39,11 +39,11 @@ export const ConfigNotice = ({
         {quarantined === null ? null : (
           <Button variant="outline" size="xs" onClick={onReveal}>
             <FolderOpen aria-hidden />
-            {strings.config.reveal}
+            {t`Montrer le fichier`}
           </Button>
         )}
         <Button variant="ghost" size="xs" onClick={onDismiss}>
-          {strings.config.dismiss}
+          {t`J’ai compris`}
         </Button>
       </div>
     </div>

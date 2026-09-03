@@ -1,10 +1,10 @@
+import { t } from '@lingui/core/macro'
 import type { Display } from '@/@types/display'
 import type { BannerCorner } from '@/@types/walk'
 import { Legend } from '@/components/layout/legend'
 import { ScreenFrame } from '@/components/layout/screen-frame'
 import { Button } from '@/components/ui/button'
 import { CORNER_PLACEMENT, CORNERS } from '@/constants/banner'
-import { strings } from '@/constants/strings'
 import { monitorShape } from '@/helpers/banner'
 import { cn } from '@/lib/utils'
 
@@ -15,15 +15,17 @@ type CornerPickerProps = Readonly<{
 }>
 
 export const CornerPicker = ({ corner, screen, onPick }: CornerPickerProps) => {
+  const cornerLegend = t`Le coin`
+
   const shape = monitorShape(screen)
 
   return (
     <div className="flex flex-col gap-2">
-      <Legend>{strings.walk.banner.cornerLegend}</Legend>
+      <Legend>{cornerLegend}</Legend>
       <ScreenFrame
         ratio={shape.ratio}
         width={shape.drawnWidth}
-        label={strings.walk.banner.cornerLegend}
+        label={cornerLegend}
         className="grid grid-cols-2 grid-rows-2 gap-1 p-1.5"
       >
         {CORNERS.map((each) => {
@@ -32,7 +34,7 @@ export const CornerPicker = ({ corner, screen, onPick }: CornerPickerProps) => {
               key={each}
               variant="ghost"
               aria-pressed={each === corner}
-              aria-label={strings.walk.banner.corners[each]}
+              aria-label={cornerLabel(each)}
               className={cn(
                 'group h-auto rounded-sm p-1.5 aria-pressed:bg-primary/6',
                 CORNER_PLACEMENT[each].anchor
@@ -51,6 +53,26 @@ export const CornerPicker = ({ corner, screen, onPick }: CornerPickerProps) => {
       </ScreenFrame>
     </div>
   )
+}
+
+const cornerLabel = (corner: BannerCorner) => {
+  switch (corner) {
+    case 'topLeft': {
+      return t`En haut à gauche`
+    }
+    case 'topRight': {
+      return t`En haut à droite`
+    }
+    case 'bottomLeft': {
+      return t`En bas à gauche`
+    }
+    case 'bottomRight': {
+      return t`En bas à droite`
+    }
+    default: {
+      return corner satisfies never
+    }
+  }
 }
 
 type MiniBannerProps = Readonly<{

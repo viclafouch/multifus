@@ -1,7 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import type { QuickReply } from '@/@types/shortcuts'
-import { strings } from '@/constants/strings'
 import { quickReplyEditLabel } from '@/helpers/wording'
 import { keyCapsOf, pending, quickReplyOf, strike } from '@/test-doubles'
 
@@ -20,7 +19,18 @@ vi.mock(import('@/lib/multifus'), () => {
 
 const { QuickRepliesScreen } = await import('@/screens/quick-replies')
 
-const words = strings.quickReplies
+const words = {
+  add: 'Ajouter une réponse',
+  example: 'Bon jeu à toi !',
+  textLabel: 'Texte de la réponse',
+  remove: 'Retirer cette réponse',
+  blank: 'Sans texte, il n’y aura rien à coller.',
+  emptyTitle: 'Aucune réponse rangée',
+  emptyBody:
+    'Une réponse, des touches, et vous ne la retapez plus de la soirée.',
+  clipboard:
+    'Multifus colle, c’est vous qui appuyez sur Entrée. Le temps du collage, il emprunte votre presse-papiers, puis vous le rend.'
+}
 
 const show = (quickReplies: readonly QuickReply[] = []) => {
   render(<QuickRepliesScreen quickReplies={quickReplies} run={() => {}} />)
@@ -94,12 +104,12 @@ describe('l’écran des réponses rapides, la liste', () => {
 
     expect(
       screen.getByRole('button', {
-        name: words.editNamed(1, 'Je vends, mp moi')
+        name: 'Modifier les touches de la réponse 1, « Je vends, mp moi »'
       })
     ).not.toBeNull()
     expect(
       screen.getByRole('button', {
-        name: words.editNamed(2, 'En combat, j’arrive')
+        name: 'Modifier les touches de la réponse 2, « En combat, j’arrive »'
       })
     ).not.toBeNull()
   })
@@ -224,16 +234,18 @@ describe('l’écran des réponses rapides, les touches', () => {
     fireEvent.click(fieldOf(first))
     fireEvent.click(fieldOf(second, 2))
 
-    expect(screen.getAllByText(strings.shortcuts.capture)).toHaveLength(1)
+    expect(screen.getAllByText('Appuyez sur vos touches')).toHaveLength(1)
     expect(
-      within(fieldOf(second, 2)).getByText(strings.shortcuts.capture)
+      within(fieldOf(second, 2)).getByText('Appuyez sur vos touches')
     ).not.toBeNull()
   })
 
   it('dit que rien ne se passera sans touches', () => {
     show([quickReplyOf({ id: 1 })])
 
-    expect(screen.getByText(strings.shortcuts.status.unbound)).not.toBeNull()
+    expect(
+      screen.getByText('Sans touches, il ne se passera rien.')
+    ).not.toBeNull()
   })
 
   it('nomme l’action qui tient déjà les mêmes touches', () => {
@@ -249,9 +261,7 @@ describe('l’écran des réponses rapides, les touches', () => {
     ])
 
     expect(screen.getByRole('alert').textContent).toBe(
-      strings.shortcuts.status.duplicate(
-        `« ${strings.shortcuts.actions.next.label} »`
-      )
+      'Déjà pris par « Fenêtre suivante ».'
     )
   })
 
@@ -263,8 +273,8 @@ describe('l’écran des réponses rapides, les touches', () => {
     fireEvent.click(fieldOf(bound))
     strike(fieldOf(bound), { code: 'KeyC', ctrlKey: true })
 
-    expect(screen.queryByText(strings.shortcuts.undo)).toBeNull()
-    expect(screen.queryByText(strings.shortcuts.undoNone)).toBeNull()
+    expect(screen.queryByText('Remettre')).toBeNull()
+    expect(screen.queryByText('Remettre : aucune touche')).toBeNull()
   })
 
   it('rappelle que le presse-papiers n’est qu’emprunté', () => {

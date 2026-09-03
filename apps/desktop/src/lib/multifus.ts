@@ -2,6 +2,7 @@ import { invoke } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event'
 import type { AboutLink } from '@/@types/about'
 import type { Display } from '@/@types/display'
+import type { Language } from '@/@types/language'
 import type { NotificationKind } from '@/@types/notification'
 import type { RelayLink } from '@/@types/relay'
 import type { Class, Color, Gender } from '@/@types/roster'
@@ -32,6 +33,14 @@ type NavigateEvent = { readonly payload: ScreenName }
 
 export const snapshot = async () => {
   return invoke<Snapshot>('snapshot')
+}
+
+export const language = async () => {
+  return invoke<Language>('language')
+}
+
+export const setLanguage = async (asked: Language) => {
+  return invoke<null>('set_language', { language: asked })
 }
 
 export const requestAuthorization = async () => {

@@ -3,8 +3,13 @@ import { act, fireEvent, render, screen } from '@testing-library/react'
 import type { Display } from '@/@types/display'
 import type { ShortcutBinding } from '@/@types/shortcuts'
 import type { BannerPlace } from '@/@types/walk'
-import { strings } from '@/constants/strings'
-import { APPLE_AGENT, displayOf, pending, WINDOWS_AGENT } from '@/test-doubles'
+import {
+  APPLE_AGENT,
+  WINDOWS_AGENT,
+  displayOf,
+  pending,
+  speakFrench
+} from '@/test-doubles'
 
 const bridge = {
   setWalkEnabled: vi.fn(pending),
@@ -58,6 +63,8 @@ const renderScreen = async ({
   vi.resetModules()
   vi.stubGlobal('navigator', { userAgent: agent })
 
+  await speakFrench()
+
   const { WalkScreen } = await import('@/screens/walk-screen')
 
   render(
@@ -87,13 +94,20 @@ const keyCaps = () => {
   })
 }
 
+const CORNER_LABELS = [
+  'En haut à gauche',
+  'En haut à droite',
+  'En bas à gauche',
+  'En bas à droite'
+]
+
 const cornerNamed = (label: string) => {
   return screen.getByRole('button', { name: label })
 }
 
 const chipNamed = (rank: number) => {
   return screen.getByRole('button', {
-    name: new RegExp(`^${strings.walk.banner.screenName(rank)}`, 'u')
+    name: new RegExp(`^Écran ${rank}`, 'u')
   })
 }
 
@@ -101,9 +115,7 @@ describe('l’écran du Déplacement rapide', () => {
   it('l’allume quand on bouge l’interrupteur', async () => {
     await show({ enabled: false })
 
-    fireEvent.click(
-      screen.getByRole('switch', { name: strings.walk.switchLabel })
-    )
+    fireEvent.click(screen.getByRole('switch', { name: 'Déplacement rapide' }))
 
     expect(bridge.setWalkEnabled).toHaveBeenCalledWith(true)
   })
@@ -111,9 +123,7 @@ describe('l’écran du Déplacement rapide', () => {
   it('l’éteint quand on rebouge l’interrupteur', async () => {
     await show({ enabled: true })
 
-    fireEvent.click(
-      screen.getByRole('switch', { name: strings.walk.switchLabel })
-    )
+    fireEvent.click(screen.getByRole('switch', { name: 'Déplacement rapide' }))
 
     expect(bridge.setWalkEnabled).toHaveBeenCalledWith(false)
   })
@@ -121,17 +131,23 @@ describe('l’écran du Déplacement rapide', () => {
   it('dit qu’il est allumé, et ce que valent les clics', async () => {
     await show({ enabled: true })
 
-    expect(screen.getByText(strings.walk.state.on.badge)).not.toBeNull()
-    expect(screen.getByText(strings.walk.state.on.body)).not.toBeNull()
-    expect(screen.queryByText(strings.walk.state.off.badge)).toBeNull()
+    expect(screen.getByText('Allumé')).not.toBeNull()
+    expect(
+      screen.getByText(
+        'Cliquez pour déplacer, la fenêtre suivante arrive toute seule.'
+      )
+    ).not.toBeNull()
+    expect(screen.queryByText('Éteint')).toBeNull()
   })
 
   it('dit qu’il est éteint, et ce que valent les clics', async () => {
     await show({ enabled: false })
 
-    expect(screen.getByText(strings.walk.state.off.badge)).not.toBeNull()
-    expect(screen.getByText(strings.walk.state.off.body)).not.toBeNull()
-    expect(screen.queryByText(strings.walk.state.on.badge)).toBeNull()
+    expect(screen.getByText('Éteint')).not.toBeNull()
+    expect(
+      screen.getByText('Vos clics vont au jeu, et à rien d’autre.')
+    ).not.toBeNull()
+    expect(screen.queryByText('Allumé')).toBeNull()
   })
 
   describe('le rappel du raccourci', () => {
@@ -144,7 +160,7 @@ describe('l’écran du Déplacement rapide', () => {
     it('dit qu’il n’y en a aucune tant que rien n’est posé', async () => {
       await show({ shortcuts: [walkShortcut(null)] })
 
-      expect(screen.getByText(strings.shortcuts.empty)).not.toBeNull()
+      expect(screen.getByText('Aucune')).not.toBeNull()
       expect(keyCaps()).toStrictEqual([])
     })
 
@@ -160,7 +176,7 @@ describe('l’écran du Déplacement rapide', () => {
         ]
       })
 
-      expect(screen.getByText(strings.shortcuts.empty)).not.toBeNull()
+      expect(screen.getByText('Aucune')).not.toBeNull()
     })
   })
 
@@ -168,13 +184,21 @@ describe('l’écran du Déplacement rapide', () => {
     it('dit de garder les clients en fenêtre agrandie, sur un Mac', async () => {
       await show({ agent: APPLE_AGENT })
 
-      expect(screen.getByText(strings.maximize.note)).not.toBeNull()
+      expect(
+        screen.getByText(
+          'Sur Mac, Multifus tourne mieux sans plein écran : gardez tous vos clients Dofus Retro sur le même bureau, en fenêtre agrandie.'
+        )
+      ).not.toBeNull()
     })
 
     it('ne dit rien sur Windows', async () => {
       await show({ agent: WINDOWS_AGENT })
 
-      expect(screen.queryByText(strings.maximize.note)).toBeNull()
+      expect(
+        screen.queryByText(
+          'Sur Mac, Multifus tourne mieux sans plein écran : gardez tous vos clients Dofus Retro sur le même bureau, en fenêtre agrandie.'
+        )
+      ).toBeNull()
     })
   })
 
@@ -186,7 +210,7 @@ describe('l’écran du Déplacement rapide', () => {
       })
 
       const monitor = screen.getByRole('group', {
-        name: strings.walk.banner.cornerLegend
+        name: 'Le coin'
       })
 
       expect(monitor.style.aspectRatio).toBe(`${3440 / 1440} / 1`)
@@ -195,7 +219,7 @@ describe('l’écran du Déplacement rapide', () => {
     it('offre les quatre coins', async () => {
       await show()
 
-      for (const label of Object.values(strings.walk.banner.corners)) {
+      for (const label of CORNER_LABELS) {
         expect(cornerNamed(label)).not.toBeNull()
       }
     })
@@ -203,22 +227,18 @@ describe('l’écran du Déplacement rapide', () => {
     it('montre le coin en cours comme choisi, et lui seul', async () => {
       await show({ banner: { corner: 'topLeft', screen: null } })
 
-      expect(
-        cornerNamed(strings.walk.banner.corners.topLeft).getAttribute(
-          'aria-pressed'
-        )
-      ).toBe('true')
-      expect(
-        cornerNamed(strings.walk.banner.corners.bottomRight).getAttribute(
-          'aria-pressed'
-        )
-      ).toBe('false')
+      expect(cornerNamed('En haut à gauche').getAttribute('aria-pressed')).toBe(
+        'true'
+      )
+      expect(cornerNamed('En bas à droite').getAttribute('aria-pressed')).toBe(
+        'false'
+      )
     })
 
     it('pose la bannière dans le coin désigné', async () => {
       await show({ banner: { corner: 'bottomRight', screen: null } })
 
-      fireEvent.click(cornerNamed(strings.walk.banner.corners.topRight))
+      fireEvent.click(cornerNamed('En haut à droite'))
 
       expect(bridge.setBannerCorner).toHaveBeenCalledWith('topRight')
     })
@@ -228,7 +248,7 @@ describe('l’écran du Déplacement rapide', () => {
     it('ne demande rien tant qu’il n’y a qu’un écran', async () => {
       await show({ screens: [LAPTOP] })
 
-      expect(screen.queryByText(strings.walk.banner.screenLegend)).toBeNull()
+      expect(screen.queryByText('L’écran')).toBeNull()
     })
 
     it('ne demande rien tant que le système n’a pas répondu', async () => {
@@ -236,20 +256,20 @@ describe('l’écran du Déplacement rapide', () => {
 
       await renderScreen({ banner: { corner: 'topLeft', screen: null } })
 
-      expect(screen.queryByText(strings.walk.banner.screenLegend)).toBeNull()
-      expect(cornerNamed(strings.walk.banner.corners.topLeft)).not.toBeNull()
+      expect(screen.queryByText('L’écran')).toBeNull()
+      expect(cornerNamed('En haut à gauche')).not.toBeNull()
     })
 
     it('ne demande rien quand le système ne rend aucun écran', async () => {
       await show({ screens: [] })
 
-      expect(screen.queryByText(strings.walk.banner.screenLegend)).toBeNull()
+      expect(screen.queryByText('L’écran')).toBeNull()
     })
 
     it('offre une pastille par écran dès qu’il y en a deux', async () => {
       await show({ screens: [LAPTOP, TELEVISION] })
 
-      expect(screen.getByText(strings.walk.banner.screenLegend)).not.toBeNull()
+      expect(screen.getByText('L’écran')).not.toBeNull()
       expect(chipNamed(1)).not.toBeNull()
       expect(chipNamed(2)).not.toBeNull()
     })
@@ -257,12 +277,8 @@ describe('l’écran du Déplacement rapide', () => {
     it('dit la taille de chaque écran, et lequel est le principal', async () => {
       await show({ screens: [LAPTOP, TELEVISION] })
 
-      expect(
-        screen.getByText(strings.walk.banner.screenSize(3840, 2160))
-      ).not.toBeNull()
-      expect(
-        screen.getAllByText(strings.walk.banner.screenPrimary)
-      ).toHaveLength(1)
+      expect(screen.getByText('3840 × 2160')).not.toBeNull()
+      expect(screen.getAllByText('principal')).toHaveLength(1)
     })
 
     it('pose la bannière sur l’écran désigné', async () => {

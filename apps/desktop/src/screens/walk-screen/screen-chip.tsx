@@ -1,6 +1,6 @@
+import { t } from '@lingui/core/macro'
 import type { Display } from '@/@types/display'
 import { Button } from '@/components/ui/button'
-import { strings } from '@/constants/strings'
 
 type ScreenChipProps = Readonly<{
   screen: Display
@@ -23,15 +23,15 @@ export const ScreenChip = ({
       className="h-auto flex-col items-start gap-0.5 rounded-lg border border-border px-3 py-2 aria-pressed:border-primary/45 aria-pressed:bg-primary/8"
     >
       <span className="text-note font-medium">
-        {strings.walk.banner.screenName(rank)}
+        {t`Écran ${rank}`}
         {screen.primary ? (
           <span className="pl-1.5 text-micro text-muted-foreground">
-            {strings.walk.banner.screenPrimary}
+            {t`principal`}
           </span>
         ) : null}
       </span>
       <span className="font-mono text-micro text-muted-foreground">
-        {strings.walk.banner.screenSize(screen.width, screen.height)}
+        {`${screen.width} × ${screen.height}`}
       </span>
     </Button>
   )

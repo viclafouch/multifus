@@ -1,7 +1,13 @@
 import { TriangleAlert } from 'lucide-react'
+import { t } from '@lingui/core/macro'
 import { Panel } from '@/components/layout/panel'
-import { strings } from '@/constants/strings'
 import { screenSaverDelay } from '@/helpers/format'
+
+const screenSaverLine = (seconds: number) => {
+  const delay = screenSaverDelay(seconds)
+
+  return t`Multifus garde l’écran allumé, mais votre écran de veille démarre après ${delay} et verrouille l’ordinateur. Multifus n’entend plus le jeu, et vous ne recevez plus rien. Réglez-le sur Jamais.`
+}
 
 type ScreenSaverWarningProps = Readonly<{
   seconds: number
@@ -18,10 +24,10 @@ export const ScreenSaverWarning = ({ seconds }: ScreenSaverWarningProps) => {
         />
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           <h2 className="text-row font-medium">
-            {strings.relay.screenSaverTitle}
+            {t`Votre écran de veille peut tout arrêter`}
           </h2>
           <p className="max-w-prose text-note text-muted-foreground">
-            {strings.relay.screenSaverBody(screenSaverDelay(seconds))}
+            {screenSaverLine(seconds)}
           </p>
         </div>
       </div>

@@ -41,6 +41,7 @@ use crate::app::view::Screen;
 use crate::app::view::Snapshot;
 use crate::app::walk;
 use crate::app::wheel;
+use crate::config::Language;
 use crate::domain::Color;
 use crate::domain::GameNotification;
 use crate::platform::NotificationReport;
@@ -782,6 +783,24 @@ pub fn request_authorization(app: &AppHandle) {
 
 pub fn navigate(app: &AppHandle, screen: Screen) {
     drop(app.emit(NAVIGATE_EVENT, screen));
+}
+
+pub fn change_language(app: &AppHandle, language: Language) {
+    if lock(app).language() == language {
+        return;
+    }
+
+    lock(app).set_language(language);
+
+    tray::refresh(app);
+
+    for window in app.webview_windows().values() {
+        if let Err(error) = window.reload() {
+            lock(app).log_unless_repeated(JournalEvent::WindowFailed {
+                detail: error.to_string(),
+            });
+        }
+    }
 }
 
 pub fn open_authorization_settings(app: &AppHandle) {

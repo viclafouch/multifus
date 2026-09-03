@@ -134,6 +134,18 @@ const CALLS = [
     }
   },
   {
+    name: 'language',
+    run: () => {
+      return multifus.language()
+    }
+  },
+  {
+    name: 'setLanguage',
+    run: () => {
+      return multifus.setLanguage('en')
+    }
+  },
+  {
     name: 'requestAuthorization',
     run: () => {
       return multifus.requestAuthorization()

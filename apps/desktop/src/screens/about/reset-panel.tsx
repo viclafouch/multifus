@@ -1,5 +1,6 @@
 import React from 'react'
 import { RotateCcw } from 'lucide-react'
+import { t } from '@lingui/core/macro'
 import type { Snapshot } from '@/@types/snapshot'
 import { Panel } from '@/components/layout/panel'
 import { SectionRow } from '@/components/layout/section-row'
@@ -14,7 +15,6 @@ import {
   AlertDialogTitle
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
-import { strings } from '@/constants/strings'
 import { reset } from '@/lib/multifus'
 
 type ResetPanelProps = Readonly<{
@@ -22,12 +22,14 @@ type ResetPanelProps = Readonly<{
 }>
 
 export const ResetPanel = ({ run }: ResetPanelProps) => {
-  const words = strings.about
   const [isConfirming, setIsConfirming] = React.useState(false)
 
   return (
     <Panel className="border-destructive/25 bg-destructive/8">
-      <SectionRow title={words.resetTitle} description={words.resetBody}>
+      <SectionRow
+        title={t`Tout remettre à neuf`}
+        description={t`Multifus repart comme au premier lancement. Vos personnages Dofus Retro ne risquent rien.`}
+      >
         <Button
           variant="destructive"
           size="sm"
@@ -36,26 +38,26 @@ export const ResetPanel = ({ run }: ResetPanelProps) => {
           }}
         >
           <RotateCcw aria-hidden />
-          {words.reset}
+          {t`Tout réinitialiser`}
         </Button>
       </SectionRow>
       <AlertDialog open={isConfirming} onOpenChange={setIsConfirming}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{words.resetConfirmTitle}</AlertDialogTitle>
+            <AlertDialogTitle>{t`Tout remettre à neuf ?`}</AlertDialogTitle>
             <AlertDialogDescription>
-              {words.resetConfirmBody}
+              {t`Réglages, roster et raccourcis repartent d’origine. Vos personnages connectés reviendront dans la seconde, sans sexe ni classe.`}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{words.cancel}</AlertDialogCancel>
+            <AlertDialogCancel>{t`Annuler`}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 setIsConfirming(false)
                 run(reset())
               }}
             >
-              {words.resetConfirm}
+              {t`Réinitialiser`}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

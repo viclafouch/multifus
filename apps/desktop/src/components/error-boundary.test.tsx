@@ -1,7 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { ErrorBoundary } from '@/components/error-boundary'
-import { strings } from '@/constants/strings'
 import { ignore } from '@/lib/utils'
 
 const Broken = () => {
@@ -37,8 +36,8 @@ describe('l’écran qui remplace la fenêtre blanche', () => {
     drawBroken()
 
     expect(screen.getByRole('alert')).not.toBeNull()
-    expect(screen.getByText(strings.crash.title)).not.toBeNull()
-    expect(screen.getByText(strings.crash.body)).not.toBeNull()
+    expect(screen.getByText('L’écran s’est arrêté')).not.toBeNull()
+    expect(screen.getByText(/Multifus, lui, tourne toujours/u)).not.toBeNull()
   })
 
   it('montre le message de l’erreur, celui qu’on recopie dans un rapport', () => {
@@ -51,11 +50,11 @@ describe('l’écran qui remplace la fenêtre blanche', () => {
     drawBroken()
 
     expect(
-      screen.getByRole('button', { name: strings.crash.retry })
+      screen.getByRole('button', { name: 'Recharger l’écran' })
     ).not.toBeNull()
 
     expect(
-      screen.getByRole('button', { name: strings.crash.reveal })
+      screen.getByRole('button', { name: 'Montrer le fichier du journal' })
     ).not.toBeNull()
   })
 })

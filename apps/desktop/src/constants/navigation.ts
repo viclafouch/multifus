@@ -11,28 +11,29 @@ import {
   Users,
   Zap
 } from 'lucide-react'
+import { msg } from '@lingui/core/macro'
 import type { ScreenName } from '@/@types/snapshot'
-import { strings } from '@/constants/strings'
+import type { Phrase } from '@/lib/i18n'
 
 export type NavItem = {
   readonly name: ScreenName
-  readonly label: string
+  readonly label: Phrase
   readonly Icon: LucideIcon
 }
 
 export const NAV_ITEMS = [
-  { name: 'characters', label: strings.nav.characters, Icon: Users },
-  { name: 'shortcuts', label: strings.nav.shortcuts, Icon: Keyboard },
+  { name: 'characters', label: msg`Personnages`, Icon: Users },
+  { name: 'shortcuts', label: msg`Raccourcis`, Icon: Keyboard },
   {
     name: 'quickReplies',
-    label: strings.nav.quickReplies,
+    label: msg`Réponses rapides`,
     Icon: MessageSquareQuote
   },
-  { name: 'autoFocus', label: strings.nav.autoFocus, Icon: Zap },
-  { name: 'walk', label: strings.nav.walk, Icon: Footprints },
-  { name: 'wheel', label: strings.nav.wheel, Icon: Target },
-  { name: 'runeTable', label: strings.nav.runeTable, Icon: Gem },
-  { name: 'relay', label: strings.nav.relay, Icon: Send },
-  { name: 'settings', label: strings.nav.settings, Icon: SlidersHorizontal },
-  { name: 'about', label: strings.nav.about, Icon: Info }
+  { name: 'autoFocus', label: msg`AutoFocus`, Icon: Zap },
+  { name: 'walk', label: msg`Déplacement rapide`, Icon: Footprints },
+  { name: 'wheel', label: msg`Roue des personnages`, Icon: Target },
+  { name: 'runeTable', label: msg`Tableau des runes`, Icon: Gem },
+  { name: 'relay', label: msg`Messages privés`, Icon: Send },
+  { name: 'settings', label: msg`Paramètres`, Icon: SlidersHorizontal },
+  { name: 'about', label: msg`À propos`, Icon: Info }
 ] as const satisfies readonly NavItem[]

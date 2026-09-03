@@ -1,6 +1,9 @@
 import { afterEach, vi } from 'vitest'
 import { cleanup } from '@testing-library/react'
+import { SOURCE_LANGUAGE, speak } from '@/lib/i18n'
 import { ignore } from '@/lib/utils'
+
+speak(SOURCE_LANGUAGE)
 
 class SilentResizeObserver implements ResizeObserver {
   observe = ignore

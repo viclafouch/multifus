@@ -7,6 +7,7 @@ use multifus_lib::app::state::ShortcutEffect;
 use multifus_lib::app::view::ScreenSaverView;
 use multifus_lib::app::view::ShortcutAction;
 use multifus_lib::config::ConfigStore;
+use multifus_lib::config::Language;
 use multifus_lib::platform::GameWindow;
 use multifus_lib::platform::KeyLabels;
 use multifus_lib::platform::WindowId;
@@ -33,6 +34,7 @@ pub fn reopened(directory: &TempDir, launch: Launch) -> Multifus {
         loaded,
         version: "0.1.0".to_owned(),
         system: "test".to_owned(),
+        system_language: Language::Fr,
         keyboard: KeyLabels::new(),
         launch,
         screen_saver: ScreenSaverView::Never,

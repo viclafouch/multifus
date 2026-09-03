@@ -1,7 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import type { WheelStep } from '@/@types/wheel'
-import { strings } from '@/constants/strings'
 import { pending, wheelSliceOf } from '@/test-doubles'
 
 const bridge = {
@@ -93,7 +92,7 @@ describe('la roue', () => {
   it('s’ouvre en le disant quand personne n’est connecté', async () => {
     await show(stepOf({ slices: [] }))
 
-    expect(screen.getByText(strings.wheel.nobody)).not.toBeNull()
+    expect(screen.getByText('Personne de connecté')).not.toBeNull()
   })
 
   it('pose ce que la roue lui donne, aperçu comme vraie roue', async () => {
@@ -109,6 +108,6 @@ describe('la roue', () => {
   it('rend l’étoile au principal, et à lui seul', async () => {
     await show(stepOf({ slices: TEAM }))
 
-    expect(screen.getAllByText(strings.characters.mainMark)).toHaveLength(1)
+    expect(screen.getAllByText('Personnage principal')).toHaveLength(1)
   })
 })

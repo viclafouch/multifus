@@ -1,8 +1,8 @@
 import React from 'react'
 import { FolderOpen, RotateCcw, TriangleAlert } from 'lucide-react'
+import { t } from '@lingui/core/macro'
 import { EmptyState, EmptyStateMark } from '@/components/layout/empty-state'
 import { Button } from '@/components/ui/button'
-import { strings } from '@/constants/strings'
 import { revealJournal } from '@/lib/multifus'
 import { errorMessage, ignore } from '@/lib/utils'
 
@@ -43,8 +43,8 @@ const CrashScreen = ({ message }: CrashScreenProps) => {
   return (
     <div role="alert" className="flex min-h-screen flex-col justify-center p-7">
       <EmptyState
-        title={strings.crash.title}
-        body={strings.crash.body}
+        title={t`L’écran s’est arrêté`}
+        body={t`Multifus, lui, tourne toujours : vos raccourcis répondent, et une notification ramène encore la bonne fenêtre. Il n’y a que cet écran à relancer.`}
         mark={
           <EmptyStateMark tone="destructive">
             <TriangleAlert
@@ -67,7 +67,7 @@ const CrashScreen = ({ message }: CrashScreenProps) => {
           }}
         >
           <RotateCcw aria-hidden />
-          {strings.crash.retry}
+          {t`Recharger l’écran`}
         </Button>
         <Button
           variant="outline"
@@ -77,7 +77,7 @@ const CrashScreen = ({ message }: CrashScreenProps) => {
           }}
         >
           <FolderOpen aria-hidden />
-          {strings.crash.reveal}
+          {t`Montrer le fichier du journal`}
         </Button>
       </EmptyState>
     </div>

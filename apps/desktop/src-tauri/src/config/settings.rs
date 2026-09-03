@@ -3,6 +3,7 @@ use std::collections::HashSet;
 use serde::Deserialize;
 use serde::Serialize;
 
+use crate::config::Language;
 use crate::domain::NotificationKind;
 use crate::domain::Roster;
 use crate::domain::Shortcut;
@@ -10,6 +11,7 @@ use crate::domain::Shortcut;
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Settings {
+    pub language: Option<Language>,
     pub roster: Roster,
     pub shortcuts: Shortcuts,
     pub quick_replies: Vec<QuickReply>,
@@ -44,6 +46,7 @@ impl Default for Settings {
         quick_reply.set_text(FIRST_QUICK_REPLY);
 
         Self {
+            language: None,
             roster: Roster::default(),
             shortcuts: Shortcuts::default(),
             quick_replies: vec![quick_reply],
@@ -335,6 +338,7 @@ mod tests {
     fn a_first_launch_starts_on_an_empty_roster_and_nothing_personal() {
         let settings = Settings::default();
 
+        assert_eq!(settings.language, None);
         assert!(settings.roster.is_empty());
         assert!(!settings.start_at_login);
         assert!(!settings.maximize_on_launch);

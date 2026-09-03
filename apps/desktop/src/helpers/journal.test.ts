@@ -19,14 +19,6 @@ import type {
 } from '@/@types/shortcuts'
 import type { Snapshot } from '@/@types/snapshot'
 import {
-  DETAILED_LINES,
-  NOTICE_LINES,
-  PLAIN_LINES,
-  RELAY_STOP_LINES,
-  WALK_IDLE_LINES,
-  WORK_LABELS
-} from '@/constants/journal'
-import {
   journalLine,
   journalTime,
   journalTone,
@@ -377,6 +369,16 @@ const SETTING_CASES = {
         change: { kind: 'relayBody', sendBody: true }
       },
       line: 'Envoi du texte des messages privés activé.'
+    }
+  ],
+
+  language: [
+    {
+      event: {
+        kind: 'setting',
+        change: { kind: 'language', language: 'en' }
+      },
+      line: 'Langue de Multifus : English.'
     }
   ]
 } as const satisfies Record<SettingChange['kind'], readonly Case<'setting'>[]>
@@ -877,25 +879,25 @@ const NOTICE_CASES = {
   enabled: [
     {
       event: { kind: 'relayNoticeSent', case: 'enabled' },
-      line: NOTICE_LINES.enabled
+      line: 'Avis envoyé : les messages privés partent sur le téléphone.'
     }
   ],
   disabled: [
     {
       event: { kind: 'relayNoticeSent', case: 'disabled' },
-      line: NOTICE_LINES.disabled
+      line: 'Avis envoyé : les messages privés ne partent plus.'
     }
   ],
   disconnected: [
     {
       event: { kind: 'relayNoticeSent', case: 'disconnected' },
-      line: NOTICE_LINES.disconnected
+      line: 'Avis envoyé : un personnage relayé s’est déconnecté.'
     }
   ],
   both: [
     {
       event: { kind: 'relayNoticeSent', case: 'both' },
-      line: NOTICE_LINES.both
+      line: 'Avis envoyé : une déconnexion, et plus personne de relayé connecté.'
     }
   ]
 } as const satisfies Record<NoticeCase, readonly Case<'relayNoticeSent'>[]>
@@ -922,25 +924,30 @@ const JOURNAL_CASES = {
     }
   ],
   launchedAgain: [
-    { event: { kind: 'launchedAgain' }, line: PLAIN_LINES.launchedAgain }
+    {
+      event: { kind: 'launchedAgain' },
+      line: 'Multifus tournait déjà : le second lancement s’arrête là.'
+    }
   ],
-  listening: [{ event: { kind: 'listening' }, line: PLAIN_LINES.listening }],
+  listening: [
+    { event: { kind: 'listening' }, line: 'Écoute des notifications démarrée.' }
+  ],
   listeningFailed: [
     {
       event: { kind: 'listeningFailed', detail: DETAIL },
-      line: `${DETAILED_LINES.listeningFailed} : ${DETAIL}`
+      line: `Écoute des notifications impossible : ${DETAIL}`
     }
   ],
   listeningLost: [
     {
       event: { kind: 'listeningLost', detail: DETAIL },
-      line: `${DETAILED_LINES.listeningLost} : ${DETAIL}`
+      line: `Écoute des notifications perdue, Multifus la reprend : ${DETAIL}`
     }
   ],
   notificationUnreadable: [
     {
       event: { kind: 'notificationUnreadable', detail: DETAIL },
-      line: `${DETAILED_LINES.notificationUnreadable} : ${DETAIL}`
+      line: `Notification impossible à lire : ${DETAIL}`
     }
   ],
   authorization: [
@@ -1043,79 +1050,79 @@ const JOURNAL_CASES = {
   shortcutsFailed: [
     {
       event: { kind: 'shortcutsFailed', detail: DETAIL },
-      line: `${DETAILED_LINES.shortcutsFailed} : ${DETAIL}`
+      line: `Les raccourcis ne sont pas fiables : ${DETAIL}`
     }
   ],
   scanFailed: [
     {
       event: { kind: 'scanFailed', detail: DETAIL },
-      line: `${DETAILED_LINES.scanFailed} : ${DETAIL}`
+      line: `Lecture des fenêtres impossible : ${DETAIL}`
     }
   ],
   wakesFailed: [
     {
       event: { kind: 'wakesFailed', detail: DETAIL },
-      line: `${DETAILED_LINES.wakesFailed} : ${DETAIL}`
+      line: `Le tour ne sera pas prévenu par le système, il passera une fois par seconde : ${DETAIL}`
     }
   ],
   saveFailed: [
     {
       event: { kind: 'saveFailed', detail: DETAIL },
-      line: `${DETAILED_LINES.saveFailed} : ${DETAIL}`
+      line: `Configuration non enregistrée : ${DETAIL}`
     }
   ],
   openFailed: [
     {
       event: { kind: 'openFailed', detail: DETAIL },
-      line: `${DETAILED_LINES.openFailed} : ${DETAIL}`
+      line: `Le système n’a pas pu ouvrir cet élément : ${DETAIL}`
     }
   ],
   snapshotFailed: [
     {
       event: { kind: 'snapshotFailed', detail: DETAIL },
-      line: `${DETAILED_LINES.snapshotFailed} : ${DETAIL}`
+      line: `La fenêtre n’a pas reçu le tableau de bord : ${DETAIL}`
     }
   ],
   trayFailed: [
     {
       event: { kind: 'trayFailed', detail: DETAIL },
-      line: `${DETAILED_LINES.trayFailed} : ${DETAIL}`
+      line: `La barre système n’est pas fiable : ${DETAIL}`
     }
   ],
   windowFailed: [
     {
       event: { kind: 'windowFailed', detail: DETAIL },
-      line: `${DETAILED_LINES.windowFailed} : ${DETAIL}`
+      line: `La fenêtre de Multifus n’a pas suivi : ${DETAIL}`
     }
   ],
   clientMaximized: [
     {
       event: { kind: 'clientMaximized' },
-      line: PLAIN_LINES.clientMaximized
+      line: 'Un client Dofus vient d’ouvrir : sa fenêtre a été agrandie à l’écran.'
     }
   ],
   shortTitlesFailed: [
     {
       event: { kind: 'shortTitlesFailed', detail: DETAIL },
-      line: `${DETAILED_LINES.shortTitlesFailed} : ${DETAIL}`
+      line: `Titre d’une fenêtre impossible à changer : ${DETAIL}`
     }
   ],
   windowIconFailed: [
     {
       event: { kind: 'windowIconFailed', detail: DETAIL },
-      line: `${DETAILED_LINES.windowIconFailed} : ${DETAIL}`
+      line: `Icône d’une fenêtre impossible à poser : ${DETAIL}`
     }
   ],
   clientMaximizeFailed: [
     {
       event: { kind: 'clientMaximizeFailed', detail: DETAIL },
-      line: `${DETAILED_LINES.clientMaximizeFailed} : ${DETAIL}`
+      line: `Agrandissement de la fenêtre d’un client impossible : ${DETAIL}`
     }
   ],
   clientsCountFailed: [
     {
       event: { kind: 'clientsCountFailed', detail: DETAIL },
-      line: `${DETAILED_LINES.clientsCountFailed} : ${DETAIL}`
+      line: `Le compte des fenêtres du jeu n’est pas arrivé à l’écran : ${DETAIL}`
     }
   ],
   configLoadFailed: [
@@ -1135,7 +1142,7 @@ const JOURNAL_CASES = {
   configNotSetAside: [
     {
       event: { kind: 'configNotSetAside', detail: DETAIL },
-      line: `${DETAILED_LINES.configNotSetAside} : ${DETAIL}`
+      line: `Configuration illisible et impossible à déplacer, le prochain enregistrement l’écrasera : ${DETAIL}`
     }
   ],
   startAtLoginReconciled: [
@@ -1151,21 +1158,21 @@ const JOURNAL_CASES = {
   startAtLoginFailed: [
     {
       event: { kind: 'startAtLoginFailed', detail: DETAIL },
-      line: `${DETAILED_LINES.startAtLoginFailed} : ${DETAIL}`
+      line: `Démarrage avec la session impossible : ${DETAIL}`
     }
   ],
   panicked: [
     {
       event: { kind: 'panicked', work: 'scan' },
-      line: `${WORK_LABELS.scan} a échoué brutalement, et a repris.`
+      line: `La lecture des fenêtres a échoué brutalement, et a repris.`
     },
     {
       event: { kind: 'panicked', work: 'shortcuts' },
-      line: `${WORK_LABELS.shortcuts} a échoué brutalement, et a repris.`
+      line: `La réponse à un raccourci a échoué brutalement, et a repris.`
     },
     {
       event: { kind: 'panicked', work: 'tray' },
-      line: `${WORK_LABELS.tray} a échoué brutalement, et a repris.`
+      line: `La réponse à un clic dans la barre système a échoué brutalement, et a repris.`
     }
   ],
   updateAvailable: [
@@ -1175,19 +1182,25 @@ const JOURNAL_CASES = {
     }
   ],
   updateUpToDate: [
-    { event: { kind: 'updateUpToDate' }, line: PLAIN_LINES.updateUpToDate }
+    {
+      event: { kind: 'updateUpToDate' },
+      line: 'Aucune version plus récente.'
+    }
   ],
   updateFailed: [
     {
       event: { kind: 'updateFailed', detail: DETAIL },
-      line: `${DETAILED_LINES.updateFailed} : ${DETAIL}`
+      line: `Mise à jour impossible : ${DETAIL}`
     }
   ],
   relayPaired: [
-    { event: { kind: 'relayPaired' }, line: PLAIN_LINES.relayPaired }
+    { event: { kind: 'relayPaired' }, line: 'Robot Telegram relié.' }
   ],
   relayUnpaired: [
-    { event: { kind: 'relayUnpaired' }, line: PLAIN_LINES.relayUnpaired }
+    {
+      event: { kind: 'relayUnpaired' },
+      line: 'Robot Telegram retiré, son code effacé du trousseau.'
+    }
   ],
   relayEnabled: [
     {
@@ -1200,28 +1213,31 @@ const JOURNAL_CASES = {
     }
   ],
   relayTestSent: [
-    { event: { kind: 'relayTestSent' }, line: PLAIN_LINES.relayTestSent }
+    {
+      event: { kind: 'relayTestSent' },
+      line: 'Message d’essai envoyé sur le téléphone.'
+    }
   ],
   relayDisabled: [
     {
       event: { kind: 'relayDisabled', reason: 'shortcut' },
-      line: RELAY_STOP_LINES.shortcut
+      line: 'Envoi sur le téléphone coupé : un raccourci a été frappé depuis le jeu.'
     },
     {
       event: { kind: 'relayDisabled', reason: 'tray' },
-      line: RELAY_STOP_LINES.tray
+      line: 'Envoi sur le téléphone coupé depuis la barre système.'
     },
     {
       event: { kind: 'relayDisabled', reason: 'window' },
-      line: RELAY_STOP_LINES.window
+      line: 'Envoi sur le téléphone coupé depuis la fenêtre.'
     },
     {
       event: { kind: 'relayDisabled', reason: 'noRelayedCharacter' },
-      line: RELAY_STOP_LINES.noRelayedCharacter
+      line: 'Envoi sur le téléphone coupé : le dernier personnage relayé a été décoché.'
     },
     {
       event: { kind: 'relayDisabled', reason: 'noLongerPaired' },
-      line: RELAY_STOP_LINES.noLongerPaired
+      line: 'Envoi sur le téléphone coupé : il n’y a plus de robot où écrire.'
     }
   ],
   relayFailed: Object.values(RELAY_FAILURE_CASES).flat(),
@@ -1245,7 +1261,7 @@ const JOURNAL_CASES = {
   displayAwakeFailed: [
     {
       event: { kind: 'displayAwakeFailed', detail: DETAIL },
-      line: `${DETAILED_LINES.displayAwakeFailed} : ${DETAIL}`
+      line: `Écran impossible à tenir éveillé, la session peut se verrouiller : ${DETAIL}`
     }
   ],
   walkEnabled: [
@@ -1269,53 +1285,53 @@ const JOURNAL_CASES = {
   walkIdle: [
     {
       event: { kind: 'walkIdle', reason: 'nobodyInCycle' },
-      line: WALK_IDLE_LINES.nobodyInCycle
+      line: 'Déplacement rapide : personne dans le défilement, le clic n’a nulle part où aller.'
     },
     {
       event: { kind: 'walkIdle', reason: 'tooSlow' },
-      line: WALK_IDLE_LINES.tooSlow
+      line: 'Déplacement rapide : la fenêtre suivante a mis plus de temps que prévu à passer devant.'
     }
   ],
   walkListeningResumed: [
     {
       event: { kind: 'walkListeningResumed' },
-      line: PLAIN_LINES.walkListeningResumed
+      line: 'Déplacement rapide : le système avait cessé de transmettre les clics, ils reviennent.'
     }
   ],
   walkListeningLost: [
     {
       event: { kind: 'walkListeningLost' },
-      line: PLAIN_LINES.walkListeningLost
+      line: 'Déplacement rapide : le système a cessé de transmettre les clics, et n’a pas repris.'
     }
   ],
   walkListeningRefused: [
     {
       event: { kind: 'walkListeningRefused', detail: DETAIL },
-      line: `${DETAILED_LINES.walkListeningRefused} : ${DETAIL}`
+      line: `Déplacement rapide impossible à allumer, Multifus n’écoute pas les clics : ${DETAIL}`
     }
   ],
   walkSwitchFailed: [
     {
       event: { kind: 'walkSwitchFailed', detail: DETAIL },
-      line: `${DETAILED_LINES.walkSwitchFailed} : ${DETAIL}`
+      line: `Déplacement rapide : la fenêtre suivante n’est pas passée devant : ${DETAIL}`
     }
   ],
   bannerFailed: [
     {
       event: { kind: 'bannerFailed', detail: DETAIL },
-      line: `${DETAILED_LINES.bannerFailed} : ${DETAIL}`
+      line: `La bannière du Déplacement rapide n’a pas suivi : ${DETAIL}`
     }
   ],
   runeTableFailed: [
     {
       event: { kind: 'runeTableFailed', detail: DETAIL },
-      line: `${DETAILED_LINES.runeTableFailed} : ${DETAIL}`
+      line: `Le tableau des runes n’a pas suivi : ${DETAIL}`
     }
   ],
   wheelFailed: [
     {
       event: { kind: 'wheelFailed', detail: DETAIL },
-      line: `${DETAILED_LINES.wheelFailed} : ${DETAIL}`
+      line: `La roue n’a pas suivi : ${DETAIL}`
     }
   ],
   wheelPicked: [
@@ -1341,8 +1357,13 @@ const JOURNAL_CASES = {
       line: `La roue : le système a refusé de ramener ${NICKNAME} devant (${DETAIL}).`
     }
   ],
-  reset: [{ event: { kind: 'reset' }, line: PLAIN_LINES.reset }],
-  quit: [{ event: { kind: 'quit' }, line: PLAIN_LINES.quit }]
+  reset: [{ event: { kind: 'reset' }, line: 'Configuration remise à zéro.' }],
+  quit: [
+    {
+      event: { kind: 'quit' },
+      line: 'Multifus a été quitté depuis la barre système.'
+    }
+  ]
 } as const satisfies JournalCases
 
 const NOTIFIED = {
@@ -1367,6 +1388,7 @@ const NOON = Date.UTC(2026, 0, 15, 12, 30, 0)
 const SNAPSHOT = {
   version: '0.1.0',
   system: 'macOS 26.0 (arm64)',
+  language: 'fr',
   keyboard: {},
   characters: [],
   shortcuts: SHORTCUTS,
@@ -1612,7 +1634,7 @@ describe('journalTranscript', () => {
         'Entrées en mémoire : 2, 15/01/2026 09:05:03 → 15/01/2026 12:30:00',
         'Le fichier du journal sur le disque va plus loin en arrière que ces lignes.',
         '',
-        `09:05:03  ${PLAIN_LINES.listening}`,
+        `09:05:03  Écoute des notifications démarrée.`,
         '12:30:00  Alpha est connecté.'
       ].join('\n')
     )

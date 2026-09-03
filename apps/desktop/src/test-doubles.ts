@@ -92,6 +92,7 @@ const DEMO_TEAM = Array.from({ length: 8 }, (_, rank) => {
 const BLANK_SNAPSHOT: Snapshot = {
   version: '0.0.0',
   system: 'test',
+  language: 'fr',
   keyboard: {},
   characters: [],
   shortcuts: [],
@@ -143,4 +144,10 @@ const BLANK_SNAPSHOT: Snapshot = {
 
 export const snapshotOf = (fields: Partial<Snapshot> = {}) => {
   return { ...BLANK_SNAPSHOT, ...fields }
+}
+
+export const speakFrench = async () => {
+  const { SOURCE_LANGUAGE, speak } = await import('@/lib/i18n')
+
+  speak(SOURCE_LANGUAGE)
 }

@@ -234,6 +234,7 @@ mod tests {
     use tempfile::TempDir;
 
     use super::*;
+    use crate::config::language::Language;
     use crate::config::settings::AutoFocus;
     use crate::config::settings::Banner;
     use crate::config::settings::BannerCorner;
@@ -268,6 +269,7 @@ mod tests {
         auto_focus.wakes_minimized = false;
 
         Settings {
+            language: Some(Language::En),
             roster: Roster::from_characters(vec![
                 Character::new("Alpha")
                     .with_gender(Gender::Male)

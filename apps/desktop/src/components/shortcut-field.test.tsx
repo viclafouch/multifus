@@ -1,7 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
-import { strings } from '@/constants/strings'
-import { APPLE_AGENT, WINDOWS_AGENT } from '@/test-doubles'
+import { APPLE_AGENT, WINDOWS_AGENT, speakFrench } from '@/test-doubles'
 
 const EDIT_LABEL = 'Modifier le raccourci'
 
@@ -18,6 +17,8 @@ const field = async ({
 }: FieldParams = {}) => {
   vi.resetModules()
   vi.stubGlobal('navigator', { userAgent: agent })
+
+  await speakFrench()
 
   const { ShortcutField } = await import('@/components/shortcut-field')
 
@@ -76,7 +77,7 @@ describe('le champ d’un raccourci', () => {
 
     expect(editing.handleCapture).not.toHaveBeenCalled()
     expect(screen.getByRole('alert').textContent).toBe(
-      strings.shortcuts.rejected.pasteCombination
+      'C’est le raccourci pour coller sur votre ordinateur. Prenez-en un autre.'
     )
   })
 
@@ -94,7 +95,7 @@ describe('le champ d’un raccourci', () => {
   it('dit qu’il n’y a rien quand aucune touche n’est posée', async () => {
     await field()
 
-    expect(screen.getByText(strings.shortcuts.empty)).not.toBeNull()
+    expect(screen.getByText('Aucune')).not.toBeNull()
   })
 
   it('ouvre la saisie au clic', async () => {
@@ -108,8 +109,10 @@ describe('le champ d’un raccourci', () => {
   it('invite à frapper une combinaison une fois ouvert', async () => {
     await field({ isActive: true })
 
-    expect(screen.getByText(strings.shortcuts.capture)).not.toBeNull()
-    expect(screen.getByText(strings.shortcuts.captureHint)).not.toBeNull()
+    expect(screen.getByText('Appuyez sur vos touches')).not.toBeNull()
+    expect(
+      screen.getByText('Échap pour annuler, Retour arrière pour effacer.')
+    ).not.toBeNull()
   })
 
   it('prend la combinaison frappée', async () => {
@@ -145,7 +148,7 @@ describe('le champ d’un raccourci', () => {
 
     expect(editing.handleCapture).not.toHaveBeenCalled()
     expect(screen.getByRole('alert').textContent).toBe(
-      strings.shortcuts.rejected.noModifier
+      'Ajoutez Ctrl, Alt ou Maj, ou prenez une touche de fonction : F1, F2, F5… Seule, cette touche partirait dès que vous écrivez dans le jeu.'
     )
   })
 
@@ -179,7 +182,7 @@ describe('le champ d’un raccourci', () => {
 
     expect(editing.handleCapture).not.toHaveBeenCalled()
     expect(screen.getByRole('alert').textContent).toBe(
-      strings.shortcuts.rejected.pasteCombination
+      'C’est le raccourci pour coller sur votre ordinateur. Prenez-en un autre.'
     )
   })
 
@@ -194,7 +197,7 @@ describe('le champ d’un raccourci', () => {
 
     expect(editing.handleCapture).not.toHaveBeenCalled()
     expect(screen.getByRole('alert').textContent).toBe(
-      strings.shortcuts.rejected.unsupportedKey
+      'Cette touche ne peut pas servir de raccourci.'
     )
   })
 

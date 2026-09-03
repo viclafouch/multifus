@@ -55,6 +55,7 @@ use crate::config::Banner;
 use crate::config::BannerCorner;
 use crate::config::ConfigError;
 use crate::config::ConfigStore;
+use crate::config::Language;
 use crate::config::Loaded;
 use crate::config::QuickReply;
 use crate::config::QuickReplyId;
@@ -100,6 +101,7 @@ pub struct Multifus {
     store: ConfigStore,
     version: String,
     system: String,
+    system_language: Language,
     keyboard: KeyLabels,
     settings: Settings,
     shortcut_statuses: HashMap<Binding, ShortcutStatus>,
@@ -137,6 +139,7 @@ pub struct MultifusParams {
     pub loaded: Loaded,
     pub version: String,
     pub system: String,
+    pub system_language: Language,
     pub keyboard: KeyLabels,
     pub launch: Launch,
     pub screen_saver: ScreenSaverView,
@@ -151,6 +154,7 @@ impl Multifus {
             loaded,
             version,
             system,
+            system_language,
             keyboard,
             launch,
             screen_saver,
@@ -183,6 +187,7 @@ impl Multifus {
             store,
             version,
             system,
+            system_language,
             keyboard,
             settings,
             shortcut_statuses: HashMap::new(),
@@ -222,6 +227,7 @@ impl Multifus {
         Snapshot {
             version: self.version.clone(),
             system: self.system.clone(),
+            language: self.language(),
             keyboard: self.keyboard.clone(),
             characters: self
                 .settings
@@ -683,6 +689,20 @@ impl Multifus {
 
     pub fn set_start_at_login(&mut self, start_at_login: bool) {
         self.settings.start_at_login = start_at_login;
+        self.save();
+    }
+
+    #[must_use]
+    pub fn language(&self) -> Language {
+        self.settings.language.unwrap_or(self.system_language)
+    }
+
+    pub fn set_language(&mut self, language: Language) {
+        self.settings.language = Some(language);
+
+        self.log(JournalEvent::Setting {
+            change: SettingChange::Language { language },
+        });
         self.save();
     }
 

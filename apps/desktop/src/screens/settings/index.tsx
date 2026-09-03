@@ -6,6 +6,7 @@ import {
   SquareUserRound,
   Type
 } from 'lucide-react'
+import { t } from '@lingui/core/macro'
 import type { Snapshot } from '@/@types/snapshot'
 import { FieldRow } from '@/components/layout/field-row'
 import { Note } from '@/components/layout/note'
@@ -15,7 +16,6 @@ import { Switch } from '@/components/ui/switch'
 import { UnavailableSwitch } from '@/components/unavailable-switch'
 import { WindowsSwitch } from '@/components/windows-switch'
 import { IS_APPLE } from '@/constants/keyboard'
-import { strings } from '@/constants/strings'
 import { useClients } from '@/hooks/use-clients'
 import {
   setMaximizeOnLaunch,
@@ -45,58 +45,74 @@ export const SettingsScreen = ({
   taskbarCombines,
   run
 }: SettingsScreenProps) => {
+  const startupLabel = t`Lancer Multifus au démarrage de l’ordinateur`
+  const maximizeLabel = t`Agrandir les clients à leur ouverture`
+  const shortTitlesLabel = t`Seulement le pseudo dans la barre des tâches`
+  const portraitLabel = t`La tête de classe dans la barre des tâches`
+  const ungroupLabel = t`Un bouton par personnage dans la barre des tâches`
+  const backgroundLabel = t`Garder Multifus en arrière-plan`
+
   const isAlreadyUngrouped = !IS_APPLE && !taskbarCombines
   const clients = useClients()
 
   return (
-    <Screen title={strings.settings.title} subtitle={strings.settings.subtitle}>
-      {IS_APPLE ? <Note className="mb-4">{strings.maximize.note}</Note> : null}
+    <Screen
+      title={t`Paramètres`}
+      subtitle={t`Ce que Multifus fait pendant que vous jouez, seul ou sur demande.`}
+    >
+      {IS_APPLE ? (
+        <Note className="mb-4">{t`Sur Mac, Multifus tourne mieux sans plein écran : gardez tous vos clients Dofus Retro sur le même bureau, en fenêtre agrandie.`}</Note>
+      ) : null}
       {clients === null ? null : <ClientsPanel clients={clients} run={run} />}
       <Panel>
         <FieldRow
-          label={strings.settings.startupLabel}
-          description={strings.settings.startupDescription}
+          label={startupLabel}
+          description={t`Multifus est déjà là quand vous ouvrez vos clients Dofus Retro.`}
           icon={<Power className="size-glyph" strokeWidth={1.75} aria-hidden />}
         >
           <Switch
             checked={startAtLogin}
-            aria-label={strings.settings.startupLabel}
+            aria-label={startupLabel}
             onCheckedChange={(checked) => {
               run(setStartAtLogin(checked))
             }}
           />
         </FieldRow>
         <FieldRow
-          label={strings.settings.maximizeLabel}
-          description={strings.settings.maximizeDescription}
+          label={maximizeLabel}
+          description={
+            IS_APPLE
+              ? t`La fenêtre couvre l’écran, Dock et barre des menus en place.`
+              : t`La fenêtre couvre l’écran, barre des tâches en place.`
+          }
           icon={
             <Maximize2 className="size-glyph" strokeWidth={1.75} aria-hidden />
           }
         >
           <Switch
             checked={maximizeOnLaunch}
-            aria-label={strings.settings.maximizeLabel}
+            aria-label={maximizeLabel}
             onCheckedChange={(checked) => {
               run(setMaximizeOnLaunch(checked))
             }}
           />
         </FieldRow>
         <FieldRow
-          label={strings.settings.shortTitlesLabel}
-          description={strings.settings.shortTitlesDescription}
+          label={shortTitlesLabel}
+          description={t`Vous lisez « Elyandra » au lieu de « Elyandra - Dofus Retro ».`}
           icon={<Type className="size-glyph" strokeWidth={1.75} aria-hidden />}
         >
           <WindowsSwitch
             checked={shortTitles}
-            label={strings.settings.shortTitlesLabel}
+            label={shortTitlesLabel}
             onCheckedChange={(short) => {
               run(setShortTitles(short))
             }}
           />
         </FieldRow>
         <FieldRow
-          label={strings.settings.portraitLabel}
-          description={strings.settings.portraitDescription}
+          label={portraitLabel}
+          description={t`Vous repérez votre Enu à sa tête, pas à son titre.`}
           icon={
             <SquareUserRound
               className="size-glyph"
@@ -107,40 +123,44 @@ export const SettingsScreen = ({
         >
           <WindowsSwitch
             checked={paintPortraits}
-            label={strings.settings.portraitLabel}
+            label={portraitLabel}
             onCheckedChange={(paint) => {
               run(setPaintPortraits(paint))
             }}
           />
         </FieldRow>
         <FieldRow
-          label={strings.settings.ungroupLabel}
+          label={ungroupLabel}
           description={
             isAlreadyUngrouped
-              ? strings.settings.ungroupAlready
-              : strings.settings.ungroupDescription
+              ? t`Déjà fait : votre Windows ne colle jamais les fenêtres ensemble.`
+              : t`Chaque client garde son bouton au lieu d’être empilé avec les autres.`
           }
           icon={<Rows3 className="size-glyph" strokeWidth={1.75} aria-hidden />}
         >
           <WindowsSwitch
             checked={ungroupTaskbar}
-            label={strings.settings.ungroupLabel}
+            label={ungroupLabel}
             onCheckedChange={(ungroup) => {
               run(setUngroupTaskbar(ungroup))
             }}
           />
         </FieldRow>
         <FieldRow
-          label={strings.settings.backgroundLabel}
-          description={strings.settings.backgroundDescription}
+          label={backgroundLabel}
+          description={
+            IS_APPLE
+              ? t`La croix ne quitte pas Multifus : son icône reste en haut à droite de l’écran.`
+              : t`La croix ne quitte pas Multifus : son icône reste à côté de l’horloge.`
+          }
           icon={
             <Activity className="size-glyph" strokeWidth={1.75} aria-hidden />
           }
         >
           <UnavailableSwitch
             checked
-            label={strings.settings.backgroundLabel}
-            reason={strings.settings.backgroundLocked}
+            label={backgroundLabel}
+            reason={t`Multifus doit rester en arrière-plan pour fonctionner.`}
           />
         </FieldRow>
       </Panel>

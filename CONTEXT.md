@@ -2,6 +2,8 @@
 
 Les mots de Multifus, et rien d'autre. On en parle en français, on les écrit en anglais dans le code : l'identifiant est entre parenthèses.
 
+**Langue** (`Language`) : la langue dans laquelle Multifus parle, le français ou l'anglais. Elle n'a rien à voir avec celle du client Dofus, que Multifus ne lit pas et dont il ne se sert pour rien : un joueur peut jouer en anglais et lire Multifus en français. Elle se prend à la langue du système au premier lancement, et elle est fixée pour la durée du lancement : la changer recharge les quatre fenêtres de Multifus d'un coup, et les fenêtres du jeu ne bougent pas.
+
 **Personnage** (`Character`) : un personnage Dofus, identifié par son pseudo.
 
 **Pseudo** (`nickname`) : le nom d'un personnage, lu dans le titre de sa fenêtre.
@@ -90,7 +92,7 @@ Les mots de Multifus, et rien d'autre. On en parle en français, on les écrit e
 
 **Mécanisme** (`Mechanisms`) : ce qu'une frappe met en marche sans toucher à une fenêtre : le Déplacement rapide, les messages privés, la réponse rapide.
 
-**Réponse rapide** (`QuickReply`) : un texte tout prêt d'une seule ligne, rangé sous une combinaison de touches.
+**Réponse rapide** (`QuickReply`) : un texte tout prêt d'une seule ligne, rangé sous une combinaison de touches. Celle qu'un premier lancement offre est écrite en français, quelle que soit la langue de Multifus : une réponse rapide se tape dans le jeu, et la langue du client Dofus n'est pas celle de Multifus.
 
 **Collage** (`paste`) : le geste qui pose une réponse rapide là où l'utilisateur est en train d'écrire dans le jeu.
 

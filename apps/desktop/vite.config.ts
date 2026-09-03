@@ -1,6 +1,8 @@
 import path from 'node:path'
 import process from 'node:process'
 import { defineConfig } from 'vitest/config'
+import { lingui, linguiTransformerBabelPreset } from '@lingui/vite-plugin'
+import babel from '@rolldown/plugin-babel'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 
@@ -8,7 +10,12 @@ const host = process.env.TAURI_DEV_HOST ?? ''
 const isRemoteHost = host !== ''
 
 export default defineConfig({
-  plugins: [react({ compiler: true }), tailwindcss()],
+  plugins: [
+    react({ compiler: true }),
+    tailwindcss(),
+    lingui({ failOnMissing: true, failOnCompileError: true }),
+    babel({ presets: [linguiTransformerBabelPreset()] })
+  ],
 
   resolve: {
     alias: {

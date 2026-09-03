@@ -1,4 +1,6 @@
-import type { PairingProblem } from '@/@types/relay'
+import { i18n } from '@lingui/core'
+import { msg, plural, t } from '@lingui/core/macro'
+import type { PairingProblem, RelayFailure } from '@/@types/relay'
 import type { Character, Color, Gender } from '@/@types/roster'
 import type {
   Binding,
@@ -14,52 +16,65 @@ import type {
 } from '@/@types/system'
 import type { LampState } from '@/components/lamp'
 import { IS_APPLE } from '@/constants/keyboard'
-import { strings } from '@/constants/strings'
-import { matchIsPlural } from '@/helpers/format'
+import { CLASS_LABELS, COLOR_LABELS } from '@/constants/roster'
+import { SHORTCUT_ACTIONS } from '@/constants/shortcuts'
+import type { Phrase } from '@/lib/i18n'
 
 export type TonedLine = {
   readonly tone: 'bad' | 'calm'
   readonly text: string
 }
 
-export const CONFIG_PROBLEM_LINES = {
+type ProblemLines = {
+  readonly title: Phrase
+  readonly body: Phrase
+}
+
+const CONFIG_PROBLEM_LINES = {
   malformed: {
-    title: strings.config.malformedTitle,
-    body: strings.config.malformedBody
+    title: msg`Vos réglages ont été mis de côté`,
+    body: msg`Le fichier n’était plus lisible. Multifus l’a gardé sous un autre nom et repart sur ses réglages d’origine.`
   },
   notSaved: {
-    title: strings.config.notSavedTitle,
-    body: strings.config.notSavedBody
+    title: msg`Vos réglages n’ont pas été enregistrés`,
+    body: msg`Ce que vous voyez à l’écran est bon, mais rien n’a été écrit sur le disque.`
   },
   notSetAside: {
-    title: strings.config.notSetAsideTitle,
-    body: strings.config.notSetAsideBody
+    title: msg`Vos réglages illisibles sont toujours en place`,
+    body: msg`Multifus n’a pas réussi à mettre le fichier de côté. Le prochain enregistrement l’écrasera. Copiez-le ailleurs si son contenu compte.`
   },
   unreadable: {
-    title: strings.config.unreadableTitle,
-    body: strings.config.unreadableBody
+    title: msg`Vos réglages n’ont pas pu être lus`,
+    body: msg`Multifus a démarré sur ses réglages d’origine. Votre fichier est toujours là, intact.`
   }
-} as const satisfies Record<
-  ConfigProblem['kind'],
-  { readonly title: string; readonly body: string }
->
+} as const satisfies Record<ConfigProblem['kind'], ProblemLines>
+
+export const configProblemLines = (kind: ConfigProblem['kind']) => {
+  const { title, body } = CONFIG_PROBLEM_LINES[kind]
+
+  return { title: i18n._(title), body: i18n._(body) }
+}
 
 export const updateLine = (update: UpdateStatus) => {
   switch (update.kind) {
     case 'checking': {
-      return strings.about.updateChecking
+      return t`Vérification en cours…`
     }
     case 'upToDate': {
-      return strings.about.updateUpToDate
+      return t`Vous êtes à jour.`
     }
     case 'available': {
-      return strings.about.updateAvailable(update.version)
+      const { version } = update
+
+      return t`La version ${version} est prête. Multifus se relancera tout seul, sans toucher à vos clients.`
     }
     case 'installing': {
-      return strings.about.updateInstalling
+      return t`Téléchargement en cours…`
     }
     case 'failed': {
-      return strings.about.updateFailed(update.detail)
+      const { detail } = update
+
+      return t`La mise à jour a échoué : ${detail}`
     }
     default: {
       return update satisfies never
@@ -67,27 +82,52 @@ export const updateLine = (update: UpdateStatus) => {
   }
 }
 
-export const pairingProblemLine = (problem: PairingProblem) => {
-  const { problem: lines } = strings.relay
+const telegramSilentLine = (detail: string) => {
+  return t`Telegram n’a pas répondu. Vérifiez votre connexion (${detail}).`
+}
 
+export const pairingProblemLine = (problem: PairingProblem) => {
   switch (problem.kind) {
     case 'tokenBlank': {
-      return lines.tokenBlank
+      return t`Collez d’abord le code que BotFather vous a envoyé.`
     }
     case 'tokenRefused': {
-      return lines.tokenRefused(problem.detail)
+      const { detail } = problem
+
+      return t`Telegram ne reconnaît pas ce code. Recopiez-le en entier (${detail}).`
     }
     case 'noChat': {
-      return lines.noChat
+      return t`Le code est bon. Il ne manque que l’étape 4, votre « salut » au robot.`
     }
     case 'keychain': {
-      return lines.keychain(problem.detail)
+      const { detail } = problem
+
+      return t`Le code n’a pas pu être enregistré, rien n’est gardé (${detail}).`
     }
     case 'network': {
-      return lines.network(problem.detail)
+      const { detail } = problem
+
+      return telegramSilentLine(detail)
     }
     default: {
       return problem satisfies never
+    }
+  }
+}
+
+export const relayFailureLine = ({ reason, detail }: RelayFailure) => {
+  switch (reason) {
+    case 'keychain': {
+      return t`Multifus n’a pas retrouvé le code de votre robot (${detail}).`
+    }
+    case 'telegram': {
+      return t`Telegram a refusé la demande (${detail}).`
+    }
+    case 'network': {
+      return telegramSilentLine(detail)
+    }
+    default: {
+      return reason satisfies never
     }
   }
 }
@@ -98,14 +138,16 @@ export const bindingLabel = (
   binding: Binding,
   quickReplies: readonly QuickReply[]
 ): string => {
-  const words = strings.quickReplies
-
   if (binding.kind === 'action') {
-    return `« ${strings.shortcuts.actions[binding.action].label} »`
+    const label = i18n._(SHORTCUT_ACTIONS[binding.action].label)
+
+    return t`« ${label} »`
   }
 
   if (binding.kind === 'character') {
-    return strings.shortcuts.characterNamed(binding.nickname)
+    const { nickname } = binding
+
+    return t`« ${nickname} »`
   }
 
   const quickReply = quickReplies.find((candidate) => {
@@ -113,18 +155,22 @@ export const bindingLabel = (
   })
 
   if (quickReply === undefined || quickReply.text.length === 0) {
-    return words.unnamed
+    return t`une réponse sans texte`
   }
 
-  return words.named(shorten(quickReply.text))
+  const text = shorten(quickReply.text)
+
+  return t`la réponse « ${text} »`
 }
 
 export const quickReplyEditLabel = (quickReply: QuickReply, rank: number) => {
-  const words = strings.quickReplies
+  if (quickReply.text.length === 0) {
+    return t`Modifier les touches de la réponse ${rank}`
+  }
 
-  return quickReply.text.length === 0
-    ? words.edit(rank)
-    : words.editNamed(rank, shorten(quickReply.text))
+  const text = shorten(quickReply.text)
+
+  return t`Modifier les touches de la réponse ${rank}, « ${text} »`
 }
 
 const shorten = (text: string) => {
@@ -137,34 +183,43 @@ const shorten = (text: string) => {
   return `${letters.slice(0, QUICK_REPLY_LABEL_LENGTH).join('')}…`
 }
 
+export const shortcutActionLabel = (action: ShortcutAction) => {
+  return i18n._(SHORTCUT_ACTIONS[action].label)
+}
+
 export const shortcutUndoLabel = (action: ShortcutAction) => {
-  return strings.shortcuts.undoLabel(strings.shortcuts.actions[action].label)
+  const label = shortcutActionLabel(action)
+
+  return t`Remettre les touches d’avant pour ${label}`
 }
 
 export const shortcutStatusLine = (
   status: ShortcutStatus,
   quickReplies: readonly QuickReply[]
 ): TonedLine | null => {
-  const answers = strings.shortcuts.status
-
   switch (status.kind) {
     case 'registered': {
       return null
     }
     case 'unbound': {
-      return { tone: 'calm', text: answers.unbound }
+      return { tone: 'calm', text: t`Sans touches, il ne se passera rien.` }
     }
     case 'invalid': {
-      return { tone: 'bad', text: answers.invalid }
-    }
-    case 'refused': {
-      return { tone: 'bad', text: answers.refused }
-    }
-    case 'duplicate': {
       return {
         tone: 'bad',
-        text: answers.duplicate(bindingLabel(status.binding, quickReplies))
+        text: t`Ces touches ne peuvent pas servir de raccourci.`
       }
+    }
+    case 'refused': {
+      return {
+        tone: 'bad',
+        text: t`Refusé : un autre logiciel utilise déjà ces touches.`
+      }
+    }
+    case 'duplicate': {
+      const label = bindingLabel(status.binding, quickReplies)
+
+      return { tone: 'bad', text: t`Déjà pris par ${label}.` }
     }
     default: {
       return status satisfies never
@@ -183,12 +238,10 @@ export const characterShortcutStatusLine = (
 
 export const authorizationLine = (authorization: Authorization) => {
   if (!authorization.granted) {
-    return strings.status.denied
+    return t`Autorisation manquante`
   }
 
-  return authorization.listening
-    ? strings.status.listening
-    : strings.status.notListening
+  return authorization.listening ? t`À l’écoute du jeu` : t`Écoute interrompue`
 }
 
 const clientsState = ({ open, small, readable }: Clients): ClientsState => {
@@ -203,15 +256,56 @@ const clientsState = ({ open, small, readable }: Clients): ClientsState => {
   return small === 0 ? 'maximized' : 'small'
 }
 
+const clientsBadge = (state: ClientsState, small: number) => {
+  switch (state) {
+    case 'small': {
+      return plural(small, {
+        one: '# client en petit',
+        other: '# clients en petit'
+      })
+    }
+    case 'maximized': {
+      return t`Tout est agrandi`
+    }
+    case 'none': {
+      return t`Aucun client ouvert`
+    }
+    case 'unreadable': {
+      return t`Fenêtres illisibles`
+    }
+    default: {
+      return state satisfies never
+    }
+  }
+}
+
+const clientsBody = (state: ClientsState) => {
+  switch (state) {
+    case 'small': {
+      return t`Un client ouvert avant Multifus garde sa petite taille.`
+    }
+    case 'maximized': {
+      return t`Vos clients Dofus Retro couvrent déjà tout leur écran.`
+    }
+    case 'none': {
+      return t`Aucune fenêtre de Dofus Retro n’est ouverte en ce moment.`
+    }
+    case 'unreadable': {
+      return t`Multifus ne peut pas lire les fenêtres du jeu.`
+    }
+    default: {
+      return state satisfies never
+    }
+  }
+}
+
 export const clientsLines = (clients: Clients) => {
-  const words = strings.settings.clients
   const state = clientsState(clients)
 
   return {
     state,
-    badge:
-      state === 'small' ? words.badge.small(clients.small) : words.badge[state],
-    body: words.body[state]
+    badge: clientsBadge(state, clients.small),
+    body: clientsBody(state)
   }
 }
 
@@ -223,22 +317,29 @@ export const characterState = (character: Character): LampState => {
   return character.excluded ? 'excluded' : 'live'
 }
 
-const CHARACTER_STATE_LINES = {
-  offline: strings.characters.offline,
-  excluded: strings.characters.excluded,
-  live: strings.characters.online
-} as const satisfies Record<LampState, string>
+const lampLine = (state: LampState) => {
+  switch (state) {
+    case 'offline': {
+      return t`Déconnecté`
+    }
+    case 'excluded': {
+      return t`Exclu`
+    }
+    case 'live': {
+      return t`Connecté`
+    }
+    default: {
+      return state satisfies never
+    }
+  }
+}
 
 export const characterStateLine = (character: Character) => {
-  return CHARACTER_STATE_LINES[characterState(character)]
+  return lampLine(characterState(character))
 }
 
 export const characterPresence = (character: Character): LampState => {
   return character.online ? 'live' : 'offline'
-}
-
-const characterPresenceLine = (character: Character) => {
-  return CHARACTER_STATE_LINES[characterPresence(character)]
 }
 
 const SEPARATOR = ' · '
@@ -252,7 +353,7 @@ const classPrefixed = (character: Character, line: string) => {
     return line
   }
 
-  return prefixed(strings.characters.classes[character.class], line)
+  return prefixed(i18n._(CLASS_LABELS[character.class]), line)
 }
 
 type MissingPart = 'class' | 'gender'
@@ -269,15 +370,15 @@ const missingPart = (character: Character): MissingPart | null => {
   return null
 }
 
-const MISSING_PART_LINES = {
-  class: strings.characters.classMissing,
-  gender: strings.characters.genderMissing
-} as const satisfies Record<MissingPart, string>
+const missingPartLine = (missing: MissingPart) => {
+  return missing === 'class' ? t`Classe à choisir` : t`Sexe à choisir`
+}
 
-const MISSING_PART_LABELS = {
-  class: strings.characters.classPick,
-  gender: strings.characters.genderPick
-} as const satisfies Record<MissingPart, (nickname: string) => string>
+const missingPartLabel = (missing: MissingPart, nickname: string) => {
+  return missing === 'class'
+    ? t`Choisir la classe de ${nickname}`
+    : t`Choisir le sexe de ${nickname}`
+}
 
 export const characterSubLine = (character: Character) => {
   const missing = missingPart(character)
@@ -287,63 +388,57 @@ export const characterSubLine = (character: Character) => {
     return classPrefixed(character, state)
   }
 
-  return prefixed(MISSING_PART_LINES[missing], state)
+  return prefixed(missingPartLine(missing), state)
 }
 
 export const characterMarksLabel = (character: Character) => {
   const missing = missingPart(character)
+  const { nickname } = character
 
   if (missing === null) {
-    return strings.characters.characterChange(character.nickname)
+    return t`Changer la classe, le sexe ou la couleur de ${nickname}`
   }
 
-  return MISSING_PART_LABELS[missing](character.nickname)
+  return missingPartLabel(missing, nickname)
 }
 
 export const characterMarksTooltip = (character: Character) => {
   const missing = missingPart(character)
 
   if (missing === null) {
-    return strings.characters.characterChangeShort
+    return t`Modifier`
   }
 
-  return MISSING_PART_LABELS[missing](character.nickname)
+  return missingPartLabel(missing, character.nickname)
 }
 
 export const colorReadout = (color: Color | null, holder: string | null) => {
   if (color === null) {
-    return strings.characters.colorNone
+    return t`Aucune couleur`
   }
 
-  const label = strings.characters.colors[color]
+  const label = i18n._(COLOR_LABELS[color])
 
-  return holder === null
-    ? label
-    : prefixed(label, strings.characters.colorTakenBy(holder))
+  return holder === null ? label : prefixed(label, t`déjà pris par ${holder}`)
 }
 
 export const dialogNote = (paintPortraits: boolean) => {
   if (IS_APPLE) {
-    return strings.characters.dialogWindowKeepsIcon
+    return t`Sur macOS, la tête reste ici : le client garde son logo Dofus.`
   }
 
   if (!paintPortraits) {
-    return strings.characters.dialogPortraitOff
+    return t`La tête de classe est coupée dans les Paramètres : le client garde son logo Dofus.`
   }
 
   return null
 }
 
 export const characterPresenceSubLine = (character: Character) => {
-  return classPrefixed(character, characterPresenceLine(character))
+  return classPrefixed(character, lampLine(characterPresence(character)))
 }
 
 const MISSING_GENDER_NAMED = 2
-
-const NAMES = new Intl.ListFormat('fr-FR', {
-  style: 'long',
-  type: 'conjunction'
-})
 
 export const missingGenderLine = (nicknames: readonly string[]) => {
   if (nicknames.length === 0) {
@@ -352,13 +447,22 @@ export const missingGenderLine = (nicknames: readonly string[]) => {
 
   const named = nicknames.slice(0, MISSING_GENDER_NAMED)
   const rest = nicknames.length - named.length
-  const others = matchIsPlural(rest) ? `${rest} autres` : `${rest} autre`
+  const others = plural(rest, { one: '# autre', other: '# autres' })
   const parts = rest === 0 ? named : [...named, others]
+  const names = new Intl.ListFormat(i18n.locale, {
+    style: 'long',
+    type: 'conjunction'
+  }).format(parts)
 
-  return strings.characters.missingGender(
-    NAMES.format(parts),
-    !matchIsPlural(nicknames.length)
-  )
+  return nicknames.length === 1
+    ? t`${names} n’a pas de sexe : il ne bougera pas.`
+    : t`${names} n’ont pas de sexe : ils ne bougeront pas.`
+}
+
+export const genderGroupLabel = (gender: Gender) => {
+  return gender === 'male'
+    ? t`Hommes dans le défilement et l’AutoFocus`
+    : t`Femmes dans le défilement et l’AutoFocus`
 }
 
 type GenderGroupHintParams = {
@@ -373,10 +477,18 @@ export const genderGroupHint = ({
   isIncluded
 }: GenderGroupHintParams) => {
   if (isEmpty) {
-    return strings.characters.emptyGroupLabel[gender]
+    return gender === 'male'
+      ? t`Aucun homme connecté`
+      : t`Aucune femme connectée`
   }
 
-  return isIncluded
-    ? strings.characters.excludeGroupLabel[gender]
-    : strings.characters.includeGroupLabel[gender]
+  if (isIncluded) {
+    return gender === 'male'
+      ? t`Exclure tous les hommes`
+      : t`Exclure toutes les femmes`
+  }
+
+  return gender === 'male'
+    ? t`Réintégrer tous les hommes`
+    : t`Réintégrer toutes les femmes`
 }

@@ -4,6 +4,7 @@ use serde::Serialize;
 use crate::app::journal::JournalEntry;
 use crate::app::journal::RelayFailure;
 use crate::config::BannerCorner;
+use crate::config::Language;
 use crate::config::QuickReplyId;
 use crate::domain::Class;
 use crate::domain::Color;
@@ -29,6 +30,7 @@ impl From<ScreenSaverDelay> for ScreenSaverView {
 pub struct Snapshot {
     pub version: String,
     pub system: String,
+    pub language: Language,
     pub keyboard: KeyLabels,
     pub characters: Vec<CharacterView>,
     pub shortcuts: Vec<ShortcutView>,
@@ -502,6 +504,7 @@ mod tests {
         Snapshot {
             version: "0.1.0".to_owned(),
             system: "macos 15.0 aarch64".to_owned(),
+            language: Language::Fr,
             keyboard: KeyLabels::new(),
             characters: vec![character()],
             shortcuts: vec![ShortcutView {
@@ -620,6 +623,7 @@ mod tests {
                 "config",
                 "journal",
                 "keyboard",
+                "language",
                 "maximizeOnLaunch",
                 "paintPortraits",
                 "quickReplies",

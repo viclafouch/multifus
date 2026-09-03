@@ -1,10 +1,12 @@
 import React from 'react'
 import { Ban } from 'lucide-react'
+import { i18n } from '@lingui/core'
+import { t } from '@lingui/core/macro'
 import type { Color } from '@/@types/roster'
 import { ColorSwatch } from '@/components/color-swatch'
 import { Legend } from '@/components/layout/legend'
 import { COLORS, COLOR_TINTS } from '@/constants/colors'
-import { strings } from '@/constants/strings'
+import { COLOR_LABELS } from '@/constants/roster'
 import type { ColorHolders } from '@/helpers/colors'
 import { holderOf } from '@/helpers/colors'
 import { colorReadout } from '@/helpers/wording'
@@ -26,7 +28,6 @@ export const ColorGrid = ({
   takenColors,
   onPickColor
 }: ColorGridProps) => {
-  const words = strings.characters
   const [near, setNear] = React.useState<Near>(null)
 
   const holderOfColor = (candidate: Color | null) => {
@@ -48,7 +49,7 @@ export const ColorGrid = ({
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-baseline justify-between gap-2">
-        <Legend>{words.dialogColors}</Legend>
+        <Legend>{t`Couleur`}</Legend>
         <span aria-hidden className="truncate text-note text-muted-foreground">
           {colorReadout(shown, holderOfColor(shown))}
         </span>
@@ -56,6 +57,7 @@ export const ColorGrid = ({
       <ul className="flex flex-wrap gap-0.5">
         {COLORS.map((candidate) => {
           const holder = holderOfColor(candidate)
+          const label = i18n._(COLOR_LABELS[candidate])
 
           return (
             <li key={candidate}>
@@ -67,12 +69,8 @@ export const ColorGrid = ({
                 isBare={false}
                 label={
                   holder === null
-                    ? words.colorLabel(nickname, words.colors[candidate])
-                    : words.colorTakenLabel({
-                        nickname,
-                        label: words.colors[candidate],
-                        holder
-                      })
+                    ? t`Marquer ${nickname} en ${label}`
+                    : t`Marquer ${nickname} en ${label}, déjà pris par ${holder}`
                 }
                 onPick={() => {
                   onPickColor(candidate)
@@ -89,7 +87,7 @@ export const ColorGrid = ({
             isNear={near === NO_COLOR}
             isTaken={false}
             isBare
-            label={words.noColorLabel(nickname)}
+            label={t`Retirer la couleur de ${nickname}`}
             onPick={() => {
               onPickColor(null)
             }}

@@ -1,9 +1,9 @@
+import { t } from '@lingui/core/macro'
 import type { Snapshot } from '@/@types/snapshot'
 import type { BannerPlace } from '@/@types/walk'
 import { Legend } from '@/components/layout/legend'
 import { Panel } from '@/components/layout/panel'
 import { PanelHeader } from '@/components/layout/panel-header'
-import { strings } from '@/constants/strings'
 import { screenOf } from '@/helpers/banner'
 import { useBannerScreens } from '@/hooks/use-banner-screens'
 import { setBannerCorner, setBannerScreen } from '@/lib/multifus'
@@ -22,13 +22,13 @@ export const BannerPanel = ({ place, run }: BannerPanelProps) => {
   return (
     <Panel>
       <PanelHeader
-        title={strings.walk.banner.title}
-        description={strings.walk.banner.description}
+        title={t`La bannière`}
+        description={t`Elle s’affiche tant que le Déplacement rapide est allumé, et dit sur quel personnage vous venez d’arriver.`}
       />
       <div className="flex flex-col gap-3 px-4 py-4">
         {screens.length > 1 ? (
           <div className="flex flex-col gap-2">
-            <Legend>{strings.walk.banner.screenLegend}</Legend>
+            <Legend>{t`L’écran`}</Legend>
             <div className="flex flex-wrap gap-2">
               {screens.map((screen, rank) => {
                 return (

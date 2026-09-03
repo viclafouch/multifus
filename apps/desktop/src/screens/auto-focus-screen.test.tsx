@@ -1,7 +1,8 @@
 import { describe, expect, it, vi } from 'vitest'
+import { i18n } from '@lingui/core'
 import { fireEvent, render, screen } from '@testing-library/react'
 import type { AutoFocusSwitch, NotificationKind } from '@/@types/notification'
-import { APPLE_AGENT, WINDOWS_AGENT } from '@/test-doubles'
+import { APPLE_AGENT, WINDOWS_AGENT, speakFrench } from '@/test-doubles'
 
 const bridge = {
   setAutoFocus: vi.fn(),
@@ -43,8 +44,10 @@ const show = async ({
   vi.resetModules()
   vi.stubGlobal('navigator', { userAgent: agent })
 
+  await speakFrench()
+
   const { AutoFocusScreen } = await import('@/screens/auto-focus-screen')
-  const { strings } = await import('@/constants/strings')
+  const { NOTIFICATION_LABELS } = await import('@/constants/notification')
 
   render(
     <AutoFocusScreen
@@ -55,7 +58,7 @@ const show = async ({
     />
   )
 
-  return strings.autoFocus
+  return NOTIFICATION_LABELS
 }
 
 const switchNamed = (label: string) => {
@@ -64,61 +67,61 @@ const switchNamed = (label: string) => {
 
 describe('l’écran de l’AutoFocus', () => {
   it('porte une ligne par événement que le jeu sait annoncer', async () => {
-    const words = await show()
+    const kinds = await show()
 
     for (const kind of ALL_KINDS) {
-      const { label, description } = words.kinds[kind]
+      const { label, description } = kinds[kind]
 
-      expect(switchNamed(label)).not.toBeNull()
-      expect(screen.getByText(description)).not.toBeNull()
+      expect(switchNamed(i18n._(label))).not.toBeNull()
+      expect(screen.getByText(i18n._(description))).not.toBeNull()
     }
   })
 
   it('ne montre que les événements que Rust lui donne', async () => {
-    const words = await show({ switches: [{ kind: 'combat', enabled: true }] })
+    const kinds = await show({ switches: [{ kind: 'combat', enabled: true }] })
 
-    expect(switchNamed(words.kinds.combat.label)).not.toBeNull()
+    expect(switchNamed(i18n._(kinds.combat.label))).not.toBeNull()
     expect(
-      screen.queryByRole('switch', { name: words.kinds.craft.label })
+      screen.queryByRole('switch', { name: i18n._(kinds.craft.label) })
     ).toBeNull()
   })
 
   it('allume l’AutoFocus quand on bouge l’interrupteur maître', async () => {
-    const words = await show({ isEnabled: false })
+    await show({ isEnabled: false })
 
-    fireEvent.click(switchNamed(words.masterLabel))
+    fireEvent.click(switchNamed('Activer l’AutoFocus'))
 
     expect(bridge.setAutoFocusEnabled).toHaveBeenCalledWith(true)
   })
 
   it('éteint l’AutoFocus quand on rebouge l’interrupteur maître', async () => {
-    const words = await show({ isEnabled: true })
+    await show({ isEnabled: true })
 
-    fireEvent.click(switchNamed(words.masterLabel))
+    fireEvent.click(switchNamed('Activer l’AutoFocus'))
 
     expect(bridge.setAutoFocusEnabled).toHaveBeenCalledWith(false)
   })
 
   it('coupe un événement quand on décoche sa ligne', async () => {
-    const words = await show()
+    const kinds = await show()
 
-    fireEvent.click(switchNamed(words.kinds.combat.label))
+    fireEvent.click(switchNamed(i18n._(kinds.combat.label)))
 
     expect(bridge.setAutoFocus).toHaveBeenCalledWith('combat', false)
   })
 
   it('rallume un événement quand on recoche sa ligne', async () => {
-    const words = await show({
+    const kinds = await show({
       switches: [{ kind: 'perceptor', enabled: false }]
     })
 
-    fireEvent.click(switchNamed(words.kinds.perceptor.label))
+    fireEvent.click(switchNamed(i18n._(kinds.perceptor.label)))
 
     expect(bridge.setAutoFocus).toHaveBeenCalledWith('perceptor', true)
   })
 
   it('garde en mémoire les événements cochés, l’AutoFocus éteint', async () => {
-    const words = await show({
+    const kinds = await show({
       isEnabled: false,
       switches: [
         { kind: 'combat', enabled: true },
@@ -127,40 +130,46 @@ describe('l’écran de l’AutoFocus', () => {
     })
 
     expect(
-      switchNamed(words.kinds.combat.label).getAttribute('aria-checked')
+      switchNamed(i18n._(kinds.combat.label)).getAttribute('aria-checked')
     ).toBe('true')
     expect(
-      switchNamed(words.kinds.craft.label).getAttribute('aria-checked')
+      switchNamed(i18n._(kinds.craft.label)).getAttribute('aria-checked')
     ).toBe('false')
   })
 
   it('laisse régler les événements même l’AutoFocus éteint', async () => {
-    const words = await show({ isEnabled: false })
+    const kinds = await show({ isEnabled: false })
 
-    fireEvent.click(switchNamed(words.kinds.trade.label))
+    fireEvent.click(switchNamed(i18n._(kinds.trade.label)))
 
     expect(bridge.setAutoFocus).toHaveBeenCalledWith('trade', false)
   })
 
   it('va chercher les fenêtres réduites quand on le lui demande', async () => {
-    const words = await show({ wakesMinimized: false })
+    await show({ wakesMinimized: false })
 
-    fireEvent.click(switchNamed(words.minimizedLabel))
+    fireEvent.click(switchNamed('Aller chercher les fenêtres réduites'))
 
     expect(bridge.setWakesMinimized).toHaveBeenCalledWith(true)
   })
 
   it('parle de la barre des tâches sur Windows', async () => {
-    const words = await show({ agent: WINDOWS_AGENT })
+    await show({ agent: WINDOWS_AGENT })
 
-    expect(words.minimizedDescription).toContain('barre des tâches')
-    expect(screen.getByText(words.minimizedDescription)).not.toBeNull()
+    expect(
+      screen.getByText(
+        'Même un personnage rangé dans la barre des tâches revient devant vous.'
+      )
+    ).not.toBeNull()
   })
 
   it('parle du Dock sur un Mac', async () => {
-    const words = await show({ agent: APPLE_AGENT })
+    await show({ agent: APPLE_AGENT })
 
-    expect(words.minimizedDescription).toContain('Dock')
-    expect(screen.getByText(words.minimizedDescription)).not.toBeNull()
+    expect(
+      screen.getByText(
+        'Même un personnage rangé dans le Dock revient devant vous.'
+      )
+    ).not.toBeNull()
   })
 })

@@ -2,7 +2,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, render, screen } from '@testing-library/react'
 import type { BannerStep } from '@/@types/walk'
 import { CLASS_PORTRAITS } from '@/constants/classes'
-import { strings } from '@/constants/strings'
 import { ignore } from '@/lib/utils'
 import { pending } from '@/test-doubles'
 
@@ -70,20 +69,20 @@ describe('la bannière', () => {
 
     render(<Banner />)
 
-    expect(screen.queryByText(strings.walk.banner.waiting)).toBeNull()
+    expect(screen.queryByText('Déplacement rapide')).toBeNull()
   })
 
   it('dit seulement Déplacement rapide tant qu’on n’est arrivé sur personne', async () => {
     await posted(stepOf())
 
-    expect(screen.getByText(strings.walk.banner.waiting)).not.toBeNull()
+    expect(screen.getByText('Déplacement rapide')).not.toBeNull()
   })
 
   it('dit Aperçu le temps de montrer le coin choisi', async () => {
     await posted(stepOf({ previewing: true }))
 
-    expect(screen.getByText(strings.walk.banner.previewing)).not.toBeNull()
-    expect(screen.queryByText(strings.walk.banner.waiting)).toBeNull()
+    expect(screen.getByText('Aperçu')).not.toBeNull()
+    expect(screen.queryByText('Déplacement rapide')).toBeNull()
   })
 
   it('porte le pseudo du personnage sur lequel on vient d’arriver', async () => {
@@ -99,7 +98,7 @@ describe('la bannière', () => {
     )
 
     expect(screen.getByText('Alpha')).not.toBeNull()
-    expect(screen.queryByText(strings.walk.banner.waiting)).toBeNull()
+    expect(screen.queryByText('Déplacement rapide')).toBeNull()
   })
 
   it('porte le liseré de la couleur du personnage', async () => {
@@ -204,7 +203,7 @@ describe('la bannière', () => {
 
     step(stepOf())
 
-    expect(screen.getByText(strings.walk.banner.waiting)).not.toBeNull()
+    expect(screen.getByText('Déplacement rapide')).not.toBeNull()
     expect(screen.queryByText('Alpha')).toBeNull()
   })
 })

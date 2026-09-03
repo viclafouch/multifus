@@ -4,7 +4,7 @@ import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import type { Color } from '@/@types/roster'
 import { COLORS, COLOR_TINTS } from '@/constants/colors'
-import { strings } from '@/constants/strings'
+import { COLOR_LABELS } from '@/constants/roster'
 
 const THEME = readFileSync(join(import.meta.dirname, '..', 'theme.css'), 'utf8')
 
@@ -316,9 +316,9 @@ describe('la palette des personnages', () => {
     expect(Object.keys(COLOR_TINTS).toSorted(alphabetical)).toStrictEqual(
       COLORS.toSorted(alphabetical)
     )
-    expect(
-      Object.keys(strings.characters.colors).toSorted(alphabetical)
-    ).toStrictEqual(COLORS.toSorted(alphabetical))
+    expect(Object.keys(COLOR_LABELS).toSorted(alphabetical)).toStrictEqual(
+      COLORS.toSorted(alphabetical)
+    )
   })
 
   it.each(PAIRS)('sépare %s de %s à l’œil ordinaire', (one, other) => {

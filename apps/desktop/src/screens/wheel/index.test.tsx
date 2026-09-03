@@ -2,7 +2,6 @@ import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import type { ShortcutBinding } from '@/@types/shortcuts'
 import type { WheelSize } from '@/@types/wheel'
-import { strings } from '@/constants/strings'
 import { DEMO_FEWEST, DEMO_USUAL } from '@/constants/wheel'
 import { displayOf, pending, wheelSliceOf } from '@/test-doubles'
 
@@ -53,7 +52,9 @@ const show = async ({
 
   render(<WheelScreen wheel={size} shortcuts={shortcuts} run={() => {}} />)
 
-  await screen.findByText(strings.wheel.previewDescription)
+  await screen.findByText(
+    'De faux personnages ici comme à l’essai, les vôtres en jeu. Une jauge pour la taille, une pour le monde qu’il y a dessus.'
+  )
 }
 
 const namesOf = () => {
@@ -78,25 +79,33 @@ const gaugeUnder = (label: string) => {
 }
 
 const gauge = () => {
-  return gaugeUnder(strings.wheel.sizeLabel)
+  return gaugeUnder('Taille')
 }
 
 const crowd = () => {
-  return gaugeUnder(strings.wheel.crowdLabel)
+  return gaugeUnder('Personnages')
 }
 
 describe('l’écran de la roue des personnages', () => {
   it('rappelle la combinaison, et dit qu’elle se maintient', async () => {
     await show()
 
-    expect(screen.getByText(strings.shortcuts.held)).not.toBeNull()
-    expect(screen.queryByText(strings.wheel.unbound)).toBeNull()
+    expect(screen.getByText('au maintien')).not.toBeNull()
+    expect(
+      screen.queryByText(
+        'Sans touches, la roue n’existe pas. Posez-en dans l’écran Raccourcis.'
+      )
+    ).toBeNull()
   })
 
   it('dit en tête que la roue n’existe plus sans combinaison', async () => {
     await show({ shortcuts: [wheelShortcut(null)] })
 
-    expect(screen.getByText(strings.wheel.unbound)).not.toBeNull()
+    expect(
+      screen.getByText(
+        'Sans touches, la roue n’existe pas. Posez-en dans l’écran Raccourcis.'
+      )
+    ).not.toBeNull()
   })
 
   it('porte la jauge de taille, ses bornes et la valeur du moment', async () => {
@@ -106,7 +115,7 @@ describe('l’écran de la roue des personnages', () => {
     expect(gauge().getAttribute('max')).toBe('720')
     expect(gauge().getAttribute('step')).toBe('20')
     expect(gauge().getAttribute('aria-valuenow')).toBe('400')
-    expect(screen.getByText(strings.wheel.sizeValue(400))).not.toBeNull()
+    expect(screen.getByText('400 px')).not.toBeNull()
   })
 
   it('suit la jauge à la touche, et n’enregistre qu’une fois lâchée', async () => {
@@ -115,7 +124,7 @@ describe('l’écran de la roue des personnages', () => {
     gauge().focus()
     fireEvent.keyDown(gauge(), { key: 'ArrowRight' })
 
-    await screen.findByText(strings.wheel.sizeValue(420))
+    await screen.findByText('420 px')
 
     expect(bridge.setWheelDiameter).toHaveBeenCalledWith(420)
   })
@@ -139,7 +148,7 @@ describe('l’écran de la roue des personnages', () => {
       fireEvent.keyDown(crowd(), { key: 'ArrowLeft' })
     }
 
-    await screen.findByText(strings.wheel.crowdValue(DEMO_FEWEST))
+    await screen.findByText('Tout seul')
 
     expect(namesOf()).toStrictEqual([DEMO_TEAM[0].nickname])
     expect(bridge.setWheelDiameter).not.toHaveBeenCalled()
@@ -154,7 +163,7 @@ describe('l’écran de la roue des personnages', () => {
       fireEvent.keyDown(crowd(), { key: 'ArrowRight' })
     }
 
-    await screen.findByText(strings.wheel.crowdValue(DEMO_TEAM.length))
+    await screen.findByText(`À ${DEMO_TEAM.length}`)
 
     expect(namesOf()).toHaveLength(DEMO_TEAM.length)
   })
@@ -173,7 +182,7 @@ describe('l’écran de la roue des personnages', () => {
   it('pose la vraie roue au bouton, avec le monde de la jauge', async () => {
     await show()
 
-    fireEvent.click(screen.getByRole('button', { name: strings.wheel.tryIt }))
+    fireEvent.click(screen.getByRole('button', { name: 'Voir en vrai' }))
 
     expect(bridge.previewWheel).toHaveBeenCalledWith(DEMO_USUAL)
   })
@@ -184,8 +193,8 @@ describe('l’écran de la roue des personnages', () => {
     crowd().focus()
     fireEvent.keyDown(crowd(), { key: 'ArrowRight' })
 
-    await screen.findByText(strings.wheel.crowdValue(DEMO_USUAL + 1))
-    fireEvent.click(screen.getByRole('button', { name: strings.wheel.tryIt }))
+    await screen.findByText(`À ${DEMO_USUAL + 1}`)
+    fireEvent.click(screen.getByRole('button', { name: 'Voir en vrai' }))
 
     expect(bridge.previewWheel).toHaveBeenCalledWith(DEMO_USUAL + 1)
   })

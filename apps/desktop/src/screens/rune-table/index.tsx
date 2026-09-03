@@ -1,4 +1,5 @@
 import { Keyboard, Layers, Move, RotateCcw } from 'lucide-react'
+import { t } from '@lingui/core/macro'
 import type { RuneTableStatus } from '@/@types/rune'
 import type { ShortcutBinding } from '@/@types/shortcuts'
 import type { Snapshot } from '@/@types/snapshot'
@@ -11,7 +12,6 @@ import { ShortcutRecall } from '@/components/shortcut-recall'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { IS_APPLE } from '@/constants/keyboard'
-import { strings } from '@/constants/strings'
 import { recallRuneTable, setRuneTableEverywhere } from '@/lib/multifus'
 import { PreviewPanel } from '@/screens/rune-table/preview-panel'
 
@@ -26,7 +26,7 @@ export const RuneTableScreen = ({
   shortcuts,
   run
 }: RuneTableScreenProps) => {
-  const words = strings.runeTable
+  const everywhereLabel = t`Afficher sur tous les personnages connectés`
 
   const accelerator =
     shortcuts.find((shortcut) => {
@@ -34,14 +34,17 @@ export const RuneTableScreen = ({
     })?.accelerator ?? null
 
   return (
-    <Screen title={words.title} subtitle={words.subtitle}>
+    <Screen
+      title={t`Tableau des runes`}
+      subtitle={t`Les poids des runes, affichés par-dessus le jeu. Plus besoin d’aller les chercher ailleurs pendant que vous cassez.`}
+    >
       {accelerator === null ? (
-        <Note className="mb-3">{words.unbound}</Note>
+        <Note className="mb-3">{t`Sans touches, le tableau ne s’affiche plus. Posez-en dans l’écran Raccourcis.`}</Note>
       ) : null}
       <Panel className="mb-3">
         <FieldRow
-          label={words.shortcutLabel}
-          description={words.shortcutDescription}
+          label={t`Raccourci`}
+          description={t`Depuis une fenêtre du jeu, et nulle part ailleurs.`}
           icon={
             <Keyboard className="size-glyph" strokeWidth={1.75} aria-hidden />
           }
@@ -52,27 +55,27 @@ export const RuneTableScreen = ({
       <PreviewPanel runeTable={runeTable} run={run} />
       <Panel>
         <PanelHeader
-          title={words.whereTitle}
-          description={words.whereDescription}
+          title={t`Où il se montre`}
+          description={t`Le tableau ne s’affiche que sur le personnage où vous l’avez ouvert.`}
         />
         <FieldRow
-          label={words.everywhereLabel}
-          description={words.everywhereNote}
+          label={everywhereLabel}
+          description={t`En général, un seul personnage forge.`}
           icon={
             <Layers className="size-glyph" strokeWidth={1.75} aria-hidden />
           }
         >
           <Switch
             checked={runeTable.everywhere}
-            aria-label={words.everywhereLabel}
+            aria-label={everywhereLabel}
             onCheckedChange={(everywhere) => {
               run(setRuneTableEverywhere(everywhere))
             }}
           />
         </FieldRow>
         <FieldRow
-          label={words.recallLabel}
-          description={words.recallNote}
+          label={t`Remettre à sa position initiale`}
+          description={t`Si vous l’avez poussé hors de l’écran, il revient en haut à droite du client.`}
           icon={<Move className="size-glyph" strokeWidth={1.75} aria-hidden />}
         >
           <Button
@@ -83,11 +86,13 @@ export const RuneTableScreen = ({
             }}
           >
             <RotateCcw aria-hidden />
-            {words.recall}
+            {t({ message: 'Remettre', context: 'tableau des runes' })}
           </Button>
         </FieldRow>
       </Panel>
-      {IS_APPLE ? <Note className="mt-3">{words.fullScreenNote}</Note> : null}
+      {IS_APPLE ? (
+        <Note className="mt-3">{t`Le tableau ne s’affiche pas sur un client en plein écran. Forgez dans une fenêtre agrandie.`}</Note>
+      ) : null}
     </Screen>
   )
 }

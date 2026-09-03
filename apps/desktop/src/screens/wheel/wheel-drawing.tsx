@@ -1,9 +1,9 @@
 import React from 'react'
+import { t } from '@lingui/core/macro'
 import type { Display } from '@/@types/display'
 import type { WheelSize } from '@/@types/wheel'
 import { ScreenFrame } from '@/components/layout/screen-frame'
 import { WheelDial } from '@/components/wheel-dial'
-import { strings } from '@/constants/strings'
 import { drawnWheel } from '@/helpers/wheel'
 
 type WheelDrawingProps = Readonly<{
@@ -23,7 +23,7 @@ export const WheelDrawing = ({ screen, size, crowd }: WheelDrawingProps) => {
       <ScreenFrame
         ratio={drawn.ratio}
         width={drawn.drawnWidth}
-        label={strings.wheel.drawingLabel}
+        label={t`La roue au milieu de votre écran`}
         className="flex items-center justify-center"
       >
         <WheelDial

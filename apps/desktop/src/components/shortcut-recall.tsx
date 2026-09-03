@@ -1,5 +1,5 @@
+import { t } from '@lingui/core/macro'
 import { KeyCap } from '@/components/key-cap'
-import { strings } from '@/constants/strings'
 import { acceleratorParts } from '@/helpers/accelerator'
 
 type ShortcutRecallProps = Readonly<{
@@ -12,11 +12,7 @@ export const ShortcutRecall = ({
   mention
 }: ShortcutRecallProps) => {
   if (accelerator === null) {
-    return (
-      <span className="text-note text-muted-foreground">
-        {strings.shortcuts.empty}
-      </span>
-    )
+    return <span className="text-note text-muted-foreground">{t`Aucune`}</span>
   }
 
   return (

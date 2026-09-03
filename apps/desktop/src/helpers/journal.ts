@@ -1,3 +1,5 @@
+import { i18n } from '@lingui/core'
+import { plural, t } from '@lingui/core/macro'
 import type {
   CharacterShortcutOutcome,
   JournalEntry,
@@ -40,12 +42,18 @@ import {
   WHEEL_TONES,
   WORK_LABELS
 } from '@/constants/journal'
-import { strings } from '@/constants/strings'
-import { matchIsPlural, focusDuration } from '@/helpers/format'
-import { bindingLabel, updateLine } from '@/helpers/wording'
+import { LANGUAGE_LABELS } from '@/constants/language'
+import { NOTIFICATION_LABELS } from '@/constants/notification'
+import { CLASS_LABELS, COLOR_LABELS } from '@/constants/roster'
+import { focusDuration } from '@/helpers/format'
+import {
+  bindingLabel,
+  shortcutActionLabel,
+  updateLine
+} from '@/helpers/wording'
 
 export const journalTime = (milliseconds: number) => {
-  return new Date(milliseconds).toLocaleTimeString('fr-FR', {
+  return new Date(milliseconds).toLocaleTimeString(i18n.locale, {
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit'
@@ -53,7 +61,7 @@ export const journalTime = (milliseconds: number) => {
 }
 
 const journalMoment = (milliseconds: number) => {
-  return new Date(milliseconds).toLocaleString('fr-FR', {
+  return new Date(milliseconds).toLocaleString(i18n.locale, {
     dateStyle: 'short',
     timeStyle: 'medium'
   })
@@ -126,48 +134,50 @@ const isPlain = (
   return event.kind in PLAIN_LINES
 }
 
-const startedLine = (event: Extract<JournalEvent, { kind: 'started' }>) => {
-  const how =
-    event.launch === 'session'
-      ? 'au démarrage de la session'
-      : 'lancé à la main'
-
-  return `Multifus ${event.version} a démarré sur ${event.system}, ${how}.`
+const startedLine = ({
+  version,
+  system,
+  launch
+}: Extract<JournalEvent, { kind: 'started' }>) => {
+  return launch === 'session'
+    ? t`Multifus ${version} a démarré sur ${system}, au démarrage de la session.`
+    : t`Multifus ${version} a démarré sur ${system}, lancé à la main.`
 }
 
-const configLoadFailedLine = (
-  event: Extract<JournalEvent, { kind: 'configLoadFailed' }>
-) => {
-  const whereItWent =
-    event.quarantined === null
-      ? 'Rien n’a été déplacé.'
-      : `Fichier mis de côté : ${event.quarantined}`
-
-  return `Configuration non chargée, Multifus est reparti sur ses réglages par défaut (${event.detail}). ${whereItWent}`
-}
-
-const authorizationRequestedLine = (
-  event: Extract<JournalEvent, { kind: 'authorizationRequested' }>
-) => {
-  if (event.failure !== null) {
-    return `Autorisation demandée : le système n’a pas pu répondre (${event.failure}).`
+const configLoadFailedLine = ({
+  detail,
+  quarantined
+}: Extract<JournalEvent, { kind: 'configLoadFailed' }>) => {
+  if (quarantined === null) {
+    return t`Configuration non chargée, Multifus est reparti sur ses réglages par défaut (${detail}). Rien n’a été déplacé.`
   }
 
-  return event.granted
-    ? 'Autorisation demandée : accordée.'
-    : 'Autorisation demandée : pas encore accordée, ce qui est normal dans la seconde qui suit.'
+  return t`Configuration non chargée, Multifus est reparti sur ses réglages par défaut (${detail}). Fichier mis de côté : ${quarantined}`
 }
 
-const relayFailedLine = (reason: RelayFailure) => {
-  switch (reason.reason) {
+const authorizationRequestedLine = ({
+  failure,
+  granted
+}: Extract<JournalEvent, { kind: 'authorizationRequested' }>) => {
+  if (failure !== null) {
+    return t`Autorisation demandée : le système n’a pas pu répondre (${failure}).`
+  }
+
+  return granted
+    ? t`Autorisation demandée : accordée.`
+    : t`Autorisation demandée : pas encore accordée, ce qui est normal dans la seconde qui suit.`
+}
+
+const relayFailedLine = ({ reason, detail }: RelayFailure) => {
+  switch (reason) {
     case 'keychain': {
-      return `Messages privés : le trousseau du système a refusé le code du robot (${reason.detail}).`
+      return t`Messages privés : le trousseau du système a refusé le code du robot (${detail}).`
     }
     case 'telegram': {
-      return `Messages privés : Telegram a refusé la requête (${reason.detail}).`
+      return t`Messages privés : Telegram a refusé la requête (${detail}).`
     }
     case 'network': {
-      return `Messages privés : Telegram n’a pas répondu (${reason.detail}).`
+      return t`Messages privés : Telegram n’a pas répondu (${detail}).`
     }
     default: {
       return reason satisfies never
@@ -175,28 +185,36 @@ const relayFailedLine = (reason: RelayFailure) => {
   }
 }
 
-const quickReplyFailedLine = (reason: QuickReplyFailure) => {
-  switch (reason.reason) {
+const quickReplyFailedLine = (failure: QuickReplyFailure) => {
+  switch (failure.reason) {
     case 'outsideGame': {
-      return 'Réponse rapide ignorée : aucune fenêtre Dofus au premier plan.'
+      return t`Réponse rapide ignorée : aucune fenêtre Dofus au premier plan.`
     }
     case 'foregroundUnknown': {
-      return `Réponse rapide ignorée : impossible de savoir quelle fenêtre est au premier plan (${reason.detail}).`
+      const { detail } = failure
+
+      return t`Réponse rapide ignorée : impossible de savoir quelle fenêtre est au premier plan (${detail}).`
     }
     case 'gone': {
-      return 'Réponse rapide introuvable : elle a été retirée entre l’appui et le collage.'
+      return t`Réponse rapide introuvable : elle a été retirée entre l’appui et le collage.`
     }
     case 'clipboardRefused': {
-      return `Réponse rapide non collée : le presse-papiers a refusé le texte (${reason.detail}).`
+      const { detail } = failure
+
+      return t`Réponse rapide non collée : le presse-papiers a refusé le texte (${detail}).`
     }
     case 'pasteRefused': {
-      return `Réponse rapide non collée : le système a refusé la combinaison de collage (${reason.detail}).`
+      const { detail } = failure
+
+      return t`Réponse rapide non collée : le système a refusé la combinaison de collage (${detail}).`
     }
     case 'clipboardNotGivenBack': {
-      return `Réponse rapide collée, mais le presse-papiers d’avant n’a pas pu être rendu (${reason.detail}).`
+      const { detail } = failure
+
+      return t`Réponse rapide collée, mais le presse-papiers d’avant n’a pas pu être rendu (${detail}).`
     }
     default: {
-      return reason satisfies never
+      return failure satisfies never
     }
   }
 }
@@ -207,23 +225,28 @@ type MaximizeAllLineParams = {
 }
 
 const maximizeAllLine = ({ from, outcome }: MaximizeAllLineParams) => {
-  const subject = `${strings.maximize.all}, depuis ${SURFACE_LABELS[from]}`
+  const surface = i18n._(SURFACE_LABELS[from])
 
   switch (outcome.outcome) {
     case 'asked': {
-      return `${subject} : ${askedWindows(outcome.windows)}.`
+      return plural(outcome.windows, {
+        one: `Agrandir les fenêtres, depuis ${surface} : demandé à un client.`,
+        other: `Agrandir les fenêtres, depuis ${surface} : demandé à # clients.`
+      })
     }
     case 'nothingMoved': {
-      return `${subject} : aucun client n’a accepté.`
+      return t`Agrandir les fenêtres, depuis ${surface} : aucun client n’a accepté.`
     }
     case 'noClient': {
-      return `${subject} : aucun client Dofus ouvert.`
+      return t`Agrandir les fenêtres, depuis ${surface} : aucun client Dofus ouvert.`
     }
     case 'denied': {
-      return `${subject} : l’autorisation manque.`
+      return t`Agrandir les fenêtres, depuis ${surface} : l’autorisation manque.`
     }
     case 'refused': {
-      return `${subject} : lecture des fenêtres impossible (${outcome.detail}).`
+      const { detail } = outcome
+
+      return t`Agrandir les fenêtres, depuis ${surface} : lecture des fenêtres impossible (${detail}).`
     }
     default: {
       return outcome satisfies never
@@ -231,65 +254,83 @@ const maximizeAllLine = ({ from, outcome }: MaximizeAllLineParams) => {
   }
 }
 
-const askedWindows = (windows: number) => {
-  return matchIsPlural(windows)
-    ? `demandé à ${windows} clients`
-    : 'demandé à un client'
-}
-
 const rosterLine = (change: RosterChange) => {
   switch (change.kind) {
     case 'excluded': {
-      return `${change.nickname} exclu.`
+      const { nickname } = change
+
+      return t`${nickname} exclu.`
     }
     case 'included': {
-      return `${change.nickname} réintégré.`
+      const { nickname } = change
+
+      return t`${nickname} réintégré.`
     }
     case 'genderExcluded': {
       const lines = GENDER_GROUP_LINES[change.gender]
 
-      return change.excluded ? lines.excluded : lines.included
+      return i18n._(change.excluded ? lines.excluded : lines.included)
     }
     case 'genderAssigned': {
-      if (change.gender === null) {
-        return `Sexe retiré à ${change.nickname}.`
+      const { nickname, gender } = change
+
+      if (gender === null) {
+        return t`Sexe retiré à ${nickname}.`
       }
 
-      const sex = change.gender === 'male' ? 'homme' : 'femme'
-
-      return `${change.nickname} est assigné comme ${sex}.`
+      return gender === 'male'
+        ? t`${nickname} est assigné comme homme.`
+        : t`${nickname} est assigné comme femme.`
     }
     case 'classAssigned': {
+      const { nickname } = change
+
       if (change.class === null) {
-        return `Classe retirée à ${change.nickname}.`
+        return t`Classe retirée à ${nickname}.`
       }
 
-      return `${change.nickname} est assigné comme ${strings.characters.classes[change.class]}.`
+      const label = i18n._(CLASS_LABELS[change.class])
+
+      return t`${nickname} est assigné comme ${label}.`
     }
     case 'colorAssigned': {
-      if (change.color === null) {
-        return `Couleur retirée à ${change.nickname}.`
+      const { nickname, color } = change
+
+      if (color === null) {
+        return t`Couleur retirée à ${nickname}.`
       }
 
-      return `${change.nickname} est marqué en ${strings.characters.colors[change.color]}.`
+      const label = i18n._(COLOR_LABELS[color])
+
+      return t`${nickname} est marqué en ${label}.`
     }
     case 'reordered': {
-      return change.order.length === 0
-        ? 'Ordre du défilement modifié, roster vide.'
-        : `Ordre du défilement : ${change.order.join(', ')}.`
+      if (change.order.length === 0) {
+        return t`Ordre du défilement modifié, roster vide.`
+      }
+
+      const order = change.order.join(', ')
+
+      return t`Ordre du défilement : ${order}.`
     }
     case 'main': {
+      const { nickname } = change
+
       return change.main
-        ? `${change.nickname} devient votre personnage principal.`
-        : `${change.nickname} n’est plus votre personnage principal.`
+        ? t`${nickname} devient votre personnage principal.`
+        : t`${nickname} n’est plus votre personnage principal.`
     }
     case 'removed': {
-      return `${change.nickname} retiré du roster.`
+      const { nickname } = change
+
+      return t`${nickname} retiré du roster.`
     }
     case 'relayed': {
+      const { nickname } = change
+
       return change.relayed
-        ? `${change.nickname} est relayé.`
-        : `${change.nickname} n’est plus relayé.`
+        ? t`${nickname} est relayé.`
+        : t`${nickname} n’est plus relayé.`
     }
     default: {
       return change satisfies never
@@ -300,45 +341,55 @@ const rosterLine = (change: RosterChange) => {
 const settingLine = (change: SettingChange) => {
   switch (change.kind) {
     case 'autoFocusEnabled': {
-      const what = change.enabled ? 'activé' : 'désactivé'
+      const surface = i18n._(SURFACE_LABELS[change.from])
 
-      return `AutoFocus ${what} depuis ${SURFACE_LABELS[change.from]}.`
+      return change.enabled
+        ? t`AutoFocus activé depuis ${surface}.`
+        : t`AutoFocus désactivé depuis ${surface}.`
     }
     case 'autoFocusKind': {
-      const { label } = strings.autoFocus.kinds[change.notificationKind]
-      const what = change.enabled ? 'activé' : 'désactivé'
+      const label = i18n._(NOTIFICATION_LABELS[change.notificationKind].label)
 
-      return `AutoFocus, type ${label} ${what}.`
+      return change.enabled
+        ? t`AutoFocus, type ${label} activé.`
+        : t`AutoFocus, type ${label} désactivé.`
     }
     case 'wakesMinimized': {
-      const what = change.wakes ? 'activé' : 'désactivé'
+      const surface = i18n._(SURFACE_LABELS[change.from])
 
-      return `Réveil des fenêtres réduites ${what} depuis ${SURFACE_LABELS[change.from]}.`
+      return change.wakes
+        ? t`Réveil des fenêtres réduites activé depuis ${surface}.`
+        : t`Réveil des fenêtres réduites désactivé depuis ${surface}.`
     }
     case 'maximizeOnLaunch': {
-      const what = change.maximize ? 'activé' : 'désactivé'
-
-      return `Agrandissement des fenêtres au lancement ${what}.`
+      return change.maximize
+        ? t`Agrandissement des fenêtres au lancement activé.`
+        : t`Agrandissement des fenêtres au lancement désactivé.`
     }
     case 'shortTitles': {
-      const what = change.short ? 'activé' : 'désactivé'
-
-      return `Pseudo seul dans le titre des fenêtres ${what}.`
+      return change.short
+        ? t`Pseudo seul dans le titre des fenêtres activé.`
+        : t`Pseudo seul dans le titre des fenêtres désactivé.`
     }
     case 'paintPortraits': {
-      const what = change.paint ? 'activée' : 'désactivée'
-
-      return `Tête de classe dans la barre des tâches ${what}.`
+      return change.paint
+        ? t`Tête de classe dans la barre des tâches activée.`
+        : t`Tête de classe dans la barre des tâches désactivée.`
     }
     case 'ungroupTaskbar': {
-      const what = change.ungroup ? 'activé' : 'désactivé'
-
-      return `Un bouton par personnage dans la barre des tâches ${what}.`
+      return change.ungroup
+        ? t`Un bouton par personnage dans la barre des tâches activé.`
+        : t`Un bouton par personnage dans la barre des tâches désactivé.`
     }
     case 'relayBody': {
-      const what = change.sendBody ? 'activé' : 'désactivé'
+      return change.sendBody
+        ? t`Envoi du texte des messages privés activé.`
+        : t`Envoi du texte des messages privés désactivé.`
+    }
+    case 'language': {
+      const label = LANGUAGE_LABELS[change.language]
 
-      return `Envoi du texte des messages privés ${what}.`
+      return t`Langue de Multifus : ${label}.`
     }
     default: {
       return change satisfies never
@@ -350,34 +401,42 @@ const shortcutsBoundLine = (
   bindings: readonly BoundCombination[],
   quickReplies: readonly QuickReply[]
 ) => {
-  const parts = bindings.map((bound) => {
-    return `${bindingLabel(bound.binding, quickReplies)} ${boundCombinationLabel(bound, quickReplies)}`
-  })
+  const bound = bindings
+    .map((binding) => {
+      return `${bindingLabel(binding.binding, quickReplies)} ${boundCombinationLabel(binding, quickReplies)}`
+    })
+    .join(' · ')
 
-  return `Raccourcis : ${parts.join(' · ')}.`
+  return t`Raccourcis : ${bound}.`
 }
 
 const boundCombinationLabel = (
   { accelerator, status }: BoundCombination,
   quickReplies: readonly QuickReply[]
 ) => {
-  const combination = accelerator ?? 'aucune combinaison'
+  const combination = accelerator ?? t`aucune combinaison`
 
   switch (status.kind) {
     case 'registered': {
       return combination
     }
     case 'unbound': {
-      return 'non attribué'
+      return t`non attribué`
     }
     case 'invalid': {
-      return `${combination} illisible (${status.detail})`
+      const { detail } = status
+
+      return t`${combination} illisible (${detail})`
     }
     case 'duplicate': {
-      return `${combination} en doublon avec ${bindingLabel(status.binding, quickReplies)}, donc inerte`
+      const label = bindingLabel(status.binding, quickReplies)
+
+      return t`${combination} en doublon avec ${label}, donc inerte`
     }
     case 'refused': {
-      return `${combination} refusé (${status.detail})`
+      const { detail } = status
+
+      return t`${combination} refusé (${detail})`
     }
     default: {
       return status satisfies never
@@ -417,7 +476,7 @@ const boundCombinations = (snapshot: Snapshot): readonly BoundCombination[] => {
 
 const journalPeriod = (entries: readonly JournalEntry[]) => {
   if (entries.length === 0) {
-    return 'aucune entrée'
+    return t`aucune entrée`
   }
 
   const lastIndex = entries.length - 1
@@ -432,16 +491,28 @@ export const journalTranscript = (snapshot: Snapshot) => {
     return `${journalTime(entry.at)}  ${journalLine(entry.event, snapshot.quickReplies)}`
   })
 
+  const { version, system } = snapshot
+  const granted = snapshot.authorization.granted ? t`accordée` : t`refusée`
+  const listening = snapshot.authorization.listening ? t`active` : t`arrêtée`
+  const active = t`actif`
+  const autoFocus = snapshot.autoFocusEnabled ? active : t`suspendu`
+  const minimized = snapshot.wakesMinimized ? active : t`inactif`
+  const walk = snapshot.walk.enabled ? t`allumé` : t`éteint`
+  const { path } = snapshot.config
+  const update = updateLine(snapshot.update)
+  const kept = journal.length
+  const period = journalPeriod(journal)
+
   return [
-    `Multifus ${snapshot.version} sur ${snapshot.system}`,
-    `Autorisation : ${snapshot.authorization.granted ? 'accordée' : 'refusée'}, écoute ${snapshot.authorization.listening ? 'active' : 'arrêtée'}`,
-    `AutoFocus : ${snapshot.autoFocusEnabled ? 'actif' : 'suspendu'}, réveil des réduites ${snapshot.wakesMinimized ? 'actif' : 'inactif'}`,
-    `Déplacement rapide : ${snapshot.walk.enabled ? 'allumé' : 'éteint'}`,
+    t`Multifus ${version} sur ${system}`,
+    t`Autorisation : ${granted}, écoute ${listening}`,
+    t`AutoFocus : ${autoFocus}, réveil des réduites ${minimized}`,
+    t`Déplacement rapide : ${walk}`,
     shortcutsBoundLine(boundCombinations(snapshot), snapshot.quickReplies),
-    `Configuration : ${snapshot.config.path}`,
-    `Mise à jour : ${updateLine(snapshot.update)}`,
-    `Entrées en mémoire : ${journal.length}, ${journalPeriod(journal)}`,
-    'Le fichier du journal sur le disque va plus loin en arrière que ces lignes.',
+    t`Configuration : ${path}`,
+    t`Mise à jour : ${update}`,
+    t`Entrées en mémoire : ${kept}, ${period}`,
+    t`Le fichier du journal sur le disque va plus loin en arrière que ces lignes.`,
     '',
     ...lines
   ].join('\n')
@@ -453,41 +524,57 @@ type ShortcutLineParams = {
 }
 
 const shortcutLine = ({ action, outcome }: ShortcutLineParams) => {
-  const { label } = strings.shortcuts.actions[action]
+  const label = shortcutActionLabel(action)
 
   switch (outcome.outcome) {
     case 'focused': {
-      return `${label} : ${outcome.nickname} au premier plan.`
+      const { nickname } = outcome
+
+      return t`${label} : ${nickname} au premier plan.`
     }
     case 'excluded': {
-      return `${label} : ${outcome.nickname} exclu.`
+      const { nickname } = outcome
+
+      return t`${label} : ${nickname} exclu.`
     }
     case 'included': {
-      return `${label} : ${outcome.nickname} réintégré.`
+      const { nickname } = outcome
+
+      return t`${label} : ${nickname} réintégré.`
     }
     case 'outsideGame': {
-      return `${label} : ignoré, aucune fenêtre Dofus au premier plan.`
+      return t`${label} : ignoré, aucune fenêtre Dofus au premier plan.`
     }
     case 'notInRoster': {
-      return `${label} : ${outcome.nickname} n’est pas encore dans le roster.`
+      const { nickname } = outcome
+
+      return t`${label} : ${nickname} n’est pas encore dans le roster.`
     }
     case 'nobodyInCycle': {
-      return `${label} : personne dans le défilement.`
+      return t`${label} : personne dans le défilement.`
     }
     case 'noMain': {
-      return `${label} : vous n’en avez pas encore choisi un.`
+      return t`${label} : vous n’en avez pas encore choisi un.`
     }
     case 'alreadyThere': {
-      return `${label} : vous êtes déjà sur ${outcome.nickname}.`
+      const { nickname } = outcome
+
+      return t`${label} : vous êtes déjà sur ${nickname}.`
     }
     case 'noWindow': {
-      return `${label} : la fenêtre de ${outcome.nickname} a disparu.`
+      const { nickname } = outcome
+
+      return t`${label} : la fenêtre de ${nickname} a disparu.`
     }
     case 'focusFailed': {
-      return `${label} : le système a refusé de ramener ${outcome.nickname} au premier plan (${outcome.detail}).`
+      const { nickname, detail } = outcome
+
+      return t`${label} : le système a refusé de ramener ${nickname} au premier plan (${detail}).`
     }
     case 'foregroundUnknown': {
-      return `${label} : impossible de savoir quelle fenêtre est au premier plan (${outcome.detail}).`
+      const { detail } = outcome
+
+      return t`${label} : impossible de savoir quelle fenêtre est au premier plan (${detail}).`
     }
     default: {
       return outcome satisfies never
@@ -498,13 +585,19 @@ const shortcutLine = ({ action, outcome }: ShortcutLineParams) => {
 const wheelLine = (outcome: WheelOutcome) => {
   switch (outcome.outcome) {
     case 'focused': {
-      return `La roue a ramené ${outcome.nickname} devant.`
+      const { nickname } = outcome
+
+      return t`La roue a ramené ${nickname} devant.`
     }
     case 'noWindow': {
-      return `La roue : la fenêtre de ${outcome.nickname} a disparu.`
+      const { nickname } = outcome
+
+      return t`La roue : la fenêtre de ${nickname} a disparu.`
     }
     case 'focusFailed': {
-      return `La roue : le système a refusé de ramener ${outcome.nickname} devant (${outcome.detail}).`
+      const { nickname, detail } = outcome
+
+      return t`La roue : le système a refusé de ramener ${nickname} devant (${detail}).`
     }
     default: {
       return outcome satisfies never
@@ -521,29 +614,31 @@ const characterShortcutLine = ({
   nickname,
   outcome
 }: CharacterShortcutLineParams) => {
-  const subject = `Raccourci de ${nickname}`
-
   switch (outcome.outcome) {
     case 'focused': {
-      return `${subject} : sa fenêtre passe au premier plan.`
+      return t`Raccourci de ${nickname} : sa fenêtre passe au premier plan.`
     }
     case 'alreadyThere': {
-      return `${subject} : vous y êtes déjà.`
+      return t`Raccourci de ${nickname} : vous y êtes déjà.`
     }
     case 'notInRoster': {
-      return `${subject} : il n’est plus dans le roster.`
+      return t`Raccourci de ${nickname} : il n’est plus dans le roster.`
     }
     case 'noWindow': {
-      return `${subject} : sa fenêtre a disparu.`
+      return t`Raccourci de ${nickname} : sa fenêtre a disparu.`
     }
     case 'outsideGame': {
-      return `${subject} : ignoré, aucune fenêtre Dofus au premier plan.`
+      return t`Raccourci de ${nickname} : ignoré, aucune fenêtre Dofus au premier plan.`
     }
     case 'focusFailed': {
-      return `${subject} : le système a refusé de le ramener au premier plan (${outcome.detail}).`
+      const { detail } = outcome
+
+      return t`Raccourci de ${nickname} : le système a refusé de le ramener au premier plan (${detail}).`
     }
     case 'foregroundUnknown': {
-      return `${subject} : impossible de savoir quelle fenêtre est au premier plan (${outcome.detail}).`
+      const { detail } = outcome
+
+      return t`Raccourci de ${nickname} : impossible de savoir quelle fenêtre est au premier plan (${detail}).`
     }
     default: {
       return outcome satisfies never
@@ -559,13 +654,15 @@ type TrayLineParams = {
 const trayLine = ({ nickname, outcome }: TrayLineParams) => {
   switch (outcome.outcome) {
     case 'focused': {
-      return `Barre système : ${nickname} au premier plan.`
+      return t`Barre système : ${nickname} au premier plan.`
     }
     case 'noWindow': {
-      return `Barre système : la fenêtre de ${nickname} a disparu.`
+      return t`Barre système : la fenêtre de ${nickname} a disparu.`
     }
     case 'focusFailed': {
-      return `Barre système : le système a refusé de ramener ${nickname} au premier plan (${outcome.detail}).`
+      const { detail } = outcome
+
+      return t`Barre système : le système a refusé de ramener ${nickname} au premier plan (${detail}).`
     }
     default: {
       return outcome satisfies never
@@ -584,40 +681,54 @@ const notificationLine = ({
   notificationKind,
   outcome
 }: NotificationLineParams) => {
-  const subject =
-    notificationKind === null
-      ? `Notification pour ${nickname}`
-      : `${strings.autoFocus.kinds[notificationKind].label} pour ${nickname}`
+  const subject = notificationSubject(nickname, notificationKind)
 
   switch (outcome.outcome) {
     case 'focused': {
-      return `${subject} : fenêtre ramenée au premier plan en ${focusDuration(outcome.focusMicros)}.`
+      const took = focusDuration(outcome.focusMicros)
+
+      return t`${subject} : fenêtre ramenée au premier plan en ${took}.`
     }
     case 'kindDisabled': {
-      return `${subject} : ce type est désactivé, rien n’a été fait.`
+      return t`${subject} : ce type est désactivé, rien n’a été fait.`
     }
     case 'kindUnknown': {
-      return `${subject} : type non reconnu, rien n’a été fait.`
+      return t`${subject} : type non reconnu, rien n’a été fait.`
     }
     case 'noWindow': {
-      return `${subject} : aucune fenêtre à ramener.`
+      return t`${subject} : aucune fenêtre à ramener.`
     }
     case 'excluded': {
-      return `${subject} : personnage exclu, sa fenêtre reste où elle est.`
+      return t`${subject} : personnage exclu, sa fenêtre reste où elle est.`
     }
     case 'leftMinimized': {
-      return `${subject} : fenêtre réduite, laissée où elle est.`
+      return t`${subject} : fenêtre réduite, laissée où elle est.`
     }
     case 'bodyUnread': {
-      return `${subject} : corps de la notification illisible, rien n’a été fait.`
+      return t`${subject} : corps de la notification illisible, rien n’a été fait.`
     }
     case 'focusFailed': {
-      return `${subject} : le système a refusé le passage au premier plan (${outcome.detail}).`
+      const { detail } = outcome
+
+      return t`${subject} : le système a refusé le passage au premier plan (${detail}).`
     }
     default: {
       return outcome satisfies never
     }
   }
+}
+
+const notificationSubject = (
+  nickname: string,
+  notificationKind: NotificationKind | null
+) => {
+  if (notificationKind === null) {
+    return t`Notification pour ${nickname}`
+  }
+
+  const label = i18n._(NOTIFICATION_LABELS[notificationKind].label)
+
+  return t`${label} pour ${nickname}`
 }
 
 type EventOf<Kind extends JournalEvent['kind']> = Extract<
@@ -684,14 +795,18 @@ const runLine = (
     }
     case 'authorization': {
       return event.granted
-        ? 'Autorisation accordée : les fenêtres sont lisibles.'
-        : 'Autorisation refusée : les fenêtres ne peuvent pas être lues.'
+        ? t`Autorisation accordée : les fenêtres sont lisibles.`
+        : t`Autorisation refusée : les fenêtres ne peuvent pas être lues.`
     }
     case 'characterOnline': {
-      return `${event.nickname} est connecté.`
+      const { nickname } = event
+
+      return t`${nickname} est connecté.`
     }
     case 'characterOffline': {
-      return `${event.nickname} n’est plus connecté.`
+      const { nickname } = event
+
+      return t`${nickname} n’est plus connecté.`
     }
     case 'notification': {
       return notificationLine(event)
@@ -701,23 +816,29 @@ const runLine = (
     }
     case 'startAtLoginReconciled': {
       return event.enabled
-        ? 'Démarrage avec la session actif, enregistrement réécrit.'
-        : 'Démarrage avec la session inactif, aucun enregistrement.'
+        ? t`Démarrage avec la session actif, enregistrement réécrit.`
+        : t`Démarrage avec la session inactif, aucun enregistrement.`
     }
     case 'updateAvailable': {
-      return `La version ${event.version} est disponible.`
+      const { version } = event
+
+      return t`La version ${version} est disponible.`
     }
     case 'panicked': {
-      return `${WORK_LABELS[event.work]} a échoué brutalement, et a repris.`
+      const work = i18n._(WORK_LABELS[event.work])
+
+      return t`${work} a échoué brutalement, et a repris.`
     }
     case 'relayFailed': {
       return relayFailedLine(event.reason)
     }
     case 'relaySent': {
-      return `${event.nickname} : message privé relayé sur le téléphone.`
+      const { nickname } = event
+
+      return t`${nickname} : message privé relayé sur le téléphone.`
     }
     case 'relayNoticeSent': {
-      return NOTICE_LINES[event.case]
+      return i18n._(NOTICE_LINES[event.case])
     }
     case 'displayAwake': {
       return displayAwakeLine(event.held)
@@ -730,8 +851,8 @@ const runLine = (
 
 const displayAwakeLine = (held: boolean) => {
   return held
-    ? 'Écran tenu éveillé : il y a des messages privés à écouter.'
-    : 'Écran relâché : plus aucun personnage relayé n’est connecté.'
+    ? t`Écran tenu éveillé : il y a des messages privés à écouter.`
+    : t`Écran relâché : plus aucun personnage relayé n’est connecté.`
 }
 
 const actionLine = (event: EventOf<ActionEventKind>) => {
@@ -755,7 +876,9 @@ const actionLine = (event: EventOf<ActionEventKind>) => {
       return maximizeAllLine(event)
     }
     case 'quickReplyPasted': {
-      return `Réponse rapide collée dans le jeu : « ${event.excerpt} »`
+      const { excerpt } = event
+
+      return t`Réponse rapide collée dans le jeu : « ${excerpt} »`
     }
     case 'quickReplyFailed': {
       return quickReplyFailedLine(event.reason)
@@ -764,18 +887,22 @@ const actionLine = (event: EventOf<ActionEventKind>) => {
       return trayLine(event)
     }
     case 'relayEnabled': {
-      return `Envoi des messages privés activé depuis ${SURFACE_LABELS[event.surface]}.`
+      const surface = i18n._(SURFACE_LABELS[event.surface])
+
+      return t`Envoi des messages privés activé depuis ${surface}.`
     }
     case 'relayDisabled': {
-      return RELAY_STOP_LINES[event.reason]
+      return i18n._(RELAY_STOP_LINES[event.reason])
     }
     case 'walkEnabled': {
-      const what = event.enabled ? 'allumé' : 'éteint'
+      const from = i18n._(WALK_FROM_LABELS[event.from])
 
-      return `Déplacement rapide ${what} depuis ${WALK_FROM_LABELS[event.from]}.`
+      return event.enabled
+        ? t`Déplacement rapide allumé depuis ${from}.`
+        : t`Déplacement rapide éteint depuis ${from}.`
     }
     case 'walkIdle': {
-      return WALK_IDLE_LINES[event.reason]
+      return i18n._(WALK_IDLE_LINES[event.reason])
     }
     case 'wheelPicked': {
       return wheelLine(event.outcome)
@@ -791,11 +918,14 @@ export const journalLine = (
   quickReplies: readonly QuickReply[]
 ) => {
   if (isDetailed(event)) {
-    return `${DETAILED_LINES[event.kind]} : ${event.detail}`
+    const subject = i18n._(DETAILED_LINES[event.kind])
+    const { detail } = event
+
+    return t`${subject} : ${detail}`
   }
 
   if (isPlain(event)) {
-    return PLAIN_LINES[event.kind]
+    return i18n._(PLAIN_LINES[event.kind])
   }
 
   return isRunEvent(event) ? runLine(event, quickReplies) : actionLine(event)

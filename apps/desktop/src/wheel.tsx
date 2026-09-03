@@ -1,16 +1,5 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
+import { WheelWindow } from '@/screens/wheel-window'
+import { mount } from './boot'
 import './wheel.css'
-import { WheelWindow } from './screens/wheel-window'
 
-const rootElement = document.querySelector('#root')
-
-if (!rootElement) {
-  throw new Error('Root element #root is missing from wheel.html')
-}
-
-ReactDOM.createRoot(rootElement).render(
-  <React.StrictMode>
-    <WheelWindow />
-  </React.StrictMode>
-)
+mount('wheel.html', <WheelWindow />)

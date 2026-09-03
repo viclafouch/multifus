@@ -1,8 +1,8 @@
 import React from 'react'
+import { t } from '@lingui/core/macro'
 import { CopyButton } from '@/components/copy-button'
 import { Panel } from '@/components/layout/panel'
 import { RevealButton } from '@/components/reveal-button'
-import { strings } from '@/constants/strings'
 import { revealConfig } from '@/lib/multifus'
 
 type FactProps = Readonly<{
@@ -36,8 +36,6 @@ export const IdentityPanel = ({
   system,
   configPath
 }: IdentityPanelProps) => {
-  const words = strings.about
-
   return (
     <Panel className="mb-3">
       <div className="flex flex-col gap-2.5 px-4 py-4">
@@ -46,22 +44,25 @@ export const IdentityPanel = ({
             aria-hidden
             className="size-1.5 shrink-0 -translate-y-1 rounded-full bg-primary"
           />
-          {strings.app.name}
+          Multifus
         </p>
         <p className="max-w-prose text-body text-muted-foreground">
-          {words.tagline}
+          {t`Le multicompte confortable sur Dofus Retro : Multifus range vos fenêtres, vous jouez.`}
         </p>
       </div>
       <dl className="flex flex-col gap-2 border-t border-border/70 px-4 py-3.5 text-body">
-        <Fact label={words.version} value={version} />
-        <Fact label={words.system} value={system} />
-        <Fact label={words.configPath} value={configPath}>
+        <Fact label={t`Version`} value={version} />
+        <Fact label={t`Système`} value={system} />
+        <Fact label={t`Vos réglages`} value={configPath}>
           <CopyButton
             text={configPath}
-            label={words.configCopy}
-            copiedLabel={words.configCopied}
+            label={t`Copier le chemin`}
+            copiedLabel={t`Chemin copié`}
           />
-          <RevealButton label={words.configReveal} onReveal={revealConfig} />
+          <RevealButton
+            label={t`Montrer le fichier des réglages`}
+            onReveal={revealConfig}
+          />
         </Fact>
       </dl>
     </Panel>

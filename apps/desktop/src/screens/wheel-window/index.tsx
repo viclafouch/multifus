@@ -1,5 +1,5 @@
+import { t } from '@lingui/core/macro'
 import { WheelDial } from '@/components/wheel-dial'
-import { strings } from '@/constants/strings'
 import { useWarmPortraits } from '@/hooks/use-warm-portraits'
 import { useWheelStep } from '@/hooks/use-wheel-step'
 
@@ -16,7 +16,7 @@ export const WheelWindow = () => {
           deadZone={step.deadZone}
           slices={step.slices}
           hovered={step.hovered}
-          nobody={strings.wheel.nobody}
+          nobody={t`Personne de connecté`}
         />
       )}
     </div>

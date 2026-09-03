@@ -1,10 +1,10 @@
+import { t } from '@lingui/core/macro'
 import type { Character } from '@/@types/roster'
 import type { QuickReply, ShortcutBinding } from '@/@types/shortcuts'
 import type { Snapshot } from '@/@types/snapshot'
 import { Note } from '@/components/layout/note'
 import { Screen } from '@/components/layout/screen'
 import { IS_APPLE } from '@/constants/keyboard'
-import { strings } from '@/constants/strings'
 import { useShortcutEditing } from '@/hooks/use-shortcut-editing'
 import { useShortcutUndo } from '@/hooks/use-shortcut-undo'
 import {
@@ -36,8 +36,8 @@ export const ShortcutsScreen = ({
 
   return (
     <Screen
-      title={strings.shortcuts.title}
-      subtitle={strings.shortcuts.subtitle}
+      title={t`Raccourcis`}
+      subtitle={t`Changez de personnage sans lâcher la souris. Ces touches ne marchent que dans Dofus Retro.`}
     >
       <ActionsPanel
         shortcuts={shortcuts}
@@ -75,8 +75,10 @@ export const ShortcutsScreen = ({
           handleClose: editing.close
         }}
       />
-      <Note className="mt-4">{strings.shortcuts.silent}</Note>
-      {IS_APPLE ? null : <Note className="mt-2">{strings.shortcuts.lone}</Note>}
+      <Note className="mt-4">{t`Un autre logiciel peut déjà utiliser les mêmes touches. Multifus les accepte, mais rien ne se passera dans le jeu. En cas de doute, essayez le raccourci depuis Dofus Retro et regardez le journal, en bas.`}</Note>
+      {IS_APPLE ? null : (
+        <Note className="mt-2">{t`Une touche de fonction se pose seule, sans Ctrl ni Alt. Prise ici, elle ne redescend plus dans le jeu : évitez celles que vous avez posées dans les options de Dofus Retro.`}</Note>
+      )}
     </Screen>
   )
 }

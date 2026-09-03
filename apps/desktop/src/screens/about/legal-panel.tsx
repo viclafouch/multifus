@@ -1,14 +1,29 @@
+import { t } from '@lingui/core/macro'
 import { Panel } from '@/components/layout/panel'
-import { strings } from '@/constants/strings'
+
+const legalParagraphs = () => {
+  return [
+    {
+      lead: t`Multifus n’a rien à voir avec Ankama.`,
+      body: t`Dofus, Dofus Retro et les têtes de classe appartiennent à Ankama.`
+    },
+    {
+      lead: t`Multifus ne touche pas au jeu.`,
+      body: t`Ni sa mémoire, ni ses fichiers, ni ses paquets : il range vos fenêtres, lit les notifications et prend vos clics.`
+    },
+    {
+      lead: t`Rien ne quitte votre ordinateur sans vous.`,
+      body: t`Multifus cherche ses mises à jour, et relaie vos messages privés seulement si vous reliez Telegram.`
+    }
+  ]
+}
 
 export const LegalPanel = () => {
-  const words = strings.about
-
   return (
     <Panel className="mb-3">
       <section className="flex flex-col gap-2 px-4 py-3.5">
-        <h2 className="text-row font-medium">{words.legalTitle}</h2>
-        {words.legal.map(({ lead, body }) => {
+        <h2 className="text-row font-medium">{t`Mentions légales`}</h2>
+        {legalParagraphs().map(({ lead, body }) => {
           return (
             <p
               key={lead}

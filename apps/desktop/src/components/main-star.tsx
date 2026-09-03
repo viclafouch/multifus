@@ -1,5 +1,5 @@
 import { Star } from 'lucide-react'
-import { strings } from '@/constants/strings'
+import { t } from '@lingui/core/macro'
 import { cn } from '@/lib/utils'
 
 type MainStarProps = Readonly<{
@@ -20,7 +20,7 @@ export const MainStar = ({ isMain, className }: MainStarProps) => {
         )}
       />
       {isMain ? (
-        <span className="sr-only">{strings.characters.mainMark}</span>
+        <span className="sr-only">{t`Personnage principal`}</span>
       ) : null}
     </>
   )

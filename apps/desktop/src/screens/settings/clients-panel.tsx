@@ -1,9 +1,9 @@
 import { Maximize } from 'lucide-react'
+import { t } from '@lingui/core/macro'
 import type { Clients, Snapshot } from '@/@types/snapshot'
 import { Panel } from '@/components/layout/panel'
 import { StateBadge } from '@/components/state-badge'
 import { Button } from '@/components/ui/button'
-import { strings } from '@/constants/strings'
 import { clientsLines } from '@/helpers/wording'
 import { maximizeAllClients } from '@/lib/multifus'
 
@@ -16,7 +16,6 @@ type ClientsPanelProps = Readonly<{
 }>
 
 export const ClientsPanel = ({ clients, run }: ClientsPanelProps) => {
-  const words = strings.settings.clients
   const lines = clientsLines(clients)
 
   const handleMaximize = () => {
@@ -31,7 +30,9 @@ export const ClientsPanel = ({ clients, run }: ClientsPanelProps) => {
       <section className="flex items-center gap-5 px-4 py-3.5">
         <div className="flex min-w-0 flex-1 flex-col items-start gap-2">
           <StateBadge>{lines.badge}</StateBadge>
-          <h2 className="text-row font-medium">{words.title}</h2>
+          <h2 className="text-row font-medium">
+            {t`La taille de vos fenêtres Dofus Retro`}
+          </h2>
           <p className="max-w-prose text-pretty text-note text-muted-foreground">
             {lines.body}
           </p>
@@ -43,7 +44,7 @@ export const ClientsPanel = ({ clients, run }: ClientsPanelProps) => {
           onClick={handleMaximize}
         >
           <Maximize aria-hidden />
-          {words.action}
+          {t`Agrandir les fenêtres`}
         </Button>
       </section>
     </Panel>

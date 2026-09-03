@@ -1,16 +1,17 @@
+import { t } from '@lingui/core/macro'
 import type { RuneRow } from '@/constants/runes'
-import { strings } from '@/constants/strings'
 import { runeWeight } from '@/helpers/rune'
 
 type RuneLineProps = Readonly<{
   row: RuneRow
+  stat: string
 }>
 
-export const RuneLine = ({ row }: RuneLineProps) => {
+export const RuneLine = ({ row, stat }: RuneLineProps) => {
   return (
     <tr className="rune-line">
       <th scope="row" className="rune-stat">
-        {row.stat}
+        {stat}
       </th>
       <RuneCell weight={row.simple} />
       <RuneCell weight={row.pa} />
@@ -25,13 +26,11 @@ type RuneCellProps = Readonly<{
 }>
 
 const RuneCell = ({ weight }: RuneCellProps) => {
-  const words = strings.runeTable.sheet
-
   if (weight === null) {
     return (
       <td className="rune-cell" data-missing>
-        <span className="sr-only">{words.emptyLabel}</span>
-        <span aria-hidden>{words.empty}</span>
+        <span className="sr-only">{t`La rune n’existe pas`}</span>
+        <span aria-hidden>—</span>
       </td>
     )
   }

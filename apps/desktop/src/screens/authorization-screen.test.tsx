@@ -1,6 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
-import { strings } from '@/constants/strings'
 import { pending } from '@/test-doubles'
 
 const bridge = {
@@ -24,24 +23,28 @@ const buttonNamed = (label: string) => {
   return screen.getByRole('button', { name: label })
 }
 
+const openSettingsButton = () => {
+  return screen.getByRole('button', { name: /Ouvrir/u })
+}
+
 describe('l’écran de l’autorisation', () => {
   it('dit ce que Multifus ne peut pas faire sans elle', () => {
     show()
 
-    expect(screen.getByText(strings.authorization.title)).not.toBeNull()
-    expect(screen.getByText(strings.authorization.body)).not.toBeNull()
+    expect(screen.getByText('Multifus attend votre feu vert')).not.toBeNull()
+    expect(screen.getByText(/Multifus ne peut pas/u)).not.toBeNull()
   })
 
   it('prévient que l’écran s’en ira tout seul', () => {
     show()
 
-    expect(screen.getByText(strings.authorization.patience)).not.toBeNull()
+    expect(screen.getByText(/cet écran disparaîtra tout seul/u)).not.toBeNull()
   })
 
   it('demande l’autorisation au système, et attend l’instantané', () => {
     const run = show()
 
-    fireEvent.click(buttonNamed(strings.authorization.request))
+    fireEvent.click(buttonNamed('Demander l’autorisation'))
 
     expect(bridge.requestAuthorization).toHaveBeenCalledWith()
     expect(run).toHaveBeenCalledWith(expect.any(Promise))
@@ -50,7 +53,7 @@ describe('l’écran de l’autorisation', () => {
   it('ouvre les réglages du système sans attendre d’instantané', () => {
     const run = show()
 
-    fireEvent.click(buttonNamed(strings.authorization.openSettings))
+    fireEvent.click(openSettingsButton())
 
     expect(bridge.openAuthorizationSettings).toHaveBeenCalledWith()
     expect(run).not.toHaveBeenCalled()
@@ -64,7 +67,7 @@ describe('l’écran de l’autorisation', () => {
     show()
 
     expect(() => {
-      fireEvent.click(buttonNamed(strings.authorization.openSettings))
+      fireEvent.click(openSettingsButton())
     }).not.toThrow()
   })
 })

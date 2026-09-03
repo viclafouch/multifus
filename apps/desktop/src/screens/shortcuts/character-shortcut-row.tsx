@@ -1,9 +1,9 @@
+import { t } from '@lingui/core/macro'
 import type { Character } from '@/@types/roster'
 import type { Binding } from '@/@types/shortcuts'
 import { CharacterLine } from '@/components/character-line'
 import { MainStar } from '@/components/main-star'
 import { ShortcutField } from '@/components/shortcut-field'
-import { strings } from '@/constants/strings'
 import { matchIsSameBinding } from '@/helpers/binding'
 import type { TonedLine } from '@/helpers/wording'
 
@@ -36,7 +36,7 @@ export const CharacterShortcutRow = ({
       <ShortcutField
         accelerator={character.shortcut}
         statusLine={statusLine}
-        editLabel={strings.shortcuts.characterEdit(nickname)}
+        editLabel={t`Modifier le raccourci de ${nickname}`}
         undo={null}
         editing={{
           isActive: matchIsSameBinding(editing, {

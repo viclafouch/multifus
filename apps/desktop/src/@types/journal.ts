@@ -1,3 +1,4 @@
+import type { Language } from '@/@types/language'
 import type { NotificationKind } from '@/@types/notification'
 import type { NoticeCase, RelayFailure, RelayStop } from '@/@types/relay'
 import type { Class, Color, Gender } from '@/@types/roster'
@@ -118,6 +119,7 @@ export type SettingChange =
   | { readonly kind: 'paintPortraits'; readonly paint: boolean }
   | { readonly kind: 'ungroupTaskbar'; readonly ungroup: boolean }
   | { readonly kind: 'relayBody'; readonly sendBody: boolean }
+  | { readonly kind: 'language'; readonly language: Language }
   | {
       readonly kind: 'wakesMinimized'
       readonly wakes: boolean

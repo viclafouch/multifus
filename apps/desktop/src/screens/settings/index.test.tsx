@@ -2,9 +2,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import type { Clients } from '@/@types/snapshot'
 import { TooltipProvider } from '@/components/ui/tooltip'
-import { strings } from '@/constants/strings'
 import { ignore } from '@/lib/utils'
-import { APPLE_AGENT, snapshotOf, WINDOWS_AGENT } from '@/test-doubles'
+import {
+  APPLE_AGENT,
+  WINDOWS_AGENT,
+  snapshotOf,
+  speakFrench
+} from '@/test-doubles'
 
 const bridge = {
   setStartAtLogin: vi.fn(),
@@ -46,6 +50,8 @@ const show = async ({
     return ignore
   })
 
+  await speakFrench()
+
   const { SettingsScreen } = await import('@/screens/settings')
 
   const shown = render(
@@ -62,7 +68,7 @@ const show = async ({
     </TooltipProvider>
   )
 
-  await screen.findByRole('button', { name: strings.settings.clients.action })
+  await screen.findByRole('button', { name: 'Agrandir les fenêtres' })
 
   return shown
 }
@@ -76,13 +82,13 @@ const querySwitch = (label: string) => {
 }
 
 const WINDOWS_ONLY_LABELS = [
-  strings.settings.shortTitlesLabel,
-  strings.settings.portraitLabel,
-  strings.settings.ungroupLabel
+  'Seulement le pseudo dans la barre des tâches',
+  'La tête de classe dans la barre des tâches',
+  'Un bouton par personnage dans la barre des tâches'
 ]
 
 const maximizeButton = () => {
-  return screen.getByRole('button', { name: strings.settings.clients.action })
+  return screen.getByRole('button', { name: 'Agrandir les fenêtres' })
 }
 
 describe('l’écran des paramètres', () => {
@@ -94,9 +100,9 @@ describe('l’écran des paramètres', () => {
     await show({ agent: WINDOWS_AGENT })
 
     for (const label of [
-      strings.settings.startupLabel,
-      strings.settings.maximizeLabel,
-      strings.settings.backgroundLabel,
+      'Lancer Multifus au démarrage de l’ordinateur',
+      'Agrandir les clients à leur ouverture',
+      'Garder Multifus en arrière-plan',
       ...WINDOWS_ONLY_LABELS
     ]) {
       expect(screen.getByText(label)).not.toBeNull()
@@ -109,10 +115,12 @@ describe('l’écran des paramètres', () => {
       clients: { open: 3, small: 2, readable: true }
     })
 
+    expect(screen.getByText('2 clients en petit')).not.toBeNull()
     expect(
-      screen.getByText(strings.settings.clients.badge.small(2))
+      screen.getByText(
+        'Un client ouvert avant Multifus garde sa petite taille.'
+      )
     ).not.toBeNull()
-    expect(screen.getByText(strings.settings.clients.body.small)).not.toBeNull()
   })
 
   it('dit que tout est déjà agrandi quand plus rien n’est en petit', async () => {
@@ -121,11 +129,9 @@ describe('l’écran des paramètres', () => {
       clients: { open: 3, small: 0, readable: true }
     })
 
+    expect(screen.getByText('Tout est agrandi')).not.toBeNull()
     expect(
-      screen.getByText(strings.settings.clients.badge.maximized)
-    ).not.toBeNull()
-    expect(
-      screen.getByText(strings.settings.clients.body.maximized)
+      screen.getByText('Vos clients Dofus Retro couvrent déjà tout leur écran.')
     ).not.toBeNull()
   })
 
@@ -135,7 +141,7 @@ describe('l’écran des paramètres', () => {
       clients: { open: 0, small: 0, readable: true }
     })
 
-    expect(screen.getByText(strings.settings.clients.badge.none)).not.toBeNull()
+    expect(screen.getByText('Aucun client ouvert')).not.toBeNull()
     expect(maximizeButton()).not.toBeNull()
   })
 
@@ -145,10 +151,8 @@ describe('l’écran des paramètres', () => {
       clients: { open: 0, small: 0, readable: false }
     })
 
-    expect(
-      screen.getByText(strings.settings.clients.badge.unreadable)
-    ).not.toBeNull()
-    expect(screen.queryByText(strings.settings.clients.badge.none)).toBeNull()
+    expect(screen.getByText('Fenêtres illisibles')).not.toBeNull()
+    expect(screen.queryByText('Aucun client ouvert')).toBeNull()
   })
 
   it('agrandit les clients d’un clic', async () => {
@@ -171,17 +175,13 @@ describe('l’écran des paramètres', () => {
       counter.told?.({ open: 3, small: 0, readable: true })
     })
 
-    expect(
-      screen.getByText(strings.settings.clients.badge.maximized)
-    ).not.toBeNull()
+    expect(screen.getByText('Tout est agrandi')).not.toBeNull()
 
     act(() => {
       counter.told?.({ open: 3, small: 1, readable: true })
     })
 
-    expect(
-      screen.getByText(strings.settings.clients.badge.small(1))
-    ).not.toBeNull()
+    expect(screen.getByText('1 client en petit')).not.toBeNull()
   })
 
   it('cesse de suivre dès qu’on quitte l’écran', async () => {
@@ -203,7 +203,7 @@ describe('l’écran des paramètres', () => {
   it('lance Multifus au démarrage quand on bouge l’interrupteur', async () => {
     await show({ agent: WINDOWS_AGENT })
 
-    fireEvent.click(switchNamed(strings.settings.startupLabel))
+    fireEvent.click(switchNamed('Lancer Multifus au démarrage de l’ordinateur'))
 
     expect(bridge.setStartAtLogin).toHaveBeenCalledWith(true)
   })
@@ -211,7 +211,7 @@ describe('l’écran des paramètres', () => {
   it('agrandit les clients à leur ouverture quand on bouge l’interrupteur', async () => {
     await show({ agent: WINDOWS_AGENT })
 
-    fireEvent.click(switchNamed(strings.settings.maximizeLabel))
+    fireEvent.click(switchNamed('Agrandir les clients à leur ouverture'))
 
     expect(bridge.setMaximizeOnLaunch).toHaveBeenCalledWith(true)
   })
@@ -219,7 +219,7 @@ describe('l’écran des paramètres', () => {
   it('coupe la tête de classe quand on bouge l’interrupteur, sur Windows', async () => {
     await show({ agent: WINDOWS_AGENT })
 
-    fireEvent.click(switchNamed(strings.settings.portraitLabel))
+    fireEvent.click(switchNamed('La tête de classe dans la barre des tâches'))
 
     expect(bridge.setPaintPortraits).toHaveBeenCalledWith(false)
   })
@@ -231,7 +231,7 @@ describe('l’écran des paramètres', () => {
       expect(querySwitch(label)).not.toBeNull()
     }
 
-    expect(screen.queryByText(strings.settings.windowsOnlyLabel)).toBeNull()
+    expect(screen.queryByText('Uniquement sur Windows')).toBeNull()
   })
 
   it('dit que les trois lignes de Windows n’existent pas sur un Mac', async () => {
@@ -241,7 +241,7 @@ describe('l’écran des paramètres', () => {
       expect(querySwitch(label)).toBeNull()
     }
 
-    expect(screen.getAllByText(strings.settings.windowsOnlyLabel)).toHaveLength(
+    expect(screen.getAllByText('Uniquement sur Windows')).toHaveLength(
       WINDOWS_ONLY_LABELS.length
     )
   })
@@ -249,26 +249,36 @@ describe('l’écran des paramètres', () => {
   it('garde le démarrage et l’agrandissement sur un Mac', async () => {
     await show({ agent: APPLE_AGENT })
 
-    expect(querySwitch(strings.settings.startupLabel)).not.toBeNull()
-    expect(querySwitch(strings.settings.maximizeLabel)).not.toBeNull()
+    expect(
+      querySwitch('Lancer Multifus au démarrage de l’ordinateur')
+    ).not.toBeNull()
+    expect(querySwitch('Agrandir les clients à leur ouverture')).not.toBeNull()
   })
 
   it('conseille la fenêtre agrandie plutôt que le plein écran, sur un Mac', async () => {
     await show({ agent: APPLE_AGENT })
 
-    expect(screen.getByText(strings.maximize.note)).not.toBeNull()
+    expect(
+      screen.getByText(
+        'Sur Mac, Multifus tourne mieux sans plein écran : gardez tous vos clients Dofus Retro sur le même bureau, en fenêtre agrandie.'
+      )
+    ).not.toBeNull()
   })
 
   it('ne dit rien du plein écran sur Windows', async () => {
     await show({ agent: WINDOWS_AGENT })
 
-    expect(screen.queryByText(strings.maximize.note)).toBeNull()
+    expect(
+      screen.queryByText(
+        'Sur Mac, Multifus tourne mieux sans plein écran : gardez tous vos clients Dofus Retro sur le même bureau, en fenêtre agrandie.'
+      )
+    ).toBeNull()
   })
 
   it('n’offre jamais de quitter l’arrière-plan', async () => {
     await show({ agent: WINDOWS_AGENT })
 
-    const background = switchNamed(strings.settings.backgroundLabel)
+    const background = switchNamed('Garder Multifus en arrière-plan')
 
     expect(background.getAttribute('aria-disabled')).toBe('true')
     expect(background.getAttribute('aria-checked')).toBe('true')
@@ -277,14 +287,30 @@ describe('l’écran des paramètres', () => {
   it('dit que la barre des tâches ne colle déjà rien, quand c’est le cas', async () => {
     await show({ agent: WINDOWS_AGENT, taskbarCombines: false })
 
-    expect(screen.getByText(strings.settings.ungroupAlready)).not.toBeNull()
-    expect(screen.queryByText(strings.settings.ungroupDescription)).toBeNull()
+    expect(
+      screen.getByText(
+        'Déjà fait : votre Windows ne colle jamais les fenêtres ensemble.'
+      )
+    ).not.toBeNull()
+    expect(
+      screen.queryByText(
+        'Chaque client garde son bouton au lieu d’être empilé avec les autres.'
+      )
+    ).toBeNull()
   })
 
   it('explique le regroupement quand la barre des tâches colle les fenêtres', async () => {
     await show({ agent: WINDOWS_AGENT, taskbarCombines: true })
 
-    expect(screen.getByText(strings.settings.ungroupDescription)).not.toBeNull()
-    expect(screen.queryByText(strings.settings.ungroupAlready)).toBeNull()
+    expect(
+      screen.getByText(
+        'Chaque client garde son bouton au lieu d’être empilé avec les autres.'
+      )
+    ).not.toBeNull()
+    expect(
+      screen.queryByText(
+        'Déjà fait : votre Windows ne colle jamais les fenêtres ensemble.'
+      )
+    ).toBeNull()
   })
 })

@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
+import { i18n } from '@lingui/core'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { TABLE_DRAWN_WIDTH, RUNE_FAMILIES } from '@/constants/runes'
-import { strings } from '@/constants/strings'
 import { pending } from '@/test-doubles'
 
 const bridge = {
@@ -25,8 +25,6 @@ const { RuneTableWindow } = await import('@/screens/rune-table-window')
 
 const POINTER = 3
 
-const words = strings.runeTable.sheet
-
 const TABLE_HEIGHT = 647.4
 
 const LOOK = 0.4
@@ -42,7 +40,7 @@ const show = () => {
 }
 
 const table = () => {
-  return screen.getByRole('group', { name: words.title })
+  return screen.getByRole('group', { name: 'Tableau des runes' })
 }
 
 const takenAt = (element: Element, screenX: number, screenY: number) => {
@@ -66,12 +64,12 @@ describe('le tableau des runes posé sur le jeu', () => {
   it('porte son titre et les cinq familles', () => {
     show()
 
-    expect(screen.getByText(words.title)).not.toBeNull()
+    expect(screen.getByText('Tableau des runes')).not.toBeNull()
 
     for (const family of RUNE_FAMILIES) {
       expect(
         screen.getByRole('columnheader', {
-          name: words.families[family.name]
+          name: i18n._(family.label)
         })
       ).not.toBeNull()
     }
@@ -138,7 +136,9 @@ describe('le tableau des runes posé sur le jeu', () => {
   it('se ferme à la croix, et la croix ne déplace jamais', () => {
     show()
 
-    const cross = screen.getByRole('button', { name: words.close })
+    const cross = screen.getByRole('button', {
+      name: 'Fermer le tableau des runes'
+    })
 
     takenAt(cross, 200, 200)
     moveTo(400, 400)
@@ -159,6 +159,6 @@ describe('le tableau des runes posé sur le jeu', () => {
   it('dit qu’une case vide est une rune qui n’existe pas', () => {
     show()
 
-    expect(screen.getAllByText(words.emptyLabel)).not.toHaveLength(0)
+    expect(screen.getAllByText('La rune n’existe pas')).not.toHaveLength(0)
   })
 })

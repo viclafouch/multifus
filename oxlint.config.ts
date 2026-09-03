@@ -60,12 +60,14 @@ export default defineConfig({
       ],
       rules: {
         'typescript/prefer-readonly-parameter-types': 'off',
-        'react/function-component-definition': 'off'
+        'react/function-component-definition': 'off',
+        'no-restricted-imports': 'off'
       }
     },
     {
       files: [
         'apps/desktop/src/app.tsx',
+        'apps/desktop/src/boot.tsx',
         'apps/desktop/src/components/**',
         'apps/desktop/src/hooks/**',
         'apps/desktop/src/screens/**',

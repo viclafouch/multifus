@@ -1,9 +1,9 @@
 import React from 'react'
+import { t } from '@lingui/core/macro'
 import type { Binding, QuickReply, QuickReplyId } from '@/@types/shortcuts'
 import { RemoveButton } from '@/components/remove-button'
 import { ShortcutField } from '@/components/shortcut-field'
 import { Input } from '@/components/ui/input'
-import { strings } from '@/constants/strings'
 import { matchIsSameBinding } from '@/helpers/binding'
 import type { TonedLine } from '@/helpers/wording'
 import { quickReplyEditLabel } from '@/helpers/wording'
@@ -33,7 +33,6 @@ export const ReplyRow = ({
   actions
 }: ReplyRowProps) => {
   const { draft, setDraft } = useDraft(quickReply.text)
-  const words = strings.quickReplies
 
   const handleBlur = () => {
     const text = draft.trim()
@@ -60,8 +59,8 @@ export const ReplyRow = ({
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <Input
           value={draft}
-          placeholder={words.example}
-          aria-label={words.textLabel}
+          placeholder={t`Bon jeu à toi !`}
+          aria-label={t`Texte de la réponse`}
           spellCheck={false}
           onChange={(event) => {
             setDraft(event.target.value)
@@ -71,11 +70,13 @@ export const ReplyRow = ({
           className="h-8 font-display text-row"
         />
         {draft.length === 0 ? (
-          <p className="px-1 text-mini text-muted-foreground">{words.blank}</p>
+          <p className="px-1 text-mini text-muted-foreground">
+            {t`Sans texte, il n’y aura rien à coller.`}
+          </p>
         ) : null}
       </div>
       <RemoveButton
-        label={words.remove}
+        label={t`Retirer cette réponse`}
         onRemove={() => {
           actions.handleRemove(quickReply.id)
         }}

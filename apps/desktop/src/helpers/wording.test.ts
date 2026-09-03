@@ -4,7 +4,6 @@ import type { Character } from '@/@types/roster'
 import type { QuickReply, ShortcutStatus } from '@/@types/shortcuts'
 import type { UpdateStatus } from '@/@types/system'
 import { IS_APPLE } from '@/constants/keyboard'
-import { strings } from '@/constants/strings'
 import type { TonedLine } from '@/helpers/wording'
 import {
   authorizationLine,
@@ -30,23 +29,23 @@ type UpdateCase = {
 const UPDATE_CASES = {
   checking: {
     update: { kind: 'checking' },
-    line: strings.about.updateChecking
+    line: 'Vérification en cours…'
   },
   upToDate: {
     update: { kind: 'upToDate' },
-    line: strings.about.updateUpToDate
+    line: 'Vous êtes à jour.'
   },
   available: {
     update: { kind: 'available', version: '1.4.0' },
-    line: strings.about.updateAvailable('1.4.0')
+    line: 'La version 1.4.0 est prête. Multifus se relancera tout seul, sans toucher à vos clients.'
   },
   installing: {
     update: { kind: 'installing' },
-    line: strings.about.updateInstalling
+    line: 'Téléchargement en cours…'
   },
   failed: {
     update: { kind: 'failed', detail: 'réseau injoignable' },
-    line: strings.about.updateFailed('réseau injoignable')
+    line: 'La mise à jour a échoué : réseau injoignable'
   }
 } as const satisfies Record<UpdateStatus['kind'], UpdateCase>
 
@@ -58,23 +57,23 @@ type PairingCase = {
 const PAIRING_CASES = {
   tokenBlank: {
     problem: { kind: 'tokenBlank' },
-    line: strings.relay.problem.tokenBlank
+    line: 'Collez d’abord le code que BotFather vous a envoyé.'
   },
   tokenRefused: {
     problem: { kind: 'tokenRefused', detail: 'HTTP 401' },
-    line: strings.relay.problem.tokenRefused('HTTP 401')
+    line: 'Telegram ne reconnaît pas ce code. Recopiez-le en entier (HTTP 401).'
   },
   noChat: {
     problem: { kind: 'noChat' },
-    line: strings.relay.problem.noChat
+    line: 'Le code est bon. Il ne manque que l’étape 4, votre « salut » au robot.'
   },
   keychain: {
     problem: { kind: 'keychain', detail: 'accès refusé' },
-    line: strings.relay.problem.keychain('accès refusé')
+    line: 'Le code n’a pas pu être enregistré, rien n’est gardé (accès refusé).'
   },
   network: {
     problem: { kind: 'network', detail: 'délai dépassé' },
-    line: strings.relay.problem.network('délai dépassé')
+    line: 'Telegram n’a pas répondu. Vérifiez votre connexion (délai dépassé).'
   }
 } as const satisfies Record<PairingProblem['kind'], PairingCase>
 
@@ -90,23 +89,27 @@ const STATUS_CASES = {
   },
   unbound: {
     status: { kind: 'unbound' },
-    answer: { tone: 'calm', text: strings.shortcuts.status.unbound }
+    answer: { tone: 'calm', text: 'Sans touches, il ne se passera rien.' }
   },
   invalid: {
     status: { kind: 'invalid', detail: 'touche inconnue' },
-    answer: { tone: 'bad', text: strings.shortcuts.status.invalid }
+    answer: {
+      tone: 'bad',
+      text: 'Ces touches ne peuvent pas servir de raccourci.'
+    }
   },
   refused: {
     status: { kind: 'refused', detail: 'déjà prise' },
-    answer: { tone: 'bad', text: strings.shortcuts.status.refused }
+    answer: {
+      tone: 'bad',
+      text: 'Refusé : un autre logiciel utilise déjà ces touches.'
+    }
   },
   duplicate: {
     status: { kind: 'duplicate', binding: { kind: 'action', action: 'next' } },
     answer: {
       tone: 'bad',
-      text: strings.shortcuts.status.duplicate(
-        `« ${strings.shortcuts.actions.next.label} »`
-      )
+      text: 'Déjà pris par « Fenêtre suivante ».'
     }
   }
 } as const satisfies Record<ShortcutStatus['kind'], StatusCase>
@@ -174,7 +177,7 @@ describe('shortcutStatusLine', () => {
 
     const written = shortcutStatusLine(status, QUICK_REPLIES)
 
-    expect(written?.text).toContain(strings.shortcuts.actions.walk.label)
+    expect(written?.text).toContain('Déplacement rapide')
   })
 
   it('nomme par son texte la quickReply qui tient déjà la combinaison', () => {
@@ -196,7 +199,7 @@ describe('shortcutStatusLine', () => {
 
     const written = shortcutStatusLine(status, QUICK_REPLIES)
 
-    expect(written?.text).toContain(strings.quickReplies.unnamed)
+    expect(written?.text).toContain('une réponse sans texte')
   })
 })
 
@@ -214,7 +217,7 @@ describe('bindingLabel', () => {
   it('nomme une quickReply que le tableau ne porte plus', () => {
     const label = bindingLabel({ kind: 'quickReply', id: 404 }, QUICK_REPLIES)
 
-    expect(label).toBe(strings.quickReplies.unnamed)
+    expect(label).toBe('une réponse sans texte')
   })
 })
 
@@ -222,19 +225,19 @@ describe('authorizationLine', () => {
   it('dit l’écoute active quand le système entend', () => {
     const line = authorizationLine({ granted: true, listening: true })
 
-    expect(line).toBe(strings.status.listening)
+    expect(line).toBe('À l’écoute du jeu')
   })
 
   it('dit l’écoute arrêtée quand elle ne tourne pas', () => {
     const line = authorizationLine({ granted: true, listening: false })
 
-    expect(line).toBe(strings.status.notListening)
+    expect(line).toBe('Écoute interrompue')
   })
 
   it('dit l’autorisation manquante avant tout le reste', () => {
     const line = authorizationLine({ granted: false, listening: true })
 
-    expect(line).toBe(strings.status.denied)
+    expect(line).toBe('Autorisation manquante')
   })
 })
 
@@ -242,9 +245,7 @@ describe('characterSubLine', () => {
   it('réclame la classe tant qu’aucune n’est choisie', () => {
     const line = characterSubLine(ONLINE_CHARACTER)
 
-    expect(line).toBe(
-      `${strings.characters.classMissing} · ${strings.characters.online}`
-    )
+    expect(line).toBe(`Classe à choisir · Connecté`)
   })
 
   it('réclame le sexe d’une classe choisie sans lui', () => {
@@ -256,9 +257,7 @@ describe('characterSubLine', () => {
 
     const line = characterSubLine(character)
 
-    expect(line).toBe(
-      `${strings.characters.genderMissing} · ${strings.characters.online}`
-    )
+    expect(line).toBe(`Sexe à choisir · Connecté`)
   })
 
   it('dit la classe avant l’état une fois le portrait complet', () => {
@@ -266,7 +265,7 @@ describe('characterSubLine', () => {
 
     const line = characterSubLine(character)
 
-    expect(line).toBe(`Iop · ${strings.characters.online}`)
+    expect(line).toBe(`Iop · Connecté`)
   })
 
   it('ne nomme jamais la couleur : elle se voit, elle ne se lit pas', () => {
@@ -276,12 +275,8 @@ describe('characterSubLine', () => {
       color: 'pine'
     } as const
 
-    expect(characterSubLine(character)).toBe(
-      `Iop · ${strings.characters.online}`
-    )
-    expect(characterPresenceSubLine(character)).toBe(
-      `Iop · ${strings.characters.online}`
-    )
+    expect(characterSubLine(character)).toBe(`Iop · Connecté`)
+    expect(characterPresenceSubLine(character)).toBe(`Iop · Connecté`)
   })
 })
 
@@ -289,7 +284,7 @@ describe('characterMarksLabel', () => {
   it('invite à choisir la classe tant qu’elle manque', () => {
     const label = characterMarksLabel(ONLINE_CHARACTER)
 
-    expect(label).toBe(strings.characters.classPick('Alpha'))
+    expect(label).toBe('Choisir la classe de Alpha')
   })
 
   it('invite à choisir le sexe quand seule la classe est là', () => {
@@ -301,7 +296,7 @@ describe('characterMarksLabel', () => {
 
     const label = characterMarksLabel(character)
 
-    expect(label).toBe(strings.characters.genderPick('Alpha'))
+    expect(label).toBe('Choisir le sexe de Alpha')
   })
 
   it('propose de changer le portrait une fois complet', () => {
@@ -309,7 +304,7 @@ describe('characterMarksLabel', () => {
 
     const label = characterMarksLabel(character)
 
-    expect(label).toBe(strings.characters.characterChange('Alpha'))
+    expect(label).toBe('Changer la classe, le sexe ou la couleur de Alpha')
   })
 })
 
@@ -317,7 +312,7 @@ describe('characterMarksTooltip', () => {
   it('invite à choisir la classe tant qu’elle manque', () => {
     const tooltip = characterMarksTooltip(ONLINE_CHARACTER)
 
-    expect(tooltip).toBe(strings.characters.classPick('Alpha'))
+    expect(tooltip).toBe('Choisir la classe de Alpha')
   })
 
   it('dit seulement Modifier une fois le portrait complet', () => {
@@ -325,7 +320,7 @@ describe('characterMarksTooltip', () => {
 
     const tooltip = characterMarksTooltip(character)
 
-    expect(tooltip).toBe(strings.characters.characterChangeShort)
+    expect(tooltip).toBe('Modifier')
   })
 })
 
@@ -335,7 +330,7 @@ describe('characterPresenceSubLine', () => {
 
     const line = characterPresenceSubLine(character)
 
-    expect(line).toBe(`Iop · ${strings.characters.online}`)
+    expect(line).toBe(`Iop · Connecté`)
   })
 
   it('tait l’exclusion d’un personnage connecté et exclu', () => {
@@ -343,7 +338,7 @@ describe('characterPresenceSubLine', () => {
 
     const line = characterPresenceSubLine(character)
 
-    expect(line).toBe(strings.characters.online)
+    expect(line).toBe('Connecté')
   })
 
   it('dit la déconnexion d’un personnage déconnecté', () => {
@@ -351,7 +346,7 @@ describe('characterPresenceSubLine', () => {
 
     const line = characterPresenceSubLine(character)
 
-    expect(line).toBe(strings.characters.offline)
+    expect(line).toBe('Déconnecté')
   })
 })
 
@@ -399,7 +394,7 @@ describe('genderGroupHint', () => {
       isIncluded: true
     })
 
-    expect(hint).toBe(strings.characters.excludeGroupLabel.male)
+    expect(hint).toBe('Exclure tous les hommes')
   })
 
   it('propose de réintégrer un sexe entièrement exclu', () => {
@@ -409,7 +404,7 @@ describe('genderGroupHint', () => {
       isIncluded: false
     })
 
-    expect(hint).toBe(strings.characters.includeGroupLabel.female)
+    expect(hint).toBe('Réintégrer toutes les femmes')
   })
 
   it('dit qu’un sexe n’a personne de connecté', () => {
@@ -419,7 +414,7 @@ describe('genderGroupHint', () => {
       isIncluded: false
     })
 
-    expect(hint).toBe(strings.characters.emptyGroupLabel.female)
+    expect(hint).toBe('Aucune femme connectée')
   })
 })
 
@@ -427,7 +422,7 @@ describe('characterStateLine', () => {
   it('dit le défilement pour un personnage connecté et dedans', () => {
     const line = characterStateLine(ONLINE_CHARACTER)
 
-    expect(line).toBe(strings.characters.online)
+    expect(line).toBe('Connecté')
   })
 
   it('dit l’exclusion pour un personnage connecté et exclu', () => {
@@ -435,7 +430,7 @@ describe('characterStateLine', () => {
 
     const line = characterStateLine(character)
 
-    expect(line).toBe(strings.characters.excluded)
+    expect(line).toBe('Exclu')
   })
 
   it('dit la déconnexion avant l’exclusion pour un personnage déconnecté', () => {
@@ -443,7 +438,7 @@ describe('characterStateLine', () => {
 
     const line = characterStateLine(character)
 
-    expect(line).toBe(strings.characters.offline)
+    expect(line).toBe('Déconnecté')
   })
 })
 
@@ -454,6 +449,8 @@ describe('dialogNote', () => {
   })
 
   it('says where the head went once somebody cut it', () => {
-    expect(dialogNote(false)).toBe(strings.characters.dialogPortraitOff)
+    expect(dialogNote(false)).toBe(
+      'La tête de classe est coupée dans les Paramètres : le client garde son logo Dofus.'
+    )
   })
 })

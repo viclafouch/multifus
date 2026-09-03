@@ -29,6 +29,7 @@ use tauri::Manager;
 use crate::app::view::ScreenSaverView;
 use crate::config::ConfigError;
 use crate::config::ConfigStore;
+use crate::config::Language;
 use crate::platform::DisplayKeeper;
 use crate::platform::PlatformDisplayKeeper;
 use crate::platform::PlatformNotificationWatcher;
@@ -59,6 +60,7 @@ pub fn setup(app: &AppHandle) -> Result<(), ConfigError> {
         loaded,
         version: app.package_info().version.to_string(),
         system: system(),
+        system_language: Language::of_system(),
         keyboard: key_labels(),
         launch: main_window::launch(),
         screen_saver: screen_saver(&keeper),

@@ -25,6 +25,7 @@ use crate::app::view::WheelStep;
 use crate::app::walk;
 use crate::app::wheel;
 use crate::config::BannerCorner;
+use crate::config::Language;
 use crate::config::QuickReplyId;
 use crate::domain::Class;
 use crate::domain::Color;
@@ -36,6 +37,16 @@ pub fn snapshot(app: AppHandle, window: WebviewWindow) -> Snapshot {
     main_window::show_when_ready(&app, window.label());
 
     lock(&app).snapshot()
+}
+
+#[tauri::command]
+pub fn language(app: AppHandle) -> Language {
+    lock(&app).language()
+}
+
+#[tauri::command(async)]
+pub fn set_language(app: AppHandle, language: Language) {
+    runtime::change_language(&app, language);
 }
 
 #[tauri::command]

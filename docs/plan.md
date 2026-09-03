@@ -30,7 +30,7 @@ signatures et les constantes fausses avant que la CI ne les voie.
 
 Les manques retenus après la veille de [concurrents.md](./concurrents.md).
 
-- [ ] L'interface en anglais et en espagnol, sur la langue du système. Dracoon, ROrganizer et Focus Retro le font déjà, et la communauté hispanophone n'a rien
+- [ ] L'interface en espagnol. L'anglais est fait, la mécanique est posée, et la communauté hispanophone n'a toujours rien
 
 ## Passer le dépôt en monorepo
 

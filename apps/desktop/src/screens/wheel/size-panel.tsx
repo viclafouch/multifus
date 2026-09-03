@@ -1,5 +1,6 @@
 import React from 'react'
 import { Eye } from 'lucide-react'
+import { plural, t } from '@lingui/core/macro'
 import type { Display } from '@/@types/display'
 import type { Snapshot } from '@/@types/snapshot'
 import type { WheelSize } from '@/@types/wheel'
@@ -7,7 +8,6 @@ import { GaugeRow } from '@/components/gauge-row'
 import { Panel } from '@/components/layout/panel'
 import { PanelHeader } from '@/components/layout/panel-header'
 import { Button } from '@/components/ui/button'
-import { strings } from '@/constants/strings'
 import { DEMO_FEWEST, DEMO_USUAL } from '@/constants/wheel'
 import { useDraft } from '@/hooks/use-draft'
 import { previewWheel, setWheelDiameter } from '@/lib/multifus'
@@ -22,13 +22,12 @@ type SizePanelProps = Readonly<{
 export const SizePanel = ({ size, screen, run }: SizePanelProps) => {
   const { draft, setDraft } = useDraft(size.diameter)
   const [crowd, setCrowd] = React.useState(DEMO_USUAL)
-  const words = strings.wheel
 
   return (
     <Panel>
       <PanelHeader
-        title={words.previewTitle}
-        description={words.previewDescription}
+        title={t`L’aperçu`}
+        description={t`De faux personnages ici comme à l’essai, les vôtres en jeu. Une jauge pour la taille, une pour le monde qu’il y a dessus.`}
       >
         <Button
           variant="secondary"
@@ -38,7 +37,7 @@ export const SizePanel = ({ size, screen, run }: SizePanelProps) => {
           }}
         >
           <Eye aria-hidden />
-          {words.tryIt}
+          {t`Voir en vrai`}
         </Button>
       </PanelHeader>
       <div className="flex flex-col gap-4 px-4 py-4">
@@ -49,8 +48,8 @@ export const SizePanel = ({ size, screen, run }: SizePanelProps) => {
         />
         <div className="mx-auto flex w-full max-w-blurb flex-col gap-2.5">
           <GaugeRow
-            label={words.sizeLabel}
-            reading={words.sizeValue(draft)}
+            label={t`Taille`}
+            reading={t`${draft} px`}
             current={draft}
             min={size.smallest}
             max={size.widest}
@@ -61,8 +60,8 @@ export const SizePanel = ({ size, screen, run }: SizePanelProps) => {
             }}
           />
           <GaugeRow
-            label={words.crowdLabel}
-            reading={words.crowdValue(crowd)}
+            label={t`Personnages`}
+            reading={plural(crowd, { one: 'Tout seul', other: 'À #' })}
             current={crowd}
             min={DEMO_FEWEST}
             max={size.demo.length}

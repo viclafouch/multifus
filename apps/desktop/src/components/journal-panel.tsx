@@ -1,12 +1,12 @@
 import React from 'react'
 import { ChevronDown, ChevronUp } from 'lucide-react'
+import { plural, t } from '@lingui/core/macro'
 import type { JournalEntry } from '@/@types/journal'
 import type { QuickReply } from '@/@types/shortcuts'
 import type { Snapshot } from '@/@types/snapshot'
 import { CopyButton } from '@/components/copy-button'
 import { RevealButton } from '@/components/reveal-button'
 import { Button } from '@/components/ui/button'
-import { strings } from '@/constants/strings'
 import {
   journalLine,
   journalTime,
@@ -65,7 +65,7 @@ export const JournalPanel = ({ snapshot }: JournalPanelProps) => {
             variant="ghost"
             aria-expanded={isOpen}
             onClick={handleToggle}
-            title={isOpen ? strings.journal.hide : strings.journal.show}
+            title={isOpen ? t`Masquer le journal` : t`Afficher le journal`}
             className="h-9 w-full justify-start gap-2 rounded-none px-4 text-mini tracking-micro text-muted-foreground uppercase"
           >
             {isOpen ? (
@@ -73,20 +73,26 @@ export const JournalPanel = ({ snapshot }: JournalPanelProps) => {
             ) : (
               <ChevronUp strokeWidth={2} />
             )}
-            {strings.journal.title}
+            {t`Journal`}
             <span className="ml-auto font-mono text-micro tracking-normal normal-case">
-              {strings.journal.entries(entries.length)}
+              {plural(entries.length, {
+                one: '# entrée',
+                other: '# entrées'
+              })}
             </span>
           </Button>
         </h2>
         {entries.length === 0 ? null : (
           <CopyButton
             text={journalTranscript(snapshot)}
-            label={strings.journal.copy}
-            copiedLabel={strings.journal.copied}
+            label={t`Copier le journal`}
+            copiedLabel={t`Journal copié`}
           />
         )}
-        <RevealButton label={strings.journal.reveal} onReveal={revealJournal} />
+        <RevealButton
+          label={t`Montrer le fichier du journal`}
+          onReveal={revealJournal}
+        />
       </div>
       {isOpen ? (
         <ol
@@ -96,7 +102,7 @@ export const JournalPanel = ({ snapshot }: JournalPanelProps) => {
         >
           {entries.length === 0 ? (
             <li className="text-muted-foreground/70">
-              {strings.journal.empty}
+              {t`Rien à signaler pour l’instant.`}
             </li>
           ) : (
             entries.map((entry) => {

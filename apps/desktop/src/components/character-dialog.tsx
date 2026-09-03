@@ -1,5 +1,7 @@
 import React from 'react'
 import { Ban, ChevronLeft, X } from 'lucide-react'
+import { i18n } from '@lingui/core'
+import { t } from '@lingui/core/macro'
 import type { Character, Class, Color, Gender, Portrait } from '@/@types/roster'
 import { CharacterMedallion } from '@/components/character-medallion'
 import { ClassVignette } from '@/components/class-vignette'
@@ -17,13 +19,18 @@ import {
   DialogTitle
 } from '@/components/ui/dialog'
 import { CLASSES, CLASS_PORTRAITS } from '@/constants/classes'
-import { GENDERS } from '@/constants/roster'
-import { strings } from '@/constants/strings'
+import { CLASS_LABELS, GENDERS, GENDER_LABELS } from '@/constants/roster'
 import type { ColorHolders } from '@/helpers/colors'
 import { portraitFor } from '@/helpers/portrait'
 import { characterState, dialogNote } from '@/helpers/wording'
 
 const UNANSWERED_GENDER = 'male'
+
+const askedWhich = (asked: Class) => {
+  const label = i18n._(CLASS_LABELS[asked])
+
+  return t`${label} : homme ou femme ?`
+}
 
 type CharacterDialogProps = Readonly<{
   character: Character
@@ -49,7 +56,6 @@ export const CharacterDialog = ({
   onSetPortrait
 }: CharacterDialogProps) => {
   const { nickname, gender } = character
-  const words = strings.characters
   const [asked, setAsked] = React.useState<Class | null>(null)
 
   const handleCloseComplete = (isNowOpen: boolean) => {
@@ -98,12 +104,12 @@ export const CharacterDialog = ({
             </DialogTitle>
             {asked === null ? null : (
               <DialogDescription className="text-note">
-                {words.dialogWhich(words.classes[asked])}
+                {askedWhich(asked)}
               </DialogDescription>
             )}
           </div>
           <DialogClose
-            aria-label={words.dialogClose}
+            aria-label={t`Fermer sans rien changer`}
             className="absolute top-4 right-4"
             render={<Button variant="ghost" size="icon-sm" />}
           >
@@ -153,12 +159,11 @@ const MarksStep = ({
   onSetGender
 }: MarksStepProps) => {
   const { nickname, gender } = character
-  const words = strings.characters
 
   return (
     <>
       <div className="flex flex-col gap-2">
-        <Legend>{words.dialogGender}</Legend>
+        <Legend>{t`Sexe`}</Legend>
         <ul className="flex gap-2">
           {GENDERS.map((candidate) => {
             return (
@@ -176,7 +181,7 @@ const MarksStep = ({
                     className="opacity-60 saturate-50 group-hover/button:opacity-100 group-aria-pressed/button:sigil-lit group-aria-pressed/button:opacity-100 group-aria-pressed/button:saturate-100"
                   />
                   <span className="text-mini text-muted-foreground group-aria-pressed/button:text-foreground">
-                    {words.genders[candidate]}
+                    {i18n._(GENDER_LABELS[candidate])}
                   </span>
                 </Button>
               </li>
@@ -185,18 +190,17 @@ const MarksStep = ({
         </ul>
       </div>
       <div className="flex flex-col gap-2">
-        <Legend>{words.dialogClasses}</Legend>
+        <Legend>{t`Classe`}</Legend>
         <ul className="grid grid-cols-5 gap-1.5">
           {CLASSES.map((candidate) => {
+            const label = i18n._(CLASS_LABELS[candidate])
+
             return (
               <li key={candidate}>
                 <ClassVignette
-                  label={words.classes[candidate]}
+                  label={label}
                   isCurrent={character.class === candidate}
-                  ariaLabel={words.classLabel(
-                    nickname,
-                    words.classes[candidate]
-                  )}
+                  ariaLabel={t`Marquer ${nickname} comme ${label}`}
                   onPick={() => {
                     onPickClass(candidate)
                   }}
@@ -214,8 +218,8 @@ const MarksStep = ({
           })}
           <li>
             <ClassVignette
-              label={words.noClass}
-              ariaLabel={words.noClassLabel(nickname)}
+              label={t`Aucune`}
+              ariaLabel={t`Retirer la classe de ${nickname}`}
               onPick={() => {
                 onPickClass(null)
               }}
@@ -249,7 +253,7 @@ type GenderStepProps = Readonly<{
 }>
 
 const GenderStep = ({ asked, onPickGender, onGoBack }: GenderStepProps) => {
-  const words = strings.characters
+  const label = i18n._(CLASS_LABELS[asked])
 
   return (
     <>
@@ -259,10 +263,9 @@ const GenderStep = ({ asked, onPickGender, onGoBack }: GenderStepProps) => {
             <li key={candidate}>
               <Button
                 variant="ghost"
-                aria-label={words.classGenderLabel(
-                  words.classes[asked],
-                  candidate
-                )}
+                aria-label={
+                  candidate === 'male' ? t`${label} homme` : t`${label} femme`
+                }
                 className="h-auto flex-col gap-2 rounded-xl p-3 hover:bg-muted/60"
                 onClick={() => {
                   onPickGender(candidate)
@@ -289,7 +292,7 @@ const GenderStep = ({ asked, onPickGender, onGoBack }: GenderStepProps) => {
         onClick={onGoBack}
       >
         <ChevronLeft aria-hidden strokeWidth={2} />
-        {words.dialogBack}
+        {t`Changer de classe`}
       </Button>
     </>
   )

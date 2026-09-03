@@ -14,6 +14,7 @@ use crate::app::state::AppState;
 use crate::app::state::hold;
 use crate::app::view::ScreenSaverView;
 use crate::config::ConfigStore;
+use crate::config::Language;
 use crate::config::Loaded;
 use crate::config::Settings;
 use crate::platform::Authorization;
@@ -307,6 +308,7 @@ pub fn multifus(directory: &TempDir, loaded: Loaded) -> Multifus {
         loaded,
         version: "0.0.0".to_owned(),
         system: "test".to_owned(),
+        system_language: Language::Fr,
         keyboard: KeyLabels::new(),
         launch: Launch::ByHand,
         screen_saver: ScreenSaverView::Never,

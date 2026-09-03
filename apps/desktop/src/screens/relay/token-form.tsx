@@ -1,10 +1,10 @@
 import React from 'react'
 import { Link2 } from 'lucide-react'
+import { t } from '@lingui/core/macro'
 import type { RelayStatus } from '@/@types/relay'
 import type { Snapshot } from '@/@types/snapshot'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { strings } from '@/constants/strings'
 import { pairingProblemLine } from '@/helpers/wording'
 import { pairRelay } from '@/lib/multifus'
 
@@ -30,7 +30,7 @@ export const TokenForm = ({ relay, run }: TokenFormProps) => {
         htmlFor="relay-token"
         className="text-micro font-medium tracking-micro text-muted-foreground uppercase"
       >
-        {strings.relay.tokenLabel}
+        {t`Code du robot`}
       </label>
       <div className="flex items-start gap-2">
         <Input
@@ -39,7 +39,7 @@ export const TokenForm = ({ relay, run }: TokenFormProps) => {
           autoComplete="off"
           spellCheck={false}
           value={token}
-          placeholder={strings.relay.tokenPlaceholder}
+          placeholder={t`Collez ici le code donné par BotFather`}
           aria-invalid={problem !== null}
           aria-describedby={problem === null ? undefined : 'relay-problem'}
           onChange={(event) => {
@@ -49,7 +49,7 @@ export const TokenForm = ({ relay, run }: TokenFormProps) => {
         />
         <Button type="submit" size="sm" aria-busy={isWorking}>
           <Link2 aria-hidden />
-          {isWorking ? strings.relay.connecting : strings.relay.connect}
+          {isWorking ? t`Connexion…` : t`Connecter`}
         </Button>
       </div>
       {problem === null ? null : (

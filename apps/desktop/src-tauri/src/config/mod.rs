@@ -1,9 +1,11 @@
 pub mod error;
+pub mod language;
 pub mod settings;
 pub mod store;
 
 pub use error::ConfigError;
 pub use error::Result;
+pub use language::Language;
 pub use settings::AutoFocus;
 pub use settings::Banner;
 pub use settings::BannerCorner;

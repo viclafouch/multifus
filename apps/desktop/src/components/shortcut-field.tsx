@@ -1,9 +1,10 @@
 import React from 'react'
+import { t } from '@lingui/core/macro'
 import { KeyCap } from '@/components/key-cap'
 import { ShortcutUndoButton } from '@/components/shortcut-undo-button'
 import { Button } from '@/components/ui/button'
 import type { CaptureRejection } from '@/constants/keyboard'
-import { strings } from '@/constants/strings'
+import { IS_APPLE } from '@/constants/keyboard'
 import { acceleratorParts, capture, heldModifiers } from '@/helpers/accelerator'
 import type { TonedLine } from '@/helpers/wording'
 import type { ShortcutUndo } from '@/hooks/use-shortcut-undo'
@@ -92,9 +93,7 @@ export const ShortcutField = ({
       >
         {parts.length === 0 ? (
           <span className="text-log font-normal text-muted-foreground">
-            {editing.isActive
-              ? strings.shortcuts.capture
-              : strings.shortcuts.empty}
+            {editing.isActive ? t`Appuyez sur vos touches` : t`Aucune`}
           </span>
         ) : (
           parts.map((part) => {
@@ -116,6 +115,25 @@ export const ShortcutField = ({
   )
 }
 
+const rejectionLine = (rejected: CaptureRejection) => {
+  switch (rejected) {
+    case 'noModifier': {
+      return IS_APPLE
+        ? t`Ajoutez Ctrl, Alt ou Maj. Seule, cette touche partirait dès que vous écrivez dans le jeu.`
+        : t`Ajoutez Ctrl, Alt ou Maj, ou prenez une touche de fonction : F1, F2, F5… Seule, cette touche partirait dès que vous écrivez dans le jeu.`
+    }
+    case 'unsupportedKey': {
+      return t`Cette touche ne peut pas servir de raccourci.`
+    }
+    case 'pasteCombination': {
+      return t`C’est le raccourci pour coller sur votre ordinateur. Prenez-en un autre.`
+    }
+    default: {
+      return rejected satisfies never
+    }
+  }
+}
+
 type FieldHintParams = {
   readonly isEditing: boolean
   readonly statusLine: TonedLine | null
@@ -128,11 +146,14 @@ const fieldHint = ({
   rejected
 }: FieldHintParams): TonedLine | null => {
   if (rejected !== null) {
-    return { tone: 'bad', text: strings.shortcuts.rejected[rejected] }
+    return { tone: 'bad', text: rejectionLine(rejected) }
   }
 
   if (isEditing) {
-    return { tone: 'calm', text: strings.shortcuts.captureHint }
+    return {
+      tone: 'calm',
+      text: t`Échap pour annuler, Retour arrière pour effacer.`
+    }
   }
 
   return statusLine

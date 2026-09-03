@@ -1,7 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import type { UpdateStatus } from '@/@types/system'
-import { strings } from '@/constants/strings'
 
 const bridge = {
   checkUpdate: vi.fn(),
@@ -45,11 +44,30 @@ const buttonNamed = (label: string) => {
   return screen.getByRole('button', { name: label })
 }
 
+const LEGAL = [
+  {
+    lead: 'Multifus n’a rien à voir avec Ankama.',
+    body: 'Dofus, Dofus Retro et les têtes de classe appartiennent à Ankama.'
+  },
+  {
+    lead: 'Multifus ne touche pas au jeu.',
+    body: 'Ni sa mémoire, ni ses fichiers, ni ses paquets : il range vos fenêtres, lit les notifications et prend vos clics.'
+  },
+  {
+    lead: 'Rien ne quitte votre ordinateur sans vous.',
+    body: 'Multifus cherche ses mises à jour, et relaie vos messages privés seulement si vous reliez Telegram.'
+  }
+]
+
 describe('l’écran À propos', () => {
   it('dit ce qu’est Multifus', () => {
     show()
 
-    expect(screen.getByText(strings.about.tagline)).not.toBeNull()
+    expect(
+      screen.getByText(
+        'Le multicompte confortable sur Dofus Retro : Multifus range vos fenêtres, vous jouez.'
+      )
+    ).not.toBeNull()
   })
 
   it('dit la version, le système et où sont rangés les réglages', () => {
@@ -64,7 +82,7 @@ describe('l’écran À propos', () => {
     bridge.revealConfig.mockResolvedValue(null)
     show()
 
-    fireEvent.click(buttonNamed(strings.about.configReveal))
+    fireEvent.click(buttonNamed('Montrer le fichier des réglages'))
 
     expect(bridge.revealConfig).toHaveBeenCalledWith()
   })
@@ -72,7 +90,7 @@ describe('l’écran À propos', () => {
   it('mène chaque mention légale par la phrase qui compte', () => {
     show()
 
-    for (const { lead } of strings.about.legal) {
+    for (const { lead } of LEGAL) {
       expect(screen.getByText(lead).tagName).toBe('STRONG')
     }
   })
@@ -80,11 +98,9 @@ describe('l’écran À propos', () => {
   it('dit Ankama, les paquets auxquels on ne touche pas, et internet', () => {
     show()
 
-    const said = strings.about.legal
-      .map(({ lead, body }) => {
-        return `${lead} ${body}`
-      })
-      .join(' ')
+    const said = LEGAL.map(({ lead, body }) => {
+      return `${lead} ${body}`
+    }).join(' ')
 
     for (const owned of ['Ankama', 'mémoire', 'paquets', 'clics']) {
       expect(said).toContain(owned)
@@ -94,7 +110,7 @@ describe('l’écran À propos', () => {
   it('dit que Telegram ne part qu’à la demande', () => {
     show()
 
-    const telegram = strings.about.legal.find(({ body }) => {
+    const telegram = LEGAL.find(({ body }) => {
       return body.includes('Telegram')
     })
 
@@ -106,8 +122,8 @@ describe('l’écran À propos', () => {
       bridge.openAboutLink.mockResolvedValue(null)
       show()
 
-      fireEvent.click(buttonNamed(strings.about.sourceOpen))
-      fireEvent.click(buttonNamed(strings.about.issuesOpen))
+      fireEvent.click(buttonNamed('Aller voir'))
+      fireEvent.click(buttonNamed('Aller le dire'))
 
       expect(bridge.openAboutLink).toHaveBeenCalledWith('source')
       expect(bridge.openAboutLink).toHaveBeenCalledWith('issues')
@@ -118,7 +134,7 @@ describe('l’écran À propos', () => {
     it('va voir s’il y en a une, à la demande', () => {
       show({ update: { kind: 'upToDate' } })
 
-      fireEvent.click(buttonNamed(strings.about.check))
+      fireEvent.click(buttonNamed('Vérifier'))
 
       expect(bridge.checkUpdate).toHaveBeenCalledWith()
       expect(bridge.installUpdate).not.toHaveBeenCalled()
@@ -127,26 +143,26 @@ describe('l’écran À propos', () => {
     it('dit que la version est la dernière', () => {
       show({ update: { kind: 'upToDate' } })
 
-      expect(screen.getByText(strings.about.updateUpToDate)).not.toBeNull()
+      expect(screen.getByText('Vous êtes à jour.')).not.toBeNull()
     })
 
     it('dit que la vérification est en cours', () => {
       show({ update: { kind: 'checking' } })
 
-      expect(screen.getByText(strings.about.updateChecking)).not.toBeNull()
-      expect(buttonNamed(strings.about.check).getAttribute('aria-busy')).toBe(
-        'true'
-      )
+      expect(screen.getByText('Vérification en cours…')).not.toBeNull()
+      expect(buttonNamed('Vérifier').getAttribute('aria-busy')).toBe('true')
     })
 
     it('propose d’installer la version trouvée', () => {
       show({ update: { kind: 'available', version: '1.5.0' } })
 
       expect(
-        screen.getByText(strings.about.updateAvailable('1.5.0'))
+        screen.getByText(
+          'La version 1.5.0 est prête. Multifus se relancera tout seul, sans toucher à vos clients.'
+        )
       ).not.toBeNull()
 
-      fireEvent.click(buttonNamed(strings.about.install))
+      fireEvent.click(buttonNamed('Installer'))
 
       expect(bridge.installUpdate).toHaveBeenCalledWith()
       expect(bridge.checkUpdate).not.toHaveBeenCalled()
@@ -155,20 +171,18 @@ describe('l’écran À propos', () => {
     it('dit que le téléchargement est en cours', () => {
       show({ update: { kind: 'installing' } })
 
-      expect(screen.getByText(strings.about.updateInstalling)).not.toBeNull()
-      expect(buttonNamed(strings.about.install).getAttribute('aria-busy')).toBe(
-        'true'
-      )
+      expect(screen.getByText('Téléchargement en cours…')).not.toBeNull()
+      expect(buttonNamed('Installer').getAttribute('aria-busy')).toBe('true')
     })
 
     it('dit pourquoi la mise à jour n’a pas abouti, et laisse réessayer', () => {
       show({ update: { kind: 'failed', detail: 'signature invalide' } })
 
       expect(
-        screen.getByText(strings.about.updateFailed('signature invalide'))
+        screen.getByText('La mise à jour a échoué : signature invalide')
       ).not.toBeNull()
 
-      fireEvent.click(buttonNamed(strings.about.check))
+      fireEvent.click(buttonNamed('Vérifier'))
 
       expect(bridge.checkUpdate).toHaveBeenCalledWith()
     })
@@ -178,28 +192,38 @@ describe('l’écran À propos', () => {
     it('demande confirmation avant de rien toucher', () => {
       show()
 
-      fireEvent.click(buttonNamed(strings.about.reset))
+      fireEvent.click(buttonNamed('Tout réinitialiser'))
 
-      expect(screen.getByText(strings.about.resetConfirmTitle)).not.toBeNull()
-      expect(screen.getByText(strings.about.resetConfirmBody)).not.toBeNull()
+      expect(screen.getByText('Tout remettre à neuf ?')).not.toBeNull()
+      expect(
+        screen.getByText(
+          'Réglages, roster et raccourcis repartent d’origine. Vos personnages connectés reviendront dans la seconde, sans sexe ni classe.'
+        )
+      ).not.toBeNull()
       expect(bridge.reset).not.toHaveBeenCalled()
     })
 
     it('prévient que les personnages Dofus ne risquent rien', () => {
       show()
 
-      expect(screen.getByText(strings.about.resetBody)).not.toBeNull()
-      expect(strings.about.resetBody).toContain('Dofus Retro')
+      expect(
+        screen.getByText(
+          'Multifus repart comme au premier lancement. Vos personnages Dofus Retro ne risquent rien.'
+        )
+      ).not.toBeNull()
+      expect(
+        'Multifus repart comme au premier lancement. Vos personnages Dofus Retro ne risquent rien.'
+      ).toContain('Dofus Retro')
     })
 
     it('n’efface rien quand on annule', async () => {
       show()
 
-      fireEvent.click(buttonNamed(strings.about.reset))
-      fireEvent.click(buttonNamed(strings.about.cancel))
+      fireEvent.click(buttonNamed('Tout réinitialiser'))
+      fireEvent.click(buttonNamed('Annuler'))
 
       await waitFor(() => {
-        expect(screen.queryByText(strings.about.resetConfirmTitle)).toBeNull()
+        expect(screen.queryByText('Tout remettre à neuf ?')).toBeNull()
       })
       expect(bridge.reset).not.toHaveBeenCalled()
     })
@@ -207,12 +231,12 @@ describe('l’écran À propos', () => {
     it('demande à Rust de tout effacer quand on confirme', async () => {
       show()
 
-      fireEvent.click(buttonNamed(strings.about.reset))
-      fireEvent.click(buttonNamed(strings.about.resetConfirm))
+      fireEvent.click(buttonNamed('Tout réinitialiser'))
+      fireEvent.click(buttonNamed('Réinitialiser'))
 
       expect(bridge.reset).toHaveBeenCalledWith()
       await waitFor(() => {
-        expect(screen.queryByText(strings.about.resetConfirmTitle)).toBeNull()
+        expect(screen.queryByText('Tout remettre à neuf ?')).toBeNull()
       })
     })
   })

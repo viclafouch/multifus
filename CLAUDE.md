@@ -32,5 +32,8 @@ dépôt : `cargo install cargo-deny --locked` pour lancer `pnpm --filter
 @multifus/desktop run deny:rust` ici. Le hook de commit ne le lance pas, il
 faudrait le réseau à chaque commit.
 
+Le français est la source et Lingui porte le reste. Le menu de la barre système
+a sa propre table, en Rust, parce qu'il doit exister sans fenêtre.
+
 Le skill `/frontend-design` avant de dessiner un écran, et Tauri v2 :
 `https://v2.tauri.app/llms.txt`.

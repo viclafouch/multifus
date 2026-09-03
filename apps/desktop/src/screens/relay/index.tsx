@@ -1,4 +1,5 @@
 import { MessageSquareText } from 'lucide-react'
+import { t } from '@lingui/core/macro'
 import type { RelayStatus } from '@/@types/relay'
 import type { Character } from '@/@types/roster'
 import type { Snapshot } from '@/@types/snapshot'
@@ -8,7 +9,6 @@ import { PanelHeader } from '@/components/layout/panel-header'
 import { Screen } from '@/components/layout/screen'
 import { LinkButton } from '@/components/link-button'
 import { Switch } from '@/components/ui/switch'
-import { strings } from '@/constants/strings'
 import { openRelayLink, setSendBody } from '@/lib/multifus'
 import { BotPanel } from '@/screens/relay/bot-panel'
 import { PairingGuide } from '@/screens/relay/pairing-guide'
@@ -24,8 +24,13 @@ type RelayScreenProps = Readonly<{
 }>
 
 export const RelayScreen = ({ relay, characters, run }: RelayScreenProps) => {
+  const bodyLabel = t`Recevoir ce que le joueur a écrit`
+
   return (
-    <Screen title={strings.relay.title} subtitle={strings.relay.subtitle}>
+    <Screen
+      title={t`Messages privés`}
+      subtitle={t`Un joueur vous écrit pendant que vous êtes ailleurs ? Son message arrive sur votre téléphone, dans Telegram. Telegram, parce que c’est gratuit et que c’est la seule messagerie qu’un logiciel peut faire parler aussi simplement.`}
+    >
       {relay.paired ? (
         <>
           <StatePanel relay={relay} run={run} />
@@ -40,12 +45,12 @@ export const RelayScreen = ({ relay, characters, run }: RelayScreenProps) => {
       ) : null}
       <Panel className="mb-3">
         <PanelHeader
-          title={strings.relay.charactersTitle}
-          description={strings.relay.charactersBody}
+          title={t`Personnages relayés`}
+          description={t`Cochez ceux dont vous voulez les messages privés, en général celui avec qui vous jouez vraiment. Un personnage déconnecté reste coché, et Multifus le reprend dès qu’il se reconnecte.`}
         />
         {characters.length === 0 ? (
           <p className="px-4 py-3.5 text-note text-muted-foreground">
-            {strings.relay.emptyBody}
+            {t`Connectez un personnage dans Dofus Retro : il arrive ici, déjà coché.`}
           </p>
         ) : (
           <RelayedList characters={characters} run={run} />
@@ -53,8 +58,8 @@ export const RelayScreen = ({ relay, characters, run }: RelayScreenProps) => {
       </Panel>
       <Panel>
         <FieldRow
-          label={strings.relay.bodyLabel}
-          description={strings.relay.bodyDescription}
+          label={bodyLabel}
+          description={t`Coché, vous lisez son message dans Telegram. Décoché, vous savez seulement lequel de vos personnages a reçu un message privé.`}
           icon={
             <MessageSquareText
               className="size-glyph"
@@ -65,7 +70,7 @@ export const RelayScreen = ({ relay, characters, run }: RelayScreenProps) => {
         >
           <Switch
             checked={relay.sendBody}
-            aria-label={strings.relay.bodyLabel}
+            aria-label={bodyLabel}
             onCheckedChange={(sendBody) => {
               run(setSendBody(sendBody))
             }}
@@ -74,7 +79,7 @@ export const RelayScreen = ({ relay, characters, run }: RelayScreenProps) => {
       </Panel>
       <div className="mt-3">
         <LinkButton
-          label={strings.relay.help}
+          label={t`À quoi sert un robot Telegram ?`}
           onOpen={() => {
             return openRelayLink('faq')
           }}

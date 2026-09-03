@@ -1,8 +1,9 @@
 import React from 'react'
 import { X } from 'lucide-react'
+import { i18n } from '@lingui/core'
+import { t } from '@lingui/core/macro'
 import { Button } from '@/components/ui/button'
 import { RUNE_FAMILIES } from '@/constants/runes'
-import { strings } from '@/constants/strings'
 import type { useWindowDrag } from '@/hooks/use-window-drag'
 import { RuneLine } from '@/screens/rune-table-window/rune-line'
 
@@ -14,26 +15,26 @@ type RuneSheetProps = Readonly<{
 }>
 
 export const RuneSheet = ({ drag, look, onClose, ref }: RuneSheetProps) => {
-  const words = strings.runeTable.sheet
+  const title = t`Tableau des runes`
 
   return (
     <div
       {...drag}
       ref={ref}
       role="group"
-      aria-label={words.title}
+      aria-label={title}
       className="rune-sheet"
       style={{ opacity: look }}
     >
       <header className="rune-crown">
         <h1 className="min-w-0 flex-1 truncate text-row leading-none font-medium">
-          {words.title}
+          {title}
         </h1>
         <Button
           variant="ghost"
           size="icon-xs"
           className="shrink-0 text-muted-foreground hover:bg-destructive/20 hover:text-foreground"
-          aria-label={words.close}
+          aria-label={t`Fermer le tableau des runes`}
           onPointerDown={(event) => {
             event.stopPropagation()
           }}
@@ -43,23 +44,23 @@ export const RuneSheet = ({ drag, look, onClose, ref }: RuneSheetProps) => {
         </Button>
       </header>
       <table className="rune-grid">
-        <caption className="sr-only">{words.caption}</caption>
+        <caption className="sr-only">{t`Le poids de chaque rune : la simple, la Pa, la Ra, et le poids d’un point de stat`}</caption>
         <thead>
           <tr>
             <th scope="col" className="rune-head">
-              {words.stat}
+              {t`Stat`}
             </th>
             <th scope="col" className="rune-head" data-weight>
-              {words.simple}
+              {t`Simple`}
             </th>
             <th scope="col" className="rune-head" data-weight>
-              {words.pa}
+              {t`Pa`}
             </th>
             <th scope="col" className="rune-head" data-weight>
-              {words.ra}
+              {t`Ra`}
             </th>
             <th scope="col" className="rune-head" data-weight>
-              {words.unit}
+              {t`Point`}
             </th>
           </tr>
         </thead>
@@ -72,11 +73,13 @@ export const RuneSheet = ({ drag, look, onClose, ref }: RuneSheetProps) => {
             >
               <tr>
                 <th scope="colgroup" colSpan={5} className="rune-clan">
-                  {words.families[family.name]}
+                  {i18n._(family.label)}
                 </th>
               </tr>
               {family.rows.map((row) => {
-                return <RuneLine key={row.stat} row={row} />
+                const stat = i18n._(row.stat)
+
+                return <RuneLine key={stat} stat={stat} row={row} />
               })}
             </tbody>
           )

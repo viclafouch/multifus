@@ -1,6 +1,7 @@
 import React from 'react'
 import { GripVertical } from 'lucide-react'
 import { useSortable } from '@dnd-kit/react/sortable'
+import { t } from '@lingui/core/macro'
 import type { Character, Class, Color, Gender, Portrait } from '@/@types/roster'
 import { CharacterDialog } from '@/components/character-dialog'
 import { CharacterMedallion } from '@/components/character-medallion'
@@ -14,7 +15,6 @@ import {
   TooltipContent,
   TooltipTrigger
 } from '@/components/ui/tooltip'
-import { strings } from '@/constants/strings'
 import type { ColorHolders } from '@/helpers/colors'
 import { matchIsInCycle } from '@/helpers/cycle'
 import { portraitFor } from '@/helpers/portrait'
@@ -86,7 +86,7 @@ export const CharacterRow = ({
         ref={handleRef}
         variant="ghost"
         size="icon-xs"
-        aria-label={strings.characters.handle(nickname)}
+        aria-label={t`Déplacer ${nickname} dans le défilement`}
         className="cursor-grab touch-none text-muted-foreground/30 group-hover:text-muted-foreground/70 active:cursor-grabbing"
       >
         <GripVertical strokeWidth={1.75} />
@@ -95,9 +95,7 @@ export const CharacterRow = ({
         aria-hidden
         className="w-5 shrink-0 text-right font-mono text-log tabular-nums text-muted-foreground/45"
       >
-        {rank === null
-          ? strings.characters.rankNone
-          : String(rank).padStart(2, '0')}
+        {rank === null ? '·' : String(rank).padStart(2, '0')}
       </span>
       <Tooltip>
         <TooltipTrigger
@@ -133,7 +131,7 @@ export const CharacterRow = ({
       <Switch
         checked={matchIsInCycle(character)}
         disabled={!online}
-        aria-label={strings.characters.includeToggle(nickname)}
+        aria-label={t`${nickname} dans le défilement et l’AutoFocus`}
         className="group-data-excluded:data-unchecked:bg-destructive/45"
         onCheckedChange={() => {
           actions.handleToggleExcluded(nickname)
@@ -142,7 +140,7 @@ export const CharacterRow = ({
       <span className="flex w-6 shrink-0 justify-end">
         {online ? null : (
           <RemoveButton
-            label={strings.characters.remove(nickname)}
+            label={t`Retirer ${nickname} du roster`}
             onRemove={() => {
               actions.handleRemove(nickname)
             }}

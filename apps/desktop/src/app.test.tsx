@@ -1,8 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { i18n } from '@lingui/core'
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import type { ScreenName, Snapshot } from '@/@types/snapshot'
 import type { ConfigProblem } from '@/@types/system'
-import { strings } from '@/constants/strings'
+import { NAV_ITEMS } from '@/constants/navigation'
 import { ignore } from '@/lib/utils'
 import { characterOf, pending, snapshotOf } from '@/test-doubles'
 
@@ -51,7 +52,24 @@ const open = async (snapshot: Snapshot) => {
 }
 
 const navigateTo = (name: ScreenName) => {
-  fireEvent.click(screen.getByRole('button', { name: strings.nav[name] }))
+  fireEvent.click(screen.getByRole('button', { name: navLabel(name) }))
+}
+
+const NAV_LABELS = {
+  characters: 'Personnages',
+  shortcuts: 'Raccourcis',
+  quickReplies: 'Réponses rapides',
+  autoFocus: 'AutoFocus',
+  walk: 'Déplacement rapide',
+  wheel: 'Roue des personnages',
+  runeTable: 'Tableau des runes',
+  relay: 'Messages privés',
+  settings: 'Paramètres',
+  about: 'À propos'
+} as const satisfies Record<ScreenName, string>
+
+const navLabel = (name: ScreenName) => {
+  return NAV_LABELS[name]
 }
 
 const currentEntry = () => {
@@ -64,15 +82,24 @@ type Arrival = {
 }
 
 const ARRIVALS = [
-  { name: 'shortcuts', mark: strings.shortcuts.subtitle },
-  { name: 'quickReplies', mark: strings.quickReplies.subtitle },
-  { name: 'autoFocus', mark: strings.autoFocus.subtitle },
-  { name: 'walk', mark: strings.walk.subtitle },
-  { name: 'wheel', mark: strings.wheel.subtitle },
-  { name: 'runeTable', mark: strings.runeTable.subtitle },
-  { name: 'relay', mark: strings.relay.subtitle },
-  { name: 'settings', mark: strings.settings.subtitle },
-  { name: 'about', mark: strings.about.legalTitle }
+  { name: 'shortcuts', mark: 'Changez de personnage sans lâcher la souris.' },
+  {
+    name: 'quickReplies',
+    mark: 'Les réponses que vous retapez tous les soirs'
+  },
+  { name: 'autoFocus', mark: 'Vous jouez plusieurs personnages à la fois.' },
+  { name: 'walk', mark: 'Un clic déplace le personnage que vous avez devant' },
+  { name: 'wheel', mark: 'Maintenez vos touches dans le jeu' },
+  {
+    name: 'runeTable',
+    mark: 'Les poids des runes, affichés par-dessus le jeu.'
+  },
+  {
+    name: 'relay',
+    mark: 'Un joueur vous écrit pendant que vous êtes ailleurs ?'
+  },
+  { name: 'settings', mark: 'Ce que Multifus fait pendant que vous jouez' },
+  { name: 'about', mark: 'Mentions légales' }
 ] as const satisfies readonly Arrival[]
 
 describe('la fenêtre de Multifus', () => {
@@ -93,15 +120,17 @@ describe('la fenêtre de Multifus', () => {
   it('s’ouvre sur les personnages', async () => {
     await open(snapshotOf())
 
-    expect(currentEntry()).toBe(strings.nav.characters)
-    expect(screen.getByText(strings.characters.emptyTitle)).not.toBeNull()
+    expect(currentEntry()).toBe('Personnages')
+    expect(screen.getByText('Votre roster est vide')).not.toBeNull()
   })
 
   it('porte les dix écrans, et la version de Multifus', async () => {
     await open(snapshotOf({ version: '1.4.2' }))
 
-    for (const label of Object.values(strings.nav)) {
-      expect(screen.getByRole('button', { name: label })).not.toBeNull()
+    for (const item of NAV_ITEMS) {
+      expect(
+        screen.getByRole('button', { name: i18n._(item.label) })
+      ).not.toBeNull()
     }
 
     expect(screen.getByText('v1.4.2')).not.toBeNull()
@@ -113,8 +142,8 @@ describe('la fenêtre de Multifus', () => {
     for (const { name, mark } of ARRIVALS) {
       navigateTo(name)
 
-      expect(screen.getByText(mark)).not.toBeNull()
-      expect(currentEntry()).toBe(strings.nav[name])
+      expect(screen.getByText(mark, { exact: false })).not.toBeNull()
+      expect(currentEntry()).toBe(navLabel(name))
     }
   })
 
@@ -145,7 +174,7 @@ describe('la fenêtre de Multifus', () => {
     navigateTo('settings')
     navigateTo('characters')
 
-    expect(screen.getByText(strings.characters.emptyTitle)).not.toBeNull()
+    expect(screen.getByText('Votre roster est vide')).not.toBeNull()
   })
 
   describe('le rail', () => {
@@ -160,7 +189,7 @@ describe('la fenêtre de Multifus', () => {
         })
       )
 
-      expect(screen.getByText(strings.status.connected(2))).not.toBeNull()
+      expect(screen.getByText('2 personnages connectés')).not.toBeNull()
     })
 
     it('dit qu’il est à l’écoute du jeu', async () => {
@@ -168,7 +197,7 @@ describe('la fenêtre de Multifus', () => {
         snapshotOf({ authorization: { granted: true, listening: true } })
       )
 
-      expect(screen.getByText(strings.status.listening)).not.toBeNull()
+      expect(screen.getByText('À l’écoute du jeu')).not.toBeNull()
     })
 
     it('dit quand l’écoute s’est interrompue', async () => {
@@ -176,7 +205,7 @@ describe('la fenêtre de Multifus', () => {
         snapshotOf({ authorization: { granted: true, listening: false } })
       )
 
-      expect(screen.getByText(strings.status.notListening)).not.toBeNull()
+      expect(screen.getByText('Écoute interrompue')).not.toBeNull()
     })
 
     it('dit quand l’autorisation manque', async () => {
@@ -184,7 +213,7 @@ describe('la fenêtre de Multifus', () => {
         snapshotOf({ authorization: { granted: false, listening: false } })
       )
 
-      expect(screen.getByText(strings.status.denied)).not.toBeNull()
+      expect(screen.getByText('Autorisation manquante')).not.toBeNull()
     })
   })
 
@@ -196,8 +225,8 @@ describe('la fenêtre de Multifus', () => {
     it('demande le feu vert à la place des personnages', async () => {
       await open(denied)
 
-      expect(screen.getByText(strings.authorization.title)).not.toBeNull()
-      expect(screen.queryByText(strings.characters.emptyTitle)).toBeNull()
+      expect(screen.getByText('Multifus attend votre feu vert')).not.toBeNull()
+      expect(screen.queryByText('Votre roster est vide')).toBeNull()
     })
 
     it('laisse quand même atteindre les autres écrans', async () => {
@@ -205,7 +234,11 @@ describe('la fenêtre de Multifus', () => {
 
       navigateTo('settings')
 
-      expect(screen.getByText(strings.settings.subtitle)).not.toBeNull()
+      expect(
+        screen.getByText(
+          'Ce que Multifus fait pendant que vous jouez, seul ou sur demande.'
+        )
+      ).not.toBeNull()
     })
   })
 
@@ -216,15 +249,17 @@ describe('la fenêtre de Multifus', () => {
       tray.asked?.('relay')
     })
 
-    expect(screen.getByText(strings.relay.subtitle)).not.toBeNull()
-    expect(currentEntry()).toBe(strings.nav.relay)
+    expect(
+      screen.getByText(/Un joueur vous écrit pendant que vous êtes ailleurs/u)
+    ).not.toBeNull()
+    expect(currentEntry()).toBe('Messages privés')
   })
 
   describe('l’avis sur les réglages', () => {
     it('ne dit rien quand le fichier va bien', async () => {
       await open(snapshotOf())
 
-      expect(screen.queryByText(strings.config.dismiss)).toBeNull()
+      expect(screen.queryByText('J’ai compris')).toBeNull()
     })
 
     it('dit que les réglages n’ont pas pu être lus', async () => {
@@ -235,9 +270,11 @@ describe('la fenêtre de Multifus', () => {
 
       await open(snapshotOf({ config: { path: '/tmp/c.json', problem } }))
 
-      expect(screen.getByText(strings.config.unreadableTitle)).not.toBeNull()
       expect(
-        screen.queryByRole('button', { name: strings.config.reveal })
+        screen.getByText('Vos réglages n’ont pas pu être lus')
+      ).not.toBeNull()
+      expect(
+        screen.queryByRole('button', { name: 'Montrer le fichier' })
       ).toBeNull()
     })
 
@@ -250,11 +287,13 @@ describe('la fenêtre de Multifus', () => {
 
       await open(snapshotOf({ config: { path: '/tmp/c.json', problem } }))
 
-      expect(screen.getByText(strings.config.malformedTitle)).not.toBeNull()
+      expect(
+        screen.getByText('Vos réglages ont été mis de côté')
+      ).not.toBeNull()
       expect(screen.getByText('/tmp/multifus.json.bad')).not.toBeNull()
 
       fireEvent.click(
-        screen.getByRole('button', { name: strings.config.reveal })
+        screen.getByRole('button', { name: 'Montrer le fichier' })
       )
 
       expect(bridge.revealQuarantinedConfig).toHaveBeenCalledWith()
@@ -265,9 +304,7 @@ describe('la fenêtre de Multifus', () => {
 
       await open(snapshotOf({ config: { path: '/tmp/c.json', problem } }))
 
-      fireEvent.click(
-        screen.getByRole('button', { name: strings.config.dismiss })
-      )
+      fireEvent.click(screen.getByRole('button', { name: 'J’ai compris' }))
 
       expect(bridge.dismissConfigProblem).toHaveBeenCalledWith()
     })
@@ -279,7 +316,9 @@ describe('la fenêtre de Multifus', () => {
 
       navigateTo('settings')
 
-      expect(screen.getByText(strings.config.notSavedTitle)).not.toBeNull()
+      expect(
+        screen.getByText('Vos réglages n’ont pas été enregistrés')
+      ).not.toBeNull()
     })
   })
 
@@ -288,7 +327,7 @@ describe('la fenêtre de Multifus', () => {
 
     navigateTo('settings')
 
-    expect(screen.getByText(strings.journal.title)).not.toBeNull()
-    expect(screen.getByText(strings.journal.entries(0))).not.toBeNull()
+    expect(screen.getByText('Journal')).not.toBeNull()
+    expect(screen.getByText('0 entrée')).not.toBeNull()
   })
 })

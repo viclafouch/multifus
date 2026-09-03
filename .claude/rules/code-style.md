@@ -129,8 +129,6 @@ Always use native modern APIs (Intl, URLSearchParams, structuredClone, etc.) ins
 
 - `apps/desktop/src/helpers/` - One file per domain (`accelerator.ts`, `wording.ts`)
 - `apps/desktop/src/constants/` - One file per domain too (`keyboard.ts`, `journal.ts`)
-- `apps/desktop/src/constants/strings/` - Every French string of the interface, and nothing
-  else: one file per screen, an index that composes `strings`
 
 **Component-specific constants** (used only by one component/screen):
 
@@ -162,12 +160,33 @@ Before writing ANY function, component, type, or constant inside a feature file,
 - UI components that receive generic props (title, description, onConfirm, etc.)
 - Logic that appears in 2+ files in slightly different forms
 
+### Interface text
+
+The phrase lives where it is read, in French, and Lingui carries it elsewhere.
+
+- **`t` in a function body, `msg` at module scope, never `t` at module scope.** A
+  module is evaluated before the language is activated, so a `t` there freezes
+  the French
+- **A count goes through `plural`**, and `Intl` takes `i18n.locale`
+- The same French twice in one file is one `const`. The same French meaning two
+  things takes a `context`
+- A language names itself and is never translated: `Français`, `English`
+- `pnpm --filter @multifus/desktop run i18n:extract` after touching a phrase
+
+Tests read the French the user reads, written out in full, never the `msg` table
+the code under test reads. Walking a table to check every member reaches the
+screen is another thing, and it is welcome. No test writes an English word: the
+build refuses a catalogue with a hole.
+
 ### Where things live
 
 - `apps/desktop/src/@types/` - What crosses the bridge, without a single runtime import
-- `apps/desktop/src/constants/` - Tables and nothing else, the strings included
+- `apps/desktop/src/constants/` - Tables and nothing else, the `msg` ones included
 - `apps/desktop/src/helpers/` - Pure functions that know the domain, neither React nor Tauri
-- `apps/desktop/src/lib/` - What talks to the outside world: the IPC bridge, and `cn`
+- `apps/desktop/src/lib/` - What talks to the outside world: the IPC bridge, the
+  catalogues, and `cn`
+- `apps/desktop/src/locales/` - One `messages.po` per language, written by
+  `lingui extract` and never by hand except to translate
 - `apps/desktop/src/hooks/` - Custom hooks, one per file, named `use-*.ts`
 - `apps/desktop/src/components/` - Shared components
 - `apps/desktop/src/components/layout/` - The frame a screen sits in, one file per component

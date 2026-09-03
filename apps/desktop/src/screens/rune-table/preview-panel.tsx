@@ -1,11 +1,11 @@
 import { Eye } from 'lucide-react'
+import { t } from '@lingui/core/macro'
 import type { RuneTableStatus } from '@/@types/rune'
 import type { Snapshot } from '@/@types/snapshot'
 import { GaugeRow } from '@/components/gauge-row'
 import { Panel } from '@/components/layout/panel'
 import { PanelHeader } from '@/components/layout/panel-header'
 import { Button } from '@/components/ui/button'
-import { strings } from '@/constants/strings'
 import { useDraft } from '@/hooks/use-draft'
 import {
   fadeRuneTable,
@@ -24,13 +24,12 @@ type PreviewPanelProps = Readonly<{
 export const PreviewPanel = ({ runeTable, run }: PreviewPanelProps) => {
   const size = useDraft(runeTable.width)
   const veil = useDraft(runeTable.transparency)
-  const words = strings.runeTable
 
   return (
     <Panel className="mb-3">
       <PanelHeader
-        title={words.previewTitle}
-        description={words.previewDescription}
+        title={t`L’aperçu`}
+        description={t`Le vrai tableau, posé au milieu de Multifus. Une jauge pour la taille, une pour ce qu’on voit du jeu derrière.`}
       >
         <Button
           variant="secondary"
@@ -40,13 +39,13 @@ export const PreviewPanel = ({ runeTable, run }: PreviewPanelProps) => {
           }}
         >
           <Eye aria-hidden />
-          {words.tryIt}
+          {t`Voir en vrai`}
         </Button>
       </PanelHeader>
       <div className="flex flex-col gap-2.5 px-4 py-4">
         <GaugeRow
-          label={words.sizeLabel}
-          reading={words.sizeValue(size.draft)}
+          label={t`Taille`}
+          reading={t`${size.draft} px`}
           current={size.draft}
           min={runeTable.narrowest}
           max={runeTable.widest}
@@ -60,8 +59,8 @@ export const PreviewPanel = ({ runeTable, run }: PreviewPanelProps) => {
           }}
         />
         <GaugeRow
-          label={words.veilLabel}
-          reading={words.veilValue(veil.draft)}
+          label={t`Transparence`}
+          reading={t`${veil.draft} %`}
           current={veil.draft}
           min={0}
           max={runeTable.clearest}

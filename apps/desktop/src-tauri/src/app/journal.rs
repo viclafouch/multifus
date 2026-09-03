@@ -7,6 +7,7 @@ use serde::Serialize;
 use crate::app::journal_file;
 use crate::app::view::BindingView;
 use crate::app::view::ShortcutAction;
+use crate::config::Language;
 use crate::domain::Class;
 use crate::domain::Color;
 use crate::domain::Gender;
@@ -384,6 +385,10 @@ pub enum SettingChange {
 
     RelayBody {
         send_body: bool,
+    },
+
+    Language {
+        language: Language,
     },
 }
 

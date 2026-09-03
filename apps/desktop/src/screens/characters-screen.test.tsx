@@ -2,7 +2,6 @@ import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import type { Character, Gender } from '@/@types/roster'
 import { TooltipProvider } from '@/components/ui/tooltip'
-import { strings } from '@/constants/strings'
 import { characterOf } from '@/test-doubles'
 
 const bridge = {
@@ -29,19 +28,24 @@ const show = (characters: readonly Character[]) => {
   )
 }
 
+const GROUP_LABELS = {
+  male: 'Hommes dans le défilement et l’AutoFocus',
+  female: 'Femmes dans le défilement et l’AutoFocus'
+} as const satisfies Record<Gender, string>
+
 const rows = () => {
   return screen.getAllByRole('listitem')
 }
 
 const mainToggleOf = (nickname: string) => {
   return screen.getByRole('button', {
-    name: strings.characters.mainToggle(nickname)
+    name: `${nickname} comme personnage principal`
   })
 }
 
 const toggleOf = (gender: Gender) => {
   return screen.getByRole('button', {
-    name: strings.characters.groupLabel[gender]
+    name: GROUP_LABELS[gender]
   })
 }
 
@@ -49,11 +53,13 @@ describe('l’écran des personnages', () => {
   it('invite à entrer en jeu quand le roster est vide', () => {
     show([])
 
-    expect(screen.getByText(strings.characters.emptyTitle)).not.toBeNull()
-    expect(screen.getByText(strings.characters.emptyWatch)).not.toBeNull()
+    expect(screen.getByText('Votre roster est vide')).not.toBeNull()
+    expect(
+      screen.getByText('Multifus regarde vos fenêtres, une fois par seconde.')
+    ).not.toBeNull()
     expect(
       screen.queryByRole('switch', {
-        name: strings.characters.includeToggle('Alpha')
+        name: 'Alpha dans le défilement et l’AutoFocus'
       })
     ).toBeNull()
   })
@@ -112,7 +118,7 @@ describe('l’écran des personnages', () => {
 
     fireEvent.click(
       screen.getByRole('switch', {
-        name: strings.characters.includeToggle('Alpha')
+        name: 'Alpha dans le défilement et l’AutoFocus'
       })
     )
 
@@ -123,7 +129,7 @@ describe('l’écran des personnages', () => {
     show([characterOf({ nickname: 'Alpha', online: false })])
 
     const toggle = screen.getByRole('switch', {
-      name: strings.characters.includeToggle('Alpha')
+      name: 'Alpha dans le défilement et l’AutoFocus'
     })
 
     fireEvent.click(toggle)
@@ -139,10 +145,10 @@ describe('l’écran des personnages', () => {
     ])
 
     expect(
-      screen.queryByRole('button', { name: strings.characters.remove('Alpha') })
+      screen.queryByRole('button', { name: 'Retirer Alpha du roster' })
     ).toBeNull()
     expect(
-      screen.getByRole('button', { name: strings.characters.remove('Bravo') })
+      screen.getByRole('button', { name: 'Retirer Bravo du roster' })
     ).not.toBeNull()
   })
 
@@ -213,7 +219,7 @@ describe('l’écran des personnages', () => {
     const states = ['Alpha', 'Bravo'].map((nickname) => {
       return screen
         .getByRole('switch', {
-          name: strings.characters.includeToggle(nickname)
+          name: `${nickname} dans le défilement et l’AutoFocus`
         })
         .getAttribute('aria-checked')
     })
@@ -247,12 +253,12 @@ describe('l’écran des personnages', () => {
 
     expect(
       screen.getByRole('button', {
-        name: strings.characters.classPick('Alpha')
+        name: 'Choisir la classe de Alpha'
       })
     ).not.toBeNull()
     expect(
       screen.getByRole('button', {
-        name: strings.characters.characterChange('Bravo')
+        name: 'Changer la classe, le sexe ou la couleur de Bravo'
       })
     ).not.toBeNull()
   })
@@ -277,9 +283,7 @@ describe('la couleur, dans l’écran des personnages', () => {
       'tint-turquoise'
     )
     expect(rows()[1].querySelector('.stripe')).toBeNull()
-    expect(
-      within(rows()[0]).getByText(`Iop · ${strings.characters.online}`)
-    ).not.toBeNull()
+    expect(within(rows()[0]).getByText(`Iop · Connecté`)).not.toBeNull()
     expect(within(rows()[0]).queryByText(/Turquoise/u)).toBeNull()
   })
 
@@ -288,12 +292,12 @@ describe('la couleur, dans l’écran des personnages', () => {
 
     fireEvent.click(
       screen.getByRole('button', {
-        name: strings.characters.characterChange('Alpha')
+        name: 'Changer la classe, le sexe ou la couleur de Alpha'
       })
     )
     fireEvent.click(
       screen.getByRole('button', {
-        name: strings.characters.colorLabel('Alpha', 'Ciel')
+        name: 'Marquer Alpha en Ciel'
       })
     )
 
@@ -308,17 +312,13 @@ describe('la couleur, dans l’écran des personnages', () => {
 
     fireEvent.click(
       screen.getByRole('button', {
-        name: strings.characters.characterChange('Alpha')
+        name: 'Changer la classe, le sexe ou la couleur de Alpha'
       })
     )
 
     expect(
       screen.getByRole('button', {
-        name: strings.characters.colorTakenLabel({
-          nickname: 'Alpha',
-          label: 'Ciel',
-          holder: 'Bravo'
-        })
+        name: 'Marquer Alpha en Ciel, déjà pris par Bravo'
       })
     ).not.toBeNull()
   })

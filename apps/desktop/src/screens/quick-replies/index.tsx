@@ -1,11 +1,11 @@
 import { Plus } from 'lucide-react'
+import { t } from '@lingui/core/macro'
 import type { QuickReply } from '@/@types/shortcuts'
 import type { Snapshot } from '@/@types/snapshot'
 import { Note } from '@/components/layout/note'
 import { Panel } from '@/components/layout/panel'
 import { Screen } from '@/components/layout/screen'
 import { Button } from '@/components/ui/button'
-import { strings } from '@/constants/strings'
 import { shortcutStatusLine } from '@/helpers/wording'
 import { useShortcutEditing } from '@/hooks/use-shortcut-editing'
 import {
@@ -28,7 +28,6 @@ export const QuickRepliesScreen = ({
   run
 }: QuickRepliesScreenProps) => {
   const editing = useShortcutEditing()
-  const words = strings.quickReplies
 
   const handleAdd = () => {
     run(addQuickReply())
@@ -52,7 +51,10 @@ export const QuickRepliesScreen = ({
   }
 
   return (
-    <Screen title={words.title} subtitle={words.subtitle}>
+    <Screen
+      title={t`Réponses rapides`}
+      subtitle={t`Les réponses que vous retapez tous les soirs, rangées sous des touches. Frappez-les dans Dofus Retro, Multifus colle le texte là où vous écrivez.`}
+    >
       {quickReplies.length === 0 ? (
         <EmptyReplies handleAdd={handleAdd} />
       ) : (
@@ -80,11 +82,11 @@ export const QuickRepliesScreen = ({
             className="h-11 w-full justify-start gap-2 rounded-none rounded-b-xl border-t border-border/70 px-4 text-note font-normal text-muted-foreground"
           >
             <Plus aria-hidden />
-            {words.add}
+            {t`Ajouter une réponse`}
           </Button>
         </Panel>
       )}
-      <Note className="mt-4">{words.clipboard}</Note>
+      <Note className="mt-4">{t`Multifus colle, c’est vous qui appuyez sur Entrée. Le temps du collage, il emprunte votre presse-papiers, puis vous le rend.`}</Note>
     </Screen>
   )
 }

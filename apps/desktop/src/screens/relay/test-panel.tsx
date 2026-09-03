@@ -1,10 +1,11 @@
 import { Send } from 'lucide-react'
+import { t } from '@lingui/core/macro'
 import type { TestStatus } from '@/@types/relay'
 import type { Snapshot } from '@/@types/snapshot'
 import { Panel } from '@/components/layout/panel'
 import { SectionRow } from '@/components/layout/section-row'
 import { Button } from '@/components/ui/button'
-import { strings } from '@/constants/strings'
+import { relayFailureLine } from '@/helpers/wording'
 import { testRelay } from '@/lib/multifus'
 
 type TestPanelProps = Readonly<{
@@ -19,8 +20,8 @@ export const TestPanel = ({ test, run }: TestPanelProps) => {
   return (
     <Panel className="mb-3">
       <SectionRow
-        title={strings.relay.testTitle}
-        description={strings.relay.testBody}
+        title={t`Message d’essai`}
+        description={t`Envoyez-vous un message maintenant, pour voir ce que ça donne dans Telegram.`}
       >
         <Button
           variant="secondary"
@@ -32,7 +33,7 @@ export const TestPanel = ({ test, run }: TestPanelProps) => {
           }}
         >
           <Send aria-hidden />
-          {isWorking ? strings.relay.testing : strings.relay.testAction}
+          {isWorking ? t`Envoi…` : t`Envoyer un essai`}
         </Button>
       </SectionRow>
       {line === null ? null : (
@@ -51,15 +52,15 @@ export const TestPanel = ({ test, run }: TestPanelProps) => {
 
 const testLine = (test: TestStatus) => {
   if (test.kind === 'sent') {
-    return strings.relay.testSent
+    return t`C’est parti. Regardez votre téléphone.`
   }
 
   if (test.kind === 'tooSoon') {
-    return strings.relay.testTooSoon
+    return t`Un essai vient de partir. Attendez une trentaine de secondes avant le suivant.`
   }
 
   if (test.kind === 'failed') {
-    return strings.relay.failure[test.reason.reason](test.reason.detail)
+    return relayFailureLine(test.reason)
   }
 
   return null

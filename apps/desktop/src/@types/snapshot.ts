@@ -1,4 +1,5 @@
 import type { JournalEntry } from '@/@types/journal'
+import type { Language } from '@/@types/language'
 import type { AutoFocusSwitch } from '@/@types/notification'
 import type { RelayStatus } from '@/@types/relay'
 import type { Character } from '@/@types/roster'
@@ -36,6 +37,7 @@ export type ScreenName =
 export type Snapshot = {
   readonly version: string
   readonly system: string
+  readonly language: Language
   readonly keyboard: KeyLabels
   readonly characters: readonly Character[]
   readonly shortcuts: readonly ShortcutBinding[]

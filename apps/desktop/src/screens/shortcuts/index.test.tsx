@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
+import { i18n } from '@lingui/core'
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import type { Character } from '@/@types/roster'
 import type {
@@ -7,7 +8,7 @@ import type {
   ShortcutBinding,
   ShortcutStatus
 } from '@/@types/shortcuts'
-import { strings } from '@/constants/strings'
+import { SHORTCUT_ACTIONS } from '@/constants/shortcuts'
 import {
   characterOf,
   keyCapsOf,
@@ -94,13 +95,13 @@ const show = ({
 
 const fieldOf = (action: ShortcutAction) => {
   return screen.getByRole('button', {
-    name: strings.shortcuts.edit(strings.shortcuts.actions[action].label)
+    name: `Modifier le raccourci ${i18n._(SHORTCUT_ACTIONS[action].label)}`
   })
 }
 
 const fieldOfCharacter = (nickname: string) => {
   return screen.getByRole('button', {
-    name: strings.shortcuts.characterEdit(nickname)
+    name: `Modifier le raccourci de ${nickname}`
   })
 }
 
@@ -113,18 +114,18 @@ describe('l’écran des raccourcis, les huit actions', () => {
     show({ shortcuts: all })
 
     for (const action of ALL_ACTIONS) {
-      const { label, description } = strings.shortcuts.actions[action]
+      const { label, description } = SHORTCUT_ACTIONS[action]
 
       expect(fieldOf(action)).not.toBeNull()
-      expect(screen.getByText(label)).not.toBeNull()
-      expect(screen.getByText(description)).not.toBeNull()
+      expect(screen.getByText(i18n._(label))).not.toBeNull()
+      expect(screen.getByText(i18n._(description))).not.toBeNull()
     }
   })
 
   it('marque la seule action qui répond à une touche maintenue', () => {
     show({ shortcuts: all })
 
-    expect(screen.getAllByText(strings.shortcuts.held)).toHaveLength(1)
+    expect(screen.getAllByText('au maintien')).toHaveLength(1)
   })
 
   it('n’ouvre la saisie que sur la ligne cliquée', () => {
@@ -132,9 +133,9 @@ describe('l’écran des raccourcis, les huit actions', () => {
 
     fireEvent.click(fieldOf('next'))
 
-    expect(screen.getAllByText(strings.shortcuts.capture)).toHaveLength(1)
+    expect(screen.getAllByText('Appuyez sur vos touches')).toHaveLength(1)
     expect(
-      within(fieldOf('next')).getByText(strings.shortcuts.capture)
+      within(fieldOf('next')).getByText('Appuyez sur vos touches')
     ).not.toBeNull()
   })
 
@@ -144,9 +145,9 @@ describe('l’écran des raccourcis, les huit actions', () => {
     fireEvent.click(fieldOf('next'))
     fireEvent.click(fieldOf('walk'))
 
-    expect(screen.getAllByText(strings.shortcuts.capture)).toHaveLength(1)
+    expect(screen.getAllByText('Appuyez sur vos touches')).toHaveLength(1)
     expect(
-      within(fieldOf('walk')).getByText(strings.shortcuts.capture)
+      within(fieldOf('walk')).getByText('Appuyez sur vos touches')
     ).not.toBeNull()
   })
 
@@ -160,7 +161,7 @@ describe('l’écran des raccourcis, les huit actions', () => {
       'next',
       'Control+Shift+KeyN'
     )
-    expect(screen.queryByText(strings.shortcuts.capture)).toBeNull()
+    expect(screen.queryByText('Appuyez sur vos touches')).toBeNull()
   })
 
   it('efface la combinaison sur Retour arrière', () => {
@@ -192,7 +193,9 @@ describe('l’écran des raccourcis, le personnage principal', () => {
     })
 
     expect(
-      screen.getByText(strings.shortcuts.actions.main.description)
+      screen.getByText(
+        'Ramène devant votre personnage principal, d’où que vous veniez dans le jeu.'
+      )
     ).not.toBeNull()
     expect(keyCapsOf(fieldOf('main'))).toStrictEqual(['Ctrl', 'Maj', 'Espace'])
     expect(screen.queryByRole('alert')).toBeNull()
@@ -216,7 +219,7 @@ describe('l’écran des raccourcis, le retour en arrière', () => {
     answered({ shortcuts: after })
 
     const undo = screen.getByRole('button', {
-      name: strings.shortcuts.undoLabel(strings.shortcuts.actions.walk.label)
+      name: 'Remettre les touches d’avant pour Déplacement rapide'
     })
 
     expect(keyCapsOf(undo)).toStrictEqual(['Alt', 'W'])
@@ -231,7 +234,7 @@ describe('l’écran des raccourcis, le retour en arrière', () => {
 
     fireEvent.click(
       screen.getByRole('button', {
-        name: strings.shortcuts.undoLabel(strings.shortcuts.actions.walk.label)
+        name: 'Remettre les touches d’avant pour Déplacement rapide'
       })
     )
 
@@ -241,7 +244,7 @@ describe('l’écran des raccourcis, le retour en arrière', () => {
 
     expect(
       screen.queryByRole('button', {
-        name: strings.shortcuts.undoLabel(strings.shortcuts.actions.walk.label)
+        name: 'Remettre les touches d’avant pour Déplacement rapide'
       })
     ).toBeNull()
   })
@@ -251,7 +254,7 @@ describe('l’écran des raccourcis, le retour en arrière', () => {
 
     expect(
       screen.queryByRole('button', {
-        name: strings.shortcuts.undoLabel(strings.shortcuts.actions.walk.label)
+        name: 'Remettre les touches d’avant pour Déplacement rapide'
       })
     ).toBeNull()
   })
@@ -265,9 +268,9 @@ describe('l’écran des raccourcis, le retour en arrière', () => {
 
     expect(
       screen.getByRole('button', {
-        name: strings.shortcuts.undoLabel(strings.shortcuts.actions.walk.label)
+        name: 'Remettre les touches d’avant pour Déplacement rapide'
       }).textContent
-    ).toBe(strings.shortcuts.undoNone)
+    ).toBe('Remettre : aucune touche')
   })
 })
 
@@ -276,7 +279,7 @@ describe('l’écran des raccourcis, les touches d’origine', () => {
     show({ shortcuts: [shortcut('walk'), shortcut('next')] })
 
     expect(
-      screen.queryByRole('button', { name: strings.shortcuts.defaults })
+      screen.queryByRole('button', { name: 'Remettre les touches d’origine' })
     ).toBeNull()
   })
 
@@ -286,7 +289,7 @@ describe('l’écran des raccourcis, les touches d’origine', () => {
     })
 
     fireEvent.click(
-      screen.getByRole('button', { name: strings.shortcuts.defaults })
+      screen.getByRole('button', { name: 'Remettre les touches d’origine' })
     )
 
     expect(bridge.resetShortcuts).toHaveBeenCalledWith()
@@ -309,12 +312,12 @@ describe('l’écran des raccourcis, les touches d’origine', () => {
     })
 
     fireEvent.click(
-      screen.getByRole('button', { name: strings.shortcuts.defaults })
+      screen.getByRole('button', { name: 'Remettre les touches d’origine' })
     )
 
     expect(
       screen.queryByRole('button', {
-        name: strings.shortcuts.undoLabel(strings.shortcuts.actions.walk.label)
+        name: 'Remettre les touches d’avant pour Déplacement rapide'
       })
     ).toBeNull()
   })
@@ -324,7 +327,9 @@ describe('l’écran des raccourcis, ce que Rust répond d’une combinaison', (
   it('dit que rien ne se passera sans touches', () => {
     show({ shortcuts: [shortcut('walk')] })
 
-    expect(screen.getByText(strings.shortcuts.status.unbound)).not.toBeNull()
+    expect(
+      screen.getByText('Sans touches, il ne se passera rien.')
+    ).not.toBeNull()
   })
 
   it('dit qu’un autre logiciel a déjà pris ces touches', () => {
@@ -338,7 +343,7 @@ describe('l’écran des raccourcis, ce que Rust répond d’une combinaison', (
     })
 
     expect(screen.getByRole('alert').textContent).toBe(
-      strings.shortcuts.status.refused
+      'Refusé : un autre logiciel utilise déjà ces touches.'
     )
   })
 
@@ -357,9 +362,7 @@ describe('l’écran des raccourcis, ce que Rust répond d’une combinaison', (
     })
 
     expect(screen.getByRole('alert').textContent).toBe(
-      strings.shortcuts.status.duplicate(
-        `« ${strings.shortcuts.actions.next.label} »`
-      )
+      'Déjà pris par « Fenêtre suivante ».'
     )
   })
 
@@ -378,7 +381,7 @@ describe('l’écran des raccourcis, ce que Rust répond d’une combinaison', (
     })
 
     expect(screen.getByRole('alert').textContent).toBe(
-      strings.shortcuts.status.duplicate(strings.quickReplies.named('Bonjour'))
+      'Déjà pris par la réponse « Bonjour ».'
     )
   })
 
@@ -388,7 +391,9 @@ describe('l’écran des raccourcis, ce que Rust répond d’une combinaison', (
     })
 
     expect(screen.queryByRole('alert')).toBeNull()
-    expect(screen.queryByText(strings.shortcuts.status.unbound)).toBeNull()
+    expect(
+      screen.queryByText('Sans touches, il ne se passera rien.')
+    ).toBeNull()
   })
 })
 
@@ -399,7 +404,7 @@ describe('l’écran des raccourcis, un personnage une touche', () => {
   it('porte une ligne par personnage du roster, connecté ou non', () => {
     show({ characters: [ALPHA, BRAVO] })
 
-    expect(screen.getByText(strings.shortcuts.charactersTitle)).not.toBeNull()
+    expect(screen.getByText('Un personnage, une touche')).not.toBeNull()
     expect(fieldOfCharacter('Alpha')).not.toBeNull()
     expect(fieldOfCharacter('Bravo')).not.toBeNull()
   })
@@ -421,14 +426,20 @@ describe('l’écran des raccourcis, un personnage une touche', () => {
   it('dit où les personnages arrivent quand le roster est vide', () => {
     show({ characters: [] })
 
-    expect(screen.getByText(strings.shortcuts.charactersEmpty)).not.toBeNull()
+    expect(
+      screen.getByText(
+        'Entrez en jeu, et vos personnages se posent ici tout seuls.'
+      )
+    ).not.toBeNull()
   })
 
   it('ne donne aucune touche à un personnage, et ne l’en avertit pas', () => {
     show({ characters: [ALPHA] })
 
     expect(keyCapsOf(fieldOfCharacter('Alpha'))).toStrictEqual([])
-    expect(screen.queryByText(strings.shortcuts.status.unbound)).toBeNull()
+    expect(
+      screen.queryByText('Sans touches, il ne se passera rien.')
+    ).toBeNull()
   })
 
   it('pose la touche frappée sur le personnage, et referme la saisie', () => {
@@ -445,7 +456,7 @@ describe('l’écran des raccourcis, un personnage une touche', () => {
       'Alpha',
       'Control+Shift+F1'
     )
-    expect(screen.queryByText(strings.shortcuts.capture)).toBeNull()
+    expect(screen.queryByText('Appuyez sur vos touches')).toBeNull()
   })
 
   it('efface la touche d’un personnage sur Retour arrière', () => {
@@ -466,9 +477,9 @@ describe('l’écran des raccourcis, un personnage une touche', () => {
     fireEvent.click(fieldOf('next'))
     fireEvent.click(fieldOfCharacter('Alpha'))
 
-    expect(screen.getAllByText(strings.shortcuts.capture)).toHaveLength(1)
+    expect(screen.getAllByText('Appuyez sur vos touches')).toHaveLength(1)
     expect(
-      within(fieldOfCharacter('Alpha')).getByText(strings.shortcuts.capture)
+      within(fieldOfCharacter('Alpha')).getByText('Appuyez sur vos touches')
     ).not.toBeNull()
   })
 
@@ -480,7 +491,7 @@ describe('l’écran des raccourcis, un personnage une touche', () => {
       ]
     })
 
-    expect(screen.getAllByText(strings.characters.mainMark)).toHaveLength(1)
+    expect(screen.getAllByText('Personnage principal')).toHaveLength(1)
   })
 
   it('nomme le personnage qui tient déjà les mêmes touches', () => {
@@ -498,9 +509,7 @@ describe('l’écran des raccourcis, un personnage une touche', () => {
     })
 
     expect(screen.getByRole('alert').textContent).toBe(
-      strings.shortcuts.status.duplicate(
-        strings.shortcuts.characterNamed('Alpha')
-      )
+      'Déjà pris par « Alpha ».'
     )
   })
 })

@@ -1,9 +1,9 @@
 import { Footprints } from 'lucide-react'
+import { t } from '@lingui/core/macro'
 import type { BannerStep } from '@/@types/walk'
 import { CharacterMedallion } from '@/components/character-medallion'
 import { ColorStripe } from '@/components/color-stripe'
 import { CORNER_PLACEMENT } from '@/constants/banner'
-import { strings } from '@/constants/strings'
 import { portraitFor } from '@/helpers/portrait'
 import { cn } from '@/lib/utils'
 
@@ -24,9 +24,7 @@ export const BannerPill = ({ step }: BannerPillProps) => {
         />
         {step.character === null ? (
           <span className="pr-0.5 text-row font-medium whitespace-nowrap text-muted-foreground">
-            {step.previewing
-              ? strings.walk.banner.previewing
-              : strings.walk.banner.waiting}
+            {step.previewing ? t`Aperçu` : t`Déplacement rapide`}
           </span>
         ) : (
           <span

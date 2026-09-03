@@ -1,7 +1,7 @@
+import { t } from '@lingui/core/macro'
 import type { Snapshot } from '@/@types/snapshot'
 import type { ConfigStatus, UpdateStatus } from '@/@types/system'
 import { Screen } from '@/components/layout/screen'
-import { strings } from '@/constants/strings'
 import { IdentityPanel } from '@/screens/about/identity-panel'
 import { LegalPanel } from '@/screens/about/legal-panel'
 import { ProjectPanel } from '@/screens/about/project-panel'
@@ -23,7 +23,7 @@ export const AboutScreen = ({
   run
 }: AboutScreenProps) => {
   return (
-    <Screen title={strings.about.title}>
+    <Screen title={t`À propos`}>
       <IdentityPanel
         version={version}
         system={system}

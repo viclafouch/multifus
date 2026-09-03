@@ -1,4 +1,6 @@
 import { RotateCcw } from 'lucide-react'
+import { i18n } from '@lingui/core'
+import { t } from '@lingui/core/macro'
 import type {
   Binding,
   QuickReply,
@@ -9,7 +11,7 @@ import { FieldRow } from '@/components/layout/field-row'
 import { Panel } from '@/components/layout/panel'
 import { ShortcutField } from '@/components/shortcut-field'
 import { Button } from '@/components/ui/button'
-import { strings } from '@/constants/strings'
+import { SHORTCUT_ACTIONS } from '@/constants/shortcuts'
 import { matchIsSameBinding } from '@/helpers/binding'
 import { shortcutStatusLine } from '@/helpers/wording'
 import type { ShortcutUndo } from '@/hooks/use-shortcut-undo'
@@ -36,8 +38,6 @@ export const ActionsPanel = ({
   undoFor,
   actions
 }: ActionsPanelProps) => {
-  const words = strings.shortcuts
-
   const hasOwnKeys = shortcuts.some((shortcut) => {
     return !shortcut.isDefault
   })
@@ -46,19 +46,22 @@ export const ActionsPanel = ({
     <>
       <Panel>
         {shortcuts.map((shortcut) => {
-          const { label, description, mention } = words.actions[shortcut.action]
+          const words = SHORTCUT_ACTIONS[shortcut.action]
+          const label = i18n._(words.label)
 
           return (
             <FieldRow
               key={shortcut.action}
               label={label}
-              description={description}
-              mention={mention ?? undefined}
+              description={i18n._(words.description)}
+              mention={
+                words.mention === null ? undefined : i18n._(words.mention)
+              }
             >
               <ShortcutField
                 accelerator={shortcut.accelerator}
                 statusLine={shortcutStatusLine(shortcut.status, quickReplies)}
-                editLabel={words.edit(label)}
+                editLabel={t`Modifier le raccourci ${label}`}
                 undo={undoFor(shortcut)}
                 editing={{
                   isActive: matchIsSameBinding(editing, {
@@ -87,7 +90,7 @@ export const ActionsPanel = ({
             className="rise text-mini font-normal text-muted-foreground/75 hover:text-foreground"
           >
             <RotateCcw aria-hidden />
-            {words.defaults}
+            {t`Remettre les touches d’origine`}
           </Button>
         </div>
       ) : null}
