@@ -7,10 +7,11 @@ pub enum Language {
     #[default]
     En,
     Fr,
+    Es,
 }
 
 impl Language {
-    pub const ALL: [Self; 2] = [Self::Fr, Self::En];
+    pub const ALL: [Self; 3] = [Self::Fr, Self::En, Self::Es];
 
     #[must_use]
     pub fn of_locale(locale: &str) -> Self {
@@ -18,6 +19,8 @@ impl Language {
 
         if tag.eq_ignore_ascii_case("fr") {
             Self::Fr
+        } else if tag.eq_ignore_ascii_case("es") {
+            Self::Es
         } else {
             Self::En
         }
@@ -42,10 +45,18 @@ mod tests {
     }
 
     #[test]
+    fn a_spanish_system_gets_spanish_whatever_country_it_names() {
+        assert_eq!(Language::of_locale("es"), Language::Es);
+        assert_eq!(Language::of_locale("es-ES"), Language::Es);
+        assert_eq!(Language::of_locale("es_MX"), Language::Es);
+        assert_eq!(Language::of_locale("ES-ar"), Language::Es);
+    }
+
+    #[test]
     fn every_other_system_gets_english_rather_than_a_language_multifus_does_not_speak() {
         assert_eq!(Language::of_locale("en-US"), Language::En);
         assert_eq!(Language::of_locale("pl-PL"), Language::En);
-        assert_eq!(Language::of_locale("es"), Language::En);
+        assert_eq!(Language::of_locale("de-DE"), Language::En);
         assert_eq!(Language::of_locale(""), Language::En);
     }
 

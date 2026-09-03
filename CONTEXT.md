@@ -2,7 +2,7 @@
 
 Les mots de Multifus, et rien d'autre. On en parle en français, on les écrit en anglais dans le code : l'identifiant est entre parenthèses.
 
-**Langue** (`Language`) : la langue dans laquelle Multifus parle, le français ou l'anglais. Elle n'a rien à voir avec celle du client Dofus, que Multifus ne lit pas et dont il ne se sert pour rien : un joueur peut jouer en anglais et lire Multifus en français. Elle se prend à la langue du système au premier lancement, et elle est fixée pour la durée du lancement : la changer recharge les quatre fenêtres de Multifus d'un coup, et les fenêtres du jeu ne bougent pas.
+**Langue** (`Language`) : la langue dans laquelle Multifus parle, le français, l'anglais ou l'espagnol. Elle n'a rien à voir avec celle du client Dofus, que Multifus ne lit pas et dont il ne se sert pour rien : un joueur peut jouer en anglais et lire Multifus en français. Elle se prend à la langue du système au premier lancement, et elle est fixée pour la durée du lancement : la changer recharge les quatre fenêtres de Multifus d'un coup, la fenêtre revient sur l'écran où l'on était, et les fenêtres du jeu ne bougent pas.
 
 **Personnage** (`Character`) : un personnage Dofus, identifié par son pseudo.
 

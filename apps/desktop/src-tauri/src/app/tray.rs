@@ -141,10 +141,47 @@ const ENGLISH_MENU: MenuWords = MenuWords {
     journal: "Show the log",
 };
 
+const SPANISH_MENU: MenuWords = MenuWords {
+    characters: "Personajes",
+    shortcuts: "Atajos",
+    quick_replies: "Respuestas rápidas",
+    auto_focus_screen: "AutoFocus",
+    walk_screen: "Movimiento rápido",
+    wheel_screen: "Rueda de personajes",
+    rune_table_screen: "Tabla de runas",
+    relay: "Mensajes privados",
+    settings: "Ajustes",
+    about: "Acerca de",
+    quit: "Salir de Multifus",
+    nobody: "Ningún personaje conectado",
+    excluded: " (apartado)",
+    maximize_all: "Maximizar las ventanas",
+    auto_focus_on: "Activar el AutoFocus",
+    auto_focus_off: "Desactivar el AutoFocus",
+    walk_on: "Encender el Movimiento rápido",
+    walk_off: "Apagar el Movimiento rápido",
+    rune_table_on: "Mostrar la tabla de runas",
+    rune_table_off: "Ocultar la tabla de runas",
+    rune_table_home: "Devolver la tabla a su posición inicial",
+    wake_minimized: "Ir a buscar las ventanas minimizadas",
+    leave_minimized: "Dejar las ventanas minimizadas",
+    relay_setup: "Configurar los mensajes privados…",
+    relay_on: "Recibir mis mensajes privados",
+    relay_off: "Dejar de recibirlos",
+    denied: "Falta la autorización",
+    open_settings: if cfg!(target_os = "macos") {
+        "Abrir Ajustes del Sistema"
+    } else {
+        "Abrir la configuración del sistema"
+    },
+    journal: "Mostrar el registro",
+};
+
 fn words(language: Language) -> &'static MenuWords {
     match language {
         Language::Fr => &FRENCH_MENU,
         Language::En => &ENGLISH_MENU,
+        Language::Es => &SPANISH_MENU,
     }
 }
 
@@ -152,6 +189,7 @@ fn update_label(version: &str, language: Language) -> String {
     match language {
         Language::Fr => format!("Installer la mise à jour {version}"),
         Language::En => format!("Install update {version}"),
+        Language::Es => format!("Instalar la actualización {version}"),
     }
 }
 
@@ -232,6 +270,9 @@ fn tooltip(connected: usize, language: Language) -> String {
         (Language::En, 0) => "Multifus, nobody online".to_owned(),
         (Language::En, 1) => "Multifus, 1 character online".to_owned(),
         (Language::En, count) => format!("Multifus, {count} characters online"),
+        (Language::Es, 0) => "Multifus, ningún personaje conectado".to_owned(),
+        (Language::Es, 1) => "Multifus, 1 personaje conectado".to_owned(),
+        (Language::Es, count) => format!("Multifus, {count} personajes conectados"),
     }
 }
 
@@ -858,6 +899,15 @@ mod tests {
         assert_eq!(tooltip(0, Language::En), "Multifus, nobody online");
         assert_eq!(tooltip(1, Language::En), "Multifus, 1 character online");
         assert_eq!(tooltip(6, Language::En), "Multifus, 6 characters online");
+        assert_eq!(
+            tooltip(0, Language::Es),
+            "Multifus, ningún personaje conectado"
+        );
+        assert_eq!(tooltip(1, Language::Es), "Multifus, 1 personaje conectado");
+        assert_eq!(
+            tooltip(6, Language::Es),
+            "Multifus, 6 personajes conectados"
+        );
     }
 
     #[test]
@@ -910,6 +960,10 @@ mod tests {
             "Installer la mise à jour 0.2.0"
         );
         assert_eq!(update_label("0.2.0", Language::En), "Install update 0.2.0");
+        assert_eq!(
+            update_label("0.2.0", Language::Es),
+            "Instalar la actualización 0.2.0"
+        );
     }
 
     #[test]

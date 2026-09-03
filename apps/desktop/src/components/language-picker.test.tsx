@@ -45,6 +45,7 @@ describe('le choix de la langue', () => {
 
     expect(screen.getByRole('option', { name: 'Français' })).not.toBeNull()
     expect(screen.getByRole('option', { name: 'English' })).not.toBeNull()
+    expect(screen.getByRole('option', { name: 'Español' })).not.toBeNull()
   })
 
   it('prévient que Multifus va se recharger avant de rien changer', async () => {

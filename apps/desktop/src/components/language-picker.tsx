@@ -103,7 +103,7 @@ const LanguageConfirm = ({ asked, onGiveUp }: LanguageConfirmProps) => {
         <AlertDialogHeader>
           <AlertDialogTitle>{t`Passer Multifus en ${name} ?`}</AlertDialogTitle>
           <AlertDialogDescription>
-            {t`Multifus se recharge d’un coup et revient sur l’écran Personnages. Vos clients Dofus Retro ne bougent pas.`}
+            {t`Multifus se recharge d’un coup et vous laisse sur l’écran où vous êtes. Vos clients Dofus Retro ne bougent pas.`}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

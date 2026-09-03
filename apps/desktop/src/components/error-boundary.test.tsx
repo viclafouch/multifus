@@ -1,6 +1,7 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { ErrorBoundary } from '@/components/error-boundary'
+import { lastSeenScreen, rememberScreen } from '@/lib/screen-memory'
 import { ignore } from '@/lib/utils'
 
 const Broken = () => {
@@ -18,10 +19,6 @@ const drawBroken = () => {
 }
 
 describe('l’écran qui remplace la fenêtre blanche', () => {
-  afterEach(() => {
-    vi.restoreAllMocks()
-  })
-
   it('laisse passer ce qu’on lui confie tant que rien ne lève', () => {
     render(
       <ErrorBoundary>
@@ -56,5 +53,18 @@ describe('l’écran qui remplace la fenêtre blanche', () => {
     expect(
       screen.getByRole('button', { name: 'Montrer le fichier du journal' })
     ).not.toBeNull()
+  })
+
+  it('oublie l’écran qui vient de casser avant de recharger', () => {
+    const reload = vi.fn()
+
+    rememberScreen('settings')
+    vi.stubGlobal('location', { reload })
+    drawBroken()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Recharger l’écran' }))
+
+    expect(lastSeenScreen()).toBe('characters')
+    expect(reload).toHaveBeenCalledWith()
   })
 })

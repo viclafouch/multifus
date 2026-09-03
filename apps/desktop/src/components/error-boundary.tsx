@@ -4,6 +4,7 @@ import { t } from '@lingui/core/macro'
 import { EmptyState, EmptyStateMark } from '@/components/layout/empty-state'
 import { Button } from '@/components/ui/button'
 import { revealJournal } from '@/lib/multifus'
+import { forgetScreen } from '@/lib/screen-memory'
 import { errorMessage, ignore } from '@/lib/utils'
 
 type ErrorBoundaryProps = Readonly<{
@@ -63,6 +64,7 @@ const CrashScreen = ({ message }: CrashScreenProps) => {
         <Button
           size="sm"
           onClick={() => {
+            forgetScreen()
             window.location.reload()
           }}
         >

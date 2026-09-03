@@ -1614,12 +1614,8 @@ msgid "Multifus repart comme au premier lancement. Vos personnages Dofus Retro n
 msgstr "Multifus repart comme au premier lancement. Vos personnages Dofus Retro ne risquent rien."
 
 #: src/components/language-picker.tsx
-msgid "Multifus se recharge d’un coup et revient sur l’écran Personnages. Vos clients Dofus Retro ne bougent pas."
-msgstr "Multifus se recharge d’un coup et revient sur l’écran Personnages. Vos clients Dofus Retro ne bougent pas."
-
-#: src/components/language-picker.tsx
-#~ msgid "Multifus se recharge d’un coup, et vos clients Dofus Retro ne bougent pas."
-#~ msgstr "Multifus se recharge d’un coup, et vos clients Dofus Retro ne bougent pas."
+msgid "Multifus se recharge d’un coup et vous laisse sur l’écran où vous êtes. Vos clients Dofus Retro ne bougent pas."
+msgstr "Multifus se recharge d’un coup et vous laisse sur l’écran où vous êtes. Vos clients Dofus Retro ne bougent pas."
 
 #: src/constants/journal.ts
 msgid "Multifus tournait déjà : le second lancement s’arrête là."

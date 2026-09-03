@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { i18n } from '@lingui/core'
-import { act, fireEvent, render, screen } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import type { ScreenName, Snapshot } from '@/@types/snapshot'
 import type { ConfigProblem } from '@/@types/system'
 import { NAV_ITEMS } from '@/constants/navigation'
@@ -166,6 +166,16 @@ describe('la fenêtre de Multifus', () => {
     fireEvent.keyDown(window, { key: 'Escape' })
 
     expect(bridge.closeRuneTable).not.toHaveBeenCalled()
+  })
+
+  it('rouvre sur l’écran quitté quand Multifus se recharge', async () => {
+    await open(snapshotOf())
+
+    navigateTo('settings')
+    cleanup()
+    await open(snapshotOf())
+
+    expect(currentEntry()).toBe(navLabel('settings'))
   })
 
   it('revient aux personnages', async () => {

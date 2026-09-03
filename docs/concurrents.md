@@ -68,7 +68,7 @@ GitHub n'est pas mesurable, et pèse souvent plus lourd qu'il n'y paraît.
 | Binaire signé                       | o        | non, alerte Windows | ~ attestation | non, SmartScreen        | -        | non, antivirus | -          | -    | -     |
 | Mise à jour dans l'application      | o        | o                   | o             | ?                       | ?        | o              | o          | o    | ?     |
 | Téléchargement sans compte          | o        | o                   | o             | o                       | o        | o              | o          | o    | non   |
-| Plusieurs langues                   | fr en    | fr en es            | fr en es      | fr en es                | ~        | -              | -          | -    | -     |
+| Plusieurs langues                   | fr en es | fr en es            | fr en es      | fr en es                | ~        | -              | -          | -    | -     |
 | Ne fait que gérer des fenêtres      | o        | o                   | o             | o                       | o        | o              | non        | o    | o     |
 
 ## Ce que fait Dracoon, et que son README tait

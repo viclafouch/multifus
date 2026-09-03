@@ -26,12 +26,6 @@ code à vérifier avec des bouchons pour le reste, se type-checke pour cette mê
 cible : `windows` est du Rust pur, sans C. Ça n'essaie rien, mais ça attrape les
 signatures et les constantes fausses avant que la CI ne les voie.
 
-## Rattraper les concurrents
-
-Les manques retenus après la veille de [concurrents.md](./concurrents.md).
-
-- [ ] L'interface en espagnol. L'anglais est fait, la mécanique est posée, et la communauté hispanophone n'a toujours rien
-
 ## Passer le dépôt en monorepo
 
 Le déménagement est fait, et la CI est verte sur les deux systèmes.

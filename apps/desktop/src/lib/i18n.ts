@@ -2,6 +2,7 @@ import type { MessageDescriptor, Messages } from '@lingui/core'
 import { i18n } from '@lingui/core'
 import type { Language } from '@/@types/language'
 import { messages as en } from '@/locales/en/messages.po'
+import { messages as es } from '@/locales/es/messages.po'
 import { messages as fr } from '@/locales/fr/messages.po'
 
 export type Phrase = Readonly<Omit<MessageDescriptor, 'values'>>
@@ -10,7 +11,8 @@ export const SOURCE_LANGUAGE = 'fr' as const satisfies Language
 
 const CATALOGS = {
   fr,
-  en
+  en,
+  es
 } as const satisfies Record<Language, Messages>
 
 export const speak = (language: Language) => {

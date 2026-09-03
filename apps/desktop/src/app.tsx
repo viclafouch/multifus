@@ -1,4 +1,3 @@
-import React from 'react'
 import type { ScreenName, Snapshot } from '@/@types/snapshot'
 import type { ConfigProblem } from '@/@types/system'
 import { ConfigNotice } from '@/components/config-notice'
@@ -6,6 +5,7 @@ import { JournalPanel } from '@/components/journal-panel'
 import { KeyLabelsProvider } from '@/components/key-labels-provider'
 import { NavRail } from '@/components/nav-rail'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { useCurrentScreen } from '@/hooks/use-current-screen'
 import { useEscape } from '@/hooks/use-escape'
 import { useMultifus } from '@/hooks/use-multifus'
 import { useTrayNavigation } from '@/hooks/use-tray-navigation'
@@ -29,7 +29,7 @@ import { WheelScreen } from '@/screens/wheel'
 
 export const App = () => {
   const { snapshot, run } = useMultifus()
-  const [screen, setScreen] = React.useState<ScreenName>('characters')
+  const [screen, setScreen] = useCurrentScreen()
 
   useTrayNavigation(setScreen)
 

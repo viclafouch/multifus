@@ -38,5 +38,7 @@ Element.prototype.releasePointerCapture = function releasePointerCapture(
 
 afterEach(() => {
   cleanup()
+  vi.restoreAllMocks()
+  window.sessionStorage.clear()
   vi.unstubAllGlobals()
 })
