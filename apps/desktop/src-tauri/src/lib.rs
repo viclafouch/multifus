@@ -100,6 +100,7 @@ pub fn run() {
             app::commands::check_update,
             app::commands::install_update,
             app::commands::dismiss_config_problem,
+            app::commands::dismiss_check_notice,
             app::commands::reveal_journal,
             app::commands::reveal_config,
             app::commands::reveal_quarantined_config,

@@ -539,6 +539,13 @@ pub fn dismiss_config_problem(app: AppHandle) -> Snapshot {
 }
 
 #[tauri::command]
+pub fn dismiss_check_notice(app: AppHandle) -> Snapshot {
+    lock(&app).dismiss_check_notice();
+
+    runtime::emit_snapshot(&app)
+}
+
+#[tauri::command]
 pub fn reveal_journal(app: AppHandle) {
     journal_file::reveal(&app);
 }

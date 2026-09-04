@@ -21,9 +21,9 @@ vi.mock(import('@/lib/multifus'), () => {
   return bridge
 })
 
-const stepsWith = (checks: Partial<Record<Step, Check>>) => {
+const stepsWith = (checks: Partial<Record<Step, Check>>, proven = false) => {
   return onboardingOf().steps.map(({ step }) => {
-    return { step, check: checks[step] ?? 'unknown' }
+    return { step, check: checks[step] ?? 'unknown', proven }
   })
 }
 
@@ -177,13 +177,16 @@ describe('la prise en main', () => {
     await show({
       onboarding: onboardingOf({
         done: false,
-        steps: stepsWith({
-          authorization: 'ready',
-          notifications: 'ready',
-          focus: 'ready',
-          gameSetting: 'ready',
-          proof: 'ready'
-        })
+        steps: stepsWith(
+          {
+            authorization: 'ready',
+            notifications: 'ready',
+            focus: 'ready',
+            gameSetting: 'ready',
+            proof: 'ready'
+          },
+          true
+        )
       })
     })
 
@@ -191,6 +194,22 @@ describe('la prise en main', () => {
 
     expect(
       screen.getByText('C’est en place : le jeu a réussi à vous appeler.')
+    ).not.toBeNull()
+  })
+
+  it('dit qu’il a lu le réglage quand rien ne s’est encore fait entendre', async () => {
+    await show({
+      agent: WINDOWS_AGENT,
+      onboarding: onboardingOf({
+        done: false,
+        steps: stepsWith({ authorization: 'ready', focus: 'ready' })
+      })
+    })
+
+    goTo('La concentration')
+
+    expect(
+      screen.getByText('C’est en place : Multifus a lu le réglage.')
     ).not.toBeNull()
   })
 

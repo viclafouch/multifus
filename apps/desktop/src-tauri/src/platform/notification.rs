@@ -13,10 +13,19 @@ pub enum NotificationReport {
     ListeningLost { detail: String },
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub struct SystemChecks {
+    pub notifications: Option<bool>,
+    pub game_notifications: Option<bool>,
+    pub focus_off: Option<bool>,
+}
+
 pub trait NotificationWatcher: Send + Sync {
     fn authorization(&self) -> Result<Authorization>;
 
     fn request_authorization(&self) -> Result<Authorization>;
+
+    fn checks(&self) -> SystemChecks;
 
     fn start(&mut self, sink: NotificationSink) -> Result<()>;
 

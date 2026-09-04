@@ -154,7 +154,7 @@ export const pageWay = (page: Page) => {
   }
 }
 
-const readyLine = (step: Step) => {
+const readyLine = (step: Step, proven: boolean) => {
   switch (step) {
     case 'authorization': {
       return IS_APPLE
@@ -167,7 +167,9 @@ const readyLine = (step: Step) => {
     case 'notifications':
     case 'focus':
     case 'gameSetting': {
-      return t`C’est en place : le jeu a réussi à vous appeler.`
+      return proven
+        ? t`C’est en place : le jeu a réussi à vous appeler.`
+        : t`C’est en place : Multifus a lu le réglage.`
     }
     default: {
       return step satisfies never
@@ -194,6 +196,12 @@ const blockedLine = (step: Step) => {
   }
 }
 
-export const checkLine = (step: Step, check: KnownCheck) => {
-  return check === 'ready' ? readyLine(step) : blockedLine(step)
+type CheckLineParams = Readonly<{
+  step: Step
+  check: KnownCheck
+  proven: boolean
+}>
+
+export const checkLine = ({ step, check, proven }: CheckLineParams) => {
+  return check === 'ready' ? readyLine(step, proven) : blockedLine(step)
 }

@@ -11,9 +11,10 @@ const CHECK_MARKS = {
 type CheckBadgeProps = Readonly<{
   step: Step
   check: KnownCheck
+  proven: boolean
 }>
 
-export const CheckBadge = ({ step, check }: CheckBadgeProps) => {
+export const CheckBadge = ({ step, check, proven }: CheckBadgeProps) => {
   const Mark = CHECK_MARKS[check]
 
   return (
@@ -22,7 +23,7 @@ export const CheckBadge = ({ step, check }: CheckBadgeProps) => {
       className="toned flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-note data-[check=blocked]:tone-blocked data-[check=ready]:tone-live"
     >
       <Mark className="size-glyph shrink-0" strokeWidth={1.9} aria-hidden />
-      {checkLine(step, check)}
+      {checkLine({ step, check, proven })}
     </p>
   )
 }

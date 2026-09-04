@@ -9,11 +9,10 @@ séparer des personnages que le portrait ne sépare plus.
 est validé : la grille des couleurs, le liseré des trois listes, la roue, la
 bannière.
 
-Rien n'a tourné sur Windows. L'anneau du bouton de la barre des tâches est le
-seul morceau que le Mac ne peut pas montrer, et c'est tout ce qui reste à voir.
-Il se compile là-bas seulement : la composition elle-même est du Rust pur et ses
-tests passent ici, mais `create_icon` n'a été que type-checké pour la cible
-Windows, dans une caisse jetable hors du dépôt.
+Rien n'a été regardé à l'écran sur Windows. L'anneau du bouton de la barre des
+tâches est le seul morceau que le Mac ne peut pas montrer, et c'est tout ce qui
+reste à voir. Le code se compile et ses tests passent sur la machine Windows,
+`create_icon` compris.
 
 Ce fichier s'efface une fois l'anneau vu sur Windows.
 
@@ -209,8 +208,6 @@ sait pas montrer. Les autres ne sont là que parce qu'ils touchent au même code
   reprend son logo Dofus.
 - **La trace.** Quitter Multifus avec des couleurs posées : les icônes d'origine
   reviennent, comme pour un portrait sans couleur.
-- **La compilation.** C'est la CI qui compile Windows. `create_icon` n'a été
-  vérifié ici que par type-check sur la cible, pas construit.
 - **Un personnage sans classe mais avec une couleur.** Sa fenêtre ne doit rien
   prendre du tout : pas d'anneau posé sur le logo Dofus.
 

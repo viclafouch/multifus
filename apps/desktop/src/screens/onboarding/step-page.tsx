@@ -54,7 +54,11 @@ export const StepPage = ({
         <StepFigure page={page} />
       )}
       {isProof || status === null || status.check === 'unknown' ? null : (
-        <CheckBadge step={status.step} check={status.check} />
+        <CheckBadge
+          step={status.step}
+          check={status.check}
+          proven={status.proven}
+        />
       )}
       <StepActions
         page={page}

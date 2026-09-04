@@ -960,6 +960,16 @@ const JOURNAL_CASES = {
       line: 'Autorisation refusée : les fenêtres ne peuvent pas être lues.'
     }
   ],
+  check: [
+    {
+      event: { kind: 'check', step: 'notifications', open: true },
+      line: 'Les notifications : c’est en place.'
+    },
+    {
+      event: { kind: 'check', step: 'focus', open: false },
+      line: 'La concentration : ce n’est plus en place, le jeu ne vous appellera pas.'
+    }
+  ],
   authorizationRequested: [
     {
       event: {
@@ -1403,7 +1413,7 @@ const SNAPSHOT = {
   ungroupTaskbar: false,
   taskbarCombines: true,
   authorization: { granted: true, listening: true },
-  onboarding: { done: true, steps: [] },
+  onboarding: { done: true, steps: [], hasNotice: false },
   config: { path: '/tmp/multifus/config.json', problem: null },
   update: { kind: 'upToDate' },
   relay: {

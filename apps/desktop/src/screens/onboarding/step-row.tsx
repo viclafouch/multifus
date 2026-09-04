@@ -13,7 +13,7 @@ type StepRowProps = Readonly<{
 }>
 
 export const StepRow = ({ status, rank }: StepRowProps) => {
-  const { step, check } = status
+  const { step, check, proven } = status
   const systemPage = SYSTEM_PAGES[step]
   const shot = PAGE_SHOTS[step]
   const way = pageWay(step)
@@ -25,7 +25,7 @@ export const StepRow = ({ status, rank }: StepRowProps) => {
         <h2 className="truncate text-row font-medium">{pageTitle(step)}</h2>
         {check === 'blocked' ? (
           <p className="tone-blocked toned-ink truncate text-note">
-            {checkLine(step, check)}
+            {checkLine({ step, check, proven })}
           </p>
         ) : (
           <SettingWay way={way} />

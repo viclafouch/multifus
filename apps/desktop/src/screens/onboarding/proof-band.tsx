@@ -39,7 +39,7 @@ const ProofDone = ({ online }: ProofDoneProps) => {
         <Check aria-hidden className="size-mark" strokeWidth={2.4} />
       </span>
       <p className="max-w-lead text-lead text-balance text-live">
-        {checkLine('proof', 'ready')}
+        {checkLine({ step: 'proof', check: 'ready', proven: true })}
       </p>
       {online.length === 0 ? null : <ProofNames online={online} />}
     </div>

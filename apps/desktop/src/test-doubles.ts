@@ -89,12 +89,13 @@ export const wheelSliceOf = (fields: Partial<WheelSlice> = {}) => {
 const BLANK_ONBOARDING: Onboarding = {
   done: true,
   steps: [
-    { step: 'authorization', check: 'ready' },
-    { step: 'notifications', check: 'unknown' },
-    { step: 'focus', check: 'unknown' },
-    { step: 'gameSetting', check: 'unknown' },
-    { step: 'proof', check: 'unknown' }
-  ]
+    { step: 'authorization', check: 'ready', proven: false },
+    { step: 'notifications', check: 'unknown', proven: false },
+    { step: 'focus', check: 'unknown', proven: false },
+    { step: 'gameSetting', check: 'unknown', proven: false },
+    { step: 'proof', check: 'unknown', proven: false }
+  ],
+  hasNotice: false
 }
 
 export const onboardingOf = (fields: Partial<Onboarding> = {}) => {

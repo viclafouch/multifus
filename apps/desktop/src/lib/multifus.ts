@@ -381,6 +381,10 @@ export const installUpdate = async () => {
   return invoke<Snapshot>('install_update')
 }
 
+export const dismissCheckNotice = async () => {
+  return invoke<Snapshot>('dismiss_check_notice')
+}
+
 export const dismissConfigProblem = async () => {
   return invoke<Snapshot>('dismiss_config_problem')
 }

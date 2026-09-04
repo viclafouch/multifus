@@ -23,6 +23,7 @@ const bridge = {
   watchClients: vi.fn(pending),
   onClients: vi.fn(pending),
   dismissConfigProblem: vi.fn(pending),
+  dismissCheckNotice: vi.fn(pending),
   revealJournal: vi.fn(pending),
   revealConfig: vi.fn(pending),
   revealQuarantinedConfig: vi.fn(pending),
@@ -128,7 +129,7 @@ describe('la fenêtre de Multifus', () => {
     await open(
       snapshotOf({
         onboarding: onboardingOf({
-          steps: [{ step: 'authorization', check: 'blocked' }]
+          steps: [{ step: 'authorization', check: 'blocked', proven: false }]
         })
       })
     )
@@ -366,6 +367,38 @@ describe('la fenêtre de Multifus', () => {
       expect(
         screen.getByText('Vos réglages n’ont pas été enregistrés')
       ).not.toBeNull()
+    })
+  })
+
+  describe('l’avis sur un contrôle fermé', () => {
+    it('ne dit rien quand aucun réglage lu n’est fermé', async () => {
+      await open(snapshotOf())
+
+      expect(screen.queryByText('L’AutoFocus ne peut pas marcher')).toBeNull()
+    })
+
+    it('dit que l’AutoFocus ne peut pas marcher', async () => {
+      await open(snapshotOf({ onboarding: onboardingOf({ hasNotice: true }) }))
+
+      expect(screen.getByText('L’AutoFocus ne peut pas marcher')).not.toBeNull()
+    })
+
+    it('mène aux paramètres, et reste tant que rien n’est réglé', async () => {
+      await open(snapshotOf({ onboarding: onboardingOf({ hasNotice: true }) }))
+
+      fireEvent.click(screen.getByRole('button', { name: 'Régler' }))
+
+      expect(currentEntry()).toBe('Paramètres')
+      expect(bridge.dismissCheckNotice).not.toHaveBeenCalled()
+      expect(screen.getByText('L’AutoFocus ne peut pas marcher')).not.toBeNull()
+    })
+
+    it('s’efface quand on dit avoir compris', async () => {
+      await open(snapshotOf({ onboarding: onboardingOf({ hasNotice: true }) }))
+
+      fireEvent.click(screen.getByRole('button', { name: 'J’ai compris' }))
+
+      expect(bridge.dismissCheckNotice).toHaveBeenCalledWith()
     })
   })
 

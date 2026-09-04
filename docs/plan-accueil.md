@@ -16,6 +16,9 @@ la fenêtre de `tauri dev` est le seul endroit où ça se voit, et le fichier de
 réglages n'ayant pas la clé, la prise en main part toute seule au prochain
 lancement.
 
+Les lectures du registre de Windows sont écrites depuis, et compilées et testées
+sur la machine Windows ; rien n'y a encore été regardé à l'écran.
+
 Ce qui reste tient en trois tas : le regard, les images, et Windows. Ils sont
 plus bas.
 
@@ -71,18 +74,71 @@ au joueur ; la prise en main du Mac n'a qu'une porte à faire ouvrir.
 | Ce qu'il faut                            | Multifus peut le lire                                     | Écrit  |
 | ---------------------------------------- | --------------------------------------------------------- | ------ |
 | Accès des applications aux notifications | oui, `UserNotificationListener.GetAccessStatus`           | oui    |
-| Notifications du système allumées        | oui, `HKCU\...\PushNotifications`, `ToastEnabled`         | non    |
-| Notifications autorisées pour Dofus      | oui, `HKCU\...\Notifications\Settings\<AUMID>`, `Enabled` | non    |
-| Mode Concentration éteint                | oui, `FocusAssist` puis `NOC_GLOBAL_SETTING_DND`          | non    |
+| Notifications du système allumées        | oui, `HKCU\...\PushNotifications`, `ToastEnabled`         | oui    |
+| Notifications autorisées pour Dofus      | oui, `HKCU\...\Notifications\Settings\<AUMID>`, `Enabled` | oui    |
+| Mode Concentration éteint                | oui, `FocusAssist` puis `NOC_GLOBAL_SETTING_DND`          | oui    |
 | Notifications allumées dans le jeu       | non                                                       | jamais |
 
 Dracoon fait les quatre premiers, dans `src/core/autofocus.py`, et relit le
-quatrième toutes les 300 ms. Multifus n'en fait qu'un pour l'instant : les trois
-autres demandent l'AUMID de Dofus, qui se relève sur une machine Windows.
-Dracoon parcourt les sous-clés et retient celles dont le nom contient « dofus »,
-ce qui est plus robuste qu'un identifiant écrit en dur, et c'est ce qu'il faudra
-reprendre. En attendant, les trois étapes sont **non vérifiables** sur Windows
-comme sur le Mac : elles expliquent et elles montrent.
+quatrième toutes les 300 ms. Multifus les fait tous les quatre désormais, une
+fois par tour : le tour passe chaque seconde, et c'est bien assez pour un réglage
+qu'on change trois fois par an.
+
+L'AUMID ne s'écrit pas en dur. `dofus_application_id` parcourt les sous-clés de
+`Notifications\Settings` et garde la première dont le nom contient « dofus », la
+casse mise de côté, comme Dracoon. Un installeur écrit cet identifiant comme il
+veut, et le chemin d'un raccourci en est un tout autant qu'un nom de paquet.
+Trouvé, il est gardé pour la durée du lancement ; introuvable, le tour suivant
+recherche, parce que Dofus a le droit d'être installé après Multifus.
+
+### Ce que le registre de la machine Windows porte vraiment
+
+Relevé le 4 septembre 2026, sur un Windows 10 Home 19045 où Dofus Retro tourne :
+
+| Valeur                                          | Sur cette machine       |
+| ----------------------------------------------- | ----------------------- |
+| `PushNotifications\ToastEnabled`                | 1                       |
+| L'AUMID de Dofus                                | `com.dofus.d1elauncher` |
+| `<AUMID>\Enabled`                               | **absente**             |
+| `Notifications\Settings\NOC_GLOBAL_SETTING_DND` | **absente**             |
+| La clé `CurrentVersion\FocusAssist`             | **absente**             |
+
+C'est le même identifiant que le paquet du Mac, celui que
+[plan-focusretro.md](./plan-focusretro.md) donne pour `NSRunningApplication`. La
+sous-clé de Dofus est la seule des dix-huit dont le nom porte « dofus » : le
+parcours ne peut pas se tromper de voisin. Elle porte `ShowBanner` et pas
+`Enabled` — ce sont deux réglages différents, et c'est bien `Enabled` qu'il nous
+faut : une notification dont la bannière est coupée arrive quand même au centre
+de notifications, donc `UserNotificationListener` l'entend, et l'AutoFocus
+marche.
+
+**Une valeur absente vaut le réglage d'usine, pas un « je ne sais pas ».** Le
+premier jet rendait « je ne sais pas » pour toute valeur manquante. Le relevé
+ci-dessus a montré que ça rendait les trois lectures muettes sur la machine même
+où elles ont été écrites, ce qui n'apprend rien à personne. Windows n'écrit
+`ToastEnabled` et `Enabled` qu'au moment où quelqu'un éteint le réglage : leur
+absence dit donc « personne ne l'a éteint », et se lit ouvert.
+
+**La Concentration, elle, se tait quand on ne la lit pas.** Ni
+`NOC_GLOBAL_SETTING_DND` ni la clé `FocusAssist` n'existent ici, et rien ne
+prouve que les allumer les fasse apparaître : Windows 10 a longtemps gardé cet
+état dans un `CloudStore` binaire. Une absence lue comme « Concentration
+éteinte » serait un vert donné sans preuve, et c'est le pire des faux. La lecture
+essaie `NOC_GLOBAL_SETTING_DND` d'abord, la clé `FocusAssist` ensuite, et se tait
+si aucune des deux ne répond. L'essai avec la Concentration allumée dira laquelle
+bouge.
+
+**La lecture l'emporte sur la preuve quand elle dit fermé.** Une notification
+entendue ouvre toujours les portes que personne ne sait lire, mais un réglage lu
+fermé passe son étape au rouge, même après une notification entendue plus tôt :
+le réglage est de maintenant, la preuve est d'avant. Sans cela, une seule
+notification entendue rendrait les lectures inutiles pour le reste de la soirée.
+
+**L'étape dit d'où lui vient son vert.** `StepView` porte un `proven` à côté de
+son contrôle, et l'écran choisit sa phrase : « le jeu a réussi à vous appeler »
+quand une notification l'a prouvé, « Multifus a lu le réglage » quand c'est le
+registre. La première phrase était écrite pour les deux, et elle aurait menti sur
+Windows.
 
 ## La preuve par l'écoute
 
@@ -99,8 +155,10 @@ l'aurait laissée passer fermée, donc les notifications de Dofus, la
 concentration et la case du jeu passent au vert ensemble, avec leur raison :
 « C'est en place : le jeu a réussi à vous appeler. » C'est le seul contrôle du
 Mac sur ces trois-là, et il vaut mieux qu'une lecture de réglage, ayant vu la
-chose arriver. L'autorisation, elle, ne bouge pas : Multifus la lit lui-même, et
-un joueur peut très bien la retirer après coup.
+chose arriver. Il ne tient que tant qu'aucune lecture ne le contredit : sur
+Windows, un réglage lu fermé referme son étape, la preuve étant d'avant.
+L'autorisation, elle, ne bouge pas : Multifus la lit lui-même, et un joueur peut
+très bien la retirer après coup.
 
 Le premier jet ne verdissait que l'étape de l'essai, alors que les deux versions
 du plan promettaient les cinq portes. La relecture l'a attrapé.
@@ -517,8 +575,9 @@ cherchent avec le même mot.
 
 - [ ] Les cinq vidéos ou captures décrites plus haut, sur le Mac.
 - [ ] Les mêmes sur Windows, pour les étapes 2, 3 et 4, dont le dessin diffère.
-      `PAGE_SHOTS` doit d'abord gagner son axe plateforme : aujourd'hui elle ne
-      porte qu'une image par étape.
+      `PAGE_SHOTS` doit alors gagner son axe plateforme, et pas avant : deux
+      tables identiques en attendant les images ne seraient qu'une constante
+      écrite deux fois.
 - [ ] Une fois posées, `PAGE_SHOTS` les prend et le cadre pointillé disparaît.
 
 ### Windows
@@ -529,25 +588,51 @@ texte et de chaque chemin, les mots du système dans `systemWords`, et tout le
 dessin, qui ne connaît pas la plateforme. Il n'y a donc rien à réécrire, et
 seulement à vérifier de l'œil.
 
-**Ce qui demande vraiment Windows**, dans cet ordre, parce que les trois derniers
-dépendent du premier :
+**Ce qui est écrit depuis** : les trois lectures du registre, le parcours des
+sous-clés qui trouve l'AUMID, la ligne de journal à chaque bascule d'une étape,
+et la bannière rouge.
 
-- [ ] Relever l'AUMID de Dofus, et vérifier que le parcours des sous-clés le
-      trouve.
-- [ ] Lire les trois réglages du registre, et les relire à chaque
-      `ListeningLost` comme au démarrage de l'écoute. Les trois étapes passent
-      alors de non vérifiables à contrôlées.
-- [ ] Journaliser chaque passage d'une étape de bonne à fermée, et l'inverse.
-      Rien n'est écrit pour l'instant : seule l'autorisation peut basculer, et le
-      journal la porte déjà sous `JournalEvent::Authorization`. C'est avec le
-      registre que la ligne vaut le coup, quand quatre étapes pourront bouger.
-- [ ] La bannière rouge en haut de l'écran quand un contrôle est fermé **et**
-      que l'AutoFocus est allumé, jamais pour une étape non vérifiable.
-      `components/config-notice.tsx` porte déjà la forme, et il lui faut un
-      « J'ai compris » qui la cache jusqu'au prochain démarrage. La pastille de
-      la barre de gauche, elle, est faite : elle suffit tant que l'autorisation
-      est le seul contrôle, et une bannière rouge par-dessus l'écran
-      d'autorisation qui dit déjà tout ferait doublon.
+Les lectures partent du tour, `follow_checks` à côté de `follow_authorization`,
+et elles remontent par `NotificationWatcher::checks`. Le Mac rend une réponse
+vide, ce qui est exactement ce qu'il sait dire.
+
+**Le tour a remplacé les deux moments que ce plan demandait.** Il disait de
+relire « à chaque `ListeningLost` comme au démarrage de l'écoute » ; le tour passe
+chaque seconde et couvre les deux, sans crochet à poser. Le balayage des
+sous-clés, le seul appel un peu cher, a été mesuré ici à **1,3 ms** pour dix-huit
+sous-clés, et encore, à travers PowerShell, qui coûte plus que la boucle Rust. Un
+tour coûte dix à trente millisecondes : c'est dans le bruit. L'AUMID trouvé est
+gardé pour la durée du lancement, et seul un AUMID introuvable fait rebalayer,
+parce que Dofus a le droit d'être installé après Multifus.
+
+**Le journal ne parle que des mauvaises nouvelles et de leur fin.** Une étape qui
+se ferme pose une ligne, une étape qui se rouvre après avoir été fermée en pose
+une autre. Une étape lue ouverte au premier tour n'en pose aucune : un journal qui
+dit à chaque lancement que tout va bien ne dit rien.
+
+La bannière est `components/check-notice.tsx`. Elle ne se montre que si un
+réglage **lu** est fermé et que l'AutoFocus est allumé : jamais pour une étape
+non vérifiable, et jamais pour l'autorisation, qui a son écran à elle et le dit
+mieux qu'une bannière. « Régler » mène aux Paramètres et ne la cache pas : elle
+s'en va d'elle-même à la seconde où le réglage est remis, et la cacher pour un
+clic aurait laissé croire que c'était fait. « J'ai compris » la cache jusqu'au
+prochain démarrage, ou jusqu'à ce que le réglage soit remis puis refermé : le
+joueur a dit connaître un problème, pas le suivant. Le cadre qu'elle partage avec
+l'avis sur le fichier de réglages est sorti dans `components/notice-bar.tsx`, qui
+porte le « J'ai compris » des deux.
+
+**Ce qui demande vraiment Windows** :
+
+- [ ] Couper les notifications du système, puis celles de Dofus, puis allumer la
+      Concentration, une à la fois : chaque étape doit passer au rouge dans la
+      seconde, le journal porter sa ligne, et la bannière apparaître une fois.
+      Remettre chaque réglage, et voir l'étape repasser au vert avec sa ligne.
+- [ ] La Concentration surtout : c'est la seule des trois dont on ne sait pas
+      quelle valeur bouge. Si ni `NOC_GLOBAL_SETTING_DND` ni `FocusAssist` ne
+      change, l'étape restera muette, et il faudra chercher ailleurs ou la
+      laisser à la preuve par l'écoute.
+- [ ] « J'ai compris », puis remettre le réglage, puis le refermer : la bannière
+      doit revenir.
 - [ ] Vérifier la prise en main sur Windows, écran par écran : les mots ne sont
       pas les mêmes, et rien n'y a jamais été lancé. En particulier le nom du
       mode Concentration, que Windows 11 a renommé en cours de route, et le

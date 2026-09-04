@@ -445,6 +445,7 @@ pub enum Check {
 pub struct StepView {
     pub step: Step,
     pub check: Check,
+    pub proven: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -452,6 +453,7 @@ pub struct StepView {
 pub struct OnboardingView {
     pub done: bool,
     pub steps: Vec<StepView>,
+    pub has_notice: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -583,7 +585,9 @@ mod tests {
                 steps: vec![StepView {
                     step: Step::Authorization,
                     check: Check::Ready,
+                    proven: false,
                 }],
+                has_notice: false,
             },
             config: ConfigView {
                 path: "/tmp/multifus.json".to_owned(),
@@ -1377,9 +1381,11 @@ mod tests {
         let view = json_of(&StepView {
             step: Step::Proof,
             check: Check::Unknown,
+            proven: false,
         });
 
         assert_eq!(view["step"], json!("proof"));
         assert_eq!(view["check"], json!("unknown"));
+        assert_eq!(view["proven"], json!(false));
     }
 }

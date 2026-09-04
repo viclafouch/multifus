@@ -46,6 +46,7 @@ import { LANGUAGE_LABELS } from '@/constants/language'
 import { NOTIFICATION_LABELS } from '@/constants/notification'
 import { CLASS_LABELS, COLOR_LABELS } from '@/constants/roster'
 import { focusDuration } from '@/helpers/format'
+import { pageLabel } from '@/helpers/onboarding'
 import {
   bindingLabel,
   shortcutActionLabel,
@@ -78,6 +79,10 @@ export const journalTone = (event: JournalEvent): JournalTone => {
     }
 
     return event.granted ? 'good' : 'neutral'
+  }
+
+  if (event.kind === 'check') {
+    return event.open ? 'good' : 'warning'
   }
 
   if (event.kind === 'notification') {
@@ -744,6 +749,7 @@ type ComposedEventKind = Exclude<
 type RunEventKind =
   | 'authorization'
   | 'characterOffline'
+  | 'check'
   | 'characterOnline'
   | 'configLoadFailed'
   | 'displayAwake'
@@ -762,6 +768,7 @@ type ActionEventKind = Exclude<ComposedEventKind, RunEventKind>
 const RUN_KINDS = new Set<ComposedEventKind>([
   'authorization',
   'characterOffline',
+  'check',
   'characterOnline',
   'configLoadFailed',
   'displayAwake',
@@ -782,6 +789,17 @@ const isRunEvent = (
   return RUN_KINDS.has(event.kind)
 }
 
+const checkEventLine = ({
+  step,
+  open
+}: Extract<JournalEvent, { kind: 'check' }>) => {
+  const subject = pageLabel(step)
+
+  return open
+    ? t`${subject} : c’est en place.`
+    : t`${subject} : ce n’est plus en place, le jeu ne vous appellera pas.`
+}
+
 const runLine = (
   event: EventOf<RunEventKind>,
   quickReplies: readonly QuickReply[]
@@ -797,6 +815,9 @@ const runLine = (
       return event.granted
         ? t`Autorisation accordée : les fenêtres sont lisibles.`
         : t`Autorisation refusée : les fenêtres ne peuvent pas être lues.`
+    }
+    case 'check': {
+      return checkEventLine(event)
     }
     case 'characterOnline': {
       const { nickname } = event

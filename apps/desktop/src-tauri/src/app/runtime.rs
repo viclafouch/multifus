@@ -166,6 +166,8 @@ trait TurnMechanisms {
 
     fn follow_authorization(&self) -> bool;
 
+    fn follow_checks(&self) -> bool;
+
     fn announce_relay(&self, change: &ScanChange);
 
     fn follow_display(&self) -> bool;
@@ -190,6 +192,10 @@ impl TurnMechanisms for AppTurnMechanisms<'_> {
 
     fn follow_authorization(&self) -> bool {
         follow_authorization(self.0)
+    }
+
+    fn follow_checks(&self) -> bool {
+        follow_checks(self.0)
     }
 
     fn announce_relay(&self, change: &ScanChange) {
@@ -270,12 +276,13 @@ fn turn_over(turn: &Turn, mechanisms: &dyn TurnMechanisms) {
 fn scan(turn: &Turn, mechanisms: &dyn TurnMechanisms) -> bool {
     let change = refresh_windows(turn);
     let listening_changed = mechanisms.follow_authorization();
+    let checks_changed = mechanisms.follow_checks();
 
     mechanisms.announce_relay(&change);
 
     let display_changed = mechanisms.follow_display();
 
-    change.changed || listening_changed || display_changed
+    change.changed || listening_changed || checks_changed || display_changed
 }
 
 enum ClientsOnScreen {
@@ -610,6 +617,12 @@ fn follow_authorization(app: &AppHandle) -> bool {
         (false, true) => stop_listening(app),
         _ => false,
     }
+}
+
+fn follow_checks(app: &AppHandle) -> bool {
+    let checks = watcher(app).checks();
+
+    lock(app).apply_checks(checks)
 }
 
 fn start_listening(app: &AppHandle) -> bool {
@@ -948,6 +961,7 @@ mod tests {
     enum TurnMechanism {
         ShortcutsFollowed,
         AuthorizationFollowed,
+        ChecksFollowed,
         RelayAnnounced { relayed_gone: Vec<String> },
         DisplayFollowed,
         WalkRefreshed,
@@ -961,6 +975,7 @@ mod tests {
     struct FakeTurnMechanisms {
         set_going: Mutex<Vec<TurnMechanism>>,
         listening_changed: bool,
+        checks_changed: bool,
         display_changed: bool,
         walk_stopped: bool,
         main_window_on_screen: bool,
@@ -999,6 +1014,12 @@ mod tests {
             self.write_down(TurnMechanism::AuthorizationFollowed);
 
             self.listening_changed
+        }
+
+        fn follow_checks(&self) -> bool {
+            self.write_down(TurnMechanism::ChecksFollowed);
+
+            self.checks_changed
         }
 
         fn announce_relay(&self, change: &ScanChange) {
@@ -1063,6 +1084,7 @@ mod tests {
             vec![
                 TurnMechanism::ShortcutsFollowed,
                 TurnMechanism::AuthorizationFollowed,
+                TurnMechanism::ChecksFollowed,
                 TurnMechanism::RelayAnnounced {
                     relayed_gone: Vec::new()
                 },

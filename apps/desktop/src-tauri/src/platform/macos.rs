@@ -102,6 +102,7 @@ use crate::platform::keyboard::KeyLabels;
 use crate::platform::notification::NotificationReport;
 use crate::platform::notification::NotificationSink;
 use crate::platform::notification::NotificationWatcher;
+use crate::platform::notification::SystemChecks;
 use crate::platform::paste::PasteSender;
 use crate::platform::wake::Wake;
 use crate::platform::wake::WakeSink;
@@ -1269,6 +1270,10 @@ impl NotificationWatcher for BannerNotificationWatcher {
 
     fn request_authorization(&self) -> Result<Authorization> {
         Ok(request_accessibility_authorization())
+    }
+
+    fn checks(&self) -> SystemChecks {
+        SystemChecks::default()
     }
 
     fn start(&mut self, sink: NotificationSink) -> Result<()> {

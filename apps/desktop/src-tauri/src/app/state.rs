@@ -86,6 +86,7 @@ use crate::platform::GameWindow;
 use crate::platform::KeyLabels;
 use crate::platform::PasteSender;
 use crate::platform::PlatformNotificationWatcher;
+use crate::platform::SystemChecks;
 use crate::platform::WindowId;
 use crate::platform::WindowManager;
 
@@ -119,6 +120,8 @@ pub struct Multifus {
     painted_windows: HashMap<WindowId, WindowLook>,
     taskbar_combines: bool,
     granted: Option<bool>,
+    checks: SystemChecks,
+    notice_dismissed: bool,
     listening: bool,
     heard: bool,
     problem: Option<ConfigProblem>,
@@ -206,6 +209,8 @@ impl Multifus {
             painted_windows: HashMap::new(),
             taskbar_combines,
             granted: None,
+            checks: SystemChecks::default(),
+            notice_dismissed: false,
             listening: false,
             heard: false,
             problem,
@@ -1534,6 +1539,40 @@ impl Multifus {
         self.save();
     }
 
+    pub fn apply_checks(&mut self, checks: SystemChecks) -> bool {
+        if self.checks == checks {
+            return false;
+        }
+
+        let before = self.checks;
+
+        self.checks = checks;
+
+        for step in Step::ALL {
+            let was = check_of_reading(reading_of(before, step));
+            let now = check_of_reading(reading_of(checks, step));
+
+            match (was, now) {
+                (Check::Blocked, Check::Blocked) | (_, Check::Unknown) => {}
+                (_, Check::Blocked) => self.log(JournalEvent::Check { step, open: false }),
+                (Check::Blocked, Check::Ready) => {
+                    self.log(JournalEvent::Check { step, open: true });
+                }
+                (_, Check::Ready) => {}
+            }
+        }
+
+        if !self.reads_a_closed_check() {
+            self.notice_dismissed = false;
+        }
+
+        true
+    }
+
+    pub fn dismiss_check_notice(&mut self) {
+        self.notice_dismissed = true;
+    }
+
     #[must_use]
     fn onboarding(&self) -> OnboardingView {
         OnboardingView {
@@ -1543,26 +1582,43 @@ impl Multifus {
                 .map(|step| StepView {
                     step,
                     check: self.check_of(step),
+                    proven: self.proves(step),
                 })
                 .collect(),
+            has_notice: self.warns_of_a_closed_check(),
         }
+    }
+
+    #[must_use]
+    fn warns_of_a_closed_check(&self) -> bool {
+        !self.notice_dismissed && self.is_auto_focus_enabled() && self.reads_a_closed_check()
+    }
+
+    #[must_use]
+    fn reads_a_closed_check(&self) -> bool {
+        Step::ALL
+            .into_iter()
+            .any(|step| reading_of(self.checks, step) == Some(false))
     }
 
     #[must_use]
     fn check_of(&self, step: Step) -> Check {
         match step {
-            Step::Authorization => match self.granted {
-                Some(true) => Check::Ready,
-                Some(false) => Check::Blocked,
-                None => Check::Unknown,
-            },
-            Step::Proof | Step::Notifications | Step::Focus | Step::GameSetting => {
-                if self.heard {
-                    Check::Ready
-                } else {
-                    Check::Unknown
+            Step::Authorization => check_of_reading(self.granted),
+            Step::Notifications | Step::Focus | Step::GameSetting | Step::Proof => {
+                match check_of_reading(reading_of(self.checks, step)) {
+                    Check::Unknown if self.heard => Check::Ready,
+                    read => read,
                 }
             }
+        }
+    }
+
+    #[must_use]
+    fn proves(&self, step: Step) -> bool {
+        match step {
+            Step::Authorization => false,
+            Step::Notifications | Step::Focus | Step::GameSetting | Step::Proof => self.heard,
         }
     }
 
@@ -1705,6 +1761,33 @@ fn triage_config(
     });
 
     Some(ConfigProblem::NotSetAside { detail })
+}
+
+#[must_use]
+fn reading_of(checks: SystemChecks, step: Step) -> Option<bool> {
+    match step {
+        Step::Notifications => both_open(checks.notifications, checks.game_notifications),
+        Step::Focus => checks.focus_off,
+        Step::Authorization | Step::GameSetting | Step::Proof => None,
+    }
+}
+
+#[must_use]
+fn both_open(one: Option<bool>, other: Option<bool>) -> Option<bool> {
+    match (one, other) {
+        (Some(false), _) | (_, Some(false)) => Some(false),
+        (Some(true), Some(true)) => Some(true),
+        _ => None,
+    }
+}
+
+#[must_use]
+fn check_of_reading(read: Option<bool>) -> Check {
+    match read {
+        Some(true) => Check::Ready,
+        Some(false) => Check::Blocked,
+        None => Check::Unknown,
+    }
 }
 
 #[must_use]
@@ -3913,6 +3996,214 @@ mod tests {
                 "{step:?} was on the way of the notification multifus heard"
             );
         }
+    }
+
+    fn proven_step(state: &Multifus, step: Step) -> bool {
+        state
+            .snapshot()
+            .onboarding
+            .steps
+            .into_iter()
+            .find(|carried| carried.step == step)
+            .expect("every step travels in the snapshot")
+            .proven
+    }
+
+    #[test]
+    fn a_system_that_reads_its_reglages_opens_the_two_steps_it_can_read() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        assert!(state.apply_checks(SystemChecks {
+            notifications: Some(true),
+            game_notifications: Some(true),
+            focus_off: Some(true),
+        }));
+
+        assert_eq!(check_of_step(&state, Step::Notifications), Check::Ready);
+        assert_eq!(check_of_step(&state, Step::Focus), Check::Ready);
+        assert_eq!(
+            check_of_step(&state, Step::GameSetting),
+            Check::Unknown,
+            "no system reads the case a joueur ticks inside Dofus"
+        );
+    }
+
+    #[test]
+    fn a_reglage_read_and_closed_shows_the_step_closed() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        state.apply_checks(SystemChecks {
+            notifications: Some(true),
+            game_notifications: Some(false),
+            focus_off: Some(false),
+        });
+
+        assert_eq!(check_of_step(&state, Step::Notifications), Check::Blocked);
+        assert_eq!(check_of_step(&state, Step::Focus), Check::Blocked);
+    }
+
+    #[test]
+    fn a_reglage_half_read_says_nothing_rather_than_guessing() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        state.apply_checks(SystemChecks {
+            notifications: Some(true),
+            game_notifications: None,
+            focus_off: None,
+        });
+
+        assert_eq!(check_of_step(&state, Step::Notifications), Check::Unknown);
+        assert_eq!(check_of_step(&state, Step::Focus), Check::Unknown);
+    }
+
+    #[test]
+    fn a_reglage_read_and_closed_wins_over_a_notification_heard_before_it() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        state.note_heard();
+        state.apply_checks(focus_off(false));
+
+        assert_eq!(check_of_step(&state, Step::Focus), Check::Blocked);
+        assert_eq!(
+            check_of_step(&state, Step::GameSetting),
+            Check::Ready,
+            "the notification still proves the doors nobody reads"
+        );
+    }
+
+    #[test]
+    fn a_step_says_whether_the_game_proved_it_or_multifus_read_it() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        state.apply_checks(focus_off(true));
+
+        assert!(!proven_step(&state, Step::Focus));
+
+        state.note_heard();
+
+        assert!(proven_step(&state, Step::Focus));
+        assert!(
+            !proven_step(&state, Step::Authorization),
+            "the autorisation is read, never proved by a notification"
+        );
+    }
+
+    fn checks_journalled(state: &Multifus) -> Vec<JournalEvent> {
+        journalled(state)
+            .into_iter()
+            .filter(|event| matches!(event, JournalEvent::Check { .. }))
+            .collect()
+    }
+
+    fn focus_off(off: bool) -> SystemChecks {
+        SystemChecks {
+            focus_off: Some(off),
+            ..SystemChecks::default()
+        }
+    }
+
+    #[test]
+    fn a_reglage_read_open_at_the_first_turn_is_not_a_line_of_journal() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        state.apply_checks(focus_off(true));
+
+        assert!(
+            checks_journalled(&state).is_empty(),
+            "a journal that says everything is fine at every launch says nothing"
+        );
+    }
+
+    #[test]
+    fn a_reglage_that_closes_and_opens_again_is_written_down_once_each_way() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        state.apply_checks(focus_off(true));
+        state.apply_checks(focus_off(false));
+
+        assert!(
+            !state.apply_checks(focus_off(false)),
+            "nothing moved, nothing to say"
+        );
+
+        state.apply_checks(focus_off(true));
+
+        assert_eq!(
+            checks_journalled(&state),
+            vec![
+                JournalEvent::Check {
+                    step: Step::Focus,
+                    open: false,
+                },
+                JournalEvent::Check {
+                    step: Step::Focus,
+                    open: true,
+                },
+            ]
+        );
+    }
+
+    #[test]
+    fn a_closed_reglage_warns_only_while_the_autofocus_is_on_and_nobody_said_they_knew() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        state.apply_checks(focus_off(false));
+
+        assert!(state.snapshot().onboarding.has_notice);
+
+        state.dismiss_check_notice();
+
+        assert!(!state.snapshot().onboarding.has_notice);
+    }
+
+    #[test]
+    fn a_reglage_put_right_then_closed_again_warns_a_second_time() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        state.apply_checks(focus_off(false));
+        state.dismiss_check_notice();
+        state.apply_checks(focus_off(true));
+        state.apply_checks(focus_off(false));
+
+        assert!(
+            state.snapshot().onboarding.has_notice,
+            "the joueur said they knew about a reglage they have put right since"
+        );
+    }
+
+    #[test]
+    fn a_closed_reglage_says_nothing_when_the_autofocus_is_off() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        state.set_auto_focus_enabled(false, Surface::Window);
+        state.apply_checks(focus_off(false));
+
+        assert!(!state.snapshot().onboarding.has_notice);
+    }
+
+    #[test]
+    fn a_reglage_nobody_reads_never_warns() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        assert!(!state.snapshot().onboarding.has_notice);
+
+        state.set_granted(false);
+
+        assert!(
+            !state.snapshot().onboarding.has_notice,
+            "the autorisation refused has a screen of its own, and says it there"
+        );
     }
 
     #[test]

@@ -239,6 +239,14 @@ msgid "{subject} : aucune fenêtre à ramener."
 msgstr "{subject}: no hay ninguna ventana que traer."
 
 #: src/helpers/journal.ts
+msgid "{subject} : c’est en place."
+msgstr "{subject}: está en su sitio."
+
+#: src/helpers/journal.ts
+msgid "{subject} : ce n’est plus en place, le jeu ne vous appellera pas."
+msgstr "{subject}: ya no está en su sitio, el juego no te llamará."
+
+#: src/helpers/journal.ts
 msgid "{subject} : ce type est désactivé, rien n’a été fait."
 msgstr "{subject}: ese tipo está desactivado, no se ha hecho nada."
 
@@ -626,6 +634,10 @@ msgstr "Te toca jugar."
 #: src/helpers/onboarding.ts
 msgid "C’est en place : le jeu a réussi à vous appeler."
 msgstr "Está en su sitio: el juego ha conseguido llamarte."
+
+#: src/helpers/onboarding.ts
+msgid "C’est en place : Multifus a lu le réglage."
+msgstr "Está en su sitio: Multifus ha leído el ajuste."
 
 #: src/helpers/onboarding.ts
 #~ msgid "C’est en place."
@@ -1328,7 +1340,7 @@ msgstr "Invocaciones"
 msgid "Iop"
 msgstr "Yopuka"
 
-#: src/components/config-notice.tsx
+#: src/components/notice-bar.tsx
 msgid "J’ai compris"
 msgstr "Entendido"
 
@@ -1356,6 +1368,10 @@ msgstr "La vista previa"
 #: src/screens/onboarding/proof-band.tsx
 msgid "L’appel du jeu"
 msgstr "La llamada del juego"
+
+#: src/components/check-notice.tsx
+msgid "L’AutoFocus ne peut pas marcher"
+msgstr "El AutoFocus no puede funcionar"
 
 #: src/helpers/onboarding.ts
 msgid "L’autorisation"
@@ -2285,6 +2301,10 @@ msgstr "Ajustes del Sistema"
 msgid "Réglages, roster et raccourcis repartent d’origine. Vos personnages connectés reviendront dans la seconde, sans sexe ni classe."
 msgstr "Ajustes, roster y atajos vuelven al origen. Tus personajes conectados volverán en un segundo, sin sexo ni clase."
 
+#: src/components/check-notice.tsx
+msgid "Régler"
+msgstr "Ajustar"
+
 #: src/screens/about/reset-panel.tsx
 msgid "Réinitialiser"
 msgstr "Restablecer"
@@ -2761,6 +2781,10 @@ msgstr "Un personaje, una tecla"
 #: src/constants/journal.ts
 msgid "un raccourci"
 msgstr "un atajo"
+
+#: src/components/check-notice.tsx
+msgid "Un réglage du système empêche le jeu de vous appeler, et Multifus n’entend rien. La prise en main dit lequel."
+msgstr "Un ajuste del sistema impide que el juego te llame, y Multifus no oye nada. Primeros pasos dice cuál."
 
 #: src/screens/relay/pairing-guide.tsx
 msgid "Un robot ne parle jamais le premier. Sans ce message, il n’a pas le droit de vous écrire."

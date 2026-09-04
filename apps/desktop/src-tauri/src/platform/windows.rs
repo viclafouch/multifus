@@ -28,6 +28,8 @@ use windows::UI::Notifications::NotificationKinds;
 use windows::UI::Notifications::UserNotification;
 use windows::Win32::Foundation::CloseHandle;
 use windows::Win32::Foundation::ERROR_INVALID_WINDOW_HANDLE;
+use windows::Win32::Foundation::ERROR_MORE_DATA;
+use windows::Win32::Foundation::ERROR_SUCCESS;
 use windows::Win32::Foundation::GetLastError;
 use windows::Win32::Foundation::HANDLE;
 use windows::Win32::Foundation::HWND;
@@ -47,9 +49,14 @@ use windows::Win32::System::Power::PowerClearRequest;
 use windows::Win32::System::Power::PowerCreateRequest;
 use windows::Win32::System::Power::PowerRequestDisplayRequired;
 use windows::Win32::System::Power::PowerSetRequest;
+use windows::Win32::System::Registry::HKEY;
 use windows::Win32::System::Registry::HKEY_CURRENT_USER;
+use windows::Win32::System::Registry::KEY_READ;
 use windows::Win32::System::Registry::RRF_RT_REG_DWORD;
+use windows::Win32::System::Registry::RegCloseKey;
+use windows::Win32::System::Registry::RegEnumKeyExW;
 use windows::Win32::System::Registry::RegGetValueW;
+use windows::Win32::System::Registry::RegOpenKeyExW;
 use windows::Win32::System::Threading::AttachThreadInput;
 use windows::Win32::System::Threading::GetCurrentThreadId;
 use windows::Win32::System::Threading::OpenProcess;
@@ -175,6 +182,7 @@ use crate::platform::error::Result;
 use crate::platform::notification::NotificationReport;
 use crate::platform::notification::NotificationSink;
 use crate::platform::notification::NotificationWatcher;
+use crate::platform::notification::SystemChecks;
 use crate::platform::paste::PasteSender;
 use crate::platform::wake::Wake;
 use crate::platform::wake::WakeSink;
@@ -215,12 +223,32 @@ const ICON_RESOURCE_VERSION: u32 = 0x0003_0000;
 
 const NO_ICON: usize = 0;
 
-const TASKBAR_ADVANCED_KEY: PCWSTR =
-    w!(r"Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced");
+const TASKBAR_ADVANCED_KEY: &str = r"Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced";
 
 const TASKBAR_GLOM_LEVEL: PCWSTR = w!("TaskbarGlomLevel");
 
 const NEVER_COMBINE: u32 = 2;
+
+const PUSH_NOTIFICATIONS_KEY: &str = r"Software\Microsoft\Windows\CurrentVersion\PushNotifications";
+
+const TOAST_ENABLED: PCWSTR = w!("ToastEnabled");
+
+const NOTIFICATION_SETTINGS_KEY: &str =
+    r"Software\Microsoft\Windows\CurrentVersion\Notifications\Settings";
+
+const NOTIFICATION_ENABLED: PCWSTR = w!("Enabled");
+
+const GLOBAL_DO_NOT_DISTURB: PCWSTR = w!("NOC_GLOBAL_SETTING_DND");
+
+const FOCUS_ASSIST_KEY: &str = r"Software\Microsoft\Windows\CurrentVersion\FocusAssist";
+
+const QUIET_HOURS_ACTIVE: PCWSTR = w!("QuietHoursActive");
+
+const DOFUS_IN_APPLICATION_ID: &str = "dofus";
+
+const APPLICATION_ID_UNITS: usize = 256;
+
+const ALLOWED_UNTIL_TURNED_OFF: bool = true;
 
 type TitledWindow = (WindowId, String);
 
@@ -636,15 +664,70 @@ fn taskbar_glom_level() -> Option<u32> {
     registry_dword(TASKBAR_ADVANCED_KEY, TASKBAR_GLOM_LEVEL)
 }
 
-fn registry_dword(key: PCWSTR, value: PCWSTR) -> Option<u32> {
+fn system_checks() -> SystemChecks {
+    SystemChecks {
+        notifications: Some(
+            registry_flag(PUSH_NOTIFICATIONS_KEY, TOAST_ENABLED)
+                .unwrap_or(ALLOWED_UNTIL_TURNED_OFF),
+        ),
+        game_notifications: game_notifications(),
+        focus_off: focus_off(),
+    }
+}
+
+fn game_notifications() -> Option<bool> {
+    let application_id = dofus_application_id()?;
+
+    Some(
+        registry_flag(
+            &format!(r"{NOTIFICATION_SETTINGS_KEY}\{application_id}"),
+            NOTIFICATION_ENABLED,
+        )
+        .unwrap_or(ALLOWED_UNTIL_TURNED_OFF),
+    )
+}
+
+fn focus_off() -> Option<bool> {
+    let quiet = registry_flag(NOTIFICATION_SETTINGS_KEY, GLOBAL_DO_NOT_DISTURB)
+        .or_else(|| registry_flag(FOCUS_ASSIST_KEY, QUIET_HOURS_ACTIVE))?;
+
+    Some(!quiet)
+}
+
+static DOFUS_APPLICATION_ID: LazyLock<Mutex<Option<String>>> = LazyLock::new(|| Mutex::new(None));
+
+fn dofus_application_id() -> Option<String> {
+    let mut kept = DOFUS_APPLICATION_ID
+        .lock()
+        .unwrap_or_else(PoisonError::into_inner);
+
+    if kept.is_none() {
+        *kept = registry_subkeys(NOTIFICATION_SETTINGS_KEY)
+            .into_iter()
+            .find(|name| matches_dofus_application_id(name));
+    }
+
+    kept.clone()
+}
+
+fn matches_dofus_application_id(name: &str) -> bool {
+    name.to_lowercase().contains(DOFUS_IN_APPLICATION_ID)
+}
+
+fn registry_flag(key: &str, value: PCWSTR) -> Option<bool> {
+    registry_dword(key, value).map(|read| read != 0)
+}
+
+fn registry_dword(key: &str, value: PCWSTR) -> Option<u32> {
+    let path: Vec<u16> = key.encode_utf16().chain(once(0)).collect();
     let mut read_value = 0_u32;
     let mut length = u32::try_from(size_of::<u32>()).ok()?;
 
-    // SAFETY: the pointer is to a live four-byte value, which is what a DWORD value writes.
+    // SAFETY: the path and the value both outlive the call, and the value is four bytes long.
     let read = unsafe {
         RegGetValueW(
             HKEY_CURRENT_USER,
-            key,
+            PCWSTR(path.as_ptr()),
             value,
             RRF_RT_REG_DWORD,
             None,
@@ -654,6 +737,66 @@ fn registry_dword(key: PCWSTR, value: PCWSTR) -> Option<u32> {
     };
 
     read.is_ok().then_some(read_value)
+}
+
+fn registry_subkeys(key: &str) -> Vec<String> {
+    let path: Vec<u16> = key.encode_utf16().chain(once(0)).collect();
+    let mut opened = HKEY::default();
+
+    // SAFETY: the path outlives the call, and the handle it fills is live.
+    let read = unsafe {
+        RegOpenKeyExW(
+            HKEY_CURRENT_USER,
+            PCWSTR(path.as_ptr()),
+            None,
+            KEY_READ,
+            &mut opened,
+        )
+    };
+
+    if read.is_err() {
+        return Vec::new();
+    }
+
+    let names = subkey_names(opened);
+
+    // SAFETY: the key was opened just above, and nothing else holds it.
+    let _ = unsafe { RegCloseKey(opened) };
+
+    names
+}
+
+fn subkey_names(opened: HKEY) -> Vec<String> {
+    let mut names = Vec::new();
+
+    for index in 0.. {
+        let mut name = [0_u16; APPLICATION_ID_UNITS];
+        let Ok(mut length) = u32::try_from(name.len()) else {
+            break;
+        };
+
+        // SAFETY: the buffer is as long as the length says, and both outlive the call.
+        let read = unsafe {
+            RegEnumKeyExW(
+                opened,
+                index,
+                Some(PWSTR(name.as_mut_ptr())),
+                &mut length,
+                None,
+                None,
+                None,
+                None,
+            )
+        };
+
+        match read {
+            ERROR_SUCCESS => names.push(String::from_utf16_lossy(&name[..length as usize])),
+            ERROR_MORE_DATA => continue,
+            _ => break,
+        }
+    }
+
+    names
 }
 
 fn enter_apartment() {
@@ -1023,7 +1166,7 @@ fn window_handle(window: WindowId) -> HWND {
     HWND(window.raw() as usize as *mut c_void)
 }
 
-const DESKTOP_KEY: PCWSTR = w!("Control Panel\\Desktop");
+const DESKTOP_KEY: &str = r"Control Panel\Desktop";
 
 const LOW_LEVEL_HOOKS_TIMEOUT: PCWSTR = w!("LowLevelHooksTimeout");
 
@@ -1565,6 +1708,10 @@ impl NotificationWatcher for UserNotificationWatcher {
                 .RequestAccessAsync()
                 .and_then(|request| request.join()),
         ))
+    }
+
+    fn checks(&self) -> SystemChecks {
+        system_checks()
     }
 
     fn start(&mut self, sink: NotificationSink) -> Result<()> {
@@ -2229,6 +2376,27 @@ mod tests {
             waking.clients.is_empty(),
             "a browser renaming a tab teaches the watcher nothing"
         );
+    }
+
+    #[test]
+    fn the_application_id_of_dofus_is_found_however_the_installer_wrote_its_case() {
+        for name in [
+            r"{6D809377-6AF0-444B-8957-A3773F02200E}\Ankama\Dofus Retro\Dofus.exe",
+            "Ankama.DofusRetro",
+            "com.ankama.DOFUS",
+        ] {
+            assert!(
+                matches_dofus_application_id(name),
+                "{name} is the game, whatever case the system wrote it in"
+            );
+        }
+
+        for name in ["Microsoft.Windows.Explorer", "Chrome", "Ankama Launcher"] {
+            assert!(
+                !matches_dofus_application_id(name),
+                "{name} is not a client of the game"
+            );
+        }
     }
 
     #[test]

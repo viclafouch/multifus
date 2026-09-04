@@ -32,6 +32,7 @@ pub use macos::matches_frontmost;
 pub use notification::NotificationReport;
 pub use notification::NotificationSink;
 pub use notification::NotificationWatcher;
+pub use notification::SystemChecks;
 pub use paste::Clipboard;
 pub use paste::PasteSender;
 pub use wake::Wake;

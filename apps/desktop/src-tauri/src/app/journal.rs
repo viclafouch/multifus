@@ -7,6 +7,7 @@ use serde::Serialize;
 use crate::app::journal_file;
 use crate::app::view::BindingView;
 use crate::app::view::ShortcutAction;
+use crate::app::view::Step;
 use crate::config::Language;
 use crate::domain::Class;
 use crate::domain::Color;
@@ -66,6 +67,11 @@ pub enum JournalEvent {
     AuthorizationRequested {
         granted: bool,
         failure: Option<String>,
+    },
+
+    Check {
+        step: Step,
+        open: bool,
     },
 
     Listening,

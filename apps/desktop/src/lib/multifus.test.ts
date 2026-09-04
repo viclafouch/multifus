@@ -536,6 +536,12 @@ const CALLS = [
     }
   },
   {
+    name: 'dismissCheckNotice',
+    run: () => {
+      return multifus.dismissCheckNotice()
+    }
+  },
+  {
     name: 'revealJournal',
     run: () => {
       return multifus.revealJournal()

@@ -71,7 +71,7 @@ describe('l’écran de la prise en main', () => {
   it('dit en rouge le seul contrôle que Multifus sait lire', async () => {
     await show({
       onboarding: onboardingOf({
-        steps: [{ step: 'authorization', check: 'blocked' }]
+        steps: [{ step: 'authorization', check: 'blocked', proven: false }]
       })
     })
 

@@ -106,12 +106,9 @@ qui brûlait un cœur ne le brûle plus.
 
 ## Ce qu'il faut essayer sur Windows
 
-Le code Windows n'a jamais été compilé ni lancé : seulement type-checké contre
-le vrai crate `windows` pour la cible msvc, dans une caisse jetable hors du
-dépôt. Premier geste, avant tout essai : `pnpm --filter @multifus/desktop run
-lint:rust` puis les tests.
-
-Ensuite, parce que rien de tout ça ne se prouve par un test.
+Le code Windows se compile désormais sur la machine Windows, `lint:rust` est vert
+et les tests passent. Il n'a jamais été lancé pour autant, et rien de ce qui suit
+ne se prouve par un test.
 
 - Ouvrir un client : la fenêtre doit être agrandie tout de suite, et porter la
   tête de classe et le titre court sans attendre la seconde.

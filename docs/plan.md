@@ -17,14 +17,16 @@ La paire de clés de l'updater existe déjà, dans `~/.tauri/multifus.key` et so
 `tauri.conf.json`. En régénérer une rendrait insignables les mises à jour des
 versions déjà installées.
 
-Le code Windows ne se compile pas ici : `cargo check --target
-x86_64-pc-windows-msvc` échoue, `ring` demandant un compilateur C pour Windows.
-La CI le compile sur `windows-latest`, et la publication en dépend.
+Le code Windows se compile et ses tests passent sur la machine Windows, où
+`cargo test` prend `platform/windows.rs` comme n'importe quel autre fichier.
 
-Une caisse jetable hors du dépôt, qui ne dépend que de `windows` et porte le
-code à vérifier avec des bouchons pour le reste, se type-checke pour cette même
-cible : `windows` est du Rust pur, sans C. Ça n'essaie rien, mais ça attrape les
-signatures et les constantes fausses avant que la CI ne les voie.
+Depuis le Mac, il ne se compile pas : `cargo check --target
+x86_64-pc-windows-msvc` échoue, `ring` demandant un compilateur C pour Windows.
+Une caisse jetable hors du dépôt, qui ne dépend que de `windows` et porte le code
+à vérifier avec des bouchons pour le reste, se type-checke pour cette même cible :
+`windows` est du Rust pur, sans C. Ça n'essaie rien, mais ça attrape les
+signatures et les constantes fausses. La CI, elle, compile sur `windows-latest`,
+et la publication en dépend.
 
 ## Passer le dépôt en monorepo
 

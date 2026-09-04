@@ -1,5 +1,6 @@
 import type { ScreenName, Snapshot } from '@/@types/snapshot'
 import type { ConfigProblem } from '@/@types/system'
+import { CheckNotice } from '@/components/check-notice'
 import { ConfigNotice } from '@/components/config-notice'
 import { JournalPanel } from '@/components/journal-panel'
 import { KeyLabelsProvider } from '@/components/key-labels-provider'
@@ -11,6 +12,7 @@ import { useMultifus } from '@/hooks/use-multifus'
 import { useTrayNavigation } from '@/hooks/use-tray-navigation'
 import {
   closeRuneTable,
+  dismissCheckNotice,
   dismissConfigProblem,
   revealQuarantinedConfig
 } from '@/lib/multifus'
@@ -82,6 +84,16 @@ export const App = () => {
                   }}
                 />
               )}
+              {snapshot.onboarding.hasNotice ? (
+                <CheckNotice
+                  onOpen={() => {
+                    setScreen('settings')
+                  }}
+                  onDismiss={() => {
+                    run(dismissCheckNotice())
+                  }}
+                />
+              ) : null}
               <div className="min-h-0 flex-1 overflow-y-auto">
                 <CurrentScreen screen={screen} snapshot={snapshot} run={run} />
               </div>

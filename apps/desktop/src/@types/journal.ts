@@ -1,5 +1,6 @@
 import type { Language } from '@/@types/language'
 import type { NotificationKind } from '@/@types/notification'
+import type { Step } from '@/@types/onboarding'
 import type { NoticeCase, RelayFailure, RelayStop } from '@/@types/relay'
 import type { Class, Color, Gender } from '@/@types/roster'
 import type { BoundCombination, ShortcutAction } from '@/@types/shortcuts'
@@ -128,6 +129,7 @@ export type SettingChange =
 
 export type JournalEvent =
   | { readonly kind: 'authorization'; readonly granted: boolean }
+  | { readonly kind: 'check'; readonly step: Step; readonly open: boolean }
   | { readonly kind: 'characterOffline'; readonly nickname: string }
   | { readonly kind: 'characterOnline'; readonly nickname: string }
   | { readonly kind: 'clientMaximized' }

@@ -28,12 +28,12 @@ journalise ligne par ligne :
    dans `NOC_GLOBAL_SETTING_DND`. Dracoon les relit toutes les 300 ms et écrit
    dans son journal chaque changement d'état.
 
-Nous ne lisons que le premier. Quand un joueur dit « l'AutoFocus ne marche
-pas », notre journal ne sait pas répondre.
+Nous lisons les quatre depuis, une fois par tour, et le journal porte chaque
+bascule d'une étape. Rien n'a encore été essayé sur une vraie machine Windows.
 
 Le sujet est passé dans [plan-accueil.md](./plan-accueil.md), qui le prend en
-entier : les contrôles, ce que le Mac ne sait pas lire, et l'écran qui les
-montre.
+entier : les contrôles, ce que le Mac ne sait pas lire, l'écran qui les montre,
+et ce qui reste à essayer là-bas.
 
 ### 2. Le personnage exclu vole quand même le premier plan
 
