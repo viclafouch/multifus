@@ -103,8 +103,8 @@ Relevé le 4 septembre 2026, sur un Windows 10 Home 19045 où Dofus Retro tourne
 | `Notifications\Settings\NOC_GLOBAL_SETTING_DND` | **absente**             |
 | La clé `CurrentVersion\FocusAssist`             | **absente**             |
 
-C'est le même identifiant que le paquet du Mac, celui que
-[plan-focusretro.md](./plan-focusretro.md) donne pour `NSRunningApplication`. La
+C'est le même identifiant que le paquet du Mac, celui que `NSRunningApplication`
+reçoit dans `platform/macos.rs`. La
 sous-clé de Dofus est la seule des dix-huit dont le nom porte « dofus » : le
 parcours ne peut pas se tromper de voisin. Elle porte `ShowBanner` et pas
 `Enabled` — ce sont deux réglages différents, et c'est bien `Enabled` qu'il nous

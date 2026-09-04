@@ -12,6 +12,15 @@ pour un joueur de Dofus Retro qui mène plusieurs personnages à la fois.
 Donner les deux téléchargements, celui du Mac et celui de Windows, tirés de la
 dernière version publiée sur GitHub.
 
+Porter la commande qui vérifie l'attestation de provenance, à côté des deux
+téléchargements. Elle dit que le fichier téléchargé a bien été construit par
+notre workflow, depuis ce code source public, et n'importe qui la lance sans
+nous faire confiance. Le README la porte déjà :
+
+```
+gh attestation verify <fichier> --repo viclafouch/multifus
+```
+
 Porter le journal des versions, à une adresse qui ne bougera plus.
 `commit-and-tag-version` l'écrit dans `apps/desktop/CHANGELOG.md` à chaque
 publication, depuis les messages de commit. L'écran À propos y renverra, à côté

@@ -11,7 +11,9 @@ GitHub n'est pas mesurable, et pèse souvent plus lourd qu'il n'y paraît.
 ## À auditer en premier
 
 1. **Focus Retro**, le seul autre outil sur les deux systèmes, écrit en Rust
-   comme nous. Audit comparé demandé par Victor.
+   comme nous. Audité, dépôt lu en entier, tout est dans
+   [plan-audit-concurrents.md](./plan-audit-concurrents.md). Rien à reprendre
+   sans une raison neuve.
 2. **Dracoon**, notre jumeau fonctionnel sur Windows. Son `README` ment par
    omission : il annonce trois fonctions, le code en porte quinze. Lire
    `src/core/` et `src/ressources/i18n.json`, jamais la page d'accueil.

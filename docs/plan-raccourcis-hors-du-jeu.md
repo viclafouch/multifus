@@ -17,7 +17,7 @@ La garde de `answer` interroge ensuite `foreground_game_window()` et refuse la
 frappe hors du jeu, en le disant au journal. Trop tard : la touche est déjà
 perdue pour l'application qui la méritait.
 
-`docs/plan-focusretro.md` avait vu le défaut et conclu qu'il fallait un crochet
+L'audit de Focus Retro avait vu le défaut et conclu qu'il fallait un crochet
 clavier bas niveau, donc la permission Surveillance des entrées sur le Mac, donc
 non. Il manquait la troisième route, qui ne demande rien à personne : **ne
 prendre la combinaison au système que pendant que le jeu est devant**.

@@ -4,9 +4,11 @@ Ce qu'ils font mieux que nous, et ce qu'il faut en faire. Les fonctionnalités
 sont dans [concurrents.md](./concurrents.md) ; ce fichier ne parle que de la
 technique : ce que le code appelle, ce qu'il coûte, et ce qu'il oublie.
 
-Relevé du 31 août 2026. Deux dépôts restent sur le bureau, à côté de multifus,
-les deux seuls en Rust : `focusretro` et `ROrganizer`. Les autres ont été lus
-puis supprimés ; `concurrents.md` dit où les reprendre.
+Relevé du 31 août 2026. `ROrganizer` reste sur le bureau, à côté de multifus.
+Les autres ont été lus puis supprimés, `focusretro` compris : tout ce qui valait
+sa lecture est ici, et `gh repo clone alacroix/focusretro` le ramène en cinq
+secondes le jour où on veut revérifier une ligne. `concurrents.md` dit où
+reprendre les autres.
 
 Focus Retro est un Tauri en Rust, comme nous, sur les deux systèmes.
 ROrganizer est un Rust natif Windows, avec un `CLAUDE.md` : il est écrit avec
@@ -51,6 +53,19 @@ protège du geste de Multifus, pas de celui du jeu.
 devant au début d'un tour, ou est-ce qu'il fait seulement clignoter son bouton
 dans la barre des tâches. C'est un essai sur Windows, pas une lecture de code.
 
+Ce guetteur à demeure paierait une seconde fois, et le journal le dirait. Une
+bascule est finie quand le système la donne pour finie, et c'est ce que savent
+`ClickGate::expect` puis `await_arrival(SWITCH_CEILING)`, nourris par
+`NSWorkspaceDidActivateApplication` et `EVENT_SYSTEM_FOREGROUND` ; le
+Déplacement rapide s'en sert déjà. L'AutoFocus ne peut pas s'en servir
+aujourd'hui : `watch_foreground` vit dans le fil du tap de clics, qui ne tourne
+que pendant le Déplacement rapide ou la roue, donc personne n'appelle
+`note_foreground` pendant une bascule ordinaire et `await_arrival` expirerait à
+250 ms à chaque notification, en bloquant le fil de l'écoute d'autant. Le
+journal porte donc `focus_micros`, arrêté quand l'appel système rend la main :
+un focus pris, pas une fenêtre dessinée. Tenir le guetteur en permanence
+donnerait les deux choses d'un coup, et c'est la même décision.
+
 ## Ce qu'ils ont de bien, et qu'on ne prend pas
 
 ### La notification macOS qui reste à l'écran
@@ -64,6 +79,55 @@ comportements selon le système.
 À mesurer avant de décider : `AXPress` sur une bannière lance l'action par
 défaut de la notification, qui ramène Dofus devant. Ce serait un focus de plus
 que personne n'a demandé.
+
+### Le reste de Focus Retro, lu en entier et écarté
+
+Son dépôt a été lu ligne à ligne, et voilà ce qui a été regardé puis laissé.
+Chacun a coûté une lecture : les rouvrir demande une raison neuve.
+
+**`osascript` pour mettre au premier plan.** Il lance un sous-processus et fait
+un aller et retour Apple Events, 50 à 150 ms, et une permission de plus.
+`NSRunningApplication::activateWithOptions` fait la même chose sans rien de
+tout ça, avec `AXFrontmost` en secours.
+
+**`AXWindowCreated` à la place de `AXCreated`** pour l'écoute des bannières. Le
+nôtre est plus large et fait tourner `read_banner` pour rien, mais la marche est
+bornée à huit de profondeur et quatre textes, et aucune ligne en double n'est
+jamais apparue au journal. Un risque de régression pour un gain qu'on ne mesure
+pas.
+
+**Le repli sur `wpndatabase.db`** quand l'autorisation Windows est refusée :
+lire la base d'une autre application.
+
+**La priorité de fil relevée** (`THREAD_PRIORITY_ABOVE_NORMAL`) sur le fil de
+sondage, et **le fil séparé pour la bascule**. Le premier ne se mesure pas, le
+réveil d'un `thread::sleep` dépendant surtout de la résolution du minuteur que
+les jeux relèvent déjà ; le second est plus propre mais ne gagne rien, les tours
+de combat arrivant un par un.
+
+**Le rangement large des notifications.** Il retire toutes les notifications de
+Dofus, traitées ou non. Nous rangeons celles dont on a su lire le pseudo, et
+c'est fait avant même de décider, dans `on_notification`.
+
+**La variante hors ligne du logiciel**, qui lui coûte une deuxième compilation
+complète par plateforme à chaque publication.
+
+**Le réordonnancement des boutons de la barre des tâches** par `ITaskbarList` :
+c'est une fonctionnalité, pas une manière de faire, et elle sort de l'audit.
+
+**Son panneau de débogage**, qui affiche la latence de chaque bascule en vert,
+orange ou rouge. Notre journal porte `focus_micros` et suffit à répondre quand
+un joueur trouve ça lent.
+
+### La couleur du personnage jusque dans la barre des tâches
+
+Le seul point de méthode à retenir de lui. Il compose son icône au vol, disque
+de couleur puis portrait de classe par-dessus, au lieu d'embarquer des fichiers
+finis : c'est ce qui lui permet de porter une couleur choisie par personnage
+jusque dans le bouton de la barre des tâches. Nos `.ico` embarqués ne peuvent
+pas. Le jour où on fera cette ligne, il faudra composer au moment de poser, et
+le faire en Rust plutôt que dans le webview : l'aller et retour par le pont ne
+sert à rien, et la logique reste du côté qui écrit l'icône.
 
 ### Le cache des processus Windows
 

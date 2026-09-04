@@ -209,6 +209,8 @@ const MINIMUM_REST: Duration = Duration::from_millis(100);
 
 const REST_PER_READ: u32 = 10;
 
+const MAXIMUM_REST: Duration = Duration::from_millis(150);
+
 const PUMP_INTERVAL: Duration = Duration::from_millis(25);
 
 const TITLE_TIMEOUT_MS: u32 = 100;
@@ -1871,8 +1873,12 @@ fn watch(
     }
 }
 
+fn rest_after(read_cost: Duration) -> Duration {
+    (read_cost * REST_PER_READ).clamp(MINIMUM_REST, MAXIMUM_REST)
+}
+
 fn wait(running: &AtomicBool, read_cost: Duration) {
-    let deadline = Instant::now() + MINIMUM_REST.max(read_cost * REST_PER_READ);
+    let deadline = Instant::now() + rest_after(read_cost);
 
     while running.load(Ordering::Relaxed) && Instant::now() < deadline {
         pump();
@@ -2415,5 +2421,15 @@ mod tests {
             !waking.notices(EVENT_OBJECT_DESTROY, mine, || { false }),
             "a window dies once"
         );
+    }
+
+    #[test]
+    fn the_rest_between_two_readings_grows_with_the_reading_and_stops_at_its_ceiling() {
+        assert_eq!(rest_after(Duration::from_millis(1)), MINIMUM_REST);
+        assert_eq!(
+            rest_after(Duration::from_millis(12)),
+            Duration::from_millis(120)
+        );
+        assert_eq!(rest_after(Duration::from_millis(40)), MAXIMUM_REST);
     }
 }
