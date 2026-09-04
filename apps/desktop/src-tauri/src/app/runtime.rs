@@ -14,7 +14,6 @@ use tauri::AppHandle;
 use tauri::Emitter;
 use tauri::Manager;
 use tauri::RunEvent;
-use tauri_plugin_opener::OpenerExt;
 
 use crate::app::journal::JournalEvent;
 use crate::app::journal::MaximizeAllOutcome;
@@ -98,13 +97,6 @@ impl TurnAlarm {
         *guard = false;
     }
 }
-
-#[cfg(target_os = "macos")]
-const AUTHORIZATION_SETTINGS_URL: &str =
-    "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility";
-
-#[cfg(target_os = "windows")]
-const AUTHORIZATION_SETTINGS_URL: &str = "ms-settings:privacy-notifications";
 
 pub const SNAPSHOT_EVENT: &str = "multifus://snapshot";
 
@@ -678,8 +670,13 @@ fn on_listening_lost(app: &AppHandle, detail: String) {
 
 fn on_notification(app: &AppHandle, notification: GameNotification) {
     let heard = Instant::now();
+    let proved = lock(app).note_heard();
 
     let Some(nickname) = notification.nickname().map(str::to_owned) else {
+        if proved {
+            emit_snapshot(app);
+        }
+
         return;
     };
 
@@ -800,20 +797,6 @@ pub fn change_language(app: &AppHandle, language: Language) {
                 detail: error.to_string(),
             });
         }
-    }
-}
-
-pub fn open_authorization_settings(app: &AppHandle) {
-    let opened = app
-        .opener()
-        .open_url(AUTHORIZATION_SETTINGS_URL, None::<&str>);
-
-    if let Err(error) = opened {
-        lock(app).log(JournalEvent::OpenFailed {
-            detail: error.to_string(),
-        });
-
-        emit_snapshot(app);
     }
 }
 

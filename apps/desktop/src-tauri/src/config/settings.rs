@@ -26,6 +26,7 @@ pub struct Settings {
     pub ungroup_taskbar: bool,
     pub client_title_suffix: Option<String>,
     pub start_at_login: bool,
+    pub onboarding_done: bool,
     pub traces: Traces,
 }
 
@@ -61,6 +62,7 @@ impl Default for Settings {
             ungroup_taskbar: false,
             client_title_suffix: None,
             start_at_login: false,
+            onboarding_done: false,
             traces: Traces::default(),
         }
     }

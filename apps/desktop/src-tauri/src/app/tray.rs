@@ -22,6 +22,8 @@ use crate::app::journal::TrayOutcome;
 use crate::app::journal::WalkFrom;
 use crate::app::journal::Work;
 use crate::app::journal_file;
+use crate::app::links;
+use crate::app::links::SystemPage;
 use crate::app::main_window;
 use crate::app::relay;
 use crate::app::rune_table;
@@ -580,7 +582,7 @@ fn on_menu_event(app: &AppHandle, event: MenuEvent) {
     }
 
     if id == OPEN_SETTINGS_ID {
-        runtime::open_authorization_settings(app);
+        links::open_system_page(app, SystemPage::Authorization);
 
         return;
     }

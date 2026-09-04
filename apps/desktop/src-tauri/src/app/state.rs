@@ -30,9 +30,11 @@ use crate::app::view::BannerView;
 use crate::app::view::Binding;
 use crate::app::view::BindingView;
 use crate::app::view::CharacterView;
+use crate::app::view::Check;
 use crate::app::view::ClientsView;
 use crate::app::view::ConfigProblem;
 use crate::app::view::ConfigView;
+use crate::app::view::OnboardingView;
 use crate::app::view::PairingView;
 use crate::app::view::QuickReplyView;
 use crate::app::view::RelayView;
@@ -42,6 +44,8 @@ use crate::app::view::ShortcutAction;
 use crate::app::view::ShortcutStatus;
 use crate::app::view::ShortcutView;
 use crate::app::view::Snapshot;
+use crate::app::view::Step;
+use crate::app::view::StepView;
 use crate::app::view::SwitchView;
 use crate::app::view::TestView;
 use crate::app::view::UpdateView;
@@ -116,6 +120,7 @@ pub struct Multifus {
     taskbar_combines: bool,
     granted: Option<bool>,
     listening: bool,
+    heard: bool,
     problem: Option<ConfigProblem>,
     update: UpdateView,
     pairing: PairingView,
@@ -202,6 +207,7 @@ impl Multifus {
             taskbar_combines,
             granted: None,
             listening: false,
+            heard: false,
             problem,
             update: UpdateView::Checking,
             pairing: PairingView::Idle,
@@ -275,6 +281,7 @@ impl Multifus {
                 granted: self.is_granted(),
                 listening: self.listening,
             },
+            onboarding: self.onboarding(),
             config: ConfigView {
                 path: self.config_path().display().to_string(),
                 problem: self.problem.clone(),
@@ -1505,6 +1512,58 @@ impl Multifus {
     #[must_use]
     pub fn is_listening(&self) -> bool {
         self.listening
+    }
+
+    pub fn note_heard(&mut self) -> bool {
+        if self.heard {
+            return false;
+        }
+
+        self.heard = true;
+
+        true
+    }
+
+    pub fn finish_onboarding(&mut self) {
+        self.settings.onboarding_done = true;
+        self.save();
+    }
+
+    pub fn restart_onboarding(&mut self) {
+        self.settings.onboarding_done = false;
+        self.save();
+    }
+
+    #[must_use]
+    fn onboarding(&self) -> OnboardingView {
+        OnboardingView {
+            done: self.settings.onboarding_done,
+            steps: Step::ALL
+                .into_iter()
+                .map(|step| StepView {
+                    step,
+                    check: self.check_of(step),
+                })
+                .collect(),
+        }
+    }
+
+    #[must_use]
+    fn check_of(&self, step: Step) -> Check {
+        match step {
+            Step::Authorization => match self.granted {
+                Some(true) => Check::Ready,
+                Some(false) => Check::Blocked,
+                None => Check::Unknown,
+            },
+            Step::Proof | Step::Notifications | Step::Focus | Step::GameSetting => {
+                if self.heard {
+                    Check::Ready
+                } else {
+                    Check::Unknown
+                }
+            }
+        }
     }
 
     #[must_use]
@@ -3783,6 +3842,97 @@ mod tests {
 
             assert_eq!(state.available_update(), None);
         }
+    }
+
+    fn check_of_step(state: &Multifus, step: Step) -> Check {
+        state
+            .snapshot()
+            .onboarding
+            .steps
+            .into_iter()
+            .find(|carried| carried.step == step)
+            .expect("every step travels in the snapshot")
+            .check
+    }
+
+    #[test]
+    fn a_first_launch_has_its_prise_en_main_to_do_and_nothing_read_yet() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let state = multifus(&directory);
+
+        assert!(!state.snapshot().onboarding.done);
+        assert_eq!(check_of_step(&state, Step::Authorization), Check::Unknown);
+    }
+
+    #[test]
+    fn the_authorization_read_and_refused_is_the_only_thing_shown_as_closed() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        state.set_granted(false);
+
+        assert_eq!(check_of_step(&state, Step::Authorization), Check::Blocked);
+    }
+
+    #[test]
+    fn the_feu_vert_given_leaves_unread_what_the_system_does_not_tell() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        state.set_granted(true);
+
+        assert_eq!(check_of_step(&state, Step::Authorization), Check::Ready);
+
+        for step in [Step::Notifications, Step::Focus, Step::GameSetting] {
+            assert_eq!(
+                check_of_step(&state, step),
+                Check::Unknown,
+                "{step:?} is not something this system tells"
+            );
+        }
+    }
+
+    #[test]
+    fn the_game_heard_once_proves_every_door_it_had_to_go_through() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        assert_eq!(check_of_step(&state, Step::Proof), Check::Unknown);
+        assert!(state.note_heard());
+        assert!(!state.note_heard(), "nothing moved, nothing to tell");
+
+        for step in [
+            Step::Proof,
+            Step::Notifications,
+            Step::Focus,
+            Step::GameSetting,
+        ] {
+            assert_eq!(
+                check_of_step(&state, step),
+                Check::Ready,
+                "{step:?} was on the way of the notification multifus heard"
+            );
+        }
+    }
+
+    #[test]
+    fn the_game_heard_says_nothing_of_the_feu_vert_multifus_reads_itself() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        state.set_granted(false);
+        state.note_heard();
+
+        assert_eq!(check_of_step(&state, Step::Authorization), Check::Blocked);
+    }
+
+    #[test]
+    fn a_prise_en_main_finished_is_kept_for_the_next_launch() {
+        let directory = TempDir::new().expect("a temporary directory");
+
+        multifus(&directory).finish_onboarding();
+
+        assert!(multifus_reloaded(&directory).snapshot().onboarding.done);
     }
 
     #[test]

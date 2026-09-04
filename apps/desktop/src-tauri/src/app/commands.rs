@@ -9,6 +9,7 @@ use crate::app::journal::WalkFrom;
 use crate::app::journal_file;
 use crate::app::links;
 use crate::app::links::AboutLink;
+use crate::app::links::SystemPage;
 use crate::app::main_window;
 use crate::app::relay;
 use crate::app::rune_table;
@@ -57,8 +58,22 @@ pub fn request_authorization(app: AppHandle) -> Snapshot {
 }
 
 #[tauri::command]
-pub fn open_authorization_settings(app: AppHandle) {
-    runtime::open_authorization_settings(&app);
+pub fn open_system_page(app: AppHandle, page: SystemPage) {
+    links::open_system_page(&app, page);
+}
+
+#[tauri::command]
+pub fn finish_onboarding(app: AppHandle) -> Snapshot {
+    lock(&app).finish_onboarding();
+
+    runtime::emit_snapshot(&app)
+}
+
+#[tauri::command]
+pub fn restart_onboarding(app: AppHandle) -> Snapshot {
+    lock(&app).restart_onboarding();
+
+    runtime::emit_snapshot(&app)
 }
 
 #[tauri::command]

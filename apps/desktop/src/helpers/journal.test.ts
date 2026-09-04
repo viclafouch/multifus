@@ -1403,6 +1403,7 @@ const SNAPSHOT = {
   ungroupTaskbar: false,
   taskbarCombines: true,
   authorization: { granted: true, listening: true },
+  onboarding: { done: true, steps: [] },
   config: { path: '/tmp/multifus/config.json', problem: null },
   update: { kind: 'upToDate' },
   relay: {

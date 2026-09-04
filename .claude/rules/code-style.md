@@ -171,6 +171,14 @@ The phrase lives where it is read, in French, and Lingui carries it elsewhere.
 - The same French twice in one file is one `const`. The same French meaning two
   things takes a `context`
 - A language names itself and is never translated: `Français`, `English`
+- **A word the reader will find written on their own screen goes in guillemets**
+  when it sits inside a sentence, through `quoted`: a System Settings panel, a
+  menu of the game, a checkbox. The guillemets say Multifus is quoting, not
+  inventing. A list where every word is the system's own needs none: the shape
+  already says it. `systemWords` holds those words, once, for every screen that
+  names them
+- **No metaphor stands in for the word the system uses.** The screen and the
+  system have to be searchable with the same word
 - `pnpm --filter @multifus/desktop run i18n:extract` after touching a phrase
 
 Tests read the French the user reads, written out in full, never the `msg` table

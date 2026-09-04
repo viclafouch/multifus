@@ -19,6 +19,7 @@ import { AboutScreen } from '@/screens/about'
 import { AuthorizationScreen } from '@/screens/authorization-screen'
 import { AutoFocusScreen } from '@/screens/auto-focus-screen'
 import { CharactersScreen } from '@/screens/characters-screen'
+import { OnboardingGuide } from '@/screens/onboarding/guide'
 import { QuickRepliesScreen } from '@/screens/quick-replies'
 import { RelayScreen } from '@/screens/relay'
 import { RuneTableScreen } from '@/screens/rune-table'
@@ -41,6 +42,18 @@ export const App = () => {
     return <Backdrop />
   }
 
+  if (!snapshot.onboarding.done) {
+    return (
+      <KeyLabelsProvider labels={snapshot.keyboard}>
+        <OnboardingGuide
+          onboarding={snapshot.onboarding}
+          characters={snapshot.characters}
+          run={run}
+        />
+      </KeyLabelsProvider>
+    )
+  }
+
   return (
     <KeyLabelsProvider labels={snapshot.keyboard}>
       <TooltipProvider>
@@ -51,6 +64,7 @@ export const App = () => {
               current={screen}
               characters={snapshot.characters}
               authorization={snapshot.authorization}
+              onboarding={snapshot.onboarding}
               version={snapshot.version}
               language={snapshot.language}
               onNavigate={setScreen}
@@ -162,6 +176,7 @@ const CurrentScreen = ({ screen, snapshot, run }: CurrentScreenProps) => {
         paintPortraits={snapshot.paintPortraits}
         ungroupTaskbar={snapshot.ungroupTaskbar}
         taskbarCombines={snapshot.taskbarCombines}
+        onboarding={snapshot.onboarding}
         run={run}
       />
     )

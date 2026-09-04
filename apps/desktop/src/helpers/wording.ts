@@ -1,5 +1,6 @@
 import { i18n } from '@lingui/core'
 import { msg, plural, t } from '@lingui/core/macro'
+import type { SystemPage } from '@/@types/onboarding'
 import type { PairingProblem, RelayFailure } from '@/@types/relay'
 import type { Character, Color, Gender } from '@/@types/roster'
 import type {
@@ -53,6 +54,43 @@ export const configProblemLines = (kind: ConfigProblem['kind']) => {
   const { title, body } = CONFIG_PROBLEM_LINES[kind]
 
   return { title: i18n._(title), body: i18n._(body) }
+}
+
+export const quoted = (name: string) => {
+  return t`« ${name} »`
+}
+
+export const systemWords = () => {
+  return {
+    settings: IS_APPLE
+      ? t`Réglages Système`
+      : t({
+          message: 'Paramètres',
+          context:
+            'l’application de réglages de Windows, et non un écran de Multifus'
+        }),
+    privacy: IS_APPLE ? t`Confidentialité et sécurité` : t`Confidentialité`,
+    accessibility: t`Accessibilité`,
+    notifications: t`Notifications`,
+    system: t`Système`,
+    focus: IS_APPLE ? t`Concentration` : t`Assistant de concentration`,
+    options: t`Options`,
+    general: t`Général`,
+    miscellaneous: t`Divers`,
+    backgroundNotifications: t`Notifications en arrière-plan`
+  }
+}
+
+export const openLabel = (page: SystemPage) => {
+  const words = systemWords()
+  const targets = {
+    authorization: words.settings,
+    notifications: words.notifications,
+    focus: words.focus
+  } as const satisfies Record<SystemPage, string>
+  const name = targets[page]
+
+  return t`Ouvrir ${name}`
 }
 
 export const updateLine = (update: UpdateStatus) => {
@@ -139,15 +177,11 @@ export const bindingLabel = (
   quickReplies: readonly QuickReply[]
 ): string => {
   if (binding.kind === 'action') {
-    const label = i18n._(SHORTCUT_ACTIONS[binding.action].label)
-
-    return t`« ${label} »`
+    return quoted(i18n._(SHORTCUT_ACTIONS[binding.action].label))
   }
 
   if (binding.kind === 'character') {
-    const { nickname } = binding
-
-    return t`« ${nickname} »`
+    return quoted(binding.nickname)
   }
 
   const quickReply = quickReplies.find((candidate) => {
@@ -424,7 +458,7 @@ export const colorReadout = (color: Color | null, holder: string | null) => {
 
 export const dialogNote = (paintPortraits: boolean) => {
   if (IS_APPLE) {
-    return t`Sur macOS, la tête reste ici : le client garde son logo Dofus.`
+    return t`Sur votre Mac, la tête reste ici : le client garde son logo Dofus.`
   }
 
   if (!paintPortraits) {

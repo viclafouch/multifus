@@ -152,9 +152,21 @@ const CALLS = [
     }
   },
   {
-    name: 'openAuthorizationSettings',
+    name: 'openSystemPage',
     run: () => {
-      return multifus.openAuthorizationSettings()
+      return multifus.openSystemPage('authorization')
+    }
+  },
+  {
+    name: 'finishOnboarding',
+    run: () => {
+      return multifus.finishOnboarding()
+    }
+  },
+  {
+    name: 'restartOnboarding',
+    run: () => {
+      return multifus.restartOnboarding()
     }
   },
   {

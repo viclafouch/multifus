@@ -270,6 +270,7 @@ mod tests {
 
         Settings {
             language: Some(Language::En),
+            onboarding_done: true,
             roster: Roster::from_characters(vec![
                 Character::new("Alpha")
                     .with_gender(Gender::Male)

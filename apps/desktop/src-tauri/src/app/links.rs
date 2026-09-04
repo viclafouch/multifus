@@ -29,6 +29,49 @@ impl AboutLink {
     }
 }
 
+#[cfg(target_os = "macos")]
+const AUTHORIZATION_PAGE_URL: &str =
+    "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility";
+
+#[cfg(target_os = "macos")]
+const NOTIFICATIONS_PAGE_URL: &str =
+    "x-apple.systempreferences:com.apple.Notifications-Settings.extension";
+
+#[cfg(target_os = "macos")]
+const FOCUS_PAGE_URL: &str = "x-apple.systempreferences:com.apple.Focus-Settings.extension";
+
+#[cfg(target_os = "windows")]
+const AUTHORIZATION_PAGE_URL: &str = "ms-settings:privacy-notifications";
+
+#[cfg(target_os = "windows")]
+const NOTIFICATIONS_PAGE_URL: &str = "ms-settings:notifications";
+
+#[cfg(target_os = "windows")]
+const FOCUS_PAGE_URL: &str = "ms-settings:quiethours";
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum SystemPage {
+    Authorization,
+    Notifications,
+    Focus,
+}
+
+impl SystemPage {
+    #[must_use]
+    fn url(self) -> &'static str {
+        match self {
+            Self::Authorization => AUTHORIZATION_PAGE_URL,
+            Self::Notifications => NOTIFICATIONS_PAGE_URL,
+            Self::Focus => FOCUS_PAGE_URL,
+        }
+    }
+}
+
+pub fn open_system_page(app: &AppHandle, page: SystemPage) {
+    open_url(app, page.url());
+}
+
 pub fn open_about(app: &AppHandle, link: AboutLink) {
     open_url(app, link.url());
 }
@@ -70,5 +113,35 @@ mod tests {
     #[test]
     fn the_source_and_the_issues_are_two_different_pages() {
         assert_ne!(AboutLink::Source.url(), AboutLink::Issues.url());
+    }
+
+    #[test]
+    fn every_system_page_opens_a_page_of_the_system() {
+        let scheme = if cfg!(target_os = "macos") {
+            "x-apple.systempreferences:"
+        } else {
+            "ms-settings:"
+        };
+
+        for page in [
+            SystemPage::Authorization,
+            SystemPage::Notifications,
+            SystemPage::Focus,
+        ] {
+            let url = page.url();
+
+            assert!(url.starts_with(scheme), "{url} is not a page of the system");
+        }
+    }
+
+    #[test]
+    fn the_three_system_pages_are_three_different_pages() {
+        let authorization = SystemPage::Authorization.url();
+        let notifications = SystemPage::Notifications.url();
+        let focus = SystemPage::Focus.url();
+
+        assert_ne!(authorization, notifications);
+        assert_ne!(notifications, focus);
+        assert_ne!(focus, authorization);
     }
 }

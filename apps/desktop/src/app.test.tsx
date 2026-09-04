@@ -5,7 +5,7 @@ import type { ScreenName, Snapshot } from '@/@types/snapshot'
 import type { ConfigProblem } from '@/@types/system'
 import { NAV_ITEMS } from '@/constants/navigation'
 import { ignore } from '@/lib/utils'
-import { characterOf, pending, snapshotOf } from '@/test-doubles'
+import { characterOf, onboardingOf, pending, snapshotOf } from '@/test-doubles'
 
 type TrayHandler = Parameters<typeof import('@/lib/multifus').onNavigate>[0]
 
@@ -124,7 +124,42 @@ describe('la fenêtre de Multifus', () => {
     expect(screen.getByText('Votre roster est vide')).not.toBeNull()
   })
 
-  it('porte les dix écrans, et la version de Multifus', async () => {
+  it('marque les paramètres quand un contrôle s’est fermé', async () => {
+    await open(
+      snapshotOf({
+        onboarding: onboardingOf({
+          steps: [{ step: 'authorization', check: 'blocked' }]
+        })
+      })
+    )
+
+    expect(
+      screen.getByRole('button', { name: /Paramètres/u }).textContent
+    ).toContain('À régler')
+  })
+
+  it('ne marque rien quand tous les contrôles tiennent', async () => {
+    await open(snapshotOf())
+
+    expect(
+      screen.getByRole('button', { name: /Paramètres/u }).textContent
+    ).not.toContain('À régler')
+  })
+
+  it('n’ouvre que la prise en main tant qu’elle n’est pas faite', async () => {
+    bridge.onSnapshot.mockResolvedValue(ignore)
+    bridge.onNavigate.mockResolvedValue(ignore)
+    bridge.snapshot.mockResolvedValue(
+      snapshotOf({ onboarding: onboardingOf({ done: false }) })
+    )
+
+    render(<App />)
+
+    expect(await screen.findByText('Bienvenue dans Multifus')).not.toBeNull()
+    expect(screen.queryByRole('navigation')).toBeNull()
+  })
+
+  it('porte tous les écrans, et la version de Multifus', async () => {
     await open(snapshotOf({ version: '1.4.2' }))
 
     for (const item of NAV_ITEMS) {
@@ -232,10 +267,12 @@ describe('la fenêtre de Multifus', () => {
       authorization: { granted: false, listening: false }
     })
 
-    it('demande le feu vert à la place des personnages', async () => {
+    it('demande l’autorisation à la place des personnages', async () => {
       await open(denied)
 
-      expect(screen.getByText('Multifus attend votre feu vert')).not.toBeNull()
+      expect(
+        screen.getByText('Multifus attend votre autorisation')
+      ).not.toBeNull()
       expect(screen.queryByText('Votre roster est vide')).toBeNull()
     })
 

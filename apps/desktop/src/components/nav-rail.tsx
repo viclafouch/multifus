@@ -1,20 +1,24 @@
 import { i18n } from '@lingui/core'
-import { plural } from '@lingui/core/macro'
+import { plural, t } from '@lingui/core/macro'
 import type { Language } from '@/@types/language'
+import type { Onboarding } from '@/@types/onboarding'
 import type { Character } from '@/@types/roster'
 import type { ScreenName } from '@/@types/snapshot'
 import type { Authorization } from '@/@types/system'
 import { Lamp } from '@/components/lamp'
 import { LanguagePicker } from '@/components/language-picker'
+import { StateBadge } from '@/components/state-badge'
 import { Button } from '@/components/ui/button'
 import type { NavItem } from '@/constants/navigation'
 import { NAV_ITEMS } from '@/constants/navigation'
+import { matchIsAsking } from '@/helpers/onboarding'
 import { authorizationLine } from '@/helpers/wording'
 
 type NavRailProps = Readonly<{
   current: ScreenName
   characters: readonly Character[]
   authorization: Authorization
+  onboarding: Onboarding
   version: string
   language: Language
   onNavigate: (screen: ScreenName) => void
@@ -24,6 +28,7 @@ export const NavRail = ({
   current,
   characters,
   authorization,
+  onboarding,
   version,
   language,
   onNavigate
@@ -53,6 +58,7 @@ export const NavRail = ({
               <NavButton
                 item={{ name, label, Icon }}
                 isCurrent={name === current}
+                isAsking={name === 'settings' && matchIsAsking(onboarding)}
                 onNavigate={onNavigate}
               />
             </li>
@@ -80,10 +86,16 @@ export const NavRail = ({
 type NavButtonProps = Readonly<{
   item: NavItem
   isCurrent: boolean
+  isAsking: boolean
   onNavigate: (screen: ScreenName) => void
 }>
 
-const NavButton = ({ item, isCurrent, onNavigate }: NavButtonProps) => {
+const NavButton = ({
+  item,
+  isCurrent,
+  isAsking,
+  onNavigate
+}: NavButtonProps) => {
   const { name, label, Icon } = item
 
   return (
@@ -102,6 +114,11 @@ const NavButton = ({ item, isCurrent, onNavigate }: NavButtonProps) => {
       />
       <Icon className="size-glyph shrink-0" strokeWidth={1.75} />
       {i18n._(label)}
+      {isAsking ? (
+        <span className="tone-blocked ml-auto">
+          <StateBadge>{t`À régler`}</StateBadge>
+        </span>
+      ) : null}
     </Button>
   )
 }

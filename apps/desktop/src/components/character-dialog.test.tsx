@@ -586,7 +586,7 @@ describe('la modale de classe, ce qu’elle prévient', () => {
 
     expect(
       screen.getByText(
-        'Sur macOS, la tête reste ici : le client garde son logo Dofus.'
+        'Sur votre Mac, la tête reste ici : le client garde son logo Dofus.'
       )
     ).not.toBeNull()
   })
@@ -611,7 +611,7 @@ describe('la modale de classe, ce qu’elle prévient', () => {
     ).toBeNull()
     expect(
       screen.queryByText(
-        'Sur macOS, la tête reste ici : le client garde son logo Dofus.'
+        'Sur votre Mac, la tête reste ici : le client garde son logo Dofus.'
       )
     ).toBeNull()
   })

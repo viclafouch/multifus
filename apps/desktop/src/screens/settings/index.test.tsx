@@ -6,6 +6,7 @@ import { ignore } from '@/lib/utils'
 import {
   APPLE_AGENT,
   WINDOWS_AGENT,
+  onboardingOf,
   snapshotOf,
   speakFrench
 } from '@/test-doubles'
@@ -63,6 +64,7 @@ const show = async ({
         paintPortraits
         ungroupTaskbar={false}
         taskbarCombines={taskbarCombines}
+        onboarding={onboardingOf()}
         run={() => {}}
       />
     </TooltipProvider>
@@ -94,6 +96,13 @@ const maximizeButton = () => {
 describe('l’écran des paramètres', () => {
   beforeEach(() => {
     counter.told = null
+  })
+
+  it('porte la prise en main sous les réglages', async () => {
+    await show({ agent: APPLE_AGENT })
+
+    expect(screen.getByText('Prise en main')).not.toBeNull()
+    expect(screen.getByRole('button', { name: 'Revoir' })).not.toBeNull()
   })
 
   it('porte les six lignes de réglages, sur les deux systèmes', async () => {

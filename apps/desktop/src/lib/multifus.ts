@@ -4,6 +4,7 @@ import type { AboutLink } from '@/@types/about'
 import type { Display } from '@/@types/display'
 import type { Language } from '@/@types/language'
 import type { NotificationKind } from '@/@types/notification'
+import type { SystemPage } from '@/@types/onboarding'
 import type { RelayLink } from '@/@types/relay'
 import type { Class, Color, Gender } from '@/@types/roster'
 import type { QuickReplyId, ShortcutAction } from '@/@types/shortcuts'
@@ -47,8 +48,16 @@ export const requestAuthorization = async () => {
   return invoke<Snapshot>('request_authorization')
 }
 
-export const openAuthorizationSettings = async () => {
-  return invoke<null>('open_authorization_settings')
+export const openSystemPage = async (page: SystemPage) => {
+  return invoke<null>('open_system_page', { page })
+}
+
+export const finishOnboarding = async () => {
+  return invoke<Snapshot>('finish_onboarding')
+}
+
+export const restartOnboarding = async () => {
+  return invoke<Snapshot>('restart_onboarding')
 }
 
 export const setGender = async (nickname: string, gender: Gender | null) => {

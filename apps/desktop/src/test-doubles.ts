@@ -1,5 +1,6 @@
 import { fireEvent } from '@testing-library/react'
 import type { Display } from '@/@types/display'
+import type { Onboarding } from '@/@types/onboarding'
 import type { Character } from '@/@types/roster'
 import type { QuickReply } from '@/@types/shortcuts'
 import type { Snapshot } from '@/@types/snapshot'
@@ -85,6 +86,21 @@ export const wheelSliceOf = (fields: Partial<WheelSlice> = {}) => {
   return { ...BLANK_SLICE, ...fields }
 }
 
+const BLANK_ONBOARDING: Onboarding = {
+  done: true,
+  steps: [
+    { step: 'authorization', check: 'ready' },
+    { step: 'notifications', check: 'unknown' },
+    { step: 'focus', check: 'unknown' },
+    { step: 'gameSetting', check: 'unknown' },
+    { step: 'proof', check: 'unknown' }
+  ]
+}
+
+export const onboardingOf = (fields: Partial<Onboarding> = {}) => {
+  return { ...BLANK_ONBOARDING, ...fields }
+}
+
 const DEMO_TEAM = Array.from({ length: 8 }, (_, rank) => {
   return wheelSliceOf({ nickname: `Faux ${rank + 1}`, here: rank === 0 })
 })
@@ -107,6 +123,7 @@ const BLANK_SNAPSHOT: Snapshot = {
   ungroupTaskbar: false,
   taskbarCombines: true,
   authorization: { granted: true, listening: true },
+  onboarding: BLANK_ONBOARDING,
   config: { path: '/tmp/multifus.json', problem: null },
   update: { kind: 'upToDate' },
   relay: {

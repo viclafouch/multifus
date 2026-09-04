@@ -45,6 +45,7 @@ pub struct Snapshot {
     pub ungroup_taskbar: bool,
     pub taskbar_combines: bool,
     pub authorization: AuthorizationView,
+    pub onboarding: OnboardingView,
     pub config: ConfigView,
     pub update: UpdateView,
     pub relay: RelayView,
@@ -411,6 +412,48 @@ pub struct AuthorizationView {
     pub listening: bool,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub enum Step {
+    Authorization,
+    Notifications,
+    Focus,
+    GameSetting,
+    Proof,
+}
+
+impl Step {
+    pub const ALL: [Self; 5] = [
+        Self::Authorization,
+        Self::Notifications,
+        Self::Focus,
+        Self::GameSetting,
+        Self::Proof,
+    ];
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub enum Check {
+    Ready,
+    Blocked,
+    Unknown,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct StepView {
+    pub step: Step,
+    pub check: Check,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct OnboardingView {
+    pub done: bool,
+    pub steps: Vec<StepView>,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ConfigView {
@@ -535,6 +578,13 @@ mod tests {
                 granted: true,
                 listening: true,
             },
+            onboarding: OnboardingView {
+                done: true,
+                steps: vec![StepView {
+                    step: Step::Authorization,
+                    check: Check::Ready,
+                }],
+            },
             config: ConfigView {
                 path: "/tmp/multifus.json".to_owned(),
                 problem: None,
@@ -625,6 +675,7 @@ mod tests {
                 "keyboard",
                 "language",
                 "maximizeOnLaunch",
+                "onboarding",
                 "paintPortraits",
                 "quickReplies",
                 "relay",
@@ -1285,7 +1336,7 @@ mod tests {
     }
 
     #[test]
-    fn the_ten_screens_travel_under_the_names_the_rail_answers_to() {
+    fn every_screen_travels_under_the_name_the_rail_answers_to() {
         let screens = Screen::ALL.map(|screen| json_of(&screen));
 
         assert_eq!(
@@ -1303,5 +1354,32 @@ mod tests {
                 json!("about"),
             ]
         );
+    }
+
+    #[test]
+    fn every_step_travels_under_the_name_the_screen_answers_to() {
+        let steps = Step::ALL.map(|step| json_of(&step));
+
+        assert_eq!(
+            steps,
+            [
+                json!("authorization"),
+                json!("notifications"),
+                json!("focus"),
+                json!("gameSetting"),
+                json!("proof"),
+            ]
+        );
+    }
+
+    #[test]
+    fn a_step_carries_its_check_next_to_its_name() {
+        let view = json_of(&StepView {
+            step: Step::Proof,
+            check: Check::Unknown,
+        });
+
+        assert_eq!(view["step"], json!("proof"));
+        assert_eq!(view["check"], json!("unknown"));
     }
 }

@@ -1,6 +1,7 @@
 import type { JournalEntry } from '@/@types/journal'
 import type { Language } from '@/@types/language'
 import type { AutoFocusSwitch } from '@/@types/notification'
+import type { Onboarding } from '@/@types/onboarding'
 import type { RelayStatus } from '@/@types/relay'
 import type { Character } from '@/@types/roster'
 import type { RuneTableStatus } from '@/@types/rune'
@@ -52,6 +53,7 @@ export type Snapshot = {
   readonly ungroupTaskbar: boolean
   readonly taskbarCombines: boolean
   readonly authorization: Authorization
+  readonly onboarding: Onboarding
   readonly config: ConfigStatus
   readonly update: UpdateStatus
   readonly relay: RelayStatus

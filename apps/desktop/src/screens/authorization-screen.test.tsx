@@ -4,7 +4,7 @@ import { pending } from '@/test-doubles'
 
 const bridge = {
   requestAuthorization: vi.fn(pending),
-  openAuthorizationSettings: vi.fn(pending)
+  openSystemPage: vi.fn(pending)
 }
 
 vi.mock(import('@/lib/multifus'), () => {
@@ -31,7 +31,9 @@ describe('l’écran de l’autorisation', () => {
   it('dit ce que Multifus ne peut pas faire sans elle', () => {
     show()
 
-    expect(screen.getByText('Multifus attend votre feu vert')).not.toBeNull()
+    expect(
+      screen.getByText('Multifus attend votre autorisation')
+    ).not.toBeNull()
     expect(screen.getByText(/Multifus ne peut pas/u)).not.toBeNull()
   })
 
@@ -55,12 +57,12 @@ describe('l’écran de l’autorisation', () => {
 
     fireEvent.click(openSettingsButton())
 
-    expect(bridge.openAuthorizationSettings).toHaveBeenCalledWith()
+    expect(bridge.openSystemPage).toHaveBeenCalledWith('authorization')
     expect(run).not.toHaveBeenCalled()
   })
 
   it('ne casse pas quand les réglages refusent de s’ouvrir', () => {
-    bridge.openAuthorizationSettings.mockRejectedValueOnce(
+    bridge.openSystemPage.mockRejectedValueOnce(
       new Error('aucun panneau à ouvrir')
     )
 

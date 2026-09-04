@@ -10,6 +10,7 @@
 @import './theme.css';
 
 @custom-variant dark (&:is(.dark *));
+@custom-variant short (@media (height <= 640px));
 
 @layer base {
   * {
@@ -68,6 +69,33 @@
     color-mix(in oklch, var(--primary), transparent 88%),
     transparent 58%
   );
+}
+
+@utility stage {
+  background-color: var(--background);
+  background-image:
+    radial-gradient(
+      124% 76% at 50% -16%,
+      color-mix(in oklch, var(--primary), transparent 84%),
+      transparent 60%
+    ),
+    radial-gradient(
+      96% 58% at 50% 118%,
+      color-mix(in oklch, var(--primary), transparent 92%),
+      transparent 56%
+    );
+}
+
+@utility step-band {
+  width: 100%;
+  flex: 1 1 0%;
+  min-height: var(--spacing-band);
+  max-height: var(--spacing-shot);
+  overflow: hidden;
+
+  @media (height <= 640px) {
+    min-height: 0;
+  }
 }
 
 @utility sign-male {
@@ -137,6 +165,14 @@
   animation: rise 0.3s cubic-bezier(0.4, 0, 0.2, 1) backwards;
 }
 
+@utility rise-late {
+  animation-delay: 70ms;
+}
+
+@utility rise-later {
+  animation-delay: 140ms;
+}
+
 @utility tone-live {
   --tone: var(--live);
 }
@@ -149,6 +185,14 @@
   --tone: var(--blocked);
 }
 
+@utility tone-quiet {
+  --tone: var(--muted-foreground);
+}
+
+@utility toned-ink {
+  color: var(--tone);
+}
+
 @utility toned {
   color: var(--tone);
   border-color: color-mix(in oklch, var(--tone), transparent 55%);
@@ -159,4 +203,14 @@
   --rise-opacity: 0.55;
 
   opacity: var(--rise-opacity);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

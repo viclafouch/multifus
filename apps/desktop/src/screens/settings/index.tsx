@@ -7,6 +7,7 @@ import {
   Type
 } from 'lucide-react'
 import { t } from '@lingui/core/macro'
+import type { Onboarding } from '@/@types/onboarding'
 import type { Snapshot } from '@/@types/snapshot'
 import { FieldRow } from '@/components/layout/field-row'
 import { Note } from '@/components/layout/note'
@@ -24,6 +25,7 @@ import {
   setStartAtLogin,
   setUngroupTaskbar
 } from '@/lib/multifus'
+import { OnboardingSection } from '@/screens/onboarding'
 import { ClientsPanel } from '@/screens/settings/clients-panel'
 
 type SettingsScreenProps = Readonly<{
@@ -33,6 +35,7 @@ type SettingsScreenProps = Readonly<{
   paintPortraits: boolean
   ungroupTaskbar: boolean
   taskbarCombines: boolean
+  onboarding: Onboarding
   run: (action: Promise<Snapshot>) => void
 }>
 
@@ -43,6 +46,7 @@ export const SettingsScreen = ({
   paintPortraits,
   ungroupTaskbar,
   taskbarCombines,
+  onboarding,
   run
 }: SettingsScreenProps) => {
   const startupLabel = t`Lancer Multifus au démarrage de l’ordinateur`
@@ -164,6 +168,7 @@ export const SettingsScreen = ({
           />
         </FieldRow>
       </Panel>
+      <OnboardingSection onboarding={onboarding} run={run} />
     </Screen>
   )
 }
