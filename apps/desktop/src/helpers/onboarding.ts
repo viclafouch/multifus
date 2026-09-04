@@ -1,5 +1,11 @@
 import { t } from '@lingui/core/macro'
-import type { KnownCheck, Onboarding, Page, Step } from '@/@types/onboarding'
+import type {
+  Check,
+  KnownCheck,
+  Onboarding,
+  Page,
+  Step
+} from '@/@types/onboarding'
 import { IS_APPLE } from '@/constants/keyboard'
 import { WELCOME_PAGE } from '@/constants/onboarding'
 import { quoted, systemWords } from '@/helpers/wording'
@@ -79,7 +85,7 @@ export const pageTitle = (page: Page) => {
   }
 }
 
-export const pageBody = (page: Page) => {
+const pageBody = (page: Page) => {
   switch (page) {
     case 'welcome': {
       return t`Multifus surveille vos fenêtres Dofus Retro. Un seul personnage ou dix, il vous amène toujours devant la bonne.`
@@ -105,6 +111,17 @@ export const pageBody = (page: Page) => {
       return page satisfies never
     }
   }
+}
+
+export const pageHead = (page: Page, check: Check) => {
+  if (page === 'proof' && check === 'ready') {
+    return {
+      title: t`Tout est en place`,
+      body: t`Multifus vous amènera devant le bon personnage à chaque appel du jeu, sans que vous ayez à y penser.`
+    }
+  }
+
+  return { title: pageTitle(page), body: pageBody(page) }
 }
 
 export const pageWay = (page: Page) => {

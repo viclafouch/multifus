@@ -193,6 +193,24 @@ Dans cet ordre, parce que chacune dépend de la précédente.
    apparaît ici » se vérifie tout seul, sans deuxième compte ni ami sous la
    main. Le reste, se faire appeler, vient après.
 
+   **Repris le 4 septembre 2026, la page paraissait vide.** Un cadre de 216
+   points portait une pastille de vingt : rien ne se passait, et rien ne disait
+   ce qu'on attendait. La bande porte maintenant les deux temps de l'essai, l'un
+   sous l'autre et reliés par un trait : Multifus vous voit, puis le jeu vous
+   appelle. Le point du temps en cours bat comme un sonar, parce que Multifus
+   écoute vraiment, à la seconde ; celui du temps passé porte une coche verte et
+   allume le trait. Le deuxième temps dit enfin ce qui déclenche un appel, un
+   combat ou un message privé, que le corps de la page ne disait nulle part.
+
+   **La réussite est le seul cadre de l'étape.** Le jeu entendu, la bande devient
+   verte, éclôt une grande coche, écrit la phrase en corps de conduite et garde
+   les pseudos connectés dessous : le pseudo est la preuve, il ne disparaît pas
+   au moment où l'essai réussit. Le titre passe à « Tout est en place » et le
+   corps promet la suite. La pastille
+   d'état ne s'affiche plus sur cette page, la bande la disant en plus gros.
+   `pageTitle` n'a pas bougé, la barre des Paramètres ayant besoin du nom de
+   l'étape : c'est `pageHead` qui décide du titre et du corps de l'écran.
+
 ## Les mots du jeu, dans les trois langues
 
 Le chemin et le titre de l'étape 5 se traduisent avec les mots du client, pris

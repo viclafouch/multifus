@@ -1,9 +1,9 @@
 import { t } from '@lingui/core/macro'
 import type { Page, StepStatus } from '@/@types/onboarding'
 import type { Character } from '@/@types/roster'
-import { pageBody, pageTitle, pageWay } from '@/helpers/onboarding'
+import { pageHead, pageWay } from '@/helpers/onboarding'
 import { CheckBadge } from '@/screens/onboarding/check-badge'
-import { ProofRoster } from '@/screens/onboarding/proof-roster'
+import { ProofBand } from '@/screens/onboarding/proof-band'
 import { SettingWay } from '@/screens/onboarding/setting-way'
 import { StepActions } from '@/screens/onboarding/step-actions'
 import { StepFigure } from '@/screens/onboarding/step-figure'
@@ -28,6 +28,9 @@ export const StepPage = ({
   onAsk
 }: StepPageProps) => {
   const way = pageWay(page)
+  const check = status?.check ?? 'unknown'
+  const head = pageHead(page, check)
+  const isProof = page === 'proof'
 
   return (
     <section className="mx-auto flex min-h-full w-full max-w-stage flex-col items-center justify-center gap-3.5 text-center">
@@ -35,29 +38,29 @@ export const StepPage = ({
         {t`Étape ${rank} sur ${count}`}
       </p>
       <h1 className="rise font-display text-hero font-semibold text-balance tracking-hero short:text-title">
-        {pageTitle(page)}
+        {head.title}
       </h1>
       <p className="rise rise-late max-w-lead text-lead text-pretty text-muted-foreground">
-        {pageBody(page)}
+        {head.body}
       </p>
       {way.length === 0 ? null : (
         <div className="rise rise-late">
           <SettingWay way={way} align="center" />
         </div>
       )}
-      {page === 'proof' ? (
-        <ProofRoster characters={characters} />
+      {isProof ? (
+        <ProofBand characters={characters} check={check} />
       ) : (
         <StepFigure page={page} />
       )}
-      {status === null || status.check === 'unknown' ? null : (
+      {isProof || status === null || status.check === 'unknown' ? null : (
         <CheckBadge step={status.step} check={status.check} />
       )}
       <StepActions
         page={page}
         rank={rank}
         count={count}
-        isReady={status?.check === 'ready'}
+        isReady={check === 'ready'}
         onNext={onNext}
         onAsk={onAsk}
       />

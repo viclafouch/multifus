@@ -36,7 +36,7 @@ msgid "{0, plural, one {Agrandir les fenêtres, depuis {surface} : demandé à u
 msgstr "{0, plural, one {Maximizar las ventanas, desde {surface}: pedido a un cliente.} other {Maximizar las ventanas, desde {surface}: pedido a # clientes.}}"
 
 #. placeholder {0}: online.length
-#: src/screens/onboarding/proof-roster.tsx
+#: src/screens/onboarding/proof-band.tsx
 msgid "{0, plural, one {Multifus voit # personnage} other {Multifus voit # personnages}}"
 msgstr "{0, plural, one {Multifus ve # personaje} other {Multifus ve # personajes}}"
 
@@ -458,7 +458,7 @@ msgstr "Ningún cliente abierto"
 msgid "Aucun homme connecté"
 msgstr "Ningún hombre conectado"
 
-#: src/screens/onboarding/proof-roster.tsx
+#: src/screens/onboarding/proof-band.tsx
 #: src/screens/relay/state-panel.tsx
 msgid "Aucun personnage connecté"
 msgstr "Ningún personaje conectado"
@@ -1353,6 +1353,10 @@ msgstr "Registro copiado"
 msgid "L’aperçu"
 msgstr "La vista previa"
 
+#: src/screens/onboarding/proof-band.tsx
+msgid "L’appel du jeu"
+msgstr "La llamada del juego"
+
 #: src/helpers/onboarding.ts
 msgid "L’autorisation"
 msgstr "El permiso"
@@ -1943,6 +1947,10 @@ msgstr "Multifus ve tus ventanas."
 #~ msgid "Multifus vous a entendu."
 #~ msgstr "Multifus te ha oído."
 
+#: src/helpers/onboarding.ts
+msgid "Multifus vous amènera devant le bon personnage à chaque appel du jeu, sans que vous ayez à y penser."
+msgstr "Multifus te llevará al personaje correcto cada vez que el juego te llame, sin que tengas que pensarlo."
+
 #: src/components/error-boundary.tsx
 msgid "Multifus, lui, tourne toujours : vos raccourcis répondent, et une notification ramène encore la bonne fenêtre. Il n’y a que cet écran à relancer."
 msgstr "Multifus, en cambio, sigue en marcha: tus atajos responden, y una notificación todavía trae la ventana correcta. Solo hay que reiniciar esta pantalla."
@@ -2030,6 +2038,10 @@ msgstr "Abre Dofus y conecta un personaje: aparece aquí. Luego haz que el juego
 #: src/helpers/onboarding.ts
 #~ msgid "Ouvrez Dofus, connectez un personnage, et faites-vous appeler : lancez un combat, ou demandez à un ami de vous écrire."
 #~ msgstr "Abre Dofus, conecta un personaje y haz que te llamen: empieza un combate, o pide a un amigo que te escriba."
+
+#: src/screens/onboarding/proof-band.tsx
+msgid "Ouvrez le jeu et connectez-vous, il apparaît ici."
+msgstr "Abre el juego y conéctate, aparece aquí."
 
 #: src/screens/relay/pairing-guide.tsx
 msgid "Ouvrez Telegram sur cet ordinateur"
@@ -2650,6 +2662,10 @@ msgstr "Todos los hombres conectados están reintegrados."
 msgid "Tout est agrandi"
 msgstr "Todo está maximizado"
 
+#: src/helpers/onboarding.ts
+msgid "Tout est en place"
+msgstr "Todo está listo"
+
 #: src/screens/relay/state-panel.tsx
 msgid "Tout est prêt. Mettez l’interrupteur en marche avant de vous lever, ici ou depuis l’icône de Multifus."
 msgstr "Todo listo. Pon el interruptor en marcha antes de levantarte, aquí o desde el icono de Multifus."
@@ -2721,6 +2737,10 @@ msgstr "Un cliente por personaje, como siempre."
 #: src/components/empty-roster.tsx
 msgid "Un client resté à l’écran de connexion n’a pas encore de pseudo."
 msgstr "Un cliente que se ha quedado en la pantalla de conexión todavía no tiene apodo."
+
+#: src/screens/onboarding/proof-band.tsx
+msgid "Un combat, un message privé : Multifus vous amène devant."
+msgstr "Un combate, un mensaje privado: Multifus te lleva al frente."
 
 #: src/screens/relay/test-panel.tsx
 msgid "Un essai vient de partir. Attendez une trentaine de secondes avant le suivant."

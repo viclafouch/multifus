@@ -243,6 +243,21 @@ describe('la prise en main', () => {
     expect(screen.queryByText('Bravo')).toBeNull()
   })
 
+  it('dit ce qui fait appeler le jeu', async () => {
+    await show({
+      characters: [characterOf({ nickname: 'Alpha', online: true })]
+    })
+
+    goTo('L’essai')
+
+    expect(screen.getByText('L’appel du jeu')).not.toBeNull()
+    expect(
+      screen.getByText(
+        'Un combat, un message privé : Multifus vous amène devant.'
+      )
+    ).not.toBeNull()
+  })
+
   it('laisse partir sans avoir entendu le jeu', async () => {
     const run = await show()
 
@@ -255,6 +270,7 @@ describe('la prise en main', () => {
 
   it('se termine sur une réussite quand le jeu s’est fait entendre', async () => {
     await show({
+      characters: [characterOf({ nickname: 'Alpha', online: true })],
       onboarding: onboardingOf({
         done: false,
         steps: stepsWith({ authorization: 'ready', proof: 'ready' })
@@ -263,9 +279,11 @@ describe('la prise en main', () => {
 
     goTo('L’essai')
 
+    expect(screen.getByText('Tout est en place')).not.toBeNull()
     expect(
       screen.getByText('Le jeu vous a appelé, Multifus l’a entendu.')
     ).not.toBeNull()
+    expect(screen.getByText('Alpha')).not.toBeNull()
 
     fireEvent.click(buttonNamed('Terminer'))
 

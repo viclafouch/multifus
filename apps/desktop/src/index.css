@@ -71,6 +71,14 @@
   );
 }
 
+@utility live-light {
+  background-image: radial-gradient(
+    92% 108% at 50% 0%,
+    color-mix(in oklch, var(--live), transparent 90%),
+    transparent 66%
+  );
+}
+
 @utility stage {
   background-color: var(--background);
   background-image:
@@ -147,6 +155,53 @@
     0 0 9px 1px var(--halo-far);
 }
 
+@keyframes sonar {
+  from {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+
+  to {
+    transform: scale(3.4);
+    opacity: 0;
+  }
+}
+
+@utility sonar {
+  position: relative;
+  background-color: var(--primary);
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 9999px;
+    border: 1px solid var(--primary);
+    animation: sonar 2.6s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  }
+
+  &::after {
+    animation-delay: 1.3s;
+  }
+}
+
+@keyframes bloom {
+  from {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@utility bloom {
+  animation: bloom 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) 0.16s backwards;
+}
+
 @keyframes rise {
   from {
     opacity: 0;
@@ -212,5 +267,15 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  .sonar::before,
+  .sonar::after {
+    animation: none !important;
+    display: none;
+  }
+
+  .bloom {
+    animation: none !important;
   }
 }
