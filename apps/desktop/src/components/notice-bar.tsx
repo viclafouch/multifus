@@ -30,7 +30,7 @@ export const NoticeBar = ({
         <p className="max-w-prose text-note text-muted-foreground">{body}</p>
         {children}
       </div>
-      <div className="flex shrink-0 items-center gap-1.5">
+      <div className="flex shrink-0 items-center gap-1.5 self-center">
         {actions}
         <Button variant="ghost" size="xs" onClick={onDismiss}>
           {t`J’ai compris`}

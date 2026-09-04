@@ -2783,8 +2783,12 @@ msgid "un raccourci"
 msgstr "un atajo"
 
 #: src/components/check-notice.tsx
-msgid "Un réglage du système empêche le jeu de vous appeler, et Multifus n’entend rien. La prise en main dit lequel."
-msgstr "Un ajuste del sistema impide que el juego te llame, y Multifus no oye nada. Primeros pasos dice cuál."
+#~ msgid "Un réglage du système empêche le jeu de vous appeler, et Multifus n’entend rien. La prise en main dit lequel."
+#~ msgstr "Un ajuste del sistema impide que el juego te llame, y Multifus no oye nada. Primeros pasos dice cuál."
+
+#: src/components/check-notice.tsx
+msgid "Un réglage du système empêche le jeu de vous appeler."
+msgstr "Un ajuste del sistema impide que el juego te llame."
 
 #: src/screens/relay/pairing-guide.tsx
 msgid "Un robot ne parle jamais le premier. Sans ce message, il n’a pas le droit de vous écrire."

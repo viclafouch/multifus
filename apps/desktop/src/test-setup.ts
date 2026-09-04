@@ -13,6 +13,24 @@ class SilentResizeObserver implements ResizeObserver {
 
 globalThis.ResizeObserver = SilentResizeObserver
 
+class StillMediaQueryList extends EventTarget implements MediaQueryList {
+  matches = false
+  onchange = null
+
+  constructor(readonly media: string) {
+    super()
+  }
+
+  addListener = ignore
+  removeListener = ignore
+}
+
+window.matchMedia = (query: string) => {
+  return new StillMediaQueryList(query)
+}
+
+Element.prototype.scrollIntoView = ignore
+
 const CAPTURED = new WeakMap<Element, Set<number>>()
 
 Element.prototype.setPointerCapture = function setPointerCapture(

@@ -4,6 +4,7 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import type { ScreenName, Snapshot } from '@/@types/snapshot'
 import type { ConfigProblem } from '@/@types/system'
 import { NAV_ITEMS } from '@/constants/navigation'
+import { ONBOARDING_ANCHOR } from '@/constants/onboarding'
 import { ignore } from '@/lib/utils'
 import { characterOf, onboardingOf, pending, snapshotOf } from '@/test-doubles'
 
@@ -384,6 +385,8 @@ describe('la fenêtre de Multifus', () => {
     })
 
     it('mène aux paramètres, et reste tant que rien n’est réglé', async () => {
+      const scrolled = vi.spyOn(Element.prototype, 'scrollIntoView')
+
       await open(snapshotOf({ onboarding: onboardingOf({ hasNotice: true }) }))
 
       fireEvent.click(screen.getByRole('button', { name: 'Régler' }))
@@ -391,6 +394,9 @@ describe('la fenêtre de Multifus', () => {
       expect(currentEntry()).toBe('Paramètres')
       expect(bridge.dismissCheckNotice).not.toHaveBeenCalled()
       expect(screen.getByText('L’AutoFocus ne peut pas marcher')).not.toBeNull()
+      expect(scrolled.mock.contexts).toStrictEqual([
+        document.querySelector(`#${ONBOARDING_ANCHOR}`)
+      ])
     })
 
     it('s’efface quand on dit avoir compris', async () => {

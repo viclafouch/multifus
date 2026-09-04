@@ -4,6 +4,7 @@ import type { Snapshot } from '@/@types/snapshot'
 import { Panel } from '@/components/layout/panel'
 import { SectionTitle } from '@/components/layout/section-title'
 import { Button } from '@/components/ui/button'
+import { ONBOARDING_ANCHOR } from '@/constants/onboarding'
 import { restartOnboarding } from '@/lib/multifus'
 import { StepRow } from '@/screens/onboarding/step-row'
 
@@ -17,7 +18,7 @@ export const OnboardingSection = ({
   run
 }: OnboardingSectionProps) => {
   return (
-    <section>
+    <section id={ONBOARDING_ANCHOR} className="scroll-mt-4">
       <SectionTitle
         title={t`Prise en main`}
         subtitle={t`Les réglages à faire une fois. Multifus vous prévient s’il en voit un qui bloque.`}

@@ -6,10 +6,12 @@ import { JournalPanel } from '@/components/journal-panel'
 import { KeyLabelsProvider } from '@/components/key-labels-provider'
 import { NavRail } from '@/components/nav-rail'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { ONBOARDING_ANCHOR } from '@/constants/onboarding'
 import { useCurrentScreen } from '@/hooks/use-current-screen'
 import { useEscape } from '@/hooks/use-escape'
 import { useMultifus } from '@/hooks/use-multifus'
 import { useTrayNavigation } from '@/hooks/use-tray-navigation'
+import { showAnchor } from '@/lib/anchor'
 import {
   closeRuneTable,
   dismissCheckNotice,
@@ -87,7 +89,9 @@ export const App = () => {
               {snapshot.onboarding.hasNotice ? (
                 <CheckNotice
                   onOpen={() => {
-                    setScreen('settings')
+                    showAnchor(ONBOARDING_ANCHOR, () => {
+                      setScreen('settings')
+                    })
                   }}
                   onDismiss={() => {
                     run(dismissCheckNotice())

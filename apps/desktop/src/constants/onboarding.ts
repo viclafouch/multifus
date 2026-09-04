@@ -8,6 +8,8 @@ import type { Phrase } from '@/lib/i18n'
 
 export const WELCOME_PAGE = 'welcome' satisfies Page
 
+export const ONBOARDING_ANCHOR = 'prise-en-main'
+
 export const PAGE_ICONS = {
   welcome: Sparkles,
   authorization: Unlock,
