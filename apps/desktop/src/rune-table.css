@@ -104,14 +104,6 @@
   color: var(--tone);
 }
 
-@utility rune-line {
-  transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-
-  &:hover {
-    background-color: color-mix(in oklch, var(--primary), transparent 92%);
-  }
-}
-
 @utility rune-stat {
   padding: calc(var(--spacing) * 0.5) calc(var(--spacing) * 2)
     calc(var(--spacing) * 0.5) calc(var(--spacing) * 3);

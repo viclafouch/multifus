@@ -9,7 +9,7 @@ type RuneLineProps = Readonly<{
 
 export const RuneLine = ({ row, stat }: RuneLineProps) => {
   return (
-    <tr className="rune-line">
+    <tr>
       <th scope="row" className="rune-stat">
         {stat}
       </th>
