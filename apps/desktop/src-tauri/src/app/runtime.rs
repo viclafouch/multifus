@@ -613,10 +613,19 @@ fn follow_authorization(app: &AppHandle) -> bool {
     };
 
     match (granted, listening) {
-        (true, false) => start_listening(app),
+        (true, false) => retry_listening(app),
+        (true, true) => lock(app).note_listening_holds(),
         (false, true) => stop_listening(app),
-        _ => false,
+        (false, false) => false,
     }
+}
+
+fn retry_listening(app: &AppHandle) -> bool {
+    if !lock(app).take_listening_retry() {
+        return false;
+    }
+
+    start_listening(app)
 }
 
 fn follow_checks(app: &AppHandle) -> bool {
@@ -674,7 +683,7 @@ fn on_listening_lost(app: &AppHandle, detail: String) {
     {
         let mut state = lock(app);
 
-        state.log_unless_repeated(JournalEvent::ListeningLost { detail });
+        state.note_listening_lost(detail);
         state.set_listening(false);
     }
 
@@ -683,7 +692,12 @@ fn on_listening_lost(app: &AppHandle, detail: String) {
 
 fn on_notification(app: &AppHandle, notification: GameNotification) {
     let heard = Instant::now();
-    let proved = lock(app).note_heard();
+    let proved = {
+        let mut state = lock(app);
+        let back = state.note_listening_back();
+
+        state.note_heard() || back
+    };
 
     let Some(nickname) = notification.nickname().map(str::to_owned) else {
         if proved {

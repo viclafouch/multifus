@@ -101,6 +101,49 @@ pub type PasteState = Arc<dyn PasteSender>;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct StartId(u64);
 
+const FIRST_LISTENING_REST: u32 = 1;
+
+const LONGEST_LISTENING_REST: u32 = 5;
+
+const LISTENING_HELD_TURNS: u32 = 5;
+
+#[derive(Debug)]
+struct ListeningRecovery {
+    rest: u32,
+    turns_left: u32,
+    held: u32,
+}
+
+impl ListeningRecovery {
+    fn first() -> Self {
+        Self {
+            rest: FIRST_LISTENING_REST,
+            turns_left: FIRST_LISTENING_REST,
+            held: 0,
+        }
+    }
+
+    fn take_turn(&mut self) -> bool {
+        self.held = 0;
+        self.turns_left = self.turns_left.saturating_sub(1);
+
+        if self.turns_left > 0 {
+            return false;
+        }
+
+        self.rest = (self.rest * 2).min(LONGEST_LISTENING_REST);
+        self.turns_left = self.rest;
+
+        true
+    }
+
+    fn hold_turn(&mut self) -> bool {
+        self.held += 1;
+
+        self.held >= LISTENING_HELD_TURNS
+    }
+}
+
 #[derive(Debug)]
 pub struct Multifus {
     store: ConfigStore,
@@ -123,6 +166,7 @@ pub struct Multifus {
     checks: SystemChecks,
     notice_dismissed: bool,
     listening: bool,
+    listening_recovery: Option<ListeningRecovery>,
     heard: bool,
     problem: Option<ConfigProblem>,
     update: UpdateView,
@@ -212,6 +256,7 @@ impl Multifus {
             checks: SystemChecks::default(),
             notice_dismissed: false,
             listening: false,
+            listening_recovery: None,
             heard: false,
             problem,
             update: UpdateView::Checking,
@@ -1507,11 +1552,52 @@ impl Multifus {
 
         self.listening = listening;
 
-        if listening {
+        if listening && self.listening_recovery.is_none() {
             self.log(JournalEvent::Listening);
         }
 
         true
+    }
+
+    pub fn note_listening_lost(&mut self, detail: String) -> bool {
+        if self.listening_recovery.is_some() {
+            return false;
+        }
+
+        self.log(JournalEvent::ListeningLost { detail });
+        self.listening_recovery = Some(ListeningRecovery::first());
+
+        true
+    }
+
+    pub fn note_listening_back(&mut self) -> bool {
+        if self.listening_recovery.take().is_none() {
+            return false;
+        }
+
+        self.log(JournalEvent::Listening);
+
+        true
+    }
+
+    pub fn note_listening_holds(&mut self) -> bool {
+        let Some(recovery) = self.listening_recovery.as_mut() else {
+            return false;
+        };
+
+        if !recovery.hold_turn() {
+            return false;
+        }
+
+        self.note_listening_back()
+    }
+
+    pub fn take_listening_retry(&mut self) -> bool {
+        let Some(recovery) = self.listening_recovery.as_mut() else {
+            return true;
+        };
+
+        recovery.take_turn()
     }
 
     #[must_use]
@@ -4247,6 +4333,13 @@ mod tests {
         assert_eq!(said, 1);
     }
 
+    fn counted(state: &Multifus, wanted: &JournalEvent) -> usize {
+        journalled(state)
+            .iter()
+            .filter(|event| *event == wanted)
+            .count()
+    }
+
     #[test]
     fn an_ecoute_that_dies_is_written_down_and_puts_multifus_back_in_line_to_listen() {
         let directory = TempDir::new().expect("a temporary directory");
@@ -4254,9 +4347,7 @@ mod tests {
 
         state.set_listening(true);
 
-        state.log_unless_repeated(JournalEvent::ListeningLost {
-            detail: "the notification centre of macOS restarted".to_owned(),
-        });
+        assert!(state.note_listening_lost("the notification platform is not available".to_owned()));
         state.set_listening(false);
 
         assert!(
@@ -4265,19 +4356,132 @@ mod tests {
         );
         assert!(!state.snapshot().authorization.listening);
         assert!(journalled(&state).contains(&JournalEvent::ListeningLost {
-            detail: "the notification centre of macOS restarted".to_owned(),
+            detail: "the notification platform is not available".to_owned(),
         }));
+    }
+
+    #[test]
+    fn an_ecoute_that_dies_again_and_again_writes_one_line_and_holds_its_tongue() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
 
         state.set_listening(true);
 
-        let said = journalled(&state)
-            .into_iter()
-            .filter(|event| matches!(event, JournalEvent::Listening))
-            .count();
+        for _ in 0..10 {
+            state.note_listening_lost("the notification platform is not available".to_owned());
+            state.set_listening(false);
+            state.set_listening(true);
+        }
 
         assert_eq!(
-            said, 2,
+            counted(
+                &state,
+                &JournalEvent::ListeningLost {
+                    detail: "the notification platform is not available".to_owned(),
+                }
+            ),
+            1,
+            "the same loss, over and over, is one line"
+        );
+        assert_eq!(
+            counted(&state, &JournalEvent::Listening),
+            1,
+            "only the first start counts, the tries that follow say nothing"
+        );
+    }
+
+    #[test]
+    fn the_ecoute_says_it_is_back_the_moment_a_notification_is_heard_again() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        state.set_listening(true);
+        state.note_listening_lost("the notification platform is not available".to_owned());
+        state.set_listening(false);
+        state.set_listening(true);
+
+        assert!(state.note_listening_back());
+        assert_eq!(
+            counted(&state, &JournalEvent::Listening),
+            2,
             "the ecoute that comes back says so, as the first did"
+        );
+        assert!(
+            !state.note_listening_back(),
+            "nothing was lost, there is nothing to say"
+        );
+    }
+
+    #[test]
+    fn an_ecoute_that_holds_a_few_turns_says_it_is_back_without_waiting_for_a_notification() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        state.set_listening(true);
+        state.note_listening_lost("the notification platform is not available".to_owned());
+        state.set_listening(false);
+        state.take_listening_retry();
+        state.set_listening(true);
+
+        let held: Vec<bool> = (0..LISTENING_HELD_TURNS)
+            .map(|_| state.note_listening_holds())
+            .collect();
+
+        assert_eq!(held, vec![false, false, false, false, true]);
+        assert_eq!(counted(&state, &JournalEvent::Listening), 2);
+        assert!(
+            !state.note_listening_holds(),
+            "an ecoute nobody lost has nothing to hold"
+        );
+        assert!(
+            state.take_listening_retry(),
+            "the ecoute that held starts its rest over"
+        );
+    }
+
+    fn turns_rested(state: &mut Multifus, tries: usize) -> Vec<u32> {
+        (0..tries)
+            .map(|_| {
+                let mut turns = 0;
+
+                while !state.take_listening_retry() {
+                    turns += 1;
+                }
+
+                turns
+            })
+            .collect()
+    }
+
+    #[test]
+    fn a_lost_ecoute_is_tried_again_less_and_less_often_up_to_a_ceiling() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        assert!(
+            state.take_listening_retry(),
+            "an ecoute that never died waits for nothing"
+        );
+
+        state.note_listening_lost("the notification platform is not available".to_owned());
+
+        assert_eq!(
+            turns_rested(&mut state, 6),
+            vec![
+                0,
+                1,
+                3,
+                LONGEST_LISTENING_REST - 1,
+                LONGEST_LISTENING_REST - 1,
+                LONGEST_LISTENING_REST - 1
+            ]
+        );
+
+        state.note_listening_back();
+
+        assert!(
+            state.take_listening_retry(),
+            "an ecoute that came back starts its rest over"
         );
     }
 

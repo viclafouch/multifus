@@ -29,15 +29,30 @@ Une caisse jetable hors du dépôt, qui ne dépend que de `windows` et porte le 
 signatures et les constantes fausses. La CI, elle, compile sur `windows-latest`,
 et la publication en dépend.
 
+## Lire le bon interrupteur des notifications de Dofus, sur Windows
+
+L'AutoFocus s'est tu une soirée entière, et la Prise en main affichait l'étape au
+vert. Multifus lit `Enabled` sous
+`Notifications\Settings\com.dofus.d1elauncher`, une valeur qui n'existait pas.
+L'interrupteur que les Paramètres montrent est ailleurs, dans `wpndatabase.db`,
+sous `HandlerSettings` : `s:toast` valait zéro, et Dofus n'émettait plus rien
+depuis une heure et demie. Vu le 04/09/2026.
+
+- [ ] Lire `s:toast` du handler `com.dofus.d1elauncher` dans
+      `%LOCALAPPDATA%\Microsoft\Windows\Notifications\wpndatabase.db`, ou trouver
+      l'API qui le dit, et faire de ce contrôle celui de l'étape. `Enabled` du
+      registre reste vrai quand il existe, mais son absence ne prouve rien
+- [ ] Poser un avis quand Multifus écoute, l'AutoFocus allumé, et n'a rien
+      entendu depuis longtemps : c'est le seul symptôme qu'a vu le joueur
+
 ## Essayer sur les vraies machines
 
 Le code est écrit et les tests passent des deux côtés. Rien de ce qui suit ne se
 prouve par un test : il faut la machine, et le jeu ouvert à côté.
 
-- [ ] Le réveil du tour, sur Windows. Un client qui s'ouvre doit arriver agrandi, avec sa tête de classe et son titre court, sans attendre la seconde. Un personnage qui se connecte, et un client qui se ferme, doivent changer de ligne tout de suite. Ouvrir et fermer des menus dans d'autres applications ne doit rien réveiller, c'est le filtre de `DESTROY` qu'on essaie. Et Multifus laissé une heure à côté d'un navigateur ne doit rien prendre au processeur
-- [ ] Trancher, une fois ces essais faits, si le tour réveillé fait tout ou seulement relit les fenêtres. Il fait tout aujourd'hui, et le Mac n'y voit rien coûter : à ne découper que si Windows dit le contraire
+- [ ] Multifus laissé une heure à côté d'un navigateur, sur Windows : le gestionnaire des tâches ne doit rien lui voir prendre au processeur. Le reste du réveil du tour est essayé et bon, filtre de `DESTROY` compris
 - [ ] Un client Dofus figé, sur le Mac : vérifier qu'il ne retient plus le fil de scan, donc que le roster, la Roue et les titres courts continuent de suivre. `set_messaging_timeout` est posé à une demi-seconde dans `platform/macos.rs`
-- [ ] La reprise de l'écoute des notifications, sur les deux systèmes. Tuer le centre de notifications sur le Mac, et couper le service de notifications sur Windows : le journal doit porter l'écoute perdue, puis l'AutoFocus doit repartir dans la seconde sans qu'on relance Multifus. Les deux chemins passent par `on_listening_lost` et aucun n'est couvert par un test
+- [ ] La reprise de l'écoute des notifications, sur le Mac : tuer le centre de notifications, le journal doit porter une ligne, une seule, puis « Écoute des notifications démarrée » cinq secondes plus tard. Windows est essayé et bon, par `Stop-Service WpnUserService_*`, qui rend `0x803E0105`. L'essai casse le jeu et non le logiciel : le client Dofus perd son inscription auprès de la plateforme et n'émet plus rien tant qu'on ne l'a pas relancé, Multifus se rebranchant seul
 
 ## Passer le dépôt en monorepo
 
