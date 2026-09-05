@@ -77,7 +77,8 @@ export const systemWords = () => {
     options: t`Options`,
     general: t`Général`,
     miscellaneous: t`Divers`,
-    backgroundNotifications: t`Notifications en arrière-plan`
+    backgroundNotifications: t`Notifications en arrière-plan`,
+    game: 'Dofus Retro'
   }
 }
 

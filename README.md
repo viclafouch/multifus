@@ -62,6 +62,16 @@ gh attestation verify <fichier> --repo viclafouch/multifus
 
 Multifus ne lit pas la mémoire du client, ne touche à aucun de ses paquets, ne simule aucune action de jeu, n'empêche pas la déconnexion pour inactivité et ne modifie aucun fichier. Il gère des fenêtres et lit des notifications système, rien d'autre. Les outils de type macro sont interdits par Ankama et restent hors de ce projet.
 
+Ankama a posé la limite deux fois, en ces mots :
+
+> L'utilisation d'un logiciel tiers est tolérée UNIQUEMENT s'il ne modifie/n'interagit pas avec les fichiers du jeu ou le jeu en lui-même. [...] Il est également important de distinguer un outil de gestion de fenêtre d'autres outils tiers comme les macros, ces dernières sont strictement interdites.
+
+> Nous avons une certaine tolérance pour ce qui est des logiciels de « gestion de fenêtres », mais il est important de rappeler qu'il ne s'agit pas d'outils officiellement pris en charge par Ankama. [...] L'utilisation de macros apportant un avantage déloyal, comme le déplacement de plusieurs personnages simultanément sans changer de fenêtre, est strictement bannissable. [...] vérifiez bien que l'outil que vous vous apprêtez à utiliser n'interagit jamais avec les fichiers du jeu.
+
+Deux règles en sortent, et elles tiennent le projet. Une action ne vaut que pour la fenêtre au premier plan, jamais pour plusieurs à la fois. Aucun fichier du jeu n'est lu, ni extrait, ni converti, ni embarqué.
+
+Cette tolérance ne couvre que le comportement du logiciel. Les images d'Ankama restent régies par ses conditions d'utilisation, qui demandent une autorisation écrite.
+
 Dofus et Dofus Retro sont des marques déposées d'Ankama. Ce projet n'y est pas affilié.
 
 ## Développement
@@ -70,7 +80,7 @@ Le dépôt est un monorepo pnpm : le logiciel dans `apps/desktop`, le site dans 
 
 Une release se prépare par `pnpm --filter @multifus/desktop release`, qui écrit le changelog et pose le tag, puis se déclenche en poussant ce tag : le workflow compile, signe, notarise et dépose un brouillon qu'il reste à publier.
 
-Les vingt-quatre portraits de `apps/desktop/src/assets/portraits` appartiennent à Ankama. Ils sont repris d'un outil communautaire, et ils vivent dans un dossier qu'un `git rm` suffit à retirer. Leurs vingt-quatre `.ico` de `apps/desktop/src-tauri/icons/portraits`, que Rust embarque, en ont été tirés une fois pour toutes.
+Les vingt-quatre portraits de `apps/desktop/src/assets/portraits` appartiennent à Ankama. Ils sont repris d'un outil communautaire, et ils vivent dans un dossier qu'un `git rm` suffit à retirer. Leurs vingt-quatre `.ico` de `apps/desktop/src-tauri/icons/portraits`, que Rust embarque, en ont été tirés une fois pour toutes. Le décor de la prise en main, dans `apps/desktop/src/assets/ankama`, suit la même règle. La [licence](./LICENSE) exclut ces trois dossiers du MIT, qui ne peut pas concéder ce que Multifus ne possède pas.
 
 Les mots du projet sont dans [CONTEXT.md](./CONTEXT.md), ce qui reste à faire dans [docs/plan.md](./docs/plan.md).
 

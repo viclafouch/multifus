@@ -1,8 +1,11 @@
-import type { LucideIcon } from 'lucide-react'
-import { Bell, Ear, Gamepad2, Moon, Sparkles, Unlock } from 'lucide-react'
 import { msg } from '@lingui/core/macro'
 import type { Page, SystemPage } from '@/@types/onboarding'
-import backgroundNotifications from '@/assets/dofus-background-notifications.png'
+import arena from '@/assets/ankama/arena.webp'
+import camp from '@/assets/ankama/camp.webp'
+import forest from '@/assets/ankama/forest.webp'
+import harbour from '@/assets/ankama/harbour.webp'
+import pen from '@/assets/ankama/pen.webp'
+import village from '@/assets/ankama/village.webp'
 import optionsGeneral from '@/assets/dofus-options-general.png'
 import type { Phrase } from '@/lib/i18n'
 
@@ -10,14 +13,14 @@ export const WELCOME_PAGE = 'welcome' satisfies Page
 
 export const ONBOARDING_ANCHOR = 'prise-en-main'
 
-export const PAGE_ICONS = {
-  welcome: Sparkles,
-  authorization: Unlock,
-  notifications: Bell,
-  focus: Moon,
-  gameSetting: Gamepad2,
-  proof: Ear
-} as const satisfies Record<Page, LucideIcon>
+export const PAGE_SCENES = {
+  welcome: camp,
+  authorization: village,
+  notifications: harbour,
+  focus: forest,
+  gameSetting: pen,
+  proof: arena
+} as const satisfies Record<Page, string>
 
 export const SYSTEM_PAGES = {
   welcome: null,
@@ -28,8 +31,7 @@ export const SYSTEM_PAGES = {
   proof: null
 } as const satisfies Record<Page, SystemPage | null>
 
-type Shot = {
-  readonly crop: string
+export type Shot = {
   readonly full: string
   readonly alt: Phrase
 }
@@ -40,7 +42,6 @@ export const PAGE_SHOTS = {
   notifications: null,
   focus: null,
   gameSetting: {
-    crop: backgroundNotifications,
     full: optionsGeneral,
     alt: msg`Les options de Dofus, avec la case Notifications en arrière-plan cochée`
   },

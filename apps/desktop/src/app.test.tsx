@@ -157,7 +157,9 @@ describe('la fenêtre de Multifus', () => {
 
     render(<App />)
 
-    expect(await screen.findByText('Bienvenue dans Multifus')).not.toBeNull()
+    expect(
+      await screen.findByText('Vous ne chercherez plus la bonne fenêtre')
+    ).not.toBeNull()
     expect(screen.queryByRole('navigation')).toBeNull()
   })
 

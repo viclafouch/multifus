@@ -11,6 +11,18 @@ import {
   speakFrench
 } from '@/test-doubles'
 
+const FEATURE_NAMES = [
+  'L’AutoFocus',
+  'La roue des personnages',
+  'Le Déplacement rapide',
+  'Le tableau des runes',
+  'Les réponses rapides',
+  'Les messages privés',
+  'Les raccourcis',
+  'Vos personnages',
+  'Les fenêtres agrandies'
+]
+
 const bridge = {
   finishOnboarding: vi.fn(pending),
   requestAuthorization: vi.fn(pending),
@@ -72,15 +84,37 @@ describe('la prise en main', () => {
   it('ouvre sur la bienvenue, première des six étapes', async () => {
     await show()
 
-    expect(screen.getByText('Bienvenue dans Multifus')).not.toBeNull()
+    expect(
+      screen.getByText('Vous ne chercherez plus la bonne fenêtre')
+    ).not.toBeNull()
     expect(screen.getByText('Étape 1 sur 6')).not.toBeNull()
   })
 
-  it('promet Multifus à qui n’a qu’un seul personnage', async () => {
+  it('dit la peine du multicompte avant de dire le remède', async () => {
     await show()
 
     expect(
-      screen.getByText(/Un seul personnage ou dix/u, { exact: false })
+      screen.getByText(/sans jamais chercher lequel vous appelle/u, {
+        exact: false
+      })
+    ).not.toBeNull()
+  })
+
+  it('annonce tout ce que Multifus sait faire, et pas seulement l’AutoFocus', async () => {
+    await show()
+
+    const named = FEATURE_NAMES.filter((name) => {
+      return screen.queryByText(name) !== null
+    })
+
+    expect(named).toStrictEqual(FEATURE_NAMES)
+  })
+
+  it('dit à qui appartient le décor', async () => {
+    await show()
+
+    expect(
+      screen.getByText(/Décor © Ankama Games/u, { exact: false })
     ).not.toBeNull()
   })
 
@@ -226,16 +260,16 @@ describe('la prise en main', () => {
     expect(screen.getByText('Divers')).not.toBeNull()
   })
 
-  it('agrandit la capture du jeu dans une fenêtre', async () => {
+  it('garde la capture du jeu pour qui la demande', async () => {
     await show()
 
     goTo('Dans le jeu')
 
-    const inline = screen.getByRole('img').getAttribute('src')
+    expect(screen.queryByRole('img')).toBeNull()
 
     fireEvent.click(buttonNamed('Voir l’image'))
 
-    expect(screen.getByRole('img').getAttribute('src')).not.toBe(inline)
+    expect(screen.getByRole('img')).not.toBeNull()
     expect(screen.getByRole('button', { name: 'Fermer' })).not.toBeNull()
   })
 
@@ -262,17 +296,18 @@ describe('la prise en main', () => {
     expect(screen.queryByText('Bravo')).toBeNull()
   })
 
-  it('dit ce qui fait appeler le jeu', async () => {
+  it('dit ce qu’il reste à faire une fois le personnage vu', async () => {
     await show({
       characters: [characterOf({ nickname: 'Alpha', online: true })]
     })
 
     goTo('L’essai')
 
-    expect(screen.getByText('L’appel du jeu')).not.toBeNull()
+    expect(screen.getByText('Plus qu’à vous faire appeler.')).not.toBeNull()
     expect(
       screen.getByText(
-        'Un combat, un message privé : Multifus vous amène devant.'
+        /Recevez ensuite un message privé ou entrez en combat/u,
+        { exact: false }
       )
     ).not.toBeNull()
   })

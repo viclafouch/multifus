@@ -1,11 +1,11 @@
-import { ArrowRight, Check, ShieldCheck } from 'lucide-react'
 import { i18n } from '@lingui/core'
 import { t } from '@lingui/core/macro'
 import type { Page } from '@/@types/onboarding'
-import { SystemPageButton } from '@/components/system-page-button'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/retro/button'
 import { PAGE_SHOTS, SYSTEM_PAGES } from '@/constants/onboarding'
-import { ShotDialog } from '@/screens/onboarding/shot-dialog'
+import { leadOf, nextLabel } from '@/helpers/onboarding'
+import { OpenButton } from '@/screens/onboarding/open-button'
+import { ShotWindow } from '@/screens/onboarding/shot-window'
 
 type StepActionsProps = Readonly<{
   page: Page
@@ -26,91 +26,50 @@ export const StepActions = ({
 }: StepActionsProps) => {
   const systemPage = SYSTEM_PAGES[page]
   const shot = PAGE_SHOTS[page]
-  const isAsking = page === 'authorization' && !isReady
-  const isOpening = systemPage !== null && !isAsking && !isReady
-  const isShowing = shot !== null && !isReady
+  const lead = leadOf(page, isReady)
+  const label = nextLabel({ page, rank, count, isReady })
 
   return (
-    <div className="rise rise-later flex flex-wrap items-center justify-center gap-2.5">
-      {systemPage === null ? null : (
-        <SystemPageButton
-          page={systemPage}
-          variant={isOpening ? 'outline' : 'ghost'}
-          size="default"
-        />
-      )}
-      {isAsking ? (
-        <Button variant="outline" onClick={onAsk}>
-          <ShieldCheck aria-hidden />
+    <div className="flex flex-col items-center gap-4">
+      {lead.kind === 'ask' ? (
+        <Button size="lead" onClick={onAsk}>
           {t`Autoriser Multifus`}
         </Button>
       ) : null}
-      {shot === null ? null : (
-        <ShotDialog
-          source={shot.full}
-          alt={i18n._(shot.alt)}
-          variant={isShowing ? 'outline' : 'ghost'}
-          size="default"
+      {lead.kind === 'open' ? (
+        <OpenButton page={lead.systemPage} variant="leaf" size="lead" />
+      ) : null}
+      {lead.kind === 'show' ? (
+        <ShotWindow
+          source={lead.shot.full}
+          alt={i18n._(lead.shot.alt)}
+          variant="leaf"
+          size="lead"
         />
-      )}
-      <NextButton
-        page={page}
-        rank={rank}
-        count={count}
-        isReady={isReady}
-        onNext={onNext}
-      />
+      ) : null}
+      {lead.kind === 'next' ? (
+        <Button size="lead" variant="leaf" onClick={onNext}>
+          {label}
+        </Button>
+      ) : null}
+      <div className="flex flex-wrap items-center justify-center gap-2">
+        {systemPage === null || lead.kind === 'open' ? null : (
+          <OpenButton page={systemPage} variant="slate" size="default" />
+        )}
+        {shot === null || lead.kind === 'show' ? null : (
+          <ShotWindow
+            source={shot.full}
+            alt={i18n._(shot.alt)}
+            variant="slate"
+            size="default"
+          />
+        )}
+        {lead.kind === 'next' ? null : (
+          <Button size="default" variant="slate" onClick={onNext}>
+            {label}
+          </Button>
+        )}
+      </div>
     </div>
-  )
-}
-
-type NextButtonProps = Readonly<{
-  page: Page
-  rank: number
-  count: number
-  isReady: boolean
-  onNext: () => void
-}>
-
-const NextButton = ({
-  page,
-  rank,
-  count,
-  isReady,
-  onNext
-}: NextButtonProps) => {
-  if (rank === count) {
-    return isReady ? (
-      <Button onClick={onNext}>{t`Terminer`}</Button>
-    ) : (
-      <Button variant="outline" onClick={onNext}>
-        {t`Je verrai plus tard`}
-      </Button>
-    )
-  }
-
-  if (rank === 1) {
-    return (
-      <Button onClick={onNext}>
-        {t`C’est parti`}
-        <ArrowRight aria-hidden />
-      </Button>
-    )
-  }
-
-  if (isReady || page === 'authorization') {
-    return (
-      <Button onClick={onNext}>
-        {t`Continuer`}
-        <ArrowRight aria-hidden />
-      </Button>
-    )
-  }
-
-  return (
-    <Button onClick={onNext}>
-      <Check aria-hidden />
-      {t`C’est fait`}
-    </Button>
   )
 }

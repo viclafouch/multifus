@@ -1,10 +1,7 @@
-import { Check } from 'lucide-react'
-import { plural, t } from '@lingui/core/macro'
+import { t } from '@lingui/core/macro'
 import type { Check as StepCheck } from '@/@types/onboarding'
 import type { Character } from '@/@types/roster'
-import { Lamp } from '@/components/lamp'
-import { checkLine } from '@/helpers/onboarding'
-import { ProofLine } from '@/screens/onboarding/proof-line'
+import { proofHeading } from '@/helpers/onboarding'
 
 type ProofNamesProps = Readonly<{
   online: readonly Character[]
@@ -12,80 +9,22 @@ type ProofNamesProps = Readonly<{
 
 const ProofNames = ({ online }: ProofNamesProps) => {
   return (
-    <ul className="flex flex-wrap justify-center gap-1.5">
+    <ul className="flex flex-wrap justify-center gap-2">
       {online.map((character) => {
         return (
           <li
             key={character.nickname}
-            className="selectable flex items-center gap-2 rounded-md border border-border/70 bg-card/50 px-2 py-1 text-note font-medium"
+            className="plaque selectable flex items-center gap-2 rounded-sm px-2.5 py-1 text-aside font-medium text-cream"
           >
-            <Lamp state="live" />
+            <span
+              aria-hidden
+              className="pip pip-live size-2 shrink-0 rounded-full"
+            />
             {character.nickname}
           </li>
         )
       })}
     </ul>
-  )
-}
-
-type ProofDoneProps = Readonly<{
-  online: readonly Character[]
-}>
-
-const ProofDone = ({ online }: ProofDoneProps) => {
-  return (
-    <div className="step-band live-light rise rise-later flex flex-col items-center justify-center gap-2.5 rounded-xl border border-live/35 bg-live/5 px-6">
-      <span className="bloom flex size-sigil shrink-0 items-center justify-center rounded-full bg-live/15 text-live ring-1 ring-live/45">
-        <Check aria-hidden className="size-mark" strokeWidth={2.4} />
-      </span>
-      <p className="max-w-lead text-lead text-balance text-live">
-        {checkLine({ step: 'proof', check: 'ready', proven: true })}
-      </p>
-      {online.length === 0 ? null : <ProofNames online={online} />}
-    </div>
-  )
-}
-
-type ProofWaitProps = Readonly<{
-  online: readonly Character[]
-}>
-
-const ProofWait = ({ online }: ProofWaitProps) => {
-  const isSeen = online.length > 0
-  const seenLabel = isSeen
-    ? plural(online.length, {
-        one: 'Multifus voit # personnage',
-        other: 'Multifus voit # personnages'
-      })
-    : t`Aucun personnage connecté`
-
-  return (
-    <div className="step-band rise rise-later flex items-center justify-center">
-      <ol className="flex w-full max-w-blurb flex-col">
-        <ProofLine
-          hasTrail
-          state={isSeen ? 'done' : 'listening'}
-          label={seenLabel}
-        >
-          {isSeen ? (
-            <ProofNames online={online} />
-          ) : (
-            <p className="text-note text-muted-foreground">
-              {t`Ouvrez le jeu et connectez-vous, il apparaît ici.`}
-            </p>
-          )}
-        </ProofLine>
-        <ProofLine
-          hasTrail={false}
-          state={isSeen ? 'listening' : 'pending'}
-          label={t`L’appel du jeu`}
-        >
-          <p className="text-note text-muted-foreground">
-            {t`Un combat, un message privé : Multifus vous amène devant.`}
-          </p>
-        </ProofLine>
-      </ol>
-    </div>
   )
 }
 
@@ -99,9 +38,31 @@ export const ProofBand = ({ characters, check }: ProofBandProps) => {
     return character.online
   })
 
-  if (check === 'ready') {
-    return <ProofDone online={online} />
-  }
+  const isDone = check === 'ready'
+  const isSeen = online.length > 0
+  const heading = proofHeading({ isDone, online: online.length })
 
-  return <ProofWait online={online} />
+  return (
+    <div className="flex flex-col items-center gap-3">
+      <p
+        data-done={isDone ? '' : undefined}
+        className="limelight flex items-center gap-3 font-carve text-bar tracking-wide text-cream uppercase data-done:font-plain data-done:text-aside data-done:font-medium data-done:tracking-normal data-done:text-khaki data-done:normal-case"
+      >
+        <span
+          aria-hidden
+          data-done={isDone ? '' : undefined}
+          className="sonar sonar-leaf size-2.5 shrink-0 rounded-full data-done:sonar-still"
+        />
+        {heading}
+      </p>
+      {isSeen ? <ProofNames online={online} /> : null}
+      {isDone ? null : (
+        <p className="text-aside text-khaki/80">
+          {isSeen
+            ? t`Plus qu’à vous faire appeler.`
+            : t`Multifus écoute, la fenêtre apparaîtra ici.`}
+        </p>
+      )}
+    </div>
+  )
 }

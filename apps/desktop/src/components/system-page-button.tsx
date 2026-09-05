@@ -1,11 +1,8 @@
-import type { VariantProps } from 'class-variance-authority'
 import type { SystemPage } from '@/@types/onboarding'
+import type { ButtonLook } from '@/components/button-look'
 import { LinkButton } from '@/components/link-button'
-import type { buttonVariants } from '@/components/ui/button'
 import { openLabel } from '@/helpers/wording'
 import { openSystemPage } from '@/lib/multifus'
-
-type ButtonLook = VariantProps<typeof buttonVariants>
 
 type SystemPageButtonProps = Readonly<{
   page: SystemPage

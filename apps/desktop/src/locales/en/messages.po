@@ -37,8 +37,8 @@ msgstr "{0, plural, one {Maximize the windows, from {surface}: asked one client.
 
 #. placeholder {0}: online.length
 #: src/screens/onboarding/proof-band.tsx
-msgid "{0, plural, one {Multifus voit # personnage} other {Multifus voit # personnages}}"
-msgstr "{0, plural, one {Multifus sees # character} other {Multifus sees # characters}}"
+#~ msgid "{0, plural, one {Multifus voit # personnage} other {Multifus voit # personnages}}"
+#~ msgstr "{0, plural, one {Multifus sees # character} other {Multifus sees # characters}}"
 
 #. placeholder {0}: veil.draft
 #: src/screens/rune-table/preview-panel.tsx
@@ -221,6 +221,10 @@ msgstr "{nickname} brought back."
 #: src/helpers/journal.ts
 msgid "{nickname} retiré du roster."
 msgstr "{nickname} removed from the roster."
+
+#: src/helpers/onboarding.ts
+msgid "{online, plural, one {Multifus voit # personnage} other {Multifus voit # personnages}}"
+msgstr "{online, plural, one {Multifus sees # character} other {Multifus sees # characters}}"
 
 #: src/helpers/wording.ts
 msgid "{rest, plural, one {# autre} other {# autres}}"
@@ -466,7 +470,7 @@ msgstr "No client open"
 msgid "Aucun homme connecté"
 msgstr "No male online"
 
-#: src/screens/onboarding/proof-band.tsx
+#: src/helpers/onboarding.ts
 #: src/screens/relay/state-panel.tsx
 msgid "Aucun personnage connecté"
 msgstr "Nobody online"
@@ -611,8 +615,8 @@ msgid "Bienvenue"
 msgstr "Welcome"
 
 #: src/helpers/onboarding.ts
-msgid "Bienvenue dans Multifus"
-msgstr "Welcome to Multifus"
+#~ msgid "Bienvenue dans Multifus"
+#~ msgstr "Welcome to Multifus"
 
 #: src/constants/roster.ts
 msgid "Bleu"
@@ -643,7 +647,7 @@ msgstr "It is in place: Multifus read the setting."
 #~ msgid "C’est en place."
 #~ msgstr "It is in place."
 
-#: src/screens/onboarding/step-actions.tsx
+#: src/helpers/onboarding.ts
 msgid "C’est fait"
 msgstr "Done, next"
 
@@ -655,6 +659,14 @@ msgstr "Done, next"
 #~ msgid "C’est la notification de Dofus qui réveille Multifus. Si le jeu n’a pas le droit d’en envoyer, personne ne viendra jamais devant vous."
 #~ msgstr "It is the Dofus notification that wakes Multifus up. If the game is not allowed to send any, nobody will ever come up in front of you."
 
+#: src/helpers/onboarding.ts
+#~ msgid "C’est la seule chose que Multifus vous demande. Sans elle, il n’entend pas Dofus, et l’AutoFocus ne ramènera jamais personne devant vous."
+#~ msgstr "It is the only thing Multifus asks of you. Without it, it cannot hear Dofus, and AutoFocus will never bring anyone in front of you."
+
+#: src/helpers/onboarding.ts
+#~ msgid "C’est la seule chose que Multifus vous demande. Sans elle, il ne voit aucune de vos fenêtres, et l’AutoFocus ne ramènera jamais personne devant vous."
+#~ msgstr "It is the only thing Multifus asks of you. Without it, it sees none of your windows, and AutoFocus will never bring anyone in front of you."
+
 #: src/components/shortcut-field.tsx
 msgid "C’est le raccourci pour coller sur votre ordinateur. Prenez-en un autre."
 msgstr "That is the paste shortcut on your computer. Take another one."
@@ -663,7 +675,7 @@ msgstr "That is the paste shortcut on your computer. Take another one."
 msgid "C’est lui qui vous écrit dans Telegram. Le retirer coupe tout, et il faudra refaire les cinq étapes."
 msgstr "It is the one that writes to you in Telegram. Removing it cuts everything, and you will have to redo the five steps."
 
-#: src/screens/onboarding/step-actions.tsx
+#: src/helpers/onboarding.ts
 msgid "C’est parti"
 msgstr "Let’s go"
 
@@ -763,6 +775,14 @@ msgstr "Click to move, the next window comes along on its own."
 msgid "Cliquez sur Connecter"
 msgstr "Click Connect"
 
+#: src/helpers/onboarding.ts
+msgid "Cliquez sur le bouton, puis cochez Multifus dans la liste. Sans cette autorisation, il n’entend pas Dofus et ne ramènera personne devant vous."
+msgstr "Click the button, then tick Multifus in the list. Without this permission, it cannot hear Dofus and will bring no one in front of you."
+
+#: src/helpers/onboarding.ts
+msgid "Cliquez sur le bouton, puis cochez Multifus dans la liste. Sans cette autorisation, il ne voit aucune fenêtre et ne ramènera personne devant vous."
+msgstr "Click the button, then tick Multifus in the list. Without this permission, it sees no window and will bring no one in front of you."
+
 #: src/screens/relay/index.tsx
 msgid "Coché, vous lisez son message dans Telegram. Décoché, vous savez seulement lequel de vos personnages a reçu un message privé."
 msgstr "Ticked, you read their message in Telegram. Unticked, you only know which of your characters got a private message."
@@ -798,6 +818,10 @@ msgstr "Paste the token BotFather gave you here"
 #: src/constants/notification.ts
 msgid "Combat"
 msgstr "Fight"
+
+#: src/helpers/onboarding.ts
+#~ msgid "Combat, échange, groupe, craft, message privé, défi, percepteur : sept appels du jeu. Multifus les entend par les notifications de Dofus, et vous emmène sur le personnage concerné."
+#~ msgstr "Fight, trade, group, craft, private message, challenge, tax collector: seven calls from the game. Multifus hears them through Dofus notifications, and takes you to the character concerned."
 
 #: src/screens/onboarding/step-actions.tsx
 #~ msgid "Commencer"
@@ -871,7 +895,7 @@ msgstr "Log a character in inside Dofus Retro: they land here, already ticked."
 msgid "Connexion…"
 msgstr "Connecting…"
 
-#: src/screens/onboarding/step-actions.tsx
+#: src/helpers/onboarding.ts
 msgid "Continuer"
 msgstr "Continue"
 
@@ -916,6 +940,10 @@ msgid "Ctrl+Maj+1 sur l’Eniripsa, Ctrl+Maj+2 sur le Sacrieur : sa fenêtre pas
 msgstr "Ctrl+Shift+1 on the Eniripsa, Ctrl+Shift+2 on the Sacrier: their window comes to the front, wherever you are in the game."
 
 #: src/helpers/onboarding.ts
+#~ msgid "Dans Dofus, ouvrez les Options et cochez la case. Sans elle, le client se tait dès qu’il passe derrière, et Multifus n’a plus rien à écouter."
+#~ msgstr "In Dofus, open Options and tick the box. Without it, the client goes quiet the moment it moves behind, and Multifus has nothing left to hear."
+
+#: src/helpers/onboarding.ts
 msgid "Dans le jeu"
 msgstr "In the game"
 
@@ -926,6 +954,10 @@ msgstr "Made-up characters here and in the try-out, yours in the game. One slide
 #: src/helpers/wording.ts
 msgid "Déconnecté"
 msgstr "Offline"
+
+#: src/components/retro/scene.tsx
+msgid "Décor © Ankama Games. Multifus n’est pas un logiciel d’Ankama."
+msgstr "Artwork © Ankama Games. Multifus is not an Ankama product."
 
 #: src/constants/notification.ts
 msgid "Défi"
@@ -1100,6 +1132,10 @@ msgstr "Write “hello” to your bot"
 msgid "Écrivez-lui /newbot et répondez à ses questions, il parle anglais. Ce robot sera le contact qui vous écrira."
 msgstr "Write /newbot to it and answer its questions. This bot will be the contact that writes to you."
 
+#: src/helpers/onboarding.ts
+#~ msgid "Elle retient les notifications. Multifus devient sourd, votre percepteur se fait taper à l’autre bout du monde, et vous ne l’apprenez qu’en rentrant."
+#~ msgstr "It holds notifications back. Multifus goes deaf, your tax collector gets hit on the other side of the world, and you only find out when you come home."
+
 #: src/screens/walk-screen/banner-panel.tsx
 msgid "Elle s’affiche tant que le Déplacement rapide est allumé, et dit sur quel personnage vous venez d’arriver."
 msgstr "It shows for as long as Quick move is on, and tells you which character you have just landed on."
@@ -1196,7 +1232,7 @@ msgstr "Send a test"
 msgid "Envoyez-vous un message maintenant, pour voir ce que ça donne dans Telegram."
 msgstr "Send yourself a message now, to see what it looks like in Telegram."
 
-#: src/screens/onboarding/step-page.tsx
+#: src/screens/onboarding/guide.tsx
 msgid "Étape {rank} sur {count}"
 msgstr "Step {rank} of {count}"
 
@@ -1207,6 +1243,10 @@ msgstr "Step {rank} of {count}"
 #: src/helpers/onboarding.ts
 #~ msgid "Éteignez Ne pas déranger"
 #~ msgstr "Turn Do Not Disturb off"
+
+#: src/helpers/onboarding.ts
+msgid "Éteignez-la. Allumée, elle retient les notifications : votre percepteur se fait taper à l’autre bout du monde et vous ne l’apprenez qu’en rentrant."
+msgstr "Turn it off. While it is on, it holds notifications back: your tax collector gets hit on the other side of the world and you only find out when you come home."
 
 #: src/helpers/journal.ts
 msgid "éteint"
@@ -1240,6 +1280,10 @@ msgstr "Setting aside"
 msgid "F1 sur l’Eniripsa, F2 sur le Sacrieur : sa fenêtre passe devant, d’où que vous veniez dans le jeu."
 msgstr "F1 on the Eniripsa, F2 on the Sacrier: their window comes to the front, wherever you are in the game."
 
+#: src/constants/features.ts
+msgid "F1 sur l’Eniripsa, F2 sur le Sacrieur."
+msgstr "F1 for the Eniripsa, F2 for the Sacrier."
+
 #: src/constants/roster.ts
 msgid "Féca"
 msgstr "Feca"
@@ -1265,6 +1309,7 @@ msgid "Fenêtres illisibles"
 msgstr "Windows unreadable"
 
 #: src/screens/onboarding/shot-dialog.tsx
+#: src/screens/onboarding/shot-window.tsx
 msgid "Fermer"
 msgstr "Close"
 
@@ -1279,6 +1324,10 @@ msgstr "Close without changing anything"
 #: src/screens/settings/index.tsx
 msgid "Garder Multifus en arrière-plan"
 msgstr "Keep Multifus in the background"
+
+#: src/helpers/onboarding.ts
+msgid "Gardez vos huit clients ouverts sans jamais chercher lequel vous appelle. Multifus regarde à votre place, et voici tout ce qu’il sait faire."
+msgstr "Keep your eight clients open and never hunt for the one calling you. Multifus watches for you, and here is everything it can do."
 
 #: src/helpers/wording.ts
 msgid "Général"
@@ -1300,6 +1349,14 @@ msgstr "Male"
 msgid "Hommes dans le défilement et l’AutoFocus"
 msgstr "Males in the cycle and in AutoFocus"
 
+#: src/helpers/onboarding.ts
+#~ msgid "Huit clients ouverts, un percepteur qui se fait taper, et vous êtes sur la mauvaise fenêtre. Multifus écoute le jeu et vous met devant celle qui vous appelle. Quelques réglages à faire une fois, et on n’en reparle plus."
+#~ msgstr "Eight clients open, a tax collector under attack, and you are on the wrong window. Multifus listens to the game and puts you in front of the one calling you. A few settings to make once, and we never speak of them again."
+
+#: src/helpers/onboarding.ts
+#~ msgid "Huit clients ouverts, un percepteur qui se fait taper, et vous êtes sur la mauvaise fenêtre. Multifus regarde à votre place, et il ne fait pas que ça."
+#~ msgstr "Eight clients open, a tax collector under attack, and you are on the wrong window. Multifus watches for you, and that is only the start."
+
 #: src/constants/journal.ts
 msgid "Icône d’une fenêtre impossible à poser"
 msgstr "A window icon could not be set"
@@ -1309,8 +1366,8 @@ msgid "Il arrive ici"
 msgstr "They land here"
 
 #: src/screens/onboarding/step-figure.tsx
-msgid "Image à venir"
-msgstr "Picture to come"
+#~ msgid "Image à venir"
+#~ msgstr "Picture to come"
 
 #: src/helpers/journal.ts
 msgid "inactif"
@@ -1348,7 +1405,7 @@ msgstr "Got it"
 msgid "Jaune"
 msgstr "Yellow"
 
-#: src/screens/onboarding/step-actions.tsx
+#: src/helpers/onboarding.ts
 msgid "Je verrai plus tard"
 msgstr "I will see later"
 
@@ -1366,8 +1423,16 @@ msgid "L’aperçu"
 msgstr "The preview"
 
 #: src/screens/onboarding/proof-band.tsx
-msgid "L’appel du jeu"
-msgstr "The call from the game"
+#~ msgid "L’appel du jeu"
+#~ msgstr "The call from the game"
+
+#: src/constants/features.ts
+msgid "L’AutoFocus"
+msgstr "AutoFocus"
+
+#: src/helpers/onboarding.ts
+#~ msgid "L’AutoFocus est en marche. Il vous reste la roue des personnages, le Déplacement rapide et le tableau des runes : tout vous attend dans la barre de gauche."
+#~ msgstr "AutoFocus is running. Still ahead of you: the character wheel, Quick Travel and the rune table. It is all waiting in the left bar."
 
 #: src/components/check-notice.tsx
 msgid "L’AutoFocus ne peut pas marcher"
@@ -1418,8 +1483,8 @@ msgid "La concentration"
 msgstr "Focus assist"
 
 #: src/helpers/onboarding.ts
-msgid "La concentration coupe les notifications. Multifus n’entend plus rien, et vos personnages restent derrière."
-msgstr "Focus cuts off the notifications. Multifus hears nothing any more, and your characters stay behind."
+#~ msgid "La concentration coupe les notifications. Multifus n’entend plus rien, et vos personnages restent derrière."
+#~ msgstr "Focus cuts off the notifications. Multifus hears nothing any more, and your characters stay behind."
 
 #: src/screens/settings/index.tsx
 msgid "La croix ne quitte pas Multifus : son icône reste à côté de l’horloge."
@@ -1493,6 +1558,7 @@ msgstr "The wheel brought {nickname} to the front."
 msgid "La roue au milieu de votre écran"
 msgstr "The wheel in the middle of your screen"
 
+#: src/constants/features.ts
 #: src/screens/wheel/index.tsx
 msgid "La roue des personnages"
 msgstr "The character wheel"
@@ -1549,6 +1615,10 @@ msgstr "Let Multifus see your windows"
 msgid "Lancer Multifus au démarrage de l’ordinateur"
 msgstr "Start Multifus when the computer starts"
 
+#: src/helpers/onboarding.ts
+msgid "Lancez Dofus et connectez un personnage. Recevez ensuite un message privé ou entrez en combat : sa fenêtre passera devant toute seule."
+msgstr "Start Dofus and log a character in. Then get a private message or enter a fight: its window will come to the front on its own."
+
 #: src/components/empty-roster.tsx
 msgid "Lancez le jeu"
 msgstr "Launch the game"
@@ -1585,6 +1655,10 @@ msgstr "The corner"
 msgid "Le compte des fenêtres du jeu n’est pas arrivé à l’écran"
 msgstr "The count of game windows did not reach the screen"
 
+#: src/constants/features.ts
+msgid "Le Déplacement rapide"
+msgstr "Quick Travel"
+
 #: src/helpers/onboarding.ts
 #~ msgid "Le feu vert"
 #~ msgstr "The go-ahead"
@@ -1597,9 +1671,21 @@ msgstr "The log file on the disk goes further back than these lines."
 msgid "Le fichier n’était plus lisible. Multifus l’a gardé sous un autre nom et repart sur ses réglages d’origine."
 msgstr "The file could not be read any more. Multifus kept it under another name and starts again on its original settings."
 
+#: src/constants/features.ts
+#~ msgid "Le jeu appelle, la fenêtre du personnage passe devant."
+#~ msgstr "The game calls, that character’s window comes to the front."
+
+#: src/constants/features.ts
+#~ msgid "Le jeu appelle, sa fenêtre passe devant."
+#~ msgstr "The game calls, its window comes to the front."
+
 #: src/helpers/onboarding.ts
 msgid "Le jeu vous a appelé, Multifus l’a entendu."
 msgstr "The game called you, and Multifus heard it."
+
+#: src/constants/features.ts
+msgid "Le jeu vous appelle, sa fenêtre passe devant."
+msgstr "The game calls you, its window comes to the front."
 
 #: src/screens/about/identity-panel.tsx
 msgid "Le multicompte confortable sur Dofus Retro : Multifus range vos fenêtres, vous jouez."
@@ -1609,6 +1695,10 @@ msgstr "Comfortable multi-account on Dofus Retro: Multifus tidies your windows, 
 msgid "Le poids de chaque rune : la simple, la Pa, la Ra, et le poids d’un point de stat"
 msgstr "The weight of each rune: the basic one, the Pa, the Ra, and the weight of one point of stat"
 
+#: src/constants/features.ts
+msgid "Le poids des runes, posé sur la fenêtre du jeu."
+msgstr "Rune weights, laid over the game window."
+
 #: src/screens/about/project-panel.tsx
 msgid "Le projet"
 msgstr "The project"
@@ -1617,6 +1707,7 @@ msgstr "The project"
 msgid "Le système n’a pas pu ouvrir cet élément"
 msgstr "The system could not open this item"
 
+#: src/constants/features.ts
 #: src/constants/journal.ts
 msgid "Le tableau des runes"
 msgstr "The rune table"
@@ -1645,6 +1736,10 @@ msgstr "The real table, laid in the middle of Multifus. One slider for the size,
 msgid "Lecture des fenêtres impossible"
 msgstr "The windows could not be read"
 
+#: src/constants/features.ts
+msgid "Les fenêtres agrandies"
+msgstr "Maximised windows"
+
 #: src/constants/runes.ts
 msgid "Les légères"
 msgstr "The light ones"
@@ -1652,6 +1747,10 @@ msgstr "The light ones"
 #: src/constants/runes.ts
 msgid "Les lourdes"
 msgstr "The heavy ones"
+
+#: src/constants/features.ts
+msgid "Les messages privés"
+msgstr "Private messages"
 
 #: src/helpers/onboarding.ts
 msgid "Les notifications"
@@ -1664,6 +1763,18 @@ msgstr "The Dofus options, with the Background notifications box ticked"
 #: src/screens/rune-table/index.tsx
 msgid "Les poids des runes, affichés par-dessus le jeu. Plus besoin d’aller les chercher ailleurs pendant que vous cassez."
 msgstr "The rune weights, laid over the game. No more looking them up somewhere else while you break."
+
+#: src/constants/features.ts
+#~ msgid "Les poids des runes, posés sur la fenêtre du jeu."
+#~ msgstr "Rune weights, laid over the game window."
+
+#: src/constants/features.ts
+#~ msgid "Les poids des runes, sur la fenêtre du jeu."
+#~ msgstr "Rune weights, over the game window."
+
+#: src/constants/features.ts
+msgid "Les raccourcis"
+msgstr "Shortcuts"
 
 #: src/constants/journal.ts
 msgid "Les raccourcis ne sont pas fiables"
@@ -1680,6 +1791,10 @@ msgstr "The settings to do once. Multifus warns you if it sees one of them block
 #: src/screens/quick-replies/index.tsx
 msgid "Les réponses que vous retapez tous les soirs, rangées sous des touches. Frappez-les dans Dofus Retro, Multifus colle le texte là où vous écrivez."
 msgstr "The replies you retype every evening, stored under keys. Press them inside Dofus Retro, and Multifus pastes the text where you are writing."
+
+#: src/constants/features.ts
+msgid "Les réponses rapides"
+msgstr "Quick replies"
 
 #: src/screens/authorization-screen.tsx
 #~ msgid "macOS n’accorde jamais cette autorisation dans la seconde. Cochez Multifus dans {settings}, puis revenez : cet écran disparaîtra tout seul."
@@ -1708,6 +1823,10 @@ msgstr "The replies you retype every evening, stored under keys. Press them insi
 #: src/helpers/onboarding.ts
 #~ msgid "macOS ne laisse aucune application lire les fenêtres des autres. Sans votre feu vert, Multifus ne voit pas vos personnages et ne peut rien mettre devant vous."
 #~ msgstr "macOS lets no application read the windows of another one. Without your go-ahead, Multifus does not see your characters and cannot bring anything in front of you."
+
+#: src/constants/features.ts
+msgid "Maintenez la combinaison, visez une tête, lâchez."
+msgstr "Hold the shortcut, aim at a head, let go."
 
 #: src/screens/wheel/index.tsx
 msgid "Maintenez vos touches dans le jeu : la roue s’ouvre au milieu de l’écran. Visez une tête, lâchez ou cliquez, la fenêtre passe devant."
@@ -1860,8 +1979,12 @@ msgstr "Multifus has to stay in the background to work."
 #~ msgstr "Multifus is listening"
 
 #: src/helpers/onboarding.ts
-msgid "Multifus écoute les notifications de Dofus : c’est comme ça qu’il sait quel personnage vous appelle."
-msgstr "Multifus listens to the Dofus notifications: that is how it knows which character is calling you."
+#~ msgid "Multifus écoute les notifications de Dofus : c’est comme ça qu’il sait quel personnage vous appelle."
+#~ msgstr "Multifus listens to the Dofus notifications: that is how it knows which character is calling you."
+
+#: src/screens/onboarding/proof-band.tsx
+msgid "Multifus écoute, la fenêtre apparaîtra ici."
+msgstr "Multifus is listening, the window will show up here."
 
 #: src/screens/relay/pairing-guide.tsx
 msgid "Multifus écrit à votre robot. Si le message arrive sur votre téléphone, c’est gagné."
@@ -1948,8 +2071,8 @@ msgid "Multifus se recharge d’un coup et vous laisse sur l’écran où vous �
 msgstr "Multifus reloads in one go and leaves you on the screen you are on. Your Dofus Retro clients do not move."
 
 #: src/helpers/onboarding.ts
-msgid "Multifus surveille vos fenêtres Dofus Retro. Un seul personnage ou dix, il vous amène toujours devant la bonne."
-msgstr "Multifus watches your Dofus Retro windows. One character or ten, it always brings you the right one."
+#~ msgid "Multifus surveille vos fenêtres Dofus Retro. Un seul personnage ou dix, il vous amène toujours devant la bonne."
+#~ msgstr "Multifus watches your Dofus Retro windows. One character or ten, it always brings you the right one."
 
 #: src/constants/journal.ts
 msgid "Multifus tournait déjà : le second lancement s’arrête là."
@@ -1964,8 +2087,8 @@ msgstr "Multifus sees your windows."
 #~ msgstr "Multifus heard you."
 
 #: src/helpers/onboarding.ts
-msgid "Multifus vous amènera devant le bon personnage à chaque appel du jeu, sans que vous ayez à y penser."
-msgstr "Multifus will bring you to the right character every time the game calls, without you having to think about it."
+#~ msgid "Multifus vous amènera devant le bon personnage à chaque appel du jeu, sans que vous ayez à y penser."
+#~ msgstr "Multifus will bring you to the right character every time the game calls, without you having to think about it."
 
 #: src/components/error-boundary.tsx
 msgid "Multifus, lui, tourne toujours : vos raccourcis répondent, et une notification ramène encore la bonne fenêtre. Il n’y a que cet écran à relancer."
@@ -2048,16 +2171,24 @@ msgid "Où il se montre"
 msgstr "Where it shows"
 
 #: src/helpers/onboarding.ts
-msgid "Ouvrez Dofus et connectez un personnage : il apparaît ici. Faites-vous ensuite appeler dans le jeu."
-msgstr "Open Dofus and log a character in: it shows up here. Then get the game to call you."
+#~ msgid "Ouvrez Dofus et connectez un personnage : il apparaît ici. Faites-vous ensuite appeler dans le jeu."
+#~ msgstr "Open Dofus and log a character in: it shows up here. Then get the game to call you."
+
+#: src/helpers/onboarding.ts
+#~ msgid "Ouvrez Dofus, connectez un personnage : il apparaît ici. Faites-vous ensuite appeler, un combat ou un mot en privé, et regardez Multifus faire."
+#~ msgstr "Open Dofus, log a character in: it shows up here. Then get yourself called, a fight or a word in private, and watch Multifus work."
 
 #: src/helpers/onboarding.ts
 #~ msgid "Ouvrez Dofus, connectez un personnage, et faites-vous appeler : lancez un combat, ou demandez à un ami de vous écrire."
 #~ msgstr "Open Dofus, log a character in, and get yourself called: start a fight, or ask a friend to write to you."
 
 #: src/screens/onboarding/proof-band.tsx
-msgid "Ouvrez le jeu et connectez-vous, il apparaît ici."
-msgstr "Open the game and log in, your character shows up here."
+#~ msgid "Ouvrez le jeu et connectez-vous, il apparaît ici."
+#~ msgstr "Open the game and log in, your character shows up here."
+
+#: src/helpers/onboarding.ts
+msgid "Ouvrez les {options} de Dofus et cochez la case. Sans elle, le client se tait dès qu’il passe derrière, et Multifus n’a plus rien à écouter."
+msgstr "Open the Dofus {options} and tick the box. Without it, the client goes silent as soon as it drops behind, and Multifus has nothing left to hear."
 
 #: src/screens/relay/pairing-guide.tsx
 msgid "Ouvrez Telegram sur cet ordinateur"
@@ -2165,6 +2296,10 @@ msgstr "Relayed characters"
 #: src/screens/wheel-window/index.tsx
 msgid "Personne de connecté"
 msgstr "Nobody online"
+
+#: src/screens/onboarding/proof-band.tsx
+msgid "Plus qu’à vous faire appeler."
+msgstr "Now just get yourself called."
 
 #: src/constants/runes.ts
 msgid "PM"
@@ -2423,6 +2558,14 @@ msgstr "Back"
 msgid "Retrait…"
 msgstr "Removing…"
 
+#: src/helpers/onboarding.ts
+msgid "Retrouvez tout ce qui suit dans la barre de gauche."
+msgstr "Find everything below in the left bar."
+
+#: src/helpers/onboarding.ts
+#~ msgid "Retrouvez tout ce qui suit dans la barre de gauche. Multifus tourne maintenant tout seul, et vous pouvez fermer cette fenêtre sans rien perdre."
+#~ msgstr "Find everything below in the left bar. Multifus now runs on its own, and you can close this window without losing a thing."
+
 #: src/helpers/journal.ts
 msgid "Réveil des fenêtres réduites activé depuis {surface}."
 msgstr "Fetching minimized windows turned on from {surface}."
@@ -2472,6 +2615,10 @@ msgstr "Character wheel"
 msgid "Rouge"
 msgstr "Red"
 
+#: src/constants/features.ts
+msgid "Sa classe, son sexe, sa couleur, sa tête sur sa fenêtre."
+msgstr "Class, gender, colour, and their face on their window."
+
 #: src/components/empty-roster.tsx
 msgid "Sa ligne se pose seule, et elle y reste."
 msgstr "Their row lands on its own, and it stays."
@@ -2489,16 +2636,16 @@ msgid "Sagesse"
 msgstr "Wisdom"
 
 #: src/helpers/onboarding.ts
-msgid "Sans cette autorisation, Multifus n’entend pas Dofus et n’amènera aucun personnage devant vous."
-msgstr "Without this permission, Multifus cannot hear Dofus and will bring no character in front of you."
+#~ msgid "Sans cette autorisation, Multifus n’entend pas Dofus et n’amènera aucun personnage devant vous."
+#~ msgstr "Without this permission, Multifus cannot hear Dofus and will bring no character in front of you."
 
 #: src/helpers/onboarding.ts
-msgid "Sans cette autorisation, Multifus ne voit pas vos fenêtres Dofus et n’amènera aucun personnage devant vous."
-msgstr "Without this permission, Multifus cannot see your Dofus windows and will bring no character in front of you."
+#~ msgid "Sans cette autorisation, Multifus ne voit pas vos fenêtres Dofus et n’amènera aucun personnage devant vous."
+#~ msgstr "Without this permission, Multifus cannot see your Dofus windows and will bring no character in front of you."
 
 #: src/helpers/onboarding.ts
-msgid "Sans cette case cochée, Dofus n’envoie aucune notification, et Multifus n’a plus rien à écouter."
-msgstr "Without this box ticked, Dofus sends no notification, and Multifus has nothing left to listen to."
+#~ msgid "Sans cette case cochée, Dofus n’envoie aucune notification, et Multifus n’a plus rien à écouter."
+#~ msgstr "Without this box ticked, Dofus sends no notification, and Multifus has nothing left to listen to."
 
 #: src/screens/authorization-screen.tsx
 msgid "Sans l’accès aux notifications, Multifus ne peut pas entendre le jeu vous appeler, ni mettre la bonne fenêtre Dofus Retro devant vous."
@@ -2597,6 +2744,14 @@ msgstr "On a Mac, Multifus works better without full screen: keep all your Dofus
 msgid "Sur votre Mac, la tête reste ici : le client garde son logo Dofus."
 msgstr "On your Mac, the head stays here: the client keeps its Dofus logo."
 
+#: src/constants/features.ts
+#~ msgid "Sur votre téléphone, par Telegram, quand vous n’êtes pas là."
+#~ msgstr "On your phone, through Telegram, while you are away."
+
+#: src/constants/features.ts
+#~ msgid "Sur votre téléphone, par Telegram."
+#~ msgstr "On your phone, through Telegram."
+
 #: src/helpers/journal.ts
 msgid "suspendu"
 msgstr "held"
@@ -2642,7 +2797,7 @@ msgstr "Telegram did not answer. Check your connection ({detail})."
 msgid "Telegram ne reconnaît pas ce code. Recopiez-le en entier ({detail})."
 msgstr "Telegram does not recognise this token. Copy it again in full ({detail})."
 
-#: src/screens/onboarding/step-actions.tsx
+#: src/helpers/onboarding.ts
 msgid "Terminer"
 msgstr "Finish"
 
@@ -2677,6 +2832,10 @@ msgstr "Every male online is set aside."
 #: src/constants/journal.ts
 msgid "Tous les hommes connectés sont réintégrés."
 msgstr "Every male online is brought back."
+
+#: src/helpers/onboarding.ts
+#~ msgid "Tout ce qui suit vous attend dans la barre de gauche."
+#~ msgstr "Everything below is waiting in the left bar."
 
 #: src/helpers/wording.ts
 msgid "Tout est agrandi"
@@ -2714,6 +2873,14 @@ msgstr "Every female online is brought back."
 msgid "Transparence"
 msgstr "Transparency"
 
+#: src/helpers/onboarding.ts
+msgid "Trouvez {game} dans la liste et laissez-le envoyer des notifications. Combat, échange, défi, percepteur : tout passe par là."
+msgstr "Find {game} in the list and let it send notifications. Fights, trades, challenges, tax collectors: it all comes through here."
+
+#: src/helpers/onboarding.ts
+#~ msgid "Trouvez Dofus Retro dans la liste et laissez-le envoyer des notifications. Combat, échange, groupe, craft, message privé, défi, percepteur : c’est par là que ça passe."
+#~ msgstr "Find Dofus Retro in the list and let it send notifications. Fight, trade, group, craft, private message, challenge, tax collector: that is how they reach you."
+
 #: src/constants/roster.ts
 msgid "Turquoise"
 msgstr "Turquoise"
@@ -2742,6 +2909,14 @@ msgstr "A bug, an idea: this is where you tell it."
 msgid "Un clic déplace le personnage que vous avez devant vous, et la fenêtre du suivant prend sa place. Vous recliquez au même endroit, et toute la team change de map sans toucher au clavier."
 msgstr "One click moves the character in front of you, and the window of the next one takes its place. You click again in the same spot, and the whole team changes map without touching the keyboard."
 
+#: src/constants/features.ts
+msgid "Un clic gauche, et toute la team change de map."
+msgstr "One left click, and the whole team changes map."
+
+#: src/constants/features.ts
+#~ msgid "Un clic gauche, toute la team change de map."
+#~ msgstr "One left click, the whole team changes map."
+
 #: src/constants/journal.ts
 msgid "Un client Dofus vient d’ouvrir : sa fenêtre a été agrandie à l’écran."
 msgstr "A Dofus client just opened: its window was maximized on screen."
@@ -2754,13 +2929,25 @@ msgstr "A client opened before Multifus keeps its small size."
 msgid "Un client par personnage, comme d’habitude."
 msgstr "One client per character, as usual."
 
+#: src/constants/features.ts
+#~ msgid "Un client qui s’ouvre prend tout l’écran."
+#~ msgstr "A client that opens fills the screen."
+
+#: src/constants/features.ts
+#~ msgid "Un client qui s’ouvre prend tout son écran, tout seul."
+#~ msgstr "A client that opens fills its screen, on its own."
+
+#: src/constants/features.ts
+msgid "Un client qui s’ouvre prend tout son écran."
+msgstr "A client that opens fills its whole screen."
+
 #: src/components/empty-roster.tsx
 msgid "Un client resté à l’écran de connexion n’a pas encore de pseudo."
 msgstr "A client left on the login screen has no name yet."
 
 #: src/screens/onboarding/proof-band.tsx
-msgid "Un combat, un message privé : Multifus vous amène devant."
-msgstr "A fight, a private message: Multifus brings you to the front."
+#~ msgid "Un combat, un message privé : Multifus vous amène devant."
+#~ msgstr "A fight, a private message: Multifus brings you to the front."
 
 #: src/screens/relay/test-panel.tsx
 msgid "Un essai vient de partir. Attendez une trentaine de secondes avant le suivant."
@@ -2794,9 +2981,17 @@ msgstr "A system setting stops the game from calling you."
 msgid "Un robot ne parle jamais le premier. Sans ce message, il n’a pas le droit de vous écrire."
 msgstr "A bot never speaks first. Without this message, it is not allowed to write to you."
 
+#: src/constants/features.ts
+msgid "Un texte tout prêt, collé dans le chat."
+msgstr "A ready-made line, pasted into the chat."
+
 #: src/helpers/onboarding.ts
 #~ msgid "Une case à cocher dans Dofus"
 #~ msgstr "One tick box in Dofus"
+
+#: src/helpers/onboarding.ts
+#~ msgid "Une case, dans les options de Dofus. Sans elle, le client se tait dès qu’il passe derrière, et Multifus n’a plus rien à écouter."
+#~ msgstr "One checkbox, in the Dofus options. Without it, the client goes quiet the moment it moves behind, and Multifus has nothing left to hear."
 
 #: src/helpers/wording.ts
 msgid "une réponse sans texte"
@@ -2809,6 +3004,10 @@ msgstr "One reply, a few keys, and you never retype it for the rest of the eveni
 #: src/screens/shortcuts/index.tsx
 msgid "Une touche de fonction se pose seule, sans Ctrl ni Alt. Prise ici, elle ne redescend plus dans le jeu : évitez celles que vous avez posées dans les options de Dofus Retro."
 msgstr "A function key stands on its own, with no Ctrl and no Alt. Taken here, it no longer reaches the game: stay away from the ones you set in the Dofus Retro options."
+
+#: src/constants/features.ts
+#~ msgid "Une touche par personnage"
+#~ msgstr "One key per character"
 
 #: src/components/windows-only.tsx
 msgid "Uniquement sur Windows"
@@ -2844,6 +3043,7 @@ msgid "Voir en vrai"
 msgstr "See it for real"
 
 #: src/screens/onboarding/shot-dialog.tsx
+#: src/screens/onboarding/shot-window.tsx
 msgid "Voir l’image"
 msgstr "See the picture"
 
@@ -2858,6 +3058,14 @@ msgstr "Your clicks go to the game, and to nothing else."
 #: src/helpers/wording.ts
 msgid "Vos clients Dofus Retro couvrent déjà tout leur écran."
 msgstr "Your Dofus Retro clients already cover their whole screen."
+
+#: src/constants/features.ts
+msgid "Vos MP suivis sur votre téléphone, par Telegram."
+msgstr "Your private messages on your phone, through Telegram."
+
+#: src/constants/features.ts
+msgid "Vos personnages"
+msgstr "Your characters"
 
 #: src/screens/about/identity-panel.tsx
 msgid "Vos réglages"
@@ -2918,6 +3126,10 @@ msgstr "You play several characters at once. Multifus shows the one whose turn i
 #: src/screens/settings/index.tsx
 msgid "Vous lisez « Elyandra » au lieu de « Elyandra - Dofus Retro »."
 msgstr "You read “Elyandra” instead of “Elyandra - Dofus Retro”."
+
+#: src/helpers/onboarding.ts
+msgid "Vous ne chercherez plus la bonne fenêtre"
+msgstr "You will never hunt for the right window again"
 
 #: src/screens/relay/state-panel.tsx
 msgid "Vous ne raterez rien tant que Dofus Retro vous garde connecté. Un raccourci qui vous ramène sur une fenêtre coupe l’envoi, puisque vous voilà revenu."

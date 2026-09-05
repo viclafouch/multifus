@@ -1,16 +1,16 @@
-import { t } from '@lingui/core/macro'
+import { plural, t } from '@lingui/core/macro'
 import type {
   Check,
   KnownCheck,
   Onboarding,
   Page,
-  Step
+  Step,
+  SystemPage
 } from '@/@types/onboarding'
 import { IS_APPLE } from '@/constants/keyboard'
-import { WELCOME_PAGE } from '@/constants/onboarding'
+import type { Shot } from '@/constants/onboarding'
+import { PAGE_SHOTS, SYSTEM_PAGES, WELCOME_PAGE } from '@/constants/onboarding'
 import { quoted, systemWords } from '@/helpers/wording'
-
-const GAME_IN_SYSTEM = 'Dofus Retro'
 
 export const pagesOf = (onboarding: Onboarding): readonly Page[] => {
   return [
@@ -56,7 +56,7 @@ export const pageLabel = (page: Page) => {
 export const pageTitle = (page: Page) => {
   switch (page) {
     case 'welcome': {
-      return t`Bienvenue dans Multifus`
+      return t`Vous ne chercherez plus la bonne fenêtre`
     }
     case 'authorization': {
       return IS_APPLE
@@ -88,24 +88,28 @@ export const pageTitle = (page: Page) => {
 const pageBody = (page: Page) => {
   switch (page) {
     case 'welcome': {
-      return t`Multifus surveille vos fenêtres Dofus Retro. Un seul personnage ou dix, il vous amène toujours devant la bonne.`
+      return t`Gardez vos huit clients ouverts sans jamais chercher lequel vous appelle. Multifus regarde à votre place, et voici tout ce qu’il sait faire.`
     }
     case 'authorization': {
       return IS_APPLE
-        ? t`Sans cette autorisation, Multifus ne voit pas vos fenêtres Dofus et n’amènera aucun personnage devant vous.`
-        : t`Sans cette autorisation, Multifus n’entend pas Dofus et n’amènera aucun personnage devant vous.`
+        ? t`Cliquez sur le bouton, puis cochez Multifus dans la liste. Sans cette autorisation, il ne voit aucune fenêtre et ne ramènera personne devant vous.`
+        : t`Cliquez sur le bouton, puis cochez Multifus dans la liste. Sans cette autorisation, il n’entend pas Dofus et ne ramènera personne devant vous.`
     }
     case 'notifications': {
-      return t`Multifus écoute les notifications de Dofus : c’est comme ça qu’il sait quel personnage vous appelle.`
+      const game = quoted(systemWords().game)
+
+      return t`Trouvez ${game} dans la liste et laissez-le envoyer des notifications. Combat, échange, défi, percepteur : tout passe par là.`
     }
     case 'focus': {
-      return t`La concentration coupe les notifications. Multifus n’entend plus rien, et vos personnages restent derrière.`
+      return t`Éteignez-la. Allumée, elle retient les notifications : votre percepteur se fait taper à l’autre bout du monde et vous ne l’apprenez qu’en rentrant.`
     }
     case 'gameSetting': {
-      return t`Sans cette case cochée, Dofus n’envoie aucune notification, et Multifus n’a plus rien à écouter.`
+      const options = quoted(systemWords().options)
+
+      return t`Ouvrez les ${options} de Dofus et cochez la case. Sans elle, le client se tait dès qu’il passe derrière, et Multifus n’a plus rien à écouter.`
     }
     case 'proof': {
-      return t`Ouvrez Dofus et connectez un personnage : il apparaît ici. Faites-vous ensuite appeler dans le jeu.`
+      return t`Lancez Dofus et connectez un personnage. Recevez ensuite un message privé ou entrez en combat : sa fenêtre passera devant toute seule.`
     }
     default: {
       return page satisfies never
@@ -117,7 +121,7 @@ export const pageHead = (page: Page, check: Check) => {
   if (page === 'proof' && check === 'ready') {
     return {
       title: t`Tout est en place`,
-      body: t`Multifus vous amènera devant le bon personnage à chaque appel du jeu, sans que vous ayez à y penser.`
+      body: t`Retrouvez tout ce qui suit dans la barre de gauche.`
     }
   }
 
@@ -135,7 +139,7 @@ export const pageWay = (page: Page) => {
     }
     case 'notifications': {
       return IS_APPLE
-        ? [words.settings, words.notifications, GAME_IN_SYSTEM]
+        ? [words.settings, words.notifications, words.game]
         : [words.settings, words.system, words.notifications]
     }
     case 'focus': {
@@ -204,4 +208,74 @@ type CheckLineParams = Readonly<{
 
 export const checkLine = ({ step, check, proven }: CheckLineParams) => {
   return check === 'ready' ? readyLine(step, proven) : blockedLine(step)
+}
+
+type ProofHeadingParams = Readonly<{
+  isDone: boolean
+  online: number
+}>
+
+export const proofHeading = ({ isDone, online }: ProofHeadingParams) => {
+  if (isDone) {
+    return checkLine({ step: 'proof', check: 'ready', proven: true })
+  }
+
+  if (online === 0) {
+    return t`Aucun personnage connecté`
+  }
+
+  return plural(online, {
+    one: 'Multifus voit # personnage',
+    other: 'Multifus voit # personnages'
+  })
+}
+
+export type Lead =
+  | Readonly<{ kind: 'ask' }>
+  | Readonly<{ kind: 'open'; systemPage: SystemPage }>
+  | Readonly<{ kind: 'show'; shot: Shot }>
+  | Readonly<{ kind: 'next' }>
+  | Readonly<{ kind: 'none' }>
+
+export const leadOf = (page: Page, isReady: boolean): Lead => {
+  if (isReady) {
+    return { kind: 'next' }
+  }
+
+  if (page === 'authorization') {
+    return { kind: 'ask' }
+  }
+
+  const systemPage = SYSTEM_PAGES[page]
+
+  if (systemPage !== null) {
+    return { kind: 'open', systemPage }
+  }
+
+  const shot = PAGE_SHOTS[page]
+
+  if (shot !== null) {
+    return { kind: 'show', shot }
+  }
+
+  return page === 'proof' ? { kind: 'none' } : { kind: 'next' }
+}
+
+type NextLabelParams = Readonly<{
+  page: Page
+  rank: number
+  count: number
+  isReady: boolean
+}>
+
+export const nextLabel = ({ page, rank, count, isReady }: NextLabelParams) => {
+  if (rank === count) {
+    return isReady ? t`Terminer` : t`Je verrai plus tard`
+  }
+
+  if (rank === 1) {
+    return t`C’est parti`
+  }
+
+  return isReady || page === 'authorization' ? t`Continuer` : t`C’est fait`
 }

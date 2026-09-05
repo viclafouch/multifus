@@ -1,0 +1,486 @@
+@theme inline {
+  --font-carve: 'Bebas Neue', 'Haettenschweiler', sans-serif;
+  --font-plain: 'Roboto', 'Helvetica Neue', sans-serif;
+
+  --color-iron: var(--iron);
+  --color-slate: var(--slate);
+  --color-band: var(--band);
+  --color-khaki: var(--khaki);
+  --color-khaki-lit: var(--khaki-lit);
+  --color-cream: var(--cream);
+  --color-leaf: var(--leaf);
+  --color-stone: var(--stone);
+
+  --text-chapter: 2.875rem;
+  --text-chapter--line-height: 0.94;
+  --text-sign: 2.125rem;
+  --text-sign--line-height: 1.02;
+  --text-action: 1.4375rem;
+  --text-action--line-height: 1.1;
+  --text-bar: 1.25rem;
+  --text-bar--line-height: 1.1;
+  --text-legend: 0.8125rem;
+  --text-legend--line-height: 1.1;
+  --text-tale: 1.0625rem;
+  --text-tale--line-height: 1.62;
+  --text-aside: 0.8125rem;
+  --text-aside--line-height: 1.5;
+  --text-credit: 0.625rem;
+  --text-credit--line-height: 1.3;
+
+  --spacing-knob: 11px;
+  --spacing-stake: 5px;
+  --spacing-lath: 3px;
+  --spacing-fence: 30px;
+  --spacing-crest: 9rem;
+  --spacing-shot: 76vh;
+
+  --tracking-chapter: 0.3em;
+
+  --container-tale: 62ch;
+  --container-scene: 34rem;
+  --container-roll: 44rem;
+}
+
+:root {
+  --iron: #241f19;
+  --slate: #4b463c;
+  --band: #978870;
+  --khaki: #c7bfa1;
+  --khaki-lit: #d2ccac;
+  --cream: #f2ead6;
+  --stone: #b1ac9c;
+  --leaf: #248b2e;
+  --leaf-lit: #289b33;
+  --olive-deep: #848e02;
+  --flame: #e4442c;
+  --night: #021b08;
+}
+
+@utility grove {
+  background-color: var(--iron);
+}
+
+@utility grove-shade {
+  background-image:
+    radial-gradient(
+      116% 68% at 50% 50%,
+      color-mix(in srgb, var(--night), transparent 46%) 0%,
+      color-mix(in srgb, var(--night), transparent 64%) 48%,
+      transparent 88%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--iron), transparent 42%) 0%,
+      transparent 18%,
+      transparent 58%,
+      color-mix(in srgb, var(--iron), transparent 30%) 100%
+    ),
+    radial-gradient(
+      118% 118% at 50% 50%,
+      transparent 40%,
+      color-mix(in srgb, var(--iron), transparent 42%) 100%
+    );
+}
+
+@keyframes drift {
+  from {
+    transform: scale(1.05) translate3d(-1.2%, 0.7%, 0);
+  }
+
+  to {
+    transform: scale(1.14) translate3d(1.2%, -0.9%, 0);
+  }
+}
+
+@utility drift {
+  opacity: 0;
+  transition: opacity 1.1s cubic-bezier(0.4, 0, 0.2, 1);
+  animation-name: drift;
+  animation-duration: 62s;
+  animation-timing-function: cubic-bezier(0.37, 0, 0.63, 1);
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+
+  &[data-here] {
+    opacity: 1;
+  }
+}
+
+@utility plate {
+  overflow: clip;
+  border-radius: 12px;
+  border: 2px solid color-mix(in srgb, var(--band), transparent 32%);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--iron), transparent 22%) 0%,
+    color-mix(in srgb, var(--slate), transparent 30%) 45%,
+    color-mix(in srgb, var(--iron), transparent 18%) 100%
+  );
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--khaki), transparent 88%),
+    inset 0 2px 0 0 color-mix(in srgb, var(--khaki), transparent 80%),
+    inset 0 -2px 0 0 rgb(0 0 0 / 0.4),
+    0 0 0 1px rgb(0 0 0 / 0.55),
+    0 20px 44px -14px rgb(0 0 0 / 0.85);
+}
+
+@utility crest {
+  position: relative;
+  display: block;
+  width: var(--spacing-crest);
+  height: 7px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background-image: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in srgb, var(--khaki), transparent 55%) 28%,
+      color-mix(in srgb, var(--khaki), transparent 55%) 72%,
+      transparent
+    );
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 7px;
+    height: 7px;
+    margin-left: -3.5px;
+    transform: rotate(45deg);
+    background-color: var(--leaf-lit);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--iron), transparent 25%);
+  }
+}
+
+@utility btn-leaf {
+  border: 2px solid var(--stone);
+  transition-property: background-image, border-color, color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 0.2s;
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--leaf-lit), white 10%),
+    var(--leaf) 55%,
+    color-mix(in srgb, var(--leaf), black 18%)
+  );
+  color: #fff;
+  text-shadow: 0 1px 1px var(--olive-deep);
+  box-shadow:
+    0 3px 0 0 rgb(0 0 0 / 0.35),
+    0 10px 20px -8px rgb(0 0 0 / 0.75);
+
+  &:hover {
+    border-color: var(--cream);
+    background-image: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--leaf-lit), white 22%),
+      var(--leaf-lit) 55%,
+      var(--leaf)
+    );
+  }
+
+  &:active {
+    box-shadow: 0 1px 0 0 rgb(0 0 0 / 0.35);
+  }
+}
+
+@utility btn-slate {
+  border: 2px solid color-mix(in srgb, var(--khaki), transparent 64%);
+  transition-property: background-color, border-color, color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 0.2s;
+  background-color: color-mix(in srgb, var(--iron), transparent 25%);
+  color: var(--khaki);
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.5);
+
+  &:hover {
+    border-color: color-mix(in srgb, var(--khaki), transparent 32%);
+    background-color: var(--slate);
+    color: var(--cream);
+  }
+
+  &:active {
+    background-color: var(--iron);
+  }
+}
+
+@utility btn-bare {
+  border: 2px solid transparent;
+  transition-property: background-color, border-color, color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 0.2s;
+  background-color: transparent;
+  color: color-mix(in srgb, var(--khaki), transparent 42%);
+  text-shadow:
+    0 1px 3px rgb(0 0 0 / 0.9),
+    0 3px 18px rgb(0 0 0 / 0.75);
+
+  &:hover {
+    border-color: color-mix(in srgb, var(--khaki), transparent 68%);
+    background-color: color-mix(in srgb, var(--iron), transparent 30%);
+    color: var(--cream);
+  }
+}
+
+@utility plaque {
+  background-color: color-mix(in srgb, var(--iron), transparent 25%);
+  border: 1px solid color-mix(in srgb, var(--band), transparent 45%);
+  color: var(--khaki);
+  box-shadow: inset 0 1px 0 0 rgb(0 0 0 / 0.4);
+}
+
+@utility badge {
+  --mark: var(--leaf-lit);
+
+  color: color-mix(in srgb, var(--mark), white 52%);
+  text-shadow: 0 1px 3px rgb(0 0 0 / 0.85);
+
+  &[data-check='blocked'] {
+    --mark: var(--flame);
+  }
+}
+
+@utility pip {
+  background-color: var(--mark, var(--khaki));
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.45);
+}
+
+@utility pip-live {
+  --mark: var(--leaf-lit);
+}
+
+@utility frame {
+  background-color: color-mix(in srgb, var(--iron), transparent 12%);
+  border: 2px solid color-mix(in srgb, var(--band), transparent 40%);
+  box-shadow:
+    inset 0 1px 0 0 color-mix(in srgb, var(--khaki), transparent 82%),
+    0 10px 24px -10px rgb(0 0 0 / 0.85);
+}
+
+@utility fenceline {
+  filter: drop-shadow(0 2px 5px rgb(0 0 0 / 0.85));
+}
+
+@utility rail {
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--slate), var(--band) 45%),
+    var(--slate)
+  );
+  box-shadow: 0 1px 0 0 rgb(0 0 0 / 0.5);
+}
+
+@utility stake {
+  background-image: linear-gradient(
+    90deg,
+    var(--iron),
+    color-mix(in srgb, var(--slate), var(--band) 45%) 42%,
+    var(--iron)
+  );
+}
+
+@utility knob {
+  background-image: radial-gradient(
+    circle at 36% 28%,
+    color-mix(in srgb, var(--slate), var(--band) 62%),
+    var(--slate) 62%,
+    var(--iron)
+  );
+  transition-property: background-image, box-shadow;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 0.2s;
+}
+
+@utility knob-lit {
+  background-image: radial-gradient(
+    circle at 36% 28%,
+    color-mix(in srgb, var(--khaki-lit), white 30%),
+    var(--khaki) 55%,
+    color-mix(in srgb, var(--band), black 22%)
+  );
+}
+
+@utility knob-here {
+  box-shadow:
+    0 0 0 2px rgb(0 0 0 / 0.45),
+    0 0 10px 1px color-mix(in srgb, var(--cream), transparent 32%);
+}
+
+@utility sonar-leaf {
+  --sonar-ink: var(--leaf-lit);
+}
+
+@utility sonar-still {
+  &::before,
+  &::after {
+    display: none;
+  }
+}
+
+@utility limelight {
+  text-shadow:
+    0 2px 0 color-mix(in srgb, var(--iron), transparent 40%),
+    0 1px 4px rgb(0 0 0 / 0.95),
+    0 4px 22px rgb(0 0 0 / 0.8);
+}
+
+@utility rule {
+  border-color: color-mix(in srgb, var(--khaki), transparent 72%);
+}
+
+@keyframes chapter {
+  0% {
+    opacity: 0;
+    transform: translateY(14px) scale(0.97);
+  }
+
+  12% {
+    opacity: 1;
+    transform: none;
+  }
+
+  76% {
+    opacity: 1;
+    transform: none;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-14px) scale(1.04);
+  }
+}
+
+@utility chapter {
+  animation-name: chapter;
+  animation-duration: 2500ms;
+  animation-delay: 250ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-fill-mode: both;
+}
+
+@keyframes unfurl {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@utility unfurl {
+  animation-name: unfurl;
+  animation-duration: 700ms;
+  animation-delay: 2150ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-fill-mode: backwards;
+}
+
+@keyframes lift {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@utility lift {
+  animation-name: lift;
+  animation-duration: 700ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-fill-mode: backwards;
+}
+
+@utility lift-1 {
+  animation-delay: 2500ms;
+}
+
+@utility lift-2 {
+  animation-delay: 2700ms;
+}
+
+@utility lift-3 {
+  animation-delay: 2900ms;
+}
+
+@utility lift-4 {
+  animation-delay: 3300ms;
+}
+
+@utility lift-5 {
+  animation-delay: 3500ms;
+}
+
+@utility roll {
+  & > * {
+    animation-name: lift;
+    animation-duration: 620ms;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+    animation-fill-mode: backwards;
+  }
+
+  & > *:nth-child(1) {
+    animation-delay: 3000ms;
+  }
+
+  & > *:nth-child(2) {
+    animation-delay: 3130ms;
+  }
+
+  & > *:nth-child(3) {
+    animation-delay: 3260ms;
+  }
+
+  & > *:nth-child(4) {
+    animation-delay: 3390ms;
+  }
+
+  & > *:nth-child(5) {
+    animation-delay: 3520ms;
+  }
+
+  & > *:nth-child(6) {
+    animation-delay: 3650ms;
+  }
+
+  & > *:nth-child(7) {
+    animation-delay: 3780ms;
+  }
+
+  & > *:nth-child(8) {
+    animation-delay: 3910ms;
+  }
+
+  & > *:nth-child(9) {
+    animation-delay: 4040ms;
+  }
+
+  & > *:nth-child(10) {
+    animation-delay: 4170ms;
+  }
+}
+
+@utility lift-chrome {
+  animation-delay: 240ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drift[data-here] {
+    animation: none !important;
+  }
+}

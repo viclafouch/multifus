@@ -1,16 +1,9 @@
-import type { VariantProps } from 'class-variance-authority'
 import { Expand, X } from 'lucide-react'
 import { t } from '@lingui/core/macro'
-import { Button, type buttonVariants } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogTitle,
-  DialogTrigger
-} from '@/components/ui/dialog'
-
-type ButtonLook = VariantProps<typeof buttonVariants>
+import type { ButtonLook } from '@/components/button-look'
+import { ShotSheet } from '@/components/shot-sheet'
+import { Button } from '@/components/ui/button'
+import { Dialog, DialogClose, DialogTrigger } from '@/components/ui/dialog'
 
 type ShotDialogProps = Readonly<{
   source: string
@@ -31,11 +24,7 @@ export const ShotDialog = ({
         <Expand aria-hidden />
         {t`Voir l’image`}
       </DialogTrigger>
-      <DialogContent
-        showCloseButton={false}
-        className="pointer-events-none inset-0 flex max-w-none translate-x-0 translate-y-0 items-center justify-center bg-transparent p-6 ring-0 sm:max-w-none"
-      >
-        <DialogTitle className="sr-only">{alt}</DialogTitle>
+      <ShotSheet alt={alt}>
         <div className="pointer-events-auto relative min-w-0 rounded-xl bg-popover p-2 ring-1 ring-foreground/10">
           <img
             src={source}
@@ -55,7 +44,7 @@ export const ShotDialog = ({
             <X aria-hidden />
           </DialogClose>
         </div>
-      </DialogContent>
+      </ShotSheet>
     </Dialog>
   )
 }

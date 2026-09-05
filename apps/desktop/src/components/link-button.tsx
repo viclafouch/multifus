@@ -1,9 +1,7 @@
-import type { VariantProps } from 'class-variance-authority'
 import { ExternalLink } from 'lucide-react'
-import { Button, buttonVariants } from '@/components/ui/button'
+import type { ButtonLook } from '@/components/button-look'
+import { Button } from '@/components/ui/button'
 import { ignore } from '@/lib/utils'
-
-type ButtonLook = VariantProps<typeof buttonVariants>
 
 type LinkButtonProps = Readonly<{
   label: string

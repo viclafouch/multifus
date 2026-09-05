@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { PAGE_ICONS } from '@/constants/onboarding'
+import { SYSTEM_PAGES } from '@/constants/onboarding'
 import VIEW_SOURCE from '../../src-tauri/src/app/view.rs?raw'
 
 const STEP_BLOCK = /pub enum Step \{(?<variants>[^}]+)\}/u
@@ -19,6 +19,6 @@ const RUST_STEPS = (STEP_BLOCK.exec(VIEW_SOURCE)?.groups?.variants ?? '')
 describe('les étapes de la prise en main', () => {
   it('sont celles que le Rust nomme, dans le même ordre, la bienvenue en tête', () => {
     expect(RUST_STEPS).toHaveLength(5)
-    expect(Object.keys(PAGE_ICONS)).toStrictEqual(['welcome', ...RUST_STEPS])
+    expect(Object.keys(SYSTEM_PAGES)).toStrictEqual(['welcome', ...RUST_STEPS])
   })
 })
