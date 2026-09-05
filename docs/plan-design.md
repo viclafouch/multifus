@@ -119,29 +119,16 @@ dans la barre de menus et que macOS y peint tout d'une seule couleur.
 
 Il est relevé, écrit et figé dans
 [docs/design-system.md](./design-system.md) : d'où vient chaque couleur, chaque
-fonte, chaque matière, et ce qui a été écarté. Ce plan ne le répète pas.
+fonte, chaque matière, ce qui a été écarté, les huit règles, et ce qu'il reste à
+relever pour les écrans qui viennent. Ce plan ne le répète pas.
 
-## La prise en main est une scène, pas un tutoriel
+## La prise en main est livrée
 
-Pas de fenêtre posée sur une image : l'image est l'écran. Une étape, un décor du
-jeu en plein cadre, et le texte dessus. On enchaîne comme un film.
-
-Chaque étape s'ouvre sur un carton de chapitre au milieu de l'écran, « ÉTAPE 2
-SUR 6 » et le nom de l'étape entre deux filets. Il tient deux secondes et demie,
-le temps de le lire, s'efface vers le haut, et le texte arrive alors dans
-l'ordre : le titre, le corps, le chemin du réglage, le contrôle, les boutons, à
-200 ms d'écart. Tout est posé à quatre secondes.
-
-Le décor ne s'arrête jamais de bouger : un aller-retour de soixante-deux
-secondes,
-qui tourne sur les six images en même temps. C'est ce qui règle un défaut vu à
-l'essai : quand la panoramique ne tournait que sur l'image de l'étape en cours,
-la sortante se recalait d'un coup au moment du changement, et l'image sautait.
-Rien ne s'arrête, donc plus rien ne saute, et le passage d'une étape à l'autre
-n'est plus qu'une opacité.
-
-Les six décors sont dans `apps/desktop/src/assets/ankama/`, un par étape, et
-chacun raconte son étape :
+Six scènes, un décor du jeu en plein cadre par étape, un carton de chapitre au
+milieu, puis la plaque qui se déplie et son contenu qui monte cran par cran.
+Commit `b5c378c`. Le pourquoi de chaque choix est dans
+[docs/design-system.md](./design-system.md) ; il ne reste ici que la provenance
+des six images, parce qu'elles vivent dans le dépôt.
 
 | Étape             | Décor          | Pourquoi                                |
 | ----------------- | -------------- | --------------------------------------- |
@@ -156,99 +143,28 @@ Les cinq premiers sont recadrés en 4:3 depuis
 `static.ankama.com/dofus-retro/www/modules/mmorpg/discover/assets/screens/screenN.jpg`,
 le sixième depuis
 `static.ankama.com/upload/backoffice/direct/2021-02-22/827fd3d564a0507051826a7fcf5f5e18.png`.
-608 ko à eux six, en WebP. Ils portent le logo Dofus Retro d'Ankama incrusté, et
-la mention de droits est répétée sous la clôture. La [licence](../LICENSE) exclut
-le dossier du MIT.
+608 ko à eux six, en WebP, dans `apps/desktop/src/assets/ankama/`. Ils portent le
+logo Dofus Retro d'Ankama incrusté, et la mention de droits est répétée sous la
+clôture. La [licence](../LICENSE) exclut le dossier du MIT.
 
-Ce qui tient tout ça est du CSS, pas une bibliothèque. Rien n'est monté ni
-démonté au fil de l'animation : tout est là dès la première image, seules
-l'opacité et la translation bougent. Un joueur pressé clique sans attendre la
-fin, un lecteur d'écran lit tout tout de suite, et les tests trouvent chaque
-bouton à la milliseconde zéro. Une bibliothèque d'animation n'aurait rien ajouté
-à ça et aurait demandé de démonter des éléments, ce qui casse les deux.
+## Ce qui vient : tout le reste du logiciel
 
-Les délais sont dans `retro.css`, `lift-1` à `lift-5` et `chapter`. Le bloc
-`prefers-reduced-motion` de `index.css` remet maintenant les délais à zéro en
-plus des durées : sans ça, un joueur qui coupe les animations aurait attendu
-deux secondes devant un écran vide.
+Même système, même univers, mais ce ne sont plus des étapes : ce sont des écrans
+qu'on rouvre tous les jours. La section « Étendre le système au reste de
+Multifus » de [docs/design-system.md](./design-system.md) dit ce qui passe tel
+quel, ce qui ne passe pas, et les douze matières qui manquent encore.
 
-- `apps/desktop/src/retro.css` : le système, tout entier. Importé après
-  `theme.css`, et aucun jeton de couleur ni aucune matière ne se croise avec
-  l'ancien
-- `apps/desktop/src/components/retro/` : le `Button` à trois faces, la `Scene` et
-  son fondu enchaîné, la `ChapterCard` du carton, la `StepFence` des étapes, le
-  `StepState` du contrôle, le `SettingPath` du chemin, le `FeatureRoll` du
-  générique
+Trois choses à trancher avant de dessiner, et elles sont pour Victor :
 
-Les étapes sont une clôture d'enclos en bas de l'écran, un piquet par étape, la
-tête claire quand l'étape est passée. Elle n'est pas verte : le vert dirait le
-geste du moment, et un piquet ne dit que l'avancement.
-
-## Un seul bouton vert par écran
-
-L'écran d'essai en montrait quatre à la fois, et deux n'étaient même pas
-cliquables : le chemin du réglage et l'état du contrôle portaient un fond et un
-bord, donc ils avaient l'air de boutons. Trois règles en sortent.
-
-- **Ce qui n'est pas cliquable ne porte pas de boîte.** Le chemin est du texte
-  kaki, sans fond ni bord, l'état est un point de couleur suivi d'une phrase. Il
-  ne reste de fond que sous les vrais boutons
-- **Le vert désigne le geste du moment, jamais l'avancement.** `leadOf` dans
-  `helpers/onboarding.ts` le choisit, et rend le geste avec ce qu'il faut pour
-  l'accomplir : autoriser si l'étape est l'autorisation, ouvrir la page du
-  système s'il y en a une, montrer la capture du jeu s'il y en a une, avancer si
-  le contrôle est bon, et rien du tout sur l'essai tant que le jeu n'a pas
-  appelé, parce que là il n'y a rien à cliquer, il faut aller jouer. Avant,
-  « Continuer » était vert même sans rien avoir fait : l'écran disait de sauter
-  l'étape
-- **Le reste passe en second**, en dessous, plus petit et sans couleur, y
-  compris « Continuer »
-
-## Le wording
-
-Une étape dit ce que le joueur y gagne, et [CONTEXT.md](../CONTEXT.md) le
-demandait déjà. Le titre nomme le réglage comme le système l'écrit, il n'a pas
-bougé et il sert aussi l'écran des Paramètres. Le corps, lui, est neuf.
-
-Il dit ce qu'il faut faire, pas ce que ça évoque. « Un combat, un message privé :
-Multifus vous amène devant » ne dit pas au joueur ce qu'il doit faire ; « Recevez
-un message privé ou entrez en combat : sa fenêtre passera devant toute seule »
-le dit. Chaque corps commence par un verbe et tient entre 120 et 160 signes, pour
-que les six pages aient le même poids.
-
-## Le film montre tout Multifus
-
-La prise en main ne vend pas que l'AutoFocus : quelqu'un qui la finit doit savoir
-tout ce qu'il vient d'installer. Les fonctionnalités sont dans
-`constants/features.ts`, une table de neuf, et elles se montrent deux fois :
-
-- **À la bienvenue**, leurs noms seuls, sur trois colonnes qui s'écrivent l'une
-  après l'autre
-- **À la fin**, une fois l'essai réussi, le générique : les neuf sur trois
-  colonnes, chacune avec sa phrase, et l'écran s'élargit pour les tenir
-
-Trois colonnes et pas deux, parce que deux débordaient de la fenêtre. Sous 640 px
-de haut, la variante `short` retire les phrases et ne garde que les noms : le
-relevé de `scrollHeight - clientHeight` rend zéro sur les six étapes, à 880 × 660
-comme à la taille minimale de 720 × 520.
-
-Huit des neuf portent le nom d'un écran de la barre de gauche, et
-`constants/features.test.ts` refuse qu'un écran ouvrable manque au générique :
-ajouter une fonctionnalité sans l'annoncer casse le test.
-
-La cascade est l'utilitaire `roll` de `retro.css`, qui donne son délai à chaque
-enfant par `nth-child`. C'est du CSS parce qu'un style en ligne est interdit ici
-et qu'une valeur arbitraire dans un composant l'est aussi.
-
-## Ce que le système a ajouté au dépôt
-
-Deux paquets, tous deux dans `apps/desktop` : `@fontsource/bebas-neue` pour les
-titres et les boutons, `@fontsource/roboto` pour le texte courant, en 400, 500 et 700. Ils sont importés dans `index.css`, avant `theme.css` et `retro.css`.
-[docs/design-system.md](./design-system.md) dit pourquoi ce sont celles-là, et
-pourquoi elles ne viennent pas d'un CDN.
+- **Les icônes** de la barre de gauche : les garder, les enlever, ou en dessiner
+  un jeu. C'est ce qui décide de l'allure de tout le logiciel
+- **Le décor** : une image d'Ankama au fond de chaque écran, seulement au fond de
+  ceux où l'on entre, ou pas d'image du tout et rien qu'une matière
+- **Par quel écran commencer** : le plus dense dit tout de suite si le système
+  tient, donc Raccourcis ou Personnages
 
 ## Ce qui reste à décider
 
+- Les trois questions ci-dessus
 - Quelles images Victor garde, dans la galerie
-- Les autres écrans, un par un, sur le même système
 - Le logo

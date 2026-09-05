@@ -46,6 +46,29 @@ boutons orange en pilule, et les avoir repris a fait dériver tout l'écran hors
 système. Sur le site, l'orange (`#f2801b`, `#ee5a12`) ne sert qu'à colorer un
 titre de texte, jamais un bouton. Les boutons du site sont verts.
 
+### Y retourner avant de dessiner
+
+Le système n'est pas fini : il ne couvre que ce que la prise en main a demandé.
+Dès qu'un écran a besoin d'une matière qui n'est pas dans les tables plus bas, on
+retourne à la source plutôt que d'inventer. C'est ce qui garde le logiciel dans
+l'univers du jeu au lieu de le faire glisser vers un thème générique.
+
+La marche à suivre, et ses pièges, relevés le 5 septembre 2026 :
+
+- **La feuille de style se prend en direct.** `curl` sur
+  `https://static.ankama.com/dofus-retro/www/modules/common/common.css`.
+  CloudFront refuse un Chrome sans interface sur `www.dofus-retro.com`, donc on
+  n'ouvre pas le site avec un navigateur piloté
+- **Elle est minifiée sur peu de lignes**, 1,5 Mo, et une expression régulière en
+  Python s'y perd sans fin. `tr '}' '\n'` puis `grep` la lit en une seconde
+- **On lit à la main, et on ne garde que des adresses.** L'article 13.5 des CGU
+  d'Ankama qualifie le moissonnage automatisé de ses sites d'acte de
+  contrefaçon. Le relevé sert à repérer, pas à ramasser
+- **Le client donne ce que le site n'a pas.** Le site est une vitrine : il a des
+  panneaux, des titres et des boutons, pas de champ de saisie, pas d'onglet, pas
+  de curseur. La fenêtre Options du jeu les a tous, et c'est là qu'on va pour un
+  écran de travail
+
 ## Les fontes
 
 | Rôle                        | Fonte                      | Preuve                                                          |
@@ -183,9 +206,9 @@ Elles viennent toutes d'un essai raté, et elles se tiennent.
 1. **Un seul bouton vert par écran**, et il désigne le geste du moment, jamais
    l'avancement. « Continuer » vert alors que rien n'est fait dit au joueur de
    sauter l'étape
-2. **Ce qui n'est pas cliquable ne porte pas de bouton.** Un chemin de réglage
-   est une plaque incrustée, un état est un point de couleur suivi d'une phrase.
-   Quatre boîtes empilées dont deux sont mortes, et on ne sait plus où cliquer
+2. **Ce qui n'est pas cliquable ne porte ni fond ni bord.** Un chemin de réglage
+   est du texte, un état est un point de couleur suivi d'une phrase. Quatre
+   boîtes empilées dont deux sont mortes, et on ne sait plus où cliquer
 3. **Le décor ne s'arrête jamais de bouger.** Si la panoramique ne tourne que sur
    l'image affichée, la sortante se recale d'un coup au changement et l'image
    saute. Tout tourne, tout le temps, et changer d'étape n'est plus qu'une
@@ -265,6 +288,70 @@ porte aucune couleur de thème : `grain` pour le grain de l'image, `selectable`
 pour un texte qu'on veut pouvoir copier, `sonar` pour l'onde d'écoute, dont
 l'encre se donne par `--sonar-ink`. Un écran passe au nouveau système quand il
 est refait, jamais à moitié.
+
+## Étendre le système au reste de Multifus
+
+La prise en main est livrée. Elle a servi à poser le système, pas à l'épuiser :
+c'est une scène qu'on traverse une fois, et tout le reste du logiciel est fait
+d'écrans qu'on rouvre tous les jours. Ce qui suit dit ce qui passe tel quel, ce
+qui ne passe pas, et ce qui manque encore.
+
+Il reste à refaire les dix écrans de la barre de gauche (Personnages, Raccourcis,
+Réponses rapides, AutoFocus, Déplacement rapide, Roue des personnages, Tableau
+des runes, Messages privés, Paramètres, À propos), les trois fenêtres à part
+(`banner.html`, `wheel.html`, `rune-table.html`) et le cadre qui les tient.
+
+### Ce qui passe tel quel
+
+Les jetons de couleur, les deux fontes, les trois faces du bouton, la `plaque`,
+le `frame`, le `badge` et son `pip`, le `limelight`, le `crest`. Les huit règles
+plus haut, toutes. Les règles de voix : un verbe pour commencer, les mots du jeu,
+les guillemets sur ce que le joueur lit sur son propre écran, jamais de métaphore
+là où il y a un geste à faire.
+
+Deux règles comptent double sur un écran de travail, parce qu'il porte plus de
+choses qu'une étape : **un seul bouton vert**, et **ce qui n'est pas cliquable ne
+porte ni fond ni bord**. Une liste de vingt raccourcis où chaque ligne a un
+cadre, c'est l'écran d'essai en pire.
+
+### Ce qui ne passe pas
+
+- **La chorégraphie de quatre secondes.** `unfurl`, `lift-1` à `lift-5` et
+  `chapter` sont faits pour une scène qu'on traverse une fois. Un écran qu'on
+  rouvre vingt fois par jour doit être lisible tout de suite. La règle qui en
+  sort : **une animation qui fait attendre ne se pose que là où on ne passe
+  qu'une fois**
+- **Le carton de chapitre.** Il annonce une étape dans un enchaînement. Un écran
+  ouvert depuis la barre de gauche n'a rien à annoncer
+- **La clôture des étapes.** `StepFence`, `stake` et `knob` ne disent qu'un
+  avancement, et il n'y en a plus
+- **Le décor en plein cadre qui bouge.** `drift` derrière un tableau de runes,
+  c'est du bruit sous des chiffres qu'on vient lire. Et ce serait une image
+  d'Ankama posée sous chaque écran, en permanence, ce que la licence supporte mal
+
+### Ce qui manque, et qu'il faudra relever
+
+Le système n'a aujourd'hui aucune de ces matières, parce que la prise en main
+n'en avait pas besoin. Chacune se prend sur la fenêtre Options du client, qui les
+a toutes :
+
+le champ de saisie, la zone de texte, la liste déroulante, l'interrupteur, la
+case à cocher, le curseur, l'onglet, le tableau, l'infobulle, la barre de
+défilement, le séparateur, et le cadre de fenêtre lui-même avec sa barre de
+titre.
+
+### Les trois questions ouvertes, à trancher avec Victor
+
+1. **Les icônes.** Le système écarte `lucide`, et la barre de gauche en pose une
+   par écran aujourd'hui. Trois issues : les garder pour la seule barre, s'en
+   passer et n'y mettre que du texte en capitales comme le fait le site, ou en
+   dessiner un jeu maison. Rien n'est tranché, et c'est la question qui décide de
+   l'allure de tout le logiciel
+2. **Le décor.** Est-ce qu'une image d'Ankama reste au fond de chaque écran, ou
+   seulement de ceux où l'on entre ? Le fond peut aussi n'être qu'une matière,
+   sans image, ce qui règle la question des droits d'un coup
+3. **Par quel écran commencer.** Le plus dense dit tout de suite si le système
+   tient : Raccourcis, ou Personnages
 
 ## Les images
 
