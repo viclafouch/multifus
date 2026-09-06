@@ -268,7 +268,7 @@ shield`
 ## Ce qui a déjà été essayé
 
 Dix pistes de composition dans
-[plan-design-logos.html](./plan-design-logos.html), à ouvrir dans un navigateur :
+[logo-pistes.html](./logo-pistes.html), à ouvrir dans un navigateur :
 la ponte, le Dofus Ocre, le monogramme, la couvée, les trois fenêtres, le kama,
 la roue, le triskèle, l'écu, la touche. Elles sont vectorielles et plates, donc
 pas le rendu voulu, mais elles servent à choisir une composition avant de la faire

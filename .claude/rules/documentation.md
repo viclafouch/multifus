@@ -1,20 +1,24 @@
 ## Documentation & Sync
 
-### Principle
+### Where a fact lives
 
-- **CLAUDE.md** = Operational instructions (stack without versions, commands, tools)
-- **`docs/plan.md`** = Detailed specs, milestones, exact versions
-- **`apps/desktop/package.json` / `apps/desktop/src-tauri/Cargo.toml`** = Source of truth for versions
+- **CLAUDE.md** = operational instructions: stack without versions, commands, tools
+- **`CONTEXT.md`** = the words of the domain
+- **`docs/plan.md`** = what remains to do, one line per thing. A line done is deleted, not ticked
+- **`docs/design-system.md`** = the rules that decide what a screen looks like. It copies no value: the CSS holds them
+- **`docs/plan-<subject>.md`** = the subject being worked right now. Deleted once shipped, handing back to `docs/plan.md` whatever it did not finish
+- **`apps/desktop/package.json` / `apps/desktop/src-tauri/Cargo.toml`** = source of truth for versions
 
 The root `package.json` carries no version: only the software is numbered, and
 `commit-and-tag-version` numbers it from `apps/desktop`.
 
-Never put version numbers in CLAUDE.md (sync risk).
+Never put a version number in a document (sync risk). Never copy into a document
+a value the code already holds: point at the file instead.
 
 ### After Code Changes
 
-1. Update `docs/plan.md` if applicable (step reached, decisions taken, libs added)
-2. Verify CLAUDE.md remains valid (stack, patterns)
+1. Delete from `docs/plan.md` every line the change has done, and add the ones it revealed
+2. Verify CLAUDE.md remains valid (stack, patterns, pointers)
 3. `pnpm run lint:fix` from the root
 
 ### Adding a Dependency
@@ -24,18 +28,16 @@ Never put version numbers in CLAUDE.md (sync risk).
 3. Install with exact required versions, in the package that imports it:
    `pnpm --filter @multifus/desktop add <name>`. The root takes only what the
    whole repository needs, the linters and the formatter
-4. Document in the plan
 
 ### Removing a Dependency
 
 1. Remove from the right `package.json`, or from `Cargo.toml`
 2. `pnpm install`
 3. Search and remove orphan imports
-4. Remove from plan
 
 ### Checklist
 
-- [ ] Plan up to date (step, decisions, libs)
-- [ ] CLAUDE.md consistent
+- [ ] `docs/plan.md` up to date, lines done deleted
+- [ ] CLAUDE.md consistent, every pointer resolving
 - [ ] No orphan imports
 - [ ] `pnpm run lint:fix` passes

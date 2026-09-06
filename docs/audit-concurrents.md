@@ -33,9 +33,9 @@ journalise ligne par ligne :
 Nous lisons les quatre depuis, une fois par tour, et le journal porte chaque
 bascule d'une étape. Rien n'a encore été essayé sur une vraie machine Windows.
 
-Le sujet est passé dans [plan-accueil.md](./plan-accueil.md), qui le prend en
-entier : les contrôles, ce que le Mac ne sait pas lire, l'écran qui les montre,
-et ce qui reste à essayer là-bas.
+La mise en route a repris le sujet en entier : les contrôles, ce que le Mac ne
+sait pas lire, et l'écran qui les montre. `CONTEXT.md` tient les mots, aux
+entrées **Étape** et **Contrôle**.
 
 ### 2. Le personnage exclu vole quand même le premier plan
 
@@ -194,18 +194,5 @@ Retro Toolbox interroge un Supabase pour les prix de l'hôtel de vente
 (`hdv_prices.py`, dossier `supabase`). Dracoon écrit dans le registre pour
 migrer ses anciens réglages.
 
-## Ce qu'il reste à essayer sur Windows
-
-- L'instance unique, livrée : lancer Multifus une deuxième fois. Le second
-  lancement doit s'arrêter tout seul, la fenêtre du premier revenir devant, et
-  le journal porter « Multifus tournait déjà ». À essayer aussi Multifus rangé
-  dans la barre système, fenêtre fermée.
-- Un client Dofus lancé en administrateur : notre titre court, notre tête de
-  classe et notre bascule échouent tous en silence sur sa fenêtre, et le
-  personnage reste pourtant dans le roster. Vérifier ce que dit le journal.
-- Le point 3 : est-ce que le jeu passe devant tout seul au début d'un tour.
-
-## Ce que ce document a corrigé ailleurs
-
-`concurrents.md` listait l'attestation de compilation comme un manque à
-creuser. Elle est déjà en place. La ligne est retirée.
+Ce que ce document laisse à essayer sur une vraie machine est passé dans
+[plan.md](./plan.md).

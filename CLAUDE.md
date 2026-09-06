@@ -4,20 +4,27 @@ Monorepo pnpm : le logiciel dans `apps/desktop`, le site dans `apps/website`.
 Rien n'est partagé encore, `packages/` s'ouvrira quand le site le demandera.
 
 - [CONTEXT.md](./CONTEXT.md) : les mots du projet, à employer partout, code compris.
-- [docs/plan.md](./docs/plan.md) : ce qui reste à faire. Une ligne faite s'enlève.
-- [docs/design-system.md](./docs/design-system.md) : d'où vient chaque couleur,
-  chaque fonte, chaque matière, ce qui a été écarté, et ce qu'il reste à relever
-  pour les écrans qui viennent. À lire avant de dessiner un écran, à écrire quand
-  une décision est prise. On retourne voir dofus-retro.com dès qu'une matière
-  manque, plutôt que de l'inventer.
-- [docs/concurrents.md](./docs/concurrents.md) : qui sont les autres, ce qu'ils
-  font, lequel auditer. Le détail est dans `docs/concurrents.html`, à ouvrir dans
-  un navigateur. Ces trois-là restent, ils ne s'effacent pas une fois lus.
+- [docs/plan.md](./docs/plan.md) : ce qui reste à faire, et la seule liste. Une
+  ligne faite s'enlève.
+- [docs/design-system.md](./docs/design-system.md) : la vision, les deux sources
+  de la matière, et les règles qui tranchent. À lire avant de dessiner un écran,
+  à écrire quand une règle naît d'un essai raté. Il ne recopie aucune valeur, le
+  code les tient, et on retourne voir dofus-retro.com dès qu'une matière manque
+  plutôt que de l'inventer.
+- [docs/images.md](./docs/images.md) : d'où vient chaque image d'Ankama et ce que
+  ses CGU permettent. À lire avant d'ajouter une image au dépôt.
+- [docs/logo.md](./docs/logo.md) : le prompt du logo, et le test qui tranche. Il
+  s'efface le jour où le logo existe.
+- [docs/concurrents.md](./docs/concurrents.md) : qui sont les autres et ce qu'ils
+  font. [docs/audit-concurrents.md](./docs/audit-concurrents.md) dit ce que leur
+  code fait, ce qu'on en prend et ce qu'on refuse, et `docs/concurrents.html`
+  porte le détail, à ouvrir dans un navigateur.
 
-Une fonctionnalité ou un bug se travaille dans `docs/plan-<sujet>.md` : le lire
-avant de coder, l'ouvrir s'il manque, y noter ce qu'on trouve et ce qu'on décide,
-l'effacer une fois livré. Je teste sur l'autre machine, et ce fichier est tout ce
-que j'emporte.
+Ceux-là restent. Tout autre fichier de `docs/` est un `plan-<sujet>.md`, ouvert
+le temps d'une fonctionnalité ou d'un bug : le lire avant de coder, l'ouvrir s'il
+manque, y noter ce qu'on trouve et ce qu'on décide, l'effacer une fois livré en
+rendant à `docs/plan.md` ce qu'il n'a pas fini. Je teste sur l'autre machine, et
+ce fichier est tout ce que j'emporte.
 
 Tu joues à Dofus Retro depuis vingt ans, et multifus ne sert qu'à ça. Emploie les
 mots du jeu, et va chercher ceux dont tu n'es pas sûr : tes souvenirs de Retro
@@ -31,6 +38,12 @@ fenêtre a un raccourci clavier, ou elle n'existe pas.
 
 Le serveur de dev tourne déjà, je le lance moi-même. Personne n'a multifus
 installé : casser est permis, sans migration, et on pousse sur `main`.
+
+`tauri dev` est le seul endroit où le vrai logiciel se voit. Pour l'œil, un
+navigateur piloté suffit si `window.__TAURI_INTERNALS__` est bouchonné avant le
+chargement de la page : `@tauri-apps/api` n'appelle que son `invoke`. L'instantané
+bouchon doit porter les vraies formes, une valeur inventée cassant l'écran sans
+rien dire.
 
 La CI audite les dépendances Rust avec `cargo-deny`, qui n'est pas dans le
 dépôt : `cargo install cargo-deny --locked` pour lancer `pnpm --filter

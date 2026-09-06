@@ -18,7 +18,7 @@ paths: ['apps/desktop/src/**/*.{ts,tsx}']
 ### Libraries
 
 - ALWAYS use shadcn components instead of raw HTML elements, `<Input>` instead of `<input>`, `<Textarea>` instead of `<textarea>`, etc.
-- **Never modify code** in `apps/desktop/src/components/ui` - run `pnpm run lint:fix` first (auto-fixes formatting), then rely on the override in `oxlint.config.ts` for the remaining errors
+- **Edit `apps/desktop/src/components/ui` only to give a component the retro matter** - nothing is regenerated from shadcn anymore. Run `pnpm run lint:fix` first (auto-fixes formatting), then rely on the override in `oxlint.config.ts` for the remaining errors
 - **No margins on icons in buttons** - shadcn Button has built-in `gap` spacing
 
 ### Accessibility (WCAG 2.1 AA)
@@ -62,7 +62,7 @@ paths: ['apps/desktop/src/**/*.{ts,tsx}']
 ### Tailwind CSS
 
 - **No arbitrary values in components** (e.g., `font-[Bricolage_Grotesque]`, `text-[14px]`)
-- Define custom utilities in global CSS (`apps/desktop/src/index.css`) and reuse them
+- Define custom utilities in `apps/desktop/src/retro.css`, which holds the design system, and reuse them. `index.css` keeps only what the main window needs
 - Keep styling consistent: one source of truth for design tokens (fonts, colors, spacing)
 - If a value is used more than once, it should be a utility class or CSS variable
 - **Prefer `gap`/`space-y`/`space-x`** over `mt-*`/`mb-*` for spacing between siblings
@@ -82,10 +82,11 @@ paths: ['apps/desktop/src/**/*.{ts,tsx}']
 - Buttons already have built-in hover states via shadcn - don't override with custom transforms
 - Links use `hover:text-primary` or `hover:text-foreground` - keep it simple
 - **Consistency over creativity**: match existing patterns, don't invent new interactions
+- The clearing menu (`btn-way`) is the one place that moves on hover, and `docs/design-system.md` rule 18 holds that exception. Leave it alone
 
 ### Animations
 
 - **Respect `prefers-reduced-motion`**
 - **Standard durations**: 0.2s (fast), 0.3s (normal), 0.5s (slow)
 - **Standard easings**: `[0.4, 0, 0.2, 1]` (ease-out), `[0.4, 0, 1, 1]` (ease-in)
-- When CSS transitions or keyframes are used, add a named class and include it in the `@media (prefers-reduced-motion: reduce)` block of `apps/desktop/src/index.css` with `transition: none`
+- When CSS transitions or keyframes are used, add a named class and include it in the `@media (prefers-reduced-motion: reduce)` block of the sheet that declares it, `retro.css` or `index.css`. Cancel the delays too, not only the durations
