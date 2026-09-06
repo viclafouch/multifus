@@ -37,7 +37,6 @@ describe('le monde', () => {
       'Réponses rapides',
       'AutoFocus',
       'Déplacement rapide',
-      'Roue des personnages',
       'Tableau des runes',
       'Messages privés',
       'Paramètres',

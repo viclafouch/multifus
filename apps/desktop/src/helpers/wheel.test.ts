@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Display } from '@/@types/display'
 import type { WheelSize } from '@/@types/wheel'
-import { DRAWN_SCREEN } from '@/constants/display'
 import {
   DEMO_FEWEST,
   DEMO_USUAL,
@@ -9,6 +8,7 @@ import {
   HEAD_SMALLEST,
   LABEL_SMALLEST
 } from '@/constants/wheel'
+import { screenShape } from '@/helpers/display'
 import { dialShape, drawnWheel, headPlace, slicePath } from '@/helpers/wheel'
 
 const DEAD_ZONE = 0.32
@@ -140,25 +140,28 @@ describe('drawnWheel', () => {
     widest: 720,
     step: 20,
     deadZone: DEAD_ZONE,
+    loopSeen: true,
     demo: []
   }
 
+  const BOX = 640
+
   it('prend la forme de l’écran qui porte Multifus', () => {
-    const drawn = drawnWheel({ screen: LAPTOP, size: GAUGE })
+    const drawn = drawnWheel({ screen: LAPTOP, size: GAUGE, boxWidth: BOX })
 
     expect(drawn.ratio).toBeCloseTo(LAPTOP.width / LAPTOP.height)
-    expect(drawn.drawnWidth).toBeLessThanOrEqual(DRAWN_SCREEN.width)
   })
 
-  it('grandit avec la jauge, et tient dans l’écran dessiné', () => {
-    const narrow = drawnWheel({ screen: LAPTOP, size: GAUGE })
+  it('grandit avec la jauge, et tient dans la boîte', () => {
+    const narrow = drawnWheel({ screen: LAPTOP, size: GAUGE, boxWidth: BOX })
     const wide = drawnWheel({
       screen: LAPTOP,
-      size: { ...GAUGE, diameter: 720 }
+      size: { ...GAUGE, diameter: 720 },
+      boxWidth: BOX
     })
 
     expect(wide.drawnDiameter).toBeGreaterThan(narrow.drawnDiameter)
-    expect(wide.drawnDiameter).toBeLessThanOrEqual(wide.drawnWidth / wide.ratio)
+    expect(wide.drawnDiameter).toBeLessThanOrEqual(BOX / wide.ratio)
   })
 
   it('garde l’exemple lisible sur tous les écrans, seul comme à huit', () => {
@@ -166,7 +169,8 @@ describe('drawnWheel', () => {
       for (const count of [DEMO_FEWEST, DEMO_USUAL, WIDEST_TEAM]) {
         const drawn = drawnWheel({
           screen: { ...LAPTOP, width, height: (width * 9) / 16 },
-          size: GAUGE
+          size: GAUGE,
+          boxWidth: BOX
         })
         const shape = dialShape({
           diameter: drawn.drawnDiameter,
@@ -183,16 +187,33 @@ describe('drawnWheel', () => {
   it('laisse de l’air entre la roue dessinée et son cadre', () => {
     const wide = drawnWheel({
       screen: LAPTOP,
-      size: { ...GAUGE, diameter: 720 }
+      size: { ...GAUGE, diameter: 720 },
+      boxWidth: BOX
     })
 
-    expect(wide.drawnDiameter).toBeLessThan(
-      (wide.drawnWidth / wide.ratio) * 0.9
-    )
+    expect(wide.drawnDiameter).toBeLessThan((BOX / wide.ratio) * 0.9)
+  })
+
+  it('suit la boîte que la plaque lui donne, une fois mesurée', () => {
+    const wide = drawnWheel({ screen: LAPTOP, size: GAUGE, boxWidth: BOX })
+    const half = drawnWheel({ screen: LAPTOP, size: GAUGE, boxWidth: BOX / 2 })
+
+    expect(wide.drawnDiameter).toBeCloseTo(half.drawnDiameter * 2)
+  })
+
+  it('retombe sur l’écran dessiné tant que rien n’est mesuré', () => {
+    const unmeasured = drawnWheel({ screen: LAPTOP, size: GAUGE, boxWidth: 0 })
+    const measured = drawnWheel({
+      screen: LAPTOP,
+      size: GAUGE,
+      boxWidth: screenShape(LAPTOP).drawnWidth
+    })
+
+    expect(unmeasured.drawnDiameter).toBeCloseTo(measured.drawnDiameter)
   })
 
   it('prend un seize-neuvièmes tant que le système n’a nommé aucun écran', () => {
-    const drawn = drawnWheel({ screen: null, size: GAUGE })
+    const drawn = drawnWheel({ screen: null, size: GAUGE, boxWidth: BOX })
 
     expect(drawn.ratio).toBeCloseTo(16 / 9)
   })

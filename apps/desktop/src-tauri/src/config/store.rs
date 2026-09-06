@@ -310,7 +310,10 @@ mod tests {
                 corner: BannerCorner::TopLeft,
                 screen: Some("DISPLAY2".to_owned()),
             },
-            wheel: Wheel { diameter: 300 },
+            wheel: Wheel {
+                diameter: 300,
+                loop_seen: true,
+            },
             rune_table: RuneTable {
                 width: 480,
                 transparency: 25,
@@ -350,6 +353,7 @@ mod tests {
         let settings = Settings {
             wheel: Wheel {
                 diameter: WHEEL_WIDEST * 2,
+                loop_seen: false,
             },
             ..a_settled_configuration()
         };

@@ -185,6 +185,10 @@ export const setWheelDiameter = async (diameter: number) => {
   return invoke<Snapshot>('set_wheel_diameter', { diameter })
 }
 
+export const setWheelLoopSeen = async () => {
+  return invoke<Snapshot>('set_wheel_loop_seen')
+}
+
 export const previewWheel = async (crowd: number) => {
   return invoke<Snapshot>('preview_wheel', { crowd })
 }

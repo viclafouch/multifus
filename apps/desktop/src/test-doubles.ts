@@ -4,7 +4,7 @@ import type { Onboarding } from '@/@types/onboarding'
 import type { Character } from '@/@types/roster'
 import type { QuickReply } from '@/@types/shortcuts'
 import type { Snapshot } from '@/@types/snapshot'
-import type { WheelSlice } from '@/@types/wheel'
+import type { WheelSize, WheelSlice } from '@/@types/wheel'
 
 export const APPLE_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)'
 export const WINDOWS_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
@@ -106,6 +106,20 @@ const DEMO_TEAM = Array.from({ length: 8 }, (_, rank) => {
   return wheelSliceOf({ nickname: `Faux ${rank + 1}`, here: rank === 0 })
 })
 
+const BLANK_WHEEL_SIZE: WheelSize = {
+  diameter: 400,
+  smallest: 280,
+  widest: 720,
+  step: 20,
+  deadZone: 0.32,
+  loopSeen: true,
+  demo: DEMO_TEAM
+}
+
+export const wheelSizeOf = (fields: Partial<WheelSize> = {}) => {
+  return { ...BLANK_WHEEL_SIZE, ...fields }
+}
+
 const BLANK_SNAPSHOT: Snapshot = {
   version: '0.0.0',
   system: 'test',
@@ -138,14 +152,7 @@ const BLANK_SNAPSHOT: Snapshot = {
     test: { kind: 'idle' }
   },
   walk: { enabled: false, banner: { corner: 'bottomRight', screen: null } },
-  wheel: {
-    diameter: 400,
-    smallest: 280,
-    widest: 720,
-    step: 20,
-    deadZone: 0.32,
-    demo: DEMO_TEAM
-  },
+  wheel: BLANK_WHEEL_SIZE,
   runeTable: {
     width: 420,
     narrowest: 320,

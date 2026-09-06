@@ -87,7 +87,6 @@ const ARRIVALS = [
   },
   { name: 'autoFocus', mark: 'Vous jouez plusieurs personnages à la fois.' },
   { name: 'walk', mark: 'Un clic déplace le personnage que vous avez devant' },
-  { name: 'wheel', mark: 'Maintenez vos touches dans le jeu' },
   {
     name: 'runeTable',
     mark: 'Les poids des runes, affichés par-dessus le jeu.'

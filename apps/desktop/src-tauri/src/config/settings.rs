@@ -107,12 +107,14 @@ const DEFAULT_DIAMETER: u32 = 320;
 #[serde(default)]
 pub struct Wheel {
     pub diameter: u32,
+    pub loop_seen: bool,
 }
 
 impl Default for Wheel {
     fn default() -> Self {
         Self {
             diameter: DEFAULT_DIAMETER,
+            loop_seen: false,
         }
     }
 }

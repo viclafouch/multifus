@@ -102,6 +102,7 @@ pub struct WheelView {
     pub widest: u32,
     pub step: u32,
     pub dead_zone: f64,
+    pub loop_seen: bool,
     pub demo: Vec<WheelSlice>,
 }
 
@@ -274,7 +275,6 @@ pub enum Screen {
     QuickReplies,
     AutoFocus,
     Walk,
-    Wheel,
     RuneTable,
     Relay,
     Settings,
@@ -282,13 +282,12 @@ pub enum Screen {
 }
 
 impl Screen {
-    pub const ALL: [Self; 10] = [
+    pub const ALL: [Self; 9] = [
         Self::Characters,
         Self::Shortcuts,
         Self::QuickReplies,
         Self::AutoFocus,
         Self::Walk,
-        Self::Wheel,
         Self::RuneTable,
         Self::Relay,
         Self::Settings,
@@ -608,6 +607,7 @@ mod tests {
                 widest: 720,
                 step: 20,
                 dead_zone: 0.32,
+                loop_seen: false,
                 demo: vec![slice()],
             },
             rune_table: rune_table(),
@@ -1229,6 +1229,7 @@ mod tests {
                 widest: 720,
                 step: 20,
                 dead_zone: 0.32,
+                loop_seen: true,
                 demo: vec![slice()],
             }),
             json!({
@@ -1237,6 +1238,7 @@ mod tests {
                 "widest": 720,
                 "step": 20,
                 "deadZone": 0.32,
+                "loopSeen": true,
                 "demo": [{
                     "nickname": "Bravo",
                     "class": "cra",
@@ -1351,7 +1353,6 @@ mod tests {
                 json!("quickReplies"),
                 json!("autoFocus"),
                 json!("walk"),
-                json!("wheel"),
                 json!("runeTable"),
                 json!("relay"),
                 json!("settings"),

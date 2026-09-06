@@ -33,7 +33,6 @@ export type ScreenName =
   | 'settings'
   | 'shortcuts'
   | 'walk'
-  | 'wheel'
 
 export type Snapshot = {
   readonly version: string

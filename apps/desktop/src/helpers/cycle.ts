@@ -10,6 +10,14 @@ export const matchIsInCycle = (character: Character) => {
   return character.online && !character.excluded
 }
 
+export const rankOf = (rows: readonly Character[], character: Character) => {
+  if (!matchIsInCycle(character)) {
+    return null
+  }
+
+  return rows.filter(matchIsInCycle).indexOf(character) + 1
+}
+
 type GenderGroupParams = {
   readonly characters: readonly Character[]
   readonly gender: Gender

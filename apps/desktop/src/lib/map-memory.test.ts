@@ -41,7 +41,7 @@ describe('la mémoire de la map', () => {
     refuseMemory()
 
     expect(() => {
-      rememberMap('wheel')
+      rememberMap('walk')
     }).not.toThrow()
     expect(() => {
       forgetMap()

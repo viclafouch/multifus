@@ -18,12 +18,12 @@ vi.mock(import('@/lib/multifus'), () => {
   return bridge
 })
 
-const { CharactersScreen } = await import('@/screens/characters-screen')
+const { RosterPanel } = await import('@/screens/characters/roster-panel')
 
 const show = (characters: readonly Character[]) => {
   return render(
     <TooltipProvider>
-      <CharactersScreen characters={characters} paintPortraits run={() => {}} />
+      <RosterPanel characters={characters} paintPortraits run={() => {}} />
     </TooltipProvider>
   )
 }
@@ -49,41 +49,7 @@ const toggleOf = (gender: Gender) => {
   })
 }
 
-describe('l’écran des personnages', () => {
-  it('invite à entrer en jeu quand le roster est vide', () => {
-    show([])
-
-    expect(screen.getByText('Votre roster est vide')).not.toBeNull()
-    expect(
-      screen.getByText('Multifus regarde vos fenêtres, une fois par seconde.')
-    ).not.toBeNull()
-    expect(
-      screen.queryByRole('switch', {
-        name: 'Alpha dans le défilement et l’AutoFocus'
-      })
-    ).toBeNull()
-  })
-
-  it('déroule les trois temps du joueur quand le roster est vide', () => {
-    show([])
-
-    const titles = rows().map((row) => {
-      return within(row).getByText(/^(Lancez|Entrez|Il arrive)/u).textContent
-    })
-
-    expect(titles).toStrictEqual([
-      'Lancez le jeu',
-      'Entrez en jeu',
-      'Il arrive ici'
-    ])
-  })
-
-  it('ne laisse aucun bouton à cliquer quand le roster est vide', () => {
-    show([])
-
-    expect(screen.queryAllByRole('button')).toStrictEqual([])
-  })
-
+describe('le roster des personnages', () => {
   it('montre une ligne par personnage, dans l’ordre du défilement', () => {
     show([
       characterOf({ nickname: 'Alpha' }),

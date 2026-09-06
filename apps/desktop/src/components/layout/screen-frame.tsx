@@ -1,37 +1,40 @@
 import React from 'react'
+import { SCREEN_SCENE } from '@/constants/world'
 import { cn } from '@/lib/utils'
 
 type ScreenFrameProps = Readonly<{
   ratio: number
-  width: number
   label: string
+  width?: number
   className?: string
+  ref?: React.Ref<HTMLDivElement>
   children: React.ReactNode
 }>
 
 export const ScreenFrame = ({
   ratio,
-  width,
   label,
+  width,
   className,
+  ref,
   children
 }: ScreenFrameProps) => {
   return (
     <div
-      style={{ maxWidth: width }}
-      className="w-full rounded-lg border border-border bg-card/70 p-2"
+      ref={ref}
+      role="group"
+      aria-label={label}
+      style={{ aspectRatio: ratio, maxWidth: width }}
+      className={cn('pane relative w-full', className)}
     >
-      <div
-        role="group"
-        aria-label={label}
-        style={{ aspectRatio: ratio }}
-        className={cn(
-          'warm-light overflow-hidden rounded-md border border-border/60 bg-background',
-          className
-        )}
-      >
-        {children}
-      </div>
+      <img
+        aria-hidden
+        alt=""
+        src={SCREEN_SCENE}
+        className="pane-scene absolute inset-0 size-full object-cover"
+      />
+      <span aria-hidden className="pane-shade absolute inset-0" />
+      {children}
     </div>
   )
 }

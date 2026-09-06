@@ -117,17 +117,18 @@ export type DialShape = ReturnType<typeof dialShape>
 type DrawnWheelParams = {
   readonly screen: Display | null
   readonly size: WheelSize
+  readonly boxWidth: number
 }
 
-export const drawnWheel = ({ screen, size }: DrawnWheelParams) => {
+export const drawnWheel = ({ screen, size, boxWidth }: DrawnWheelParams) => {
   const { ratio, drawnWidth } = screenShape(screen)
+  const width = boxWidth > 0 ? boxWidth : drawnWidth
   const span = size.widest - size.smallest
   const grown = span <= 0 ? 1 : (size.diameter - size.smallest) / span
   const share = DRAWN_SMALLEST + grown * (DRAWN_WIDEST - DRAWN_SMALLEST)
 
   return {
     ratio,
-    drawnWidth,
-    drawnDiameter: (drawnWidth / ratio) * share
+    drawnDiameter: (width / ratio) * share
   }
 }

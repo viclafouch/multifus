@@ -19,11 +19,9 @@ describe('les chemins de la clairière', () => {
     const onGo = vi.fn()
     render(<WayList asking={null} onGo={onGo} />)
 
-    fireEvent.click(
-      screen.getByRole('button', { name: 'Roue des personnages' })
-    )
+    fireEvent.click(screen.getByRole('button', { name: 'Déplacement rapide' }))
 
-    expect(onGo).toHaveBeenCalledWith('wheel')
+    expect(onGo).toHaveBeenCalledWith('walk')
   })
 
   it('ne marque « À régler » que sur la map qui le demande', () => {

@@ -222,10 +222,10 @@ vert.
 Une action posée au bout d'une ligne porte le cadre `slate`, jamais `bare`. Sans
 cadre, « Ouvrir Telegram Web » et « Aller voir » se lisaient comme la valeur de
 la ligne, et personne ne cliquait. Le « Retour » d'une map le porte aussi, parce
-qu'il se pose sur onze décors dont des clairs. `bare` ne sert plus qu'à ce qui
+qu'il se pose sur dix décors dont des clairs. `bare` ne sert plus qu'à ce qui
 borde la fenêtre de la mise en route et aux icônes qui portent leur infobulle.
 
-**Le menu de la clairière se vise comme une case du jeu.** Ses dix entrées sont
+**Le menu de la clairière se vise comme une case du jeu.** Ses neuf entrées sont
 des chemins, et les survoler, c'est viser la case où l'on va poser le pied. Un
 losange vert glisse depuis la gauche et se pose au début de l'entrée, et le nom
 s'écarte pour lui laisser la place (`wayname`). C'est le seul endroit où le
@@ -329,7 +329,7 @@ rectangle bordé se lit comme un bouton.
 | `veil`, `deepen`                     | le voile de toute map, et le cran de plus d'une map de travail       |
 | `settle`                             | ce qui monte à l'arrivée, quatre crans puis tout le reste            |
 | `flank`                              | le dégradé qui assombrit le côté où l'on écrit                       |
-| `hem`, `brow`                        | l'ourlet du bas sous le crédit, et celui du haut sous le retour      |
+| `hem`, `hem-deep`, `brow`            | l'ourlet du bas, le même en plus sombre, et celui du haut            |
 | `legible`                            | le halo sous une phrase posée à même le décor : une ellipse floutée  |
 | `sighted`                            | l'anneau du clavier, le même sur tout ce qui se focalise             |
 | `tint-*`, `stripe`                   | la couleur d'un personnage, et la pastille qui la porte              |
@@ -337,7 +337,8 @@ rectangle bordé se lit comme un bouton.
 | `ensign`                             | un drapeau de langue, éteint tant qu'il n'est pas celui du moment    |
 | `dolmen-field`                       | la boîte qui refait la géométrie du décor en `cover`                 |
 | `dolmen-seat`                        | la place de la dalle, et `--head`, dont tout le reste se déduit      |
-| `stage`                              | le cadre d'une boucle du jeu, au format 16/10                        |
+| `stage`                              | le cadre d'une vidéo du jeu, au format 16/9                          |
+| `pane`                               | la même planche, opaque : l'écran du joueur dessiné                  |
 | `emblem`                             | l'ombre portée qui décolle le logo du décor                          |
 | `hearth`, `glade`                    | l'ombre sous les têtes, et la lueur d'herbe autour                   |
 | `head`, `hood`                       | la tête de classe sur le dolmen, et sa pierre de survol              |
@@ -349,32 +350,36 @@ propriété se battent, et c'est le hasard de l'ordre d'émission qui gagne.
 
 ### Les mots du système
 
-| Nom              | Ce que c'est                                                                |
-| ---------------- | --------------------------------------------------------------------------- |
-| `ChapterCard`    | le carton de chapitre au milieu de l'écran                                  |
-| `Scene`          | les six décors empilés, et celui qui est devant                             |
-| `StepFence`      | la clôture d'enclos, un piquet par étape                                    |
-| `StepState`      | le point et la phrase qui disent si l'étape est en place                    |
-| `SettingPath`    | le chemin d'un réglage, `Options › Général › Divers`                        |
-| `FeatureRoll`    | les fonctionnalités sur trois colonnes, leurs noms seuls ou avec leur ligne |
-| `WorldScene`     | les onze décors empilés, le voile, et celui qui est devant                  |
-| `Dolmen`         | la dalle du centre, les têtes dessus, le compte dessous                     |
-| `Head`           | une tête de classe, sa couleur, et ce qu'elle dit au survol                 |
-| `WayBack`        | le retour à la clairière, en haut à gauche de chaque map                    |
-| `MapFrame`       | le cadre d'une map : le retour, et ce qui défile dessous                    |
-| `Screen`         | une map qui est une liste : titre, fronton, une phrase, les plaques         |
-| `KeyStone`       | une combinaison de touches, gravée                                          |
-| `WayList`        | la colonne des dix maps, sur l'accueil                                      |
-| `LoopStage`      | la boucle du jeu, ou ce qu'elle montrera tant qu'elle manque                |
-| `StageScreen`    | une map qui montre le jeu : la boucle, et les réglages à côté               |
-| `Tick`           | la case à cocher, seule forme d'un réglage qui s'allume                     |
-| `MainMark`       | l'étoile d'or du principal, la même partout                                 |
-| `SceneCredit`    | la mention d'Ankama, en bas de chaque fenêtre                               |
-| `ClearingScreen` | l'accueil : le titre, le menu, le dolmen                                    |
-| `Cartouche`      | le coin haut droit : la version, et les trois drapeaux                      |
-| `Flag`           | un drapeau, dessiné en SVG, jamais un émoji ni une image                    |
-| `Tale`           | la phrase d'un titre, et le halo qui la décolle du décor                    |
-| `MapHeader`      | le titre, le fronton et la phrase, partagés par les deux sortes d'écran     |
+| Nom               | Ce que c'est                                                                |
+| ----------------- | --------------------------------------------------------------------------- |
+| `ChapterCard`     | le carton de chapitre au milieu de l'écran                                  |
+| `Scene`           | les six décors empilés, et celui qui est devant                             |
+| `StepFence`       | la clôture d'enclos, un piquet par étape                                    |
+| `StepState`       | le point et la phrase qui disent si l'étape est en place                    |
+| `SettingPath`     | le chemin d'un réglage, `Options › Général › Divers`                        |
+| `FeatureRoll`     | les fonctionnalités sur trois colonnes, leurs noms seuls ou avec leur ligne |
+| `WorldScene`      | les dix décors empilés, le voile, et celui qui est devant                   |
+| `Dolmen`          | la dalle du centre, les têtes dessus, le compte dessous                     |
+| `Head`            | une tête de classe, sa couleur, et ce qu'elle dit au survol                 |
+| `WayBack`         | le retour à la clairière, en haut à gauche de chaque map                    |
+| `MapFrame`        | le cadre d'une map : le retour, et ce qui défile dessous                    |
+| `Screen`          | une map qui est une liste : titre, fronton, une phrase, les plaques         |
+| `KeyStone`        | une combinaison de touches, gravée                                          |
+| `WayList`         | la colonne des neuf maps, sur l'accueil                                     |
+| `LoopStage`       | la vidéo du jeu, ou ce qu'elle montrera tant qu'elle manque                 |
+| `StageScreen`     | une map qui montre le jeu : la vidéo, et les réglages à côté                |
+| `Tick`            | la case à cocher, seule forme d'un réglage qui s'allume                     |
+| `MainMark`        | l'étoile d'or du principal, la même partout                                 |
+| `SceneCredit`     | la mention d'Ankama, en bas de chaque fenêtre                               |
+| `ClearingScreen`  | l'accueil : le titre, le menu, le dolmen                                    |
+| `Cartouche`       | le coin haut droit : la version, et les trois drapeaux                      |
+| `Flag`            | un drapeau, dessiné en SVG, jamais un émoji ni une image                    |
+| `Tale`            | la phrase d'un titre, et le halo qui la décolle du décor                    |
+| `MapHeader`       | le titre, le fronton et la phrase, partagés par les deux sortes d'écran     |
+| `ScreenFrame`     | l'écran du joueur dessiné : le seul, du coin de la bannière à la roue       |
+| `WheelPanel`      | la plaque de la roue : le raccourci, le dessin, les jauges, les gestes      |
+| `WheelLoopDialog` | la vidéo de la roue, en plein cadre, une seule fois dans la vie             |
+| `RosterPanel`     | la plaque du roster : l'exclusion, et une ligne par personnage              |
 
 ## Les règles qui tranchent
 
@@ -446,7 +451,7 @@ Elles viennent toutes d'un essai raté, et elles se tiennent.
     L'ombrage de la plaque se fait donc en variant l'alpha, 24 % en haut, 28 %
     au milieu, 22 % en bas, jamais en changeant de couleur. `saturate(1.15)`
     reste, il rend au décor la couleur que le sombre lui prend. La note et la
-    scène d'une boucle sont la même matière. La mesure se refait avec un canvas
+    scène d'une vidéo sont la même matière. La mesure se refait avec un canvas
     dans la page, en compositant `deepen` puis la plaque sur le pixel le plus
     clair du décor : rien dans les tests ne la garde, parce qu'un test qui
     fige un dégradé fige un choix qu'on règle à l'œil
@@ -469,6 +474,60 @@ Elles viennent toutes d'un essai raté, et elles se tiennent.
     maintenant une ellipse pleine, posée derrière la phrase et floutée de 26 px :
     le flou déborde de sa boîte, il n'a aucun bord à couper, et il s'éteint sans
     marche. Rien à installer pour ça, `filter: blur` suffit
+
+### La plaque de la roue, et la vidéo qui l'annonce
+
+Livré le 6 septembre 2026. La roue des personnages a perdu sa map et vit en bas
+des Personnages. Le détail est dans
+[docs/plan-personnages.md](./plan-personnages.md) ; ce qui suit devient une règle.
+
+**Le code dit `loop`, l'écran dit la vidéo.** `LoopStage` garde son nom, comme
+`Relay` garde le sien pour les messages privés. Aucune prose ne dit « la boucle » :
+c'est un mot de code, et [CONTEXT.md](../CONTEXT.md) tient l'entrée **Vidéo**.
+
+**Un cadre qui montre l'écran du joueur prend la largeur qu'on lui donne.** Il
+portait 420 px en dur, hérités d'une vignette. Posé sous une vidéo en pleine
+largeur, il se lisait comme un timbre oublié au milieu d'une plaque : deux
+écrans, deux tailles, dans la même carte. `ScreenFrame` prend maintenant une
+largeur facultative et un `ref` : sans largeur il remplit ce qu'on lui donne,
+`useBoxWidth` la mesure, et `drawnWheel` tire le diamètre de la mesure. Deux
+boîtes dans une même plaque ont la même largeur, ou l'une des deux est de trop.
+`ScreenFrame` a changé de matière au passage : il portait encore le `bg-card` de
+l'ancien thème, et il est le seul cadre « l'écran du joueur » du logiciel, sur la
+map Déplacement rapide comme sur les Personnages.
+
+**Un écran dessiné est opaque, une vidéo ne l'est pas : ce sont deux planches.**
+`stage` laisse passer 14 % du décor, ce qui ne se voit jamais sous une vidéo, qui
+couvre tout. Sous une roue dessinée, qui est un SVG à trous, les mâts et les
+bannières du camp de Bonta remontaient en traits verticaux au travers de la
+boîte, et `backdrop-filter: saturate(1.15)` les rehaussait encore. `pane` est la
+même planche, même bord, même ombre, mais sur de l'`iron` plein et sans filtre.
+Les deux ne se composent pas : `class="stage pane"` poserait deux fois
+`background-color`, et Tailwind v4 n'émet pas les `@utility` dans l'ordre du
+fichier. Chacune est complète, comme les faces de bouton.
+
+**Ce qui s'apprend une fois s'ouvre dans un dialogue, pas dans la page.** Une
+vidéo qui explique une fonctionnalité n'a pas à vivre dans la plaque qui la
+règle : elle y pousse le réglage hors de l'écran, et le bouton qui la replie
+finit loin d'elle. Elle arrive donc seule, six dixièmes de seconde après
+l'entrée, elle prend le cadre entier, et elle ne revient qu'au bouton. La plaque
+derrière garde un seul agencement, celui de tous les jours.
+
+**Une légende posée sur une image du jeu demande `hem-deep`, pas `hem`.** Les
+décors du logiciel sont voilés ; une vidéo en plein cadre ne l'est pas, et
+l'herbe de Dofus est claire. `hem` s'arrête à 92 % d'`iron` au ras du bord, ce
+qui suffit sous un crédit et pas sous un titre. `hem-deep` monte plus tôt et
+finit sur l'`iron` plein.
+
+**Une vidéo qui s'ouvre seule respecte `prefers-reduced-motion`.** Le délai
+tombe à zéro et le dialogue est déjà là, comme le dit la règle 6 ; l'animation du
+GIF, elle, se coupe en fermant le dialogue, qui est le seul endroit où il tourne.
+`matchIsStill` de `lib/motion.ts` porte la question, pour l'ancre comme pour la
+vidéo.
+
+**« Replier » a été essayé et retiré.** Le mot ne dit rien à qui n'a pas dessiné
+l'écran. Un dialogue se ferme, et le bouton qui le ferme la première fois dit
+« J'ai compris », parce qu'il promet en plus de ne pas revenir.
 
 ## Le rythme
 

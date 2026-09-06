@@ -175,7 +175,6 @@ Deux questions, dans cet ordre : **est-ce qu'il dit ce que la map fait**, et
 | Réponses rapides   | `harbour.webp`  | le quai : c'est là qu'on se parle                 |
 | AutoFocus          | `battle.webp`   | le combat, et c'est à votre tour                  |
 | Déplacement rapide | `forest.webp`   | la grille de déplacement, sous les arbres         |
-| La roue            | `arena.webp`    | l'arène : on choisit son combattant               |
 | Tableau des runes  | `workshop.webp` | l'atelier du forgemage, l'enclume et les runes    |
 | Messages privés    | `pen.webp`      | l'enclos, loin de la foule, où un mot vous trouve |
 | Paramètres         | `workshop.webp` | l'atelier, encore : c'est là qu'on règle          |
@@ -183,8 +182,22 @@ Deux questions, dans cet ordre : **est-ce qu'il dit ce que la map fait**, et
 
 **Les décors sombres vont aux maps qui parlent le plus.** `battle` et `workshop`
 sont les deux plus sombres et les moins saturés, et ce sont AutoFocus, Tableau
-des runes et Paramètres qui portent le plus de lignes. `camp` et `arena`, les
-plus chargés, vont là où il y a le moins à lire.
+des runes et Paramètres qui portent le plus de lignes. `camp`, le plus chargé, va
+là où il y a le moins à lire.
+
+`arena.webp` n'est plus un décor de map depuis que la roue a rejoint les
+Personnages, mais il reste dans le dépôt : la mise en route s'en sert pour
+l'étape de l'essai.
+
+### La boucle de la roue
+
+| Fichier          | Source                    | Ce qu'il porte                   |
+| ---------------- | ------------------------- | -------------------------------- |
+| `wheel-loop.gif` | `2022-07-26/f9dfcb77…gif` | une Crâ qui respire dans l'herbe |
+
+**C'est un bouche-trou.** Il tient la place de l'enregistrement de la roue à
+l'œuvre, que Victor fera dans le jeu. Il fait 950 × 531 et pèse 345 Ko ; le
+remplacer ne demande rien d'autre que d'écraser le fichier.
 
 ## Ce qui vient : tout le reste du logiciel
 

@@ -64,7 +64,7 @@
   --container-roll: 44rem;
   --container-world: 58rem;
 
-  --aspect-loop: 16 / 10;
+  --aspect-loop: 16 / 9;
 }
 
 :root {
@@ -960,6 +960,16 @@
   );
 }
 
+@utility hem-deep {
+  background-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    color-mix(in srgb, var(--iron), transparent 62%) 32%,
+    color-mix(in srgb, var(--iron), transparent 16%) 66%,
+    var(--iron) 100%
+  );
+}
+
 @utility brow {
   background-image: linear-gradient(
     180deg,
@@ -1013,6 +1023,31 @@
   backdrop-filter: saturate(1.15);
   text-shadow: var(--engrave);
   background-color: color-mix(in srgb, var(--iron), transparent 14%);
+  box-shadow:
+    inset 0 0 0 1px rgb(0 0 0 / 0.6),
+    0 24px 48px -18px rgb(0 0 0 / 0.9);
+}
+
+@utility pane-scene {
+  opacity: 0.46;
+  filter: saturate(0.72);
+}
+
+@utility pane-shade {
+  background-image: radial-gradient(
+    62% 66% at 50% 50%,
+    color-mix(in srgb, var(--iron), transparent 8%) 0%,
+    color-mix(in srgb, var(--iron), transparent 34%) 52%,
+    color-mix(in srgb, var(--iron), transparent 72%) 100%
+  );
+}
+
+@utility pane {
+  overflow: clip;
+  border-radius: 10px;
+  border: 2px solid color-mix(in srgb, var(--band), transparent 45%);
+  text-shadow: var(--engrave);
+  background-color: var(--iron);
   box-shadow:
     inset 0 0 0 1px rgb(0 0 0 / 0.6),
     0 24px 48px -18px rgb(0 0 0 / 0.9);

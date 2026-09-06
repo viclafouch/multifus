@@ -350,6 +350,7 @@ impl Multifus {
                 widest: WHEEL_WIDEST,
                 step: WHEEL_STEP,
                 dead_zone: wheel::DEAD_ZONE,
+                loop_seen: self.settings.wheel.loop_seen,
                 demo: wheel::demo_slices(wheel::demo_crowd()),
             },
             rune_table: RuneTableView {
@@ -1079,6 +1080,12 @@ impl Multifus {
 
     pub fn set_wheel_diameter(&mut self, diameter: u32) {
         self.settings.wheel.set_diameter(diameter);
+
+        self.save();
+    }
+
+    pub fn set_wheel_loop_seen(&mut self) {
+        self.settings.wheel.loop_seen = true;
 
         self.save();
     }
@@ -2153,6 +2160,19 @@ mod tests {
 
         assert_eq!(state.wheel_diameter(), 300);
         assert_eq!(multifus_reloaded(&directory).wheel_diameter(), 300);
+    }
+
+    #[test]
+    fn the_video_of_the_wheel_is_folded_for_good_once_it_has_been_seen() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        assert!(!state.snapshot().wheel.loop_seen);
+
+        state.set_wheel_loop_seen();
+
+        assert!(state.snapshot().wheel.loop_seen);
+        assert!(multifus_reloaded(&directory).snapshot().wheel.loop_seen);
     }
 
     #[test]

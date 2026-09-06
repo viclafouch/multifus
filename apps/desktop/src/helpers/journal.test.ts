@@ -1436,6 +1436,7 @@ const SNAPSHOT = {
     widest: 720,
     step: 20,
     deadZone: 0.32,
+    loopSeen: true,
     demo: []
   },
   runeTable: {

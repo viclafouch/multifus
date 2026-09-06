@@ -320,6 +320,12 @@ const CALLS = [
     }
   },
   {
+    name: 'setWheelLoopSeen',
+    run: () => {
+      return multifus.setWheelLoopSeen()
+    }
+  },
+  {
     name: 'previewWheel',
     run: () => {
       return multifus.previewWheel(6)

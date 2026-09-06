@@ -17,7 +17,7 @@ export const FEATURES = [
   {
     name: msg`La roue des personnages`,
     line: msg`Maintenez la combinaison, visez une tête, lâchez.`,
-    screen: 'wheel'
+    screen: 'characters'
   },
   {
     name: msg`Le Déplacement rapide`,

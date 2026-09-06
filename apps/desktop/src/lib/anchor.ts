@@ -1,12 +1,11 @@
 import ReactDOM from 'react-dom'
-
-const STILL = '(prefers-reduced-motion: reduce)'
+import { matchIsStill } from '@/lib/motion'
 
 export const showAnchor = (anchor: string, render: () => void) => {
   ReactDOM.flushSync(render)
 
   document.querySelector(`#${anchor}`)?.scrollIntoView({
-    behavior: window.matchMedia(STILL).matches ? 'auto' : 'smooth',
+    behavior: matchIsStill() ? 'auto' : 'smooth',
     block: 'start'
   })
 }

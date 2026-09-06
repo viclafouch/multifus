@@ -280,6 +280,13 @@ pub fn set_wheel_diameter(app: AppHandle, diameter: u32) -> Snapshot {
 }
 
 #[tauri::command]
+pub fn set_wheel_loop_seen(app: AppHandle) -> Snapshot {
+    lock(&app).set_wheel_loop_seen();
+
+    runtime::emit_snapshot(&app)
+}
+
+#[tauri::command]
 pub fn preview_wheel(app: AppHandle, crowd: usize) -> Snapshot {
     wheel::preview(&app, crowd);
 

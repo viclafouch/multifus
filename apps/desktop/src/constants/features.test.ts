@@ -8,11 +8,15 @@ const OUTSIDE_THE_ROLL = [
   'about'
 ] as const satisfies readonly ScreenName[]
 
-const SHOWN_SCREENS = new Set<ScreenName | null>()
+const TIMES_NAMED = new Map<ScreenName | null, number>()
 
 for (const feature of FEATURES) {
-  SHOWN_SCREENS.add(feature.screen)
+  TIMES_NAMED.set(feature.screen, (TIMES_NAMED.get(feature.screen) ?? 0) + 1)
 }
+
+const TWICE_NAMED = [...TIMES_NAMED.keys()].filter((screen) => {
+  return (TIMES_NAMED.get(screen) ?? 0) > 1
+})
 
 const matchIsExpected = (name: ScreenName) => {
   return !OUTSIDE_THE_ROLL.some((skipped) => {
@@ -24,7 +28,7 @@ const missingFromRoll = () => {
   const missing = []
 
   for (const name of MAPS) {
-    if (matchIsExpected(name) && !SHOWN_SCREENS.has(name)) {
+    if (matchIsExpected(name) && !TIMES_NAMED.has(name)) {
       missing.push(name)
     }
   }
@@ -37,7 +41,7 @@ describe('les fonctionnalités du générique', () => {
     expect(missingFromRoll()).toStrictEqual([])
   })
 
-  it('ne nomment jamais deux fois le même écran', () => {
-    expect(SHOWN_SCREENS.size).toBe(FEATURES.length)
+  it('ne mène deux fois qu’à la map qui porte deux fonctionnalités', () => {
+    expect(TWICE_NAMED).toStrictEqual(['characters'])
   })
 })

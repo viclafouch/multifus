@@ -3,14 +3,13 @@ import type { ScreenName, Snapshot } from '@/@types/snapshot'
 import { AboutScreen } from '@/screens/about'
 import { AuthorizationScreen } from '@/screens/authorization-screen'
 import { AutoFocusScreen } from '@/screens/auto-focus-screen'
-import { CharactersScreen } from '@/screens/characters-screen'
+import { CharactersScreen } from '@/screens/characters'
 import { QuickRepliesScreen } from '@/screens/quick-replies'
 import { RelayScreen } from '@/screens/relay'
 import { RuneTableScreen } from '@/screens/rune-table'
 import { SettingsScreen } from '@/screens/settings'
 import { ShortcutsScreen } from '@/screens/shortcuts'
 import { WalkScreen } from '@/screens/walk-screen'
-import { WheelScreen } from '@/screens/wheel'
 
 type CurrentMapProps = Readonly<{
   map: ScreenName
@@ -25,6 +24,8 @@ export const CurrentMap = ({ map, snapshot, run }: CurrentMapProps) => {
         <CharactersScreen
           characters={snapshot.characters}
           paintPortraits={snapshot.paintPortraits}
+          wheel={snapshot.wheel}
+          shortcuts={snapshot.shortcuts}
           run={run}
         />
       ) : (
@@ -60,15 +61,6 @@ export const CurrentMap = ({ map, snapshot, run }: CurrentMapProps) => {
       return (
         <WalkScreen
           walk={snapshot.walk}
-          shortcuts={snapshot.shortcuts}
-          run={run}
-        />
-      )
-    },
-    wheel: () => {
-      return (
-        <WheelScreen
-          wheel={snapshot.wheel}
           shortcuts={snapshot.shortcuts}
           run={run}
         />
