@@ -8,6 +8,7 @@ const TWO_ROWS = 8
 type DolmenProps = Readonly<{
   characters: readonly Character[]
   onOpenCharacter: (nickname: string) => void
+  onRemoveCharacter: (nickname: string) => void
 }>
 
 const crowdOf = (count: number) => {
@@ -22,7 +23,11 @@ const crowdOf = (count: number) => {
   return 'many'
 }
 
-export const Dolmen = ({ characters, onOpenCharacter }: DolmenProps) => {
+export const Dolmen = ({
+  characters,
+  onOpenCharacter,
+  onRemoveCharacter
+}: DolmenProps) => {
   const connected = characters.filter((character) => {
     return character.online
   }).length
@@ -55,6 +60,9 @@ export const Dolmen = ({ characters, onOpenCharacter }: DolmenProps) => {
                       character={character}
                       onOpen={() => {
                         onOpenCharacter(character.nickname)
+                      }}
+                      onRemove={() => {
+                        onRemoveCharacter(character.nickname)
                       }}
                     />
                   </li>

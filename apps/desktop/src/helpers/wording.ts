@@ -455,6 +455,10 @@ export const characterMarksTooltip = (character: Character) => {
   return missingPartLabel(missing, character.nickname)
 }
 
+export const characterRemoveLabel = (nickname: string) => {
+  return t`Retirer ${nickname} du roster`
+}
+
 export const colorReadout = (color: Color | null, holder: string | null) => {
   if (color === null) {
     return t`Aucune couleur`

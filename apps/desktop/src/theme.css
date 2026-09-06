@@ -139,12 +139,6 @@
     0 0 10px -1px var(--halo-far);
 }
 
-@utility main-lit {
-  box-shadow:
-    0 0 0 1px rgb(0 0 0 / 0.55),
-    0 1px 3px rgb(0 0 0 / 0.85);
-}
-
 @utility wheel-glass {
   filter: drop-shadow(0 5px 16px oklch(0 0 0 / 0.6));
 }

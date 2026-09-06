@@ -36,6 +36,8 @@
   --text-way--line-height: 1.1;
 
   --spacing-head: var(--head);
+  --spacing-pebble: calc(var(--head) * 0.42);
+  --spacing-nook: calc(var(--head) * 0.147);
   --spacing-dolmen: clamp(15rem, 38vw, 24rem);
   --spacing-paving: clamp(6.5rem, 18vw, 11rem);
   --spacing-board: clamp(8.25rem, 16vw, 11.5rem);
@@ -80,6 +82,7 @@
   --leaf-lit: #289b33;
   --leaf-glow: oklch(0.79 0.16 152);
   --amber: oklch(0.796 0.142 71);
+  --gold: oklch(0.84 0.155 88);
   --male: oklch(0.66 0.13 212);
   --female: oklch(0.6 0.17 348);
   --olive-deep: #848e02;
@@ -360,6 +363,50 @@
     border-color: color-mix(in srgb, var(--khaki), transparent 68%);
     background-color: color-mix(in srgb, var(--iron), transparent 30%);
     color: var(--cream);
+  }
+}
+
+@utility btn-glint {
+  border: 2px solid transparent;
+  background-color: transparent;
+}
+
+@utility btn-ember {
+  border: 2px solid transparent;
+  transition-property: background-color, border-color, color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 0.2s;
+  background-color: color-mix(in srgb, var(--iron), transparent 25%);
+  color: color-mix(in srgb, var(--khaki), transparent 15%);
+
+  &:hover {
+    border-color: color-mix(in srgb, var(--flame), transparent 45%);
+    background-color: color-mix(in srgb, var(--flame), transparent 84%);
+    color: color-mix(in srgb, var(--flame), white 34%);
+  }
+}
+
+@utility btn-token {
+  position: relative;
+  border: 2px solid color-mix(in srgb, var(--iron), transparent 15%);
+  transition-property: background-color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 0.2s;
+  background-color: var(--flame);
+  color: var(--cream);
+  box-shadow:
+    0 0 6px rgb(0 0 0 / 0.6),
+    0 0 0 1px rgb(0 0 0 / 0.35);
+
+  &:hover {
+    background-color: color-mix(in srgb, var(--flame), white 16%);
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
   }
 }
 
@@ -783,8 +830,31 @@
   }
 }
 
-@utility relief {
-  box-shadow: 0 1px 3px rgb(0 0 0 / 0.8);
+@utility cross {
+  fill: none;
+  stroke: currentcolor;
+  stroke-width: 3.2;
+  stroke-linecap: round;
+}
+
+@utility star {
+  fill: none;
+  stroke: color-mix(in srgb, var(--khaki), transparent 60%);
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+  paint-order: stroke;
+  transition-property: fill, stroke, filter;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 0.2s;
+
+  &[data-main] {
+    fill: var(--gold);
+    stroke: color-mix(in oklch, var(--gold), black 62%);
+    filter: drop-shadow(
+        0 0 4px color-mix(in oklch, var(--gold), transparent 55%)
+      )
+      drop-shadow(0 1px 2px rgb(0 0 0 / 0.75));
+  }
 }
 
 @utility emblem {

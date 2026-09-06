@@ -25,12 +25,7 @@ import {
 import { useCycleOrder } from '@/hooks/use-cycle-order'
 import { characterMarks } from '@/lib/character-marks'
 import { DRAG_MODIFIERS, dragAccessibility } from '@/lib/drag'
-import {
-  removeCharacter,
-  setGenderExcluded,
-  setMain,
-  toggleExcluded
-} from '@/lib/multifus'
+import { setGenderExcluded, setMain, toggleExcluded } from '@/lib/multifus'
 
 type CharactersScreenProps = Readonly<{
   characters: readonly Character[]
@@ -53,9 +48,6 @@ export const CharactersScreen = ({
     },
     handleSetMain: (nickname: string, main: boolean) => {
       run(setMain(nickname, main))
-    },
-    handleRemove: (nickname: string) => {
-      run(removeCharacter(nickname))
     }
   }
 

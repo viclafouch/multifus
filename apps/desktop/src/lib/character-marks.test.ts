@@ -72,6 +72,19 @@ describe('les gestes d’un personnage', () => {
     ])
   })
 
+  it('retire le personnage nommé du roster', async () => {
+    const invoked = listenIPC()
+    const run = vi.fn()
+
+    characterMarks({ run }).handleRemove('Kanpaï')
+    await settled()
+
+    expect(invoked).toStrictEqual([
+      { command: 'remove_character', payload: { nickname: 'Kanpaï' } }
+    ])
+    expect(run).toHaveBeenCalledTimes(1)
+  })
+
   it('pose un portrait en deux temps, la classe puis le genre', async () => {
     const invoked = listenIPC()
     const run = vi.fn()

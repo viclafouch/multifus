@@ -64,7 +64,11 @@ export const ClearingScreen = ({
           <WayList asking={asking} onGo={onGo} />
         </div>
       </div>
-      <Dolmen characters={characters} onOpenCharacter={setOpened} />
+      <Dolmen
+        characters={characters}
+        onOpenCharacter={setOpened}
+        onRemoveCharacter={marks.handleRemove}
+      />
       {character === null ? null : (
         <CharacterDialog
           character={character}

@@ -1,6 +1,6 @@
 import type { Class, Color, Gender, Portrait } from '@/@types/roster'
 import type { Snapshot } from '@/@types/snapshot'
-import { setClass, setColor, setGender } from '@/lib/multifus'
+import { removeCharacter, setClass, setColor, setGender } from '@/lib/multifus'
 
 type CharacterMarksParams = Readonly<{
   run: (action: Promise<Snapshot>) => void
@@ -16,6 +16,9 @@ export const characterMarks = ({ run }: CharacterMarksParams) => {
     },
     handleSetColor: (nickname: string, color: Color | null) => {
       run(setColor(nickname, color))
+    },
+    handleRemove: (nickname: string) => {
+      run(removeCharacter(nickname))
     },
     handleSetPortrait: (nickname: string, portrait: Portrait) => {
       run(

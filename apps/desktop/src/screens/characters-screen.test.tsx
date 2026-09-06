@@ -152,6 +152,16 @@ describe('l’écran des personnages', () => {
     ).not.toBeNull()
   })
 
+  it('retire du roster sans rien demander', () => {
+    show([characterOf({ nickname: 'Bravo', online: false })])
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Retirer Bravo du roster' })
+    )
+
+    expect(bridge.removeCharacter).toHaveBeenCalledWith('Bravo')
+  })
+
   it('montre les deux sexes allumés quand tout le monde défile', () => {
     show([
       characterOf({ nickname: 'Alpha' }),

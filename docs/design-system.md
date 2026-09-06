@@ -147,12 +147,13 @@ Les valeurs vivent dans `apps/desktop/src/retro.css`, sous `:root`.
 | `--flame`      | `#e4442c` | le rouge d'erreur du site                                   |
 | `--night`      | `#021b08` | le fond du site, qui sert au voile sur les décors           |
 
-Quatre valeurs ne viennent d'aucune des deux sources, et disent pourquoi :
+Cinq valeurs ne viennent d'aucune des deux sources, et disent pourquoi :
 
 | Jeton         | Valeur                  | Ce que c'est                                                                       |
 | ------------- | ----------------------- | ---------------------------------------------------------------------------------- |
 | `--leaf-glow` | `oklch(0.79 0.16 152)`  | le vert du connecté : `--leaf` éclairci, pour qu'une pastille brille sur du sombre |
 | `--amber`     | `oklch(0.796 0.142 71)` | la part sans couleur de la roue, et rien d'autre                                   |
+| `--gold`      | `oklch(0.84 0.155 88)`  | l'étoile du principal : `--amber` éclairci et tiré vers le jaune, et rien d'autre  |
 | `--male`      | `oklch(0.66 0.13 212)`  | le sceau de Mars, un bleu de sarcelle                                              |
 | `--female`    | `oklch(0.6 0.17 348)`   | le sceau de Vénus, un prune                                                        |
 
@@ -175,7 +176,12 @@ Une piste écartée revient toujours si personne n'écrit pourquoi.
 
 - **L'or et l'ambre.** Ils ne sont que dans le logo Dofus Retro, jamais dans le
   système. Une interface dorée ressemble à un jeu mobile, pas à Retro. `--amber`
-  survit au seul endroit que `CONTEXT.md` nomme, la part sans couleur de la roue
+  survit au seul endroit que `CONTEXT.md` nomme, la part sans couleur de la roue.
+  `--gold` en est la seconde exception, et la dernière : l'étoile du personnage
+  principal. Une distinction se lit en or partout depuis toujours, elle mesure
+  18 px, et une pièce d'or posée sur un portrait ne dore pas un écran. Une étoile
+  crème avait été essayée d'abord : sur un médaillon clair elle disparaissait, et
+  rien ne disait qu'elle était allumée plutôt que blanche
 - **Les icônes en trait**, celles de `lucide`. Le site n'en pose aucune et le
   jeu non plus. Un bouton y est du texte, en capitales, et rien d'autre. Il en
   reste dans les écrans que le monde n'a pas encore repris, et elles s'en iront
@@ -197,13 +203,17 @@ décor reste visible tout autour, sinon la scène disparaît.
 **Le fronton** (`@utility crest`) est un filet horizontal avec un losange vert au
 milieu, sous le titre. Le losange est la case isométrique de Dofus.
 
-**Les boutons** ont trois formes, et une seule est verte par écran :
+**Les boutons** ont sept faces, et une seule est verte par écran :
 
 | Variante | Emploi                                            |
 | -------- | ------------------------------------------------- |
 | `leaf`   | le geste du moment, un seul par écran             |
 | `slate`  | tout le reste, y compris « Continuer »            |
 | `bare`   | le cadre de la fenêtre, « Passer », et les icônes |
+| `flame`  | ce qui détruit : « Tout effacer »                 |
+| `glint`  | rien qu'un contenu : l'étoile du principal        |
+| `ember`  | la croix qui retire, kaki au repos, flamme dessus |
+| `token`  | la même croix posée sur un décor, en jeton rouge  |
 
 Ils sont en pilule, en Bebas capitales. La taille `lead` est réservée au bouton
 vert.
@@ -223,6 +233,13 @@ rendrait le bord et le rayon au hasard de l'ordre d'émission des `@utility`, ce
 que la note plus bas décrit. Ils prennent `sighted`, qui porte l'anneau de focus
 de tout le logiciel, et rien d'autre du bouton.
 
+**Une pastille posée sur une tête suit la tête.** Le dolmen rétrécit `--head` à
+mesure que le roster grossit, de 66 px pour un personnage seul à 26 px pour une
+foule. `--spacing-pebble` en tire la taille de l'étoile et de la croix, 42 % de
+la tête, et `--spacing-nook` le point du cercle où la croix se pose, à 45° du
+sommet : son centre tombe sur le bord, moitié dedans, moitié dehors. Rien de
+posé sur une tête ne porte de taille en pixels.
+
 **Le voile** (`@utility grove-shade`) est ce qui rend un décor de jeu lisible : un
 ovale sombre au centre, un dégradé en haut et en bas, un vignettage de bord. Sans
 lui, un texte blanc sur une prairie verte ne se lit pas.
@@ -234,45 +251,47 @@ rectangle bordé se lit comme un bouton.
 
 ### Toutes les matières de `retro.css`
 
-| Utilitaire                           | Ce que ça pose                                                      |
-| ------------------------------------ | ------------------------------------------------------------------- |
-| `grove`, `grove-shade`               | le fond du décor, et le voile qui le rend lisible                   |
-| `drift`                              | la panoramique permanente et le fondu entre deux décors             |
-| `plate`, `note`                      | le verre posé sur la carte, et le texte gravé dessus                |
-| `crest`                              | le fronton : un filet et le losange vert                            |
-| `btn-leaf`, `btn-slate`, `btn-bare`  | les trois faces du bouton, chacune complète                         |
-| `btn-flame`                          | la quatrième, celle qui détruit : « Tout effacer »                  |
-| `tick`                               | la case à cocher du jeu, verte et cochée quand c'est en place       |
-| `plaque`                             | un creux inscrit : les noms des personnages vus                     |
-| `frame`                              | le cadre d'une capture ouverte en grand                             |
-| `badge`, `pip`, `pip-live`           | l'état : la couleur du texte, et son point                          |
-| `fenceline`, `rail`, `stake`, `knob` | la clôture des étapes : l'ombre, les lisses, le piquet              |
-| `knob-lit`, `knob-here`              | la tête d'un piquet franchi, et celle de l'étape en cours           |
-| `sonar-leaf`, `sonar-still`          | l'encre et l'arrêt de l'onde partagée avec l'ancien thème           |
-| `limelight`                          | l'ombre portée qui décolle un titre du décor                        |
-| `rule`                               | le filet du carton de chapitre                                      |
-| `chapter`                            | le carton : il monte, tient, s'efface vers le haut                  |
-| `unfurl`                             | la plaque qui se déplie                                             |
-| `lift`, `lift-1` à `lift-5`          | ce qui monte, un cran toutes les 200 ms                             |
-| `roll`                               | le générique, un poste toutes les 130 ms par `nth-child`            |
-| `lift-chrome`                        | l'en-tête et le pied, qui arrivent tout de suite                    |
-| `roam`                               | la panoramique du monde, et le fondu entre deux maps                |
-| `veil`, `deepen`                     | le voile de toute map, et le cran de plus d'une map de travail      |
-| `relief`                             | l'ombre portée qui décolle une petite forme du décor                |
-| `settle`                             | ce qui monte à l'arrivée, quatre crans puis tout le reste           |
-| `flank`                              | le dégradé qui assombrit le côté où l'on écrit                      |
-| `hem`, `brow`                        | l'ourlet du bas sous le crédit, et celui du haut sous le retour     |
-| `legible`                            | le halo sous une phrase posée à même le décor : une ellipse floutée |
-| `sighted`                            | l'anneau du clavier, le même sur tout ce qui se focalise            |
-| `tint-*`, `stripe`                   | la couleur d'un personnage, et la pastille qui la porte             |
-| `sigil`, `sign-male`, `sign-female`  | le sceau d'un sexe, gris éteint, bleu ou prune allumé               |
-| `ensign`                             | un drapeau de langue, éteint tant qu'il n'est pas celui du moment   |
-| `dolmen-field`                       | la boîte qui refait la géométrie du décor en `cover`                |
-| `dolmen-seat`                        | la place de la dalle dans cette boîte, et la taille des têtes       |
-| `stage`                              | le cadre d'une boucle du jeu, au format 16/10                       |
-| `emblem`                             | l'ombre portée qui décolle le logo du décor                         |
-| `hearth`, `glade`                    | l'ombre sous les têtes, et la lueur d'herbe autour                  |
-| `head`, `hood`                       | la tête de classe sur le dolmen, et sa pierre de survol             |
+| Utilitaire                           | Ce que ça pose                                                       |
+| ------------------------------------ | -------------------------------------------------------------------- |
+| `grove`, `grove-shade`               | le fond du décor, et le voile qui le rend lisible                    |
+| `drift`                              | la panoramique permanente et le fondu entre deux décors              |
+| `plate`, `note`                      | le verre posé sur la carte, et le texte gravé dessus                 |
+| `crest`                              | le fronton : un filet et le losange vert                             |
+| `btn-leaf`, `btn-slate`, `btn-bare`  | les trois faces du bouton, chacune complète                          |
+| `btn-flame`                          | la quatrième, celle qui détruit : « Tout effacer »                   |
+| `btn-glint`, `btn-ember`             | le bouton sans face, et la croix qui retire une ligne                |
+| `btn-token`                          | la même croix posée sur un décor : un jeton rouge plein              |
+| `star`, `cross`                      | l'étoile du principal, et la croix qui retire, toutes deux dessinées |
+| `tick`                               | la case à cocher du jeu, verte et cochée quand c'est en place        |
+| `plaque`                             | un creux inscrit : les noms des personnages vus                      |
+| `frame`                              | le cadre d'une capture ouverte en grand                              |
+| `badge`, `pip`, `pip-live`           | l'état : la couleur du texte, et son point                           |
+| `fenceline`, `rail`, `stake`, `knob` | la clôture des étapes : l'ombre, les lisses, le piquet               |
+| `knob-lit`, `knob-here`              | la tête d'un piquet franchi, et celle de l'étape en cours            |
+| `sonar-leaf`, `sonar-still`          | l'encre et l'arrêt de l'onde partagée avec l'ancien thème            |
+| `limelight`                          | l'ombre portée qui décolle un titre du décor                         |
+| `rule`                               | le filet du carton de chapitre                                       |
+| `chapter`                            | le carton : il monte, tient, s'efface vers le haut                   |
+| `unfurl`                             | la plaque qui se déplie                                              |
+| `lift`, `lift-1` à `lift-5`          | ce qui monte, un cran toutes les 200 ms                              |
+| `roll`                               | le générique, un poste toutes les 130 ms par `nth-child`             |
+| `lift-chrome`                        | l'en-tête et le pied, qui arrivent tout de suite                     |
+| `roam`                               | la panoramique du monde, et le fondu entre deux maps                 |
+| `veil`, `deepen`                     | le voile de toute map, et le cran de plus d'une map de travail       |
+| `settle`                             | ce qui monte à l'arrivée, quatre crans puis tout le reste            |
+| `flank`                              | le dégradé qui assombrit le côté où l'on écrit                       |
+| `hem`, `brow`                        | l'ourlet du bas sous le crédit, et celui du haut sous le retour      |
+| `legible`                            | le halo sous une phrase posée à même le décor : une ellipse floutée  |
+| `sighted`                            | l'anneau du clavier, le même sur tout ce qui se focalise             |
+| `tint-*`, `stripe`                   | la couleur d'un personnage, et la pastille qui la porte              |
+| `sigil`, `sign-male`, `sign-female`  | le sceau d'un sexe, gris éteint, bleu ou prune allumé                |
+| `ensign`                             | un drapeau de langue, éteint tant qu'il n'est pas celui du moment    |
+| `dolmen-field`                       | la boîte qui refait la géométrie du décor en `cover`                 |
+| `dolmen-seat`                        | la place de la dalle, et `--head`, dont tout le reste se déduit      |
+| `stage`                              | le cadre d'une boucle du jeu, au format 16/10                        |
+| `emblem`                             | l'ombre portée qui décolle le logo du décor                          |
+| `hearth`, `glade`                    | l'ombre sous les têtes, et la lueur d'herbe autour                   |
+| `head`, `hood`                       | la tête de classe sur le dolmen, et sa pierre de survol              |
 
 Chaque face de bouton porte son propre bord et ses propres transitions. Elles ne
 partagent aucun utilitaire de base, parce que Tailwind v4 n'émet pas les
@@ -300,7 +319,7 @@ propriété se battent, et c'est le hasard de l'ordre d'émission qui gagne.
 | `LoopStage`      | la boucle du jeu, ou ce qu'elle montrera tant qu'elle manque                |
 | `StageScreen`    | une map qui montre le jeu : la boucle, et les réglages à côté               |
 | `Tick`           | la case à cocher, seule forme d'un réglage qui s'allume                     |
-| `MainMark`       | le losange crème du principal, le même partout                              |
+| `MainMark`       | l'étoile d'or du principal, la même partout                                 |
 | `SceneCredit`    | la mention d'Ankama, en bas de chaque fenêtre                               |
 | `ClearingScreen` | l'accueil : le titre, le menu, le dolmen                                    |
 | `Cartouche`      | le coin haut droit : la version, et les trois drapeaux                      |
@@ -494,9 +513,10 @@ une feuille qu'elle importe**, et il n'y en a que deux, `theme.css` et
 du connecté : le même vert, plus clair, parce qu'une pastille d'état doit briller
 sur du sombre. `colors.test.ts` mesure que les douze couleurs s'en éloignent.
 
-**L'ambre survit à un seul endroit**, `--amber`, et c'est la part sans couleur de
-la roue. `CONTEXT.md` la nomme, donc elle existe ; elle n'entre nulle part
-ailleurs, et surtout pas dans un bouton.
+**L'ambre survit à deux endroits.** `--amber` est la part sans couleur de la
+roue, que `CONTEXT.md` nomme, donc elle existe. `--gold`, qui en descend, est
+l'étoile du personnage principal, et c'est tout : ni l'un ni l'autre n'entre dans
+un bouton, un titre ou un fond.
 
 ### Les trois questions, tranchées
 

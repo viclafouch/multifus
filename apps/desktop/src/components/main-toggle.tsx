@@ -17,13 +17,13 @@ export const MainToggle = ({ nickname, isMain, onToggle }: MainToggleProps) => {
   return (
     <Tooltip>
       <TooltipTrigger
-        render={<Button variant="bare" size="icon-tight" />}
+        render={<Button variant="glint" size="icon-tight" />}
         aria-pressed={isMain}
         aria-label={t`${nickname} comme personnage principal`}
         className="shrink-0"
         onClick={onToggle}
       >
-        <MainMark isMain={isMain} />
+        <MainMark isMain={isMain} className="size-4.5" />
       </TooltipTrigger>
       <TooltipContent>
         {isMain

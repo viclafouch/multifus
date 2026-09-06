@@ -10,6 +10,9 @@ const buttonVariants = cva(
         leaf: 'btn-leaf',
         slate: 'btn-slate',
         bare: 'btn-bare',
+        glint: 'btn-glint',
+        ember: 'btn-ember',
+        token: 'btn-token',
         flame: 'btn-flame'
       },
       size: {
@@ -19,7 +22,8 @@ const buttonVariants = cva(
         sm: 'h-7 px-3.5 text-legend',
         tight: 'h-6 px-3 text-legend',
         icon: 'size-8',
-        'icon-tight': 'size-6'
+        'icon-tight': 'size-6',
+        'icon-pebble': 'size-pebble'
       }
     },
     defaultVariants: {

@@ -31,7 +31,7 @@ export const CharacterShortcutRow = ({
   return (
     <CharacterLine
       character={character}
-      mark={character.main ? <MainMark isMain /> : null}
+      mark={character.main ? <MainMark isMain className="size-4.5" /> : null}
     >
       <ShortcutField
         accelerator={character.shortcut}
