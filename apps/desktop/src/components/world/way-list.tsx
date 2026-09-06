@@ -17,19 +17,19 @@ export const WayList = ({ asking, onGo }: WayListProps) => {
           return (
             <li key={map}>
               <Button
-                variant="bare"
+                variant="way"
                 size="way"
                 className="w-full justify-start"
                 onClick={() => {
                   onGo(map)
                 }}
               >
-                {i18n._(MAP_NAMES[map])}
+                <span className="wayname">{i18n._(MAP_NAMES[map])}</span>
                 {map === asking ? (
                   <>
                     <span
                       aria-hidden
-                      className="ml-auto size-1.5 rounded-full bg-flame"
+                      className="relative ml-auto size-1.5 rounded-full bg-flame"
                     />
                     <span className="sr-only">{t`À régler`}</span>
                   </>

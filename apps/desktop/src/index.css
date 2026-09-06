@@ -239,4 +239,11 @@
   .bloom {
     animation: none !important;
   }
+
+  .btn-way,
+  .btn-way::before,
+  .btn-way::after,
+  .wayname {
+    transition: none !important;
+  }
 }

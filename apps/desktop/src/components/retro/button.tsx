@@ -10,6 +10,7 @@ const buttonVariants = cva(
         leaf: 'btn-leaf',
         slate: 'btn-slate',
         bare: 'btn-bare',
+        way: 'btn-way active:translate-y-0',
         glint: 'btn-glint',
         ember: 'btn-ember',
         token: 'btn-token',

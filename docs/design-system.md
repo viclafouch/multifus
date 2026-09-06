@@ -203,7 +203,7 @@ décor reste visible tout autour, sinon la scène disparaît.
 **Le fronton** (`@utility crest`) est un filet horizontal avec un losange vert au
 milieu, sous le titre. Le losange est la case isométrique de Dofus.
 
-**Les boutons** ont sept faces, et une seule est verte par écran :
+**Les boutons** ont huit faces, et une seule est verte par écran :
 
 | Variante | Emploi                                            |
 | -------- | ------------------------------------------------- |
@@ -214,6 +214,7 @@ milieu, sous le titre. Le losange est la case isométrique de Dofus.
 | `glint`  | rien qu'un contenu : l'étoile du principal        |
 | `ember`  | la croix qui retire, kaki au repos, flamme dessus |
 | `token`  | la même croix posée sur un décor, en jeton rouge  |
+| `way`    | un chemin qui part de la clairière, et lui seul   |
 
 Ils sont en pilule, en Bebas capitales. La taille `lead` est réservée au bouton
 vert.
@@ -223,6 +224,53 @@ cadre, « Ouvrir Telegram Web » et « Aller voir » se lisaient comme la valeur
 la ligne, et personne ne cliquait. Le « Retour » d'une map le porte aussi, parce
 qu'il se pose sur onze décors dont des clairs. `bare` ne sert plus qu'à ce qui
 borde la fenêtre de la mise en route et aux icônes qui portent leur infobulle.
+
+**Le menu de la clairière se vise comme une case du jeu.** Ses dix entrées sont
+des chemins, et les survoler, c'est viser la case où l'on va poser le pied. Un
+losange vert glisse depuis la gauche et se pose au début de l'entrée, et le nom
+s'écarte pour lui laisser la place (`wayname`). C'est le seul endroit où le
+survol raconte quelque chose, parce que c'est le seul écran dont tout le contenu
+est un départ.
+
+**C'est la seule exception à la règle du survol de `frontend.md`**, qui interdit
+tout effet de survol qui n'existe pas déjà ailleurs. Elle a été levée pour cet
+écran, et pour lui seul : ce qui bouge ici se déplace le long de la lecture, il
+n'y a ni `scale` ni soulèvement, et aucun autre écran n'a le droit d'en faire
+autant.
+
+Le vert n'y colore ni un titre ni un état, mais l'action du moment, ce que la
+règle du vert autorise déjà. Le cadre bordé de `bare` a disparu : à sa place, un
+dégradé sombre qui s'éteint vers la droite, donc une ligne éclairée du côté du
+losange plutôt qu'une ligne encadrée.
+
+**Le losange du chemin est celui du fronton, dessiné deux fois.** Même carré de
+7 px tourné à 45°, même `--leaf-lit`, mais celui du fronton porte un cerne sombre
+qui le détache du filet, et celui du chemin une lueur verte qui le détache de la
+planche. Deux `@utility` ne peuvent pas se partager un pseudo-élément, et un
+troisième utilitaire pour une forme de deux déclarations coûterait plus qu'il ne
+rendrait. Les trois mesures du chemin, la taille du losange, son écart du bord et
+le pas du nom, sont des propriétés personnalisées déclarées ensemble en tête de
+`btn-way` : elles doivent bouger ensemble.
+
+Le pas du nom, 16 px, n'est pas la largeur du losange. Le losange tourné en
+occupe dix, et les six qui restent sont l'air qu'il faut entre lui et la première
+lettre.
+
+**Une entrée ne s'enfonce pas au clic.** Toutes les faces portent
+`active:translate-y-px`, le pixel de course d'un bouton qu'on presse. Ici il n'y
+a ni cadre ni relief à enfoncer : seul le texte sautait d'un pixel, et ça se
+lisait comme un défaut. La face `way` remet ce pixel à zéro elle-même, dans la
+table des variantes et non chez l'appelant, pour que la prochaine entrée qui la
+portera l'ait aussi.
+
+**Une bande de lumière y a été essayée, et retirée.** Un éclat crème traversait
+la ligne une fois, de gauche à droite, comme sur un panneau qu'on éclaire au
+passage. Franc puis presque transparent, il se lisait dans les deux cas comme un
+reflet sur une vitre : quelque chose qui glisse devant le texte au lieu
+d'éclairer la planche. Deux mouvements suffisent à un survol.
+
+Rien n'y coûte une mise en page : `transform` pour le losange et le nom,
+`opacity` pour la planche. Une seule ligne s'anime à la fois.
 
 **Deux boutons restent des `<button>` du navigateur**, la tête du dolmen et le
 drapeau d'une langue, contre la règle de `frontend.md` qui veut un composant. Ce
@@ -261,6 +309,7 @@ rectangle bordé se lit comme un bouton.
 | `btn-flame`                          | la quatrième, celle qui détruit : « Tout effacer »                   |
 | `btn-glint`, `btn-ember`             | le bouton sans face, et la croix qui retire une ligne                |
 | `btn-token`                          | la même croix posée sur un décor : un jeton rouge plein              |
+| `btn-way`, `wayname`                 | un chemin de la clairière : la planche, le losange, le nom qui cède  |
 | `star`, `cross`                      | l'étoile du principal, et la croix qui retire, toutes deux dessinées |
 | `tick`                               | la case à cocher du jeu, verte et cochée quand c'est en place        |
 | `plaque`                             | un creux inscrit : les noms des personnages vus                      |

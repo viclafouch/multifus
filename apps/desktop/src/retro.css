@@ -366,6 +366,80 @@
   }
 }
 
+@utility btn-way {
+  --waymark: 7px;
+  --waymark-from: 12px;
+  --waymark-step: 16px;
+
+  position: relative;
+  border: 2px solid transparent;
+  background-color: transparent;
+  color: color-mix(in srgb, var(--khaki), transparent 22%);
+  text-shadow:
+    0 1px 3px rgb(0 0 0 / 0.9),
+    0 3px 18px rgb(0 0 0 / 0.75);
+  transition-property: color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 0.3s;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    opacity: 0;
+    background-image: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--iron), transparent 12%),
+      color-mix(in srgb, var(--iron), transparent 56%) 64%,
+      transparent
+    );
+    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: var(--waymark-from);
+    width: var(--waymark);
+    height: var(--waymark);
+    margin-top: calc(var(--waymark) / -2);
+    opacity: 0;
+    transform: translateX(calc(var(--waymark-step) / -2)) rotate(45deg);
+    background-color: var(--leaf-lit);
+    box-shadow: 0 0 8px color-mix(in srgb, var(--leaf-glow), transparent 40%);
+    transition-property: opacity, transform;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 0.3s;
+  }
+
+  &:hover,
+  &:focus-visible {
+    color: var(--cream);
+
+    &::before {
+      opacity: 1;
+    }
+
+    &::after {
+      opacity: 1;
+      transform: translateX(0) rotate(45deg);
+    }
+
+    & .wayname {
+      transform: translateX(var(--waymark-step));
+    }
+  }
+}
+
+@utility wayname {
+  position: relative;
+  transition-property: transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 0.3s;
+}
+
 @utility btn-glint {
   border: 2px solid transparent;
   background-color: transparent;
