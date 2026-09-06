@@ -1588,8 +1588,6 @@ msgid "La roue au milieu de votre écran"
 msgstr "La rueda en medio de tu pantalla"
 
 #: src/constants/features.ts
-#: src/constants/shortcuts.ts
-#: src/constants/world.ts
 msgid "La roue des personnages"
 msgstr "La rueda de personajes"
 
@@ -2586,7 +2584,7 @@ msgstr "Resistencia fija"
 msgid "Résistances"
 msgstr "Resistencias"
 
-#: src/components/character-row.tsx
+#: src/helpers/wording.ts
 msgid "Retirer {nickname} du roster"
 msgstr "Quitar a {nickname} del roster"
 
@@ -2668,8 +2666,9 @@ msgid "Rose"
 msgstr "Rosa"
 
 #: src/constants/shortcuts.ts
-#~ msgid "Roue des personnages"
-#~ msgstr "Rueda de personajes"
+#: src/constants/world.ts
+msgid "Roue des personnages"
+msgstr "Rueda de personajes"
 
 #: src/constants/roster.ts
 msgid "Rouge"

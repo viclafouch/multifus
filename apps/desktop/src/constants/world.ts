@@ -49,7 +49,7 @@ export const MAP_NAMES = {
   quickReplies: msg`Réponses rapides`,
   autoFocus: msg`AutoFocus`,
   walk: msg`Déplacement rapide`,
-  wheel: msg`La roue des personnages`,
+  wheel: msg`Roue des personnages`,
   runeTable: msg`Tableau des runes`,
   relay: msg`Messages privés`,
   settings: msg`Paramètres`,
