@@ -1,11 +1,13 @@
 import { Lock } from 'lucide-react'
+import { i18n } from '@lingui/core'
 import { t } from '@lingui/core/macro'
 import type { Snapshot } from '@/@types/snapshot'
 import { EmptyState, EmptyStateMark } from '@/components/layout/empty-state'
 import { Screen } from '@/components/layout/screen'
+import { Button } from '@/components/retro/button'
 import { SystemPageButton } from '@/components/system-page-button'
-import { Button } from '@/components/ui/button'
 import { IS_APPLE } from '@/constants/keyboard'
+import { MAP_NAMES } from '@/constants/world'
 import { quoted, systemWords } from '@/helpers/wording'
 import { requestAuthorization } from '@/lib/multifus'
 
@@ -19,7 +21,7 @@ export const AuthorizationScreen = ({ run }: AuthorizationScreenProps) => {
   const accessibility = quoted(words.accessibility)
 
   return (
-    <Screen title={t`Personnages`}>
+    <Screen title={i18n._(MAP_NAMES.characters)}>
       <EmptyState
         title={t`Multifus attend votre autorisation`}
         body={
@@ -46,7 +48,7 @@ export const AuthorizationScreen = ({ run }: AuthorizationScreenProps) => {
         >
           {t`Demander l’autorisation`}
         </Button>
-        <SystemPageButton page="authorization" variant="outline" size="sm" />
+        <SystemPageButton page="authorization" variant="slate" size="sm" />
       </EmptyState>
     </Screen>
   )

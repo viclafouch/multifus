@@ -1,6 +1,6 @@
 import { t } from '@lingui/core/macro'
-import { MainStar } from '@/components/main-star'
-import { Button } from '@/components/ui/button'
+import { MainMark } from '@/components/main-mark'
+import { Button } from '@/components/retro/button'
 import {
   Tooltip,
   TooltipContent,
@@ -17,13 +17,13 @@ export const MainToggle = ({ nickname, isMain, onToggle }: MainToggleProps) => {
   return (
     <Tooltip>
       <TooltipTrigger
-        render={<Button variant="ghost" size="icon-xs" />}
+        render={<Button variant="bare" size="icon-tight" />}
         aria-pressed={isMain}
         aria-label={t`${nickname} comme personnage principal`}
         className="shrink-0"
         onClick={onToggle}
       >
-        <MainStar isMain={isMain} />
+        <MainMark isMain={isMain} />
       </TooltipTrigger>
       <TooltipContent>
         {isMain

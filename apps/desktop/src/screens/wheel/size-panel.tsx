@@ -1,5 +1,4 @@
 import React from 'react'
-import { Eye } from 'lucide-react'
 import { plural, t } from '@lingui/core/macro'
 import type { Display } from '@/@types/display'
 import type { Snapshot } from '@/@types/snapshot'
@@ -7,7 +6,7 @@ import type { WheelSize } from '@/@types/wheel'
 import { GaugeRow } from '@/components/gauge-row'
 import { Panel } from '@/components/layout/panel'
 import { PanelHeader } from '@/components/layout/panel-header'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/retro/button'
 import { DEMO_FEWEST, DEMO_USUAL } from '@/constants/wheel'
 import { useDraft } from '@/hooks/use-draft'
 import { previewWheel, setWheelDiameter } from '@/lib/multifus'
@@ -30,13 +29,12 @@ export const SizePanel = ({ size, screen, run }: SizePanelProps) => {
         description={t`De faux personnages ici comme à l’essai, les vôtres en jeu. Une jauge pour la taille, une pour le monde qu’il y a dessus.`}
       >
         <Button
-          variant="secondary"
+          variant="slate"
           size="sm"
           onClick={() => {
             run(previewWheel(crowd))
           }}
         >
-          <Eye aria-hidden />
           {t`Voir en vrai`}
         </Button>
       </PanelHeader>

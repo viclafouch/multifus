@@ -104,7 +104,7 @@ export const WheelDial = ({
       {count === 0 && nobody !== undefined ? (
         <p
           style={{ fontSize: shape.nobody, maxWidth: shape.nobodyWidth }}
-          className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center font-display leading-tight font-semibold text-balance text-muted-foreground"
+          className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center font-carve leading-tight text-balance text-muted-foreground"
         >
           {nobody}
         </p>

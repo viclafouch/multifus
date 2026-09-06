@@ -6,7 +6,29 @@ import type { Color } from '@/@types/roster'
 import { COLORS, COLOR_TINTS } from '@/constants/colors'
 import { COLOR_LABELS } from '@/constants/roster'
 
-const THEME = readFileSync(join(import.meta.dirname, '..', 'theme.css'), 'utf8')
+const styleSheet = (name: string) => {
+  return readFileSync(join(import.meta.dirname, '..', name), 'utf8')
+}
+
+const THEME = ['index.css', 'theme.css', 'retro.css'].map(styleSheet).join('\n')
+
+const importsOf = (name: string) => {
+  const imported: string[] = []
+
+  for (const found of styleSheet(name).matchAll(
+    /@import '\.\/([\w-]+\.css)'/gu
+  )) {
+    imported.push(found[1])
+  }
+
+  return imported
+}
+
+const SATELLITES = ['banner.css', 'wheel.css'] as const
+
+const loadedBy = (name: string) => {
+  return importsOf(name).map(styleSheet).join('\n')
+}
 
 const CHARACTER_RS = readFileSync(
   join(
@@ -173,28 +195,57 @@ const contrast = (one: Triplet, other: Triplet) => {
   return (Math.max(first, second) + 0.05) / (Math.min(first, second) + 0.05)
 }
 
-const declaredColor = (name: string): Triplet => {
-  const declaration = new RegExp(
-    `--${name}:\\s*oklch\\(([\\d.]+) ([\\d.]+) ([\\d.]+)\\)`,
-    'u'
-  ).exec(THEME)
+const declaredValue = (name: string) => {
+  const declaration = new RegExp(`--${name}:\\s*([^;]+);`, 'u').exec(THEME)
 
   if (declaration === null) {
-    throw new Error(`theme.css declares no --${name}`)
+    throw new Error(`aucune feuille ne déclare --${name}`)
   }
 
-  return [
-    Number(declaration[1]),
-    Number(declaration[2]),
-    Number(declaration[3])
-  ]
+  return declaration[1].trim()
+}
+
+const declaredColor = (name: string): Triplet => {
+  const value = declaredValue(name)
+  const oklch = /^oklch\(([\d.]+) ([\d.]+) ([\d.]+)\)$/u.exec(value)
+
+  if (oklch === null) {
+    throw new Error(`--${name} n’est pas écrit en oklch`)
+  }
+
+  return [Number(oklch[1]), Number(oklch[2]), Number(oklch[3])]
+}
+
+const linearOfHex = (hex: string): Triplet => {
+  const channel = (rank: number) => {
+    return decoded(
+      Number.parseInt(hex.slice(1 + rank * 2, 3 + rank * 2), 16) / 255
+    )
+  }
+
+  return [channel(0), channel(1), channel(2)]
+}
+
+const declaredLinear = (name: string): Triplet => {
+  const value = declaredValue(name)
+  const borrowed = /^var\(--([a-z-]+)\)$/u.exec(value)
+
+  if (borrowed !== null) {
+    return declaredLinear(borrowed[1])
+  }
+
+  if (value.startsWith('#')) {
+    return linearOfHex(value)
+  }
+
+  return linearOf(declaredColor(name))
 }
 
 const share = (declaration: string) => {
   const found = new RegExp(declaration, 'u').exec(THEME)
 
   if (found === null) {
-    throw new Error(`theme.css mixes no ${declaration}`)
+    throw new Error(`aucune feuille ne mélange ${declaration}`)
   }
 
   return Number(found[1]) / 100
@@ -218,7 +269,7 @@ const BLACK: Triplet = [0, 0, 0]
 
 const WHITE: Triplet = [1, 0, 0]
 
-const AMBER = 'primary'
+const AMBER = 'amber'
 
 const WHEEL_TINTS = [...COLORS, AMBER]
 
@@ -293,7 +344,7 @@ const declared = (color: Color): Triplet => {
   const found = DECLARED.get(color)
 
   if (found === undefined) {
-    throw new Error(`theme.css declares no --${color}`)
+    throw new Error(`aucune feuille ne déclare --${color}`)
   }
 
   return found
@@ -345,7 +396,7 @@ describe('la palette des personnages', () => {
   })
 
   it.each(WHEEL_TINTS)('laisse lire un pseudo sur la part %s', (tint) => {
-    const name = linearOf(declaredColor('foreground'))
+    const name = declaredLinear('foreground')
 
     expect(contrast(sliceFill(tint), name)).toBeGreaterThanOrEqual(NAME_FLOOR)
   })
@@ -353,7 +404,7 @@ describe('la palette des personnages', () => {
   it.each(WHEEL_TINTS)(
     'laisse lire un pseudo sur la part %s au survol',
     (tint) => {
-      const name = linearOf(declaredColor('foreground'))
+      const name = declaredLinear('foreground')
 
       expect(contrast(hoveredFill(tint), name)).toBeGreaterThanOrEqual(
         HOVERED_NAME_FLOOR
@@ -362,23 +413,32 @@ describe('la palette des personnages', () => {
   )
 
   it.each(COLORS)('éloigne %s du vert du connecté', (color) => {
-    const live = linearOf(declaredColor('live'))
+    const live = declaredLinear('live')
 
     expect(apart(declared(color), live)).toBeGreaterThanOrEqual(LIVE_FLOOR)
   })
 
   it.each(COLORS)('éloigne %s de l’ambre d’une part sans couleur', (color) => {
-    const primary = linearOf(declaredColor('primary'))
+    const amber = declaredLinear(AMBER)
 
-    expect(apart(declared(color), primary)).toBeGreaterThanOrEqual(
-      PRIMARY_FLOOR
-    )
+    expect(apart(declared(color), amber)).toBeGreaterThanOrEqual(PRIMARY_FLOOR)
   })
 
   it.each(COLORS)('affiche %s telle qu’elle est déclarée', (color) => {
     const shown = shownOf(declared(color))
 
     expect(apart(declared(color), shown)).toBeLessThanOrEqual(RENDERED_DRIFT)
+  })
+
+  it.each(SATELLITES)('sert les douze teintes à %s', (satellite) => {
+    const loaded = loadedBy(satellite)
+
+    for (const color of COLORS) {
+      expect(loaded).toContain(`--${color}:`)
+      expect(loaded).toContain(`@utility tint-${color}`)
+    }
+
+    expect(loaded).toContain('@utility stripe')
   })
 
   it('donne au Rust les douze couleurs, et pas une de plus', () => {

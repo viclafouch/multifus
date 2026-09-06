@@ -2,7 +2,7 @@ import { t } from '@lingui/core/macro'
 import type { Character } from '@/@types/roster'
 import type { Snapshot } from '@/@types/snapshot'
 import { CharacterLine } from '@/components/character-line'
-import { Switch } from '@/components/ui/switch'
+import { Tick } from '@/components/retro/tick'
 import { setRelayed } from '@/lib/multifus'
 
 const relayToggleLabel = (nickname: string) => {
@@ -20,7 +20,7 @@ export const RelayedList = ({ characters, run }: RelayedListProps) => {
       {characters.map((character) => {
         return (
           <CharacterLine key={character.nickname} character={character}>
-            <Switch
+            <Tick
               checked={character.relayed}
               aria-label={relayToggleLabel(character.nickname)}
               onCheckedChange={(relayed) => {

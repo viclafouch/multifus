@@ -1,13 +1,12 @@
-import { Mars, Venus, type LucideIcon } from 'lucide-react'
 import type { Gender } from '@/@types/roster'
 import { cn } from '@/lib/utils'
 
 const SIGIL_GLYPHS = {
-  male: Mars,
-  female: Venus
-} as const satisfies Record<Gender, LucideIcon>
+  male: '♂',
+  female: '♀'
+} as const satisfies Record<Gender, string>
 
-const SIGIL_TONES = {
+const SIGIL_SIGNS = {
   male: 'sign-male',
   female: 'sign-female'
 } as const satisfies Record<Gender, string>
@@ -18,18 +17,16 @@ type GenderSigilProps = Readonly<{
 }>
 
 export const GenderSigil = ({ gender, className }: GenderSigilProps) => {
-  const Glyph = SIGIL_GLYPHS[gender]
-
   return (
     <span
       aria-hidden
       className={cn(
-        'sigil flex size-sigil items-center justify-center rounded-full border transition-row',
-        SIGIL_TONES[gender],
+        'sigil flex size-sigil items-center justify-center rounded-full border text-bar leading-none transition-row',
+        SIGIL_SIGNS[gender],
         className
       )}
     >
-      <Glyph className="size-glyph" strokeWidth={2} />
+      {SIGIL_GLYPHS[gender]}
     </span>
   )
 }

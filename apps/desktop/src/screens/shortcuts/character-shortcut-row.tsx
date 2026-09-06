@@ -2,7 +2,7 @@ import { t } from '@lingui/core/macro'
 import type { Character } from '@/@types/roster'
 import type { Binding } from '@/@types/shortcuts'
 import { CharacterLine } from '@/components/character-line'
-import { MainStar } from '@/components/main-star'
+import { MainMark } from '@/components/main-mark'
 import { ShortcutField } from '@/components/shortcut-field'
 import { matchIsSameBinding } from '@/helpers/binding'
 import type { TonedLine } from '@/helpers/wording'
@@ -31,7 +31,7 @@ export const CharacterShortcutRow = ({
   return (
     <CharacterLine
       character={character}
-      mark={character.main ? <MainStar isMain /> : null}
+      mark={character.main ? <MainMark isMain /> : null}
     >
       <ShortcutField
         accelerator={character.shortcut}

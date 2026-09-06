@@ -3,7 +3,7 @@ import type { Display } from '@/@types/display'
 import type { BannerCorner } from '@/@types/walk'
 import { Legend } from '@/components/layout/legend'
 import { ScreenFrame } from '@/components/layout/screen-frame'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/retro/button'
 import { CORNER_PLACEMENT, CORNERS } from '@/constants/banner'
 import { monitorShape } from '@/helpers/banner'
 import { cn } from '@/lib/utils'
@@ -32,7 +32,7 @@ export const CornerPicker = ({ corner, screen, onPick }: CornerPickerProps) => {
           return (
             <Button
               key={each}
-              variant="ghost"
+              variant="bare"
               aria-pressed={each === corner}
               aria-label={cornerLabel(each)}
               className={cn(

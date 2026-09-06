@@ -1,5 +1,5 @@
 import { Check, Copy } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/retro/button'
 import { useCopy } from '@/hooks/use-copy'
 
 type CopyButtonProps = Readonly<{
@@ -17,8 +17,8 @@ export const CopyButton = ({ text, label, copiedLabel }: CopyButtonProps) => {
 
   return (
     <Button
-      variant="ghost"
-      size="icon-xs"
+      variant="bare"
+      size="icon-tight"
       data-copied={hasCopied ? '' : undefined}
       onClick={handleClick}
       title={hasCopied ? copiedLabel : label}

@@ -1,6 +1,7 @@
 import { DragDropProvider } from '@dnd-kit/react'
+import { i18n } from '@lingui/core'
 import { t } from '@lingui/core/macro'
-import type { Character, Class, Color, Gender, Portrait } from '@/@types/roster'
+import type { Character } from '@/@types/roster'
 import type { Snapshot } from '@/@types/snapshot'
 import { CharacterRow } from '@/components/character-row'
 import { EmptyRoster } from '@/components/empty-roster'
@@ -9,6 +10,7 @@ import { Panel } from '@/components/layout/panel'
 import { PanelHeader } from '@/components/layout/panel-header'
 import { Screen } from '@/components/layout/screen'
 import { GENDERS } from '@/constants/roster'
+import { MAP_NAMES } from '@/constants/world'
 import { colorHolders } from '@/helpers/colors'
 import {
   genderGroupOf,
@@ -21,12 +23,10 @@ import {
   missingGenderLine
 } from '@/helpers/wording'
 import { useCycleOrder } from '@/hooks/use-cycle-order'
+import { characterMarks } from '@/lib/character-marks'
 import { DRAG_MODIFIERS, dragAccessibility } from '@/lib/drag'
 import {
   removeCharacter,
-  setClass,
-  setColor,
-  setGender,
   setGenderExcluded,
   setMain,
   toggleExcluded
@@ -44,30 +44,15 @@ export const CharactersScreen = ({
   run
 }: CharactersScreenProps) => {
   const cycle = useCycleOrder({ characters, run })
-  const title = t`Personnages`
+  const title = i18n._(MAP_NAMES.characters)
 
   const actions = {
+    ...characterMarks({ run }),
     handleToggleExcluded: (nickname: string) => {
       run(toggleExcluded(nickname))
     },
     handleSetMain: (nickname: string, main: boolean) => {
       run(setMain(nickname, main))
-    },
-    handleSetGender: (nickname: string, gender: Gender | null) => {
-      run(setGender(nickname, gender))
-    },
-    handleSetClass: (nickname: string, characterClass: Class | null) => {
-      run(setClass(nickname, characterClass))
-    },
-    handleSetColor: (nickname: string, color: Color | null) => {
-      run(setColor(nickname, color))
-    },
-    handleSetPortrait: (nickname: string, portrait: Portrait) => {
-      run(
-        setClass(nickname, portrait.class).then(() => {
-          return setGender(nickname, portrait.gender)
-        })
-      )
     },
     handleRemove: (nickname: string) => {
       run(removeCharacter(nickname))
@@ -88,7 +73,7 @@ export const CharactersScreen = ({
   return (
     <Screen
       title={title}
-      subtitle={t`Tirez une ligne par sa poignée pour changer l’ordre du défilement. Un raccourci vous ramène direct sur votre personnage principal.`}
+      subtitle={t`Tirez une ligne pour changer l’ordre du défilement.`}
     >
       <DragDropProvider
         modifiers={DRAG_MODIFIERS}
@@ -101,7 +86,7 @@ export const CharactersScreen = ({
         <Panel>
           <PanelHeader
             title={t`Exclusion`}
-            description={t`Un personnage exclu est sauté par le défilement et par le Déplacement rapide, et l’AutoFocus ne le fait plus passer devant. Ses messages privés continuent d’arriver.`}
+            description={t`Un exclu est sauté par le défilement, le Déplacement rapide et l’AutoFocus. Ses messages privés arrivent quand même.`}
           >
             {GENDERS.map((gender) => {
               const { isEmpty, isIncluded } = genderGroupOf({

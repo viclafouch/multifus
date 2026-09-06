@@ -1,8 +1,7 @@
-import { FolderOpen } from 'lucide-react'
 import { t } from '@lingui/core/macro'
 import type { ConfigProblem } from '@/@types/system'
 import { NoticeBar } from '@/components/notice-bar'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/retro/button'
 import { configProblemLines } from '@/helpers/wording'
 
 type ConfigNoticeProps = Readonly<{
@@ -27,15 +26,14 @@ export const ConfigNotice = ({
       onDismiss={onDismiss}
       actions={
         quarantined === null ? null : (
-          <Button variant="outline" size="xs" onClick={onReveal}>
-            <FolderOpen aria-hidden />
+          <Button variant="slate" size="tight" onClick={onReveal}>
             {t`Montrer le fichier`}
           </Button>
         )
       }
     >
       {quarantined === null ? null : (
-        <p className="selectable font-mono text-mini break-all text-muted-foreground/75">
+        <p className="selectable font-mono text-log wrap-anywhere text-khaki/75">
           {quarantined}
         </p>
       )}

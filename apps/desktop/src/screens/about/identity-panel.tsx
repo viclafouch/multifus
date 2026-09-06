@@ -14,8 +14,8 @@ type FactProps = Readonly<{
 const Fact = ({ label, value, children }: FactProps) => {
   return (
     <div className="flex items-start gap-6">
-      <dt className="w-28 shrink-0 pt-px text-muted-foreground">{label}</dt>
-      <dd className="selectable min-w-0 flex-1 font-mono text-note break-all text-foreground/80">
+      <dt className="w-28 shrink-0 pt-px text-khaki">{label}</dt>
+      <dd className="selectable min-w-0 flex-1 font-mono text-aside wrap-anywhere text-cream/80">
         {value}
       </dd>
       {children === undefined ? null : (
@@ -37,20 +37,16 @@ export const IdentityPanel = ({
   configPath
 }: IdentityPanelProps) => {
   return (
-    <Panel className="mb-3">
+    <Panel>
       <div className="flex flex-col gap-2.5 px-4 py-4">
-        <p className="flex items-baseline gap-2.5 font-display text-heading font-semibold tracking-title">
-          <span
-            aria-hidden
-            className="size-1.5 shrink-0 -translate-y-1 rounded-full bg-primary"
-          />
+        <p className="font-carve text-bar tracking-wide text-cream uppercase">
           Multifus
         </p>
-        <p className="max-w-prose text-body text-muted-foreground">
+        <p className="max-w-tale text-tale text-khaki">
           {t`Le multicompte confortable sur Dofus Retro : Multifus range vos fenêtres, vous jouez.`}
         </p>
       </div>
-      <dl className="flex flex-col gap-2 border-t border-border/70 px-4 py-3.5 text-body">
+      <dl className="flex flex-col gap-2 border-t border-band/25 px-4 py-3.5 text-tale">
         <Fact label={t`Version`} value={version} />
         <Fact label={t`Système`} value={system} />
         <Fact label={t`Vos réglages`} value={configPath}>

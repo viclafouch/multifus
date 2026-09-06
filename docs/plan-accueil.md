@@ -1,19 +1,21 @@
-# La prise en main
+# La mise en route
 
 Ce que voit quelqu'un qui vient d'installer Multifus, et pourquoi il repartait en
 croyant que le logiciel est cassé.
 
-Le nom a été tranché le 4 septembre 2026 : « la prise en main », partout, à
-l'écran comme dans le plan. « L'accueil » disait le premier écran, pas la suite,
-et une entrée « Accueil » dans la barre de gauche se serait lue comme une page
-d'accueil.
+Le nom a été tranché deux fois. Le 4 septembre 2026, « la prise en main »
+remplace « l'accueil », qui disait le premier écran et pas la suite, et qui se
+serait lu comme une page d'accueil dans la barre de gauche. Le 6 septembre, « la
+mise en route » remplace « la prise en main », qui nomme un moment et non une
+chose : personne ne sait ce qu'il va trouver derrière. Le nouveau nom vaut
+partout, à l'écran comme dans les plans.
 
 ## Où on en est
 
 Écrit et vert sur le Mac, tests compris. Le dessin a été repris une fois, du
 tout au tout : la description en est plus bas. Rien n'a été regardé à l'écran :
 la fenêtre de `tauri dev` est le seul endroit où ça se voit, et le fichier de
-réglages n'ayant pas la clé, la prise en main part toute seule au prochain
+réglages n'ayant pas la clé, la mise en route part toute seule au prochain
 lancement.
 
 Les lectures du registre de Windows sont écrites depuis, et compilées et testées
@@ -44,7 +46,7 @@ coûtait un utilisateur à chaque installation ratée.
 ## Ce que Multifus peut contrôler, et ce qu'il ne peut pas
 
 C'est la contrainte qui décide de tout le dessin. Les deux systèmes ne se
-laissent pas lire pareil, et la prise en main ne fait jamais semblant.
+laissent pas lire pareil, et la mise en route ne fait jamais semblant.
 
 ### macOS
 
@@ -67,7 +69,7 @@ com.viclafouch.multifus`, l'Accessibilité seule rendue, puis le Déplacement
 rapide armé sur deux clients. Le tap s'est créé, le journal ne porte aucun
 `CGEventTapCreate` refusé, et Surveillance de la saisie est resté vide. Focus
 Retro appelle `CGPreflightListenEventAccess` et demande donc deux autorisations
-au joueur ; la prise en main du Mac n'a qu'une porte à faire ouvrir.
+au joueur ; la mise en route du Mac n'a qu'une porte à faire ouvrir.
 
 ### Windows
 
@@ -142,7 +144,7 @@ Windows.
 
 ## La preuve par l'écoute
 
-C'est ce qui sauve la prise en main sur le Mac, et ce qui la termine sur
+C'est ce qui sauve la mise en route sur le Mac, et ce qui la termine sur
 Windows.
 
 Multifus sait dire une chose que personne d'autre ne sait dire : il a entendu
@@ -211,10 +213,10 @@ figure comme par la liste de l'essai. Les mots sont dans
 exacts des deux systèmes dans `systemWords` de `helpers/wording.ts`, à un seul
 endroit pour les deux écrans.
 
-**La prise en main n'a pas d'entrée à elle.** Elle en a eu une, entre Paramètres
+**La mise en route n'a pas d'entrée à elle.** Elle en a eu une, entre Paramètres
 et À propos, dans la barre de gauche comme dans la barre système. Onze lignes
 faisaient défiler la barre de gauche, et un menu qui défile est un menu raté.
-La liste vit donc en bas de l'écran des Paramètres, sous son propre titre, et
+Elle vit donc en bas des Paramètres, en une seule ligne qui la rejoue, et
 `Screen` est revenu à dix membres.
 
 C'est la pastille « À régler » des **Paramètres** qui dit qu'un contrôle est
@@ -335,7 +337,7 @@ du logiciel, une colonne d'étapes à gauche et le texte à droite : c'était
 l'application avec un sommaire de plus, et rien ne disait qu'on venait
 d'installer quelque chose.
 
-La prise en main ne ressemble donc à aucun autre écran de Multifus.
+La mise en route ne ressemble donc à aucun autre écran de Multifus.
 
 - **Pas de colonne.** La fenêtre entière est une scène : un dégradé chaud qui
   monte du haut et remonte du bas, le grain par-dessus, et rien d'autre.
@@ -348,7 +350,7 @@ La prise en main ne ressemble donc à aucun autre écran de Multifus.
   espacements. On change de page, pas de dessin.
 - **Deux boutons dans les coins**, « Retour » à gauche et « Passer » à droite,
   discrets, hors de la colonne. Ils ne se disputent pas l'attention avec le
-  bouton qui fait avancer. « Passer la prise en main » a été raccourci le
+  bouton qui fait avancer. « Passer la mise en route » a été raccourci le
   4 septembre 2026 : dans un coin, le verbe suffit.
 - **Six pastilles en bas**, une par étape, et on peut cliquer chacune. Elles
   remplacent la colonne : on voit où on en est et on va où on veut, sans qu'un
@@ -405,7 +407,7 @@ droite, toujours dans le même ordre :
    réclamation d'achèvement, et un gris à côté d'un rouge se lit « rien à
    signaler », ce qui est vrai.
 
-   La prise en main plein écran garde son état vert, elle : une page à la fois,
+   La mise en route plein écran garde son état vert, elle : une page à la fois,
    pas de voisin avec qui se comparer, et le vert y est la récompense de l'étape
    qu'on vient de faire.
 
@@ -437,10 +439,10 @@ d'action pesait donc plus lourd que le titre qu'il sert.
 déroulante et les deux dialogues. Le changer les remet tous dans l'échelle du
 logiciel d'un seul geste, sans toucher au texte que le logiciel écrit lui-même.
 
-Dans la liste de la prise en main, les actions sont en plus passées de `sm` à
+Dans la liste de la mise en route, les actions sont en plus passées de `sm` à
 `xs`, la taille que le reste des lignes du logiciel emploie déjà.
 
-## Les boutons de la prise en main
+## Les boutons de la mise en route
 
 Repris le 4 septembre 2026. « Continuer » n'engageait à rien : on le clique cinq
 fois d'affilée sans rien faire, et on arrive au bout persuadé d'avoir tout réglé.
@@ -536,7 +538,7 @@ compte, et promettre le multicompte dès la première ligne fait fermer la fenê
 à celui qui n'en a qu'un.
 
 **Aucune métaphore**, tranché le 4 septembre 2026. « Le feu vert » disait
-l'autorisation dans toute la prise en main et jusque dans l'écran des
+l'autorisation dans toute la mise en route et jusque dans l'écran des
 personnages ; il ne dit rien à qui ne connaît pas déjà le mot qu'il remplace.
 L'écran dit « autorisation », le système dit « autorisation », et les deux se
 cherchent avec le même mot.
@@ -545,7 +547,7 @@ cherchent avec le même mot.
 
 ### À regarder, sur le Mac
 
-- [ ] La prise en main de bout en bout, dans la fenêtre à sa taille d'origine
+- [ ] La mise en route de bout en bout, dans la fenêtre à sa taille d'origine
       puis à sa taille minimale, 720 sur 520 : **aucune page ne doit défiler**,
       et l'image doit rétrécir avant tout le reste.
 - [ ] Les six pages : le titre tient sur deux lignes au plus, et le chemin tient
@@ -568,7 +570,7 @@ cherchent avec le même mot.
       barre de gauche prend sa pastille « À régler » dans la seconde.
 - [ ] L'écran des personnages sans autorisation dit « Multifus attend votre
       autorisation », et son bouton « Ouvrir Réglages Système ».
-- [ ] Terminée, la prise en main ne revient plus, même après un redémarrage.
+- [ ] Terminée, la mise en route ne revient plus, même après un redémarrage.
       « Revoir » la rejoue.
 
 ### Les images
@@ -633,7 +635,7 @@ porte le « J'ai compris » des deux.
       laisser à la preuve par l'écoute.
 - [ ] « J'ai compris », puis remettre le réglage, puis le refermer : la bannière
       doit revenir.
-- [ ] Vérifier la prise en main sur Windows, écran par écran : les mots ne sont
+- [ ] Vérifier la mise en route sur Windows, écran par écran : les mots ne sont
       pas les mêmes, et rien n'y a jamais été lancé. En particulier le nom du
       mode Concentration, que Windows 11 a renommé en cours de route, et le
       chemin de l'accès aux notifications, qui a bougé de place entre deux
@@ -712,7 +714,7 @@ Il ne relit pas le Mode Concentration toutes les 300 ms, comme Dracoon. Le tour
 passe déjà chaque seconde, et c'est bien assez pour un réglage qu'on change trois
 fois par an.
 
-La prise en main ne se rejoue pas toute seule après une mise à jour qui ajoute
+La mise en route ne se rejoue pas toute seule après une mise à jour qui ajoute
 une étape. La nouvelle étape apparaît dans l'écran permanent, et c'est au joueur
 de cliquer « Revoir » s'il veut la suite. Réveiller un logiciel installé depuis
 six mois avec un tutoriel est une punition, pas un service.

@@ -1,6 +1,6 @@
 import type { SystemPage } from '@/@types/onboarding'
-import type { ButtonLook } from '@/components/button-look'
 import { LinkButton } from '@/components/link-button'
+import type { ButtonLook } from '@/components/retro/button'
 import { openLabel } from '@/helpers/wording'
 import { openSystemPage } from '@/lib/multifus'
 

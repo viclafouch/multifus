@@ -1,4 +1,3 @@
-import { Keyboard } from 'lucide-react'
 import { i18n } from '@lingui/core'
 import { t } from '@lingui/core/macro'
 import type { ShortcutBinding } from '@/@types/shortcuts'
@@ -10,6 +9,7 @@ import { Panel } from '@/components/layout/panel'
 import { Screen } from '@/components/layout/screen'
 import { ShortcutRecall } from '@/components/shortcut-recall'
 import { HELD } from '@/constants/shortcuts'
+import { MAP_NAMES } from '@/constants/world'
 import { useWheelDisplay } from '@/hooks/use-wheel-display'
 import { SizePanel } from '@/screens/wheel/size-panel'
 
@@ -29,19 +29,16 @@ export const WheelScreen = ({ wheel, shortcuts, run }: WheelScreenProps) => {
 
   return (
     <Screen
-      title={t`La roue des personnages`}
+      title={i18n._(MAP_NAMES.wheel)}
       subtitle={t`Maintenez vos touches dans le jeu : la roue s’ouvre au milieu de l’écran. Visez une tête, lâchez ou cliquez, la fenêtre passe devant.`}
     >
       {accelerator === null ? (
-        <Note className="mb-3">{t`Sans touches, la roue n’existe pas. Posez-en dans l’écran Raccourcis.`}</Note>
+        <Note>{t`Sans touches, la roue n’existe pas. Posez-en dans l’écran Raccourcis.`}</Note>
       ) : null}
-      <Panel className="mb-3">
+      <Panel>
         <FieldRow
           label={t`Raccourci`}
           description={t`Depuis une fenêtre du jeu, et nulle part ailleurs.`}
-          icon={
-            <Keyboard className="size-glyph" strokeWidth={1.75} aria-hidden />
-          }
         >
           <ShortcutRecall accelerator={accelerator} mention={i18n._(HELD)} />
         </FieldRow>

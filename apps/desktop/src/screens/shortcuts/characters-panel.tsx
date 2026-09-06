@@ -32,7 +32,7 @@ export const CharactersPanel = ({
         }
       />
       {characters.length === 0 ? (
-        <p className="px-4 py-5 text-note text-muted-foreground">
+        <p className="px-4 py-5 text-aside text-muted-foreground">
           {t`Entrez en jeu, et vos personnages se posent ici tout seuls.`}
         </p>
       ) : (

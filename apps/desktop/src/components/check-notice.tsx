@@ -1,6 +1,6 @@
 import { t } from '@lingui/core/macro'
 import { NoticeBar } from '@/components/notice-bar'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/retro/button'
 
 type CheckNoticeProps = Readonly<{
   onOpen: () => void
@@ -14,7 +14,7 @@ export const CheckNotice = ({ onOpen, onDismiss }: CheckNoticeProps) => {
       body={t`Un réglage du système empêche le jeu de vous appeler.`}
       onDismiss={onDismiss}
       actions={
-        <Button variant="outline" size="xs" onClick={onOpen}>
+        <Button variant="slate" size="tight" onClick={onOpen}>
           {t`Régler`}
         </Button>
       }

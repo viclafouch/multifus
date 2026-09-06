@@ -1,7 +1,8 @@
-import { t } from '@lingui/core/macro'
+import { i18n } from '@lingui/core'
 import type { Snapshot } from '@/@types/snapshot'
 import type { ConfigStatus, UpdateStatus } from '@/@types/system'
 import { Screen } from '@/components/layout/screen'
+import { MAP_NAMES } from '@/constants/world'
 import { IdentityPanel } from '@/screens/about/identity-panel'
 import { LegalPanel } from '@/screens/about/legal-panel'
 import { ProjectPanel } from '@/screens/about/project-panel'
@@ -23,7 +24,7 @@ export const AboutScreen = ({
   run
 }: AboutScreenProps) => {
   return (
-    <Screen title={t`À propos`}>
+    <Screen title={i18n._(MAP_NAMES.about)}>
       <IdentityPanel
         version={version}
         system={system}

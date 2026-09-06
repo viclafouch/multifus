@@ -46,6 +46,7 @@ export default defineConfig({
     },
     {
       files: [
+        'apps/desktop/src/lib/character-marks.test.ts',
         'apps/desktop/src/lib/multifus.test.ts',
         'apps/desktop/src/test-doubles.ts'
       ],
@@ -71,6 +72,7 @@ export default defineConfig({
         'apps/desktop/src/components/**',
         'apps/desktop/src/hooks/**',
         'apps/desktop/src/screens/**',
+        'apps/desktop/src/lib/character-marks.ts',
         'apps/desktop/src/lib/drag.ts'
       ],
       rules: {

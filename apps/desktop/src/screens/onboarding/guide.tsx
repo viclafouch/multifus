@@ -1,11 +1,14 @@
 import React from 'react'
 import { t } from '@lingui/core/macro'
+import type { Language } from '@/@types/language'
 import type { Onboarding } from '@/@types/onboarding'
 import type { Character } from '@/@types/roster'
 import type { Snapshot } from '@/@types/snapshot'
+import { LanguagePicker } from '@/components/language-picker'
 import { Button } from '@/components/retro/button'
 import { ChapterCard } from '@/components/retro/chapter-card'
-import { Scene, SceneCredit } from '@/components/retro/scene'
+import { Scene } from '@/components/retro/scene'
+import { SceneCredit } from '@/components/retro/scene-credit'
 import { StepFence } from '@/components/retro/step-fence'
 import { pageLabel, pagesOf } from '@/helpers/onboarding'
 import { finishOnboarding, requestAuthorization } from '@/lib/multifus'
@@ -14,12 +17,14 @@ import { StepPage } from '@/screens/onboarding/step-page'
 type OnboardingGuideProps = Readonly<{
   onboarding: Onboarding
   characters: readonly Character[]
+  language: Language
   run: (action: Promise<Snapshot>) => void
 }>
 
 export const OnboardingGuide = ({
   onboarding,
   characters,
+  language,
   run
 }: OnboardingGuideProps) => {
   const [current, setCurrent] = React.useState(0)
@@ -46,7 +51,7 @@ export const OnboardingGuide = ({
         legend={t`Étape ${rank} sur ${count}`}
         title={pageLabel(page)}
       />
-      <header className="lift lift-chrome relative flex shrink-0 items-center px-4 py-3">
+      <header className="brow lift lift-chrome relative flex shrink-0 items-center px-4 py-3">
         {current === 0 ? null : (
           <Button
             variant="bare"
@@ -60,9 +65,12 @@ export const OnboardingGuide = ({
             {t`Retour`}
           </Button>
         )}
-        <Button variant="bare" size="sm" className="ml-auto" onClick={finish}>
-          {t`Passer`}
-        </Button>
+        <div className="ml-auto flex items-center gap-4">
+          <LanguagePicker current={language} />
+          <Button variant="bare" size="sm" onClick={finish}>
+            {t`Passer`}
+          </Button>
+        </div>
       </header>
       <main className="relative flex min-h-0 flex-1 flex-col overflow-y-auto">
         <StepPage

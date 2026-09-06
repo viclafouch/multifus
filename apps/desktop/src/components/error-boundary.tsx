@@ -1,10 +1,10 @@
 import React from 'react'
-import { FolderOpen, RotateCcw, TriangleAlert } from 'lucide-react'
+import { TriangleAlert } from 'lucide-react'
 import { t } from '@lingui/core/macro'
 import { EmptyState, EmptyStateMark } from '@/components/layout/empty-state'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/retro/button'
+import { forgetMap } from '@/lib/map-memory'
 import { revealJournal } from '@/lib/multifus'
-import { forgetScreen } from '@/lib/screen-memory'
 import { errorMessage, ignore } from '@/lib/utils'
 
 type ErrorBoundaryProps = Readonly<{
@@ -56,7 +56,7 @@ const CrashScreen = ({ message }: CrashScreenProps) => {
           </EmptyStateMark>
         }
         footer={
-          <span className="selectable font-mono text-mini break-all">
+          <span className="selectable font-mono text-log wrap-anywhere">
             {message}
           </span>
         }
@@ -64,21 +64,19 @@ const CrashScreen = ({ message }: CrashScreenProps) => {
         <Button
           size="sm"
           onClick={() => {
-            forgetScreen()
+            forgetMap()
             window.location.reload()
           }}
         >
-          <RotateCcw aria-hidden />
           {t`Recharger l’écran`}
         </Button>
         <Button
-          variant="outline"
+          variant="slate"
           size="sm"
           onClick={() => {
             revealJournal().catch(ignore)
           }}
         >
-          <FolderOpen aria-hidden />
           {t`Montrer le fichier du journal`}
         </Button>
       </EmptyState>

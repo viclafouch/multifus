@@ -8,8 +8,8 @@ import { CharacterMedallion } from '@/components/character-medallion'
 import { ColorStripe } from '@/components/color-stripe'
 import { MainToggle } from '@/components/main-toggle'
 import { RemoveButton } from '@/components/remove-button'
-import { Button } from '@/components/ui/button'
-import { Switch } from '@/components/ui/switch'
+import { Button } from '@/components/retro/button'
+import { Tick } from '@/components/retro/tick'
 import {
   Tooltip,
   TooltipContent,
@@ -84,8 +84,8 @@ export const CharacterRow = ({
       )}
       <Button
         ref={handleRef}
-        variant="ghost"
-        size="icon-xs"
+        variant="bare"
+        size="icon-tight"
         aria-label={t`Déplacer ${nickname} dans le défilement`}
         className="cursor-grab touch-none text-muted-foreground/30 group-hover:text-muted-foreground/70 active:cursor-grabbing"
       >
@@ -99,7 +99,7 @@ export const CharacterRow = ({
       </span>
       <Tooltip>
         <TooltipTrigger
-          render={<Button variant="ghost" />}
+          render={<Button variant="bare" />}
           aria-label={marksLabel}
           className="group/portrait size-fit shrink-0 rounded-full border-0 p-0.5"
           onClick={() => {
@@ -114,10 +114,10 @@ export const CharacterRow = ({
         <TooltipContent>{marksTooltip}</TooltipContent>
       </Tooltip>
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <p className="selectable truncate text-row font-medium group-data-excluded:text-destructive group-data-excluded:line-through group-data-excluded:decoration-destructive/80">
+        <p className="selectable truncate text-tale font-medium group-data-excluded:text-destructive group-data-excluded:line-through group-data-excluded:decoration-destructive/80">
           {nickname}
         </p>
-        <p className="text-micro font-medium tracking-micro text-muted-foreground/65 uppercase">
+        <p className="text-mark font-medium tracking-micro text-muted-foreground/65 uppercase">
           {characterSubLine(character)}
         </p>
       </div>
@@ -128,7 +128,7 @@ export const CharacterRow = ({
           actions.handleSetMain(nickname, !main)
         }}
       />
-      <Switch
+      <Tick
         checked={matchIsInCycle(character)}
         disabled={!online}
         aria-label={t`${nickname} dans le défilement et l’AutoFocus`}

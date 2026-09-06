@@ -1,11 +1,12 @@
-import { Plus } from 'lucide-react'
+import { i18n } from '@lingui/core'
 import { t } from '@lingui/core/macro'
 import type { QuickReply } from '@/@types/shortcuts'
 import type { Snapshot } from '@/@types/snapshot'
 import { Note } from '@/components/layout/note'
 import { Panel } from '@/components/layout/panel'
 import { Screen } from '@/components/layout/screen'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/retro/button'
+import { MAP_NAMES } from '@/constants/world'
 import { shortcutStatusLine } from '@/helpers/wording'
 import { useShortcutEditing } from '@/hooks/use-shortcut-editing'
 import {
@@ -52,7 +53,7 @@ export const QuickRepliesScreen = ({
 
   return (
     <Screen
-      title={t`Réponses rapides`}
+      title={i18n._(MAP_NAMES.quickReplies)}
       subtitle={t`Les réponses que vous retapez tous les soirs, rangées sous des touches. Frappez-les dans Dofus Retro, Multifus colle le texte là où vous écrivez.`}
     >
       {quickReplies.length === 0 ? (
@@ -76,17 +77,14 @@ export const QuickRepliesScreen = ({
               )
             })}
           </ul>
-          <Button
-            variant="ghost"
-            onClick={handleAdd}
-            className="h-11 w-full justify-start gap-2 rounded-none rounded-b-xl border-t border-border/70 px-4 text-note font-normal text-muted-foreground"
-          >
-            <Plus aria-hidden />
-            {t`Ajouter une réponse`}
-          </Button>
+          <div className="flex justify-center border-t border-band/25 px-4 py-3">
+            <Button variant="slate" size="sm" onClick={handleAdd}>
+              {t`Ajouter une réponse`}
+            </Button>
+          </div>
         </Panel>
       )}
-      <Note className="mt-4">{t`Multifus colle, c’est vous qui appuyez sur Entrée. Le temps du collage, il emprunte votre presse-papiers, puis vous le rend.`}</Note>
+      <Note>{t`Multifus colle, c’est vous qui appuyez sur Entrée. Le temps du collage, il emprunte votre presse-papiers, puis vous le rend.`}</Note>
     </Screen>
   )
 }

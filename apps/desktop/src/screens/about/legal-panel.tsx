@@ -20,14 +20,14 @@ const legalParagraphs = () => {
 
 export const LegalPanel = () => {
   return (
-    <Panel className="mb-3">
+    <Panel>
       <section className="flex flex-col gap-2 px-4 py-3.5">
-        <h2 className="text-row font-medium">{t`Mentions légales`}</h2>
+        <h2 className="text-tale font-medium">{t`Mentions légales`}</h2>
         {legalParagraphs().map(({ lead, body }) => {
           return (
             <p
               key={lead}
-              className="max-w-prose text-note text-muted-foreground"
+              className="max-w-tale text-aside text-muted-foreground"
             >
               <strong className="font-medium text-foreground/90">{lead}</strong>{' '}
               {body}

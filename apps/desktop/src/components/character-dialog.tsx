@@ -9,7 +9,7 @@ import { ColorGrid } from '@/components/color-grid'
 import { ColorStripe } from '@/components/color-stripe'
 import { GenderSigil } from '@/components/gender-sigil'
 import { Legend } from '@/components/layout/legend'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/retro/button'
 import {
   Dialog,
   DialogClose,
@@ -99,11 +99,11 @@ export const CharacterDialog = ({
             state={characterState(character)}
           />
           <div className="flex min-w-0 flex-col gap-0.5 pr-8">
-            <DialogTitle className="truncate text-heading">
+            <DialogTitle className="truncate text-tale font-medium">
               {nickname}
             </DialogTitle>
             {asked === null ? null : (
-              <DialogDescription className="text-note">
+              <DialogDescription className="text-aside">
                 {askedWhich(asked)}
               </DialogDescription>
             )}
@@ -111,7 +111,7 @@ export const CharacterDialog = ({
           <DialogClose
             aria-label={t`Fermer sans rien changer`}
             className="absolute top-4 right-4"
-            render={<Button variant="ghost" size="icon-sm" />}
+            render={<Button variant="bare" size="icon" />}
           >
             <X aria-hidden strokeWidth={2} />
           </DialogClose>
@@ -169,7 +169,7 @@ const MarksStep = ({
             return (
               <li key={candidate}>
                 <Button
-                  variant="ghost"
+                  variant="bare"
                   aria-pressed={gender === candidate}
                   className="h-auto flex-col gap-1.5 rounded-lg px-3 py-2 aria-pressed:bg-muted/70"
                   onClick={() => {
@@ -180,7 +180,7 @@ const MarksStep = ({
                     gender={candidate}
                     className="opacity-60 saturate-50 group-hover/button:opacity-100 group-aria-pressed/button:sigil-lit group-aria-pressed/button:opacity-100 group-aria-pressed/button:saturate-100"
                   />
-                  <span className="text-mini text-muted-foreground group-aria-pressed/button:text-foreground">
+                  <span className="text-aside text-muted-foreground group-aria-pressed/button:text-foreground">
                     {i18n._(GENDER_LABELS[candidate])}
                   </span>
                 </Button>
@@ -238,7 +238,7 @@ const MarksStep = ({
         onPickColor={onPickColor}
       />
       {note === null ? null : (
-        <p className="border-t border-border/60 pt-3.5 text-note text-muted-foreground">
+        <p className="border-t border-border/60 pt-3.5 text-aside text-muted-foreground">
           {note}
         </p>
       )}
@@ -262,7 +262,7 @@ const GenderStep = ({ asked, onPickGender, onGoBack }: GenderStepProps) => {
           return (
             <li key={candidate}>
               <Button
-                variant="ghost"
+                variant="bare"
                 aria-label={
                   candidate === 'male' ? t`${label} homme` : t`${label} femme`
                 }
@@ -286,8 +286,8 @@ const GenderStep = ({ asked, onPickGender, onGoBack }: GenderStepProps) => {
         })}
       </ul>
       <Button
-        variant="ghost"
-        size="xs"
+        variant="bare"
+        size="tight"
         className="mx-auto text-muted-foreground"
         onClick={onGoBack}
       >

@@ -1,7 +1,7 @@
 import React from 'react'
-import { Languages } from 'lucide-react'
 import { t } from '@lingui/core/macro'
 import type { Language } from '@/@types/language'
+import { Flag } from '@/components/flag'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,13 +12,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from '@/components/ui/alert-dialog'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select'
 import { LANGUAGES, LANGUAGE_LABELS } from '@/constants/language'
 import { setLanguage } from '@/lib/multifus'
 import { ignore } from '@/lib/utils'
@@ -32,44 +25,32 @@ export const LanguagePicker = ({ current }: LanguagePickerProps) => {
 
   return (
     <>
-      <Select
-        items={LANGUAGE_LABELS}
-        value={current}
-        onValueChange={(picked) => {
-          if (picked === null || picked === current) {
-            return
-          }
-
-          setAsked(picked)
-        }}
+      <ul
+        aria-label={t`La langue de Multifus`}
+        className="flex items-center gap-1.5"
       >
-        <SelectTrigger
-          size="sm"
-          aria-label={t`La langue de Multifus`}
-          className="h-6 gap-1 border-transparent px-1.5 text-mini font-normal text-muted-foreground shadow-none hover:bg-accent/60 hover:text-foreground data-popup-open:bg-accent/60 data-popup-open:text-foreground [&>svg:last-child]:size-3"
-        >
-          <Languages
-            className="size-3.5 shrink-0"
-            strokeWidth={1.75}
-            aria-hidden
-          />
-          <SelectValue render={<span lang={current} />} />
-        </SelectTrigger>
-        <SelectContent align="end" alignItemWithTrigger={false}>
-          {LANGUAGES.map((language) => {
-            return (
-              <SelectItem
-                key={language}
-                value={language}
+        {LANGUAGES.map((language) => {
+          return (
+            <li key={language} className="flex">
+              <button
+                type="button"
                 lang={language}
-                className="text-note"
+                aria-pressed={language === current}
+                aria-label={LANGUAGE_LABELS[language]}
+                title={LANGUAGE_LABELS[language]}
+                onClick={() => {
+                  if (language !== current) {
+                    setAsked(language)
+                  }
+                }}
+                className="ensign h-4 w-6 sighted"
               >
-                {LANGUAGE_LABELS[language]}
-              </SelectItem>
-            )
-          })}
-        </SelectContent>
-      </Select>
+                <Flag language={language} />
+              </button>
+            </li>
+          )
+        })}
+      </ul>
       {asked === null ? null : (
         <LanguageConfirm
           asked={asked}

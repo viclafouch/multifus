@@ -1,7 +1,7 @@
 import type { WheelSlice } from '@/@types/wheel'
-import { MainStar } from '@/components/main-star'
+import { MainMark } from '@/components/main-mark'
 import { PORTRAIT_UNKNOWN } from '@/constants/classes'
-import { STAR_SHARE, UNKNOWN_SHARE } from '@/constants/wheel'
+import { MARK_SHARE, UNKNOWN_SHARE } from '@/constants/wheel'
 import { portraitFor } from '@/helpers/portrait'
 import type { DialShape } from '@/helpers/wheel'
 
@@ -13,7 +13,7 @@ type WheelHeadProps = Readonly<{
 
 export const WheelHead = ({ slice, shape, isHovered }: WheelHeadProps) => {
   const portrait = portraitFor(slice)
-  const star = shape.head * STAR_SHARE
+  const mark = shape.head * MARK_SHARE
 
   return (
     <span
@@ -31,7 +31,7 @@ export const WheelHead = ({ slice, shape, isHovered }: WheelHeadProps) => {
             <span
               aria-hidden
               style={{ fontSize: shape.head * UNKNOWN_SHARE }}
-              className="font-display leading-none font-semibold text-muted-foreground/70"
+              className="font-carve leading-none text-muted-foreground/70"
             >
               {PORTRAIT_UNKNOWN}
             </span>
@@ -41,10 +41,10 @@ export const WheelHead = ({ slice, shape, isHovered }: WheelHeadProps) => {
         </span>
         {slice.main ? (
           <span
-            style={{ width: star, height: star }}
+            style={{ width: mark, height: mark }}
             className="absolute -top-0.5 -right-0.5 flex"
           >
-            <MainStar isMain className="size-full" />
+            <MainMark isMain className="size-full" />
           </span>
         ) : null}
       </span>

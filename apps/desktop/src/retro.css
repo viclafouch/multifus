@@ -1,6 +1,6 @@
 @theme inline {
-  --font-carve: 'Bebas Neue', 'Haettenschweiler', sans-serif;
-  --font-plain: 'Roboto', 'Helvetica Neue', sans-serif;
+  --font-carve: var(--carve);
+  --font-plain: var(--plain);
 
   --color-iron: var(--iron);
   --color-slate: var(--slate);
@@ -10,24 +10,43 @@
   --color-cream: var(--cream);
   --color-leaf: var(--leaf);
   --color-stone: var(--stone);
+  --color-flame: var(--flame);
 
   --text-chapter: 2.875rem;
   --text-chapter--line-height: 0.94;
-  --text-sign: 2.125rem;
+  --text-sign: clamp(1.75rem, 4.6vh, 2.125rem);
   --text-sign--line-height: 1.02;
   --text-action: 1.4375rem;
   --text-action--line-height: 1.1;
   --text-bar: 1.25rem;
   --text-bar--line-height: 1.1;
+  --text-deed: 1.0625rem;
+  --text-deed--line-height: 1.1;
   --text-legend: 0.8125rem;
   --text-legend--line-height: 1.1;
   --text-tale: 1.0625rem;
   --text-tale--line-height: 1.62;
-  --text-aside: 0.8125rem;
+  --text-aside: var(--size-aside);
   --text-aside--line-height: 1.5;
-  --text-credit: 0.625rem;
-  --text-credit--line-height: 1.3;
+  --text-mark: var(--size-mark);
+  --text-mark--line-height: 1.3;
+  --text-log: var(--size-mark);
+  --text-log--line-height: 1.75;
+  --text-way: clamp(1.0625rem, 2.7vh, 1.375rem);
+  --text-way--line-height: 1.1;
 
+  --spacing-head: var(--head);
+  --spacing-dolmen: clamp(15rem, 38vw, 24rem);
+  --spacing-paving: clamp(6.5rem, 18vw, 11rem);
+  --spacing-board: clamp(8.25rem, 16vw, 11.5rem);
+  --spacing-emblem: 40px;
+  --spacing-way: 15.5rem;
+  --spacing-rung: clamp(30px, 6.1vh, 40px);
+  --spacing-ledger: 37px;
+  --spacing-hem: 56px;
+  --spacing-brow: 68px;
+  --spacing-side: 15rem;
+  --spacing-tick: 19px;
   --spacing-knob: 11px;
   --spacing-stake: 5px;
   --spacing-lath: 3px;
@@ -37,12 +56,19 @@
 
   --tracking-chapter: 0.3em;
 
+  --container-cluster: var(--cluster);
   --container-tale: 62ch;
   --container-scene: 34rem;
   --container-roll: 44rem;
+  --container-world: 58rem;
+
+  --aspect-loop: 16 / 10;
 }
 
 :root {
+  --carve: 'Bebas Neue', 'Haettenschweiler', sans-serif;
+  --plain: 'Roboto', 'Helvetica Neue', sans-serif;
+
   --iron: #241f19;
   --slate: #4b463c;
   --band: #978870;
@@ -52,9 +78,86 @@
   --stone: #b1ac9c;
   --leaf: #248b2e;
   --leaf-lit: #289b33;
+  --leaf-glow: oklch(0.79 0.16 152);
+  --amber: oklch(0.796 0.142 71);
+  --male: oklch(0.66 0.13 212);
+  --female: oklch(0.6 0.17 348);
   --olive-deep: #848e02;
   --flame: #e4442c;
   --night: #021b08;
+
+  --size-aside: 0.8125rem;
+  --size-mark: 0.6875rem;
+
+  --engrave: 0 1px 2px rgb(0 0 0 / 0.65);
+
+  --red: oklch(0.6 0.223 8);
+  --orange: oklch(0.68 0.207 42);
+  --earth: oklch(0.54 0.13 46);
+  --yellow: oklch(0.9 0.197 110);
+  --green: oklch(0.62 0.211 142);
+  --pine: oklch(0.52 0.11 166);
+  --turquoise: oklch(0.66 0.113 202);
+  --sky: oklch(0.8 0.143 222);
+  --blue: oklch(0.56 0.243 262);
+  --lavender: oklch(0.7 0.186 300);
+  --violet: oklch(0.59 0.285 320);
+  --pink: oklch(0.74 0.205 344);
+
+  --head: clamp(44px, 8.6vh, 66px);
+  --cluster: calc(4 * var(--head) + 40px);
+}
+
+@utility tint-red {
+  --tint: var(--red);
+}
+
+@utility tint-orange {
+  --tint: var(--orange);
+}
+
+@utility tint-earth {
+  --tint: var(--earth);
+}
+
+@utility tint-yellow {
+  --tint: var(--yellow);
+}
+
+@utility tint-green {
+  --tint: var(--green);
+}
+
+@utility tint-pine {
+  --tint: var(--pine);
+}
+
+@utility tint-turquoise {
+  --tint: var(--turquoise);
+}
+
+@utility tint-sky {
+  --tint: var(--sky);
+}
+
+@utility tint-blue {
+  --tint: var(--blue);
+}
+
+@utility tint-lavender {
+  --tint: var(--lavender);
+}
+
+@utility tint-violet {
+  --tint: var(--violet);
+}
+
+@utility tint-pink {
+  --tint: var(--pink);
+}
+
+@utility stripe {
+  background-color: var(--tint);
 }
 
 @utility grove {
@@ -111,11 +214,13 @@
   overflow: clip;
   border-radius: 12px;
   border: 2px solid color-mix(in srgb, var(--band), transparent 32%);
+  backdrop-filter: saturate(1.15);
+  text-shadow: var(--engrave);
   background-image: linear-gradient(
     180deg,
-    color-mix(in srgb, var(--iron), transparent 22%) 0%,
-    color-mix(in srgb, var(--slate), transparent 30%) 45%,
-    color-mix(in srgb, var(--iron), transparent 18%) 100%
+    color-mix(in srgb, var(--iron), transparent 24%) 0%,
+    color-mix(in srgb, var(--iron), transparent 28%) 45%,
+    color-mix(in srgb, var(--iron), transparent 22%) 100%
   );
   box-shadow:
     inset 0 0 0 1px color-mix(in srgb, var(--khaki), transparent 88%),
@@ -123,6 +228,18 @@
     inset 0 -2px 0 0 rgb(0 0 0 / 0.4),
     0 0 0 1px rgb(0 0 0 / 0.55),
     0 20px 44px -14px rgb(0 0 0 / 0.85);
+
+  & :is(input, textarea) {
+    text-shadow: none;
+  }
+}
+
+@utility note {
+  border-left: 2px solid color-mix(in srgb, var(--band), transparent 40%);
+  border-radius: 6px;
+  backdrop-filter: saturate(1.15);
+  text-shadow: var(--engrave);
+  background-color: color-mix(in srgb, var(--iron), transparent 28%);
 }
 
 @utility crest {
@@ -213,13 +330,28 @@
   }
 }
 
+@utility btn-flame {
+  border: 2px solid color-mix(in srgb, var(--flame), transparent 55%);
+  transition-property: background-color, border-color, color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 0.2s;
+  background-color: color-mix(in srgb, var(--flame), transparent 86%);
+  color: color-mix(in srgb, var(--flame), white 34%);
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.6);
+
+  &:hover {
+    border-color: var(--flame);
+    background-color: color-mix(in srgb, var(--flame), transparent 72%);
+  }
+}
+
 @utility btn-bare {
   border: 2px solid transparent;
   transition-property: background-color, border-color, color;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 0.2s;
   background-color: transparent;
-  color: color-mix(in srgb, var(--khaki), transparent 42%);
+  color: color-mix(in srgb, var(--khaki), transparent 22%);
   text-shadow:
     0 1px 3px rgb(0 0 0 / 0.9),
     0 3px 18px rgb(0 0 0 / 0.75);
@@ -229,6 +361,100 @@
     background-color: color-mix(in srgb, var(--iron), transparent 30%);
     color: var(--cream);
   }
+}
+
+@utility tick {
+  position: relative;
+  border: 2px solid var(--iron);
+  border-radius: 3px;
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--cream), white 40%) 0%,
+    var(--khaki-lit) 100%
+  );
+  transition-property: background-image, box-shadow;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 0.2s;
+  box-shadow:
+    inset 0 2px 3px rgb(0 0 0 / 0.28),
+    0 1px 0 0 rgb(255 255 255 / 0.14);
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 1px;
+    left: 4px;
+    width: 5px;
+    height: 10px;
+    border: solid var(--iron);
+    border-width: 0 2.5px 2.5px 0;
+    transform: rotate(42deg) scale(0.6);
+    opacity: 0;
+    transition:
+      opacity 0.16s cubic-bezier(0.4, 0, 0.2, 1),
+      transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  &[data-checked] {
+    background-image: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--leaf-lit), white 16%) 0%,
+      var(--leaf) 100%
+    );
+    box-shadow:
+      inset 0 2px 3px rgb(0 0 0 / 0.3),
+      0 0 10px -1px color-mix(in srgb, var(--leaf-lit), transparent 55%);
+  }
+
+  &[data-checked]::after {
+    border-color: var(--cream);
+    transform: rotate(42deg) scale(1);
+    opacity: 1;
+  }
+
+  &:hover:not([data-disabled]) {
+    box-shadow:
+      inset 0 2px 3px rgb(0 0 0 / 0.28),
+      0 0 0 2px color-mix(in srgb, var(--cream), transparent 60%);
+  }
+
+  &[data-disabled] {
+    cursor: not-allowed;
+    opacity: 0.45;
+  }
+}
+
+@utility sigil {
+  border-color: color-mix(in srgb, var(--band), transparent 45%);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--slate), var(--band) 30%),
+    color-mix(in srgb, var(--slate), black 28%)
+  );
+  color: var(--khaki);
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.6);
+}
+
+@utility sign-male {
+  --sign: var(--male);
+}
+
+@utility sign-female {
+  --sign: var(--female);
+}
+
+@utility sigil-lit {
+  border-color: var(--sign, var(--leaf-lit));
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--sign, var(--leaf-lit)), white 12%),
+    color-mix(in srgb, var(--sign, var(--leaf-lit)), black 22%)
+  );
+  color: var(--cream);
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--sign, var(--leaf-lit)), transparent 72%),
+    0 0 12px -2px
+      color-mix(in srgb, var(--sign, var(--leaf-lit)), transparent 44%);
 }
 
 @utility plaque {
@@ -479,8 +705,290 @@
   animation-delay: 240ms;
 }
 
+@keyframes roam {
+  from {
+    transform: scale(1.01) translate3d(-0.2%, 0.15%, 0);
+  }
+
+  to {
+    transform: scale(1.03) translate3d(0.2%, -0.2%, 0);
+  }
+}
+
+@utility roam {
+  opacity: 0;
+  transition: opacity 0.42s cubic-bezier(0.4, 0, 0.2, 1);
+  animation-name: roam;
+  animation-duration: 62s;
+  animation-timing-function: cubic-bezier(0.37, 0, 0.63, 1);
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+
+  &[data-here] {
+    opacity: 1;
+  }
+}
+
+@utility dolmen-field {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: max(100vw, calc(100vh * 1484 / 864));
+  height: max(100vh, calc(100vw * 864 / 1484));
+}
+
+@utility dolmen-seat {
+  position: absolute;
+  top: 46.2%;
+  left: 62.1%;
+  transform: translate(-50%, -50%);
+
+  &[data-crowd='some'] {
+    --head: clamp(30px, 5.2vh, 40px);
+    --cluster: calc(4 * var(--head) + 40px);
+  }
+
+  &[data-crowd='many'] {
+    --head: clamp(26px, 4.6vh, 36px);
+    --cluster: calc(6 * var(--head) + 64px);
+  }
+}
+
+@utility ensign {
+  overflow: clip;
+  border-radius: 2px;
+  border: 1px solid color-mix(in srgb, var(--band), transparent 45%);
+  opacity: 0.7;
+  filter: grayscale(0.35);
+  transition-property: opacity, filter, border-color, box-shadow;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 0.2s;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.75);
+
+  &:hover,
+  &:focus-visible {
+    opacity: 1;
+    filter: none;
+    border-color: var(--cream);
+  }
+
+  &[aria-pressed='true'] {
+    opacity: 1;
+    filter: none;
+    border-color: var(--leaf-lit);
+    box-shadow:
+      0 0 0 2px color-mix(in srgb, var(--leaf-lit), transparent 72%),
+      0 1px 3px rgb(0 0 0 / 0.75);
+  }
+}
+
+@utility relief {
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.8);
+}
+
+@utility emblem {
+  filter: drop-shadow(0 2px 6px rgb(0 0 0 / 0.85));
+}
+
+@utility flank {
+  opacity: 0;
+  transition: opacity 0.42s cubic-bezier(0.4, 0, 0.2, 1);
+  background-image: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--iron), transparent 6%) 0%,
+    color-mix(in srgb, var(--iron), transparent 22%) 30%,
+    color-mix(in srgb, var(--iron), transparent 62%) 62%,
+    transparent 100%
+  );
+
+  &[data-here] {
+    opacity: 1;
+  }
+}
+
+@utility hem {
+  background-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    color-mix(in srgb, var(--iron), transparent 45%) 45%,
+    color-mix(in srgb, var(--iron), transparent 8%) 100%
+  );
+}
+
+@utility brow {
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--iron), transparent 8%) 0%,
+    color-mix(in srgb, var(--iron), transparent 45%) 52%,
+    transparent 100%
+  );
+}
+
+@utility sighted {
+  @apply outline-none focus-visible:ring-2 focus-visible:ring-cream focus-visible:ring-offset-2 focus-visible:ring-offset-iron;
+}
+
+@utility legible {
+  border-radius: 50%;
+  background-color: color-mix(in srgb, var(--iron), transparent 30%);
+  filter: blur(26px);
+}
+
+@utility veil {
+  background-image:
+    radial-gradient(
+      118% 78% at 50% 46%,
+      transparent 0%,
+      color-mix(in srgb, var(--iron), transparent 84%) 54%,
+      color-mix(in srgb, var(--iron), transparent 48%) 100%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--iron), transparent 56%) 0%,
+      transparent 20%,
+      transparent 74%,
+      color-mix(in srgb, var(--iron), transparent 52%) 100%
+    );
+}
+
+@utility deepen {
+  background-color: color-mix(in srgb, var(--iron), transparent 80%);
+  opacity: 0;
+  transition: opacity 0.42s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &[data-deep] {
+    opacity: 1;
+  }
+}
+
+@utility stage {
+  overflow: clip;
+  border-radius: 10px;
+  border: 2px solid color-mix(in srgb, var(--band), transparent 45%);
+  backdrop-filter: saturate(1.15);
+  text-shadow: var(--engrave);
+  background-color: color-mix(in srgb, var(--iron), transparent 14%);
+  box-shadow:
+    inset 0 0 0 1px rgb(0 0 0 / 0.6),
+    0 24px 48px -18px rgb(0 0 0 / 0.9);
+}
+
+@utility hearth {
+  background-image: radial-gradient(
+    58% 62% at 50% 50%,
+    color-mix(in srgb, var(--iron), transparent 12%) 0%,
+    color-mix(in srgb, var(--iron), transparent 44%) 48%,
+    transparent 78%
+  );
+}
+
+@utility glade {
+  background-image: radial-gradient(
+    50% 50% at 50% 50%,
+    color-mix(in srgb, var(--leaf-lit), transparent 62%) 0%,
+    color-mix(in srgb, var(--leaf-lit), transparent 86%) 46%,
+    transparent 74%
+  );
+}
+
+@utility head {
+  border: 2px solid color-mix(in srgb, var(--band), black 20%);
+  background-color: color-mix(in srgb, var(--iron), transparent 20%);
+  transition-property: border-color, box-shadow, filter;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 0.2s;
+  box-shadow:
+    inset 0 2px 4px rgb(0 0 0 / 0.5),
+    0 6px 12px -5px rgb(0 0 0 / 0.85);
+
+  &[data-state='live'] {
+    border-color: var(--leaf-lit);
+    box-shadow:
+      0 0 0 2px color-mix(in srgb, var(--leaf-lit), transparent 74%),
+      0 0 14px -1px color-mix(in srgb, var(--leaf-lit), transparent 46%),
+      0 6px 12px -5px rgb(0 0 0 / 0.85);
+  }
+
+  &[data-state='excluded'] {
+    border-color: color-mix(in srgb, var(--flame), transparent 40%);
+  }
+
+  &[data-state='offline'] {
+    filter: grayscale(1);
+    opacity: 0.62;
+  }
+
+  &:hover,
+  &:focus-visible {
+    border-color: var(--cream);
+    filter: none;
+    opacity: 1;
+  }
+}
+
+@utility hood {
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--iron), transparent 8%),
+    color-mix(in srgb, var(--iron), transparent 26%)
+  );
+  border: 1px solid color-mix(in srgb, var(--band), transparent 40%);
+  color: var(--cream);
+  box-shadow: 0 10px 22px -10px rgb(0 0 0 / 0.95);
+}
+
+@keyframes arrive {
+  from {
+    opacity: 0;
+    transform: scale(0.985) translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@utility settle {
+  & > * {
+    animation-name: arrive;
+    animation-duration: 460ms;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+    animation-fill-mode: backwards;
+  }
+
+  & > *:nth-child(1) {
+    animation-delay: 60ms;
+  }
+
+  & > *:nth-child(2) {
+    animation-delay: 200ms;
+  }
+
+  & > *:nth-child(3) {
+    animation-delay: 340ms;
+  }
+
+  & > *:nth-child(4) {
+    animation-delay: 480ms;
+  }
+
+  & > *:nth-child(n + 5) {
+    animation-delay: 620ms;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .drift[data-here] {
+    animation: none !important;
+  }
+
+  .roam[data-here] {
+    animation: none !important;
+  }
+
+  .settle > * {
     animation: none !important;
   }
 }

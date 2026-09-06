@@ -1,8 +1,8 @@
 import { Expand, X } from 'lucide-react'
 import { t } from '@lingui/core/macro'
-import type { ButtonLook } from '@/components/button-look'
+import type { ButtonLook } from '@/components/retro/button'
+import { Button } from '@/components/retro/button'
 import { ShotSheet } from '@/components/shot-sheet'
-import { Button } from '@/components/ui/button'
 import { Dialog, DialogClose, DialogTrigger } from '@/components/ui/dialog'
 
 type ShotDialogProps = Readonly<{
@@ -15,7 +15,7 @@ type ShotDialogProps = Readonly<{
 export const ShotDialog = ({
   source,
   alt,
-  variant = 'ghost',
+  variant = 'bare',
   size = 'sm'
 }: ShotDialogProps) => {
   return (
@@ -34,8 +34,8 @@ export const ShotDialog = ({
           <DialogClose
             render={
               <Button
-                variant="secondary"
-                size="icon-sm"
+                variant="slate"
+                size="icon"
                 aria-label={t`Fermer`}
                 className="absolute top-3.5 right-3.5 shadow-xs"
               />

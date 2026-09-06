@@ -12,16 +12,16 @@ type StepProps = Readonly<{
 
 export const Step = ({ rank, title, body, link, action }: StepProps) => {
   return (
-    <li className="flex items-center gap-3.5 px-4 py-2">
+    <li className="flex items-start gap-3.5 px-4 py-2">
       <span
         aria-hidden
-        className="w-5 shrink-0 pt-px text-right font-mono text-log tabular-nums text-muted-foreground/45"
+        className="w-5 shrink-0 pt-1 text-right font-mono text-log tabular-nums text-khaki/45"
       >
         {String(rank).padStart(2, '0')}
       </span>
       <div className="flex min-w-0 flex-1 flex-col gap-0.5 pb-0.5">
-        <p className="text-row font-medium">{title}</p>
-        <p className="max-w-prose text-note text-muted-foreground">{body}</p>
+        <p className="text-tale font-medium text-cream">{title}</p>
+        <p className="max-w-tale text-aside text-khaki">{body}</p>
       </div>
       {link === undefined || action === undefined ? null : (
         <LinkButton

@@ -12,7 +12,7 @@ export const ShortcutRecall = ({
   mention
 }: ShortcutRecallProps) => {
   if (accelerator === null) {
-    return <span className="text-note text-muted-foreground">{t`Aucune`}</span>
+    return <span className="text-aside text-muted-foreground">{t`Aucune`}</span>
   }
 
   return (
@@ -23,7 +23,7 @@ export const ShortcutRecall = ({
         })}
       </span>
       {mention === undefined ? null : (
-        <span className="text-mini text-muted-foreground/80">{mention}</span>
+        <span className="text-aside text-muted-foreground/80">{mention}</span>
       )}
     </span>
   )

@@ -65,6 +65,7 @@ const show = async ({
     <OnboardingGuide
       onboarding={onboarding}
       characters={characters}
+      language="fr"
       run={run}
     />
   )
@@ -80,7 +81,17 @@ const goTo = (label: string) => {
   fireEvent.click(buttonNamed(new RegExp(`^${label}$`, 'u')))
 }
 
-describe('la prise en main', () => {
+describe('la mise en route', () => {
+  it('laisse changer de langue avant d’avoir fini', async () => {
+    await show()
+
+    expect(
+      screen.getByRole('list', { name: 'La langue de Multifus' })
+    ).not.toBeNull()
+    expect(buttonNamed('Français').getAttribute('aria-pressed')).toBe('true')
+    expect(buttonNamed('English').getAttribute('aria-pressed')).toBe('false')
+  })
+
   it('ouvre sur la bienvenue, première des six étapes', async () => {
     await show()
 

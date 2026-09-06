@@ -42,7 +42,7 @@ export const SHORTCUT_ACTIONS = {
     mention: null
   },
   wheel: {
-    label: msg`Roue des personnages`,
+    label: msg`La roue des personnages`,
     description: msg`La team s’ouvre au milieu de l’écran, vous visez une tête, vous lâchez.`,
     mention: HELD
   },

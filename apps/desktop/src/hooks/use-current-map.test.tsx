@@ -1,21 +1,21 @@
 import { describe, expect, it } from 'vitest'
 import { act, renderHook } from '@testing-library/react'
-import { useCurrentScreen } from '@/hooks/use-current-screen'
+import { useCurrentMap } from '@/hooks/use-current-map'
 
 const openMultifus = () => {
   return renderHook(() => {
-    return useCurrentScreen()
+    return useCurrentMap()
   })
 }
 
-describe('useCurrentScreen', () => {
-  it('ouvre sur les personnages tant que rien n’a été visité', () => {
+describe('useCurrentMap', () => {
+  it('ouvre sur la clairière tant que rien n’a été visité', () => {
     const { result } = openMultifus()
 
-    expect(result.current[0]).toBe('characters')
+    expect(result.current[0]).toBe('clearing')
   })
 
-  it('garde l’écran visité quand la fenêtre se recharge', () => {
+  it('garde la map visitée quand la fenêtre se recharge', () => {
     const first = openMultifus()
 
     act(() => {

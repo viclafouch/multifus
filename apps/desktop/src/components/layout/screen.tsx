@@ -1,4 +1,5 @@
 import React from 'react'
+import { MapHeader } from '@/components/layout/map-header'
 
 type ScreenProps = Readonly<{
   title: string
@@ -8,18 +9,9 @@ type ScreenProps = Readonly<{
 
 export const Screen = ({ title, subtitle, children }: ScreenProps) => {
   return (
-    <section className="flex min-h-full flex-col">
-      <header className="flex flex-col gap-2 px-7 pt-6 pb-5">
-        <h1 className="font-display text-title font-semibold tracking-title">
-          {title}
-        </h1>
-        {subtitle === undefined ? null : (
-          <p className="max-w-prose text-body text-muted-foreground">
-            {subtitle}
-          </p>
-        )}
-      </header>
-      <div className="flex-1 px-7 pb-8">{children}</div>
+    <section className="settle mx-auto flex min-h-full w-full max-w-roll flex-col gap-4 pt-20 pb-hem">
+      <MapHeader title={title} subtitle={subtitle} />
+      {children}
     </section>
   )
 }

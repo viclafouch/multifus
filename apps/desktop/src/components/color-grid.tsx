@@ -50,7 +50,7 @@ export const ColorGrid = ({
     <div className="flex flex-col gap-2">
       <div className="flex items-baseline justify-between gap-2">
         <Legend>{t`Couleur`}</Legend>
-        <span aria-hidden className="truncate text-note text-muted-foreground">
+        <span aria-hidden className="truncate text-aside text-muted-foreground">
           {colorReadout(shown, holderOfColor(shown))}
         </span>
       </div>

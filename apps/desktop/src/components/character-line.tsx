@@ -33,12 +33,12 @@ export const CharacterLine = ({
       />
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <div className="flex min-w-0 items-center gap-1.5">
-          <p className="selectable truncate text-row font-medium group-data-offline:text-muted-foreground">
+          <p className="selectable truncate text-tale font-medium group-data-offline:text-muted-foreground">
             {character.nickname}
           </p>
           {mark}
         </div>
-        <p className="text-micro font-medium tracking-micro text-muted-foreground/65 uppercase">
+        <p className="text-mark font-medium tracking-micro text-muted-foreground/65 uppercase">
           {characterPresenceSubLine(character)}
         </p>
       </div>

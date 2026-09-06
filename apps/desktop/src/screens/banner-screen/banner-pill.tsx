@@ -23,7 +23,7 @@ export const BannerPill = ({ step }: BannerPillProps) => {
           className="size-4 shrink-0 text-primary"
         />
         {step.character === null ? (
-          <span className="pr-0.5 text-row font-medium whitespace-nowrap text-muted-foreground">
+          <span className="pr-0.5 text-tale font-medium whitespace-nowrap text-muted-foreground">
             {step.previewing ? t`Aperçu` : t`Déplacement rapide`}
           </span>
         ) : (
@@ -42,7 +42,7 @@ export const BannerPill = ({ step }: BannerPillProps) => {
               portrait={portraitFor(step.character)}
               state="live"
             />
-            <span className="truncate text-row font-medium">
+            <span className="truncate text-tale font-medium">
               {step.character.nickname}
             </span>
           </span>

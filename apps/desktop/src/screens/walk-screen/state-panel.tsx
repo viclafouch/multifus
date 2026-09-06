@@ -1,12 +1,10 @@
-import { Keyboard } from 'lucide-react'
 import { t } from '@lingui/core/macro'
 import type { Snapshot } from '@/@types/snapshot'
 import type { WalkLiveState, WalkStatus } from '@/@types/walk'
-import { FieldRow } from '@/components/layout/field-row'
 import { Panel } from '@/components/layout/panel'
+import { Tick } from '@/components/retro/tick'
 import { ShortcutRecall } from '@/components/shortcut-recall'
 import { StateBadge } from '@/components/state-badge'
-import { Switch } from '@/components/ui/switch'
 import { setWalkEnabled } from '@/lib/multifus'
 
 const TONES = 'data-[walk=on]:tone-live data-[walk=off]:tone-idle'
@@ -22,30 +20,24 @@ export const StatePanel = ({ walk, accelerator, run }: StatePanelProps) => {
   const lines = stateLines(state)
 
   return (
-    <Panel data-walk={state} className={`${TONES} transition-row mb-3`}>
-      <section className="flex items-start gap-5 border-b border-border/70 px-4 py-3.5">
-        <div className="flex min-w-0 flex-1 flex-col items-start gap-2">
+    <Panel data-walk={state} className={`${TONES} transition-row`}>
+      <div className="flex items-start gap-3 px-3.5 py-3">
+        <div className="flex min-w-0 flex-1 flex-col gap-1.5">
           <StateBadge>{lines.badge}</StateBadge>
-          <p className="max-w-prose text-pretty text-row">{lines.body}</p>
+          <p className="text-pretty text-aside text-khaki">{lines.body}</p>
         </div>
-        <Switch
+        <Tick
           checked={walk.enabled}
           aria-label={t`Déplacement rapide`}
-          className="mt-0.5"
           onCheckedChange={(enabled) => {
             run(setWalkEnabled(enabled))
           }}
         />
-      </section>
-      <FieldRow
-        label={t`Raccourci`}
-        description={t`Allume sans quitter le jeu.`}
-        icon={
-          <Keyboard className="size-glyph" strokeWidth={1.75} aria-hidden />
-        }
-      >
+      </div>
+      <div className="flex items-center justify-between gap-2 border-t border-band/25 px-3.5 py-2.5">
+        <span className="text-aside text-khaki">{t`Raccourci`}</span>
         <ShortcutRecall accelerator={accelerator} />
-      </FieldRow>
+      </div>
     </Panel>
   )
 }

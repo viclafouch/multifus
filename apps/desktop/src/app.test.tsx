@@ -3,8 +3,8 @@ import { i18n } from '@lingui/core'
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import type { ScreenName, Snapshot } from '@/@types/snapshot'
 import type { ConfigProblem } from '@/@types/system'
-import { NAV_ITEMS } from '@/constants/navigation'
 import { ONBOARDING_ANCHOR } from '@/constants/onboarding'
+import { MAP_NAMES, MAPS } from '@/constants/world'
 import { ignore } from '@/lib/utils'
 import { characterOf, onboardingOf, pending, snapshotOf } from '@/test-doubles'
 
@@ -50,32 +50,28 @@ const open = async (snapshot: Snapshot) => {
 
   render(<App />)
 
-  await screen.findByRole('navigation')
+  await screen.findByRole('heading', { level: 1 })
+}
+
+const goBack = () => {
+  const back = screen.queryByRole('button', { name: 'Retour' })
+
+  if (back !== null) {
+    fireEvent.click(back)
+  }
 }
 
 const navigateTo = (name: ScreenName) => {
-  fireEvent.click(screen.getByRole('button', { name: navLabel(name) }))
+  goBack()
+  fireEvent.click(screen.getByRole('button', { name: mapName(name) }))
 }
 
-const NAV_LABELS = {
-  characters: 'Personnages',
-  shortcuts: 'Raccourcis',
-  quickReplies: 'Réponses rapides',
-  autoFocus: 'AutoFocus',
-  walk: 'Déplacement rapide',
-  wheel: 'Roue des personnages',
-  runeTable: 'Tableau des runes',
-  relay: 'Messages privés',
-  settings: 'Paramètres',
-  about: 'À propos'
-} as const satisfies Record<ScreenName, string>
-
-const navLabel = (name: ScreenName) => {
-  return NAV_LABELS[name]
+const mapName = (name: ScreenName) => {
+  return i18n._(MAP_NAMES[name])
 }
 
-const currentEntry = () => {
-  return screen.getByRole('button', { current: 'page' }).textContent
+const currentMap = () => {
+  return screen.getByRole('heading', { level: 1 }).textContent
 }
 
 type Arrival = {
@@ -116,14 +112,14 @@ describe('la fenêtre de Multifus', () => {
 
     render(<App />)
 
-    expect(screen.queryByRole('navigation')).toBeNull()
+    expect(screen.queryByRole('heading', { level: 1 })).toBeNull()
   })
 
-  it('s’ouvre sur les personnages', async () => {
+  it('s’ouvre sur l’accueil', async () => {
     await open(snapshotOf())
 
-    expect(currentEntry()).toBe('Personnages')
-    expect(screen.getByText('Votre roster est vide')).not.toBeNull()
+    expect(currentMap()).toBe('Multifus')
+    expect(screen.getByText('0 connecté')).not.toBeNull()
   })
 
   it('marque les paramètres quand un contrôle s’est fermé', async () => {
@@ -160,29 +156,27 @@ describe('la fenêtre de Multifus', () => {
     expect(
       await screen.findByText('Vous ne chercherez plus la bonne fenêtre')
     ).not.toBeNull()
-    expect(screen.queryByRole('navigation')).toBeNull()
+    expect(screen.queryByRole('heading', { name: 'Multifus' })).toBeNull()
   })
 
-  it('porte tous les écrans, et la version de Multifus', async () => {
+  it('mène à toutes les maps depuis l’accueil, et dit la version', async () => {
     await open(snapshotOf({ version: '1.4.2' }))
 
-    for (const item of NAV_ITEMS) {
-      expect(
-        screen.getByRole('button', { name: i18n._(item.label) })
-      ).not.toBeNull()
+    for (const name of MAPS) {
+      expect(screen.getByRole('button', { name: mapName(name) })).not.toBeNull()
     }
 
     expect(screen.getByText('v1.4.2')).not.toBeNull()
   })
 
-  it('mène à chaque écran, et marque celui où l’on est', async () => {
+  it('mène à chaque map, et son titre dit où l’on est', async () => {
     await open(snapshotOf())
 
     for (const { name, mark } of ARRIVALS) {
       navigateTo(name)
 
       expect(screen.getByText(mark, { exact: false })).not.toBeNull()
-      expect(currentEntry()).toBe(navLabel(name))
+      expect(currentMap()).toBe(mapName(name))
     }
   })
 
@@ -214,19 +208,19 @@ describe('la fenêtre de Multifus', () => {
     cleanup()
     await open(snapshotOf())
 
-    expect(currentEntry()).toBe(navLabel('settings'))
+    expect(currentMap()).toBe(mapName('settings'))
   })
 
-  it('revient aux personnages', async () => {
+  it('revient à l’accueil à Échap', async () => {
     await open(snapshotOf())
 
     navigateTo('settings')
-    navigateTo('characters')
+    fireEvent.keyDown(window, { key: 'Escape' })
 
-    expect(screen.getByText('Votre roster est vide')).not.toBeNull()
+    expect(currentMap()).toBe('Multifus')
   })
 
-  describe('le rail', () => {
+  describe('l’accueil', () => {
     it('compte les personnages connectés', async () => {
       await open(
         snapshotOf({
@@ -238,7 +232,7 @@ describe('la fenêtre de Multifus', () => {
         })
       )
 
-      expect(screen.getByText('2 personnages connectés')).not.toBeNull()
+      expect(screen.getByText('2 connectés')).not.toBeNull()
     })
 
     it('dit qu’il est à l’écoute du jeu', async () => {
@@ -274,6 +268,8 @@ describe('la fenêtre de Multifus', () => {
     it('demande l’autorisation à la place des personnages', async () => {
       await open(denied)
 
+      navigateTo('characters')
+
       expect(
         screen.getByText('Multifus attend votre autorisation')
       ).not.toBeNull()
@@ -293,7 +289,7 @@ describe('la fenêtre de Multifus', () => {
     })
   })
 
-  it('suit la barre système sans qu’on ait touché au rail', async () => {
+  it('suit la barre système sans qu’on ait touché à un panneau', async () => {
     await open(snapshotOf())
 
     act(() => {
@@ -303,7 +299,7 @@ describe('la fenêtre de Multifus', () => {
     expect(
       screen.getByText(/Un joueur vous écrit pendant que vous êtes ailleurs/u)
     ).not.toBeNull()
-    expect(currentEntry()).toBe('Messages privés')
+    expect(currentMap()).toBe('Messages privés')
   })
 
   describe('l’avis sur les réglages', () => {
@@ -393,7 +389,7 @@ describe('la fenêtre de Multifus', () => {
 
       fireEvent.click(screen.getByRole('button', { name: 'Régler' }))
 
-      expect(currentEntry()).toBe('Paramètres')
+      expect(currentMap()).toBe('Paramètres')
       expect(bridge.dismissCheckNotice).not.toHaveBeenCalled()
       expect(screen.getByText('L’AutoFocus ne peut pas marcher')).not.toBeNull()
       expect(scrolled.mock.contexts).toStrictEqual([

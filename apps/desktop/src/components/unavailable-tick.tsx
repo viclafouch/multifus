@@ -1,21 +1,21 @@
-import { Switch } from '@/components/ui/switch'
+import { Tick } from '@/components/retro/tick'
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger
 } from '@/components/ui/tooltip'
 
-type UnavailableSwitchProps = Readonly<{
+type UnavailableTickProps = Readonly<{
   label: string
   reason: string
   checked: boolean
 }>
 
-export const UnavailableSwitch = ({
+export const UnavailableTick = ({
   label,
   reason,
   checked
-}: UnavailableSwitchProps) => {
+}: UnavailableTickProps) => {
   return (
     <Tooltip>
       <TooltipTrigger
@@ -25,9 +25,9 @@ export const UnavailableSwitch = ({
         aria-disabled
         aria-label={label}
         tabIndex={0}
-        className="inline-flex cursor-not-allowed rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+        className="inline-flex cursor-not-allowed rounded-xs sighted"
       >
-        <Switch
+        <Tick
           aria-hidden
           checked={checked}
           disabled

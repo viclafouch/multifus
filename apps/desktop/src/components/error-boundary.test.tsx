@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { ErrorBoundary } from '@/components/error-boundary'
-import { lastSeenScreen, rememberScreen } from '@/lib/screen-memory'
+import { lastSeenMap, rememberMap } from '@/lib/map-memory'
 import { ignore } from '@/lib/utils'
 
 const Broken = () => {
@@ -58,13 +58,13 @@ describe('l’écran qui remplace la fenêtre blanche', () => {
   it('oublie l’écran qui vient de casser avant de recharger', () => {
     const reload = vi.fn()
 
-    rememberScreen('settings')
+    rememberMap('settings')
     vi.stubGlobal('location', { reload })
     drawBroken()
 
     fireEvent.click(screen.getByRole('button', { name: 'Recharger l’écran' }))
 
-    expect(lastSeenScreen()).toBe('characters')
+    expect(lastSeenMap()).toBe('clearing')
     expect(reload).toHaveBeenCalledWith()
   })
 })

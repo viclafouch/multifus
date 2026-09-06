@@ -105,6 +105,10 @@ const cornerNamed = (label: string) => {
   return screen.getByRole('button', { name: label })
 }
 
+const openBanner = () => {
+  fireEvent.click(screen.getByRole('button', { name: 'La bannière' }))
+}
+
 const chipNamed = (rank: number) => {
   return screen.getByRole('button', {
     name: new RegExp(`^Écran ${rank}`, 'u')
@@ -208,6 +212,7 @@ describe('l’écran du Déplacement rapide', () => {
         screens: [ULTRAWIDE],
         banner: { corner: 'topLeft', screen: ULTRAWIDE.name }
       })
+      openBanner()
 
       const monitor = screen.getByRole('group', {
         name: 'Le coin'
@@ -218,6 +223,7 @@ describe('l’écran du Déplacement rapide', () => {
 
     it('offre les quatre coins', async () => {
       await show()
+      openBanner()
 
       for (const label of CORNER_LABELS) {
         expect(cornerNamed(label)).not.toBeNull()
@@ -226,6 +232,7 @@ describe('l’écran du Déplacement rapide', () => {
 
     it('montre le coin en cours comme choisi, et lui seul', async () => {
       await show({ banner: { corner: 'topLeft', screen: null } })
+      openBanner()
 
       expect(cornerNamed('En haut à gauche').getAttribute('aria-pressed')).toBe(
         'true'
@@ -237,6 +244,7 @@ describe('l’écran du Déplacement rapide', () => {
 
     it('pose la bannière dans le coin désigné', async () => {
       await show({ banner: { corner: 'bottomRight', screen: null } })
+      openBanner()
 
       fireEvent.click(cornerNamed('En haut à droite'))
 
@@ -247,6 +255,7 @@ describe('l’écran du Déplacement rapide', () => {
   describe('le choix de l’écran', () => {
     it('ne demande rien tant qu’il n’y a qu’un écran', async () => {
       await show({ screens: [LAPTOP] })
+      openBanner()
 
       expect(screen.queryByText('L’écran')).toBeNull()
     })
@@ -255,6 +264,7 @@ describe('l’écran du Déplacement rapide', () => {
       bridge.bannerScreens.mockImplementation(pending)
 
       await renderScreen({ banner: { corner: 'topLeft', screen: null } })
+      openBanner()
 
       expect(screen.queryByText('L’écran')).toBeNull()
       expect(cornerNamed('En haut à gauche')).not.toBeNull()
@@ -262,12 +272,14 @@ describe('l’écran du Déplacement rapide', () => {
 
     it('ne demande rien quand le système ne rend aucun écran', async () => {
       await show({ screens: [] })
+      openBanner()
 
       expect(screen.queryByText('L’écran')).toBeNull()
     })
 
     it('offre une pastille par écran dès qu’il y en a deux', async () => {
       await show({ screens: [LAPTOP, TELEVISION] })
+      openBanner()
 
       expect(screen.getByText('L’écran')).not.toBeNull()
       expect(chipNamed(1)).not.toBeNull()
@@ -276,6 +288,7 @@ describe('l’écran du Déplacement rapide', () => {
 
     it('dit la taille de chaque écran, et lequel est le principal', async () => {
       await show({ screens: [LAPTOP, TELEVISION] })
+      openBanner()
 
       expect(screen.getByText('3840 × 2160')).not.toBeNull()
       expect(screen.getAllByText('principal')).toHaveLength(1)
@@ -283,6 +296,7 @@ describe('l’écran du Déplacement rapide', () => {
 
     it('pose la bannière sur l’écran désigné', async () => {
       await show({ screens: [LAPTOP, TELEVISION] })
+      openBanner()
 
       fireEvent.click(chipNamed(2))
 
@@ -294,6 +308,7 @@ describe('l’écran du Déplacement rapide', () => {
         screens: [LAPTOP, TELEVISION],
         banner: { corner: 'bottomRight', screen: TELEVISION.name }
       })
+      openBanner()
 
       expect(chipNamed(1).getAttribute('aria-pressed')).toBe('false')
       expect(chipNamed(2).getAttribute('aria-pressed')).toBe('true')
@@ -304,6 +319,7 @@ describe('l’écran du Déplacement rapide', () => {
         screens: [LAPTOP, TELEVISION],
         banner: { corner: 'bottomRight', screen: 'un écran parti' }
       })
+      openBanner()
 
       expect(chipNamed(1).getAttribute('aria-pressed')).toBe('true')
       expect(chipNamed(2).getAttribute('aria-pressed')).toBe('false')

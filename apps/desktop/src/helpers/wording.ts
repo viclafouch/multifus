@@ -271,6 +271,14 @@ export const characterShortcutStatusLine = (
     : shortcutStatusLine(status, quickReplies)
 }
 
+export const authorizationState = (authorization: Authorization): LampState => {
+  if (!authorization.granted) {
+    return 'excluded'
+  }
+
+  return authorization.listening ? 'live' : 'offline'
+}
+
 export const authorizationLine = (authorization: Authorization) => {
   if (!authorization.granted) {
     return t`Autorisation manquante`

@@ -2,8 +2,6 @@
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
 
-@import '@fontsource-variable/inter';
-@import '@fontsource-variable/fraunces/wght.css';
 @import '@fontsource/bebas-neue';
 @import '@fontsource/roboto/400.css';
 @import '@fontsource/roboto/500.css';
@@ -24,10 +22,6 @@
 
   html {
     @apply font-sans;
-
-    font-variation-settings:
-      'SOFT' 24,
-      'WONK' 1;
   }
 
   body {
@@ -84,21 +78,6 @@
   );
 }
 
-@utility stage {
-  background-color: var(--background);
-  background-image:
-    radial-gradient(
-      124% 76% at 50% -16%,
-      color-mix(in oklch, var(--primary), transparent 84%),
-      transparent 60%
-    ),
-    radial-gradient(
-      96% 58% at 50% 118%,
-      color-mix(in oklch, var(--primary), transparent 92%),
-      transparent 56%
-    );
-}
-
 @utility step-band {
   width: 100%;
   flex: 1 1 0%;
@@ -109,30 +88,6 @@
   @media (height <= 640px) {
     min-height: 0;
   }
-}
-
-@utility sign-male {
-  --sign: var(--male);
-}
-
-@utility sign-female {
-  --sign: var(--female);
-}
-
-@utility sigil {
-  background-image: radial-gradient(
-    circle at 34% 24%,
-    color-mix(in oklch, var(--sign), black 20%),
-    color-mix(in oklch, var(--sign), black 58%) 78%
-  );
-  border-color: color-mix(in oklch, var(--sign), white 28%);
-  color: color-mix(in oklch, var(--sign), white 92%);
-}
-
-@utility sigil-lit {
-  box-shadow:
-    0 0 0 2px color-mix(in oklch, var(--sign), transparent 72%),
-    0 0 12px -2px color-mix(in oklch, var(--sign), transparent 42%);
 }
 
 @utility keycap {

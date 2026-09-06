@@ -8,7 +8,7 @@ export const Legend = ({ className, children, ...rest }: LegendProps) => {
     <span
       {...rest}
       className={cn(
-        'text-micro font-medium tracking-micro text-muted-foreground/70 uppercase',
+        'text-mark font-medium tracking-micro text-muted-foreground/70 uppercase',
         className
       )}
     >

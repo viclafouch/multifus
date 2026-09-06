@@ -2,7 +2,7 @@ import React from 'react'
 import { X } from 'lucide-react'
 import { i18n } from '@lingui/core'
 import { t } from '@lingui/core/macro'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/retro/button'
 import { RUNE_FAMILIES } from '@/constants/runes'
 import type { useWindowDrag } from '@/hooks/use-window-drag'
 import { RuneLine } from '@/screens/rune-table-window/rune-line'
@@ -27,12 +27,12 @@ export const RuneSheet = ({ drag, look, onClose, ref }: RuneSheetProps) => {
       style={{ opacity: look }}
     >
       <header className="rune-crown">
-        <h1 className="min-w-0 flex-1 truncate text-row leading-none font-medium">
+        <h1 className="min-w-0 flex-1 truncate text-tale leading-none font-medium">
           {title}
         </h1>
         <Button
-          variant="ghost"
-          size="icon-xs"
+          variant="bare"
+          size="icon-tight"
           className="shrink-0 text-muted-foreground hover:bg-destructive/20 hover:text-foreground"
           aria-label={t`Fermer le tableau des runes`}
           onPointerDown={(event) => {

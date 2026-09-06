@@ -1,4 +1,3 @@
-import { RotateCcw } from 'lucide-react'
 import { i18n } from '@lingui/core'
 import { t } from '@lingui/core/macro'
 import type {
@@ -9,8 +8,8 @@ import type {
 } from '@/@types/shortcuts'
 import { FieldRow } from '@/components/layout/field-row'
 import { Panel } from '@/components/layout/panel'
+import { Button } from '@/components/retro/button'
 import { ShortcutField } from '@/components/shortcut-field'
-import { Button } from '@/components/ui/button'
 import { SHORTCUT_ACTIONS } from '@/constants/shortcuts'
 import { matchIsSameBinding } from '@/helpers/binding'
 import { shortcutStatusLine } from '@/helpers/wording'
@@ -84,12 +83,11 @@ export const ActionsPanel = ({
       {hasOwnKeys ? (
         <div className="mt-2 mr-2 flex justify-end">
           <Button
-            variant="ghost"
-            size="xs"
+            variant="bare"
+            size="tight"
             onClick={actions.handleDefaults}
-            className="rise text-mini font-normal text-muted-foreground/75 hover:text-foreground"
+            className="rise text-aside font-normal text-khaki/75 hover:text-cream"
           >
-            <RotateCcw aria-hidden />
             {t`Remettre les touches d’origine`}
           </Button>
         </div>

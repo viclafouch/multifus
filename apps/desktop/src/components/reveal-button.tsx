@@ -1,5 +1,5 @@
 import { FolderOpen } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/retro/button'
 import { ignore } from '@/lib/utils'
 
 type RevealButtonProps = Readonly<{
@@ -14,8 +14,8 @@ export const RevealButton = ({ label, onReveal }: RevealButtonProps) => {
 
   return (
     <Button
-      variant="ghost"
-      size="icon-xs"
+      variant="bare"
+      size="icon-tight"
       onClick={handleClick}
       title={label}
       aria-label={label}

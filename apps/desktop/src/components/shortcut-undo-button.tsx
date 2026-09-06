@@ -1,7 +1,6 @@
-import { Undo2 } from 'lucide-react'
 import { t } from '@lingui/core/macro'
 import { KeyCap } from '@/components/key-cap'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/retro/button'
 import { acceleratorParts } from '@/helpers/accelerator'
 import type { ShortcutUndo } from '@/hooks/use-shortcut-undo'
 
@@ -14,13 +13,12 @@ export const ShortcutUndoButton = ({ undo }: ShortcutUndoButtonProps) => {
 
   return (
     <Button
-      variant="ghost"
-      size="xs"
+      variant="bare"
+      size="tight"
       aria-label={undo.label}
       onClick={undo.handleUndo}
-      className="rise text-mini font-normal text-muted-foreground hover:text-foreground"
+      className="rise text-aside font-normal text-muted-foreground hover:text-foreground"
     >
-      <Undo2 aria-hidden />
       {parts.length === 0 ? t`Remettre : aucune touche` : t`Remettre`}
       {parts.map((part) => {
         return <KeyCap key={part} token={part} />

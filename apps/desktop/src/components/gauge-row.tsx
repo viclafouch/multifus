@@ -27,10 +27,7 @@ export const GaugeRow = ({
 
   return (
     <div className="flex items-center gap-3">
-      <span
-        id={labelId}
-        className="w-24 shrink-0 text-micro text-muted-foreground/70"
-      >
+      <span id={labelId} className="w-24 shrink-0 text-aside text-khaki">
         {label}
       </span>
       <Slider
@@ -46,7 +43,7 @@ export const GaugeRow = ({
           onCommit(gaugeValue(next, current))
         }}
       />
-      <output className="w-20 shrink-0 text-right font-mono text-note tabular-nums text-foreground/85">
+      <output className="w-20 shrink-0 text-right font-mono text-aside tabular-nums text-cream/85">
         {reading}
       </output>
     </div>

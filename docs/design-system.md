@@ -48,7 +48,7 @@ titre de texte, jamais un bouton. Les boutons du site sont verts.
 
 ### Y retourner avant de dessiner
 
-Le système n'est pas fini : il ne couvre que ce que la prise en main a demandé.
+Le système n'est pas fini : il ne couvre que ce que la mise en route a demandé.
 Dès qu'un écran a besoin d'une matière qui n'est pas dans les tables plus bas, on
 retourne à la source plutôt que d'inventer. C'est ce qui garde le logiciel dans
 l'univers du jeu au lieu de le faire glisser vers un thème générique.
@@ -83,6 +83,44 @@ de Tauri n'autorise que `'self'` pour les polices.
 Bebas Neue n'a pas de bas de casse. Tout ce qui la porte est en capitales, et le
 français met ses accents sur les capitales.
 
+**Ce que le joueur a écrit reste en Roboto**, dans sa casse à lui. Une réponse
+rapide s'est affichée en Bebas capitales : le texte qui allait être collé dans le
+jeu ne ressemblait plus à ce qu'on avait tapé, et une longue phrase devenait
+illisible. Bebas est la fonte de Multifus, pas celle du joueur.
+
+### Les corps, et il n'y en a qu'une échelle
+
+Le jeton dit le corps, la classe de fonte dit la fonte. Tout est dans le
+`@theme inline` de `retro.css`, et `theme.css` n'en porte plus un seul.
+
+| Jeton     | Corps   | Fonte  | Ce qui le porte                                     |
+| --------- | ------- | ------ | --------------------------------------------------- |
+| `chapter` | 46 px   | Bebas  | le carton de chapitre                               |
+| `sign`    | 28 à 34 | Bebas  | le titre d'une map, qui suit la hauteur             |
+| `action`  | 23 px   | Bebas  | le grand bouton vert, taille `lead`                 |
+| `bar`     | 20 px   | Bebas  | le titre d'une plaque                               |
+| `way`     | 17 à 22 | Bebas  | le menu de l'accueil, qui suit la hauteur           |
+| `deed`    | 17 px   | Bebas  | l'étiquette d'un bouton                             |
+| `tale`    | 17 px   | Roboto | la phrase d'une map, et le titre d'une ligne        |
+| `aside`   | 13 px   | Roboto | la seconde ligne, les indications                   |
+| `legend`  | 13 px   | Bebas  | la petite étiquette gravée                          |
+| `mark`    | 11 px   | Roboto | l'étiquette en capitales, la version, le crédit     |
+| `log`     | 11 px   | mono   | le journal, les touches, ce qui vient de la machine |
+
+Huit corps pour douze jetons : `tale` et `deed` partagent 17 px, `aside` et
+`legend` 13, `mark` et `log` 11. Chaque paire vit dans deux fontes et deux
+interlignes, jamais dans deux tailles voisines.
+
+**Il y avait deux échelles.** `theme.css` en portait onze de plus, de 9,6 px à
+34 px, dont quatre à moins d'un pixel les unes des autres : 11,5, 12,5, 13 et
+13,5. Une plaque écrivait donc son titre en 13,5 et sa phrase en 11,5, quand la
+map au-dessus parlait en 17. C'est ce que l'œil voyait sans savoir le nommer.
+Elles sont mortes le même jour, et `--size-aside` et `--size-mark` sont descendus
+dans le `:root` pour que les fenêtres satellites, qui écrivent du CSS à la main,
+tirent la même échelle. Leur nom porte `size-` parce que `--mark` était déjà pris
+par la couleur d'une pastille : un corps posé dessous aurait éteint tous les
+points d'état, sans erreur nulle part.
+
 ## Les couleurs
 
 Les valeurs vivent dans `apps/desktop/src/retro.css`, sous `:root`.
@@ -109,6 +147,23 @@ Les valeurs vivent dans `apps/desktop/src/retro.css`, sous `:root`.
 | `--flame`      | `#e4442c` | le rouge d'erreur du site                                   |
 | `--night`      | `#021b08` | le fond du site, qui sert au voile sur les décors           |
 
+Quatre valeurs ne viennent d'aucune des deux sources, et disent pourquoi :
+
+| Jeton         | Valeur                  | Ce que c'est                                                                       |
+| ------------- | ----------------------- | ---------------------------------------------------------------------------------- |
+| `--leaf-glow` | `oklch(0.79 0.16 152)`  | le vert du connecté : `--leaf` éclairci, pour qu'une pastille brille sur du sombre |
+| `--amber`     | `oklch(0.796 0.142 71)` | la part sans couleur de la roue, et rien d'autre                                   |
+| `--male`      | `oklch(0.66 0.13 212)`  | le sceau de Mars, un bleu de sarcelle                                              |
+| `--female`    | `oklch(0.6 0.17 348)`   | le sceau de Vénus, un prune                                                        |
+
+**Les deux sceaux gardent leur couleur, et c'est la seule exception au vert.** Un
+sexe choisi est un état, donc il devrait s'allumer en vert comme le reste ; sauf
+que les deux se choisissent côte à côte, et deux disques verts l'un contre
+l'autre ne se distinguent plus. Le sceau allumé prend donc sa propre couleur,
+l'éteint reste gris. `--sign` porte celle du moment, et `sigil-lit` la lit
+partout : l'en-tête des Personnages, la fiche d'un personnage, la grille des
+classes.
+
 Le vert ne s'emploie que pour **l'action du moment** et pour **ce qui est en
 place**. Il ne colore jamais un titre, ni un texte courant, ni un avancement :
 un piquet d'étape franchi est clair, pas vert, sinon l'écran porte deux verts
@@ -119,10 +174,12 @@ qui ne disent pas la même chose.
 Une piste écartée revient toujours si personne n'écrit pourquoi.
 
 - **L'or et l'ambre.** Ils ne sont que dans le logo Dofus Retro, jamais dans le
-  système. Une interface dorée ressemble à un jeu mobile, pas à Retro
+  système. Une interface dorée ressemble à un jeu mobile, pas à Retro. `--amber`
+  survit au seul endroit que `CONTEXT.md` nomme, la part sans couleur de la roue
 - **Les icônes en trait**, celles de `lucide`. Le site n'en pose aucune et le
-  jeu non plus. Un bouton y est du texte, en capitales, et rien d'autre. Elles
-  restent employées dans le reste de Multifus, qui a son propre thème
+  jeu non plus. Un bouton y est du texte, en capitales, et rien d'autre. Il en
+  reste dans les écrans que le monde n'a pas encore repris, et elles s'en iront
+  avec eux
 - **L'orange en bouton.** C'est celui du client, pas du site. Voir plus haut
 - **Le panneau clair sur fond clair.** Un panneau `#f8f8f6` posé sur un décor de
   jeu écrase le décor. La plaque est sombre et laisse voir la carte derrière
@@ -142,14 +199,29 @@ milieu, sous le titre. Le losange est la case isométrique de Dofus.
 
 **Les boutons** ont trois formes, et une seule est verte par écran :
 
-| Variante | Emploi                                           |
-| -------- | ------------------------------------------------ |
-| `leaf`   | le geste du moment, un seul par écran            |
-| `slate`  | tout le reste, y compris « Continuer »           |
-| `bare`   | le cadre de la fenêtre, « Retour » et « Passer » |
+| Variante | Emploi                                            |
+| -------- | ------------------------------------------------- |
+| `leaf`   | le geste du moment, un seul par écran             |
+| `slate`  | tout le reste, y compris « Continuer »            |
+| `bare`   | le cadre de la fenêtre, « Passer », et les icônes |
 
 Ils sont en pilule, en Bebas capitales. La taille `lead` est réservée au bouton
 vert.
+
+Une action posée au bout d'une ligne porte le cadre `slate`, jamais `bare`. Sans
+cadre, « Ouvrir Telegram Web » et « Aller voir » se lisaient comme la valeur de
+la ligne, et personne ne cliquait. Le « Retour » d'une map le porte aussi, parce
+qu'il se pose sur onze décors dont des clairs. `bare` ne sert plus qu'à ce qui
+borde la fenêtre de la mise en route et aux icônes qui portent leur infobulle.
+
+**Deux boutons restent des `<button>` du navigateur**, la tête du dolmen et le
+drapeau d'une langue, contre la règle de `frontend.md` qui veut un composant. Ce
+n'est pas un oubli : chaque face de bouton porte un bord complet et une pilule en
+Bebas capitales, et ces deux-là ont déjà leur matière, `head` et `ensign`, qui
+pose son propre `border` et son propre `border-radius`. Les faire porter une face
+rendrait le bord et le rayon au hasard de l'ordre d'émission des `@utility`, ce
+que la note plus bas décrit. Ils prennent `sighted`, qui porte l'anneau de focus
+de tout le logiciel, et rien d'autre du bouton.
 
 **Le voile** (`@utility grove-shade`) est ce qui rend un décor de jeu lisible : un
 ovale sombre au centre, un dégradé en haut et en bas, un vignettage de bord. Sans
@@ -162,26 +234,45 @@ rectangle bordé se lit comme un bouton.
 
 ### Toutes les matières de `retro.css`
 
-| Utilitaire                           | Ce que ça pose                                            |
-| ------------------------------------ | --------------------------------------------------------- |
-| `grove`, `grove-shade`               | le fond du décor, et le voile qui le rend lisible         |
-| `drift`                              | la panoramique permanente et le fondu entre deux décors   |
-| `plate`                              | la fenêtre du jeu posée sur la carte                      |
-| `crest`                              | le fronton : un filet et le losange vert                  |
-| `btn-leaf`, `btn-slate`, `btn-bare`  | les trois faces du bouton, chacune complète               |
-| `plaque`                             | un creux inscrit : les noms des personnages vus           |
-| `frame`                              | le cadre d'une capture ouverte en grand                   |
-| `badge`, `pip`, `pip-live`           | l'état : la couleur du texte, et son point                |
-| `fenceline`, `rail`, `stake`, `knob` | la clôture des étapes : l'ombre, les lisses, le piquet    |
-| `knob-lit`, `knob-here`              | la tête d'un piquet franchi, et celle de l'étape en cours |
-| `sonar-leaf`, `sonar-still`          | l'encre et l'arrêt de l'onde partagée avec l'ancien thème |
-| `limelight`                          | l'ombre portée qui décolle un titre du décor              |
-| `rule`                               | le filet du carton de chapitre                            |
-| `chapter`                            | le carton : il monte, tient, s'efface vers le haut        |
-| `unfurl`                             | la plaque qui se déplie                                   |
-| `lift`, `lift-1` à `lift-5`          | ce qui monte, un cran toutes les 200 ms                   |
-| `roll`                               | le générique, un poste toutes les 130 ms par `nth-child`  |
-| `lift-chrome`                        | l'en-tête et le pied, qui arrivent tout de suite          |
+| Utilitaire                           | Ce que ça pose                                                      |
+| ------------------------------------ | ------------------------------------------------------------------- |
+| `grove`, `grove-shade`               | le fond du décor, et le voile qui le rend lisible                   |
+| `drift`                              | la panoramique permanente et le fondu entre deux décors             |
+| `plate`, `note`                      | le verre posé sur la carte, et le texte gravé dessus                |
+| `crest`                              | le fronton : un filet et le losange vert                            |
+| `btn-leaf`, `btn-slate`, `btn-bare`  | les trois faces du bouton, chacune complète                         |
+| `btn-flame`                          | la quatrième, celle qui détruit : « Tout effacer »                  |
+| `tick`                               | la case à cocher du jeu, verte et cochée quand c'est en place       |
+| `plaque`                             | un creux inscrit : les noms des personnages vus                     |
+| `frame`                              | le cadre d'une capture ouverte en grand                             |
+| `badge`, `pip`, `pip-live`           | l'état : la couleur du texte, et son point                          |
+| `fenceline`, `rail`, `stake`, `knob` | la clôture des étapes : l'ombre, les lisses, le piquet              |
+| `knob-lit`, `knob-here`              | la tête d'un piquet franchi, et celle de l'étape en cours           |
+| `sonar-leaf`, `sonar-still`          | l'encre et l'arrêt de l'onde partagée avec l'ancien thème           |
+| `limelight`                          | l'ombre portée qui décolle un titre du décor                        |
+| `rule`                               | le filet du carton de chapitre                                      |
+| `chapter`                            | le carton : il monte, tient, s'efface vers le haut                  |
+| `unfurl`                             | la plaque qui se déplie                                             |
+| `lift`, `lift-1` à `lift-5`          | ce qui monte, un cran toutes les 200 ms                             |
+| `roll`                               | le générique, un poste toutes les 130 ms par `nth-child`            |
+| `lift-chrome`                        | l'en-tête et le pied, qui arrivent tout de suite                    |
+| `roam`                               | la panoramique du monde, et le fondu entre deux maps                |
+| `veil`, `deepen`                     | le voile de toute map, et le cran de plus d'une map de travail      |
+| `relief`                             | l'ombre portée qui décolle une petite forme du décor                |
+| `settle`                             | ce qui monte à l'arrivée, quatre crans puis tout le reste           |
+| `flank`                              | le dégradé qui assombrit le côté où l'on écrit                      |
+| `hem`, `brow`                        | l'ourlet du bas sous le crédit, et celui du haut sous le retour     |
+| `legible`                            | le halo sous une phrase posée à même le décor : une ellipse floutée |
+| `sighted`                            | l'anneau du clavier, le même sur tout ce qui se focalise            |
+| `tint-*`, `stripe`                   | la couleur d'un personnage, et la pastille qui la porte             |
+| `sigil`, `sign-male`, `sign-female`  | le sceau d'un sexe, gris éteint, bleu ou prune allumé               |
+| `ensign`                             | un drapeau de langue, éteint tant qu'il n'est pas celui du moment   |
+| `dolmen-field`                       | la boîte qui refait la géométrie du décor en `cover`                |
+| `dolmen-seat`                        | la place de la dalle dans cette boîte, et la taille des têtes       |
+| `stage`                              | le cadre d'une boucle du jeu, au format 16/10                       |
+| `emblem`                             | l'ombre portée qui décolle le logo du décor                         |
+| `hearth`, `glade`                    | l'ombre sous les têtes, et la lueur d'herbe autour                  |
+| `head`, `hood`                       | la tête de classe sur le dolmen, et sa pierre de survol             |
 
 Chaque face de bouton porte son propre bord et ses propres transitions. Elles ne
 partagent aucun utilitaire de base, parce que Tailwind v4 n'émet pas les
@@ -190,14 +281,32 @@ propriété se battent, et c'est le hasard de l'ordre d'émission qui gagne.
 
 ### Les mots du système
 
-| Nom           | Ce que c'est                                                                |
-| ------------- | --------------------------------------------------------------------------- |
-| `ChapterCard` | le carton de chapitre au milieu de l'écran                                  |
-| `Scene`       | les six décors empilés, et celui qui est devant                             |
-| `StepFence`   | la clôture d'enclos, un piquet par étape                                    |
-| `StepState`   | le point et la phrase qui disent si l'étape est en place                    |
-| `SettingPath` | le chemin d'un réglage, `Options › Général › Divers`                        |
-| `FeatureRoll` | les fonctionnalités sur trois colonnes, leurs noms seuls ou avec leur ligne |
+| Nom              | Ce que c'est                                                                |
+| ---------------- | --------------------------------------------------------------------------- |
+| `ChapterCard`    | le carton de chapitre au milieu de l'écran                                  |
+| `Scene`          | les six décors empilés, et celui qui est devant                             |
+| `StepFence`      | la clôture d'enclos, un piquet par étape                                    |
+| `StepState`      | le point et la phrase qui disent si l'étape est en place                    |
+| `SettingPath`    | le chemin d'un réglage, `Options › Général › Divers`                        |
+| `FeatureRoll`    | les fonctionnalités sur trois colonnes, leurs noms seuls ou avec leur ligne |
+| `WorldScene`     | les onze décors empilés, le voile, et celui qui est devant                  |
+| `Dolmen`         | la dalle du centre, les têtes dessus, le compte dessous                     |
+| `Head`           | une tête de classe, sa couleur, et ce qu'elle dit au survol                 |
+| `WayBack`        | le retour à la clairière, en haut à gauche de chaque map                    |
+| `MapFrame`       | le cadre d'une map : le retour, et ce qui défile dessous                    |
+| `Screen`         | une map qui est une liste : titre, fronton, une phrase, les plaques         |
+| `KeyStone`       | une combinaison de touches, gravée                                          |
+| `WayList`        | la colonne des dix maps, sur l'accueil                                      |
+| `LoopStage`      | la boucle du jeu, ou ce qu'elle montrera tant qu'elle manque                |
+| `StageScreen`    | une map qui montre le jeu : la boucle, et les réglages à côté               |
+| `Tick`           | la case à cocher, seule forme d'un réglage qui s'allume                     |
+| `MainMark`       | le losange crème du principal, le même partout                              |
+| `SceneCredit`    | la mention d'Ankama, en bas de chaque fenêtre                               |
+| `ClearingScreen` | l'accueil : le titre, le menu, le dolmen                                    |
+| `Cartouche`      | le coin haut droit : la version, et les trois drapeaux                      |
+| `Flag`           | un drapeau, dessiné en SVG, jamais un émoji ni une image                    |
+| `Tale`           | la phrase d'un titre, et le halo qui la décolle du décor                    |
+| `MapHeader`      | le titre, le fronton et la phrase, partagés par les deux sortes d'écran     |
 
 ## Les règles qui tranchent
 
@@ -234,6 +343,64 @@ Elles viennent toutes d'un essai raté, et elles se tiennent.
    dans le code ne le mesure : c'est un essai à mener à la main, en relevant
    `scrollHeight - clientHeight` toutes les 16 ms pendant toute l'animation, sur
    chaque étape et à la taille minimale de la fenêtre. Il doit rendre zéro
+9. **Une map occupe toute la fenêtre, et le reste flotte au-dessus.** Le retour,
+   le crédit du décor et le journal sont posés en absolu ou en fixe, hors du
+   flux. Tant qu'ils prenaient une part de la colonne, ce qui défilait se coupait
+   net sous le retour, et ouvrir le journal levait la scène entière : les
+   personnages quittaient leur dalle. Trois conséquences qui se tiennent : la
+   dalle se place par rapport à la fenêtre et non par rapport à ce qui reste ; le
+   décor descend jusqu'au bas de l'écran, ourlet compris ; et le bas de la
+   colonne garde la hauteur du journal en creux, pour que rien ne finisse dessous
+10. **Ce qui assombrit est local, et le moins possible.** `flank` sur le côté du
+    menu, `legible` derrière une phrase, `hem` en bas de l'écran. Deux voiles
+    couvrent bien tout l'écran, `veil` sur chaque map et `deepen` sur les maps de
+    travail, mais ils sont doux et chiffrés pour cela : `deepen` est descendu de
+    48 % à 32 % d'`iron` le jour où `legible` est arrivé, puis à 20 % le jour où
+    `legible` a cessé de couper. Chaque fois, la même raison : le décor s'était
+    éteint pour un texte qui savait déjà se défendre. Un voile qui cache le décor
+    coûte plus qu'il ne rapporte, c'est le décor qui dit où on est
+11. **La plaque est du verre teinté d'`iron`, et le texte est gravé.** Elle laisse
+    voir le décor à 28 % en son milieu, sans aucun flou : sur le port, on suit
+    le bateau derrière la liste ; au camp de Bonta, la foule passe sous les
+    pseudos. Ce qui tient le texte lisible n'est pas l'opacité seule, c'est
+    `--engrave`, une ombre portée d'un pixel à 65 % de noir posée sur toute la
+    plaque. Un champ de saisie en est exclu : ce que le joueur tape ne se grave
+    pas. Trois essais écartés en chemin. Le flou, qui rendait un gris de
+    plastique et effaçait le décor qu'on voulait voir. L'opacité seule, qui
+    demandait un panneau fermé. Et surtout **le `slate` au ventre de la
+    plaque** : c'était lui, le gris. Mesure faite sur le 1 % le plus clair de
+    chacun des onze décors, voile non compté, le kaki de 13 px tombait à
+    **2,8:1** derrière du `slate` à 68 %, et il fallait 94 % pour atteindre les
+    4,5:1 que demande `frontend.md`. Le même alpha en `iron` donne **4,6:1** au
+    pire décor et 7,1:1 pour la crème de 17 px, à transparence égale. La
+    couleur du voile décide du contraste, l'alpha décide de ce qu'on voit
+    derrière : ce sont deux réglages, et on ne paie pas l'un avec l'autre.
+    L'ombrage de la plaque se fait donc en variant l'alpha, 24 % en haut, 28 %
+    au milieu, 22 % en bas, jamais en changeant de couleur. `saturate(1.15)`
+    reste, il rend au décor la couleur que le sombre lui prend. La note et la
+    scène d'une boucle sont la même matière. La mesure se refait avec un canvas
+    dans la page, en compositant `deepen` puis la plaque sur le pixel le plus
+    clair du décor : rien dans les tests ne la garde, parce qu'un test qui
+    fige un dégradé fige un choix qu'on règle à l'œil
+12. **Ce qui flotte a sa bande.** Le retour, le cartouche et le crédit sont hors
+    du flux, et ce qui défile passe dessous : sans rien entre les deux, une case
+    à cocher venait se poser contre les drapeaux, et une ligne de réglage
+    traversait le crédit. `brow` en haut et `hem` en bas éteignent le décor sous
+    eux. Le texte qui glisse dessous s'efface au lieu de se cogner. Deux suites :
+    ce qui vit dans la bande passe au-dessus d'elle, la ligne d'écoute de
+    l'accueil comme le retour et le cartouche ; et un écran commence sous elle,
+    à 80 px, pour qu'aucun titre ne naisse dans le sombre
+13. **Le titre d'une map se pose toujours au même endroit**, quelle que soit la
+    hauteur de ce qu'il annonce. L'écran était centré : une map à deux réglages
+    posait son titre cent pixels plus bas qu'une map à huit, et passer de l'une à
+    l'autre faisait sauter le titre. Il est en haut, à une distance fixe, et
+    c'est le bas qui reste vide quand il y a peu à dire
+14. **Un halo se floute, il ne se dégrade pas.** `legible` était un dégradé radial
+    peint dans la boîte de la phrase : la boîte coupe le fond, et le dégradé
+    n'avait pas fini de s'éteindre au bord. On voyait le rectangle. C'est
+    maintenant une ellipse pleine, posée derrière la phrase et floutée de 26 px :
+    le flou déborde de sa boîte, il n'a aucun bord à couper, et il s'éteint sans
+    marche. Rien à installer pour ça, `filter: blur` suffit
 
 ## Le rythme
 
@@ -273,85 +440,117 @@ Le français est la source, Lingui porte le reste, et
 
 ## Où le système vit
 
-| Fichier                                  | Ce qu'il tient                               |
-| ---------------------------------------- | -------------------------------------------- |
-| `apps/desktop/src/retro.css`             | tout le système : jetons, matière, rythme    |
-| `apps/desktop/src/components/retro/`     | les composants qui l'emploient               |
-| `apps/desktop/src/constants/features.ts` | les fonctionnalités que le générique montre  |
-| `apps/desktop/src/helpers/onboarding.ts` | les phrases de la prise en main, et `leadOf` |
-| `apps/desktop/src/assets/ankama/`        | les décors, qui appartiennent à Ankama       |
+| Fichier                                  | Ce qu'il tient                                          |
+| ---------------------------------------- | ------------------------------------------------------- |
+| `apps/desktop/src/retro.css`             | tout le système : jetons, matière, rythme               |
+| `apps/desktop/src/theme.css`             | le pont vers shadcn, et pas une couleur à lui           |
+| `apps/desktop/src/index.css`             | le fonds neutre, et les douze couleurs du domaine       |
+| `apps/desktop/src/components/retro/`     | les composants de la mise en route                      |
+| `apps/desktop/src/components/world/`     | les composants du monde : le dolmen, les têtes, le menu |
+| `apps/desktop/src/constants/world.ts`    | les maps, leurs noms et leurs décors                    |
+| `apps/desktop/src/constants/features.ts` | les fonctionnalités que le générique montre             |
+| `apps/desktop/src/helpers/onboarding.ts` | les phrases de la mise en route, et `leadOf`            |
+| `apps/desktop/src/assets/ankama/`        | les décors, qui appartiennent à Ankama                  |
 
-Le reste de Multifus tourne encore sur `theme.css`, l'ancien thème. Les deux
-vivent côte à côte : **aucun jeton de couleur, aucune fonte et aucune matière ne
-se croise**. Ce qui se partage est le petit fonds neutre d'`index.css`, qui ne
-porte aucune couleur de thème : `grain` pour le grain de l'image, `selectable`
-pour un texte qu'on veut pouvoir copier, `sonar` pour l'onde d'écoute, dont
-l'encre se donne par `--sonar-ink`. Un écran passe au nouveau système quand il
-est refait, jamais à moitié.
+Le fonds neutre d'`index.css` ne porte toujours aucune couleur d'interface :
+`grain` pour le grain de l'image, `selectable` pour un texte qu'on veut pouvoir
+copier, `sonar` pour l'onde d'écoute dont l'encre se donne par `--sonar-ink`, et
+les douze `tint-*` du domaine.
 
-## Étendre le système au reste de Multifus
+## Le monde, et la fin des deux thèmes
 
-La prise en main est livrée. Elle a servi à poser le système, pas à l'épuiser :
-c'est une scène qu'on traverse une fois, et tout le reste du logiciel est fait
-d'écrans qu'on rouvre tous les jours. Ce qui suit dit ce qui passe tel quel, ce
-qui ne passe pas, et ce qui manque encore.
+Livré le 5 septembre 2026. Le système ne couvre plus la seule mise en route : il
+couvre tout Multifus. Le détail du monde est dans
+[docs/plan-monde.md](./plan-monde.md) ; ce qui suit est ce qui devient une règle.
 
-Il reste à refaire les dix écrans de la barre de gauche (Personnages, Raccourcis,
-Réponses rapides, AutoFocus, Déplacement rapide, Roue des personnages, Tableau
-des runes, Messages privés, Paramètres, À propos), les trois fenêtres à part
-(`banner.html`, `wheel.html`, `rune-table.html`) et le cadre qui les tient.
+**Il n'y a plus deux thèmes.** `theme.css` est le pont vers les composants
+shadcn, et chacun de ses jetons de couleur pointe sur un jeton de `retro.css`.
+Ce qui lui reste en propre part avec les fenêtres satellites, qui sont dans « Ce
+qui reste » du plan du monde : les fonds du disque de la roue (`wheel-disc`,
+`wheel-hub`, `wheel-face`), le nom et la tête d'une part, la pastille de couleur
+d'un dialogue, et une quinzaine d'espacements. `--background` est `--iron`,
+`--foreground` est `--cream`, `--primary` est `--leaf-lit`, `--font-sans` est
+Roboto. Fraunces et Inter ont quitté le dépôt, `--font-display` et
+`--font-heading` aussi : un composant qui veut la fonte gravée écrit
+`font-carve`, comme le reste du logiciel. Repeindre un écran ne demande
+donc plus de le réécrire : il arrive dans le système par ses jetons, et on ne le
+réécrit que pour sa forme.
 
-### Ce qui passe tel quel
+`theme.css` dépend maintenant du `:root` de `retro.css`. **Toute entrée qui
+importe l'un importe l'autre**, `banner.css`, `wheel.css` et `rune-table.css`
+comprises.
 
-Les jetons de couleur, les deux fontes, les trois faces du bouton, la `plaque`,
-le `frame`, le `badge` et son `pip`, le `limelight`, le `crest`. Les huit règles
-plus haut, toutes. Les règles de voix : un verbe pour commencer, les mots du jeu,
-les guillemets sur ce que le joueur lit sur son propre écran, jamais de métaphore
-là où il y a un geste à faire.
+**Les douze couleurs des personnages vivent dans `retro.css`**, avec les
+`tint-*` et la pastille `stripe`. Elles ont passé une journée dans `index.css`,
+au motif qu'elles appartiennent au domaine et non au monde, et c'était une
+faute : `index.css` n'est chargé que par la fenêtre principale. La bannière
+peignait donc sa pastille sans couleur et la roue rendait ses onze parts en
+ambre, sans qu'aucun test ne le voie, puisqu'ils lisaient les trois feuilles
+collées bout à bout. **Ce qu'une fenêtre satellite peint doit être déclaré dans
+une feuille qu'elle importe**, et il n'y en a que deux, `theme.css` et
+`retro.css`.
 
-Deux règles comptent double sur un écran de travail, parce qu'il porte plus de
-choses qu'une étape : **un seul bouton vert**, et **ce qui n'est pas cliquable ne
-porte ni fond ni bord**. Une liste de vingt raccourcis où chaque ligne a un
-cadre, c'est l'écran d'essai en pire.
+**Deux verts, et c'est voulu.** `--leaf` est l'action, `--leaf-glow` est le vert
+du connecté : le même vert, plus clair, parce qu'une pastille d'état doit briller
+sur du sombre. `colors.test.ts` mesure que les douze couleurs s'en éloignent.
 
-### Ce qui ne passe pas
+**L'ambre survit à un seul endroit**, `--amber`, et c'est la part sans couleur de
+la roue. `CONTEXT.md` la nomme, donc elle existe ; elle n'entre nulle part
+ailleurs, et surtout pas dans un bouton.
+
+### Les trois questions, tranchées
+
+1. **Les icônes.** La barre de gauche qui en portait une par ligne n'existe plus.
+   Une route se nomme en capitales Bebas, comme sur le site. `lucide` reste dans
+   ce qui n'est pas encore repris, ligne par ligne, et s'en ira avec
+2. **Le décor.** Une image d'Ankama au fond de chaque map. Elle est voilée d'un
+   cran de plus sur une map de travail que sur la clairière : on vient y lire des
+   chiffres. Le crédit reste en bas, sur chaque map
+3. **Par quel écran commencer.** Par aucun des dix : par la clairière, qui
+   n'existait pas
+
+### Ce qui ne passe pas de la mise en route
 
 - **La chorégraphie de quatre secondes.** `unfurl`, `lift-1` à `lift-5` et
-  `chapter` sont faits pour une scène qu'on traverse une fois. Un écran qu'on
-  rouvre vingt fois par jour doit être lisible tout de suite. La règle qui en
+  `chapter` sont faits pour une scène qu'on traverse une fois. La règle qui en
   sort : **une animation qui fait attendre ne se pose que là où on ne passe
-  qu'une fois**
-- **Le carton de chapitre.** Il annonce une étape dans un enchaînement. Un écran
-  ouvert depuis la barre de gauche n'a rien à annoncer
+  qu'une fois**. On a essayé de la contourner en rejouant le chargement de carte
+  du client entre deux maps, 1150 ms de noir plein : beau une fois, pesant à la
+  dixième. Retiré. Une map s'ouvre maintenant en 800 ms, sans rien bloquer
+- **Le carton de chapitre.** Il annonce une étape dans un enchaînement. Une map
+  ouverte depuis la clairière n'a rien à annoncer
 - **La clôture des étapes.** `StepFence`, `stake` et `knob` ne disent qu'un
-  avancement, et il n'y en a plus
-- **Le décor en plein cadre qui bouge.** `drift` derrière un tableau de runes,
-  c'est du bruit sous des chiffres qu'on vient lire. Et ce serait une image
-  d'Ankama posée sous chaque écran, en permanence, ce que la licence supporte mal
+  avancement, et il n'y en a plus hors de la mise en route
 
-### Ce qui manque, et qu'il faudra relever
+### La case et le bouton, pris sur la fenêtre Options
 
-Le système n'a aujourd'hui aucune de ces matières, parce que la prise en main
-n'en avait pas besoin. Chacune se prend sur la fenêtre Options du client, qui les
-a toutes :
+Livré le 5 septembre 2026, après le monde, et **c'est la matière qui change les
+dix maps d'un coup, pas les dix maps qui changent une matière**. Deux gestes ont
+suffi :
 
-le champ de saisie, la zone de texte, la liste déroulante, l'interrupteur, la
-case à cocher, le curseur, l'onglet, le tableau, l'infobulle, la barre de
-défilement, le séparateur, et le cadre de fenêtre lui-même avec sa barre de
-titre.
+- **`Tick`** remplace l'interrupteur shadcn partout : la case carrée du client,
+  bord `--iron` de 2 points, face crème creusée, coche dessinée en bordures
+  tournées à 42°. Cochée, elle passe au vert, parce que le vert dit ce qui est en
+  place. Elle garde le rôle ARIA `switch` du composant qu'elle remplace : un
+  réglage qui s'allume n'est pas un formulaire à valider
+- **Le bouton shadcn est supprimé.** Il n'y a plus que
+  `components/retro/button.tsx`, avec une face de plus, `btn-flame`, pour ce qui
+  détruit
 
-### Les trois questions ouvertes, à trancher avec Victor
+Et la règle des icônes est appliquée là où elle se voyait le plus : `IconTile`
+supprimé, `FieldRow` sans prop `icon`, aucun glyphe dans un bouton qui porte un
+mot. Ce qui reste de `lucide` est un glyphe seul, sans mot à côté.
 
-1. **Les icônes.** Le système écarte `lucide`, et la barre de gauche en pose une
-   par écran aujourd'hui. Trois issues : les garder pour la seule barre, s'en
-   passer et n'y mettre que du texte en capitales comme le fait le site, ou en
-   dessiner un jeu maison. Rien n'est tranché, et c'est la question qui décide de
-   l'allure de tout le logiciel
-2. **Le décor.** Est-ce qu'une image d'Ankama reste au fond de chaque écran, ou
-   seulement de ceux où l'on entre ? Le fond peut aussi n'être qu'une matière,
-   sans image, ce qui règle la question des droits d'un coup
-3. **Par quel écran commencer.** Le plus dense dit tout de suite si le système
-   tient : Raccourcis, ou Personnages
+### Ce qui manque encore
+
+Le champ de saisie, la zone de texte, la liste déroulante, le curseur, le
+tableau. Ils tournent aujourd'hui sur les composants shadcn repeints par les
+jetons, ce qui les met dans la bonne palette sans leur donner la bonne matière.
+Chacun se prend sur la fenêtre Options du client,
+`apps/desktop/src/assets/dofus-options-general.png`, quand la map qui en a besoin
+est reprise. **On n'écrit pas une matière avant l'écran qui l'emploie** : une
+`@utility` sans appelant est une abstraction pour plus tard, et le dépôt les
+refuse.
 
 ## Les images
 

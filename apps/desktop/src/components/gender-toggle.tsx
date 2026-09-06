@@ -1,6 +1,6 @@
 import type { Gender } from '@/@types/roster'
 import { GenderSigil } from '@/components/gender-sigil'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/retro/button'
 import {
   Tooltip,
   TooltipContent,
@@ -27,7 +27,7 @@ export const GenderToggle = ({
   return (
     <Tooltip>
       <TooltipTrigger
-        render={<Button variant="ghost" />}
+        render={<Button variant="bare" />}
         aria-pressed={isIncluded}
         aria-label={label}
         className="size-fit rounded-full border-0 p-0.5"
@@ -35,7 +35,7 @@ export const GenderToggle = ({
       >
         <GenderSigil
           gender={gender}
-          className="opacity-45 saturate-0 group-hover/button:opacity-75 group-aria-pressed/button:sigil-lit group-aria-pressed/button:opacity-100 group-aria-pressed/button:saturate-100"
+          className="opacity-60 group-hover/button:opacity-85 group-aria-pressed/button:sigil-lit group-aria-pressed/button:opacity-100"
         />
       </TooltipTrigger>
       <TooltipContent className="flex-col items-start gap-0.5">

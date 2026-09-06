@@ -1,13 +1,16 @@
-import type { ScreenName, Snapshot } from '@/@types/snapshot'
 import type { ConfigProblem } from '@/@types/system'
 import { CheckNotice } from '@/components/check-notice'
 import { ConfigNotice } from '@/components/config-notice'
 import { JournalPanel } from '@/components/journal-panel'
 import { KeyLabelsProvider } from '@/components/key-labels-provider'
-import { NavRail } from '@/components/nav-rail'
+import { SceneCredit } from '@/components/retro/scene-credit'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { Cartouche } from '@/components/world/cartouche'
+import { MapFrame } from '@/components/world/map-frame'
+import { WorldScene } from '@/components/world/world-scene'
 import { ONBOARDING_ANCHOR } from '@/constants/onboarding'
-import { useCurrentScreen } from '@/hooks/use-current-screen'
+import { CLEARING } from '@/constants/world'
+import { useCurrentMap } from '@/hooks/use-current-map'
 import { useEscape } from '@/hooks/use-escape'
 import { useMultifus } from '@/hooks/use-multifus'
 import { useTrayNavigation } from '@/hooks/use-tray-navigation'
@@ -19,31 +22,28 @@ import {
   revealQuarantinedConfig
 } from '@/lib/multifus'
 import { ignore } from '@/lib/utils'
-import { AboutScreen } from '@/screens/about'
-import { AuthorizationScreen } from '@/screens/authorization-screen'
-import { AutoFocusScreen } from '@/screens/auto-focus-screen'
-import { CharactersScreen } from '@/screens/characters-screen'
+import { ClearingScreen } from '@/screens/clearing'
+import { CurrentMap } from '@/screens/current-map'
 import { OnboardingGuide } from '@/screens/onboarding/guide'
-import { QuickRepliesScreen } from '@/screens/quick-replies'
-import { RelayScreen } from '@/screens/relay'
-import { RuneTableScreen } from '@/screens/rune-table'
-import { SettingsScreen } from '@/screens/settings'
-import { ShortcutsScreen } from '@/screens/shortcuts'
-import { WalkScreen } from '@/screens/walk-screen'
-import { WheelScreen } from '@/screens/wheel'
 
 export const App = () => {
   const { snapshot, run } = useMultifus()
-  const [screen, setScreen] = useCurrentScreen()
+  const [map, setMap] = useCurrentMap()
 
-  useTrayNavigation(setScreen)
+  useTrayNavigation(setMap)
 
-  useEscape(snapshot?.runeTable.previewing ?? false, () => {
+  const isPreviewing = snapshot?.runeTable.previewing ?? false
+
+  useEscape(isPreviewing, () => {
     run(closeRuneTable())
   })
 
+  useEscape(!isPreviewing && map !== CLEARING, () => {
+    setMap(CLEARING)
+  })
+
   if (snapshot === null) {
-    return <Backdrop />
+    return <div aria-hidden className="grove fixed inset-0 -z-10" />
   }
 
   if (!snapshot.onboarding.done) {
@@ -52,6 +52,7 @@ export const App = () => {
         <OnboardingGuide
           onboarding={snapshot.onboarding}
           characters={snapshot.characters}
+          language={snapshot.language}
           run={run}
         />
       </KeyLabelsProvider>
@@ -61,172 +62,63 @@ export const App = () => {
   return (
     <KeyLabelsProvider labels={snapshot.keyboard}>
       <TooltipProvider>
-        <Backdrop />
-        <div className="relative flex h-screen flex-col">
-          <div className="flex min-h-0 flex-1">
-            <NavRail
-              current={screen}
+        <div className="relative flex h-screen flex-col overflow-hidden pb-ledger font-plain text-khaki">
+          <WorldScene map={map} />
+          <div
+            aria-hidden
+            className="brow pointer-events-none absolute inset-x-0 top-0 z-20 h-brow"
+          />
+          {snapshot.config.problem === null ? null : (
+            <ConfigNotice
+              problem={snapshot.config.problem}
+              quarantined={quarantinedPath(snapshot.config.problem)}
+              onReveal={() => {
+                revealQuarantinedConfig().catch(ignore)
+              }}
+              onDismiss={() => {
+                run(dismissConfigProblem())
+              }}
+            />
+          )}
+          {snapshot.onboarding.hasNotice ? (
+            <CheckNotice
+              onOpen={() => {
+                showAnchor(ONBOARDING_ANCHOR, () => {
+                  setMap('settings')
+                })
+              }}
+              onDismiss={() => {
+                run(dismissCheckNotice())
+              }}
+            />
+          ) : null}
+          <Cartouche version={snapshot.version} language={snapshot.language} />
+          {map === CLEARING ? (
+            <ClearingScreen
               characters={snapshot.characters}
               authorization={snapshot.authorization}
               onboarding={snapshot.onboarding}
-              version={snapshot.version}
-              language={snapshot.language}
-              onNavigate={setScreen}
+              paintPortraits={snapshot.paintPortraits}
+              onGo={setMap}
+              run={run}
             />
-            <main className="flex min-h-0 flex-1 flex-col">
-              {snapshot.config.problem === null ? null : (
-                <ConfigNotice
-                  problem={snapshot.config.problem}
-                  quarantined={quarantinedPath(snapshot.config.problem)}
-                  onReveal={() => {
-                    revealQuarantinedConfig().catch(ignore)
-                  }}
-                  onDismiss={() => {
-                    run(dismissConfigProblem())
-                  }}
-                />
-              )}
-              {snapshot.onboarding.hasNotice ? (
-                <CheckNotice
-                  onOpen={() => {
-                    showAnchor(ONBOARDING_ANCHOR, () => {
-                      setScreen('settings')
-                    })
-                  }}
-                  onDismiss={() => {
-                    run(dismissCheckNotice())
-                  }}
-                />
-              ) : null}
-              <div className="min-h-0 flex-1 overflow-y-auto">
-                <CurrentScreen screen={screen} snapshot={snapshot} run={run} />
-              </div>
-            </main>
-          </div>
+          ) : (
+            <MapFrame
+              map={map}
+              onLeave={() => {
+                setMap(CLEARING)
+              }}
+            >
+              <CurrentMap map={map} snapshot={snapshot} run={run} />
+            </MapFrame>
+          )}
+          <footer className="hem pointer-events-none absolute inset-x-0 bottom-ledger z-20 flex h-hem items-end px-4 pb-2">
+            <SceneCredit />
+          </footer>
           <JournalPanel snapshot={snapshot} />
         </div>
       </TooltipProvider>
     </KeyLabelsProvider>
-  )
-}
-
-type CurrentScreenProps = Readonly<{
-  screen: ScreenName
-  snapshot: Snapshot
-  run: (action: Promise<Snapshot>) => void
-}>
-
-const CurrentScreen = ({ screen, snapshot, run }: CurrentScreenProps) => {
-  if (screen === 'shortcuts') {
-    return (
-      <ShortcutsScreen
-        shortcuts={snapshot.shortcuts}
-        characters={snapshot.characters}
-        quickReplies={snapshot.quickReplies}
-        run={run}
-      />
-    )
-  }
-
-  if (screen === 'quickReplies') {
-    return <QuickRepliesScreen quickReplies={snapshot.quickReplies} run={run} />
-  }
-
-  if (screen === 'autoFocus') {
-    return (
-      <AutoFocusScreen
-        switches={snapshot.autoFocus}
-        isEnabled={snapshot.autoFocusEnabled}
-        wakesMinimized={snapshot.wakesMinimized}
-        run={run}
-      />
-    )
-  }
-
-  if (screen === 'walk') {
-    return (
-      <WalkScreen
-        walk={snapshot.walk}
-        shortcuts={snapshot.shortcuts}
-        run={run}
-      />
-    )
-  }
-
-  if (screen === 'wheel') {
-    return (
-      <WheelScreen
-        wheel={snapshot.wheel}
-        shortcuts={snapshot.shortcuts}
-        run={run}
-      />
-    )
-  }
-
-  if (screen === 'runeTable') {
-    return (
-      <RuneTableScreen
-        runeTable={snapshot.runeTable}
-        shortcuts={snapshot.shortcuts}
-        run={run}
-      />
-    )
-  }
-
-  if (screen === 'relay') {
-    return (
-      <RelayScreen
-        relay={snapshot.relay}
-        characters={snapshot.characters}
-        run={run}
-      />
-    )
-  }
-
-  if (screen === 'settings') {
-    return (
-      <SettingsScreen
-        startAtLogin={snapshot.startAtLogin}
-        maximizeOnLaunch={snapshot.maximizeOnLaunch}
-        shortTitles={snapshot.shortTitles}
-        paintPortraits={snapshot.paintPortraits}
-        ungroupTaskbar={snapshot.ungroupTaskbar}
-        taskbarCombines={snapshot.taskbarCombines}
-        onboarding={snapshot.onboarding}
-        run={run}
-      />
-    )
-  }
-
-  if (screen === 'about') {
-    return (
-      <AboutScreen
-        version={snapshot.version}
-        system={snapshot.system}
-        config={snapshot.config}
-        update={snapshot.update}
-        run={run}
-      />
-    )
-  }
-
-  return snapshot.authorization.granted ? (
-    <CharactersScreen
-      characters={snapshot.characters}
-      paintPortraits={snapshot.paintPortraits}
-      run={run}
-    />
-  ) : (
-    <AuthorizationScreen run={run} />
-  )
-}
-
-const Backdrop = () => {
-  return (
-    <div aria-hidden className="pointer-events-none fixed inset-0 -z-10">
-      <div className="warm-light absolute inset-0" />
-      <div className="grain absolute inset-0" />
-    </div>
   )
 }
 

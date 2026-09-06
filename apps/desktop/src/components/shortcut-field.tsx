@@ -1,8 +1,8 @@
 import React from 'react'
 import { t } from '@lingui/core/macro'
 import { KeyCap } from '@/components/key-cap'
+import { Button } from '@/components/retro/button'
 import { ShortcutUndoButton } from '@/components/shortcut-undo-button'
-import { Button } from '@/components/ui/button'
 import type { CaptureRejection } from '@/constants/keyboard'
 import { IS_APPLE } from '@/constants/keyboard'
 import { acceleratorParts, capture, heldModifiers } from '@/helpers/accelerator'
@@ -80,19 +80,19 @@ export const ShortcutField = ({
   const offer = editing.isActive ? null : undo
 
   return (
-    <div className="flex flex-col items-end gap-1">
+    <div className="flex w-60 shrink-0 flex-col items-end gap-1">
       <Button
-        variant="outline"
+        variant="slate"
         aria-label={editLabel}
         data-editing={editing.isActive ? '' : undefined}
         data-error={hint?.tone === 'bad' ? '' : undefined}
         onClick={editing.handleOpen}
         onKeyDown={editing.isActive ? handleKeyDown : undefined}
         onBlur={editing.isActive ? stop : undefined}
-        className="h-8 min-w-field justify-center gap-1 px-2 data-editing:border-primary/60 data-editing:bg-primary/8 data-editing:ring-2 data-editing:ring-ring data-error:border-destructive/45"
+        className="h-8 min-w-field justify-center gap-1 px-2 data-editing:border-leaf data-editing:ring-2 data-editing:ring-cream/45 data-error:border-flame/60"
       >
         {parts.length === 0 ? (
-          <span className="text-log font-normal text-muted-foreground">
+          <span className="text-log font-normal text-khaki">
             {editing.isActive ? t`Appuyez sur vos touches` : t`Aucune`}
           </span>
         ) : (
@@ -105,7 +105,7 @@ export const ShortcutField = ({
         <p
           data-tone={hint.tone}
           role={hint.tone === 'bad' ? 'alert' : undefined}
-          className="max-w-60 text-right text-mini text-muted-foreground data-[tone=bad]:text-destructive"
+          className="text-right text-aside text-khaki data-[tone=bad]:text-flame"
         >
           {hint.text}
         </p>

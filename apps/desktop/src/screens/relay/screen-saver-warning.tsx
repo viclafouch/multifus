@@ -15,7 +15,7 @@ type ScreenSaverWarningProps = Readonly<{
 
 export const ScreenSaverWarning = ({ seconds }: ScreenSaverWarningProps) => {
   return (
-    <Panel className="mb-3">
+    <Panel>
       <div className="flex items-start gap-3 px-4 py-3.5">
         <TriangleAlert
           aria-hidden
@@ -23,10 +23,10 @@ export const ScreenSaverWarning = ({ seconds }: ScreenSaverWarningProps) => {
           strokeWidth={1.9}
         />
         <div className="flex min-w-0 flex-1 flex-col gap-1">
-          <h2 className="text-row font-medium">
+          <h2 className="text-tale font-medium">
             {t`Votre écran de veille peut tout arrêter`}
           </h2>
-          <p className="max-w-prose text-note text-muted-foreground">
+          <p className="max-w-tale text-aside text-muted-foreground">
             {screenSaverLine(seconds)}
           </p>
         </div>

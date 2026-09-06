@@ -55,7 +55,7 @@ export const ReplyRow = ({
   }
 
   return (
-    <li className="group flex items-start gap-3 border-b border-border/70 px-4 py-3 last:border-b-0">
+    <li className="group flex items-start gap-3 border-b border-band/25 px-4 py-3 last:border-b-0">
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <Input
           value={draft}
@@ -67,10 +67,10 @@ export const ReplyRow = ({
           }}
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}
-          className="h-8 font-display text-row"
+          className="h-9 text-tale"
         />
         {draft.length === 0 ? (
-          <p className="px-1 text-mini text-muted-foreground">
+          <p className="px-1 text-aside text-khaki">
             {t`Sans texte, il n’y aura rien à coller.`}
           </p>
         ) : null}

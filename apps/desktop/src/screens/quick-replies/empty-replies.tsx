@@ -1,8 +1,7 @@
-import { Plus } from 'lucide-react'
 import { t } from '@lingui/core/macro'
 import { KeyCap } from '@/components/key-cap'
 import { EmptyState } from '@/components/layout/empty-state'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/retro/button'
 import { acceleratorParts } from '@/helpers/accelerator'
 
 const EXAMPLE_ACCELERATOR = 'Control+Alt+KeyB'
@@ -18,8 +17,7 @@ export const EmptyReplies = ({ handleAdd }: EmptyRepliesProps) => {
       body={t`Une réponse, des touches, et vous ne la retapez plus de la soirée.`}
       mark={<ReplyMark />}
     >
-      <Button variant="secondary" size="sm" onClick={handleAdd}>
-        <Plus aria-hidden />
+      <Button variant="slate" size="sm" onClick={handleAdd}>
         {t`Ajouter une réponse`}
       </Button>
     </EmptyState>
@@ -34,7 +32,7 @@ const ReplyMark = () => {
           return <KeyCap key={part} token={part} />
         })}
       </span>
-      <span className="font-display text-row">{t`Bon jeu à toi !`}</span>
+      <span className="text-tale text-khaki">{t`Bon jeu à toi !`}</span>
     </span>
   )
 }

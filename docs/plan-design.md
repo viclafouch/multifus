@@ -122,7 +122,7 @@ Il est relevé, écrit et figé dans
 fonte, chaque matière, ce qui a été écarté, les huit règles, et ce qu'il reste à
 relever pour les écrans qui viennent. Ce plan ne le répète pas.
 
-## La prise en main est livrée
+## La mise en route est livrée
 
 Six scènes, un décor du jeu en plein cadre par étape, un carton de chapitre au
 milieu, puis la plaque qui se déplie et son contenu qui monte cran par cran.
@@ -143,9 +143,48 @@ Les cinq premiers sont recadrés en 4:3 depuis
 `static.ankama.com/dofus-retro/www/modules/mmorpg/discover/assets/screens/screenN.jpg`,
 le sixième depuis
 `static.ankama.com/upload/backoffice/direct/2021-02-22/827fd3d564a0507051826a7fcf5f5e18.png`.
-608 ko à eux six, en WebP, dans `apps/desktop/src/assets/ankama/`. Ils portent le
-logo Dofus Retro d'Ankama incrusté, et la mention de droits est répétée sous la
-clôture. La [licence](../LICENSE) exclut le dossier du MIT.
+Ils portent le logo Dofus Retro d'Ankama incrusté, et la mention de droits est
+répétée sous la clôture. La [licence](../LICENSE) exclut le dossier du MIT.
+
+### Les trois décors ajoutés pour le monde
+
+Donnés par Victor le 5 septembre 2026, depuis
+`static.ankama.com/upload/backoffice/direct/`.
+
+| Fichier         | Source                    | Ce qu'il porte                               |
+| --------------- | ------------------------- | -------------------------------------------- |
+| `dolmen.webp`   | `2026-06-24/d865ca61…png` | quatre menhirs autour d'une dalle pavée      |
+| `workshop.webp` | `2023-03-21/04ba16cf…png` | un atelier : l'enclume, la scie, les potions |
+| `battle.webp`   | `2025-02-10/3620d31a…png` | un champ de bataille, braseros et ossements  |
+
+**Un quatrième a été écarté**, `2020-12-03/e01dbec5…png` : c'est un montage de
+presse KrosmoNote, cinq vignettes séparées par des traits blancs, avec le
+filigrane Ankama. Chaque vignette fait 635 × 360, soit un agrandissement de 2,4
+pour remplir une fenêtre de 1100. Un fond ne se prend pas dans un montage.
+
+### Comment un décor est choisi
+
+Deux questions, dans cet ordre : **est-ce qu'il dit ce que la map fait**, et
+**est-ce qu'un texte s'y lit**. Les deux comptent, et le premier passe devant.
+
+| Map                | Décor           | Ce qu'il dit                                      |
+| ------------------ | --------------- | ------------------------------------------------- |
+| Accueil            | `dolmen.webp`   | la dalle porte la team                            |
+| Personnages        | `camp.webp`     | un camp bondé : votre roster au complet           |
+| Raccourcis         | `village.webp`  | la place du village, on va d'une maison à l'autre |
+| Réponses rapides   | `harbour.webp`  | le quai : c'est là qu'on se parle                 |
+| AutoFocus          | `battle.webp`   | le combat, et c'est à votre tour                  |
+| Déplacement rapide | `forest.webp`   | la grille de déplacement, sous les arbres         |
+| La roue            | `arena.webp`    | l'arène : on choisit son combattant               |
+| Tableau des runes  | `workshop.webp` | l'atelier du forgemage, l'enclume et les runes    |
+| Messages privés    | `pen.webp`      | l'enclos, loin de la foule, où un mot vous trouve |
+| Paramètres         | `workshop.webp` | l'atelier, encore : c'est là qu'on règle          |
+| À propos           | `village.webp`  | le village, d'où le projet vient                  |
+
+**Les décors sombres vont aux maps qui parlent le plus.** `battle` et `workshop`
+sont les deux plus sombres et les moins saturés, et ce sont AutoFocus, Tableau
+des runes et Paramètres qui portent le plus de lignes. `camp` et `arena`, les
+plus chargés, vont là où il y a le moins à lire.
 
 ## Ce qui vient : tout le reste du logiciel
 

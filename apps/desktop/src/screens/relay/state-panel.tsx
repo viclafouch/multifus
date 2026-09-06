@@ -2,8 +2,8 @@ import { t } from '@lingui/core/macro'
 import type { RelayLiveState, RelayStatus } from '@/@types/relay'
 import type { Snapshot } from '@/@types/snapshot'
 import { Panel } from '@/components/layout/panel'
+import { Tick } from '@/components/retro/tick'
 import { StateBadge } from '@/components/state-badge'
-import { Switch } from '@/components/ui/switch'
 import { relayFailureLine } from '@/helpers/wording'
 import { setRelayActive } from '@/lib/multifus'
 
@@ -27,12 +27,14 @@ export const StatePanel = ({ relay, run }: StatePanelProps) => {
       <section className="flex items-start gap-5 px-4 py-3.5">
         <div className="flex min-w-0 flex-1 flex-col items-start gap-1.5">
           <StateBadge>{lines.badge}</StateBadge>
-          <h2 className="text-pretty text-row font-medium">{switchLabel}</h2>
-          <p className="max-w-prose text-pretty text-note text-muted-foreground">
+          <h2 className="text-pretty text-tale font-medium text-cream">
+            {switchLabel}
+          </h2>
+          <p className="max-w-tale text-pretty text-aside text-khaki">
             {lines.body}
           </p>
         </div>
-        <Switch
+        <Tick
           checked={relay.active}
           aria-label={switchLabel}
           aria-busy={relay.switch.kind === 'starting'}
@@ -47,7 +49,7 @@ export const StatePanel = ({ relay, run }: StatePanelProps) => {
         <p
           id="relay-switch"
           role="alert"
-          className="border-t border-border/70 px-4 py-2.5 text-note text-destructive"
+          className="border-t border-band/25 px-4 py-2.5 text-aside text-flame"
         >
           {relayFailureLine(failure)}
         </p>

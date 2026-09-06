@@ -49,15 +49,15 @@ export const EmptyRoster = () => {
           return (
             <li
               key={step.title}
-              className="flex flex-col gap-1.5 rounded-lg border border-border bg-card/45 p-3.5 text-left"
+              className="flex flex-col gap-1.5 rounded-lg border border-band/30 bg-iron/45 p-3.5 text-left"
             >
-              <span className="font-mono text-log tabular-nums text-primary/80">
+              <span className="font-mono text-log tabular-nums text-khaki/60">
                 {String(index + 1).padStart(2, '0')}
               </span>
-              <span className="text-row font-medium">{step.title}</span>
-              <span className="text-note text-muted-foreground">
-                {step.line}
+              <span className="text-tale font-medium text-cream">
+                {step.title}
               </span>
+              <span className="text-aside text-khaki">{step.line}</span>
             </li>
           )
         })}
@@ -75,7 +75,7 @@ const TeamMark = () => {
             key={portrait.class}
             alt=""
             src={CLASS_PORTRAITS[portrait.class][portrait.gender]}
-            className="size-12 rounded-full border-2 border-background bg-card object-cover ring-1 ring-border"
+            className="size-12 rounded-full border-2 border-iron bg-slate object-cover ring-1 ring-band/45"
           />
         )
       })}

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { ScreenName } from '@/@types/snapshot'
 import { FEATURES } from '@/constants/features'
-import { NAV_ITEMS } from '@/constants/navigation'
+import { MAPS } from '@/constants/world'
 
 const OUTSIDE_THE_ROLL = [
   'settings',
@@ -23,9 +23,9 @@ const matchIsExpected = (name: ScreenName) => {
 const missingFromRoll = () => {
   const missing = []
 
-  for (const item of NAV_ITEMS) {
-    if (matchIsExpected(item.name) && !SHOWN_SCREENS.has(item.name)) {
-      missing.push(item.name)
+  for (const name of MAPS) {
+    if (matchIsExpected(name) && !SHOWN_SCREENS.has(name)) {
+      missing.push(name)
     }
   }
 
@@ -33,7 +33,7 @@ const missingFromRoll = () => {
 }
 
 describe('les fonctionnalités du générique', () => {
-  it('nomment tout ce que la barre de gauche ouvre, les réglages mis à part', () => {
+  it('nomment toutes les maps du monde, les réglages mis à part', () => {
     expect(missingFromRoll()).toStrictEqual([])
   })
 

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/retro/button'
 import { cn } from '@/lib/utils'
 
 type ColorSwatchProps = Readonly<{
@@ -27,7 +27,7 @@ export const ColorSwatch = ({
 }: ColorSwatchProps) => {
   return (
     <Button
-      variant="ghost"
+      variant="bare"
       aria-pressed={isWorn}
       aria-label={label}
       className="size-auto rounded-full p-1.5 hover:bg-transparent"

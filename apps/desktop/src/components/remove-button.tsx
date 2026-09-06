@@ -1,5 +1,4 @@
-import { X } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/retro/button'
 import { cn } from '@/lib/utils'
 
 type RemoveButtonProps = Readonly<{
@@ -15,16 +14,16 @@ export const RemoveButton = ({
 }: RemoveButtonProps) => {
   return (
     <Button
-      variant="ghost"
-      size="icon-xs"
+      variant="bare"
+      size="icon-tight"
       aria-label={label}
       onClick={onRemove}
       className={cn(
-        'text-muted-foreground/50 opacity-0 group-hover:opacity-100 hover:text-destructive focus-visible:opacity-100',
+        'text-bar leading-none text-khaki/55 opacity-0 group-hover:opacity-100 hover:text-flame focus-visible:opacity-100',
         className
       )}
     >
-      <X strokeWidth={2.2} />
+      <span aria-hidden>×</span>
     </Button>
   )
 }

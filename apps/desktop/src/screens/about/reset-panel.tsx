@@ -1,9 +1,9 @@
 import React from 'react'
-import { RotateCcw } from 'lucide-react'
 import { t } from '@lingui/core/macro'
 import type { Snapshot } from '@/@types/snapshot'
 import { Panel } from '@/components/layout/panel'
 import { SectionRow } from '@/components/layout/section-row'
+import { Button } from '@/components/retro/button'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,7 +14,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from '@/components/ui/alert-dialog'
-import { Button } from '@/components/ui/button'
 import { reset } from '@/lib/multifus'
 
 type ResetPanelProps = Readonly<{
@@ -31,13 +30,12 @@ export const ResetPanel = ({ run }: ResetPanelProps) => {
         description={t`Multifus repart comme au premier lancement. Vos personnages Dofus Retro ne risquent rien.`}
       >
         <Button
-          variant="destructive"
+          variant="flame"
           size="sm"
           onClick={() => {
             setIsConfirming(true)
           }}
         >
-          <RotateCcw aria-hidden />
           {t`Tout réinitialiser`}
         </Button>
       </SectionRow>

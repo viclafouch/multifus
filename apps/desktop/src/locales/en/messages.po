@@ -62,9 +62,13 @@ msgstr "{combination} unreadable ({detail})"
 msgid "{combination} refusé ({detail})"
 msgstr "{combination} refused ({detail})"
 
+#: src/components/world/dolmen.tsx
+msgid "{connected, plural, one {# connecté} other {# connectés}}"
+msgstr "{connected, plural, one {# online} other {# online}}"
+
 #: src/components/nav-rail.tsx
-msgid "{connected, plural, one {# personnage connecté} other {# personnages connectés}}"
-msgstr "{connected, plural, one {# character online} other {# characters online}}"
+#~ msgid "{connected, plural, one {# personnage connecté} other {# personnages connectés}}"
+#~ msgstr "{connected, plural, one {# character online} other {# characters online}}"
 
 #: src/screens/onboarding/index.tsx
 #~ msgid "{count, plural, one {# étape, comme au premier lancement.} other {# étapes, dans l’ordre, comme au premier lancement.}}"
@@ -149,6 +153,10 @@ msgstr "{names} have no sex: they will not move."
 #: src/helpers/journal.ts
 msgid "{nickname} : message privé relayé sur le téléphone."
 msgstr "{nickname}: private message sent to the phone."
+
+#: src/components/world/head.tsx
+#~ msgid "{nickname} · {line}"
+#~ msgstr "{nickname} · {line}"
 
 #: src/components/main-toggle.tsx
 msgid "{nickname} comme personnage principal"
@@ -306,8 +314,7 @@ msgstr "Stopped"
 msgid "À l’écoute du jeu"
 msgstr "Listening to the game"
 
-#: src/constants/navigation.ts
-#: src/screens/about/index.tsx
+#: src/constants/world.ts
 msgid "À propos"
 msgstr "About"
 
@@ -315,7 +322,7 @@ msgstr "About"
 msgid "À quoi sert un robot Telegram ?"
 msgstr "What is a Telegram bot for?"
 
-#: src/components/nav-rail.tsx
+#: src/components/world/way-list.tsx
 msgid "À régler"
 msgstr "To fix"
 
@@ -434,8 +441,8 @@ msgid "Allume le clic qui emmène toute la team d’une map à l’autre."
 msgstr "Turns on the click that walks the whole team from one map to the next."
 
 #: src/screens/walk-screen/state-panel.tsx
-msgid "Allume sans quitter le jeu."
-msgstr "Turns it on without leaving the game."
+#~ msgid "Allume sans quitter le jeu."
+#~ msgstr "Turns it on without leaving the game."
 
 #: src/components/language-picker.tsx
 #: src/screens/about/reset-panel.tsx
@@ -509,8 +516,7 @@ msgstr "No reply stored"
 msgid "Aucune version plus récente."
 msgstr "No newer version."
 
-#: src/constants/navigation.ts
-#: src/screens/auto-focus-screen.tsx
+#: src/constants/world.ts
 msgid "AutoFocus"
 msgstr "AutoFocus"
 
@@ -728,12 +734,20 @@ msgid "Changer la langue"
 msgstr "Change the language"
 
 #: src/screens/shortcuts/index.tsx
-msgid "Changez de personnage sans lâcher la souris. Ces touches ne marchent que dans Dofus Retro."
-msgstr "Switch character without letting go of the mouse. These keys only work inside Dofus Retro."
+#~ msgid "Changez de personnage sans lâcher la souris. Ces touches ne marchent que dans Dofus Retro."
+#~ msgstr "Switch character without letting go of the mouse. These keys only work inside Dofus Retro."
+
+#: src/screens/shortcuts/index.tsx
+msgid "Changez de personnage sans lâcher la souris. Ces touches ne marchent que dans le jeu."
+msgstr "Switch character without letting go of the mouse. These keys only work inside the game."
 
 #: src/screens/settings/index.tsx
 msgid "Chaque client garde son bouton au lieu d’être empilé avec les autres."
 msgstr "Each client keeps its own button instead of being stacked with the others."
+
+#: src/components/world/wayfare.tsx
+#~ msgid "Chargement de la carte ..."
+#~ msgstr "Loading map ..."
 
 #: src/constants/runes.ts
 msgid "Chasse"
@@ -955,7 +969,7 @@ msgstr "Made-up characters here and in the try-out, yours in the game. One slide
 msgid "Déconnecté"
 msgstr "Offline"
 
-#: src/components/retro/scene.tsx
+#: src/components/retro/scene-credit.tsx
 msgid "Décor © Ankama Games. Multifus n’est pas un logiciel d’Ankama."
 msgstr "Artwork © Ankama Games. Multifus is not an Ankama product."
 
@@ -999,10 +1013,9 @@ msgstr "Starting at login is off, nothing registered."
 msgid "Déplacement annulé. {nickname} reste à sa place."
 msgstr "Move cancelled. {nickname} stays where they were."
 
-#: src/constants/navigation.ts
 #: src/constants/shortcuts.ts
+#: src/constants/world.ts
 #: src/screens/banner-screen/banner-pill.tsx
-#: src/screens/walk-screen/index.tsx
 #: src/screens/walk-screen/state-panel.tsx
 msgid "Déplacement rapide"
 msgstr "Quick move"
@@ -1132,13 +1145,17 @@ msgstr "Write “hello” to your bot"
 msgid "Écrivez-lui /newbot et répondez à ses questions, il parle anglais. Ce robot sera le contact qui vous écrira."
 msgstr "Write /newbot to it and answer its questions. This bot will be the contact that writes to you."
 
+#: src/screens/walk-screen/banner-dialog.tsx
+msgid "Elle dit sur quel personnage vous venez d’arriver."
+msgstr "It says which character you have just landed on."
+
 #: src/helpers/onboarding.ts
 #~ msgid "Elle retient les notifications. Multifus devient sourd, votre percepteur se fait taper à l’autre bout du monde, et vous ne l’apprenez qu’en rentrant."
 #~ msgstr "It holds notifications back. Multifus goes deaf, your tax collector gets hit on the other side of the world, and you only find out when you come home."
 
 #: src/screens/walk-screen/banner-panel.tsx
-msgid "Elle s’affiche tant que le Déplacement rapide est allumé, et dit sur quel personnage vous venez d’arriver."
-msgstr "It shows for as long as Quick move is on, and tells you which character you have just landed on."
+#~ msgid "Elle s’affiche tant que le Déplacement rapide est allumé, et dit sur quel personnage vous venez d’arriver."
+#~ msgstr "It shows for as long as Quick move is on, and tells you which character you have just landed on."
 
 #: src/screens/walk-screen/corner-picker.tsx
 msgid "En bas à droite"
@@ -1422,6 +1439,10 @@ msgstr "Log copied"
 msgid "L’aperçu"
 msgstr "The preview"
 
+#: src/constants/world.ts
+#~ msgid "L'appel"
+#~ msgstr "The call"
+
 #: src/screens/onboarding/proof-band.tsx
 #~ msgid "L’appel du jeu"
 #~ msgstr "The call from the game"
@@ -1442,7 +1463,7 @@ msgstr "AutoFocus cannot work"
 msgid "L’autorisation"
 msgstr "Permission"
 
-#: src/screens/walk-screen/banner-panel.tsx
+#: src/screens/walk-screen/banner-dialog.tsx
 msgid "L’écran"
 msgstr "The screen"
 
@@ -1454,7 +1475,7 @@ msgstr "This screen stopped"
 msgid "L’essai"
 msgstr "The try"
 
-#: src/screens/walk-screen/banner-panel.tsx
+#: src/screens/walk-screen/banner-dialog.tsx
 msgid "La bannière"
 msgstr "The banner"
 
@@ -1477,6 +1498,10 @@ msgstr "The tray is not reliable"
 #: src/constants/journal.ts
 msgid "La bascule du Déplacement rapide"
 msgstr "The Quick move switch"
+
+#: src/constants/world.ts
+#~ msgid "La clairière"
+#~ msgstr "The clearing"
 
 #: src/helpers/onboarding.ts
 msgid "La concentration"
@@ -1522,6 +1547,10 @@ msgstr "The Multifus language"
 msgid "La lecture des fenêtres"
 msgstr "Reading the windows"
 
+#: src/constants/world.ts
+#~ msgid "La main"
+#~ msgstr "The hand"
+
 #: src/helpers/wording.ts
 msgid "La mise à jour a échoué : {detail}"
 msgstr "The update failed: {detail}"
@@ -1559,7 +1588,8 @@ msgid "La roue au milieu de votre écran"
 msgstr "The wheel in the middle of your screen"
 
 #: src/constants/features.ts
-#: src/screens/wheel/index.tsx
+#: src/constants/shortcuts.ts
+#: src/constants/world.ts
 msgid "La roue des personnages"
 msgstr "The character wheel"
 
@@ -1634,6 +1664,10 @@ msgstr "Lavender"
 #: src/screens/auto-focus-screen.tsx
 msgid "Le bon personnage s’affiche tout seul."
 msgstr "The right character shows up on its own."
+
+#: src/constants/world.ts
+#~ msgid "Le camp"
+#~ msgstr "The camp"
 
 #: src/helpers/wording.ts
 msgid "Le code est bon. Il ne manque que l’étape 4, votre « salut » au robot."
@@ -1736,6 +1770,14 @@ msgstr "The real table, laid in the middle of Multifus. One slider for the size,
 msgid "Lecture des fenêtres impossible"
 msgstr "The windows could not be read"
 
+#: src/components/world/way-list.tsx
+#~ msgid "Les écrans de Multifus"
+#~ msgstr "The screens of Multifus"
+
+#: src/constants/world.ts
+#~ msgid "Les fenêtres"
+#~ msgstr "The windows"
+
 #: src/constants/features.ts
 msgid "Les fenêtres agrandies"
 msgstr "Maximised windows"
@@ -1747,6 +1789,10 @@ msgstr "The light ones"
 #: src/constants/runes.ts
 msgid "Les lourdes"
 msgstr "The heavy ones"
+
+#: src/components/world/way-list.tsx
+msgid "Les maps de Multifus"
+msgstr "Multifus maps"
 
 #: src/constants/features.ts
 msgid "Les messages privés"
@@ -1781,12 +1827,16 @@ msgid "Les raccourcis ne sont pas fiables"
 msgstr "The shortcuts are not reliable"
 
 #: src/screens/onboarding/index.tsx
+msgid "Les réglages à faire une fois, repris un par un. Rien de ce qui est déjà en place ne s’annule."
+msgstr "The one-time settings, walked through again one by one. Nothing already in place is undone."
+
+#: src/screens/onboarding/index.tsx
 #~ msgid "Les réglages à faire une fois. Multifus vérifie ce qu’il peut lire."
 #~ msgstr "The settings to do once. Multifus checks what it can read."
 
 #: src/screens/onboarding/index.tsx
-msgid "Les réglages à faire une fois. Multifus vous prévient s’il en voit un qui bloque."
-msgstr "The settings to do once. Multifus warns you if it sees one of them blocking."
+#~ msgid "Les réglages à faire une fois. Multifus vous prévient s’il en voit un qui bloque."
+#~ msgstr "The settings to do once. Multifus warns you if it sees one of them blocking."
 
 #: src/screens/quick-replies/index.tsx
 msgid "Les réponses que vous retapez tous les soirs, rangées sous des touches. Frappez-les dans Dofus Retro, Multifus colle le texte là où vous écrivez."
@@ -1872,8 +1922,7 @@ msgstr "Test message sent to the phone."
 msgid "Message privé"
 msgstr "Private message"
 
-#: src/constants/navigation.ts
-#: src/screens/relay/index.tsx
+#: src/constants/world.ts
 msgid "Messages privés"
 msgstr "Private messages"
 
@@ -1933,6 +1982,10 @@ msgstr "Show the settings file"
 #: src/components/journal-panel.tsx
 msgid "Montrer le fichier du journal"
 msgstr "Show the log file"
+
+#: src/constants/world.ts
+msgid "Multifus"
+msgstr "Multifus"
 
 #: src/helpers/journal.ts
 msgid "Multifus {version} a démarré sur {system}, au démarrage de la session."
@@ -2194,6 +2247,10 @@ msgstr "Open the Dofus {options} and tick the box. Without it, the client goes s
 msgid "Ouvrez Telegram sur cet ordinateur"
 msgstr "Open Telegram on this computer"
 
+#: src/components/world/dolmen.tsx
+msgid "Ouvrez un client Dofus : votre personnage viendra se poser ici."
+msgstr "Open a Dofus client: your character will come and stand here."
+
 #: src/helpers/wording.ts
 msgid "Ouvrir {name}"
 msgstr "Open {name}"
@@ -2243,8 +2300,7 @@ msgstr "AP"
 msgid "Pandawa"
 msgstr "Pandawa"
 
-#: src/constants/navigation.ts
-#: src/screens/settings/index.tsx
+#: src/constants/world.ts
 msgid "Paramètres"
 msgstr "Settings"
 
@@ -2277,14 +2333,12 @@ msgstr "Switch Multifus to {name}?"
 msgid "Percepteur"
 msgstr "Perceptor"
 
-#: src/components/main-star.tsx
+#: src/components/main-mark.tsx
 #: src/constants/shortcuts.ts
 msgid "Personnage principal"
 msgstr "Main character"
 
-#: src/constants/navigation.ts
-#: src/screens/authorization-screen.tsx
-#: src/screens/characters-screen.tsx
+#: src/constants/world.ts
 #: src/screens/wheel/size-panel.tsx
 msgid "Personnages"
 msgstr "Characters"
@@ -2325,9 +2379,13 @@ msgstr "To pick a row up, press the space bar. Move it with the arrow keys. Pres
 msgid "principal"
 msgstr "main"
 
+#: src/components/world/head.tsx
+msgid "Principal"
+msgstr "Main"
+
 #: src/screens/onboarding/index.tsx
-msgid "Prise en main"
-msgstr "Getting started"
+#~ msgid "Prise en main"
+#~ msgstr "Getting started"
 
 #: src/constants/runes.ts
 msgid "Prospection"
@@ -2395,8 +2453,7 @@ msgstr "Shortcut of {nickname}: their window comes to the front."
 msgid "Raccourci de {nickname} : vous y êtes déjà."
 msgstr "Shortcut of {nickname}: you are already there."
 
-#: src/constants/navigation.ts
-#: src/screens/shortcuts/index.tsx
+#: src/constants/world.ts
 msgid "Raccourcis"
 msgstr "Shortcuts"
 
@@ -2517,8 +2574,7 @@ msgstr "Quick reply not pasted: the clipboard refused the text ({detail})."
 msgid "Réponse rapide non collée : le système a refusé la combinaison de collage ({detail})."
 msgstr "Quick reply not pasted: the system refused the paste combination ({detail})."
 
-#: src/constants/navigation.ts
-#: src/screens/quick-replies/index.tsx
+#: src/constants/world.ts
 msgid "Réponses rapides"
 msgstr "Quick replies"
 
@@ -2550,6 +2606,7 @@ msgstr "Take the class away from {nickname}"
 msgid "Retirer la couleur de {nickname}"
 msgstr "Take the colour away from {nickname}"
 
+#: src/components/world/way-back.tsx
 #: src/screens/onboarding/guide.tsx
 msgid "Retour"
 msgstr "Back"
@@ -2579,8 +2636,12 @@ msgid "Revoir"
 msgstr "See again"
 
 #: src/screens/onboarding/index.tsx
-msgid "Revoir la prise en main"
-msgstr "See getting started again"
+msgid "Revoir la mise en route"
+msgstr "Go through the setup again"
+
+#: src/screens/onboarding/index.tsx
+#~ msgid "Revoir la prise en main"
+#~ msgstr "See getting started again"
 
 #: src/components/journal-panel.tsx
 msgid "Rien à signaler pour l’instant."
@@ -2606,10 +2667,9 @@ msgstr "Telegram bot removed, its token wiped from the keychain."
 msgid "Rose"
 msgstr "Pink"
 
-#: src/constants/navigation.ts
 #: src/constants/shortcuts.ts
-msgid "Roue des personnages"
-msgstr "Character wheel"
+#~ msgid "Roue des personnages"
+#~ msgstr "Character wheel"
 
 #: src/constants/roster.ts
 msgid "Rouge"
@@ -2761,10 +2821,9 @@ msgstr "held"
 msgid "Système"
 msgstr "System"
 
-#: src/constants/navigation.ts
 #: src/constants/shortcuts.ts
+#: src/constants/world.ts
 #: src/screens/rune-table-window/rune-sheet.tsx
-#: src/screens/rune-table/index.tsx
 msgid "Tableau des runes"
 msgstr "Rune table"
 
@@ -2818,8 +2877,12 @@ msgid "Texte de la réponse"
 msgstr "Text of the reply"
 
 #: src/screens/characters-screen.tsx
-msgid "Tirez une ligne par sa poignée pour changer l’ordre du défilement. Un raccourci vous ramène direct sur votre personnage principal."
-msgstr "Drag a row by its handle to change the cycle order. A shortcut takes you straight back to your main character."
+#~ msgid "Tirez une ligne par sa poignée pour changer l’ordre du défilement. Un raccourci vous ramène direct sur votre personnage principal."
+#~ msgstr "Drag a row by its handle to change the cycle order. A shortcut takes you straight back to your main character."
+
+#: src/screens/characters-screen.tsx
+msgid "Tirez une ligne pour changer l’ordre du défilement."
+msgstr "Drag a line to change the cycling order."
 
 #: src/constants/journal.ts
 msgid "Titre d’une fenêtre impossible à changer"
@@ -2886,8 +2949,12 @@ msgid "Turquoise"
 msgstr "Turquoise"
 
 #: src/screens/shortcuts/index.tsx
-msgid "Un autre logiciel peut déjà utiliser les mêmes touches. Multifus les accepte, mais rien ne se passera dans le jeu. En cas de doute, essayez le raccourci depuis Dofus Retro et regardez le journal, en bas."
-msgstr "Another program may already use the same keys. Multifus takes them, but nothing will happen in the game. When in doubt, try the shortcut from Dofus Retro and watch the log, at the bottom."
+msgid "Un autre logiciel peut déjà prendre ces touches. Multifus les accepte, mais rien ne bougera dans le jeu : essayez, et regardez le journal en bas."
+msgstr "Another program may already take these keys. Multifus accepts them, but nothing will move in the game: try it, and watch the journal below."
+
+#: src/screens/shortcuts/index.tsx
+#~ msgid "Un autre logiciel peut déjà utiliser les mêmes touches. Multifus les accepte, mais rien ne se passera dans le jeu. En cas de doute, essayez le raccourci depuis Dofus Retro et regardez le journal, en bas."
+#~ msgstr "Another program may already use the same keys. Multifus takes them, but nothing will happen in the game. When in doubt, try the shortcut from Dofus Retro and watch the log, at the bottom."
 
 #: src/screens/settings/index.tsx
 msgid "Un bouton par personnage dans la barre des tâches"
@@ -2906,8 +2973,16 @@ msgid "Un bug, une idée : c’est ici que ça se raconte."
 msgstr "A bug, an idea: this is where you tell it."
 
 #: src/screens/walk-screen/index.tsx
-msgid "Un clic déplace le personnage que vous avez devant vous, et la fenêtre du suivant prend sa place. Vous recliquez au même endroit, et toute la team change de map sans toucher au clavier."
-msgstr "One click moves the character in front of you, and the window of the next one takes its place. You click again in the same spot, and the whole team changes map without touching the keyboard."
+msgid "Un clic déplace le personnage que vous avez devant vous, et la fenêtre du suivant prend sa place."
+msgstr "One click moves the character in front of you, and the next one’s window takes its place."
+
+#: src/screens/walk-screen/index.tsx
+#~ msgid "Un clic déplace le personnage que vous avez devant vous, et la fenêtre du suivant prend sa place. Vous recliquez au même endroit, et toute la team change de map sans toucher au clavier."
+#~ msgstr "One click moves the character in front of you, and the window of the next one takes its place. You click again in the same spot, and the whole team changes map without touching the keyboard."
+
+#: src/screens/walk-screen/index.tsx
+msgid "Un clic gauche dans le jeu : le personnage marche, la fenêtre du suivant passe devant, et la bannière se pose dans le coin."
+msgstr "A left click in the game: the character walks, the next one’s window comes to the front, and the banner settles in the corner."
 
 #: src/constants/features.ts
 msgid "Un clic gauche, et toute la team change de map."
@@ -2953,13 +3028,17 @@ msgstr "A client left on the login screen has no name yet."
 msgid "Un essai vient de partir. Attendez une trentaine de secondes avant le suivant."
 msgstr "A test just went out. Wait thirty seconds or so before the next one."
 
+#: src/screens/characters-screen.tsx
+msgid "Un exclu est sauté par le défilement, le Déplacement rapide et l’AutoFocus. Ses messages privés arrivent quand même."
+msgstr "An excluded character is skipped by cycling, by Quick Move and by AutoFocus. Their private messages still arrive."
+
 #: src/screens/relay/index.tsx
 msgid "Un joueur vous écrit pendant que vous êtes ailleurs ? Son message arrive sur votre téléphone, dans Telegram. Telegram, parce que c’est gratuit et que c’est la seule messagerie qu’un logiciel peut faire parler aussi simplement."
 msgstr "A player writes to you while you are away? Their message lands on your phone, in Telegram. Telegram, because it is free and it is the only messenger a program can talk through this simply."
 
 #: src/screens/characters-screen.tsx
-msgid "Un personnage exclu est sauté par le défilement et par le Déplacement rapide, et l’AutoFocus ne le fait plus passer devant. Ses messages privés continuent d’arriver."
-msgstr "A character set aside is skipped by the cycle and by Quick move, and AutoFocus no longer brings them to the front. Their private messages keep coming."
+#~ msgid "Un personnage exclu est sauté par le défilement et par le Déplacement rapide, et l’AutoFocus ne le fait plus passer devant. Ses messages privés continuent d’arriver."
+#~ msgstr "A character set aside is skipped by the cycle and by Quick move, and AutoFocus no longer brings them to the front. Their private messages keep coming."
 
 #: src/screens/shortcuts/characters-panel.tsx
 msgid "Un personnage, une touche"
@@ -3002,8 +3081,12 @@ msgid "Une réponse, des touches, et vous ne la retapez plus de la soirée."
 msgstr "One reply, a few keys, and you never retype it for the rest of the evening."
 
 #: src/screens/shortcuts/index.tsx
-msgid "Une touche de fonction se pose seule, sans Ctrl ni Alt. Prise ici, elle ne redescend plus dans le jeu : évitez celles que vous avez posées dans les options de Dofus Retro."
-msgstr "A function key stands on its own, with no Ctrl and no Alt. Taken here, it no longer reaches the game: stay away from the ones you set in the Dofus Retro options."
+#~ msgid "Une touche de fonction se pose seule, sans Ctrl ni Alt. Prise ici, elle ne redescend plus dans le jeu : évitez celles que vous avez posées dans les options de Dofus Retro."
+#~ msgstr "A function key stands on its own, with no Ctrl and no Alt. Taken here, it no longer reaches the game: stay away from the ones you set in the Dofus Retro options."
+
+#: src/screens/shortcuts/index.tsx
+msgid "Une touche de fonction se pose seule. Prise ici, elle ne redescend plus dans le jeu."
+msgstr "A function key stands alone. Taken here, it no longer reaches the game."
 
 #: src/constants/features.ts
 #~ msgid "Une touche par personnage"

@@ -18,7 +18,7 @@ export const LABEL_SMALLEST = 9
 
 export const HUB_ROOM = 0.82
 
-export const STAR_SHARE = 0.36
+export const MARK_SHARE = 0.36
 
 export const UNKNOWN_SHARE = 0.44
 

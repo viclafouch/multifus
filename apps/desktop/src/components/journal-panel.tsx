@@ -1,12 +1,11 @@
 import React from 'react'
-import { ChevronDown, ChevronUp } from 'lucide-react'
 import { plural, t } from '@lingui/core/macro'
 import type { JournalEntry } from '@/@types/journal'
 import type { QuickReply } from '@/@types/shortcuts'
 import type { Snapshot } from '@/@types/snapshot'
 import { CopyButton } from '@/components/copy-button'
+import { Button } from '@/components/retro/button'
 import { RevealButton } from '@/components/reveal-button'
-import { Button } from '@/components/ui/button'
 import {
   journalLine,
   journalTime,
@@ -58,23 +57,18 @@ export const JournalPanel = ({ snapshot }: JournalPanelProps) => {
   }
 
   return (
-    <section className="relative shrink-0 border-t border-border bg-sidebar">
+    <section className="fixed inset-x-0 bottom-0 z-50 border-t border-band/30 bg-iron/95 backdrop-blur-sm">
       <div className="flex items-center pr-2.5">
         <h2 className="min-w-0 flex-1">
           <Button
-            variant="ghost"
+            variant="bare"
             aria-expanded={isOpen}
             onClick={handleToggle}
             title={isOpen ? t`Masquer le journal` : t`Afficher le journal`}
-            className="h-9 w-full justify-start gap-2 rounded-none px-4 text-mini tracking-micro text-muted-foreground uppercase"
+            className="h-9 w-full justify-start gap-2 rounded-none px-4 font-carve text-legend tracking-widest text-khaki uppercase"
           >
-            {isOpen ? (
-              <ChevronDown strokeWidth={2} />
-            ) : (
-              <ChevronUp strokeWidth={2} />
-            )}
             {t`Journal`}
-            <span className="ml-auto font-mono text-micro tracking-normal normal-case">
+            <span className="ml-auto font-carve text-legend tracking-wide">
               {plural(entries.length, {
                 one: '# entrée',
                 other: '# entrées'
@@ -98,7 +92,7 @@ export const JournalPanel = ({ snapshot }: JournalPanelProps) => {
         <ol
           ref={list}
           onScroll={handleScroll}
-          className="h-journal overflow-y-auto border-t border-border/70 px-4 py-2.5 font-mono text-log"
+          className="h-journal overflow-y-auto border-t border-band/25 px-4 py-2.5 font-mono text-log"
         >
           {entries.length === 0 ? (
             <li className="text-muted-foreground/70">

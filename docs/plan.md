@@ -31,7 +31,7 @@ et la publication en dépend.
 
 ## Lire le bon interrupteur des notifications de Dofus, sur Windows
 
-L'AutoFocus s'est tu une soirée entière, et la Prise en main affichait l'étape au
+L'AutoFocus s'est tu une soirée entière, et la Mise en route affichait l'étape au
 vert. Multifus lit `Enabled` sous
 `Notifications\Settings\com.dofus.d1elauncher`, une valeur qui n'existait pas.
 L'interrupteur que les Paramètres montrent est ailleurs, dans `wpndatabase.db`,

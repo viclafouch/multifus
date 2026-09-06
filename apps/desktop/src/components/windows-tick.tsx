@@ -1,24 +1,24 @@
-import { Switch } from '@/components/ui/switch'
+import { Tick } from '@/components/retro/tick'
 import { WindowsOnly } from '@/components/windows-only'
 import { IS_APPLE } from '@/constants/keyboard'
 
-type WindowsSwitchProps = Readonly<{
+type WindowsTickProps = Readonly<{
   checked: boolean
   label: string
   onCheckedChange: (checked: boolean) => void
 }>
 
-export const WindowsSwitch = ({
+export const WindowsTick = ({
   checked,
   label,
   onCheckedChange
-}: WindowsSwitchProps) => {
+}: WindowsTickProps) => {
   if (IS_APPLE) {
     return <WindowsOnly />
   }
 
   return (
-    <Switch
+    <Tick
       checked={checked}
       aria-label={label}
       onCheckedChange={onCheckedChange}

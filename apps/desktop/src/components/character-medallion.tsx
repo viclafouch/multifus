@@ -29,7 +29,7 @@ export const CharacterMedallion = ({
       )}
     >
       {portrait === null ? (
-        <span className="font-display text-heading leading-none font-semibold">
+        <span className="font-carve text-bar leading-none">
           {PORTRAIT_UNKNOWN}
         </span>
       ) : (

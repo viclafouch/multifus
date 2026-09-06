@@ -13,7 +13,7 @@ type PairingGuideProps = Readonly<{
 
 export const PairingGuide = ({ relay, run }: PairingGuideProps) => {
   return (
-    <Panel className="mb-3">
+    <Panel>
       <PanelHeader
         title={t`Relier votre téléphone`}
         description={t`Installez Telegram sur votre téléphone, puis suivez ces cinq étapes ici. Après, on n’y revient plus.`}
