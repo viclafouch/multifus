@@ -18,11 +18,16 @@
         "title": "Multifus",
         "width": 880,
         "height": 660,
-        "minWidth": 720,
-        "minHeight": 520,
+        "minWidth": 880,
+        "minHeight": 660,
+        "preventOverflow": true,
         "center": true,
         "resizable": true,
         "visible": false,
+        "theme": "Dark",
+        "titleBarStyle": "Transparent",
+        "hiddenTitle": true,
+        "generalAutofillEnabled": false,
         "backgroundColor": "#1c1a17"
       }
     ],

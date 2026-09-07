@@ -20,7 +20,7 @@ export const FeatureRoll = ({ hasLines }: FeatureRollProps) => {
                 {i18n._(feature.name)}
               </p>
               {hasLines ? (
-                <p className="text-aside text-khaki/85 short:hidden">
+                <p className="text-aside text-khaki/85">
                   {i18n._(feature.line)}
                 </p>
               ) : null}

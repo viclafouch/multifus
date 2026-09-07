@@ -40,14 +40,12 @@ export const StepPage = ({
         data-wide={isWide ? '' : undefined}
         className="plate unfurl group mx-auto w-full max-w-scene data-wide:max-w-roll"
       >
-        <div className="flex flex-col items-center gap-4 px-8 py-6 text-center group-data-wide:py-4 short:gap-2.5 short:px-6 short:py-4">
-          <h1 className="lift lift-1 limelight font-carve text-sign tracking-wide text-balance text-cream uppercase short:text-action">
+        <div className="flex flex-col items-center gap-4 px-8 py-6 text-center group-data-wide:py-4">
+          <h1 className="lift lift-1 limelight font-carve text-sign tracking-wide text-balance text-cream uppercase">
             {head.title}
           </h1>
-          {isDone ? null : (
-            <span aria-hidden className="lift lift-1 crest short:hidden" />
-          )}
-          <p className="lift lift-2 max-w-tale text-tale text-balance text-khaki short:text-aside">
+          {isDone ? null : <span aria-hidden className="lift lift-1 crest" />}
+          <p className="lift lift-2 max-w-tale text-tale text-balance text-khaki">
             {head.body}
           </p>
           {way.length === 0 ? null : (

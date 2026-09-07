@@ -87,11 +87,9 @@ pour un écran de travail, c'est la fenêtre Options du client qui répond.
     sous elle. Le texte qui glisse dessous s'efface au lieu de se cogner
 11. Le titre d'une map se pose toujours à la même hauteur, quelle que soit celle
     de ce qu'il annonce. C'est le bas qui reste vide
-12. Sous 640 px de haut, la variante `short` resserre. Rien qui porte une action
-    n'y disparaît
-13. Un écran garde une marge de hauteur : les fontes chargent en `swap`, et la
+12. Un écran garde une marge de hauteur : les fontes chargent en `swap`, et la
     page grandit de quelques pixels le temps que les vraies arrivent
-14. Un dialogue tient sa place de son composant, jamais de sa classe. Une classe
+13. Un dialogue tient sa place de son composant, jamais de sa classe. Une classe
     de position dans le `className` d'un `DialogContent` remplace le `fixed` du
     composant, `tailwind-merge` gardant la dernière : la carte retombe dans le
     flux, tout en bas du document, et le navigateur y défile pour poser le
@@ -99,46 +97,46 @@ pour un écran de travail, c'est la fenêtre Options du client qui répond.
 
 ### Le mouvement
 
-15. Rien n'est monté ni démonté au fil d'une animation. Tout est là à la première
+14. Rien n'est monté ni démonté au fil d'une animation. Tout est là à la première
     image, seules l'opacité et la translation bougent : un joueur pressé clique
     avant la fin, et un test cherche à la milliseconde zéro. Un bouton ne monte
     pas en opacité au-dessus du décor, il porte `steady` et arrive posé : son
     fond translucide laisse passer la pelouse tant que le fondu dure, et cela
     se lit comme un survol
-16. Une animation qui fait attendre ne se pose que là où on ne passe qu'une fois.
+15. Une animation qui fait attendre ne se pose que là où on ne passe qu'une fois.
     La mise en route a ses quatre secondes ; une map s'ouvre en 800 ms sans rien
     bloquer
-17. Les délais s'annulent sous `prefers-reduced-motion`, pas seulement les durées
-18. Une translation d'entrée vit dans un conteneur qui coupe, sinon elle agrandit
+16. Les délais s'annulent sous `prefers-reduced-motion`, pas seulement les durées
+17. Une translation d'entrée vit dans un conteneur qui coupe, sinon elle agrandit
     la zone défilable et la barre paraît une demi-seconde
-19. Un survol change une couleur. Le menu de l'accueil en est la seule exception,
+18. Un survol change une couleur. Le menu de l'accueil en est la seule exception,
     parce que viser une entrée y est le geste même de l'écran
 
 ### Le CSS
 
-20. Chaque `@utility` est complète et ne partage aucune base. Tailwind v4 ne les
+19. Chaque `@utility` est complète et ne partage aucune base. Tailwind v4 ne les
     émet pas dans l'ordre du fichier : deux qui posent la même propriété se
     battent, et c'est le hasard qui gagne
-21. On n'écrit pas une matière avant l'écran qui l'emploie. Une `@utility` sans
+20. On n'écrit pas une matière avant l'écran qui l'emploie. Une `@utility` sans
     appelant est une abstraction pour plus tard
-22. Aucune valeur en dur dans un composant : un jeton, ou rien. Ce qui se pose sur
+21. Aucune valeur en dur dans un composant : un jeton, ou rien. Ce qui se pose sur
     une tête se déduit de `--head`, qui rétrécit quand le roster grossit
-23. Une taille de texte du thème s'ajoute à `cn`, dans `lib/utils.ts`.
+22. Une taille de texte du thème s'ajoute à `cn`, dans `lib/utils.ts`.
     `tailwind-merge` ne connaît que les tailles de Tailwind : sans cette liste il
     lit `text-mark` comme une couleur, le `text-background` qui suit l'écrase, et
     le texte repart à la taille du navigateur sans que rien ne le dise
 
 ### Les mots et les formes
 
-24. Un bouton est du texte en Bebas capitales. Pas d'icône à côté d'un mot ; ce
+23. Un bouton est du texte en Bebas capitales. Pas d'icône à côté d'un mot ; ce
     qui reste de `lucide` est un glyphe seul, et s'en ira
-25. Bebas est la fonte de Multifus. Ce que le joueur a écrit reste en Roboto, dans
+24. Bebas est la fonte de Multifus. Ce que le joueur a écrit reste en Roboto, dans
     sa casse à lui
-26. Un corps de texte commence par un verbe, et ne parle pas par métaphore quand
+25. Un corps de texte commence par un verbe, et ne parle pas par métaphore quand
     il y a un geste à faire
-27. Un titre nomme le réglage comme le système l'écrit, et un mot que le joueur
+26. Un titre nomme le réglage comme le système l'écrit, et un mot que le joueur
     lira sur son propre écran passe entre guillemets par `quoted`
-28. Ce qui s'apprend une fois s'ouvre dans un dialogue, pas dans la plaque qui le
+27. Ce qui s'apprend une fois s'ouvre dans un dialogue, pas dans la plaque qui le
     règle. Le bouton qui le rouvre se pose sous la phrase de la map quand la
     vidéo montre la map entière, et juste au-dessus de la plaque quand elle ne
     montre que cette plaque. Jamais dans son en-tête, où il se lit comme un
@@ -149,13 +147,13 @@ pour un écran de travail, c'est la fenêtre Options du client qui répond.
 `app.tsx` pose déjà le décor, les bandes, le cartouche, le crédit et le journal.
 Une nouvelle map n'écrit que son dedans :
 
-29. `Screen` si c'est une liste, `StageScreen` si ça montre le jeu. Les deux
+28. `Screen` si c'est une liste, `StageScreen` si ça montre le jeu. Les deux
     posent `MapHeader`, donc le titre, le fronton et une phrase
-30. `Panel` par groupe, c'est le verre. `FieldRow` pour une ligne de réglage,
+29. `Panel` par groupe, c'est le verre. `FieldRow` pour une ligne de réglage,
     `Tick` pour ce qui s'allume, `Button` pour un geste
-31. Le nom de la map et son décor se déclarent dans `constants/world.ts`, et
+30. Le nom de la map et son décor se déclarent dans `constants/world.ts`, et
     `CurrentMap` la branche
-32. Ni onglet ni barre latérale : on vient de l'accueil, on y retourne par
+31. Ni onglet ni barre latérale : on vient de l'accueil, on y retourne par
     « Retour » ou par Échap
 
 Avant de dessiner, lire `CONTEXT.md` pour les mots. `frontend.md` tient React,
