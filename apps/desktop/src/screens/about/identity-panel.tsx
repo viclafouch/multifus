@@ -1,5 +1,6 @@
 import React from 'react'
 import { t } from '@lingui/core/macro'
+import logo from '@/assets/logo.png'
 import { CopyButton } from '@/components/copy-button'
 import { Panel } from '@/components/layout/panel'
 import { RevealButton } from '@/components/reveal-button'
@@ -38,12 +39,20 @@ export const IdentityPanel = ({
 }: IdentityPanelProps) => {
   return (
     <Panel>
-      <div className="flex flex-col gap-2.5 px-4 py-4">
-        <p className="font-carve text-bar tracking-wide text-cream uppercase">
-          Multifus
-        </p>
+      <div className="flex flex-col gap-3 px-4 py-4">
+        <div className="flex items-center gap-3.5">
+          <img src={logo} alt="" className="emblem size-emblem shrink-0" />
+          <div className="flex min-w-0 flex-col gap-0.5">
+            <p className="limelight font-carve text-action tracking-wide text-cream uppercase">
+              Multifus
+            </p>
+            <p className="limelight text-aside text-khaki-lit">
+              {t`Logiciel communautaire pour Dofus Retro`}
+            </p>
+          </div>
+        </div>
         <p className="max-w-tale text-tale text-khaki">
-          {t`Le multicompte confortable sur Dofus Retro : Multifus range vos fenêtres, vous jouez.`}
+          {t`Le multicompte sur Dofus Retro, sans quitter le jeu des yeux. Vos fenêtres passent devant au clavier, à la roue des personnages ou au clic, et celle qui vous appelle arrive toute seule. Un raccourci colle une réponse rapide, un autre pose le tableau des runes, et vos messages privés vous rejoignent sur votre téléphone si vous reliez Telegram.`}
         </p>
       </div>
       <dl className="flex flex-col gap-2 border-t border-band/25 px-4 py-3.5 text-tale">

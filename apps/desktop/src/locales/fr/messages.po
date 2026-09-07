@@ -1324,6 +1324,10 @@ msgstr "Envoyer un essai"
 msgid "Envoyez-vous un message maintenant, pour voir ce que ça donne dans Telegram."
 msgstr "Envoyez-vous un message maintenant, pour voir ce que ça donne dans Telegram."
 
+#: src/screens/about/identity-panel.tsx
+#~ msgid "Et si vous le voulez, vos messages privés vous rejoignent sur votre téléphone quand vous vous levez : ils vont de votre ordinateur au robot Telegram que vous avez créé, et Multifus n’en garde rien."
+#~ msgstr "Et si vous le voulez, vos messages privés vous rejoignent sur votre téléphone quand vous vous levez : ils vont de votre ordinateur au robot Telegram que vous avez créé, et Multifus n’en garde rien."
+
 #: src/screens/onboarding/guide.tsx
 msgid "Étape {rank} sur {count}"
 msgstr "Étape {rank} sur {count}"
@@ -1825,8 +1829,16 @@ msgstr "Le jeu vous appelle, sa fenêtre passe devant."
 #~ msgstr "Le monde"
 
 #: src/screens/about/identity-panel.tsx
-msgid "Le multicompte confortable sur Dofus Retro : Multifus range vos fenêtres, vous jouez."
-msgstr "Le multicompte confortable sur Dofus Retro : Multifus range vos fenêtres, vous jouez."
+#~ msgid "Le multicompte confortable sur Dofus Retro : Multifus range vos fenêtres, vous jouez."
+#~ msgstr "Le multicompte confortable sur Dofus Retro : Multifus range vos fenêtres, vous jouez."
+
+#: src/screens/about/identity-panel.tsx
+#~ msgid "Le multicompte sur Dofus Retro, sans quitter le jeu des yeux."
+#~ msgstr "Le multicompte sur Dofus Retro, sans quitter le jeu des yeux."
+
+#: src/screens/about/identity-panel.tsx
+msgid "Le multicompte sur Dofus Retro, sans quitter le jeu des yeux. Vos fenêtres passent devant au clavier, à la roue des personnages ou au clic, et celle qui vous appelle arrive toute seule. Un raccourci colle une réponse rapide, un autre pose le tableau des runes, et vos messages privés vous rejoignent sur votre téléphone si vous reliez Telegram."
+msgstr "Le multicompte sur Dofus Retro, sans quitter le jeu des yeux. Vos fenêtres passent devant au clavier, à la roue des personnages ou au clic, et celle qui vous appelle arrive toute seule. Un raccourci colle une réponse rapide, un autre pose le tableau des runes, et vos messages privés vous rejoignent sur votre téléphone si vous reliez Telegram."
 
 #: src/screens/rune-table-window/rune-sheet.tsx
 msgid "Le poids de chaque rune : la simple, la Pa, la Ra, et le poids d’un point de stat"
@@ -1985,6 +1997,7 @@ msgstr "Lire"
 msgid "Lire {source}"
 msgstr "Lire {source}"
 
+#: src/screens/about/identity-panel.tsx
 #: src/screens/clearing/index.tsx
 msgid "Logiciel communautaire pour Dofus Retro"
 msgstr "Logiciel communautaire pour Dofus Retro"
@@ -3459,6 +3472,14 @@ msgstr "Vous ne chercherez plus la bonne fenêtre"
 #: src/screens/relay/state-panel.tsx
 msgid "Vous ne raterez rien tant que Dofus Retro vous garde connecté. Un raccourci qui vous ramène sur une fenêtre coupe l’envoi, puisque vous voilà revenu."
 msgstr "Vous ne raterez rien tant que Dofus Retro vous garde connecté. Un raccourci qui vous ramène sur une fenêtre coupe l’envoi, puisque vous voilà revenu."
+
+#: src/screens/about/identity-panel.tsx
+#~ msgid "Vous passez d’un personnage à l’autre au clavier, à la roue des personnages ou au clic. Le jeu vous appelle, sa fenêtre passe devant. Un raccourci colle une réponse rapide, un autre pose le tableau des runes sur le jeu, et vos messages privés partent sur votre téléphone."
+#~ msgstr "Vous passez d’un personnage à l’autre au clavier, à la roue des personnages ou au clic. Le jeu vous appelle, sa fenêtre passe devant. Un raccourci colle une réponse rapide, un autre pose le tableau des runes sur le jeu, et vos messages privés partent sur votre téléphone."
+
+#: src/screens/about/identity-panel.tsx
+#~ msgid "Vous passez d’un personnage à l’autre au clavier, à la roue des personnages ou au clic. Le jeu vous appelle, sa fenêtre passe devant. Un raccourci colle une réponse rapide, un autre pose le tableau des runes sur le jeu."
+#~ msgstr "Vous passez d’un personnage à l’autre au clavier, à la roue des personnages ou au clic. Le jeu vous appelle, sa fenêtre passe devant. Un raccourci colle une réponse rapide, un autre pose le tableau des runes sur le jeu."
 
 #: src/screens/settings/index.tsx
 msgid "Vous repérez votre Enu à sa tête, pas à son titre."
