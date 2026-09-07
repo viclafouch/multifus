@@ -10,6 +10,7 @@ use tauri_plugin_log::TargetKind;
 use tauri_plugin_log::TimezoneStrategy;
 
 use crate::app::journal::JournalEntry;
+use crate::app::journal::JournalEvent;
 use crate::app::links;
 
 const TARGET: &str = "journal";
@@ -45,6 +46,13 @@ pub fn append(entry: &JournalEntry) {
         Err(error) => {
             log::info!(target: TARGET, r#"{{"id":{},"unwritable":"{error}"}}"#, entry.id);
         }
+    }
+}
+
+pub fn append_unnumbered(event: &JournalEvent) {
+    match serde_json::to_string(event) {
+        Ok(line) => log::info!(target: TARGET, "{line}"),
+        Err(error) => log::info!(target: TARGET, r#"{{"unwritable":"{error}"}}"#),
     }
 }
 

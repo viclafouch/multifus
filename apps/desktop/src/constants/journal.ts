@@ -40,6 +40,8 @@ export const TONES = {
   listeningLost: 'warning',
   notificationUnreadable: 'warning',
   panicked: 'warning',
+  panickedElsewhere: 'warning',
+  screenStopped: 'warning',
   characterOnline: 'neutral',
   characterOffline: 'neutral',
   roster: 'neutral',
@@ -169,7 +171,7 @@ export const TRAY_TONES = {
 
 type DetailedEventKind = Exclude<
   Extract<JournalEvent, { readonly detail: string }>['kind'],
-  'configLoadFailed'
+  'configLoadFailed' | 'panicked'
 >
 
 export const DETAILED_LINES = {
@@ -180,6 +182,8 @@ export const DETAILED_LINES = {
   trayFailed: msg`La barre système n’est pas fiable`,
   windowFailed: msg`La fenêtre de Multifus n’a pas suivi`,
   snapshotFailed: msg`La fenêtre n’a pas reçu le tableau de bord`,
+  screenStopped: msg`L’écran s’est arrêté`,
+  panickedElsewhere: msg`Une partie de Multifus a échoué brutalement`,
   startAtLoginFailed: msg`Démarrage avec la session impossible`,
   scanFailed: msg`Lecture des fenêtres impossible`,
   wakesFailed: msg`Le tour ne sera pas prévenu par le système, il passera une fois par seconde`,

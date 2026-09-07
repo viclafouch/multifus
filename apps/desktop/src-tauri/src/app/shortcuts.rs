@@ -1,6 +1,4 @@
 use std::collections::HashMap;
-use std::panic::AssertUnwindSafe;
-use std::panic::catch_unwind;
 use std::sync::mpsc;
 use std::sync::mpsc::Sender;
 use std::thread;
@@ -20,6 +18,7 @@ use crate::app::journal::ShortcutOutcome;
 use crate::app::journal::Surface;
 use crate::app::journal::WalkFrom;
 use crate::app::journal::Work;
+use crate::app::panics;
 use crate::app::quick_replies;
 use crate::app::relay;
 use crate::app::rune_table;
@@ -67,9 +66,10 @@ pub fn start(app: &AppHandle) {
 
             move || {
                 for order in told {
-                    if catch_unwind(AssertUnwindSafe(|| on_told(&app, order))).is_err() {
+                    if let Err(detail) = panics::guard(|| on_told(&app, order)) {
                         lock(&app).log_unless_repeated(JournalEvent::Panicked {
                             work: Work::Shortcuts,
+                            detail,
                         });
                     }
                 }

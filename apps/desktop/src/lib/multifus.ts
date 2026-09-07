@@ -394,6 +394,10 @@ export const dismissConfigProblem = async () => {
   return invoke<Snapshot>('dismiss_config_problem')
 }
 
+export const screenStopped = async (detail: string) => {
+  return invoke<null>('screen_stopped', { detail })
+}
+
 export const revealJournal = async () => {
   return invoke<null>('reveal_journal')
 }

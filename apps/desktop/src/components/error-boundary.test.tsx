@@ -1,8 +1,19 @@
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
-import { ErrorBoundary } from '@/components/error-boundary'
 import { lastSeenMap, rememberMap } from '@/lib/map-memory'
 import { ignore } from '@/lib/utils'
+import { pending } from '@/test-doubles'
+
+const bridge = {
+  revealJournal: vi.fn(pending),
+  screenStopped: vi.fn(pending)
+}
+
+vi.mock(import('@/lib/multifus'), () => {
+  return bridge
+})
+
+const { ErrorBoundary } = await import('@/components/error-boundary')
 
 const Broken = () => {
   throw new Error('le rendu a lâché')
@@ -41,6 +52,12 @@ describe('l’écran qui remplace la fenêtre blanche', () => {
     drawBroken()
 
     expect(screen.getByText('le rendu a lâché')).not.toBeNull()
+  })
+
+  it('écrit dans le journal, que le bouton propose ensuite d’ouvrir', () => {
+    drawBroken()
+
+    expect(bridge.screenStopped).toHaveBeenCalledWith('le rendu a lâché')
   })
 
   it('offre de recharger l’écran et d’ouvrir le journal', () => {

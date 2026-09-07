@@ -5,6 +5,7 @@ use std::sync::Arc;
 use std::sync::Mutex;
 use std::sync::MutexGuard;
 use std::sync::PoisonError;
+use std::sync::TryLockError;
 use std::time::Duration;
 use std::time::Instant;
 
@@ -1962,6 +1963,14 @@ pub fn lock(app: &AppHandle) -> MutexGuard<'_, Multifus> {
 
 pub fn hold(state: &AppState) -> MutexGuard<'_, Multifus> {
     state.lock().unwrap_or_else(PoisonError::into_inner)
+}
+
+pub fn lock_if_free(app: &AppHandle) -> Option<MutexGuard<'_, Multifus>> {
+    match app.try_state::<AppState>()?.inner().try_lock() {
+        Ok(guard) => Some(guard),
+        Err(TryLockError::Poisoned(poisoned)) => Some(poisoned.into_inner()),
+        Err(TryLockError::WouldBlock) => None,
+    }
 }
 
 #[must_use]

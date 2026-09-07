@@ -1,5 +1,3 @@
-use std::panic::AssertUnwindSafe;
-use std::panic::catch_unwind;
 use std::sync::Mutex;
 use std::sync::MutexGuard;
 use std::sync::PoisonError;
@@ -25,6 +23,7 @@ use crate::app::journal_file;
 use crate::app::links;
 use crate::app::links::SystemPage;
 use crate::app::main_window;
+use crate::app::panics;
 use crate::app::relay;
 use crate::app::rune_table;
 use crate::app::runtime;
@@ -708,8 +707,11 @@ fn start_worker(app: &AppHandle) {
 
             move || {
                 for work in works {
-                    if catch_unwind(AssertUnwindSafe(|| carry_out(&app, &work))).is_err() {
-                        lock(&app).log_unless_repeated(JournalEvent::Panicked { work: Work::Tray });
+                    if let Err(detail) = panics::guard(|| carry_out(&app, &work)) {
+                        lock(&app).log_unless_repeated(JournalEvent::Panicked {
+                            work: Work::Tray,
+                            detail,
+                        });
                     }
                 }
             }

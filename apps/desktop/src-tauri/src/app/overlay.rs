@@ -1,5 +1,3 @@
-use std::panic::AssertUnwindSafe;
-use std::panic::catch_unwind;
 use std::sync::atomic::AtomicU64;
 use std::sync::atomic::Ordering;
 use std::thread;
@@ -14,6 +12,7 @@ use tauri::WebviewWindowBuilder;
 
 use crate::app::journal::JournalEvent;
 use crate::app::journal::Work;
+use crate::app::panics;
 use crate::app::state::lock;
 
 #[derive(Debug, Default)]
@@ -112,8 +111,11 @@ impl Overlay {
             let app = app.clone();
 
             move || {
-                if catch_unwind(AssertUnwindSafe(|| work(&app))).is_err() {
-                    lock(&app).log_unless_repeated(JournalEvent::Panicked { work: panicked });
+                if let Err(detail) = panics::guard(|| work(&app)) {
+                    lock(&app).log_unless_repeated(JournalEvent::Panicked {
+                        work: panicked,
+                        detail,
+                    });
                 }
             }
         });

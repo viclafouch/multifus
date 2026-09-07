@@ -176,6 +176,10 @@ pub enum JournalEvent {
         detail: String,
     },
 
+    ScreenStopped {
+        detail: String,
+    },
+
     StartAtLoginReconciled {
         enabled: bool,
     },
@@ -186,6 +190,11 @@ pub enum JournalEvent {
 
     Panicked {
         work: Work,
+        detail: String,
+    },
+
+    PanickedElsewhere {
+        detail: String,
     },
 
     ScanFailed {

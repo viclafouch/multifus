@@ -1,6 +1,4 @@
 use std::collections::HashMap;
-use std::panic::AssertUnwindSafe;
-use std::panic::catch_unwind;
 use std::sync::Arc;
 use std::sync::Mutex;
 use std::sync::MutexGuard;
@@ -20,6 +18,7 @@ use crate::app::journal::JournalEvent;
 use crate::app::journal::WalkFrom;
 use crate::app::journal::WalkIdle;
 use crate::app::journal::Work;
+use crate::app::panics;
 use crate::app::state::AppState;
 use crate::app::state::hold;
 use crate::app::state::lock;
@@ -89,10 +88,13 @@ pub fn setup(app: &AppHandle) {
 
             move || {
                 for step in taken {
-                    if catch_unwind(AssertUnwindSafe(|| take(&app, step))).is_err() {
+                    if let Err(detail) = panics::guard(|| take(&app, step)) {
                         clicks::gate(&app).open();
 
-                        lock(&app).log_unless_repeated(JournalEvent::Panicked { work: Work::Walk });
+                        lock(&app).log_unless_repeated(JournalEvent::Panicked {
+                            work: Work::Walk,
+                            detail,
+                        });
                     }
                 }
             }

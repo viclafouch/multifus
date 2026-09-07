@@ -550,6 +550,12 @@ const CALLS = [
     }
   },
   {
+    name: 'screenStopped',
+    run: () => {
+      return multifus.screenStopped('Cannot read properties of undefined')
+    }
+  },
+  {
     name: 'revealJournal',
     run: () => {
       return multifus.revealJournal()

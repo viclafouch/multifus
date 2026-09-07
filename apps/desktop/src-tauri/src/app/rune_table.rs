@@ -1,5 +1,3 @@
-use std::panic::AssertUnwindSafe;
-use std::panic::catch_unwind;
 use std::sync::Mutex;
 use std::sync::MutexGuard;
 use std::sync::PoisonError;
@@ -22,6 +20,7 @@ use crate::app::main_window;
 use crate::app::overlay::Generation;
 use crate::app::overlay::Overlay;
 use crate::app::overlay::holds_point;
+use crate::app::panics;
 use crate::app::state::lock;
 use crate::app::state::windows;
 use crate::config::RUNE_TABLE_CLEAREST;
@@ -328,15 +327,16 @@ fn follow_foreground(app: &AppHandle) {
 
     let _posing = table.posing.lock().unwrap_or_else(PoisonError::into_inner);
 
-    let followed = catch_unwind(AssertUnwindSafe(|| match table.mode() {
+    let followed = panics::guard(|| match table.mode() {
         Mode::Hidden => {}
         Mode::Preview { .. } => follow_multifus(app),
         Mode::Posted { .. } => follow_game(app),
-    }));
+    });
 
-    if followed.is_err() {
+    if let Err(detail) = followed {
         lock(app).log_unless_repeated(JournalEvent::Panicked {
             work: Work::RuneTable,
+            detail,
         });
     }
 }

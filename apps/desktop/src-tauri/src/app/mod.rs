@@ -7,6 +7,7 @@ pub mod journal_file;
 pub mod links;
 pub mod main_window;
 pub mod overlay;
+pub mod panics;
 pub mod portraits;
 pub mod quick_replies;
 pub mod relay;
@@ -46,6 +47,8 @@ pub use state::WindowState;
 pub use view::Snapshot;
 
 pub fn setup(app: &AppHandle) -> Result<(), ConfigError> {
+    panics::watch(app);
+
     install_crypto_provider();
 
     let store = ConfigStore::for_app(app)?;

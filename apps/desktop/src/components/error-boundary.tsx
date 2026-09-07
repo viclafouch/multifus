@@ -4,7 +4,7 @@ import { t } from '@lingui/core/macro'
 import { EmptyState, EmptyStateMark } from '@/components/layout/empty-state'
 import { Button } from '@/components/retro/button'
 import { forgetMap } from '@/lib/map-memory'
-import { revealJournal } from '@/lib/multifus'
+import { revealJournal, screenStopped } from '@/lib/multifus'
 import { errorMessage, ignore } from '@/lib/utils'
 
 type ErrorBoundaryProps = Readonly<{
@@ -23,6 +23,11 @@ export class ErrorBoundary extends React.Component<
 
   static getDerivedStateFromError(error: unknown): ErrorBoundaryState {
     return { message: errorMessage(error) }
+  }
+
+  // oxlint-disable-next-line class-methods-use-this -- React n’appelle componentDidCatch que sur l’instance
+  componentDidCatch(error: unknown) {
+    screenStopped(errorMessage(error)).catch(ignore)
   }
 
   render() {

@@ -1173,16 +1173,28 @@ const JOURNAL_CASES = {
   ],
   panicked: [
     {
-      event: { kind: 'panicked', work: 'scan' },
-      line: `La lecture des fenêtres a échoué brutalement, et a repris.`
+      event: { kind: 'panicked', work: 'scan', detail: DETAIL },
+      line: `La lecture des fenêtres a échoué brutalement, et a repris (${DETAIL}).`
     },
     {
-      event: { kind: 'panicked', work: 'shortcuts' },
-      line: `La réponse à un raccourci a échoué brutalement, et a repris.`
+      event: { kind: 'panicked', work: 'shortcuts', detail: DETAIL },
+      line: `La réponse à un raccourci a échoué brutalement, et a repris (${DETAIL}).`
     },
     {
-      event: { kind: 'panicked', work: 'tray' },
-      line: `La réponse à un clic dans la barre système a échoué brutalement, et a repris.`
+      event: { kind: 'panicked', work: 'tray', detail: DETAIL },
+      line: `La réponse à un clic dans la barre système a échoué brutalement, et a repris (${DETAIL}).`
+    }
+  ],
+  panickedElsewhere: [
+    {
+      event: { kind: 'panickedElsewhere', detail: DETAIL },
+      line: `Une partie de Multifus a échoué brutalement : ${DETAIL}`
+    }
+  ],
+  screenStopped: [
+    {
+      event: { kind: 'screenStopped', detail: DETAIL },
+      line: `L’écran s’est arrêté : ${DETAIL}`
     }
   ],
   updateAvailable: [

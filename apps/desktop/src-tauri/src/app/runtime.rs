@@ -1,5 +1,3 @@
-use std::panic::AssertUnwindSafe;
-use std::panic::catch_unwind;
 use std::sync::Arc;
 use std::sync::Condvar;
 use std::sync::Mutex;
@@ -21,6 +19,7 @@ use crate::app::journal::Outcome;
 use crate::app::journal::Surface;
 use crate::app::journal::Work;
 use crate::app::main_window;
+use crate::app::panics;
 use crate::app::portraits;
 use crate::app::relay;
 use crate::app::shortcuts;
@@ -113,8 +112,11 @@ pub fn start(app: AppHandle) {
             let app = app.clone();
 
             move || loop {
-                if catch_unwind(AssertUnwindSafe(|| tick(&app))).is_err() {
-                    lock(&app).log_unless_repeated(JournalEvent::Panicked { work: Work::Scan });
+                if let Err(detail) = panics::guard(|| tick(&app)) {
+                    lock(&app).log_unless_repeated(JournalEvent::Panicked {
+                        work: Work::Scan,
+                        detail,
+                    });
                 }
 
                 wait_for_next_turn();

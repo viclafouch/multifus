@@ -146,7 +146,8 @@ export type JournalEvent =
   | { readonly kind: 'listeningLost'; readonly detail: string }
   | { readonly kind: 'notificationUnreadable'; readonly detail: string }
   | { readonly kind: 'openFailed'; readonly detail: string }
-  | { readonly kind: 'panicked'; readonly work: Work }
+  | { readonly kind: 'panicked'; readonly work: Work; readonly detail: string }
+  | { readonly kind: 'panickedElsewhere'; readonly detail: string }
   | { readonly kind: 'quickReplyFailed'; readonly reason: QuickReplyFailure }
   | { readonly kind: 'quickReplyPasted'; readonly excerpt: string }
   | { readonly kind: 'quit' }
@@ -169,6 +170,7 @@ export type JournalEvent =
       readonly bindings: readonly BoundCombination[]
     }
   | { readonly kind: 'shortcutsFailed'; readonly detail: string }
+  | { readonly kind: 'screenStopped'; readonly detail: string }
   | { readonly kind: 'snapshotFailed'; readonly detail: string }
   | { readonly kind: 'startAtLoginFailed'; readonly detail: string }
   | { readonly kind: 'startAtLoginReconciled'; readonly enabled: boolean }

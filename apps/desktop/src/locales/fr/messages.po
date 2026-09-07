@@ -291,8 +291,12 @@ msgid "{subject} : type non reconnu, rien n’a été fait."
 msgstr "{subject} : type non reconnu, rien n’a été fait."
 
 #: src/helpers/journal.ts
-msgid "{work} a échoué brutalement, et a repris."
-msgstr "{work} a échoué brutalement, et a repris."
+msgid "{work} a échoué brutalement, et a repris ({detail})."
+msgstr "{work} a échoué brutalement, et a repris ({detail})."
+
+#: src/helpers/journal.ts
+#~ msgid "{work} a échoué brutalement, et a repris."
+#~ msgstr "{work} a échoué brutalement, et a repris."
 
 #: src/constants/runes.ts
 msgid "% dommages"
@@ -1556,6 +1560,7 @@ msgid "L’écran"
 msgstr "L’écran"
 
 #: src/components/error-boundary.tsx
+#: src/constants/journal.ts
 msgid "L’écran s’est arrêté"
 msgstr "L’écran s’est arrêté"
 
@@ -3306,6 +3311,10 @@ msgstr "Un texte tout prêt, collé dans le chat."
 #: src/helpers/onboarding.ts
 #~ msgid "Une case, dans les options de Dofus. Sans elle, le client se tait dès qu’il passe derrière, et Multifus n’a plus rien à écouter."
 #~ msgstr "Une case, dans les options de Dofus. Sans elle, le client se tait dès qu’il passe derrière, et Multifus n’a plus rien à écouter."
+
+#: src/constants/journal.ts
+msgid "Une partie de Multifus a échoué brutalement"
+msgstr "Une partie de Multifus a échoué brutalement"
 
 #: src/helpers/wording.ts
 msgid "une réponse sans texte"

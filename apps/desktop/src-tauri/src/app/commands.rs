@@ -3,6 +3,7 @@ use tauri::WebviewWindow;
 
 use crate::app::autostart;
 use crate::app::banner;
+use crate::app::journal::JournalEvent;
 use crate::app::journal::RelayStop;
 use crate::app::journal::Surface;
 use crate::app::journal::WalkFrom;
@@ -551,6 +552,11 @@ pub fn dismiss_check_notice(app: AppHandle) -> Snapshot {
     lock(&app).dismiss_check_notice();
 
     runtime::emit_snapshot(&app)
+}
+
+#[tauri::command]
+pub fn screen_stopped(app: AppHandle, detail: String) {
+    lock(&app).log_unless_repeated(JournalEvent::ScreenStopped { detail });
 }
 
 #[tauri::command]

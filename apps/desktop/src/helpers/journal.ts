@@ -847,8 +847,9 @@ const runLine = (
     }
     case 'panicked': {
       const work = i18n._(WORK_LABELS[event.work])
+      const { detail } = event
 
-      return t`${work} a échoué brutalement, et a repris.`
+      return t`${work} a échoué brutalement, et a repris (${detail}).`
     }
     case 'relayFailed': {
       return relayFailedLine(event.reason)

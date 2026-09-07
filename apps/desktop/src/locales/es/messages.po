@@ -291,8 +291,12 @@ msgid "{subject} : type non reconnu, rien n’a été fait."
 msgstr "{subject}: tipo no reconocido, no se ha hecho nada."
 
 #: src/helpers/journal.ts
-msgid "{work} a échoué brutalement, et a repris."
-msgstr "{work} ha fallado en seco, y se ha recuperado."
+msgid "{work} a échoué brutalement, et a repris ({detail})."
+msgstr "{work} ha fallado en seco, y se ha recuperado ({detail})."
+
+#: src/helpers/journal.ts
+#~ msgid "{work} a échoué brutalement, et a repris."
+#~ msgstr "{work} ha fallado en seco, y se ha recuperado."
 
 #: src/constants/runes.ts
 msgid "% dommages"
@@ -1556,6 +1560,7 @@ msgid "L’écran"
 msgstr "La pantalla"
 
 #: src/components/error-boundary.tsx
+#: src/constants/journal.ts
 msgid "L’écran s’est arrêté"
 msgstr "Esta pantalla se ha parado"
 
@@ -3306,6 +3311,10 @@ msgstr "Un texto ya listo, pegado en el chat."
 #: src/helpers/onboarding.ts
 #~ msgid "Une case, dans les options de Dofus. Sans elle, le client se tait dès qu’il passe derrière, et Multifus n’a plus rien à écouter."
 #~ msgstr "Una casilla, en las opciones de Dofus. Sin ella, el cliente se calla en cuanto pasa detrás, y Multifus ya no tiene nada que escuchar."
+
+#: src/constants/journal.ts
+msgid "Une partie de Multifus a échoué brutalement"
+msgstr "Una parte de Multifus ha fallado en seco"
 
 #: src/helpers/wording.ts
 msgid "une réponse sans texte"
