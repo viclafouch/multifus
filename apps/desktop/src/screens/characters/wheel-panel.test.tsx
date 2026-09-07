@@ -20,7 +20,7 @@ const { WheelPanel } = await import('@/screens/characters/wheel-panel')
 const SIZE = wheelSizeOf()
 
 const HEADER_LINE =
-  'Maintenez vos touches depuis une fenêtre du jeu, et nulle part ailleurs. La roue s’ouvre au milieu de l’écran : visez une tête, lâchez ou cliquez, sa fenêtre passe devant.'
+  'Maintenez vos touches dans le jeu, et nulle part ailleurs. Visez une tête au milieu de l’écran, lâchez : ce personnage s’affiche.'
 
 const wheelShortcut = (accelerator: string | null): ShortcutBinding => {
   return {
@@ -73,7 +73,7 @@ const gauge = () => {
 }
 
 const crowd = () => {
-  return gaugeUnder('Le monde')
+  return gaugeUnder('Personnages')
 }
 
 describe('la plaque de la roue des personnages', () => {
@@ -138,7 +138,7 @@ describe('la plaque de la roue des personnages', () => {
       fireEvent.keyDown(crowd(), { key: 'ArrowLeft' })
     }
 
-    await screen.findByText('Tout seul')
+    await screen.findByText(String(DEMO_FEWEST))
 
     expect(namesOf()).toStrictEqual([SIZE.demo[0].nickname])
     expect(bridge.setWheelDiameter).not.toHaveBeenCalled()
@@ -153,7 +153,7 @@ describe('la plaque de la roue des personnages', () => {
       fireEvent.keyDown(crowd(), { key: 'ArrowRight' })
     }
 
-    await screen.findByText(`À ${SIZE.demo.length}`)
+    await screen.findByText(String(SIZE.demo.length))
 
     expect(namesOf()).toHaveLength(SIZE.demo.length)
   })
@@ -183,7 +183,7 @@ describe('la plaque de la roue des personnages', () => {
     crowd().focus()
     fireEvent.keyDown(crowd(), { key: 'ArrowRight' })
 
-    await screen.findByText(`À ${DEMO_USUAL + 1}`)
+    await screen.findByText(String(DEMO_USUAL + 1))
     fireEvent.click(screen.getByRole('button', { name: 'Voir en vrai' }))
 
     expect(bridge.previewWheel).toHaveBeenCalledWith(DEMO_USUAL + 1)

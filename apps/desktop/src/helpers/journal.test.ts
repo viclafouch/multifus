@@ -114,7 +114,7 @@ const QUIET_STATUSES = new Set<ShortcutStatus['kind']>([
 ])
 
 const BINDINGS_LINE =
-  'Raccourcis : « Fenêtre suivante » Control+Shift+ArrowRight · « Fenêtre précédente » non attribué · « Exclure ou réintégrer » Control+Shift+KeyS refusé (déjà prise) · « Déplacement rapide » Control+Shift+KeyX illisible (touche inconnue) · la réponse « prix libre » Control+Shift+KeyP.'
+  'Raccourcis : « Personnage suivant » Control+Shift+ArrowRight · « Personnage précédent » non attribué · « Exclure ou réintégrer » Control+Shift+KeyS refusé (déjà prise) · « Déplacement rapide » Control+Shift+KeyX illisible (touche inconnue) · la réponse « prix libre » Control+Shift+KeyP.'
 
 const ROSTER_CASES = {
   excluded: [
@@ -467,7 +467,7 @@ const SHORTCUT_CASES = {
         action: 'next',
         outcome: { outcome: 'focused', nickname: NICKNAME }
       },
-      line: 'Fenêtre suivante : Alpha au premier plan.'
+      line: 'Personnage suivant : Alpha au premier plan.'
     }
   ],
   excluded: [
@@ -497,7 +497,7 @@ const SHORTCUT_CASES = {
         action: 'next',
         outcome: { outcome: 'outsideGame' }
       },
-      line: 'Fenêtre suivante : ignoré, aucune fenêtre Dofus au premier plan.'
+      line: 'Personnage suivant : ignoré, aucune fenêtre Dofus au premier plan.'
     }
   ],
   notInRoster: [
@@ -507,7 +507,7 @@ const SHORTCUT_CASES = {
         action: 'previous',
         outcome: { outcome: 'notInRoster', nickname: NICKNAME }
       },
-      line: 'Fenêtre précédente : Alpha n’est pas encore dans le roster.'
+      line: 'Personnage précédent : Alpha n’est pas encore dans le roster.'
     }
   ],
   nobodyInCycle: [
@@ -517,7 +517,7 @@ const SHORTCUT_CASES = {
         action: 'next',
         outcome: { outcome: 'nobodyInCycle' }
       },
-      line: 'Fenêtre suivante : personne dans le défilement.'
+      line: 'Personnage suivant : personne dans le défilement.'
     }
   ],
   noMain: [
@@ -547,7 +547,7 @@ const SHORTCUT_CASES = {
         action: 'next',
         outcome: { outcome: 'noWindow', nickname: NICKNAME }
       },
-      line: 'Fenêtre suivante : la fenêtre de Alpha a disparu.'
+      line: 'Personnage suivant : la fenêtre de Alpha a disparu.'
     },
     {
       event: {
@@ -565,7 +565,7 @@ const SHORTCUT_CASES = {
         action: 'next',
         outcome: { outcome: 'focusFailed', nickname: NICKNAME, detail: DETAIL }
       },
-      line: `Fenêtre suivante : le système a refusé de ramener Alpha au premier plan (${DETAIL}).`
+      line: `Personnage suivant : le système a refusé de ramener Alpha au premier plan (${DETAIL}).`
     }
   ],
   foregroundUnknown: [
@@ -575,7 +575,7 @@ const SHORTCUT_CASES = {
         action: 'previous',
         outcome: { outcome: 'foregroundUnknown', detail: DETAIL }
       },
-      line: `Fenêtre précédente : impossible de savoir quelle fenêtre est au premier plan (${DETAIL}).`
+      line: `Personnage précédent : impossible de savoir quelle fenêtre est au premier plan (${DETAIL}).`
     }
   ]
 } as const satisfies Record<
@@ -1038,7 +1038,7 @@ const JOURNAL_CASES = {
           }
         ]
       },
-      line: 'Raccourcis : « Fenêtre suivante » Control+Shift+ArrowRight en doublon avec « Fenêtre précédente », donc inerte · « Personnage principal » aucune combinaison refusé (déjà prise).'
+      line: 'Raccourcis : « Personnage suivant » Control+Shift+ArrowRight en doublon avec « Personnage précédent », donc inerte · « Personnage principal » aucune combinaison refusé (déjà prise).'
     },
     {
       event: {
@@ -1054,7 +1054,7 @@ const JOURNAL_CASES = {
           }
         ]
       },
-      line: 'Raccourcis : une réponse sans texte Control+Shift+KeyP en doublon avec « Fenêtre suivante », donc inerte.'
+      line: 'Raccourcis : une réponse sans texte Control+Shift+KeyP en doublon avec « Personnage suivant », donc inerte.'
     }
   ],
   shortcutsFailed: [

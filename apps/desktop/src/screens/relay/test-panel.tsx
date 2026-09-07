@@ -17,7 +17,7 @@ export const TestPanel = ({ test, run }: TestPanelProps) => {
   const line = testLine(test)
 
   return (
-    <Panel className="mb-3">
+    <Panel>
       <SectionRow
         title={t`Message d’essai`}
         description={t`Envoyez-vous un message maintenant, pour voir ce que ça donne dans Telegram.`}

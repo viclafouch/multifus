@@ -54,7 +54,7 @@ export const QuickRepliesScreen = ({
   return (
     <Screen
       title={i18n._(MAP_NAMES.quickReplies)}
-      subtitle={t`Les réponses que vous retapez tous les soirs, rangées sous des touches. Frappez-les dans Dofus Retro, Multifus colle le texte là où vous écrivez.`}
+      subtitle={t`Les phrases que vous retapez tous les soirs, rangées sous une touche. Multifus les colle dans le jeu.`}
     >
       {quickReplies.length === 0 ? (
         <EmptyReplies handleAdd={handleAdd} />

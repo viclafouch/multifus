@@ -75,8 +75,12 @@ msgstr "{connected, plural, one {# connecté} other {# connectés}}"
 #~ msgstr "{count, plural, one {# étape, comme au premier lancement.} other {# étapes, dans l’ordre, comme au premier lancement.}}"
 
 #: src/screens/characters/wheel-panel.tsx
-msgid "{crowd, plural, one {Tout seul} other {À #}}"
-msgstr "{crowd, plural, one {Tout seul} other {À #}}"
+#~ msgid "{crowd, plural, one {# personnage} other {# personnages}}"
+#~ msgstr "{crowd, plural, one {# personnage} other {# personnages}}"
+
+#: src/screens/characters/wheel-panel.tsx
+#~ msgid "{crowd, plural, one {Tout seul} other {À #}}"
+#~ msgstr "{crowd, plural, one {Tout seul} other {À #}}"
 
 #: src/screens/characters/wheel-panel.tsx
 msgid "{draft} px"
@@ -351,8 +355,12 @@ msgid "Activer l’AutoFocus"
 msgstr "Activer l’AutoFocus"
 
 #: src/constants/shortcuts.ts
-msgid "Affiche les poids des runes par-dessus le jeu. Les mêmes touches les retirent."
-msgstr "Affiche les poids des runes par-dessus le jeu. Les mêmes touches les retirent."
+msgid "Affiche la roue des personnages. Lâchez sur une tête."
+msgstr "Affiche la roue des personnages. Lâchez sur une tête."
+
+#: src/constants/shortcuts.ts
+#~ msgid "Affiche les poids des runes par-dessus le jeu. Les mêmes touches les retirent."
+#~ msgstr "Affiche les poids des runes par-dessus le jeu. Les mêmes touches les retirent."
 
 #: src/components/journal-panel.tsx
 msgid "Afficher le journal"
@@ -400,8 +408,12 @@ msgid "Agrandissement des fenêtres au lancement désactivé."
 msgstr "Agrandissement des fenêtres au lancement désactivé."
 
 #: src/constants/shortcuts.ts
-msgid "Agrandit tous vos clients, même ceux ouverts avant Multifus."
-msgstr "Agrandit tous vos clients, même ceux ouverts avant Multifus."
+msgid "Agrandit tous vos clients Dofus d’un seul coup."
+msgstr "Agrandit tous vos clients Dofus d’un seul coup."
+
+#: src/constants/shortcuts.ts
+#~ msgid "Agrandit tous vos clients, même ceux ouverts avant Multifus."
+#~ msgstr "Agrandit tous vos clients, même ceux ouverts avant Multifus."
 
 #: src/screens/quick-replies/empty-replies.tsx
 #: src/screens/quick-replies/index.tsx
@@ -437,8 +449,12 @@ msgid "Allumé"
 msgstr "Allumé"
 
 #: src/constants/shortcuts.ts
-msgid "Allume le clic qui emmène toute la team d’une map à l’autre."
-msgstr "Allume le clic qui emmène toute la team d’une map à l’autre."
+#~ msgid "Allume le clic qui emmène toute la team d’une map à l’autre."
+#~ msgstr "Allume le clic qui emmène toute la team d’une map à l’autre."
+
+#: src/constants/shortcuts.ts
+msgid "Allume ou éteint le Déplacement rapide."
+msgstr "Allume ou éteint le Déplacement rapide."
 
 #: src/screens/walk-screen/state-panel.tsx
 #~ msgid "Allume sans quitter le jeu."
@@ -702,8 +718,12 @@ msgstr "Ce n’est pas en place."
 #~ msgstr "Ce qu’il faut pour que Multifus vous amène devant la bonne fenêtre. Il contrôle ce qu’il peut, et vous montre le reste."
 
 #: src/screens/settings/index.tsx
-msgid "Ce que Multifus fait pendant que vous jouez, seul ou sur demande."
-msgstr "Ce que Multifus fait pendant que vous jouez, seul ou sur demande."
+#~ msgid "Ce que Multifus fait pendant que vous jouez : tout seul, ou seulement quand vous le demandez."
+#~ msgstr "Ce que Multifus fait pendant que vous jouez : tout seul, ou seulement quand vous le demandez."
+
+#: src/screens/settings/index.tsx
+#~ msgid "Ce que Multifus fait pendant que vous jouez, seul ou sur demande."
+#~ msgstr "Ce que Multifus fait pendant que vous jouez, seul ou sur demande."
 
 #: src/helpers/wording.ts
 msgid "Ce que vous voyez à l’écran est bon, mais rien n’a été écrit sur le disque."
@@ -744,6 +764,10 @@ msgstr "Changer la langue"
 #: src/screens/shortcuts/index.tsx
 msgid "Changez de personnage sans lâcher la souris. Ces touches ne marchent que dans le jeu."
 msgstr "Changez de personnage sans lâcher la souris. Ces touches ne marchent que dans le jeu."
+
+#: src/screens/walk-screen/state-panel.tsx
+msgid "Chaque clic gauche affiche le personnage suivant."
+msgstr "Chaque clic gauche affiche le personnage suivant."
 
 #: src/screens/settings/index.tsx
 msgid "Chaque client garde son bouton au lieu d’être empilé avec les autres."
@@ -786,8 +810,8 @@ msgid "Classe retirée à {nickname}."
 msgstr "Classe retirée à {nickname}."
 
 #: src/screens/walk-screen/state-panel.tsx
-msgid "Cliquez pour déplacer, la fenêtre suivante arrive toute seule."
-msgstr "Cliquez pour déplacer, la fenêtre suivante arrive toute seule."
+#~ msgid "Cliquez pour déplacer, la fenêtre suivante arrive toute seule."
+#~ msgstr "Cliquez pour déplacer, la fenêtre suivante arrive toute seule."
 
 #: src/screens/relay/pairing-guide.tsx
 msgid "Cliquez sur Connecter"
@@ -800,6 +824,10 @@ msgstr "Cliquez sur le bouton, puis cochez Multifus dans la liste. Sans cette au
 #: src/helpers/onboarding.ts
 msgid "Cliquez sur le bouton, puis cochez Multifus dans la liste. Sans cette autorisation, il ne voit aucune fenêtre et ne ramènera personne devant vous."
 msgstr "Cliquez sur le bouton, puis cochez Multifus dans la liste. Sans cette autorisation, il ne voit aucune fenêtre et ne ramènera personne devant vous."
+
+#: src/screens/characters/roster-panel.tsx
+msgid "Cliquez une tête pour changer sa classe, son sexe ou sa couleur. Tirez une ligne pour changer l’ordre, la croix retire un déconnecté."
+msgstr "Cliquez une tête pour changer sa classe, son sexe ou sa couleur. Tirez une ligne pour changer l’ordre, la croix retire un déconnecté."
 
 #: src/screens/relay/index.tsx
 msgid "Coché, vous lisez son message dans Telegram. Décoché, vous savez seulement lequel de vos personnages a reçu un message privé."
@@ -954,8 +982,12 @@ msgid "Critique"
 msgstr "Critique"
 
 #: src/screens/shortcuts/characters-panel.tsx
-msgid "Ctrl+Maj+1 sur l’Eniripsa, Ctrl+Maj+2 sur le Sacrieur : sa fenêtre passe devant, d’où que vous veniez dans le jeu."
-msgstr "Ctrl+Maj+1 sur l’Eniripsa, Ctrl+Maj+2 sur le Sacrieur : sa fenêtre passe devant, d’où que vous veniez dans le jeu."
+msgid "Ctrl+Maj+1 sur l’Eniripsa, Ctrl+Maj+2 sur le Sacrieur : il passe devant, d’où que vous veniez dans le jeu."
+msgstr "Ctrl+Maj+1 sur l’Eniripsa, Ctrl+Maj+2 sur le Sacrieur : il passe devant, d’où que vous veniez dans le jeu."
+
+#: src/screens/shortcuts/characters-panel.tsx
+#~ msgid "Ctrl+Maj+1 sur l’Eniripsa, Ctrl+Maj+2 sur le Sacrieur : sa fenêtre passe devant, d’où que vous veniez dans le jeu."
+#~ msgstr "Ctrl+Maj+1 sur l’Eniripsa, Ctrl+Maj+2 sur le Sacrieur : sa fenêtre passe devant, d’où que vous veniez dans le jeu."
 
 #: src/helpers/onboarding.ts
 #~ msgid "Dans Dofus, ouvrez les Options et cochez la case. Sans elle, le client se tait dès qu’il passe derrière, et Multifus n’a plus rien à écouter."
@@ -1156,13 +1188,17 @@ msgstr "Écrivez « salut » à votre robot"
 msgid "Écrivez-lui /newbot et répondez à ses questions, il parle anglais. Ce robot sera le contact qui vous écrira."
 msgstr "Écrivez-lui /newbot et répondez à ses questions, il parle anglais. Ce robot sera le contact qui vous écrira."
 
+#: src/screens/walk-screen/banner-panel.tsx
+msgid "Elle affiche le personnage sur lequel vous venez d’arriver."
+msgstr "Elle affiche le personnage sur lequel vous venez d’arriver."
+
 #: src/screens/walk-screen/banner-dialog.tsx
 #~ msgid "Elle dit sur quel personnage vous venez d’arriver."
 #~ msgstr "Elle dit sur quel personnage vous venez d’arriver."
 
 #: src/screens/walk-screen/banner-panel.tsx
-msgid "Elle dit sur quel personnage vous venez d’arriver. Posez-la où elle ne cache rien du jeu."
-msgstr "Elle dit sur quel personnage vous venez d’arriver. Posez-la où elle ne cache rien du jeu."
+#~ msgid "Elle dit sur quel personnage vous venez d’arriver. Posez-la où elle ne cache rien du jeu."
+#~ msgstr "Elle dit sur quel personnage vous venez d’arriver. Posez-la où elle ne cache rien du jeu."
 
 #: src/helpers/onboarding.ts
 #~ msgid "Elle retient les notifications. Multifus devient sourd, votre percepteur se fait taper à l’autre bout du monde, et vous ne l’apprenez qu’en rentrant."
@@ -1309,8 +1345,12 @@ msgstr "Exclure toutes les femmes"
 #~ msgstr "Exclusion"
 
 #: src/screens/shortcuts/characters-panel.tsx
-msgid "F1 sur l’Eniripsa, F2 sur le Sacrieur : sa fenêtre passe devant, d’où que vous veniez dans le jeu."
-msgstr "F1 sur l’Eniripsa, F2 sur le Sacrieur : sa fenêtre passe devant, d’où que vous veniez dans le jeu."
+msgid "F1 sur l’Eniripsa, F2 sur le Sacrieur : il passe devant, d’où que vous veniez dans le jeu."
+msgstr "F1 sur l’Eniripsa, F2 sur le Sacrieur : il passe devant, d’où que vous veniez dans le jeu."
+
+#: src/screens/shortcuts/characters-panel.tsx
+#~ msgid "F1 sur l’Eniripsa, F2 sur le Sacrieur : sa fenêtre passe devant, d’où que vous veniez dans le jeu."
+#~ msgstr "F1 sur l’Eniripsa, F2 sur le Sacrieur : sa fenêtre passe devant, d’où que vous veniez dans le jeu."
 
 #: src/constants/features.ts
 msgid "F1 sur l’Eniripsa, F2 sur le Sacrieur."
@@ -1329,12 +1369,12 @@ msgid "Femmes dans le défilement et l’AutoFocus"
 msgstr "Femmes dans le défilement et l’AutoFocus"
 
 #: src/constants/shortcuts.ts
-msgid "Fenêtre précédente"
-msgstr "Fenêtre précédente"
+#~ msgid "Fenêtre précédente"
+#~ msgstr "Fenêtre précédente"
 
 #: src/constants/shortcuts.ts
-msgid "Fenêtre suivante"
-msgstr "Fenêtre suivante"
+#~ msgid "Fenêtre suivante"
+#~ msgstr "Fenêtre suivante"
 
 #: src/helpers/wording.ts
 msgid "Fenêtres illisibles"
@@ -1628,8 +1668,8 @@ msgid "La taille de vos fenêtres Dofus Retro"
 msgstr "La taille de vos fenêtres Dofus Retro"
 
 #: src/constants/shortcuts.ts
-msgid "La team s’ouvre au milieu de l’écran, vous visez une tête, vous lâchez."
-msgstr "La team s’ouvre au milieu de l’écran, vous visez une tête, vous lâchez."
+#~ msgid "La team s’ouvre au milieu de l’écran, vous visez une tête, vous lâchez."
+#~ msgstr "La team s’ouvre au milieu de l’écran, vous visez une tête, vous lâchez."
 
 #: src/screens/settings/index.tsx
 msgid "La tête de classe dans la barre des tâches"
@@ -1691,6 +1731,10 @@ msgstr "Le bon personnage s’affiche tout seul."
 #~ msgid "Le camp"
 #~ msgstr "Le camp"
 
+#: src/constants/shortcuts.ts
+#~ msgid "Le clic emmène toute la team d’une map à l’autre."
+#~ msgstr "Le clic emmène toute la team d’une map à l’autre."
+
 #: src/helpers/wording.ts
 msgid "Le code est bon. Il ne manque que l’étape 4, votre « salut » au robot."
 msgstr "Le code est bon. Il ne manque que l’étape 4, votre « salut » au robot."
@@ -1744,8 +1788,8 @@ msgid "Le jeu vous appelle, sa fenêtre passe devant."
 msgstr "Le jeu vous appelle, sa fenêtre passe devant."
 
 #: src/screens/characters/wheel-panel.tsx
-msgid "Le monde"
-msgstr "Le monde"
+#~ msgid "Le monde"
+#~ msgstr "Le monde"
 
 #: src/screens/about/identity-panel.tsx
 msgid "Le multicompte confortable sur Dofus Retro : Multifus range vos fenêtres, vous jouez."
@@ -1836,9 +1880,21 @@ msgstr "Les notifications"
 msgid "Les options de Dofus, avec la case Notifications en arrière-plan cochée"
 msgstr "Les options de Dofus, avec la case Notifications en arrière-plan cochée"
 
+#: src/screens/quick-replies/index.tsx
+msgid "Les phrases que vous retapez tous les soirs, rangées sous une touche. Multifus les colle dans le jeu."
+msgstr "Les phrases que vous retapez tous les soirs, rangées sous une touche. Multifus les colle dans le jeu."
+
 #: src/screens/rune-table/index.tsx
-msgid "Les poids des runes, affichés par-dessus le jeu. Plus besoin d’aller les chercher ailleurs pendant que vous cassez."
-msgstr "Les poids des runes, affichés par-dessus le jeu. Plus besoin d’aller les chercher ailleurs pendant que vous cassez."
+msgid "Les poids des runes par-dessus le jeu. Plus besoin d’aller les chercher ailleurs pendant un brisage."
+msgstr "Les poids des runes par-dessus le jeu. Plus besoin d’aller les chercher ailleurs pendant un brisage."
+
+#: src/screens/rune-table/index.tsx
+#~ msgid "Les poids des runes par-dessus le jeu. Plus besoin d’aller les chercher ailleurs quand vous cassez."
+#~ msgstr "Les poids des runes par-dessus le jeu. Plus besoin d’aller les chercher ailleurs quand vous cassez."
+
+#: src/screens/rune-table/index.tsx
+#~ msgid "Les poids des runes, affichés par-dessus le jeu. Plus besoin d’aller les chercher ailleurs pendant que vous cassez."
+#~ msgstr "Les poids des runes, affichés par-dessus le jeu. Plus besoin d’aller les chercher ailleurs pendant que vous cassez."
 
 #: src/constants/features.ts
 #~ msgid "Les poids des runes, posés sur la fenêtre du jeu."
@@ -1868,9 +1924,13 @@ msgstr "Les réglages à faire une fois, repris un par un. Rien de ce qui est d�
 #~ msgid "Les réglages à faire une fois. Multifus vous prévient s’il en voit un qui bloque."
 #~ msgstr "Les réglages à faire une fois. Multifus vous prévient s’il en voit un qui bloque."
 
+#: src/screens/settings/index.tsx
+msgid "Les réglages de Multifus : son démarrage, et ce qu’il change sur vos clients Dofus."
+msgstr "Les réglages de Multifus : son démarrage, et ce qu’il change sur vos clients Dofus."
+
 #: src/screens/quick-replies/index.tsx
-msgid "Les réponses que vous retapez tous les soirs, rangées sous des touches. Frappez-les dans Dofus Retro, Multifus colle le texte là où vous écrivez."
-msgstr "Les réponses que vous retapez tous les soirs, rangées sous des touches. Frappez-les dans Dofus Retro, Multifus colle le texte là où vous écrivez."
+#~ msgid "Les réponses que vous retapez tous les soirs, rangées sous des touches. Frappez-les dans Dofus Retro, Multifus colle le texte là où vous écrivez."
+#~ msgstr "Les réponses que vous retapez tous les soirs, rangées sous des touches. Frappez-les dans Dofus Retro, Multifus colle le texte là où vous écrivez."
 
 #: src/constants/features.ts
 msgid "Les réponses rapides"
@@ -1924,13 +1984,17 @@ msgstr "Maintenez la combinaison, visez une tête, lâchez."
 #~ msgid "Maintenez vos touches dans le jeu : la roue s’ouvre au milieu de l’écran. Visez une tête, lâchez ou cliquez, sa fenêtre passe devant."
 #~ msgstr "Maintenez vos touches dans le jeu : la roue s’ouvre au milieu de l’écran. Visez une tête, lâchez ou cliquez, sa fenêtre passe devant."
 
+#: src/screens/characters/wheel-panel.tsx
+msgid "Maintenez vos touches dans le jeu, et nulle part ailleurs. Visez une tête au milieu de l’écran, lâchez : ce personnage s’affiche."
+msgstr "Maintenez vos touches dans le jeu, et nulle part ailleurs. Visez une tête au milieu de l’écran, lâchez : ce personnage s’affiche."
+
 #: src/screens/characters/index.tsx
 msgid "Maintenez vos touches dans le jeu, visez une tête, lâchez : sa fenêtre passe devant sans que la souris quitte le combat."
 msgstr "Maintenez vos touches dans le jeu, visez une tête, lâchez : sa fenêtre passe devant sans que la souris quitte le combat."
 
 #: src/screens/characters/wheel-panel.tsx
-msgid "Maintenez vos touches depuis une fenêtre du jeu, et nulle part ailleurs. La roue s’ouvre au milieu de l’écran : visez une tête, lâchez ou cliquez, sa fenêtre passe devant."
-msgstr "Maintenez vos touches depuis une fenêtre du jeu, et nulle part ailleurs. La roue s’ouvre au milieu de l’écran : visez une tête, lâchez ou cliquez, sa fenêtre passe devant."
+#~ msgid "Maintenez vos touches depuis une fenêtre du jeu, et nulle part ailleurs. La roue s’ouvre au milieu de l’écran : visez une tête, lâchez ou cliquez, sa fenêtre passe devant."
+#~ msgstr "Maintenez vos touches depuis une fenêtre du jeu, et nulle part ailleurs. La roue s’ouvre au milieu de l’écran : visez une tête, lâchez ou cliquez, sa fenêtre passe devant."
 
 #: src/components/character-dialog.tsx
 msgid "Marquer {nickname} comme {label}"
@@ -2360,8 +2424,12 @@ msgid "Paramètres"
 msgstr "Paramètres"
 
 #: src/constants/shortcuts.ts
-msgid "Passe au personnage d’après, dans l’ordre de l’écran Personnages."
-msgstr "Passe au personnage d’après, dans l’ordre de l’écran Personnages."
+#~ msgid "Passe au personnage d’après, dans l’ordre de l’écran Personnages."
+#~ msgstr "Passe au personnage d’après, dans l’ordre de l’écran Personnages."
+
+#: src/constants/shortcuts.ts
+msgid "Passe au personnage d’après, dans votre ordre."
+msgstr "Passe au personnage d’après, dans votre ordre."
 
 #: src/constants/shortcuts.ts
 msgid "Passe au personnage d’avant, dans le même ordre."
@@ -2383,12 +2451,21 @@ msgstr "Passer Multifus en {name} ?"
 msgid "Percepteur"
 msgstr "Percepteur"
 
+#: src/constants/shortcuts.ts
+msgid "Personnage précédent"
+msgstr "Personnage précédent"
+
 #: src/components/main-mark.tsx
 #: src/constants/shortcuts.ts
 msgid "Personnage principal"
 msgstr "Personnage principal"
 
+#: src/constants/shortcuts.ts
+msgid "Personnage suivant"
+msgstr "Personnage suivant"
+
 #: src/constants/world.ts
+#: src/screens/characters/wheel-panel.tsx
 msgid "Personnages"
 msgstr "Personnages"
 
@@ -2419,6 +2496,10 @@ msgstr "Pods"
 #: src/screens/rune-table-window/rune-sheet.tsx
 msgid "Point"
 msgstr "Point"
+
+#: src/constants/shortcuts.ts
+msgid "Pose les poids des runes par-dessus le jeu."
+msgstr "Pose les poids des runes par-dessus le jeu."
 
 #: src/lib/drag.ts
 msgid "Pour prendre une ligne, appuyez sur la barre d’espace. Déplacez-la avec les flèches. Appuyez de nouveau sur la barre d’espace pour la poser, ou sur Échap pour annuler."
@@ -2510,8 +2591,12 @@ msgid "Raccourcis : {bound}."
 msgstr "Raccourcis : {bound}."
 
 #: src/constants/shortcuts.ts
-msgid "Ramène devant votre personnage principal, d’où que vous veniez dans le jeu."
-msgstr "Ramène devant votre personnage principal, d’où que vous veniez dans le jeu."
+#~ msgid "Ramène devant votre personnage principal, d’où que vous veniez dans le jeu."
+#~ msgstr "Ramène devant votre personnage principal, d’où que vous veniez dans le jeu."
+
+#: src/constants/shortcuts.ts
+msgid "Ramène votre principal devant, où que vous soyez."
+msgstr "Ramène votre principal devant, où que vous soyez."
 
 #: src/screens/relay/index.tsx
 msgid "Recevoir ce que le joueur a écrit"
@@ -2836,8 +2921,12 @@ msgid "Soin"
 msgstr "Soin"
 
 #: src/constants/shortcuts.ts
-msgid "Sort le personnage devant vous du défilement et de l’AutoFocus."
-msgstr "Sort le personnage devant vous du défilement et de l’AutoFocus."
+#~ msgid "Sort le personnage devant vous du défilement et de l’AutoFocus."
+#~ msgstr "Sort le personnage devant vous du défilement et de l’AutoFocus."
+
+#: src/constants/shortcuts.ts
+msgid "Sort le personnage devant vous du défilement."
+msgstr "Sort le personnage devant vous du défilement."
 
 #: src/constants/roster.ts
 msgid "Sram"
@@ -2937,8 +3026,8 @@ msgstr "Texte de la réponse"
 #~ msgstr "Tirez une ligne par sa poignée pour changer l’ordre du défilement. Un raccourci vous ramène direct sur votre personnage principal."
 
 #: src/screens/characters/index.tsx
-msgid "Tirez une ligne pour changer l’ordre du défilement."
-msgstr "Tirez une ligne pour changer l’ordre du défilement."
+#~ msgid "Tirez une ligne pour changer l’ordre du défilement."
+#~ msgstr "Tirez une ligne pour changer l’ordre du défilement."
 
 #: src/constants/journal.ts
 msgid "Titre d’une fenêtre impossible à changer"
@@ -2953,8 +3042,12 @@ msgid "Tous les hommes connectés sont réintégrés."
 msgstr "Tous les hommes connectés sont réintégrés."
 
 #: src/screens/characters/roster-panel.tsx
-msgid "Tous vos personnages, connectés ou non. Cliquez une tête pour changer sa classe, son sexe ou sa couleur, la croix retire un déconnecté."
-msgstr "Tous vos personnages, connectés ou non. Cliquez une tête pour changer sa classe, son sexe ou sa couleur, la croix retire un déconnecté."
+#~ msgid "Tous vos personnages, connectés ou non. Cliquez une tête pour changer sa classe, son sexe ou sa couleur, la croix retire un déconnecté."
+#~ msgstr "Tous vos personnages, connectés ou non. Cliquez une tête pour changer sa classe, son sexe ou sa couleur, la croix retire un déconnecté."
+
+#: src/screens/characters/index.tsx
+#~ msgid "Tous vos personnages, dans l’ordre où vous passez de l’un à l’autre. Tirez une ligne pour la déplacer."
+#~ msgstr "Tous vos personnages, dans l’ordre où vous passez de l’un à l’autre. Tirez une ligne pour la déplacer."
 
 #: src/helpers/onboarding.ts
 #~ msgid "Tout ce qui suit vous attend dans la barre de gauche."
@@ -3033,8 +3126,12 @@ msgid "Un bug, une idée : c’est ici que ça se raconte."
 msgstr "Un bug, une idée : c’est ici que ça se raconte."
 
 #: src/screens/walk-screen/index.tsx
-msgid "Un clic déplace le personnage que vous avez devant vous, et la fenêtre du suivant prend sa place."
-msgstr "Un clic déplace le personnage que vous avez devant vous, et la fenêtre du suivant prend sa place."
+msgid "Un clic déplace le personnage devant vous, et le suivant prend sa place à l’écran."
+msgstr "Un clic déplace le personnage devant vous, et le suivant prend sa place à l’écran."
+
+#: src/screens/walk-screen/index.tsx
+#~ msgid "Un clic déplace le personnage que vous avez devant vous, et la fenêtre du suivant prend sa place."
+#~ msgstr "Un clic déplace le personnage que vous avez devant vous, et la fenêtre du suivant prend sa place."
 
 #: src/screens/walk-screen/index.tsx
 #~ msgid "Un clic déplace le personnage que vous avez devant vous, et la fenêtre du suivant prend sa place. Vous recliquez au même endroit, et toute la team change de map sans toucher au clavier."
@@ -3080,6 +3177,14 @@ msgstr "Un client qui s’ouvre prend tout son écran."
 msgid "Un client resté à l’écran de connexion n’a pas encore de pseudo."
 msgstr "Un client resté à l’écran de connexion n’a pas encore de pseudo."
 
+#: src/screens/auto-focus-screen.tsx
+#~ msgid "Un combat, un échange, un message : Multifus passe devant le personnage concerné, tout seul."
+#~ msgstr "Un combat, un échange, un message : Multifus passe devant le personnage concerné, tout seul."
+
+#: src/screens/auto-focus-screen.tsx
+msgid "Un combat, un échange, un message privé : Multifus affiche le personnage concerné, tout seul."
+msgstr "Un combat, un échange, un message privé : Multifus affiche le personnage concerné, tout seul."
+
 #: src/screens/onboarding/proof-band.tsx
 #~ msgid "Un combat, un message privé : Multifus vous amène devant."
 #~ msgstr "Un combat, un message privé : Multifus vous amène devant."
@@ -3093,8 +3198,12 @@ msgstr "Un essai vient de partir. Attendez une trentaine de secondes avant le su
 #~ msgstr "Un exclu est sauté par le défilement, le Déplacement rapide et l’AutoFocus. Ses messages privés arrivent quand même."
 
 #: src/screens/relay/index.tsx
-msgid "Un joueur vous écrit pendant que vous êtes ailleurs ? Son message arrive sur votre téléphone, dans Telegram. Telegram, parce que c’est gratuit et que c’est la seule messagerie qu’un logiciel peut faire parler aussi simplement."
-msgstr "Un joueur vous écrit pendant que vous êtes ailleurs ? Son message arrive sur votre téléphone, dans Telegram. Telegram, parce que c’est gratuit et que c’est la seule messagerie qu’un logiciel peut faire parler aussi simplement."
+msgid "Un joueur vous écrit pendant que vous êtes ailleurs ? Son message arrive sur votre téléphone, dans Telegram."
+msgstr "Un joueur vous écrit pendant que vous êtes ailleurs ? Son message arrive sur votre téléphone, dans Telegram."
+
+#: src/screens/relay/index.tsx
+#~ msgid "Un joueur vous écrit pendant que vous êtes ailleurs ? Son message arrive sur votre téléphone, dans Telegram. Telegram, parce que c’est gratuit et que c’est la seule messagerie qu’un logiciel peut faire parler aussi simplement."
+#~ msgstr "Un joueur vous écrit pendant que vous êtes ailleurs ? Son message arrive sur votre téléphone, dans Telegram. Telegram, parce que c’est gratuit et que c’est la seule messagerie qu’un logiciel peut faire parler aussi simplement."
 
 #: src/screens/characters-screen.tsx
 #~ msgid "Un personnage exclu est sauté par le défilement et par le Déplacement rapide, et l’AutoFocus ne le fait plus passer devant. Ses messages privés continuent d’arriver."
@@ -3176,6 +3285,10 @@ msgstr "Vert"
 msgid "Violet"
 msgstr "Violet"
 
+#: src/constants/shortcuts.ts
+#~ msgid "Visez une tête au milieu de l’écran, et lâchez."
+#~ msgstr "Visez une tête au milieu de l’écran, et lâchez."
+
 #: src/constants/runes.ts
 msgid "Vitalité"
 msgstr "Vitalité"
@@ -3195,8 +3308,12 @@ msgstr "Voir l’image"
 #~ msgstr "Voir l’image en grand"
 
 #: src/screens/walk-screen/state-panel.tsx
-msgid "Vos clics vont au jeu, et à rien d’autre."
-msgstr "Vos clics vont au jeu, et à rien d’autre."
+msgid "Vos clics ne changent pas de personnage."
+msgstr "Vos clics ne changent pas de personnage."
+
+#: src/screens/walk-screen/state-panel.tsx
+#~ msgid "Vos clics vont au jeu, et à rien d’autre."
+#~ msgstr "Vos clics vont au jeu, et à rien d’autre."
 
 #: src/helpers/wording.ts
 msgid "Vos clients Dofus Retro couvrent déjà tout leur écran."
@@ -3209,6 +3326,10 @@ msgstr "Vos MP suivis sur votre téléphone, par Telegram."
 #: src/constants/features.ts
 msgid "Vos personnages"
 msgstr "Vos personnages"
+
+#: src/screens/characters/index.tsx
+msgid "Vos personnages, l’ordre où vous passez de l’un à l’autre, et la roue qui les affiche au milieu de l’écran."
+msgstr "Vos personnages, l’ordre où vous passez de l’un à l’autre, et la roue qui les affiche au milieu de l’écran."
 
 #: src/screens/about/identity-panel.tsx
 msgid "Vos réglages"
@@ -3267,8 +3388,8 @@ msgstr "Vous êtes à jour."
 #~ msgstr "Vous jouez à plusieurs personnages à la fois. Multifus les garde à l’œil : quand le jeu appelle l’un d’eux, sa fenêtre passe devant vous toute seule."
 
 #: src/screens/auto-focus-screen.tsx
-msgid "Vous jouez plusieurs personnages à la fois. Multifus affiche celui dont c’est le tour, vous n’avez rien à cliquer."
-msgstr "Vous jouez plusieurs personnages à la fois. Multifus affiche celui dont c’est le tour, vous n’avez rien à cliquer."
+#~ msgid "Vous jouez plusieurs personnages à la fois. Multifus affiche celui dont c’est le tour, vous n’avez rien à cliquer."
+#~ msgstr "Vous jouez plusieurs personnages à la fois. Multifus affiche celui dont c’est le tour, vous n’avez rien à cliquer."
 
 #: src/helpers/onboarding.ts
 #~ msgid "Vous jouez plusieurs personnages à la fois. Multifus les garde à l’œil : quand le jeu appelle l’un d’eux, sa fenêtre passe devant vous toute seule."

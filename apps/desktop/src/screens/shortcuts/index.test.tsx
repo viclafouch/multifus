@@ -193,9 +193,7 @@ describe('l’écran des raccourcis, le personnage principal', () => {
     })
 
     expect(
-      screen.getByText(
-        'Ramène devant votre personnage principal, d’où que vous veniez dans le jeu.'
-      )
+      screen.getByText('Ramène votre principal devant, où que vous soyez.')
     ).not.toBeNull()
     expect(keyCapsOf(fieldOf('main'))).toStrictEqual(['Ctrl', 'Maj', 'Espace'])
     expect(screen.queryByRole('alert')).toBeNull()
@@ -362,7 +360,7 @@ describe('l’écran des raccourcis, ce que Rust répond d’une combinaison', (
     })
 
     expect(screen.getByRole('alert').textContent).toBe(
-      'Déjà pris par « Fenêtre suivante ».'
+      'Déjà pris par « Personnage suivant ».'
     )
   })
 

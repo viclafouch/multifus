@@ -1,6 +1,6 @@
 import React from 'react'
 import { i18n } from '@lingui/core'
-import { plural, t } from '@lingui/core/macro'
+import { t } from '@lingui/core/macro'
 import type { ShortcutBinding } from '@/@types/shortcuts'
 import type { Snapshot } from '@/@types/snapshot'
 import type { WheelSize } from '@/@types/wheel'
@@ -37,7 +37,7 @@ export const WheelPanel = ({ wheel, shortcuts, run }: WheelPanelProps) => {
     <Panel>
       <PanelHeader
         title={i18n._(SHORTCUT_ACTIONS.wheel.label)}
-        description={t`Maintenez vos touches depuis une fenêtre du jeu, et nulle part ailleurs. La roue s’ouvre au milieu de l’écran : visez une tête, lâchez ou cliquez, sa fenêtre passe devant.`}
+        description={t`Maintenez vos touches dans le jeu, et nulle part ailleurs. Visez une tête au milieu de l’écran, lâchez : ce personnage s’affiche.`}
       >
         <ShortcutRecall accelerator={accelerator} mention={i18n._(HELD)} />
       </PanelHeader>
@@ -63,8 +63,8 @@ export const WheelPanel = ({ wheel, shortcuts, run }: WheelPanelProps) => {
           }}
         />
         <GaugeRow
-          label={t`Le monde`}
-          reading={plural(crowd, { one: 'Tout seul', other: 'À #' })}
+          label={t`Personnages`}
+          reading={new Intl.NumberFormat(i18n.locale).format(crowd)}
           current={crowd}
           min={DEMO_FEWEST}
           max={wheel.demo.length}

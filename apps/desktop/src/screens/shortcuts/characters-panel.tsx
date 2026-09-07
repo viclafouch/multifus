@@ -22,13 +22,13 @@ export const CharactersPanel = ({
   actions
 }: CharactersPanelProps) => {
   return (
-    <Panel className="mt-6">
+    <Panel>
       <PanelHeader
         title={t`Un personnage, une touche`}
         description={
           IS_APPLE
-            ? t`Ctrl+Maj+1 sur l’Eniripsa, Ctrl+Maj+2 sur le Sacrieur : sa fenêtre passe devant, d’où que vous veniez dans le jeu.`
-            : t`F1 sur l’Eniripsa, F2 sur le Sacrieur : sa fenêtre passe devant, d’où que vous veniez dans le jeu.`
+            ? t`Ctrl+Maj+1 sur l’Eniripsa, Ctrl+Maj+2 sur le Sacrieur : il passe devant, d’où que vous veniez dans le jeu.`
+            : t`F1 sur l’Eniripsa, F2 sur le Sacrieur : il passe devant, d’où que vous veniez dans le jeu.`
         }
       />
       {characters.length === 0 ? (

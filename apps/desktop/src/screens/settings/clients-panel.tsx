@@ -22,10 +22,7 @@ export const ClientsPanel = ({ clients, run }: ClientsPanelProps) => {
   }
 
   return (
-    <Panel
-      data-clients={lines.state}
-      className={`${TONES} transition-row mb-4`}
-    >
+    <Panel data-clients={lines.state} className={`${TONES} transition-row`}>
       <section className="flex items-center gap-5 px-4 py-3.5">
         <div className="flex min-w-0 flex-1 flex-col items-start gap-2">
           <StateBadge>{lines.badge}</StateBadge>

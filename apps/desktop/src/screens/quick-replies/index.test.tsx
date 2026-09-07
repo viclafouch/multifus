@@ -261,7 +261,7 @@ describe('l’écran des réponses rapides, les touches', () => {
     ])
 
     expect(screen.getByRole('alert').textContent).toBe(
-      'Déjà pris par « Fenêtre suivante ».'
+      'Déjà pris par « Personnage suivant ».'
     )
   })
 

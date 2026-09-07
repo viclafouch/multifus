@@ -36,7 +36,7 @@ export const WalkScreen = ({
   return (
     <Screen
       title={i18n._(MAP_NAMES.walk)}
-      subtitle={t`Un clic déplace le personnage que vous avez devant vous, et la fenêtre du suivant prend sa place.`}
+      subtitle={t`Un clic déplace le personnage devant vous, et le suivant prend sa place à l’écran.`}
       action={<LoopButton onOpen={loop.handleOpen} />}
     >
       <StatePanel walk={walk} accelerator={accelerator} run={run} />

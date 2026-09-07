@@ -40,7 +40,7 @@ export const CharactersScreen = ({
       subtitle={
         isRosterEmpty
           ? undefined
-          : t`Tirez une ligne pour changer l’ordre du défilement.`
+          : t`Vos personnages, l’ordre où vous passez de l’un à l’autre, et la roue qui les affiche au milieu de l’écran.`
       }
     >
       {isRosterEmpty ? (

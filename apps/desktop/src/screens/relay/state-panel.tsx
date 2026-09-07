@@ -23,7 +23,7 @@ export const StatePanel = ({ relay, run }: StatePanelProps) => {
   const failure = relay.switch.kind === 'failed' ? relay.switch.reason : null
 
   return (
-    <Panel data-relay={state} className={`${TONES} transition-row group mb-3`}>
+    <Panel data-relay={state} className={`${TONES} transition-row group`}>
       <section className="flex items-start gap-5 px-4 py-3.5">
         <div className="flex min-w-0 flex-1 flex-col items-start gap-1.5">
           <StateBadge>{lines.badge}</StateBadge>

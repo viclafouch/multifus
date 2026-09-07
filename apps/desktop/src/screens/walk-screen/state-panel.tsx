@@ -50,12 +50,12 @@ const stateLines = (state: WalkLiveState) => {
   if (state === 'on') {
     return {
       badge: t`Allumé`,
-      body: t`Cliquez pour déplacer, la fenêtre suivante arrive toute seule.`
+      body: t`Chaque clic gauche affiche le personnage suivant.`
     }
   }
 
   return {
     badge: t`Éteint`,
-    body: t`Vos clics vont au jeu, et à rien d’autre.`
+    body: t`Vos clics ne changent pas de personnage.`
   }
 }

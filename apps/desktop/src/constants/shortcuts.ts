@@ -12,43 +12,43 @@ type ActionLabel = {
 
 export const SHORTCUT_ACTIONS = {
   next: {
-    label: msg`Fenêtre suivante`,
-    description: msg`Passe au personnage d’après, dans l’ordre de l’écran Personnages.`,
+    label: msg`Personnage suivant`,
+    description: msg`Passe au personnage d’après, dans votre ordre.`,
     mention: null
   },
   previous: {
-    label: msg`Fenêtre précédente`,
+    label: msg`Personnage précédent`,
     description: msg`Passe au personnage d’avant, dans le même ordre.`,
     mention: null
   },
   main: {
     label: msg`Personnage principal`,
-    description: msg`Ramène devant votre personnage principal, d’où que vous veniez dans le jeu.`,
+    description: msg`Ramène votre principal devant, où que vous soyez.`,
     mention: null
   },
   toggleExcluded: {
     label: msg`Exclure ou réintégrer`,
-    description: msg`Sort le personnage devant vous du défilement et de l’AutoFocus.`,
+    description: msg`Sort le personnage devant vous du défilement.`,
     mention: null
   },
   walk: {
     label: msg`Déplacement rapide`,
-    description: msg`Allume le clic qui emmène toute la team d’une map à l’autre.`,
+    description: msg`Allume ou éteint le Déplacement rapide.`,
     mention: null
   },
   maximizeAll: {
     label: msg`Agrandir les fenêtres`,
-    description: msg`Agrandit tous vos clients, même ceux ouverts avant Multifus.`,
+    description: msg`Agrandit tous vos clients Dofus d’un seul coup.`,
     mention: null
   },
   wheel: {
     label: msg`Roue des personnages`,
-    description: msg`La team s’ouvre au milieu de l’écran, vous visez une tête, vous lâchez.`,
+    description: msg`Affiche la roue des personnages. Lâchez sur une tête.`,
     mention: HELD
   },
   runeTable: {
     label: msg`Tableau des runes`,
-    description: msg`Affiche les poids des runes par-dessus le jeu. Les mêmes touches les retirent.`,
+    description: msg`Pose les poids des runes par-dessus le jeu.`,
     mention: null
   }
 } as const satisfies Record<ShortcutAction, ActionLabel>

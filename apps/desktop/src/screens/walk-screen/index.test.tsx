@@ -141,9 +141,7 @@ describe('l’écran du Déplacement rapide', () => {
 
     expect(screen.getByText('Allumé')).not.toBeNull()
     expect(
-      screen.getByText(
-        'Cliquez pour déplacer, la fenêtre suivante arrive toute seule.'
-      )
+      screen.getByText('Chaque clic gauche affiche le personnage suivant.')
     ).not.toBeNull()
     expect(screen.queryByText('Éteint')).toBeNull()
   })
@@ -153,7 +151,7 @@ describe('l’écran du Déplacement rapide', () => {
 
     expect(screen.getByText('Éteint')).not.toBeNull()
     expect(
-      screen.getByText('Vos clics vont au jeu, et à rien d’autre.')
+      screen.getByText('Vos clics ne changent pas de personnage.')
     ).not.toBeNull()
     expect(screen.queryByText('Allumé')).toBeNull()
   })

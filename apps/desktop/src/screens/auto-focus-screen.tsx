@@ -35,7 +35,7 @@ export const AutoFocusScreen = ({
   return (
     <Screen
       title={i18n._(MAP_NAMES.autoFocus)}
-      subtitle={t`Vous jouez plusieurs personnages à la fois. Multifus affiche celui dont c’est le tour, vous n’avez rien à cliquer.`}
+      subtitle={t`Un combat, un échange, un message privé : Multifus affiche le personnage concerné, tout seul.`}
     >
       <Panel>
         <FieldRow

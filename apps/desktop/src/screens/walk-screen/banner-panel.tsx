@@ -23,7 +23,7 @@ export const BannerPanel = ({ place, run }: BannerPanelProps) => {
     <Panel>
       <PanelHeader
         title={t`La bannière`}
-        description={t`Elle dit sur quel personnage vous venez d’arriver. Posez-la où elle ne cache rien du jeu.`}
+        description={t`Elle affiche le personnage sur lequel vous venez d’arriver.`}
       />
       <div className="flex flex-col gap-3 px-4 py-4">
         {screens.length > 1 ? (

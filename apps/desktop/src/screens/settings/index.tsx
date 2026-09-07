@@ -53,7 +53,7 @@ export const SettingsScreen = ({
   return (
     <Screen
       title={i18n._(MAP_NAMES.settings)}
-      subtitle={t`Ce que Multifus fait pendant que vous jouez, seul ou sur demande.`}
+      subtitle={t`Les réglages de Multifus : son démarrage, et ce qu’il change sur vos clients Dofus.`}
     >
       {IS_APPLE ? (
         <Note>{t`Sur Mac, Multifus tourne mieux sans plein écran : gardez tous vos clients Dofus Retro sur le même bureau, en fenêtre agrandie.`}</Note>

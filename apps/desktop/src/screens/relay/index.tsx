@@ -30,7 +30,7 @@ export const RelayScreen = ({ relay, characters, run }: RelayScreenProps) => {
   return (
     <Screen
       title={i18n._(MAP_NAMES.relay)}
-      subtitle={t`Un joueur vous écrit pendant que vous êtes ailleurs ? Son message arrive sur votre téléphone, dans Telegram. Telegram, parce que c’est gratuit et que c’est la seule messagerie qu’un logiciel peut faire parler aussi simplement.`}
+      subtitle={t`Un joueur vous écrit pendant que vous êtes ailleurs ? Son message arrive sur votre téléphone, dans Telegram.`}
     >
       {relay.paired ? (
         <>

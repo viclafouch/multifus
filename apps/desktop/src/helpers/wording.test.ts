@@ -110,7 +110,7 @@ const STATUS_CASES = {
     status: { kind: 'duplicate', binding: { kind: 'action', action: 'next' } },
     answer: {
       tone: 'bad',
-      text: 'Déjà pris par « Fenêtre suivante ».'
+      text: 'Déjà pris par « Personnage suivant ».'
     }
   }
 } as const satisfies Record<ShortcutStatus['kind'], StatusCase>

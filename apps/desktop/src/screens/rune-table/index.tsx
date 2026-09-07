@@ -43,7 +43,7 @@ export const RuneTableScreen = ({
   return (
     <Screen
       title={i18n._(MAP_NAMES.runeTable)}
-      subtitle={t`Les poids des runes, affichés par-dessus le jeu. Plus besoin d’aller les chercher ailleurs pendant que vous cassez.`}
+      subtitle={t`Les poids des runes par-dessus le jeu. Plus besoin d’aller les chercher ailleurs pendant un brisage.`}
       action={<LoopButton onOpen={loop.handleOpen} />}
     >
       {accelerator === null ? (

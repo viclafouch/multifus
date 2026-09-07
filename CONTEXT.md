@@ -72,7 +72,7 @@ Les mots de Multifus, et rien d'autre. On en parle en français, on les écrit e
 
 **Tirage** (`drag`) : l'action de prendre une ligne par sa poignée, et de la porter plus haut ou plus bas pour changer l'ordre du défilement. C'est aussi le geste qui déplace le tableau des runes : il se prend en entier, sauf là où le clic est arrêté, et un geste plus court que quatre points ne déplace rien et n'écrit rien.
 
-**Exclu** (`excluded`) : état d'un personnage que l'utilisateur écarte à la main. Les raccourcis Fenêtre suivante et précédente le sautent, le Déplacement rapide aussi, et l'AutoFocus ne passe plus sa fenêtre devant. Ses messages privés partent comme avant. L'exclusion ne survit pas à un redémarrage de Multifus.
+**Exclu** (`excluded`) : état d'un personnage que l'utilisateur écarte à la main. Les raccourcis Personnage suivant et précédent le sautent, le Déplacement rapide aussi, et l'AutoFocus ne passe plus sa fenêtre devant. Ses messages privés partent comme avant. L'exclusion ne survit pas à un redémarrage de Multifus.
 
 **Réintégrer** (`included`) : rendre à un exclu le défilement et l'AutoFocus. C'est le seul contraire d'exclure, et l'écran ne dit jamais « remettre ».
 

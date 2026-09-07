@@ -24,7 +24,7 @@ const exampleOn = async (agent: string) => {
     />
   )
 
-  return screen.getByText(/sa fenêtre passe devant/u)
+  return screen.getByText(/il passe devant/u)
 }
 
 describe('l’exemple donné aux raccourcis de personnage', () => {

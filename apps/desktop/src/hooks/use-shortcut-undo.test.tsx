@@ -45,7 +45,7 @@ describe('useShortcutUndo', () => {
 
     expect(undo?.accelerator).toBe('Control+Shift+Right')
     expect(undo?.label).toBe(
-      'Remettre les touches d’avant pour Fenêtre suivante'
+      'Remettre les touches d’avant pour Personnage suivant'
     )
   })
 

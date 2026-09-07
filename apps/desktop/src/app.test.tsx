@@ -83,19 +83,19 @@ const ARRIVALS = [
   { name: 'shortcuts', mark: 'Changez de personnage sans lâcher la souris.' },
   {
     name: 'quickReplies',
-    mark: 'Les réponses que vous retapez tous les soirs'
+    mark: 'Les phrases que vous retapez tous les soirs'
   },
-  { name: 'autoFocus', mark: 'Vous jouez plusieurs personnages à la fois.' },
-  { name: 'walk', mark: 'Un clic déplace le personnage que vous avez devant' },
+  { name: 'autoFocus', mark: 'Un combat, un échange, un message privé :' },
+  { name: 'walk', mark: 'Un clic déplace le personnage devant vous' },
   {
     name: 'runeTable',
-    mark: 'Les poids des runes, affichés par-dessus le jeu.'
+    mark: 'Les poids des runes par-dessus le jeu.'
   },
   {
     name: 'relay',
     mark: 'Un joueur vous écrit pendant que vous êtes ailleurs ?'
   },
-  { name: 'settings', mark: 'Ce que Multifus fait pendant que vous jouez' },
+  { name: 'settings', mark: 'Les réglages de Multifus :' },
   { name: 'about', mark: 'Mentions légales' }
 ] as const satisfies readonly Arrival[]
 
@@ -282,7 +282,7 @@ describe('la fenêtre de Multifus', () => {
 
       expect(
         screen.getByText(
-          'Ce que Multifus fait pendant que vous jouez, seul ou sur demande.'
+          'Les réglages de Multifus : son démarrage, et ce qu’il change sur vos clients Dofus.'
         )
       ).not.toBeNull()
     })
