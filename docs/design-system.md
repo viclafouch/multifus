@@ -123,18 +123,22 @@ pour un écran de travail, c'est la fenêtre Options du client qui répond.
     appelant est une abstraction pour plus tard
 22. Aucune valeur en dur dans un composant : un jeton, ou rien. Ce qui se pose sur
     une tête se déduit de `--head`, qui rétrécit quand le roster grossit
+23. Une taille de texte du thème s'ajoute à `cn`, dans `lib/utils.ts`.
+    `tailwind-merge` ne connaît que les tailles de Tailwind : sans cette liste il
+    lit `text-mark` comme une couleur, le `text-background` qui suit l'écrase, et
+    le texte repart à la taille du navigateur sans que rien ne le dise
 
 ### Les mots et les formes
 
-23. Un bouton est du texte en Bebas capitales. Pas d'icône à côté d'un mot ; ce
+24. Un bouton est du texte en Bebas capitales. Pas d'icône à côté d'un mot ; ce
     qui reste de `lucide` est un glyphe seul, et s'en ira
-24. Bebas est la fonte de Multifus. Ce que le joueur a écrit reste en Roboto, dans
+25. Bebas est la fonte de Multifus. Ce que le joueur a écrit reste en Roboto, dans
     sa casse à lui
-25. Un corps de texte commence par un verbe, et ne parle pas par métaphore quand
+26. Un corps de texte commence par un verbe, et ne parle pas par métaphore quand
     il y a un geste à faire
-26. Un titre nomme le réglage comme le système l'écrit, et un mot que le joueur
+27. Un titre nomme le réglage comme le système l'écrit, et un mot que le joueur
     lira sur son propre écran passe entre guillemets par `quoted`
-27. Ce qui s'apprend une fois s'ouvre dans un dialogue, pas dans la plaque qui le
+28. Ce qui s'apprend une fois s'ouvre dans un dialogue, pas dans la plaque qui le
     règle. Le bouton qui le rouvre se pose sous la phrase de la map quand la
     vidéo montre la map entière, et juste au-dessus de la plaque quand elle ne
     montre que cette plaque. Jamais dans son en-tête, où il se lit comme un
@@ -145,14 +149,14 @@ pour un écran de travail, c'est la fenêtre Options du client qui répond.
 `app.tsx` pose déjà le décor, les bandes, le cartouche, le crédit et le journal.
 Une nouvelle map n'écrit que son dedans :
 
-1. `Screen` si c'est une liste, `StageScreen` si ça montre le jeu. Les deux
-   posent `MapHeader`, donc le titre, le fronton et une phrase
-2. `Panel` par groupe, c'est le verre. `FieldRow` pour une ligne de réglage,
-   `Tick` pour ce qui s'allume, `Button` pour un geste
-3. Le nom de la map et son décor se déclarent dans `constants/world.ts`, et
-   `CurrentMap` la branche
-4. Ni onglet ni barre latérale : on vient de l'accueil, on y retourne par
-   « Retour » ou par Échap
+29. `Screen` si c'est une liste, `StageScreen` si ça montre le jeu. Les deux
+    posent `MapHeader`, donc le titre, le fronton et une phrase
+30. `Panel` par groupe, c'est le verre. `FieldRow` pour une ligne de réglage,
+    `Tick` pour ce qui s'allume, `Button` pour un geste
+31. Le nom de la map et son décor se déclarent dans `constants/world.ts`, et
+    `CurrentMap` la branche
+32. Ni onglet ni barre latérale : on vient de l'accueil, on y retourne par
+    « Retour » ou par Échap
 
 Avant de dessiner, lire `CONTEXT.md` pour les mots. `frontend.md` tient React,
 l'accessibilité et Tailwind, et ce document ne les redit pas.
