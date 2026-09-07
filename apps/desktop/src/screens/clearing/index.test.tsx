@@ -33,6 +33,14 @@ const show = (characters: readonly Character[]) => {
 }
 
 describe('l’accueil', () => {
+  it('dit sous le titre que Multifus vient de la communauté', () => {
+    show([])
+
+    expect(
+      screen.getByText('Logiciel communautaire pour Dofus Retro')
+    ).not.toBeNull()
+  })
+
   it('pose sur le dolmen une tête par personnage', () => {
     show([
       characterOf({ nickname: 'Alpha' }),

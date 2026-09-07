@@ -1,5 +1,6 @@
 import React from 'react'
 import { i18n } from '@lingui/core'
+import { t } from '@lingui/core/macro'
 import type { Onboarding } from '@/@types/onboarding'
 import type { Character } from '@/@types/roster'
 import type { ScreenName, Snapshot } from '@/@types/snapshot'
@@ -54,12 +55,17 @@ export const ClearingScreen = ({
       </header>
       <div className="relative min-h-0 flex-1">
         <div className="settle absolute top-1/2 left-0 flex -translate-y-1/2 flex-col items-start gap-4">
-          <h1 className="flex items-center gap-3">
+          <div className="flex items-center gap-3">
             <img src={logo} alt="" className="emblem size-emblem shrink-0" />
-            <span className="limelight font-carve text-sign tracking-wide text-cream uppercase">
-              {i18n._(MAP_NAMES[CLEARING])}
-            </span>
-          </h1>
+            <div className="flex flex-col gap-1">
+              <h1 className="limelight font-carve text-sign tracking-wide text-cream uppercase">
+                {i18n._(MAP_NAMES[CLEARING])}
+              </h1>
+              <p className="limelight text-aside text-khaki-lit">
+                {t`Logiciel communautaire pour Dofus Retro`}
+              </p>
+            </div>
+          </div>
           <span aria-hidden className="crest w-way" />
           <WayList asking={asking} onGo={onGo} />
         </div>

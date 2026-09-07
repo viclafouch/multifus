@@ -118,9 +118,11 @@ Les mots de Multifus, et rien d'autre. On en parle en français, on les écrit e
 
 **Map** (`MapName`) : un des dix lieux de Multifus, l'accueil et les neuf écrans que la barre système nomme. Le mot vient du jeu, où l'on change de map, et il a remplacé « écran » partout dans l'interface et dans le code qui la porte. Chaque map porte un décor, un titre en haut, et rien qui ressemble à un onglet : on y va depuis l'accueil, on en revient par « Retour » ou par Échap.
 
-**Accueil** (`clearing`) : la map d'ouverture, celle qui porte le logo, le nom de Multifus, la liste des neuf maps à gauche et le dolmen à droite. Elle se nomme « Multifus » à l'écran, et jamais autrement : un nom de lieu inventé n'apprend rien à personne.
+**Accueil** (`clearing`) : la map d'ouverture, celle qui porte le logo, le nom de Multifus, la liste des neuf maps à gauche et le dolmen à droite. Elle se nomme « Multifus » à l'écran, et jamais autrement : un nom de lieu inventé n'apprend rien à personne. Sous le nom, une ligne dit d'où vient le logiciel, pour que le logo et les décors d'Ankama ne le fassent pas passer pour le sien.
 
 **Décor** (`scene`) : l'image du jeu qui remplit la fenêtre derrière une map. Elle appartient à Ankama, chaque fenêtre le dit en bas, et elle dit d'abord ce que la map fait. On assombrit sous le texte, jamais le décor entier.
+
+**Tolérance** (`ToleranceShot`) : ce qu'Ankama a écrit deux fois en public sur les gestionnaires de fenêtres, et que l'écran À propos montre en entier. Chaque message est une capture datée et située, qui s'ouvre en grand avec sa source posée dessus, en bas, et un bouton qui rouvre la page chez Ankama. Multifus dit la règle avec ses mots à lui et laisse Ankama parler avec les siens : c'est la preuve, pas la paraphrase, qui rassure.
 
 **Dolmen** (`Dolmen`) : la dalle de pierre du décor de l'accueil, où les personnages connus viennent se poser. Elle n'est pas dessinée par Multifus : c'est la pierre de l'image, et les têtes sont placées dessus.
 

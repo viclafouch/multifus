@@ -117,6 +117,66 @@ describe('l’écran À propos', () => {
     expect(telegram?.body).toContain('seulement si vous')
   })
 
+  describe('ce qu’Ankama autorise', () => {
+    it('dit la tolérance, la limite et qui répond de Multifus', () => {
+      show()
+
+      expect(
+        screen.getByText('Ankama tolère les gestionnaires de fenêtres.').tagName
+      ).toBe('STRONG')
+      expect(
+        screen.getByText('La limite, c’est le jeu lui-même.')
+      ).not.toBeNull()
+      expect(
+        screen.getByText('Ankama ne répond pas de Multifus.')
+      ).not.toBeNull()
+    })
+
+    it('montre les deux messages d’Ankama, datés et situés', () => {
+      show()
+
+      expect(
+        buttonNamed('Lire Forum de Dofus Retro, le 1ᵉʳ avril 2026')
+      ).not.toBeNull()
+      expect(
+        buttonNamed('Lire Compte DOFUS Rétro sur X, le 10 mars 2026')
+      ).not.toBeNull()
+    })
+
+    it('ouvre un message en grand, sa source par-dessus', async () => {
+      show()
+
+      fireEvent.click(
+        buttonNamed('Lire Forum de Dofus Retro, le 1ᵉʳ avril 2026')
+      )
+
+      await waitFor(() => {
+        expect(
+          screen.getByRole('img', {
+            name: 'Forum de Dofus Retro, le 1ᵉʳ avril 2026'
+          })
+        ).not.toBeNull()
+      })
+      expect(buttonNamed('Fermer')).not.toBeNull()
+    })
+
+    it('mène à la page d’Ankama où le message a été écrit', async () => {
+      bridge.openAboutLink.mockResolvedValue(null)
+      show()
+
+      fireEvent.click(
+        buttonNamed('Lire Compte DOFUS Rétro sur X, le 10 mars 2026')
+      )
+
+      await waitFor(() => {
+        expect(buttonNamed('Ouvrir la source')).not.toBeNull()
+      })
+      fireEvent.click(buttonNamed('Ouvrir la source'))
+
+      expect(bridge.openAboutLink).toHaveBeenCalledWith('post')
+    })
+  })
+
   describe('le projet', () => {
     it('mène au code source et à l’endroit où raconter un bug', () => {
       bridge.openAboutLink.mockResolvedValue(null)

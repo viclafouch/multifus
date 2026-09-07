@@ -12,11 +12,17 @@ const SOURCE_URL: &str = "https://github.com/viclafouch/multifus";
 
 const ISSUES_URL: &str = "https://github.com/viclafouch/multifus/issues";
 
+const FORUM_URL: &str = "https://www.dofus-retro.com/fr/forum/12-suggestions-retours/2950-pourquoi-ankama-autorise-outils-crees-communaute";
+
+const POST_URL: &str = "https://x.com/DOFUSRetro_FR/status/2031323028072681799";
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum AboutLink {
     Source,
     Issues,
+    Forum,
+    Post,
 }
 
 impl AboutLink {
@@ -25,6 +31,8 @@ impl AboutLink {
         match self {
             Self::Source => SOURCE_URL,
             Self::Issues => ISSUES_URL,
+            Self::Forum => FORUM_URL,
+            Self::Post => POST_URL,
         }
     }
 }
@@ -99,7 +107,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn every_about_link_goes_to_the_repository() {
+    fn the_project_links_go_to_the_repository() {
         for link in [AboutLink::Source, AboutLink::Issues] {
             let url = link.url();
 
@@ -111,8 +119,31 @@ mod tests {
     }
 
     #[test]
-    fn the_source_and_the_issues_are_two_different_pages() {
-        assert_ne!(AboutLink::Source.url(), AboutLink::Issues.url());
+    fn the_tolerance_links_go_to_what_ankama_wrote() {
+        assert!(
+            AboutLink::Forum
+                .url()
+                .starts_with("https://www.dofus-retro.com/fr/forum/")
+        );
+        assert!(
+            AboutLink::Post
+                .url()
+                .starts_with("https://x.com/DOFUSRetro_FR/status/")
+        );
+    }
+
+    #[test]
+    fn every_about_link_goes_to_its_own_page() {
+        let urls = [
+            AboutLink::Source.url(),
+            AboutLink::Issues.url(),
+            AboutLink::Forum.url(),
+            AboutLink::Post.url(),
+        ];
+
+        for (rank, url) in urls.iter().enumerate() {
+            assert!(!urls[rank + 1..].contains(url), "{url} is given twice");
+        }
     }
 
     #[test]

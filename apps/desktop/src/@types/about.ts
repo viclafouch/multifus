@@ -1,1 +1,1 @@
-export type AboutLink = 'issues' | 'source'
+export type AboutLink = 'forum' | 'issues' | 'post' | 'source'

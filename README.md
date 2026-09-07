@@ -66,7 +66,13 @@ Ankama a posé la limite deux fois, en ces mots :
 
 > L'utilisation d'un logiciel tiers est tolérée UNIQUEMENT s'il ne modifie/n'interagit pas avec les fichiers du jeu ou le jeu en lui-même. [...] Il est également important de distinguer un outil de gestion de fenêtre d'autres outils tiers comme les macros, ces dernières sont strictement interdites.
 
+— [le compte DOFUS Rétro sur X, le 10 mars 2026](https://x.com/DOFUSRetro_FR/status/2031323028072681799)
+
 > Nous avons une certaine tolérance pour ce qui est des logiciels de « gestion de fenêtres », mais il est important de rappeler qu'il ne s'agit pas d'outils officiellement pris en charge par Ankama. [...] L'utilisation de macros apportant un avantage déloyal, comme le déplacement de plusieurs personnages simultanément sans changer de fenêtre, est strictement bannissable. [...] vérifiez bien que l'outil que vous vous apprêtez à utiliser n'interagit jamais avec les fichiers du jeu.
+
+— [le forum de Dofus Retro, le 1ᵉʳ avril 2026](https://www.dofus-retro.com/fr/forum/12-suggestions-retours/2950-pourquoi-ankama-autorise-outils-crees-communaute)
+
+L'écran À propos montre ces deux messages en entier et mène à leur page.
 
 Deux règles en sortent, et elles tiennent le projet. Une action ne vaut que pour la fenêtre au premier plan, jamais pour plusieurs à la fois. Aucun fichier du jeu n'est lu, ni extrait, ni converti, ni embarqué.
 

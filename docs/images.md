@@ -98,6 +98,23 @@ KrosmoNote, cinq vignettes séparées par des traits blancs et filigranées. Cha
 vignette fait 635 × 360, soit un agrandissement de 2,4 pour remplir une fenêtre
 de 1100. Un fond ne se prend pas dans un montage.
 
+## Les deux messages d'Ankama
+
+Ils vivent dans le même dossier que les décors et ne sont pas des décors : ce
+sont deux captures de ce qu'Ankama a écrit en public sur les gestionnaires de
+fenêtres, que l'écran À propos montre en entier.
+
+| Fichier                | Source                                                                                                        |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `tolerance-forum.webp` | le fil `12-suggestions-retours/2950-…` de `www.dofus-retro.com`, première réponse de l'équipe, 1ᵉʳ avril 2026 |
+| `tolerance-post.webp`  | le message de `@DOFUSRetro_FR` sur X, 10 mars 2026                                                            |
+
+Chacune est datée, située, et rouvre sa page chez Ankama par « Ouvrir la
+source » : `apps/desktop/src-tauri/src/app/links.rs` tient les deux adresses.
+Une capture montre l'auteur, la date et le fil, ce qu'un texte recopié ne prouve
+pas, et c'est pour cela qu'elle est là plutôt qu'une citation de plus. Elle reste
+une image d'Ankama et suit la discipline du dossier.
+
 ## Choisir un décor
 
 Deux questions, dans cet ordre : **est-ce qu'il dit ce que la map fait**, et

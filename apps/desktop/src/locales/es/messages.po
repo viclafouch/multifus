@@ -464,6 +464,14 @@ msgstr "Activa o desactiva el Desplazamiento rápido."
 msgid "Allumez, puis cliquez dans le jeu : le personnage marche, la fenêtre du suivant prend sa place, et la bannière dit sur qui vous arrivez."
 msgstr "Actívalo y haz clic en el juego: el personaje camina, la ventana del siguiente ocupa su lugar, y el estandarte dice en quién has llegado."
 
+#: src/screens/about/legal-panel.tsx
+msgid "Ankama ne répond pas de Multifus."
+msgstr "Ankama no responde por Multifus."
+
+#: src/screens/about/legal-panel.tsx
+msgid "Ankama tolère les gestionnaires de fenêtres."
+msgstr "Ankama tolera los gestores de ventanas."
+
 #: src/components/language-picker.tsx
 #: src/screens/about/reset-panel.tsx
 msgid "Annuler"
@@ -496,6 +504,10 @@ msgstr "Ningún cliente abierto"
 #: src/helpers/wording.ts
 msgid "Aucun homme connecté"
 msgstr "Ningún hombre conectado"
+
+#: src/screens/about/legal-panel.tsx
+msgid "Aucun outil de la communauté n’est soutenu par elle. Le code de Multifus est public : lisez-le, et n’installez que depuis sa page."
+msgstr "Ningún programa de la comunidad cuenta con su apoyo. El código de Multifus es público: léalo, e instale solo desde su página."
 
 #: src/helpers/onboarding.ts
 #: src/screens/relay/state-panel.tsx
@@ -713,6 +725,10 @@ msgstr "Ya está en marcha. Mira tu teléfono."
 msgid "Ce n’est pas en place."
 msgstr "No está en su sitio."
 
+#: src/screens/about/legal-panel.tsx
+msgid "Ce qu’Ankama autorise"
+msgstr "Lo que Ankama permite"
+
 #: src/screens/onboarding/index.tsx
 #~ msgid "Ce qu’il faut pour que Multifus vous amène devant la bonne fenêtre. Il contrôle ce qu’il peut, et vous montre le reste."
 #~ msgstr "Lo que Multifus necesita para llevarte ante la ventana correcta. Comprueba lo que puede, y te muestra el resto."
@@ -876,6 +892,10 @@ msgstr "Combate"
 #: src/screens/about/project-panel.tsx
 msgid "Comment Multifus est développé"
 msgstr "Cómo se desarrolla Multifus"
+
+#: src/constants/tolerance.ts
+msgid "Compte DOFUS Rétro sur X, le 10 mars 2026"
+msgstr "Cuenta DOFUS Rétro en X, el 10 de marzo de 2026"
 
 #: src/components/empty-roster.tsx
 msgid "Compte, serveur, puis votre personnage."
@@ -1200,6 +1220,10 @@ msgstr "Muestra el personaje al que acabas de llegar."
 #~ msgid "Elle dit sur quel personnage vous venez d’arriver. Posez-la où elle ne cache rien du jeu."
 #~ msgstr "Dice en qué personaje acabas de llegar. Ponlo donde no tape nada del juego."
 
+#: src/screens/about/legal-panel.tsx
+msgid "Elle l’a écrit deux fois en public, sur son forum et sur son compte X. Les deux messages sont ici, en entier."
+msgstr "Lo escribió dos veces en público, en su foro y en su cuenta de X. Los dos mensajes están aquí, enteros."
+
 #: src/helpers/onboarding.ts
 #~ msgid "Elle retient les notifications. Multifus devient sourd, votre percepteur se fait taper à l’autre bout du monde, et vous ne l’apprenez qu’en rentrant."
 #~ msgstr "Retiene las notificaciones. Multifus se queda sordo, a su recaudador le pegan al otro lado del mundo, y usted no se entera hasta volver."
@@ -1380,6 +1404,7 @@ msgstr "Mujeres en el ciclo y en el AutoFocus"
 msgid "Fenêtres illisibles"
 msgstr "Ventanas ilegibles"
 
+#: src/screens/about/tolerance-shot.tsx
 #: src/screens/onboarding/shot-dialog.tsx
 #: src/screens/onboarding/shot-window.tsx
 msgid "Fermer"
@@ -1392,6 +1417,10 @@ msgstr "Cerrar la tabla de runas"
 #: src/components/character-dialog.tsx
 msgid "Fermer sans rien changer"
 msgstr "Cerrar sin cambiar nada"
+
+#: src/constants/tolerance.ts
+msgid "Forum de Dofus Retro, le 1ᵉʳ avril 2026"
+msgstr "Foro de Dofus Retro, el 1 de abril de 2026"
 
 #: src/screens/settings/index.tsx
 msgid "Garder Multifus en arrière-plan"
@@ -1609,6 +1638,10 @@ msgstr "El idioma de Multifus"
 #: src/constants/journal.ts
 msgid "La lecture des fenêtres"
 msgstr "La lectura de las ventanas"
+
+#: src/screens/about/legal-panel.tsx
+msgid "La limite, c’est le jeu lui-même."
+msgstr "El límite es el juego mismo."
 
 #: src/constants/world.ts
 #~ msgid "La main"
@@ -1943,6 +1976,18 @@ msgstr "Las teclas pulsadas mientras rompes: la tabla se abre sobre el juego, lo
 #: src/screens/characters/index.tsx
 msgid "Les touches maintenues dans le jeu : la roue s’ouvre au milieu de l’écran, la tête visée s’allume, et sa fenêtre passe devant."
 msgstr "Las teclas mantenidas dentro del juego: la rueda se abre en medio de la pantalla, la cara apuntada se enciende y su ventana pasa al frente."
+
+#: src/screens/about/tolerance-shot.tsx
+msgid "Lire"
+msgstr "Leer"
+
+#: src/screens/about/tolerance-shot.tsx
+msgid "Lire {source}"
+msgstr "Leer {source}"
+
+#: src/screens/clearing/index.tsx
+msgid "Logiciel communautaire pour Dofus Retro"
+msgstr "Programa comunitario para Dofus Retro"
 
 #: src/screens/authorization-screen.tsx
 #~ msgid "macOS n’accorde jamais cette autorisation dans la seconde. Cochez Multifus dans {settings}, puis revenez : cet écran disparaîtra tout seul."
@@ -2380,6 +2425,10 @@ msgstr "Abrir BotFather"
 #: src/helpers/onboarding.ts
 #~ msgid "Ouvrir la concentration"
 #~ msgstr "Abrir la concentración"
+
+#: src/screens/about/tolerance-shot.tsx
+msgid "Ouvrir la source"
+msgstr "Abrir la fuente"
 
 #: src/helpers/onboarding.ts
 #~ msgid "Ouvrir les notifications"
@@ -3204,6 +3253,10 @@ msgstr "¿Un jugador te escribe mientras estás en otra parte? Su mensaje llega 
 #: src/screens/relay/index.tsx
 #~ msgid "Un joueur vous écrit pendant que vous êtes ailleurs ? Son message arrive sur votre téléphone, dans Telegram. Telegram, parce que c’est gratuit et que c’est la seule messagerie qu’un logiciel peut faire parler aussi simplement."
 #~ msgstr "¿Un jugador te escribe mientras estás en otra cosa? Su mensaje llega a tu teléfono, en Telegram. Telegram, porque es gratis y es la única mensajería que un programa puede hacer hablar con esta facilidad."
+
+#: src/screens/about/legal-panel.tsx
+msgid "Un logiciel qui ouvre ses fichiers, ou qui joue à votre place, fait bannir le compte. Multifus range des fenêtres, et rien d’autre."
+msgstr "Un programa que abre sus archivos, o que juega en su lugar, hace que baneen la cuenta. Multifus ordena ventanas, y nada más."
 
 #: src/screens/characters-screen.tsx
 #~ msgid "Un personnage exclu est sauté par le défilement et par le Déplacement rapide, et l’AutoFocus ne le fait plus passer devant. Ses messages privés continuent d’arriver."
