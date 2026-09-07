@@ -77,19 +77,28 @@ pour un écran de travail, c'est la fenêtre Options du client qui répond.
    plus qu'il ne rapporte : c'est le décor qui dit où on est
 8. Le décor ne s'arrête jamais de bouger, celui qui sort compris. Une panoramique
    qui ne tourne que sur l'image affichée fait sauter l'image au changement
+9. Une ombre qui s'éteint le fait en courbe, jamais en droite. Une rampe de trois
+   arrêts pose un trait là où la pente change, et l'œil le voit même là où
+   l'alpha ne vaut presque plus rien. La courbe est une sigmoïde à queue plate,
+   écrite une seule fois dans `fall` de `retro.css` et portée par un masque : la
+   couleur et le sens restent à l'élément. Un bord ne reçoit qu'une ombre, car
+   deux courbes superposées de longueurs différentes rendent le trait qu'on
+   venait d'effacer. Et une ombre a besoin de place : une opacité forte serrée
+   sur trop peu se verra toujours
 
 ### La mise en page
 
-9. Une map occupe la fenêtre entière, et le reste flotte au-dessus, hors du flux.
-   Dans le flux, le retour coupait ce qui défile, et ouvrir le journal levait la
-   scène entière
-10. Ce qui flotte a sa bande, `brow` en haut et `hem` en bas, et un écran commence
-    sous elle. Le texte qui glisse dessous s'efface au lieu de se cogner
-11. Le titre d'une map se pose toujours à la même hauteur, quelle que soit celle
+10. Une map occupe la fenêtre entière, et le reste flotte au-dessus, hors du flux.
+    Dans le flux, le retour coupait ce qui défile, et ouvrir le journal levait la
+    scène entière
+11. Ce qui flotte a son ombre, `Shade` en haut et en bas, et un écran commence et
+    finit hors d'elle : c'est `--spacing-fall` qui donne les deux marges. Le
+    texte qui glisse dessous s'efface au lieu de se cogner
+12. Le titre d'une map se pose toujours à la même hauteur, quelle que soit celle
     de ce qu'il annonce. C'est le bas qui reste vide
-12. Un écran garde une marge de hauteur : les fontes chargent en `swap`, et la
+13. Un écran garde une marge de hauteur : les fontes chargent en `swap`, et la
     page grandit de quelques pixels le temps que les vraies arrivent
-13. Un dialogue tient sa place de son composant, jamais de sa classe. Une classe
+14. Un dialogue tient sa place de son composant, jamais de sa classe. Une classe
     de position dans le `className` d'un `DialogContent` remplace le `fixed` du
     composant, `tailwind-merge` gardant la dernière : la carte retombe dans le
     flux, tout en bas du document, et le navigateur y défile pour poser le
@@ -97,46 +106,46 @@ pour un écran de travail, c'est la fenêtre Options du client qui répond.
 
 ### Le mouvement
 
-14. Rien n'est monté ni démonté au fil d'une animation. Tout est là à la première
+15. Rien n'est monté ni démonté au fil d'une animation. Tout est là à la première
     image, seules l'opacité et la translation bougent : un joueur pressé clique
     avant la fin, et un test cherche à la milliseconde zéro. Un bouton ne monte
     pas en opacité au-dessus du décor, il porte `steady` et arrive posé : son
     fond translucide laisse passer la pelouse tant que le fondu dure, et cela
     se lit comme un survol
-15. Une animation qui fait attendre ne se pose que là où on ne passe qu'une fois.
+16. Une animation qui fait attendre ne se pose que là où on ne passe qu'une fois.
     La mise en route a ses quatre secondes ; une map s'ouvre en 800 ms sans rien
     bloquer
-16. Les délais s'annulent sous `prefers-reduced-motion`, pas seulement les durées
-17. Une translation d'entrée vit dans un conteneur qui coupe, sinon elle agrandit
+17. Les délais s'annulent sous `prefers-reduced-motion`, pas seulement les durées
+18. Une translation d'entrée vit dans un conteneur qui coupe, sinon elle agrandit
     la zone défilable et la barre paraît une demi-seconde
-18. Un survol change une couleur. Le menu de l'accueil en est la seule exception,
+19. Un survol change une couleur. Le menu de l'accueil en est la seule exception,
     parce que viser une entrée y est le geste même de l'écran
 
 ### Le CSS
 
-19. Chaque `@utility` est complète et ne partage aucune base. Tailwind v4 ne les
+20. Chaque `@utility` est complète et ne partage aucune base. Tailwind v4 ne les
     émet pas dans l'ordre du fichier : deux qui posent la même propriété se
     battent, et c'est le hasard qui gagne
-20. On n'écrit pas une matière avant l'écran qui l'emploie. Une `@utility` sans
+21. On n'écrit pas une matière avant l'écran qui l'emploie. Une `@utility` sans
     appelant est une abstraction pour plus tard
-21. Aucune valeur en dur dans un composant : un jeton, ou rien. Ce qui se pose sur
+22. Aucune valeur en dur dans un composant : un jeton, ou rien. Ce qui se pose sur
     une tête se déduit de `--head`, qui rétrécit quand le roster grossit
-22. Une taille de texte du thème s'ajoute à `cn`, dans `lib/utils.ts`.
+23. Une taille de texte du thème s'ajoute à `cn`, dans `lib/utils.ts`.
     `tailwind-merge` ne connaît que les tailles de Tailwind : sans cette liste il
     lit `text-mark` comme une couleur, le `text-background` qui suit l'écrase, et
     le texte repart à la taille du navigateur sans que rien ne le dise
 
 ### Les mots et les formes
 
-23. Un bouton est du texte en Bebas capitales. Pas d'icône à côté d'un mot ; ce
+24. Un bouton est du texte en Bebas capitales. Pas d'icône à côté d'un mot ; ce
     qui reste de `lucide` est un glyphe seul, et s'en ira
-24. Bebas est la fonte de Multifus. Ce que le joueur a écrit reste en Roboto, dans
+25. Bebas est la fonte de Multifus. Ce que le joueur a écrit reste en Roboto, dans
     sa casse à lui
-25. Un corps de texte commence par un verbe, et ne parle pas par métaphore quand
+26. Un corps de texte commence par un verbe, et ne parle pas par métaphore quand
     il y a un geste à faire
-26. Un titre nomme le réglage comme le système l'écrit, et un mot que le joueur
+27. Un titre nomme le réglage comme le système l'écrit, et un mot que le joueur
     lira sur son propre écran passe entre guillemets par `quoted`
-27. Ce qui s'apprend une fois s'ouvre dans un dialogue, pas dans la plaque qui le
+28. Ce qui s'apprend une fois s'ouvre dans un dialogue, pas dans la plaque qui le
     règle. Le bouton qui le rouvre se pose sous la phrase de la map quand la
     vidéo montre la map entière, et juste au-dessus de la plaque quand elle ne
     montre que cette plaque. Jamais dans son en-tête, où il se lit comme un
@@ -147,13 +156,13 @@ pour un écran de travail, c'est la fenêtre Options du client qui répond.
 `app.tsx` pose déjà le décor, les bandes, le cartouche, le crédit et le journal.
 Une nouvelle map n'écrit que son dedans :
 
-28. `Screen` si c'est une liste, `StageScreen` si ça montre le jeu. Les deux
+29. `Screen` si c'est une liste, `StageScreen` si ça montre le jeu. Les deux
     posent `MapHeader`, donc le titre, le fronton et une phrase
-29. `Panel` par groupe, c'est le verre. `FieldRow` pour une ligne de réglage,
+30. `Panel` par groupe, c'est le verre. `FieldRow` pour une ligne de réglage,
     `Tick` pour ce qui s'allume, `Button` pour un geste
-30. Le nom de la map et son décor se déclarent dans `constants/world.ts`, et
+31. Le nom de la map et son décor se déclarent dans `constants/world.ts`, et
     `CurrentMap` la branche
-31. Ni onglet ni barre latérale : on vient de l'accueil, on y retourne par
+32. Ni onglet ni barre latérale : on vient de l'accueil, on y retourne par
     « Retour » ou par Échap
 
 Avant de dessiner, lire `CONTEXT.md` pour les mots. `frontend.md` tient React,

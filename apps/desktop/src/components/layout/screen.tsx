@@ -10,7 +10,7 @@ type ScreenProps = Readonly<{
 
 export const Screen = ({ title, subtitle, action, children }: ScreenProps) => {
   return (
-    <section className="settle mx-auto flex min-h-full w-full max-w-roll flex-col gap-4 pt-20 pb-hem">
+    <section className="settle mx-auto flex min-h-full w-full max-w-roll flex-col gap-4 pt-fall pb-fall">
       <MapHeader title={title} subtitle={subtitle} action={action} />
       {children}
     </section>

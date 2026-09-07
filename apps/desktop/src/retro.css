@@ -46,7 +46,7 @@
   --spacing-rung: clamp(30px, 6.1vh, 40px);
   --spacing-ledger: 37px;
   --spacing-hem: 56px;
-  --spacing-brow: 68px;
+  --spacing-fall: 104px;
   --spacing-side: 15rem;
   --spacing-tick: 19px;
   --spacing-knob: 11px;
@@ -951,13 +951,37 @@
   }
 }
 
-@utility hem {
-  background-image: linear-gradient(
-    180deg,
-    transparent 0%,
-    color-mix(in srgb, var(--iron), transparent 45%) 45%,
-    color-mix(in srgb, var(--iron), transparent 8%) 100%
+@utility fall {
+  -webkit-mask-image: linear-gradient(
+    var(--fall-turn, 180deg),
+    rgb(0 0 0 / 1) 0%,
+    rgb(0 0 0 / 0.947) 14%,
+    rgb(0 0 0 / 0.809) 28%,
+    rgb(0 0 0 / 0.619) 42%,
+    rgb(0 0 0 / 0.41) 56%,
+    rgb(0 0 0 / 0.216) 70%,
+    rgb(0 0 0 / 0.069) 84%,
+    rgb(0 0 0 / 0.028) 90%,
+    rgb(0 0 0 / 0.007) 95%,
+    transparent 100%
   );
+  mask-image: linear-gradient(
+    var(--fall-turn, 180deg),
+    rgb(0 0 0 / 1) 0%,
+    rgb(0 0 0 / 0.947) 14%,
+    rgb(0 0 0 / 0.809) 28%,
+    rgb(0 0 0 / 0.619) 42%,
+    rgb(0 0 0 / 0.41) 56%,
+    rgb(0 0 0 / 0.216) 70%,
+    rgb(0 0 0 / 0.069) 84%,
+    rgb(0 0 0 / 0.028) 90%,
+    rgb(0 0 0 / 0.007) 95%,
+    transparent 100%
+  );
+}
+
+@utility fall-up {
+  --fall-turn: 0deg;
 }
 
 @utility hem-deep {
@@ -990,20 +1014,12 @@
 }
 
 @utility veil {
-  background-image:
-    radial-gradient(
-      118% 78% at 50% 46%,
-      transparent 0%,
-      color-mix(in srgb, var(--iron), transparent 84%) 54%,
-      color-mix(in srgb, var(--iron), transparent 48%) 100%
-    ),
-    linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--iron), transparent 56%) 0%,
-      transparent 20%,
-      transparent 74%,
-      color-mix(in srgb, var(--iron), transparent 52%) 100%
-    );
+  background-image: radial-gradient(
+    118% 78% at 50% 46%,
+    transparent 0%,
+    color-mix(in srgb, var(--iron), transparent 84%) 54%,
+    color-mix(in srgb, var(--iron), transparent 48%) 100%
+  );
 }
 
 @utility deepen {

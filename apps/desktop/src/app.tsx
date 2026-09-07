@@ -3,6 +3,7 @@ import { CheckNotice } from '@/components/check-notice'
 import { ConfigNotice } from '@/components/config-notice'
 import { JournalPanel } from '@/components/journal-panel'
 import { KeyLabelsProvider } from '@/components/key-labels-provider'
+import { Shade } from '@/components/layout/shade'
 import { SceneCredit } from '@/components/retro/scene-credit'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { Cartouche } from '@/components/world/cartouche'
@@ -64,10 +65,7 @@ export const App = () => {
       <TooltipProvider>
         <div className="relative flex h-screen flex-col overflow-hidden pb-ledger font-plain text-khaki">
           <WorldScene map={map} />
-          <div
-            aria-hidden
-            className="brow pointer-events-none absolute inset-x-0 top-0 z-20 h-brow"
-          />
+          <Shade edge="top" />
           {snapshot.config.problem === null ? null : (
             <ConfigNotice
               problem={snapshot.config.problem}
@@ -112,7 +110,8 @@ export const App = () => {
               <CurrentMap map={map} snapshot={snapshot} run={run} />
             </MapFrame>
           )}
-          <footer className="hem pointer-events-none absolute inset-x-0 bottom-ledger z-20 flex h-hem items-end px-4 pb-2">
+          <Shade edge="bottom" />
+          <footer className="pointer-events-none absolute inset-x-0 bottom-ledger z-20 flex h-hem items-end px-4 pb-2">
             <SceneCredit />
           </footer>
           <JournalPanel snapshot={snapshot} />
