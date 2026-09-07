@@ -24,11 +24,11 @@ Trois sont reprises, `characters`, `shortcuts` et `walk`. Les six autres portent
 encore une liste de plaques empilées, et le système est dans
 [design-system.md](./design-system.md).
 
-- [ ] **AutoFocus**, **Réponses rapides**, **Messages privés** : passer en scène à boucle, comme Déplacement rapide
-- [ ] **Tableau des runes** : scène aussi, mais le vrai tableau à la place de la boucle. Il se dessine déjà
+- [ ] **AutoFocus**, **Réponses rapides**, **Messages privés** : passer aux plaques et à leur vidéo en dialogue, comme le Déplacement rapide
+- [ ] **Tableau des runes** : il a déjà sa vidéo en dialogue et sa plaque d'aperçu porte le vrai tableau ; le reste de la map est encore une pile de plaques
 - [ ] **Paramètres** : le plus chargé, six réglages et la mise en route. À découper en dialogues, un par sujet
 - [ ] **À propos** : trois lignes suffisent
-- [ ] Une phrase par map, et rien de plus. Le reste va dans un dialogue
+- [ ] Une phrase par map, et rien de plus. Le reste va dans un dialogue, et une vidéo qui s'apprend une fois passe par `LoopDialog`, la plaque de la roue montrant comment
 - [ ] Donner leur matière aux trois fenêtres à part, `banner.html`, `wheel.html` et `rune-table.html`. Elles importent déjà `retro.css`
 - [ ] Sortir `lucide-react` du dépôt. Il en reste dans une vingtaine de fichiers, tous des glyphes seuls : le chevron d'un `Select`, la croix d'un `Dialog`, le cadenas de l'autorisation. Chacun demande un mot ou un caractère à sa place
 - [ ] Sortir `theme.css` quand plus aucun composant shadcn ne sert. Il ne porte plus de couleur à lui, seulement des espacements et les matières de la roue
@@ -37,6 +37,7 @@ encore une liste de plaques empilées, et le système est dans
 
 - [ ] Enregistrer les cinq vidéos de la mise en route sur le Mac, et les mêmes sur Windows pour les étapes 2, 3 et 4, dont le dessin diffère. `PAGE_SHOTS` gagne son axe plateforme à ce moment-là, et pas avant : deux tables identiques en attendant les images ne seraient qu'une constante écrite deux fois. Posées, `PAGE_SHOTS` les prend et le cadre pointillé disparaît
 - [ ] Enregistrer la roue à l'œuvre dans le jeu. `assets/ankama/wheel-loop.gif` est un bouche-trou, une Crâ qui respire dans l'herbe : l'écraser suffit
+- [ ] Enregistrer le Déplacement rapide et le Tableau des runes à l'œuvre. Leurs dialogues n'ont aucune image et ne montrent que leur légende, `source={null}` : poser le fichier et le passer à `LoopDialog` suffit
 
 ## Lire le bon interrupteur des notifications de Dofus, sur Windows
 

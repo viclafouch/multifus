@@ -55,8 +55,8 @@ export const RosterPanel = ({
     >
       <Panel>
         <PanelHeader
-          title={t`Exclusion`}
-          description={t`Un exclu est sauté par le défilement, le Déplacement rapide et l’AutoFocus. Ses messages privés arrivent quand même.`}
+          title={t`Votre roster`}
+          description={t`Tous vos personnages, connectés ou non. Cliquez une tête pour changer sa classe, son sexe ou sa couleur, la croix retire un déconnecté.`}
         >
           {GENDERS.map((gender) => {
             const { isEmpty, isIncluded } = genderGroupOf({

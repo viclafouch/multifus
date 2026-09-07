@@ -211,8 +211,9 @@ build refuses a catalogue with a hole.
   teardown between two tests. Nothing that a single test needs
 - `apps/desktop/src/test-doubles.ts` - What every test needs and no module owns: the
   snapshot Rust hands over and the domain records inside it, each at their
-  emptiest, plus the user agents and the promise that never settles. A test
-  writes only the fields it reads. Nothing a single test needs
+  emptiest, plus the user agents, the promise that never settles, and the wait
+  for a dialogue that opens late. A test writes only the fields it reads.
+  Nothing a single test needs
 - `vitest` hands every `vi.fn` back new between two tests (`mockReset`): a
   `beforeEach` that only clears them is noise, do not write it
 

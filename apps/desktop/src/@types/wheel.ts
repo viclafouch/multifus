@@ -6,7 +6,6 @@ export type WheelSize = {
   readonly widest: number
   readonly step: number
   readonly deadZone: number
-  readonly loopSeen: boolean
   readonly demo: readonly WheelSlice[]
 }
 

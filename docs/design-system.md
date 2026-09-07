@@ -91,43 +91,54 @@ pour un écran de travail, c'est la fenêtre Options du client qui répond.
     n'y disparaît
 13. Un écran garde une marge de hauteur : les fontes chargent en `swap`, et la
     page grandit de quelques pixels le temps que les vraies arrivent
+14. Un dialogue tient sa place de son composant, jamais de sa classe. Une classe
+    de position dans le `className` d'un `DialogContent` remplace le `fixed` du
+    composant, `tailwind-merge` gardant la dernière : la carte retombe dans le
+    flux, tout en bas du document, et le navigateur y défile pour poser le
+    focus, emmenant l'écran entier avec lui
 
 ### Le mouvement
 
-14. Rien n'est monté ni démonté au fil d'une animation. Tout est là à la première
+15. Rien n'est monté ni démonté au fil d'une animation. Tout est là à la première
     image, seules l'opacité et la translation bougent : un joueur pressé clique
-    avant la fin, et un test cherche à la milliseconde zéro
-15. Une animation qui fait attendre ne se pose que là où on ne passe qu'une fois.
+    avant la fin, et un test cherche à la milliseconde zéro. Un bouton ne monte
+    pas en opacité au-dessus du décor, il porte `steady` et arrive posé : son
+    fond translucide laisse passer la pelouse tant que le fondu dure, et cela
+    se lit comme un survol
+16. Une animation qui fait attendre ne se pose que là où on ne passe qu'une fois.
     La mise en route a ses quatre secondes ; une map s'ouvre en 800 ms sans rien
     bloquer
-16. Les délais s'annulent sous `prefers-reduced-motion`, pas seulement les durées
-17. Une translation d'entrée vit dans un conteneur qui coupe, sinon elle agrandit
+17. Les délais s'annulent sous `prefers-reduced-motion`, pas seulement les durées
+18. Une translation d'entrée vit dans un conteneur qui coupe, sinon elle agrandit
     la zone défilable et la barre paraît une demi-seconde
-18. Un survol change une couleur. Le menu de l'accueil en est la seule exception,
+19. Un survol change une couleur. Le menu de l'accueil en est la seule exception,
     parce que viser une entrée y est le geste même de l'écran
 
 ### Le CSS
 
-19. Chaque `@utility` est complète et ne partage aucune base. Tailwind v4 ne les
+20. Chaque `@utility` est complète et ne partage aucune base. Tailwind v4 ne les
     émet pas dans l'ordre du fichier : deux qui posent la même propriété se
     battent, et c'est le hasard qui gagne
-20. On n'écrit pas une matière avant l'écran qui l'emploie. Une `@utility` sans
+21. On n'écrit pas une matière avant l'écran qui l'emploie. Une `@utility` sans
     appelant est une abstraction pour plus tard
-21. Aucune valeur en dur dans un composant : un jeton, ou rien. Ce qui se pose sur
+22. Aucune valeur en dur dans un composant : un jeton, ou rien. Ce qui se pose sur
     une tête se déduit de `--head`, qui rétrécit quand le roster grossit
 
 ### Les mots et les formes
 
-22. Un bouton est du texte en Bebas capitales. Pas d'icône à côté d'un mot ; ce
+23. Un bouton est du texte en Bebas capitales. Pas d'icône à côté d'un mot ; ce
     qui reste de `lucide` est un glyphe seul, et s'en ira
-23. Bebas est la fonte de Multifus. Ce que le joueur a écrit reste en Roboto, dans
+24. Bebas est la fonte de Multifus. Ce que le joueur a écrit reste en Roboto, dans
     sa casse à lui
-24. Un corps de texte commence par un verbe, et ne parle pas par métaphore quand
+25. Un corps de texte commence par un verbe, et ne parle pas par métaphore quand
     il y a un geste à faire
-25. Un titre nomme le réglage comme le système l'écrit, et un mot que le joueur
+26. Un titre nomme le réglage comme le système l'écrit, et un mot que le joueur
     lira sur son propre écran passe entre guillemets par `quoted`
-26. Ce qui s'apprend une fois s'ouvre dans un dialogue, pas dans la plaque qui le
-    règle
+27. Ce qui s'apprend une fois s'ouvre dans un dialogue, pas dans la plaque qui le
+    règle. Le bouton qui le rouvre se pose sous la phrase de la map quand la
+    vidéo montre la map entière, et juste au-dessus de la plaque quand elle ne
+    montre que cette plaque. Jamais dans son en-tête, où il se lit comme un
+    réglage de plus
 
 ## Dessiner une map
 

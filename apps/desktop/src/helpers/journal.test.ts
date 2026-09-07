@@ -1436,7 +1436,6 @@ const SNAPSHOT = {
     widest: 720,
     step: 20,
     deadZone: 0.32,
-    loopSeen: true,
     demo: []
   },
   runeTable: {
@@ -1450,6 +1449,7 @@ const SNAPSHOT = {
     everywhere: false,
     previewing: false
   },
+  loopsSeen: { wheel: true, walk: true, runeTable: true },
   journal: [
     { id: 1, at: MORNING, event: { kind: 'listening' } },
     { id: 2, at: NOON, event: { kind: 'characterOnline', nickname: NICKNAME } }

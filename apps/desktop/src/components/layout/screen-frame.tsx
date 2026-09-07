@@ -5,7 +5,6 @@ import { cn } from '@/lib/utils'
 type ScreenFrameProps = Readonly<{
   ratio: number
   label: string
-  width?: number
   className?: string
   ref?: React.Ref<HTMLDivElement>
   children: React.ReactNode
@@ -14,7 +13,6 @@ type ScreenFrameProps = Readonly<{
 export const ScreenFrame = ({
   ratio,
   label,
-  width,
   className,
   ref,
   children
@@ -24,16 +22,19 @@ export const ScreenFrame = ({
       ref={ref}
       role="group"
       aria-label={label}
-      style={{ aspectRatio: ratio, maxWidth: width }}
+      style={{ aspectRatio: ratio }}
       className={cn('pane relative w-full', className)}
     >
       <img
         aria-hidden
         alt=""
         src={SCREEN_SCENE}
-        className="pane-scene absolute inset-0 size-full object-cover"
+        className="pane-scene pointer-events-none absolute inset-0 size-full object-cover"
       />
-      <span aria-hidden className="pane-shade absolute inset-0" />
+      <span
+        aria-hidden
+        className="pane-shade pointer-events-none absolute inset-0"
+      />
       {children}
     </div>
   )

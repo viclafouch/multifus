@@ -5,6 +5,7 @@ use crate::app::journal::JournalEntry;
 use crate::app::journal::RelayFailure;
 use crate::config::BannerCorner;
 use crate::config::Language;
+use crate::config::LoopsSeen;
 use crate::config::QuickReplyId;
 use crate::domain::Class;
 use crate::domain::Color;
@@ -52,6 +53,7 @@ pub struct Snapshot {
     pub walk: WalkView,
     pub wheel: WheelView,
     pub rune_table: RuneTableView,
+    pub loops_seen: LoopsSeen,
     pub journal: Vec<JournalEntry>,
 }
 
@@ -102,7 +104,6 @@ pub struct WheelView {
     pub widest: u32,
     pub step: u32,
     pub dead_zone: f64,
-    pub loop_seen: bool,
     pub demo: Vec<WheelSlice>,
 }
 
@@ -607,10 +608,10 @@ mod tests {
                 widest: 720,
                 step: 20,
                 dead_zone: 0.32,
-                loop_seen: false,
                 demo: vec![slice()],
             },
             rune_table: rune_table(),
+            loops_seen: LoopsSeen::default(),
             journal: vec![JournalEntry {
                 id: 1,
                 at: 0,
@@ -678,6 +679,7 @@ mod tests {
                 "journal",
                 "keyboard",
                 "language",
+                "loopsSeen",
                 "maximizeOnLaunch",
                 "onboarding",
                 "paintPortraits",
@@ -1229,7 +1231,6 @@ mod tests {
                 widest: 720,
                 step: 20,
                 dead_zone: 0.32,
-                loop_seen: true,
                 demo: vec![slice()],
             }),
             json!({
@@ -1238,7 +1239,6 @@ mod tests {
                 "widest": 720,
                 "step": 20,
                 "deadZone": 0.32,
-                "loopSeen": true,
                 "demo": [{
                     "nickname": "Bravo",
                     "class": "cra",

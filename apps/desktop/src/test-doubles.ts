@@ -1,10 +1,11 @@
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import type { Display } from '@/@types/display'
 import type { Onboarding } from '@/@types/onboarding'
 import type { Character } from '@/@types/roster'
 import type { QuickReply } from '@/@types/shortcuts'
 import type { Snapshot } from '@/@types/snapshot'
 import type { WheelSize, WheelSlice } from '@/@types/wheel'
+import { OPENING_WAIT_MS } from '@/hooks/use-late-opening'
 
 export const APPLE_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)'
 export const WINDOWS_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
@@ -14,6 +15,12 @@ export const NARROW_NO_BREAK_SPACE = '\u202F'
 
 export function pending(): Promise<never> {
   return new Promise(() => {})
+}
+
+const LATE_DIALOG_WAIT_MS = OPENING_WAIT_MS + 800
+
+export const findLateDialog = () => {
+  return screen.findByRole('dialog', {}, { timeout: LATE_DIALOG_WAIT_MS })
 }
 
 const BLANK_CHARACTER: Character = {
@@ -112,7 +119,6 @@ const BLANK_WHEEL_SIZE: WheelSize = {
   widest: 720,
   step: 20,
   deadZone: 0.32,
-  loopSeen: true,
   demo: DEMO_TEAM
 }
 
@@ -164,6 +170,7 @@ const BLANK_SNAPSHOT: Snapshot = {
     everywhere: false,
     previewing: false
   },
+  loopsSeen: { wheel: true, walk: true, runeTable: true },
   journal: []
 }
 

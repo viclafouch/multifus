@@ -162,7 +162,7 @@ msgstr "{nickname}: private message sent to the phone."
 msgid "{nickname} comme personnage principal"
 msgstr "{nickname} as your main character"
 
-#: src/components/character-row.tsx
+#: src/helpers/wording.ts
 msgid "{nickname} dans le défilement et l’AutoFocus"
 msgstr "{nickname} in the cycle and in AutoFocus"
 
@@ -443,6 +443,10 @@ msgstr "Turns on the click that walks the whole team from one map to the next."
 #: src/screens/walk-screen/state-panel.tsx
 #~ msgid "Allume sans quitter le jeu."
 #~ msgstr "Turns it on without leaving the game."
+
+#: src/screens/walk-screen/index.tsx
+msgid "Allumez, puis cliquez dans le jeu : le personnage marche, la fenêtre du suivant prend sa place, et la bannière dit sur qui vous arrivez."
+msgstr "Switch it on, then click in the game: the character walks, the next window takes its place, and the banner tells you who you have landed on."
 
 #: src/components/language-picker.tsx
 #: src/screens/about/reset-panel.tsx
@@ -973,6 +977,10 @@ msgstr "Made-up characters here and in the try-out, yours in the game."
 msgid "Déconnecté"
 msgstr "Offline"
 
+#: src/helpers/wording.ts
+msgid "Déconnecté, il ne défile pas"
+msgstr "Offline, they do not cycle"
+
 #: src/components/retro/scene-credit.tsx
 msgid "Décor © Ankama Games. Multifus n’est pas un logiciel d’Ankama."
 msgstr "Artwork © Ankama Games. Multifus is not an Ankama product."
@@ -1149,8 +1157,12 @@ msgid "Écrivez-lui /newbot et répondez à ses questions, il parle anglais. Ce 
 msgstr "Write /newbot to it and answer its questions. This bot will be the contact that writes to you."
 
 #: src/screens/walk-screen/banner-dialog.tsx
-msgid "Elle dit sur quel personnage vous venez d’arriver."
-msgstr "It says which character you have just landed on."
+#~ msgid "Elle dit sur quel personnage vous venez d’arriver."
+#~ msgstr "It says which character you have just landed on."
+
+#: src/screens/walk-screen/banner-panel.tsx
+msgid "Elle dit sur quel personnage vous venez d’arriver. Posez-la où elle ne cache rien du jeu."
+msgstr "It tells you which character you have just landed on. Put it where it hides nothing of the game."
 
 #: src/helpers/onboarding.ts
 #~ msgid "Elle retient les notifications. Multifus devient sourd, votre percepteur se fait taper à l’autre bout du monde, et vous ne l’apprenez qu’en rentrant."
@@ -1293,8 +1305,8 @@ msgid "Exclure toutes les femmes"
 msgstr "Set aside every female"
 
 #: src/screens/characters/roster-panel.tsx
-msgid "Exclusion"
-msgstr "Setting aside"
+#~ msgid "Exclusion"
+#~ msgstr "Setting aside"
 
 #: src/screens/shortcuts/characters-panel.tsx
 msgid "F1 sur l’Eniripsa, F2 sur le Sacrieur : sa fenêtre passe devant, d’où que vous veniez dans le jeu."
@@ -1417,8 +1429,8 @@ msgstr "Summons"
 msgid "Iop"
 msgstr "Iop"
 
+#: src/components/loop-dialog.tsx
 #: src/components/notice-bar.tsx
-#: src/screens/characters/wheel-loop-dialog.tsx
 msgid "J’ai compris"
 msgstr "Got it"
 
@@ -1466,7 +1478,7 @@ msgstr "AutoFocus cannot work"
 msgid "L’autorisation"
 msgstr "Permission"
 
-#: src/screens/walk-screen/banner-dialog.tsx
+#: src/screens/walk-screen/banner-panel.tsx
 msgid "L’écran"
 msgstr "The screen"
 
@@ -1478,7 +1490,15 @@ msgstr "This screen stopped"
 msgid "L’essai"
 msgstr "The try"
 
-#: src/screens/walk-screen/banner-dialog.tsx
+#: src/helpers/wording.ts
+#~ msgid "L’exclure du défilement, du Déplacement rapide et de l’AutoFocus"
+#~ msgstr "Set them aside from cycling, Quick Move and AutoFocus"
+
+#: src/helpers/wording.ts
+msgid "L’exclure du défilement, du Déplacement rapide et de l’AutoFocus. Ses messages privés arrivent quand même."
+msgstr "Set them aside from cycling, Quick Move and AutoFocus. Their private messages still arrive."
+
+#: src/screens/walk-screen/banner-panel.tsx
 msgid "La bannière"
 msgstr "The banner"
 
@@ -1591,7 +1611,7 @@ msgid "La roue au milieu de votre écran"
 msgstr "The wheel in the middle of your screen"
 
 #: src/constants/features.ts
-#: src/screens/characters/wheel-loop-dialog.tsx
+#: src/screens/characters/index.tsx
 msgid "La roue des personnages"
 msgstr "The character wheel"
 
@@ -1743,6 +1763,10 @@ msgstr "Rune weights, laid over the game window."
 msgid "Le projet"
 msgstr "The project"
 
+#: src/helpers/wording.ts
+msgid "Le réintégrer au défilement, au Déplacement rapide et à l’AutoFocus"
+msgstr "Bring them back into cycling, Quick Move and AutoFocus"
+
 #: src/constants/journal.ts
 msgid "Le système n’a pas pu ouvrir cet élément"
 msgstr "The system could not open this item"
@@ -1852,7 +1876,11 @@ msgstr "The replies you retype every evening, stored under keys. Press them insi
 msgid "Les réponses rapides"
 msgstr "Quick replies"
 
-#: src/screens/characters/wheel-loop-dialog.tsx
+#: src/screens/rune-table/index.tsx
+msgid "Les touches frappées pendant une casse : le tableau s’ouvre sur le jeu, les poids sous les yeux, et la souris ne quitte pas l’atelier."
+msgstr "The keys struck while breaking runes: the table opens over the game, the weights in plain sight, and the mouse never leaves the workshop."
+
+#: src/screens/characters/index.tsx
 msgid "Les touches maintenues dans le jeu : la roue s’ouvre au milieu de l’écran, la tête visée s’allume, et sa fenêtre passe devant."
 msgstr "The keys held down in the game: the wheel opens in the middle of the screen, the face you aim at lights up, and its window comes to the front."
 
@@ -1896,7 +1924,7 @@ msgstr "Hold the shortcut, aim at a head, let go."
 #~ msgid "Maintenez vos touches dans le jeu : la roue s’ouvre au milieu de l’écran. Visez une tête, lâchez ou cliquez, sa fenêtre passe devant."
 #~ msgstr "Hold your keys down in the game: the wheel opens in the middle of the screen. Aim at a face, let go or click, and its window comes to the front."
 
-#: src/screens/characters/wheel-loop-dialog.tsx
+#: src/screens/characters/index.tsx
 msgid "Maintenez vos touches dans le jeu, visez une tête, lâchez : sa fenêtre passe devant sans que la souris quitte le combat."
 msgstr "Hold your keys down in the game, aim at a face, let go: its window comes to the front without the mouse leaving the fight."
 
@@ -2667,7 +2695,7 @@ msgstr "Go through the setup again"
 #~ msgid "Revoir la prise en main"
 #~ msgstr "See getting started again"
 
-#: src/screens/characters/wheel-panel.tsx
+#: src/components/loop-button.tsx
 msgid "Revoir la vidéo"
 msgstr "Watch the video again"
 
@@ -2924,6 +2952,10 @@ msgstr "Every male online is set aside."
 msgid "Tous les hommes connectés sont réintégrés."
 msgstr "Every male online is brought back."
 
+#: src/screens/characters/roster-panel.tsx
+msgid "Tous vos personnages, connectés ou non. Cliquez une tête pour changer sa classe, son sexe ou sa couleur, la croix retire un déconnecté."
+msgstr "Every one of your characters, online or not. Click a head to change its class, its gender or its colour, and the cross removes an offline one."
+
 #: src/helpers/onboarding.ts
 #~ msgid "Tout ce qui suit vous attend dans la barre de gauche."
 #~ msgstr "Everything below is waiting in the left bar."
@@ -3057,8 +3089,8 @@ msgid "Un essai vient de partir. Attendez une trentaine de secondes avant le sui
 msgstr "A test just went out. Wait thirty seconds or so before the next one."
 
 #: src/screens/characters/roster-panel.tsx
-msgid "Un exclu est sauté par le défilement, le Déplacement rapide et l’AutoFocus. Ses messages privés arrivent quand même."
-msgstr "An excluded character is skipped by cycling, by Quick Move and by AutoFocus. Their private messages still arrive."
+#~ msgid "Un exclu est sauté par le défilement, le Déplacement rapide et l’AutoFocus. Ses messages privés arrivent quand même."
+#~ msgstr "An excluded character is skipped by cycling, by Quick Move and by AutoFocus. Their private messages still arrive."
 
 #: src/screens/relay/index.tsx
 msgid "Un joueur vous écrit pendant que vous êtes ailleurs ? Son message arrive sur votre téléphone, dans Telegram. Telegram, parce que c’est gratuit et que c’est la seule messagerie qu’un logiciel peut faire parler aussi simplement."
@@ -3198,6 +3230,10 @@ msgstr "Your settings could not be read"
 msgid "Vos réglages ont été mis de côté"
 msgstr "Your settings were set aside"
 
+#: src/screens/rune-table/index.tsx
+msgid "Vos touches ouvrent le tableau par-dessus le client où vous cassez. Il reste là, il suit la fenêtre, et les mêmes touches le referment."
+msgstr "Your keys open the table over the client where you break runes. It stays there, it follows the window, and the same keys close it."
+
 #: src/screens/relay/screen-saver-warning.tsx
 msgid "Votre écran de veille peut tout arrêter"
 msgstr "Your screen saver can stop everything"
@@ -3213,6 +3249,10 @@ msgstr "Your Mac never grants this permission straight away. Tick Multifus in {s
 #: src/constants/notification.ts
 msgid "Votre percepteur est attaqué."
 msgstr "Your perceptor is under attack."
+
+#: src/screens/characters/roster-panel.tsx
+msgid "Votre roster"
+msgstr "Your roster"
 
 #: src/components/empty-roster.tsx
 msgid "Votre roster est vide"

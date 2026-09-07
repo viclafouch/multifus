@@ -1,5 +1,6 @@
 import type { JournalEntry } from '@/@types/journal'
 import type { Language } from '@/@types/language'
+import type { LoopsSeen } from '@/@types/loop'
 import type { AutoFocusSwitch } from '@/@types/notification'
 import type { Onboarding } from '@/@types/onboarding'
 import type { RelayStatus } from '@/@types/relay'
@@ -59,5 +60,6 @@ export type Snapshot = {
   readonly walk: WalkStatus
   readonly wheel: WheelSize
   readonly runeTable: RuneTableStatus
+  readonly loopsSeen: LoopsSeen
   readonly journal: readonly JournalEntry[]
 }

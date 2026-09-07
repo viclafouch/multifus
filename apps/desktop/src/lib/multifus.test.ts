@@ -68,11 +68,13 @@ const COMMAND_PATTERN =
 
 const INJECTED_PARAMETERS = ['app', 'window']
 
+const RAW_IDENTIFIER = /^r#/u
+
 const parametersOf = (signature: string) => {
   return signature
     .split(',')
     .map((parameter) => {
-      return parameter.split(':')[0].trim()
+      return parameter.split(':')[0].trim().replace(RAW_IDENTIFIER, '')
     })
     .filter((name) => {
       return name.length > 0 && !INJECTED_PARAMETERS.includes(name)
@@ -320,9 +322,9 @@ const CALLS = [
     }
   },
   {
-    name: 'setWheelLoopSeen',
+    name: 'setLoopSeen',
     run: () => {
-      return multifus.setWheelLoopSeen()
+      return multifus.setLoopSeen('wheel')
     }
   },
   {

@@ -65,7 +65,7 @@ pub fn run() {
             app::commands::banner_screens,
             app::commands::banner_step,
             app::commands::set_wheel_diameter,
-            app::commands::set_wheel_loop_seen,
+            app::commands::set_loop_seen,
             app::commands::preview_wheel,
             app::commands::wheel_display,
             app::commands::wheel_step,

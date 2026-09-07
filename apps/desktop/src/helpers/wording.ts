@@ -455,6 +455,20 @@ export const characterMarksTooltip = (character: Character) => {
   return missingPartLabel(missing, character.nickname)
 }
 
+export const cycleToggleLabel = (nickname: string) => {
+  return t`${nickname} dans le défilement et l’AutoFocus`
+}
+
+export const cycleToggleTooltip = (character: Character) => {
+  if (!character.online) {
+    return t`Déconnecté, il ne défile pas`
+  }
+
+  return character.excluded
+    ? t`Le réintégrer au défilement, au Déplacement rapide et à l’AutoFocus`
+    : t`L’exclure du défilement, du Déplacement rapide et de l’AutoFocus. Ses messages privés arrivent quand même.`
+}
+
 export const characterRemoveLabel = (nickname: string) => {
   return t`Retirer ${nickname} du roster`
 }

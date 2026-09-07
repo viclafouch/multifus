@@ -20,6 +20,7 @@ pub struct Settings {
     pub banner: Banner,
     pub wheel: Wheel,
     pub rune_table: RuneTable,
+    pub loops_seen: LoopsSeen,
     pub maximize_on_launch: bool,
     pub short_titles: bool,
     pub paint_portraits: bool,
@@ -56,6 +57,7 @@ impl Default for Settings {
             banner: Banner::default(),
             wheel: Wheel::default(),
             rune_table: RuneTable::default(),
+            loops_seen: LoopsSeen::default(),
             maximize_on_launch: false,
             short_titles: false,
             paint_portraits: true,
@@ -107,16 +109,40 @@ const DEFAULT_DIAMETER: u32 = 320;
 #[serde(default)]
 pub struct Wheel {
     pub diameter: u32,
-    pub loop_seen: bool,
 }
 
 impl Default for Wheel {
     fn default() -> Self {
         Self {
             diameter: DEFAULT_DIAMETER,
-            loop_seen: false,
         }
     }
+}
+
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(default, rename_all = "camelCase")]
+pub struct LoopsSeen {
+    pub wheel: bool,
+    pub walk: bool,
+    pub rune_table: bool,
+}
+
+impl LoopsSeen {
+    pub fn see(&mut self, r#loop: Loop) {
+        match r#loop {
+            Loop::Wheel => self.wheel = true,
+            Loop::Walk => self.walk = true,
+            Loop::RuneTable => self.rune_table = true,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum Loop {
+    Wheel,
+    Walk,
+    RuneTable,
 }
 
 impl Wheel {

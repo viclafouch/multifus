@@ -82,7 +82,7 @@ paths: ['apps/desktop/src/**/*.{ts,tsx}']
 - Buttons already have built-in hover states via shadcn - don't override with custom transforms
 - Links use `hover:text-primary` or `hover:text-foreground` - keep it simple
 - **Consistency over creativity**: match existing patterns, don't invent new interactions
-- The clearing menu (`btn-way`) is the one place that moves on hover, and `docs/design-system.md` rule 18 holds that exception. Leave it alone
+- The clearing menu (`btn-way`) is the one place that moves on hover, and `docs/design-system.md` rule 19 holds that exception. Leave it alone
 
 ### Animations
 

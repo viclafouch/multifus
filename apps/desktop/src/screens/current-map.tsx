@@ -26,6 +26,7 @@ export const CurrentMap = ({ map, snapshot, run }: CurrentMapProps) => {
           paintPortraits={snapshot.paintPortraits}
           wheel={snapshot.wheel}
           shortcuts={snapshot.shortcuts}
+          isLoopSeen={snapshot.loopsSeen.wheel}
           run={run}
         />
       ) : (
@@ -62,6 +63,7 @@ export const CurrentMap = ({ map, snapshot, run }: CurrentMapProps) => {
         <WalkScreen
           walk={snapshot.walk}
           shortcuts={snapshot.shortcuts}
+          isLoopSeen={snapshot.loopsSeen.walk}
           run={run}
         />
       )
@@ -71,6 +73,7 @@ export const CurrentMap = ({ map, snapshot, run }: CurrentMapProps) => {
         <RuneTableScreen
           runeTable={snapshot.runeTable}
           shortcuts={snapshot.shortcuts}
+          isLoopSeen={snapshot.loopsSeen.runeTable}
           run={run}
         />
       )

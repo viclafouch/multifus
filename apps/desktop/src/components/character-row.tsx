@@ -6,17 +6,16 @@ import type { Character } from '@/@types/roster'
 import { CharacterDialog } from '@/components/character-dialog'
 import { CharacterMedallion } from '@/components/character-medallion'
 import { ColorStripe } from '@/components/color-stripe'
+import { CycleToggle } from '@/components/cycle-toggle'
 import { MainToggle } from '@/components/main-toggle'
 import { RemoveButton } from '@/components/remove-button'
 import { Button } from '@/components/retro/button'
-import { Tick } from '@/components/retro/tick'
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger
 } from '@/components/ui/tooltip'
 import type { ColorHolders } from '@/helpers/colors'
-import { matchIsInCycle } from '@/helpers/cycle'
 import { portraitFor } from '@/helpers/portrait'
 import {
   characterMarksLabel,
@@ -126,12 +125,9 @@ export const CharacterRow = ({
           actions.handleSetMain(nickname, !main)
         }}
       />
-      <Tick
-        checked={matchIsInCycle(character)}
-        disabled={!online}
-        aria-label={t`${nickname} dans le défilement et l’AutoFocus`}
-        className="group-data-excluded:data-unchecked:bg-destructive/45"
-        onCheckedChange={() => {
+      <CycleToggle
+        character={character}
+        onToggle={() => {
           actions.handleToggleExcluded(nickname)
         }}
       />

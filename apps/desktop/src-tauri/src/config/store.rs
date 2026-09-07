@@ -238,6 +238,7 @@ mod tests {
     use crate::config::settings::AutoFocus;
     use crate::config::settings::Banner;
     use crate::config::settings::BannerCorner;
+    use crate::config::settings::LoopsSeen;
     use crate::config::settings::QuickReply;
     use crate::config::settings::QuickReplyId;
     use crate::config::settings::RUNE_TABLE_CLEAREST;
@@ -310,9 +311,11 @@ mod tests {
                 corner: BannerCorner::TopLeft,
                 screen: Some("DISPLAY2".to_owned()),
             },
-            wheel: Wheel {
-                diameter: 300,
-                loop_seen: true,
+            wheel: Wheel { diameter: 300 },
+            loops_seen: LoopsSeen {
+                wheel: true,
+                walk: false,
+                rune_table: false,
             },
             rune_table: RuneTable {
                 width: 480,
@@ -353,7 +356,6 @@ mod tests {
         let settings = Settings {
             wheel: Wheel {
                 diameter: WHEEL_WIDEST * 2,
-                loop_seen: false,
             },
             ..a_settled_configuration()
         };

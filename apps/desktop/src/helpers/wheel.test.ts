@@ -140,7 +140,6 @@ describe('drawnWheel', () => {
     widest: 720,
     step: 20,
     deadZone: DEAD_ZONE,
-    loopSeen: true,
     demo: []
   }
 

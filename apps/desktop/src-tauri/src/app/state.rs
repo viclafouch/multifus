@@ -61,6 +61,7 @@ use crate::config::ConfigError;
 use crate::config::ConfigStore;
 use crate::config::Language;
 use crate::config::Loaded;
+use crate::config::Loop;
 use crate::config::QuickReply;
 use crate::config::QuickReplyId;
 use crate::config::RUNE_TABLE_CLEAREST;
@@ -350,7 +351,6 @@ impl Multifus {
                 widest: WHEEL_WIDEST,
                 step: WHEEL_STEP,
                 dead_zone: wheel::DEAD_ZONE,
-                loop_seen: self.settings.wheel.loop_seen,
                 demo: wheel::demo_slices(wheel::demo_crowd()),
             },
             rune_table: RuneTableView {
@@ -364,6 +364,7 @@ impl Multifus {
                 everywhere: self.settings.rune_table.everywhere,
                 previewing: self.rune_table_previewing,
             },
+            loops_seen: self.settings.loops_seen,
             relay: RelayView {
                 paired: self.settings.relay.chat_id.is_some(),
                 send_body: self.settings.relay.send_body,
@@ -1084,8 +1085,8 @@ impl Multifus {
         self.save();
     }
 
-    pub fn set_wheel_loop_seen(&mut self) {
-        self.settings.wheel.loop_seen = true;
+    pub fn set_loop_seen(&mut self, r#loop: Loop) {
+        self.settings.loops_seen.see(r#loop);
 
         self.save();
     }
@@ -2163,16 +2164,17 @@ mod tests {
     }
 
     #[test]
-    fn the_video_of_the_wheel_is_folded_for_good_once_it_has_been_seen() {
+    fn a_video_is_folded_for_good_once_it_has_been_seen() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
 
-        assert!(!state.snapshot().wheel.loop_seen);
+        assert!(!state.snapshot().loops_seen.wheel);
 
-        state.set_wheel_loop_seen();
+        state.set_loop_seen(Loop::Wheel);
 
-        assert!(state.snapshot().wheel.loop_seen);
-        assert!(multifus_reloaded(&directory).snapshot().wheel.loop_seen);
+        assert!(state.snapshot().loops_seen.wheel);
+        assert!(!state.snapshot().loops_seen.walk);
+        assert!(multifus_reloaded(&directory).snapshot().loops_seen.wheel);
     }
 
     #[test]

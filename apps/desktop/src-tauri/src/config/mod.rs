@@ -9,6 +9,8 @@ pub use language::Language;
 pub use settings::AutoFocus;
 pub use settings::Banner;
 pub use settings::BannerCorner;
+pub use settings::Loop;
+pub use settings::LoopsSeen;
 pub use settings::QuickReply;
 pub use settings::QuickReplyId;
 pub use settings::RUNE_TABLE_CLEAREST;

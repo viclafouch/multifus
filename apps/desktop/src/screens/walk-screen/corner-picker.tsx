@@ -6,6 +6,7 @@ import { ScreenFrame } from '@/components/layout/screen-frame'
 import { Button } from '@/components/retro/button'
 import { CORNER_PLACEMENT, CORNERS } from '@/constants/banner'
 import { monitorShape } from '@/helpers/banner'
+import { useBoxWidth } from '@/hooks/use-box-width'
 import { cn } from '@/lib/utils'
 
 type CornerPickerProps = Readonly<{
@@ -16,15 +17,15 @@ type CornerPickerProps = Readonly<{
 
 export const CornerPicker = ({ corner, screen, onPick }: CornerPickerProps) => {
   const cornerLegend = t`Le coin`
-
-  const shape = monitorShape(screen)
+  const { box, width } = useBoxWidth()
+  const shape = monitorShape({ screen, boxWidth: width })
 
   return (
     <div className="flex flex-col gap-2">
       <Legend>{cornerLegend}</Legend>
       <ScreenFrame
+        ref={box}
         ratio={shape.ratio}
-        width={shape.drawnWidth}
         label={cornerLegend}
         className="grid grid-cols-2 grid-rows-2 gap-1 p-1.5"
       >
@@ -36,7 +37,7 @@ export const CornerPicker = ({ corner, screen, onPick }: CornerPickerProps) => {
               aria-pressed={each === corner}
               aria-label={cornerLabel(each)}
               className={cn(
-                'group h-auto rounded-sm p-1.5 aria-pressed:bg-primary/6',
+                'group relative h-auto rounded-sm p-1.5 aria-pressed:bg-primary/6',
                 CORNER_PLACEMENT[each].anchor
               )}
               onClick={() => {

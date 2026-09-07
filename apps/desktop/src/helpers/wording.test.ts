@@ -13,6 +13,7 @@ import {
   characterPresenceSubLine,
   characterStateLine,
   characterSubLine,
+  cycleToggleTooltip,
   dialogNote,
   genderGroupHint,
   missingGenderLine,
@@ -321,6 +322,34 @@ describe('characterMarksTooltip', () => {
     const tooltip = characterMarksTooltip(character)
 
     expect(tooltip).toBe('Modifier')
+  })
+})
+
+describe('cycleToggleTooltip', () => {
+  it('propose d’exclure un personnage qui défile', () => {
+    const tooltip = cycleToggleTooltip(ONLINE_CHARACTER)
+
+    expect(tooltip).toBe(
+      'L’exclure du défilement, du Déplacement rapide et de l’AutoFocus. Ses messages privés arrivent quand même.'
+    )
+  })
+
+  it('propose de réintégrer un personnage exclu', () => {
+    const character = { ...ONLINE_CHARACTER, excluded: true }
+
+    const tooltip = cycleToggleTooltip(character)
+
+    expect(tooltip).toBe(
+      'Le réintégrer au défilement, au Déplacement rapide et à l’AutoFocus'
+    )
+  })
+
+  it('dit pourquoi l’interrupteur d’un déconnecté ne bouge pas', () => {
+    const character = { ...ONLINE_CHARACTER, online: false }
+
+    const tooltip = cycleToggleTooltip(character)
+
+    expect(tooltip).toBe('Déconnecté, il ne défile pas')
   })
 })
 

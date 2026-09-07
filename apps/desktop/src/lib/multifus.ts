@@ -3,6 +3,7 @@ import { listen } from '@tauri-apps/api/event'
 import type { AboutLink } from '@/@types/about'
 import type { Display } from '@/@types/display'
 import type { Language } from '@/@types/language'
+import type { LoopName } from '@/@types/loop'
 import type { NotificationKind } from '@/@types/notification'
 import type { SystemPage } from '@/@types/onboarding'
 import type { RelayLink } from '@/@types/relay'
@@ -185,8 +186,8 @@ export const setWheelDiameter = async (diameter: number) => {
   return invoke<Snapshot>('set_wheel_diameter', { diameter })
 }
 
-export const setWheelLoopSeen = async () => {
-  return invoke<Snapshot>('set_wheel_loop_seen')
+export const setLoopSeen = async (loop: LoopName) => {
+  return invoke<Snapshot>('set_loop_seen', { loop })
 }
 
 export const previewWheel = async (crowd: number) => {

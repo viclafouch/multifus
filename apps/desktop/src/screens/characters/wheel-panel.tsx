@@ -13,15 +13,9 @@ import { ShortcutRecall } from '@/components/shortcut-recall'
 import { HELD, SHORTCUT_ACTIONS } from '@/constants/shortcuts'
 import { DEMO_FEWEST, DEMO_USUAL } from '@/constants/wheel'
 import { useDraft } from '@/hooks/use-draft'
-import { useLateOpening } from '@/hooks/use-late-opening'
 import { useWheelDisplay } from '@/hooks/use-wheel-display'
-import {
-  previewWheel,
-  setWheelDiameter,
-  setWheelLoopSeen
-} from '@/lib/multifus'
+import { previewWheel, setWheelDiameter } from '@/lib/multifus'
 import { WheelDrawing } from '@/screens/characters/wheel-drawing'
-import { WheelLoopDialog } from '@/screens/characters/wheel-loop-dialog'
 
 type WheelPanelProps = Readonly<{
   wheel: WheelSize
@@ -33,22 +27,11 @@ export const WheelPanel = ({ wheel, shortcuts, run }: WheelPanelProps) => {
   const screen = useWheelDisplay()
   const { draft, setDraft } = useDraft(wheel.diameter)
   const [crowd, setCrowd] = React.useState(DEMO_USUAL)
-  const loop = useLateOpening(!wheel.loopSeen)
-  const isSeenTold = React.useRef(false)
 
   const accelerator =
     shortcuts.find((shortcut) => {
       return shortcut.action === 'wheel'
     })?.accelerator ?? null
-
-  const handleLoopOpenChange = (isOpen: boolean) => {
-    loop.setIsOpen(isOpen)
-
-    if (!isOpen && !wheel.loopSeen && !isSeenTold.current) {
-      isSeenTold.current = true
-      run(setWheelLoopSeen())
-    }
-  }
 
   return (
     <Panel>
@@ -57,15 +40,6 @@ export const WheelPanel = ({ wheel, shortcuts, run }: WheelPanelProps) => {
         description={t`Maintenez vos touches depuis une fenêtre du jeu, et nulle part ailleurs. La roue s’ouvre au milieu de l’écran : visez une tête, lâchez ou cliquez, sa fenêtre passe devant.`}
       >
         <ShortcutRecall accelerator={accelerator} mention={i18n._(HELD)} />
-        <Button
-          variant="slate"
-          size="sm"
-          onClick={() => {
-            loop.setIsOpen(true)
-          }}
-        >
-          {t`Revoir la vidéo`}
-        </Button>
       </PanelHeader>
       <div className="flex flex-col gap-3 px-4 py-4">
         {accelerator === null ? (
@@ -113,10 +87,6 @@ export const WheelPanel = ({ wheel, shortcuts, run }: WheelPanelProps) => {
           </Button>
         </div>
       </div>
-      <WheelLoopDialog
-        isOpen={loop.isOpen}
-        onOpenChange={handleLoopOpenChange}
-      />
     </Panel>
   )
 }

@@ -27,6 +27,7 @@ use crate::app::walk;
 use crate::app::wheel;
 use crate::config::BannerCorner;
 use crate::config::Language;
+use crate::config::Loop;
 use crate::config::QuickReplyId;
 use crate::domain::Class;
 use crate::domain::Color;
@@ -280,8 +281,8 @@ pub fn set_wheel_diameter(app: AppHandle, diameter: u32) -> Snapshot {
 }
 
 #[tauri::command]
-pub fn set_wheel_loop_seen(app: AppHandle) -> Snapshot {
-    lock(&app).set_wheel_loop_seen();
+pub fn set_loop_seen(app: AppHandle, r#loop: Loop) -> Snapshot {
+    lock(&app).set_loop_seen(r#loop);
 
     runtime::emit_snapshot(&app)
 }
