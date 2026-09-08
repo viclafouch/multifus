@@ -170,7 +170,7 @@ const BLANK_SNAPSHOT: Snapshot = {
     everywhere: false,
     previewing: false
   },
-  loopsSeen: { wheel: true, walk: true, runeTable: true },
+  loopsSeen: { wheel: true, walk: true, runeTable: true, autoFocus: true },
   journal: []
 }
 

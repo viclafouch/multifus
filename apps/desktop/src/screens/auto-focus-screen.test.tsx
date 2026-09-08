@@ -2,12 +2,19 @@ import { describe, expect, it, vi } from 'vitest'
 import { i18n } from '@lingui/core'
 import { fireEvent, render, screen } from '@testing-library/react'
 import type { AutoFocusSwitch, NotificationKind } from '@/@types/notification'
-import { APPLE_AGENT, WINDOWS_AGENT, speakFrench } from '@/test-doubles'
+import {
+  APPLE_AGENT,
+  WINDOWS_AGENT,
+  findLateDialog,
+  pending,
+  speakFrench
+} from '@/test-doubles'
 
 const bridge = {
   setAutoFocus: vi.fn(),
   setAutoFocusEnabled: vi.fn(),
-  setWakesMinimized: vi.fn()
+  setWakesMinimized: vi.fn(),
+  setLoopSeen: vi.fn(pending)
 }
 
 vi.mock(import('@/lib/multifus'), () => {
@@ -32,6 +39,7 @@ type ShowParams = {
   readonly switches?: readonly AutoFocusSwitch[]
   readonly isEnabled?: boolean
   readonly wakesMinimized?: boolean
+  readonly isLoopSeen?: boolean
   readonly agent?: string
 }
 
@@ -39,6 +47,7 @@ const show = async ({
   switches = ALL_ON,
   isEnabled = true,
   wakesMinimized = false,
+  isLoopSeen = true,
   agent = WINDOWS_AGENT
 }: ShowParams = {}) => {
   vi.resetModules()
@@ -54,12 +63,16 @@ const show = async ({
       switches={switches}
       isEnabled={isEnabled}
       wakesMinimized={wakesMinimized}
+      isLoopSeen={isLoopSeen}
       run={() => {}}
     />
   )
 
   return NOTIFICATION_LABELS
 }
+
+const LOOP_CAPTION =
+  'Un défi arrive sur un autre personnage : sa fenêtre passe devant toute seule, la demande déjà à l’écran.'
 
 const switchNamed = (label: string) => {
   return screen.getByRole('switch', { name: label })
@@ -171,5 +184,31 @@ describe('l’écran de l’AutoFocus', () => {
         'Même un personnage rangé dans le Dock revient devant vous.'
       )
     ).not.toBeNull()
+  })
+
+  describe('la vidéo', () => {
+    it('vient d’elle-même à la première arrivée, et ne revient plus', async () => {
+      await show({ isLoopSeen: false })
+
+      await findLateDialog()
+
+      expect(screen.getByLabelText(LOOP_CAPTION)).not.toBeNull()
+
+      fireEvent.click(screen.getByRole('button', { name: 'J’ai compris' }))
+
+      expect(bridge.setLoopSeen).toHaveBeenCalledWith('autoFocus')
+    })
+
+    it('se rouvre au bouton, sans plus rien enregistrer', async () => {
+      await show()
+
+      expect(screen.queryByRole('dialog')).toBeNull()
+
+      fireEvent.click(screen.getByRole('button', { name: 'Revoir la vidéo' }))
+
+      await findLateDialog()
+
+      expect(bridge.setLoopSeen).not.toHaveBeenCalled()
+    })
   })
 })

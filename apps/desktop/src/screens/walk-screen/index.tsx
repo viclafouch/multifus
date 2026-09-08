@@ -3,6 +3,7 @@ import { t } from '@lingui/core/macro'
 import type { ShortcutBinding } from '@/@types/shortcuts'
 import type { Snapshot } from '@/@types/snapshot'
 import type { WalkStatus } from '@/@types/walk'
+import walkLoop from '@/assets/ankama/walk-loop.mp4'
 import { Note } from '@/components/layout/note'
 import { Screen } from '@/components/layout/screen'
 import { LoopButton } from '@/components/loop-button'
@@ -48,7 +49,7 @@ export const WalkScreen = ({
         title={i18n._(MAP_NAMES.walk)}
         description={t`Allumez, puis cliquez dans le jeu : le personnage marche, la fenêtre du suivant prend sa place, et la bannière dit sur qui vous arrivez.`}
         caption={t`Un clic gauche dans le jeu : le personnage marche, la fenêtre du suivant passe devant, et la bannière se pose dans le coin.`}
-        source={null}
+        source={walkLoop}
         isOpen={loop.isOpen}
         onOpenChange={loop.handleOpenChange}
       />

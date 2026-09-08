@@ -24,7 +24,8 @@ Trois sont reprises, `characters`, `shortcuts` et `walk`. Les six autres portent
 encore une liste de plaques empilées, et le système est dans
 [design-system.md](./design-system.md).
 
-- [ ] **AutoFocus**, **Réponses rapides**, **Messages privés** : passer aux plaques et à leur vidéo en dialogue, comme le Déplacement rapide
+- [ ] **AutoFocus** : il a déjà sa vidéo en dialogue ; le reste de la map est encore une pile de plaques
+- [ ] **Réponses rapides**, **Messages privés** : passer aux plaques et à leur vidéo en dialogue, comme le Déplacement rapide
 - [ ] **Tableau des runes** : il a déjà sa vidéo en dialogue et sa plaque d'aperçu porte le vrai tableau ; le reste de la map est encore une pile de plaques
 - [ ] **Paramètres** : le plus chargé, six réglages et la mise en route. À découper en dialogues, un par sujet
 - [ ] **À propos** : trois lignes suffisent
@@ -36,8 +37,7 @@ encore une liste de plaques empilées, et le système est dans
 ## Poser les images qui manquent
 
 - [ ] Enregistrer les cinq vidéos de la mise en route sur le Mac, et les mêmes sur Windows pour les étapes 2, 3 et 4, dont le dessin diffère. `PAGE_SHOTS` gagne son axe plateforme à ce moment-là, et pas avant : deux tables identiques en attendant les images ne seraient qu'une constante écrite deux fois. Posées, `PAGE_SHOTS` les prend et le cadre pointillé disparaît
-- [ ] Enregistrer la roue à l'œuvre dans le jeu. `assets/ankama/wheel-loop.mp4` montre un personnage qui marche, pas la roue : l'écraser par le skill `make-loop` suffit
-- [ ] Enregistrer le Déplacement rapide et le Tableau des runes à l'œuvre. Leurs dialogues n'ont aucune vidéo et ne montrent que leur légende, `source={null}` : poser le fichier par le skill `make-loop` et le passer à `LoopDialog` suffit
+- [ ] Enregistrer le Tableau des runes à l'œuvre. Son dialogue n'a aucune vidéo et ne montre que sa légende, `source={null}` : poser le fichier par le skill `make-loop` et le passer à `LoopDialog` suffit
 
 ## Lire le bon interrupteur des notifications de Dofus, sur Windows
 
@@ -60,6 +60,7 @@ perdant son autorisation d'Accessibilité.
 
 - [ ] Multifus laissé une heure à côté d'un navigateur, sur Windows : le gestionnaire des tâches ne doit rien lui voir prendre au processeur. Le reste du réveil du tour est essayé et bon, filtre de `DESTROY` compris
 - [ ] Un client Dofus figé, sur le Mac : vérifier qu'il ne retient plus le fil de scan, donc que le roster, la roue et les titres courts continuent de suivre. `set_messaging_timeout` est posé à une demi-seconde dans `platform/macos.rs`
+- [ ] Les notifications en rafale, sur le Mac : lancer trois échanges à deux secondes d'écart sur trois personnages, les trois doivent basculer. macOS remplit la bannière déjà à l'écran au lieu d'en créer une, et `AXLayoutChanged` est ce qui le dit. Puis ouvrir le Centre de notifications, qui expose les anciennes notifications : aucune fenêtre ne doit passer devant
 - [ ] La reprise de l'écoute des notifications, sur le Mac : tuer le centre de notifications, le journal doit porter une ligne, une seule, puis « Écoute des notifications démarrée » cinq secondes plus tard. Windows est essayé et bon, par `Stop-Service WpnUserService_*`, qui rend `0x803E0105`. L'essai casse le jeu et non le logiciel : le client Dofus perd son inscription auprès de la plateforme et n'émet plus rien tant qu'on ne l'a pas relancé, Multifus se rebranchant seul
 - [ ] Le raccourci rendu hors du jeu, sur le Mac : `Shift+Digit1` écrit le 1 dans Chrome, Multifus allumé, et colle toujours la réponse rapide dans le jeu. Puis cliquer sur un client et frapper aussitôt, il répond ; l'AutoFocus ramène une fenêtre devant, le raccourci suivant répond ; la roue maintenue puis relâchée bascule toujours
 - [ ] Le journal ne se remplit pas de « raccourcis liés » quand on entre et sort du jeu vingt fois

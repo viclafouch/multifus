@@ -464,6 +464,10 @@ msgstr "Allume ou éteint le Déplacement rapide."
 #~ msgid "Allume sans quitter le jeu."
 #~ msgstr "Allume sans quitter le jeu."
 
+#: src/screens/auto-focus-screen.tsx
+msgid "Allumez, et laissez le jeu vous appeler : dès qu’un personnage reçoit un combat, un échange ou un défi, sa fenêtre passe devant sans que vous touchiez à rien."
+msgstr "Allumez, et laissez le jeu vous appeler : dès qu’un personnage reçoit un combat, un échange ou un défi, sa fenêtre passe devant sans que vous touchiez à rien."
+
 #: src/screens/walk-screen/index.tsx
 msgid "Allumez, puis cliquez dans le jeu : le personnage marche, la fenêtre du suivant prend sa place, et la bannière dit sur qui vous arrivez."
 msgstr "Allumez, puis cliquez dans le jeu : le personnage marche, la fenêtre du suivant prend sa place, et la bannière dit sur qui vous arrivez."
@@ -3255,6 +3259,10 @@ msgstr "Un combat, un échange, un message privé : Multifus affiche le personna
 #: src/screens/onboarding/proof-band.tsx
 #~ msgid "Un combat, un message privé : Multifus vous amène devant."
 #~ msgstr "Un combat, un message privé : Multifus vous amène devant."
+
+#: src/screens/auto-focus-screen.tsx
+msgid "Un défi arrive sur un autre personnage : sa fenêtre passe devant toute seule, la demande déjà à l’écran."
+msgstr "Un défi arrive sur un autre personnage : sa fenêtre passe devant toute seule, la demande déjà à l’écran."
 
 #: src/screens/relay/test-panel.tsx
 msgid "Un essai vient de partir. Attendez une trentaine de secondes avant le suivant."

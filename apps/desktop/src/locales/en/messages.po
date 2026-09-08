@@ -464,6 +464,10 @@ msgstr "Turns Quick Walk on or off."
 #~ msgid "Allume sans quitter le jeu."
 #~ msgstr "Turns it on without leaving the game."
 
+#: src/screens/auto-focus-screen.tsx
+msgid "Allumez, et laissez le jeu vous appeler : dès qu’un personnage reçoit un combat, un échange ou un défi, sa fenêtre passe devant sans que vous touchiez à rien."
+msgstr "Turn it on, and let the game call you: as soon as a character is sent a fight, a trade or a challenge, their window comes to the front without you touching a thing."
+
 #: src/screens/walk-screen/index.tsx
 msgid "Allumez, puis cliquez dans le jeu : le personnage marche, la fenêtre du suivant prend sa place, et la bannière dit sur qui vous arrivez."
 msgstr "Switch it on, then click in the game: the character walks, the next window takes its place, and the banner tells you who you have landed on."
@@ -3255,6 +3259,10 @@ msgstr "A fight, a trade, a private message: Multifus shows the character involv
 #: src/screens/onboarding/proof-band.tsx
 #~ msgid "Un combat, un message privé : Multifus vous amène devant."
 #~ msgstr "A fight, a private message: Multifus brings you to the front."
+
+#: src/screens/auto-focus-screen.tsx
+msgid "Un défi arrive sur un autre personnage : sa fenêtre passe devant toute seule, la demande déjà à l’écran."
+msgstr "A challenge lands on another character: their window comes to the front by itself, the request already on screen."
 
 #: src/screens/relay/test-panel.tsx
 msgid "Un essai vient de partir. Attendez une trentaine de secondes avant le suivant."

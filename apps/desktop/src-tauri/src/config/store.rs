@@ -316,6 +316,7 @@ mod tests {
                 wheel: true,
                 walk: false,
                 rune_table: false,
+                auto_focus: false,
             },
             rune_table: RuneTable {
                 width: 480,

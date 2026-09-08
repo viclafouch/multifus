@@ -54,6 +54,7 @@ export const CurrentMap = ({ map, snapshot, run }: CurrentMapProps) => {
           switches={snapshot.autoFocus}
           isEnabled={snapshot.autoFocusEnabled}
           wakesMinimized={snapshot.wakesMinimized}
+          isLoopSeen={snapshot.loopsSeen.autoFocus}
           run={run}
         />
       )

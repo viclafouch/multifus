@@ -19,6 +19,7 @@ const USAGE = `make-loop <source> [options]
                       diviseur de 100
   --aspect <l:h>      recadre au centre à ce rapport avant de mettre à l'échelle
   --crf <18-32>       la qualité de la vidéo, 22 par défaut, plus haut plus léger
+  --drop-end <s>      coupe ce nombre de secondes à la fin
 
   make-loop capture.mp4 --width 1408 --aspect 16:9
 `
@@ -107,13 +108,15 @@ const cropTo = ({ width, height, aspect }) => {
     : { width: toEven(width), height: toEven(width / ratio) }
 }
 
-const renderVideo = async ({ source, filters, crf, output }) => {
+const renderVideo = async ({ source, filters, kept, crf, output }) => {
   await run('ffmpeg', [
     '-y',
     '-v',
     'error',
     '-i',
     source,
+    '-t',
+    String(kept),
     '-vf',
     filters,
     '-c:v',
@@ -136,6 +139,7 @@ const renderVideo = async ({ source, filters, crf, output }) => {
 const renderGif = async ({
   source,
   filters,
+  kept,
   framesPerSecond,
   width,
   output
@@ -149,6 +153,8 @@ const renderGif = async ({
       'error',
       '-i',
       source,
+      '-t',
+      String(kept),
       '-vf',
       filters,
       join(folder, 'f%06d.png')
@@ -203,9 +209,18 @@ const convert = async ({
   width,
   framesPerSecond,
   aspect,
-  crf
+  crf,
+  dropEnd
 }) => {
   const origin = await probe(source)
+  const kept = origin.duration - dropEnd
+
+  if (kept <= 0) {
+    throw new Error(
+      `--drop-end ${dropEnd} ne laisserait rien d'une source de ${origin.duration.toFixed(2)} s`
+    )
+  }
+
   const crop = cropTo({ ...origin, aspect })
   const outWidth = toEven(width ?? crop.width)
   const out = {
@@ -222,17 +237,18 @@ const convert = async ({
     await renderGif({
       source,
       filters,
+      kept,
       framesPerSecond,
       width: out.width,
       output
     })
   } else {
-    await renderVideo({ source, filters, crf, output })
+    await renderVideo({ source, filters, kept, crf, output })
   }
 
   const { size } = await stat(output)
 
-  return { origin, out, size }
+  return { origin, out, size, kept }
 }
 
 const main = async () => {
@@ -245,6 +261,7 @@ const main = async () => {
       fps: { type: 'string' },
       aspect: { type: 'string' },
       crf: { type: 'string' },
+      'drop-end': { type: 'string' },
       help: { type: 'boolean', default: false }
     }
   })
@@ -276,20 +293,21 @@ const main = async () => {
   await requireTools(shape)
 
   const output = values.out ? resolve(values.out) : defaultOutput(source, shape)
-  const { origin, out, size } = await convert({
+  const { origin, out, size, kept } = await convert({
     source,
     output,
     shape,
     width: values.width ? Number(values.width) : null,
     framesPerSecond,
     aspect: values.aspect ?? null,
-    crf: Number(values.crf ?? DEFAULT_CRF)
+    crf: Number(values.crf ?? DEFAULT_CRF),
+    dropEnd: Number(values['drop-end'] ?? 0)
   })
 
   process.stdout.write(
     [
       `source  ${origin.width} × ${origin.height}, ${origin.duration.toFixed(2)} s`,
-      `sortie  ${out.width} × ${out.height}, ${framesPerSecond} images par seconde, ${shape === 'gif' ? 'gif' : 'H.264 muet'}`,
+      `sortie  ${out.width} × ${out.height}, ${kept.toFixed(2)} s, ${framesPerSecond} images par seconde, ${shape === 'gif' ? 'gif' : 'H.264 muet'}`,
       `poids   ${formatWeight(size)}`,
       `chemin  ${output}`,
       ''
