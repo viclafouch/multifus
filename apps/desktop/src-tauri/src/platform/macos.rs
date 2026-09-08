@@ -18,6 +18,7 @@ use std::sync::mpsc;
 use std::thread;
 use std::thread::JoinHandle;
 use std::time::Duration;
+use std::time::Instant;
 
 use block2::RcBlock;
 use dispatch2::DispatchQueue;
@@ -130,15 +131,23 @@ const AX_WINDOWS: &str = "AXWindows";
 const AX_CHILDREN: &str = "AXChildren";
 const AX_ROLE: &str = "AXRole";
 const AX_VALUE: &str = "AXValue";
+const AX_PARENT: &str = "AXParent";
+const AX_IDENTIFIER: &str = "AXIdentifier";
+const AX_NOTIFICATION_LIST_IDENTIFIER: &str = "AXNotificationListItems";
 const AX_FRONTMOST: &str = "AXFrontmost";
 const AX_STATIC_TEXT_ROLE: &str = "AXStaticText";
 const AX_CREATED_NOTIFICATION: &str = "AXCreated";
 const AX_WINDOW_CREATED_NOTIFICATION: &str = "AXWindowCreated";
 const AX_TITLE_CHANGED_NOTIFICATION: &str = "AXTitleChanged";
+const AX_LAYOUT_CHANGED_NOTIFICATION: &str = "AXLayoutChanged";
 
 const MAX_BANNER_DEPTH: usize = 8;
 
+const MAX_BANNER_ASCENT: usize = 8;
+
 const MAX_BANNER_TEXTS: usize = 4;
+
+const BANNER_ECHO: Duration = Duration::from_secs(5);
 
 const STOP_CHECK_SECONDS: f64 = 0.25;
 
@@ -1362,12 +1371,13 @@ fn watch(
     running: &AtomicBool,
     ready: &mpsc::Sender<Result<()>>,
 ) {
-    let refcon: *mut c_void = ptr::from_ref(&sink).cast_mut().cast();
+    let banners = Banners::new(sink);
+    let refcon: *mut c_void = ptr::from_ref(&banners).cast_mut().cast();
 
     let observer = match create_observer(
         pid,
-        on_banner_created,
-        &[AX_CREATED_NOTIFICATION],
+        on_banner_drawn,
+        &[AX_CREATED_NOTIFICATION, AX_LAYOUT_CHANGED_NOTIFICATION],
         refcon,
         "creating the banner observer",
     ) {
@@ -1409,9 +1419,56 @@ fn watch(
     run_loop.remove_source(Some(&source), mode);
 
     if gone.load(Ordering::Acquire) {
-        sink(NotificationReport::ListeningLost {
+        banners.tell(NotificationReport::ListeningLost {
             detail: CENTRE_GONE.to_owned(),
         });
+    }
+}
+
+struct Banners {
+    sink: NotificationSink,
+    echo: Mutex<Option<Echo>>,
+}
+
+#[derive(Debug)]
+struct Echo {
+    notification: GameNotification,
+    heard: Instant,
+}
+
+impl Banners {
+    fn new(sink: NotificationSink) -> Self {
+        Self {
+            sink,
+            echo: Mutex::new(None),
+        }
+    }
+
+    fn tell(&self, report: NotificationReport) {
+        if let NotificationReport::Heard(notification) = &report
+            && self.swallows(notification, Instant::now())
+        {
+            return;
+        }
+
+        (self.sink)(report);
+    }
+
+    fn swallows(&self, notification: &GameNotification, heard: Instant) -> bool {
+        let mut echo = self.echo.lock().unwrap_or_else(PoisonError::into_inner);
+
+        let repeated = echo.as_ref().is_some_and(|last| {
+            &last.notification == notification && heard.duration_since(last.heard) < BANNER_ECHO
+        });
+
+        if !repeated {
+            *echo = Some(Echo {
+                notification: notification.clone(),
+                heard,
+            });
+        }
+
+        repeated
     }
 }
 
@@ -1743,7 +1800,7 @@ fn create_observer(
     for name in notifications {
         let notification = CFString::from_str(name);
 
-        // SAFETY: `refcon` points at the sink, which outlives the observer.
+        // SAFETY: `refcon` points at what the caller keeps alive past the observer.
         let status = unsafe { observer.add_notification(&application, &notification, refcon) };
 
         ax_result(status, operation)?;
@@ -1752,7 +1809,7 @@ fn create_observer(
     Ok(observer)
 }
 
-unsafe extern "C-unwind" fn on_banner_created(
+unsafe extern "C-unwind" fn on_banner_drawn(
     _observer: NonNull<AXObserver>,
     element: NonNull<AXUIElement>,
     _notification: NonNull<CFString>,
@@ -1762,8 +1819,8 @@ unsafe extern "C-unwind" fn on_banner_created(
         return;
     }
 
-    // SAFETY: `refcon` is the sink `watch` registered, dropped after the observer.
-    let sink: &NotificationSink = unsafe { &*refcon.cast::<NotificationSink>() };
+    // SAFETY: `refcon` points at the `Banners` of `watch`, dropped after the observer.
+    let banners: &Banners = unsafe { &*refcon.cast::<Banners>() };
 
     // SAFETY: the system hands a live element to its callback.
     let element: &AXUIElement = unsafe { element.as_ref() };
@@ -1779,7 +1836,7 @@ unsafe extern "C-unwind" fn on_banner_created(
 
     drop(catch_unwind(AssertUnwindSafe(|| {
         if let Some(report) = report {
-            sink(report);
+            banners.tell(report);
         }
     })));
 }
@@ -1799,6 +1856,10 @@ impl Walk {
 }
 
 fn read_banner(element: &AXUIElement) -> Option<NotificationReport> {
+    if matches_notification_list(element) {
+        return None;
+    }
+
     let mut walk = Walk::default();
 
     collect_static_texts(element, 0, &mut walk);
@@ -1822,8 +1883,41 @@ fn read_banner(element: &AXUIElement) -> Option<NotificationReport> {
     )))
 }
 
+fn matches_notification_list(element: &AXUIElement) -> bool {
+    if matches_list_identifier(element) {
+        return true;
+    }
+
+    let mut parent = element_attribute(element, AX_PARENT).ok().flatten();
+
+    for _ in 0..MAX_BANNER_ASCENT {
+        let Some(above) = parent else {
+            return false;
+        };
+
+        if matches_list_identifier(&above) {
+            return true;
+        }
+
+        parent = element_attribute(&above, AX_PARENT).ok().flatten();
+    }
+
+    false
+}
+
+fn matches_list_identifier(element: &AXUIElement) -> bool {
+    string_attribute(element, AX_IDENTIFIER)
+        .ok()
+        .flatten()
+        .is_some_and(|identifier| identifier == AX_NOTIFICATION_LIST_IDENTIFIER)
+}
+
 fn collect_static_texts(element: &AXUIElement, depth: usize, walk: &mut Walk) {
     if depth > MAX_BANNER_DEPTH || walk.texts.len() >= MAX_BANNER_TEXTS {
+        return;
+    }
+
+    if depth > 0 && matches_list_identifier(element) {
         return;
     }
 
@@ -2206,8 +2300,6 @@ unsafe extern "C" {
 
 #[cfg(test)]
 mod tests {
-    use std::time::Instant;
-
     use super::*;
 
     fn area() -> CGRect {
@@ -2259,6 +2351,102 @@ mod tests {
             Some(left),
             "a window nobody's screen holds falls back to the main one"
         );
+    }
+
+    fn invite(nickname: &str) -> NotificationReport {
+        NotificationReport::Heard(GameNotification::new(
+            format!("{nickname} - Dofus Retro v1.48.21"),
+            "Untel te propose de faire un échange",
+        ))
+    }
+
+    fn watching() -> (Banners, Arc<Mutex<Vec<NotificationReport>>>) {
+        let told = Arc::new(Mutex::new(Vec::new()));
+        let kept = Arc::clone(&told);
+
+        let banners = Banners::new(Box::new(move |report| {
+            kept.lock()
+                .unwrap_or_else(PoisonError::into_inner)
+                .push(report);
+        }));
+
+        (banners, told)
+    }
+
+    fn count(told: &Mutex<Vec<NotificationReport>>) -> usize {
+        told.lock().unwrap_or_else(PoisonError::into_inner).len()
+    }
+
+    #[test]
+    fn the_three_events_of_one_banner_are_told_once() {
+        let (banners, told) = watching();
+
+        for _ in 0..3 {
+            banners.tell(invite("Alpha"));
+        }
+
+        assert_eq!(
+            count(&told),
+            1,
+            "macOS draws the banner once, then changes its layout twice"
+        );
+    }
+
+    #[test]
+    fn a_banner_that_takes_another_notification_is_told_in_its_turn() {
+        let (banners, told) = watching();
+
+        banners.tell(invite("Alpha"));
+        banners.tell(invite("Beta"));
+        banners.tell(invite("Gamma"));
+
+        assert_eq!(
+            count(&told),
+            3,
+            "macOS refills the banner it already shows, and creates nothing"
+        );
+    }
+
+    #[test]
+    fn the_same_notification_is_heard_again_once_the_echo_has_died() {
+        let (banners, _told) = watching();
+        let first = Instant::now();
+        let notification = GameNotification::new("Alpha - Dofus Retro v1.48.21", "de jouer");
+
+        assert!(!banners.swallows(&notification, first));
+        assert!(banners.swallows(&notification, first + BANNER_ECHO / 2));
+        assert!(!banners.swallows(&notification, first + BANNER_ECHO));
+    }
+
+    #[test]
+    fn an_echo_does_not_push_back_the_end_of_its_own_window() {
+        let (banners, _told) = watching();
+        let first = Instant::now();
+        let notification = GameNotification::new("Alpha - Dofus Retro v1.48.21", "de jouer");
+
+        assert!(!banners.swallows(&notification, first));
+
+        for step in 1..5 {
+            banners.swallows(&notification, first + BANNER_ECHO / 5 * step);
+        }
+
+        assert!(
+            !banners.swallows(&notification, first + BANNER_ECHO),
+            "a banner held under the mouse would silence the next one forever"
+        );
+    }
+
+    #[test]
+    fn what_is_not_a_notification_never_counts_as_an_echo() {
+        let (banners, told) = watching();
+
+        for _ in 0..3 {
+            banners.tell(NotificationReport::Unreadable {
+                detail: "the banner has no text".to_owned(),
+            });
+        }
+
+        assert_eq!(count(&told), 3);
     }
 
     #[test]
