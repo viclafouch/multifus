@@ -27,7 +27,7 @@ export const JournalPanel = ({ snapshot }: JournalPanelProps) => {
   const list = React.useRef<HTMLOListElement>(null)
   const isFollowing = React.useRef(true)
 
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
     const element = list.current
 
     if (
