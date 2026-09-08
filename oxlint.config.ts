@@ -23,7 +23,8 @@ export default defineConfig({
     '**/node_modules/**',
     '**/dist/**',
     'apps/desktop/src-tauri/**',
-    'apps/desktop/scripts/*.cjs'
+    'apps/desktop/scripts/*.cjs',
+    '.claude/skills/**'
   ],
   options: {
     typeAware: true,
