@@ -72,13 +72,14 @@ export const Head = ({ character, onOpen, onRemove }: HeadProps) => {
         </span>
       </button>
       {online ? null : (
-        <RemoveButton
-          label={characterRemoveLabel(nickname)}
-          onRemove={onRemove}
-          variant="token"
-          size="icon-pebble"
-          className="absolute top-nook right-nook z-20 translate-x-1/2 -translate-y-1/2 opacity-0 transition-opacity duration-200 group-hover/place:opacity-100 group-focus-within/place:opacity-100"
-        />
+        <span className="absolute top-nook right-nook z-20 translate-x-1/2 -translate-y-1/2 opacity-0 transition-opacity duration-200 group-hover/place:opacity-100 group-focus-within/place:opacity-100">
+          <RemoveButton
+            label={characterRemoveLabel(nickname)}
+            onRemove={onRemove}
+            variant="token"
+            size="icon-pebble"
+          />
+        </span>
       )}
     </div>
   )
