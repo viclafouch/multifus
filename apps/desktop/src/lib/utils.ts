@@ -4,6 +4,7 @@ import { extendTailwindMerge } from 'tailwind-merge'
 const FONT_SIZES = [
   'chapter',
   'sign',
+  'motto',
   'action',
   'bar',
   'deed',

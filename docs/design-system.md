@@ -79,12 +79,17 @@ pour un écran de travail, c'est la fenêtre Options du client qui répond.
    qui ne tourne que sur l'image affichée fait sauter l'image au changement
 9. Une ombre qui s'éteint le fait en courbe, jamais en droite. Une rampe de trois
    arrêts pose un trait là où la pente change, et l'œil le voit même là où
-   l'alpha ne vaut presque plus rien. La courbe est une sigmoïde à queue plate,
-   écrite une seule fois dans `fall` de `retro.css` et portée par un masque : la
-   couleur et le sens restent à l'élément. Un bord ne reçoit qu'une ombre, car
-   deux courbes superposées de longueurs différentes rendent le trait qu'on
-   venait d'effacer. Et une ombre a besoin de place : une opacité forte serrée
-   sur trop peu se verra toujours
+   l'alpha ne vaut presque plus rien. Les deux courbes sont dans le `:root` de
+   `retro.css` et se portent par un masque, la couleur et le sens restant à
+   l'élément. `--fall-stops` est à queue plate d'un seul côté, et sert ce qui
+   pend d'un bord : `fall` s'en sert pour les deux `Shade`. `--ebb-stops` est
+   plate aux deux bouts, et sert ce qui meurt des deux côtés : la plaque d'une
+   phrase de map s'y efface à gauche comme à droite. Prendre l'une pour l'autre
+   se voit : le départ raide de `--fall-stops` pose un trait là où la plaque
+   quitte sa pleine valeur, exactement le trait qu'on voulait effacer. Un bord ne
+   reçoit qu'une ombre, car deux courbes superposées de longueurs différentes
+   rendent ce trait aussi. Et une ombre a besoin de place : une opacité forte
+   serrée sur trop peu se verra toujours
 
 ### La mise en page
 
@@ -95,7 +100,20 @@ pour un écran de travail, c'est la fenêtre Options du client qui répond.
     finit hors d'elle : c'est `--spacing-fall` qui donne les deux marges. Le
     texte qui glisse dessous s'efface au lieu de se cogner
 12. Le titre d'une map se pose toujours à la même hauteur, quelle que soit celle
-    de ce qu'il annonce. C'est le bas qui reste vide
+    de ce qu'il annonce. C'est le bas qui reste vide. Sous lui, la phrase est
+    posée sur une plaque dont le fronton fait le bord haut. Un assombrissement
+    flou et sans bord, qui défile pendant que l'ombre du haut ne bouge pas, se
+    lit comme un défaut d'affichage : deux nuages sombres qui se croisent. Un
+    objet à bords passe derrière l'ombre sans surprendre, et c'est pour cela que
+    la plaque a un bord haut, un bord bas et des côtés qui se perdent. Ses côtés
+    doivent avoir fini de se perdre avant que la phrase commence, sinon les
+    premiers et les derniers mots d'une longue ligne se posent sur presque rien :
+    la fin de la courbe et le rembourrage du texte se règlent ensemble, et se
+    vérifient sur la phrase la plus longue, pas sur la plus courte. La plaque
+    tient sa lisibilité de l'`iron`, jamais de la taille de sa phrase : sur le
+    pixel le plus clair des décors, sous la plaque, la `cream` tient les 4,5:1 là
+    où la `khaki-lit` tombe à 3,7:1. La phrase reste loin du corps du titre,
+    sinon l'œil ne va plus qu'à elle et le reste de la map s'efface
 13. Un écran garde une marge de hauteur : les fontes chargent en `swap`, et la
     page grandit de quelques pixels le temps que les vraies arrivent
 14. Un dialogue tient sa place de son composant, jamais de sa classe. Une classe
@@ -111,7 +129,10 @@ pour un écran de travail, c'est la fenêtre Options du client qui répond.
     avant la fin, et un test cherche à la milliseconde zéro. Un bouton ne monte
     pas en opacité au-dessus du décor, il porte `steady` et arrive posé : son
     fond translucide laisse passer la pelouse tant que le fondu dure, et cela
-    se lit comme un survol
+    se lit comme un survol. `settle` ne voit que ses enfants directs : ce qu'une
+    map pose en haut reste à plat dans la section. Regrouper le titre et la
+    phrase dans un conteneur a sorti le bouton de la portée de `steady`, qui est
+    reparti en fondu, et a écrasé l'échelonnement du reste
 16. Une animation qui fait attendre ne se pose que là où on ne passe qu'une fois.
     La mise en route a ses quatre secondes ; une map s'ouvre en 800 ms sans rien
     bloquer

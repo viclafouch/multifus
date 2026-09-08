@@ -13,8 +13,11 @@ export const MapHeader = ({ title, subtitle, action }: MapHeaderProps) => {
       <h1 className="limelight self-center text-center font-carve text-sign tracking-wide text-balance text-cream uppercase">
         {title}
       </h1>
-      <span aria-hidden className="crest self-center" />
-      {subtitle === undefined ? null : <Tale>{subtitle}</Tale>}
+      {subtitle === undefined ? (
+        <span aria-hidden className="crest w-crest self-center" />
+      ) : (
+        <Tale>{subtitle}</Tale>
+      )}
       {action}
     </>
   )

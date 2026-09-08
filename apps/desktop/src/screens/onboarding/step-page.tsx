@@ -44,7 +44,9 @@ export const StepPage = ({
           <h1 className="lift lift-1 limelight font-carve text-sign tracking-wide text-balance text-cream uppercase">
             {head.title}
           </h1>
-          {isDone ? null : <span aria-hidden className="lift lift-1 crest" />}
+          {isDone ? null : (
+            <span aria-hidden className="lift lift-1 crest w-crest" />
+          )}
           <p className="lift lift-2 max-w-tale text-tale text-balance text-khaki">
             {head.body}
           </p>
