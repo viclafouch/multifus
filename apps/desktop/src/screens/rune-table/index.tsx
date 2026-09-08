@@ -3,6 +3,7 @@ import { t } from '@lingui/core/macro'
 import type { RuneTableStatus } from '@/@types/rune'
 import type { ShortcutBinding } from '@/@types/shortcuts'
 import type { Snapshot } from '@/@types/snapshot'
+import runeTableLoop from '@/assets/ankama/rune-table-loop.mp4'
 import { FieldRow } from '@/components/layout/field-row'
 import { Note } from '@/components/layout/note'
 import { Panel } from '@/components/layout/panel'
@@ -97,7 +98,7 @@ export const RuneTableScreen = ({
         title={i18n._(MAP_NAMES.runeTable)}
         description={t`Vos touches ouvrent le tableau par-dessus le client où vous cassez. Il reste là, il suit la fenêtre, et les mêmes touches le referment.`}
         caption={t`Les touches frappées pendant une casse : le tableau s’ouvre sur le jeu, les poids sous les yeux, et la souris ne quitte pas l’atelier.`}
-        source={null}
+        source={runeTableLoop}
         isOpen={loop.isOpen}
         onOpenChange={loop.handleOpenChange}
       />

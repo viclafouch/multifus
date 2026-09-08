@@ -89,11 +89,12 @@ mention d'Ankama en bas.
 | `wheel-loop.mp4`      | une capture du jeu faite ici, H.264 muet                                        |
 | `walk-loop.mp4`       | idem                                                                            |
 | `auto-focus-loop.mp4` | idem                                                                            |
+| `rune-table-loop.mp4` | idem                                                                            |
 
 `arena.webp` n'est plus un décor de map depuis que la roue a rejoint les
 Personnages : la mise en route s'en sert pour l'étape de l'essai.
 Les vidéos passent par le skill `make-loop`, qui les rend au format et à la
-largeur de la plaque. Celle du Tableau des runes manque encore.
+largeur de la plaque.
 
 **Un décor a été écarté**, `2020-12-03/e01dbec5…png` : un montage de presse
 KrosmoNote, cinq vignettes séparées par des traits blancs et filigranées. Chaque

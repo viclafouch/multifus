@@ -37,7 +37,6 @@ encore une liste de plaques empilées, et le système est dans
 ## Poser les images qui manquent
 
 - [ ] Enregistrer les cinq vidéos de la mise en route sur le Mac, et les mêmes sur Windows pour les étapes 2, 3 et 4, dont le dessin diffère. `PAGE_SHOTS` gagne son axe plateforme à ce moment-là, et pas avant : deux tables identiques en attendant les images ne seraient qu'une constante écrite deux fois. Posées, `PAGE_SHOTS` les prend et le cadre pointillé disparaît
-- [ ] Enregistrer le Tableau des runes à l'œuvre. Son dialogue n'a aucune vidéo et ne montre que sa légende, `source={null}` : poser le fichier par le skill `make-loop` et le passer à `LoopDialog` suffit
 
 ## Lire le bon interrupteur des notifications de Dofus, sur Windows
 

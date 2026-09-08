@@ -196,7 +196,7 @@ describe('l’écran du tableau des runes', () => {
 
       await findLateDialog()
 
-      expect(screen.getByText(LOOP_CAPTION)).not.toBeNull()
+      expect(screen.getByLabelText(LOOP_CAPTION)).not.toBeNull()
 
       fireEvent.click(screen.getByRole('button', { name: 'J’ai compris' }))
 
