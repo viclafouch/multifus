@@ -7,7 +7,6 @@ import {
   APPLE_AGENT,
   WINDOWS_AGENT,
   displayOf,
-  findLateDialog,
   pending,
   speakFrench
 } from '@/test-doubles'
@@ -53,7 +52,6 @@ type RenderParams = {
   readonly enabled?: boolean
   readonly banner?: BannerPlace
   readonly shortcuts?: readonly ShortcutBinding[]
-  readonly isLoopSeen?: boolean
   readonly agent?: string
 }
 
@@ -61,7 +59,6 @@ const renderScreen = async ({
   enabled = false,
   banner = { corner: 'bottomRight', screen: null },
   shortcuts = [],
-  isLoopSeen = true,
   agent = WINDOWS_AGENT
 }: RenderParams = {}) => {
   vi.resetModules()
@@ -75,7 +72,6 @@ const renderScreen = async ({
     <WalkScreen
       walk={{ enabled, banner }}
       shortcuts={shortcuts}
-      isLoopSeen={isLoopSeen}
       run={() => {}}
     />
   )
@@ -98,9 +94,6 @@ const keyCaps = () => {
     return keyCap.textContent
   })
 }
-
-const LOOP_CAPTION =
-  'Un clic gauche dans le jeu : le personnage marche, la fenêtre du suivant passe devant, et la bannière se pose dans le coin.'
 
 const CORNER_LABELS = [
   'En haut à gauche',
@@ -154,32 +147,6 @@ describe('l’écran du Déplacement rapide', () => {
       screen.getByText('Vos clics ne changent pas de personnage.')
     ).not.toBeNull()
     expect(screen.queryByText('Allumé')).toBeNull()
-  })
-
-  describe('la vidéo', () => {
-    it('vient d’elle-même à la première arrivée, et ne revient plus', async () => {
-      await show({ isLoopSeen: false })
-
-      await findLateDialog()
-
-      expect(screen.getByLabelText(LOOP_CAPTION)).not.toBeNull()
-
-      fireEvent.click(screen.getByRole('button', { name: 'J’ai compris' }))
-
-      expect(bridge.setLoopSeen).toHaveBeenCalledWith('walk')
-    })
-
-    it('se rouvre au bouton, sans plus rien enregistrer', async () => {
-      await show()
-
-      expect(screen.queryByRole('dialog')).toBeNull()
-
-      fireEvent.click(screen.getByRole('button', { name: 'Revoir la vidéo' }))
-
-      await findLateDialog()
-
-      expect(bridge.setLoopSeen).not.toHaveBeenCalled()
-    })
   })
 
   describe('le rappel du raccourci', () => {

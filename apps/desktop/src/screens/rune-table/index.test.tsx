@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import type { RuneTableStatus } from '@/@types/rune'
 import type { ShortcutBinding } from '@/@types/shortcuts'
-import { findLateDialog, pending, snapshotOf } from '@/test-doubles'
+import { pending, snapshotOf } from '@/test-doubles'
 
 const bridge = {
   sizeRuneTable: vi.fn(pending),
@@ -23,9 +23,6 @@ const { RuneTableScreen } = await import('@/screens/rune-table')
 
 const RUNE_TABLE: RuneTableStatus = snapshotOf().runeTable
 
-const LOOP_CAPTION =
-  'Les touches frappées pendant une casse : le tableau s’ouvre sur le jeu, les poids sous les yeux, et la souris ne quitte pas l’atelier.'
-
 const runeTableShortcut = (accelerator: string | null): ShortcutBinding => {
   return {
     action: 'runeTable',
@@ -38,19 +35,16 @@ const runeTableShortcut = (accelerator: string | null): ShortcutBinding => {
 type ShowParams = {
   readonly runeTable?: RuneTableStatus
   readonly shortcuts?: readonly ShortcutBinding[]
-  readonly isLoopSeen?: boolean
 }
 
 const show = ({
   runeTable = RUNE_TABLE,
-  shortcuts = [runeTableShortcut('Control+Shift+KeyR')],
-  isLoopSeen = true
+  shortcuts = [runeTableShortcut('Control+Shift+KeyR')]
 }: ShowParams = {}) => {
   render(
     <RuneTableScreen
       runeTable={runeTable}
       shortcuts={shortcuts}
-      isLoopSeen={isLoopSeen}
       run={() => {}}
     />
   )
@@ -188,31 +182,5 @@ describe('l’écran du tableau des runes', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Remettre' }))
 
     expect(bridge.recallRuneTable).toHaveBeenCalledExactlyOnceWith()
-  })
-
-  describe('la vidéo', () => {
-    it('vient d’elle-même à la première arrivée, et ne revient plus', async () => {
-      show({ isLoopSeen: false })
-
-      await findLateDialog()
-
-      expect(screen.getByLabelText(LOOP_CAPTION)).not.toBeNull()
-
-      fireEvent.click(screen.getByRole('button', { name: 'J’ai compris' }))
-
-      expect(bridge.setLoopSeen).toHaveBeenCalledWith('runeTable')
-    })
-
-    it('se rouvre au bouton, sans plus rien enregistrer', async () => {
-      show()
-
-      expect(screen.queryByRole('dialog')).toBeNull()
-
-      fireEvent.click(screen.getByRole('button', { name: 'Revoir la vidéo' }))
-
-      await findLateDialog()
-
-      expect(bridge.setLoopSeen).not.toHaveBeenCalled()
-    })
   })
 })

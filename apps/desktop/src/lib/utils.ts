@@ -14,10 +14,25 @@ const FONT_SIZES = [
   'mark',
   'log',
   'way'
-]
+] as const satisfies readonly string[]
+
+const CONTAINERS = [
+  'cluster',
+  'tale',
+  'lintel',
+  'scene',
+  'roll',
+  'world',
+  'loop'
+] as const satisfies readonly string[]
 
 const twMerge = extendTailwindMerge({
-  extend: { classGroups: { 'font-size': [{ text: FONT_SIZES }] } }
+  extend: {
+    classGroups: {
+      'font-size': [{ text: FONT_SIZES }],
+      'max-w': [{ 'max-w': CONTAINERS }]
+    }
+  }
 })
 
 export function cn(...inputs: readonly ClassValue[]) {

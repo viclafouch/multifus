@@ -465,12 +465,12 @@ msgstr "Allume ou éteint le Déplacement rapide."
 #~ msgstr "Allume sans quitter le jeu."
 
 #: src/screens/auto-focus-screen.tsx
-msgid "Allumez, et laissez le jeu vous appeler : dès qu’un personnage reçoit un combat, un échange ou un défi, sa fenêtre passe devant sans que vous touchiez à rien."
-msgstr "Allumez, et laissez le jeu vous appeler : dès qu’un personnage reçoit un combat, un échange ou un défi, sa fenêtre passe devant sans que vous touchiez à rien."
+#~ msgid "Allumez, et laissez le jeu vous appeler : dès qu’un personnage reçoit un combat, un échange ou un défi, sa fenêtre passe devant sans que vous touchiez à rien."
+#~ msgstr "Allumez, et laissez le jeu vous appeler : dès qu’un personnage reçoit un combat, un échange ou un défi, sa fenêtre passe devant sans que vous touchiez à rien."
 
 #: src/screens/walk-screen/index.tsx
-msgid "Allumez, puis cliquez dans le jeu : le personnage marche, la fenêtre du suivant prend sa place, et la bannière dit sur qui vous arrivez."
-msgstr "Allumez, puis cliquez dans le jeu : le personnage marche, la fenêtre du suivant prend sa place, et la bannière dit sur qui vous arrivez."
+#~ msgid "Allumez, puis cliquez dans le jeu : le personnage marche, la fenêtre du suivant prend sa place, et la bannière dit sur qui vous arrivez."
+#~ msgstr "Allumez, puis cliquez dans le jeu : le personnage marche, la fenêtre du suivant prend sa place, et la bannière dit sur qui vous arrivez."
 
 #: src/screens/about/legal-panel.tsx
 msgid "Ankama ne répond pas de Multifus."
@@ -888,6 +888,10 @@ msgstr "Collez ici le code donné par BotFather"
 #: src/constants/notification.ts
 msgid "Combat"
 msgstr "Combat"
+
+#: src/constants/loops.ts
+msgid "Combat, échange ou défi sur un personnage : sa fenêtre passe devant toute seule."
+msgstr "Combat, échange ou défi sur un personnage : sa fenêtre passe devant toute seule."
 
 #: src/helpers/onboarding.ts
 #~ msgid "Combat, échange, groupe, craft, message privé, défi, percepteur : sept appels du jeu. Multifus les entend par les notifications de Dofus, et vous emmène sur le personnage concerné."
@@ -1416,6 +1420,7 @@ msgstr "Femmes dans le défilement et l’AutoFocus"
 msgid "Fenêtres illisibles"
 msgstr "Fenêtres illisibles"
 
+#: src/components/loop-dialog.tsx
 #: src/screens/about/tolerance-shot.tsx
 #: src/screens/onboarding/shot-dialog.tsx
 #: src/screens/onboarding/shot-window.tsx
@@ -1510,7 +1515,6 @@ msgstr "Invocation"
 msgid "Iop"
 msgstr "Iop"
 
-#: src/components/loop-dialog.tsx
 #: src/components/notice-bar.tsx
 msgid "J’ai compris"
 msgstr "J’ai compris"
@@ -1697,7 +1701,7 @@ msgid "La roue au milieu de votre écran"
 msgstr "La roue au milieu de votre écran"
 
 #: src/constants/features.ts
-#: src/screens/characters/index.tsx
+#: src/constants/loops.ts
 msgid "La roue des personnages"
 msgstr "La roue des personnages"
 
@@ -1990,11 +1994,11 @@ msgstr "Les réglages de Multifus : son démarrage, et ce qu’il change sur vos
 msgid "Les réponses rapides"
 msgstr "Les réponses rapides"
 
-#: src/screens/rune-table/index.tsx
+#: src/constants/loops.ts
 msgid "Les touches frappées pendant une casse : le tableau s’ouvre sur le jeu, les poids sous les yeux, et la souris ne quitte pas l’atelier."
 msgstr "Les touches frappées pendant une casse : le tableau s’ouvre sur le jeu, les poids sous les yeux, et la souris ne quitte pas l’atelier."
 
-#: src/screens/characters/index.tsx
+#: src/constants/loops.ts
 msgid "Les touches maintenues dans le jeu : la roue s’ouvre au milieu de l’écran, la tête visée s’allume, et sa fenêtre passe devant."
 msgstr "Les touches maintenues dans le jeu : la roue s’ouvre au milieu de l’écran, la tête visée s’allume, et sa fenêtre passe devant."
 
@@ -2056,12 +2060,16 @@ msgid "Maintenez vos touches dans le jeu, et nulle part ailleurs. Visez une têt
 msgstr "Maintenez vos touches dans le jeu, et nulle part ailleurs. Visez une tête au milieu de l’écran, lâchez : ce personnage s’affiche."
 
 #: src/screens/characters/index.tsx
-msgid "Maintenez vos touches dans le jeu, visez une tête, lâchez : sa fenêtre passe devant sans que la souris quitte le combat."
-msgstr "Maintenez vos touches dans le jeu, visez une tête, lâchez : sa fenêtre passe devant sans que la souris quitte le combat."
+#~ msgid "Maintenez vos touches dans le jeu, visez une tête, lâchez : sa fenêtre passe devant sans que la souris quitte le combat."
+#~ msgstr "Maintenez vos touches dans le jeu, visez une tête, lâchez : sa fenêtre passe devant sans que la souris quitte le combat."
 
 #: src/screens/characters/wheel-panel.tsx
 #~ msgid "Maintenez vos touches depuis une fenêtre du jeu, et nulle part ailleurs. La roue s’ouvre au milieu de l’écran : visez une tête, lâchez ou cliquez, sa fenêtre passe devant."
 #~ msgstr "Maintenez vos touches depuis une fenêtre du jeu, et nulle part ailleurs. La roue s’ouvre au milieu de l’écran : visez une tête, lâchez ou cliquez, sa fenêtre passe devant."
+
+#: src/constants/loops.ts
+msgid "Maintenez vos touches, visez une tête, lâchez : sa fenêtre passe devant."
+msgstr "Maintenez vos touches, visez une tête, lâchez : sa fenêtre passe devant."
 
 #: src/components/character-dialog.tsx
 msgid "Marquer {nickname} comme {label}"
@@ -2852,8 +2860,8 @@ msgstr "Revoir la mise en route"
 #~ msgstr "Revoir la prise en main"
 
 #: src/components/loop-button.tsx
-msgid "Revoir la vidéo"
-msgstr "Revoir la vidéo"
+#~ msgid "Revoir la vidéo"
+#~ msgstr "Revoir la vidéo"
 
 #: src/components/journal-panel.tsx
 msgid "Rien à signaler pour l’instant."
@@ -3197,6 +3205,14 @@ msgid "Un bug, une idée : c’est ici que ça se raconte."
 msgstr "Un bug, une idée : c’est ici que ça se raconte."
 
 #: src/screens/walk-screen/index.tsx
+#~ msgid "Un clic dans le jeu : le personnage marche, et la fenêtre du suivant passe devant."
+#~ msgstr "Un clic dans le jeu : le personnage marche, et la fenêtre du suivant passe devant."
+
+#: src/constants/loops.ts
+msgid "Un clic dans le jeu : le personnage marche, le suivant passe devant."
+msgstr "Un clic dans le jeu : le personnage marche, le suivant passe devant."
+
+#: src/screens/walk-screen/index.tsx
 msgid "Un clic déplace le personnage devant vous, et le suivant prend sa place à l’écran."
 msgstr "Un clic déplace le personnage devant vous, et le suivant prend sa place à l’écran."
 
@@ -3208,7 +3224,7 @@ msgstr "Un clic déplace le personnage devant vous, et le suivant prend sa place
 #~ msgid "Un clic déplace le personnage que vous avez devant vous, et la fenêtre du suivant prend sa place. Vous recliquez au même endroit, et toute la team change de map sans toucher au clavier."
 #~ msgstr "Un clic déplace le personnage que vous avez devant vous, et la fenêtre du suivant prend sa place. Vous recliquez au même endroit, et toute la team change de map sans toucher au clavier."
 
-#: src/screens/walk-screen/index.tsx
+#: src/constants/loops.ts
 msgid "Un clic gauche dans le jeu : le personnage marche, la fenêtre du suivant passe devant, et la bannière se pose dans le coin."
 msgstr "Un clic gauche dans le jeu : le personnage marche, la fenêtre du suivant passe devant, et la bannière se pose dans le coin."
 
@@ -3260,7 +3276,7 @@ msgstr "Un combat, un échange, un message privé : Multifus affiche le personna
 #~ msgid "Un combat, un message privé : Multifus vous amène devant."
 #~ msgstr "Un combat, un message privé : Multifus vous amène devant."
 
-#: src/screens/auto-focus-screen.tsx
+#: src/constants/loops.ts
 msgid "Un défi arrive sur un autre personnage : sa fenêtre passe devant toute seule, la demande déjà à l’écran."
 msgstr "Un défi arrive sur un autre personnage : sa fenêtre passe devant toute seule, la demande déjà à l’écran."
 
@@ -3390,6 +3406,10 @@ msgstr "Voir l’image"
 #~ msgid "Voir l’image en grand"
 #~ msgstr "Voir l’image en grand"
 
+#: src/components/world/map-loop.tsx
+msgid "Voir la vidéo"
+msgstr "Voir la vidéo"
+
 #: src/screens/walk-screen/state-panel.tsx
 msgid "Vos clics ne changent pas de personnage."
 msgstr "Vos clics ne changent pas de personnage."
@@ -3435,8 +3455,12 @@ msgid "Vos réglages ont été mis de côté"
 msgstr "Vos réglages ont été mis de côté"
 
 #: src/screens/rune-table/index.tsx
-msgid "Vos touches ouvrent le tableau par-dessus le client où vous cassez. Il reste là, il suit la fenêtre, et les mêmes touches le referment."
-msgstr "Vos touches ouvrent le tableau par-dessus le client où vous cassez. Il reste là, il suit la fenêtre, et les mêmes touches le referment."
+#~ msgid "Vos touches ouvrent le tableau par-dessus le client où vous cassez. Il reste là, il suit la fenêtre, et les mêmes touches le referment."
+#~ msgstr "Vos touches ouvrent le tableau par-dessus le client où vous cassez. Il reste là, il suit la fenêtre, et les mêmes touches le referment."
+
+#: src/constants/loops.ts
+msgid "Vos touches ouvrent le tableau par-dessus le jeu, et les mêmes le referment."
+msgstr "Vos touches ouvrent le tableau par-dessus le jeu, et les mêmes le referment."
 
 #: src/screens/relay/screen-saver-warning.tsx
 msgid "Votre écran de veille peut tout arrêter"

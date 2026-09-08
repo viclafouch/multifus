@@ -3,38 +3,31 @@ import { t } from '@lingui/core/macro'
 import type { RuneTableStatus } from '@/@types/rune'
 import type { ShortcutBinding } from '@/@types/shortcuts'
 import type { Snapshot } from '@/@types/snapshot'
-import runeTableLoop from '@/assets/ankama/rune-table-loop.mp4'
 import { FieldRow } from '@/components/layout/field-row'
 import { Note } from '@/components/layout/note'
 import { Panel } from '@/components/layout/panel'
 import { PanelHeader } from '@/components/layout/panel-header'
 import { Screen } from '@/components/layout/screen'
-import { LoopButton } from '@/components/loop-button'
-import { LoopDialog } from '@/components/loop-dialog'
 import { Button } from '@/components/retro/button'
 import { Tick } from '@/components/retro/tick'
 import { ShortcutRecall } from '@/components/shortcut-recall'
 import { IS_APPLE } from '@/constants/keyboard'
 import { MAP_NAMES } from '@/constants/world'
-import { useLoopOnce } from '@/hooks/use-loop-once'
 import { recallRuneTable, setRuneTableEverywhere } from '@/lib/multifus'
 import { PreviewPanel } from '@/screens/rune-table/preview-panel'
 
 type RuneTableScreenProps = Readonly<{
   runeTable: RuneTableStatus
   shortcuts: readonly ShortcutBinding[]
-  isLoopSeen: boolean
   run: (action: Promise<Snapshot>) => void
 }>
 
 export const RuneTableScreen = ({
   runeTable,
   shortcuts,
-  isLoopSeen,
   run
 }: RuneTableScreenProps) => {
   const everywhereLabel = t`Afficher sur tous les personnages connectés`
-  const loop = useLoopOnce({ loop: 'runeTable', isSeen: isLoopSeen, run })
 
   const accelerator =
     shortcuts.find((shortcut) => {
@@ -45,7 +38,6 @@ export const RuneTableScreen = ({
     <Screen
       title={i18n._(MAP_NAMES.runeTable)}
       subtitle={t`Les poids des runes par-dessus le jeu. Plus besoin d’aller les chercher ailleurs pendant un brisage.`}
-      action={<LoopButton onOpen={loop.handleOpen} />}
     >
       {accelerator === null ? (
         <Note>{t`Sans touches, le tableau ne s’affiche plus. Posez-en dans l’écran Raccourcis.`}</Note>
@@ -94,14 +86,6 @@ export const RuneTableScreen = ({
       {IS_APPLE ? (
         <Note>{t`Le tableau ne s’affiche pas sur un client en plein écran. Forgez dans une fenêtre agrandie.`}</Note>
       ) : null}
-      <LoopDialog
-        title={i18n._(MAP_NAMES.runeTable)}
-        description={t`Vos touches ouvrent le tableau par-dessus le client où vous cassez. Il reste là, il suit la fenêtre, et les mêmes touches le referment.`}
-        caption={t`Les touches frappées pendant une casse : le tableau s’ouvre sur le jeu, les poids sous les yeux, et la souris ne quitte pas l’atelier.`}
-        source={runeTableLoop}
-        isOpen={loop.isOpen}
-        onOpenChange={loop.handleOpenChange}
-      />
     </Screen>
   )
 }

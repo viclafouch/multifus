@@ -103,6 +103,8 @@ export const App = () => {
           ) : (
             <MapFrame
               map={map}
+              loopsSeen={snapshot.loopsSeen}
+              run={run}
               onLeave={() => {
                 setMap(CLEARING)
               }}

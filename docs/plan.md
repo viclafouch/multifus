@@ -29,7 +29,7 @@ encore une liste de plaques empilées, et le système est dans
 - [ ] **Tableau des runes** : il a déjà sa vidéo en dialogue et sa plaque d'aperçu porte le vrai tableau ; le reste de la map est encore une pile de plaques
 - [ ] **Paramètres** : le plus chargé, six réglages et la mise en route. À découper en dialogues, un par sujet
 - [ ] **À propos** : trois lignes suffisent
-- [ ] Une phrase par map, et rien de plus. Le reste va dans un dialogue, et une vidéo qui s'apprend une fois passe par `LoopDialog`, la plaque de la roue montrant comment
+- [ ] Une phrase par map, et rien de plus. Le reste va dans un dialogue. Une vidéo, elle, s'ajoute à `MAP_LOOPS` et rien d'autre : le cadre pose le bouton et le dialogue tout seul
 - [ ] Donner leur matière aux trois fenêtres à part, `banner.html`, `wheel.html` et `rune-table.html`. Elles importent déjà `retro.css`
 - [ ] Sortir `lucide-react` du dépôt. Il en reste dans une vingtaine de fichiers, tous des glyphes seuls : le chevron d'un `Select`, la croix d'un `Dialog`, le cadenas de l'autorisation. Chacun demande un mot ou un caractère à sa place
 - [ ] Sortir `theme.css` quand plus aucun composant shadcn ne sert. Il ne porte plus de couleur à lui, seulement des espacements et les matières de la roue

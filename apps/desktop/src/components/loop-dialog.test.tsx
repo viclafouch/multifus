@@ -1,10 +1,10 @@
-import { describe, expect, it } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { LoopDialog } from '@/components/loop-dialog'
 
 const CAPTION = 'Ce que la vidéo montre'
 
-const show = (source: string | null) => {
+const show = (source: string | null, onOpenChange = () => {}) => {
   render(
     <LoopDialog
       title="La roue des personnages"
@@ -12,7 +12,7 @@ const show = (source: string | null) => {
       caption={CAPTION}
       source={source}
       isOpen
-      onOpenChange={() => {}}
+      onOpenChange={onOpenChange}
     />
   )
 }
@@ -44,10 +44,58 @@ describe('le dialogue d’une vidéo', () => {
     expect(video.playsInline).toBe(true)
   })
 
+  it('se ferme à la croix, seul bouton posé sur la vidéo', () => {
+    const close = vi.fn()
+
+    show('/faux.mp4', close)
+
+    expect(screen.getAllByRole('button')).toHaveLength(1)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Fermer' }))
+
+    expect(close.mock.calls[0]?.[0]).toBe(false)
+  })
+
   it('ne montre que la légende tant qu’aucune vidéo n’est enregistrée', () => {
     show(null)
 
     expect(screen.queryByLabelText(CAPTION)).toBeNull()
     expect(screen.getByText(CAPTION)).not.toBeNull()
+  })
+
+  it('retient le titre tant que la vidéo ne joue pas', () => {
+    show('/faux.mp4')
+
+    expect(screen.getByRole('dialog').dataset.ready).toBeUndefined()
+
+    fireEvent.playing(screen.getByLabelText(CAPTION))
+
+    expect(screen.getByRole('dialog').dataset.ready).toBe('')
+  })
+
+  it('montre le titre tout de suite quand aucune vidéo n’est enregistrée', () => {
+    show(null)
+
+    expect(screen.getByRole('dialog').dataset.ready).toBe('')
+  })
+
+  it('montre le titre quand même quand la vidéo casse', () => {
+    show('/faux.mp4')
+
+    fireEvent.error(screen.getByLabelText(CAPTION))
+
+    expect(screen.getByRole('dialog').dataset.ready).toBe('')
+  })
+
+  it('garde son titre sous la souris, quoi qu’elle fasse', () => {
+    show('/faux.mp4')
+
+    fireEvent.playing(screen.getByLabelText(CAPTION))
+    fireEvent.pointerMove(screen.getByRole('dialog'))
+
+    expect(
+      screen.getByRole('heading', { name: 'La roue des personnages' })
+    ).not.toBeNull()
+    expect(screen.getByText('Ce que la vidéo raconte')).not.toBeNull()
   })
 })

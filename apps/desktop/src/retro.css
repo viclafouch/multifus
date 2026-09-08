@@ -66,6 +66,7 @@
   --container-scene: 34rem;
   --container-roll: 44rem;
   --container-world: 58rem;
+  --container-loop: min(100vw - 3rem, (100vh - 8rem) * 16 / 9);
 
   --aspect-loop: 16 / 9;
 }
@@ -1042,6 +1043,42 @@
     0 24px 48px -18px rgb(0 0 0 / 0.9);
 }
 
+@keyframes dawn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@utility reel {
+  & .reel-picture,
+  & .reel-veil,
+  & .reel-word {
+    opacity: 0;
+  }
+
+  &[data-ready] .reel-picture {
+    opacity: 1;
+  }
+
+  &[data-ready] .reel-veil {
+    opacity: 1;
+    animation: dawn 460ms cubic-bezier(0.22, 1, 0.36, 1) 220ms backwards;
+  }
+
+  &[data-ready] .reel-word {
+    opacity: 1;
+    animation: dawn 520ms cubic-bezier(0.22, 1, 0.36, 1) 320ms backwards;
+  }
+
+  &[data-ready] .reel-word + .reel-word {
+    animation-delay: 430ms;
+  }
+}
+
 @utility pane-scene {
   opacity: 0.46;
   filter: saturate(0.72);
@@ -1202,6 +1239,12 @@
   }
 
   .settle > * {
+    animation: none !important;
+  }
+
+  .reel .reel-picture,
+  .reel .reel-veil,
+  .reel .reel-word {
     animation: none !important;
   }
 }

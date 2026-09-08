@@ -1,3 +1,5 @@
+import React from 'react'
+import { X } from 'lucide-react'
 import { t } from '@lingui/core/macro'
 import { Button } from '@/components/retro/button'
 import {
@@ -26,28 +28,47 @@ export const LoopDialog = ({
   isOpen,
   onOpenChange
 }: LoopDialogProps) => {
+  const [isPlaying, setIsPlaying] = React.useState(false)
+
+  const isReady = source === null || isPlaying
+
+  const handleReady = () => {
+    setIsPlaying(true)
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent
+        steady
         showCloseButton={false}
-        className="block overflow-clip bg-transparent p-0 ring-0 sm:max-w-roll"
+        data-ready={isReady ? '' : undefined}
+        className="reel block overflow-clip bg-transparent p-0 ring-0 sm:max-w-loop"
       >
-        <LoopStage source={source} caption={caption} />
+        <LoopStage source={source} caption={caption} onReady={handleReady} />
         <div
           aria-hidden
-          className="hem-deep pointer-events-none absolute inset-x-0 bottom-0 h-2/3"
+          className="reel-veil hem-deep pointer-events-none absolute inset-x-0 bottom-0 h-1/2"
         />
-        <div className="absolute inset-x-0 bottom-0 flex flex-col items-start gap-2 p-5">
-          <DialogTitle className="font-carve text-bar tracking-wide uppercase">
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col items-start gap-1 p-4">
+          <DialogTitle className="reel-word font-carve text-deed tracking-wide uppercase">
             {title}
           </DialogTitle>
-          <DialogDescription className="max-w-tale">
+          <DialogDescription className="reel-word max-w-tale">
             {description}
           </DialogDescription>
-          <DialogClose render={<Button variant="leaf" className="mt-1" />}>
-            {t`J’ai compris`}
-          </DialogClose>
         </div>
+        <DialogClose
+          render={
+            <Button
+              variant="slate"
+              size="icon"
+              aria-label={t`Fermer`}
+              className="absolute top-3.5 right-3.5 shadow-xs"
+            />
+          }
+        >
+          <X aria-hidden />
+        </DialogClose>
       </DialogContent>
     </Dialog>
   )

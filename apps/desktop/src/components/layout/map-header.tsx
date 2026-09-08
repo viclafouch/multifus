@@ -1,13 +1,11 @@
-import React from 'react'
 import { Tale } from '@/components/layout/tale'
 
 type MapHeaderProps = Readonly<{
   title: string
   subtitle?: string
-  action?: React.ReactNode
 }>
 
-export const MapHeader = ({ title, subtitle, action }: MapHeaderProps) => {
+export const MapHeader = ({ title, subtitle }: MapHeaderProps) => {
   return (
     <>
       <h1 className="limelight self-center text-center font-carve text-sign tracking-wide text-balance text-cream uppercase">
@@ -18,7 +16,6 @@ export const MapHeader = ({ title, subtitle, action }: MapHeaderProps) => {
       ) : (
         <Tale>{subtitle}</Tale>
       )}
-      {action}
     </>
   )
 }

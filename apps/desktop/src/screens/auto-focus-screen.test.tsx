@@ -5,7 +5,6 @@ import type { AutoFocusSwitch, NotificationKind } from '@/@types/notification'
 import {
   APPLE_AGENT,
   WINDOWS_AGENT,
-  findLateDialog,
   pending,
   speakFrench
 } from '@/test-doubles'
@@ -39,7 +38,6 @@ type ShowParams = {
   readonly switches?: readonly AutoFocusSwitch[]
   readonly isEnabled?: boolean
   readonly wakesMinimized?: boolean
-  readonly isLoopSeen?: boolean
   readonly agent?: string
 }
 
@@ -47,7 +45,6 @@ const show = async ({
   switches = ALL_ON,
   isEnabled = true,
   wakesMinimized = false,
-  isLoopSeen = true,
   agent = WINDOWS_AGENT
 }: ShowParams = {}) => {
   vi.resetModules()
@@ -63,16 +60,12 @@ const show = async ({
       switches={switches}
       isEnabled={isEnabled}
       wakesMinimized={wakesMinimized}
-      isLoopSeen={isLoopSeen}
       run={() => {}}
     />
   )
 
   return NOTIFICATION_LABELS
 }
-
-const LOOP_CAPTION =
-  'Un défi arrive sur un autre personnage : sa fenêtre passe devant toute seule, la demande déjà à l’écran.'
 
 const switchNamed = (label: string) => {
   return screen.getByRole('switch', { name: label })
@@ -184,31 +177,5 @@ describe('l’écran de l’AutoFocus', () => {
         'Même un personnage rangé dans le Dock revient devant vous.'
       )
     ).not.toBeNull()
-  })
-
-  describe('la vidéo', () => {
-    it('vient d’elle-même à la première arrivée, et ne revient plus', async () => {
-      await show({ isLoopSeen: false })
-
-      await findLateDialog()
-
-      expect(screen.getByLabelText(LOOP_CAPTION)).not.toBeNull()
-
-      fireEvent.click(screen.getByRole('button', { name: 'J’ai compris' }))
-
-      expect(bridge.setLoopSeen).toHaveBeenCalledWith('autoFocus')
-    })
-
-    it('se rouvre au bouton, sans plus rien enregistrer', async () => {
-      await show()
-
-      expect(screen.queryByRole('dialog')).toBeNull()
-
-      fireEvent.click(screen.getByRole('button', { name: 'Revoir la vidéo' }))
-
-      await findLateDialog()
-
-      expect(bridge.setLoopSeen).not.toHaveBeenCalled()
-    })
   })
 })

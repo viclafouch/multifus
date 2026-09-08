@@ -3,28 +3,32 @@ import { matchIsStill } from '@/lib/motion'
 type LoopStageProps = Readonly<{
   source: string | null
   caption: string
+  onReady: () => void
 }>
 
-export const LoopStage = ({ source, caption }: LoopStageProps) => {
+export const LoopStage = ({ source, caption, onReady }: LoopStageProps) => {
   const isStill = matchIsStill()
 
   return (
     <div className="stage relative aspect-loop w-full">
       {source === null ? (
-        <p className="absolute inset-0 flex items-center justify-center px-10 text-center text-tale text-balance text-khaki">
+        <p className="reel-picture absolute inset-0 flex items-center justify-center px-10 text-center text-tale text-balance text-khaki">
           {caption}
         </p>
       ) : (
         <video
           src={source}
           aria-label={caption}
-          className="size-full object-cover"
+          className="reel-picture absolute inset-0 size-full object-cover"
           autoPlay={!isStill}
           controls={isStill}
           loop
           muted
           playsInline
-          preload="metadata"
+          preload="auto"
+          onPlaying={onReady}
+          onLoadedData={isStill ? onReady : undefined}
+          onError={onReady}
         />
       )}
     </div>
