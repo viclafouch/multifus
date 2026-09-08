@@ -925,6 +925,7 @@
   stroke: currentcolor;
   stroke-width: 3.2;
   stroke-linecap: round;
+  transform: translateZ(0);
 }
 
 @utility star {
@@ -933,6 +934,7 @@
   stroke-width: 1.8;
   stroke-linejoin: round;
   paint-order: stroke;
+  transform: translateZ(0);
   transition-property: fill, stroke, filter;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 0.2s;
