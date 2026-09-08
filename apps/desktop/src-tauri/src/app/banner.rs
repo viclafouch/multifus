@@ -45,6 +45,8 @@ struct BannerGeneration(Generation);
 
 pub fn setup(app: &AppHandle) {
     app.manage(BannerGeneration::default());
+
+    build(app);
 }
 
 pub fn follow_walk(app: &AppHandle, enabled: bool, inside_game: bool) {
@@ -58,7 +60,7 @@ pub fn follow_walk(app: &AppHandle, enabled: bool, inside_game: bool) {
 
     lock(app).set_banner_character(None);
 
-    close(app);
+    veil(app);
 }
 
 pub fn follow_foreground(app: &AppHandle, inside_game: bool) {
@@ -110,7 +112,7 @@ pub fn preview(app: &AppHandle) {
         if lock(app).is_walk_enabled() {
             follow_foreground(app, matches_game_in_front(windows(app)));
         } else {
-            close(app);
+            veil(app);
         }
     });
 }
@@ -139,7 +141,7 @@ fn raise(app: &AppHandle, generation: u64, inside_game: bool) {
     };
 
     if !matches_current(app, generation) {
-        close(app);
+        veil(app);
 
         return;
     }
@@ -159,7 +161,7 @@ fn raise(app: &AppHandle, generation: u64, inside_game: bool) {
     }
 
     if !matches_current(app, generation) {
-        close(app);
+        veil(app);
 
         return;
     }
@@ -169,12 +171,12 @@ fn raise(app: &AppHandle, generation: u64, inside_game: bool) {
     tell(app, step);
 }
 
-fn close(app: &AppHandle) {
+fn veil(app: &AppHandle) {
     let Some(window) = OVERLAY.window(app) else {
         return;
     };
 
-    OVERLAY.said(app, window.close());
+    OVERLAY.said(app, window.hide());
 }
 
 fn build(app: &AppHandle) -> Option<WebviewWindow> {
