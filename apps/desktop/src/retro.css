@@ -1150,9 +1150,11 @@
     filter: grayscale(1);
     opacity: 0.62;
   }
+}
 
-  &:hover,
-  &:focus-visible {
+@utility perch {
+  &:hover .head,
+  &:focus-within .head {
     border-color: var(--cream);
     filter: none;
     opacity: 1;

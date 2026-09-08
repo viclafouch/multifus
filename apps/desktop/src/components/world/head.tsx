@@ -25,12 +25,12 @@ export const Head = ({ character, onOpen, onRemove }: HeadProps) => {
   const line = characterSubLine(character)
 
   return (
-    <div className="group/place relative flex">
+    <div className="perch group/perch relative flex">
       <button
         type="button"
         aria-label={`${nickname} · ${line}`}
         onClick={onOpen}
-        className="group/head sighted relative flex flex-col items-center gap-1 rounded-md"
+        className="sighted relative flex flex-col items-center gap-1 rounded-md"
       >
         {main ? (
           <MainMark
@@ -59,7 +59,7 @@ export const Head = ({ character, onOpen, onRemove }: HeadProps) => {
         )}
         <span
           aria-hidden
-          className="hood pointer-events-none absolute bottom-full left-1/2 z-10 mb-1 flex w-max max-w-48 -translate-x-1/2 flex-col items-center gap-1 rounded-md px-3 py-2 opacity-0 transition-opacity duration-200 group-hover/head:opacity-100 group-focus-visible/head:opacity-100"
+          className="hood pointer-events-none absolute bottom-full left-1/2 z-10 mb-1 flex w-max max-w-48 -translate-x-1/2 flex-col items-center gap-1 rounded-md px-3 py-2 opacity-0 transition-opacity duration-200 group-hover/perch:opacity-100 group-focus-within/perch:opacity-100"
         >
           <span className="max-w-full truncate font-carve text-bar tracking-wide text-cream uppercase">
             {nickname}
@@ -72,7 +72,7 @@ export const Head = ({ character, onOpen, onRemove }: HeadProps) => {
         </span>
       </button>
       {online ? null : (
-        <span className="absolute top-nook right-nook z-20 translate-x-1/2 -translate-y-1/2 opacity-0 transition-opacity duration-200 group-hover/place:opacity-100 group-focus-within/place:opacity-100">
+        <span className="absolute top-nook right-nook z-20 translate-x-1/2 -translate-y-1/2 opacity-0 transition-opacity duration-200 group-hover/perch:opacity-100 group-focus-within/perch:opacity-100">
           <RemoveButton
             label={characterRemoveLabel(nickname)}
             onRemove={onRemove}
