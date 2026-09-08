@@ -1,9 +1,13 @@
+import { matchIsStill } from '@/lib/motion'
+
 type LoopStageProps = Readonly<{
   source: string | null
   caption: string
 }>
 
 export const LoopStage = ({ source, caption }: LoopStageProps) => {
+  const isStill = matchIsStill()
+
   return (
     <div className="stage relative aspect-loop w-full">
       {source === null ? (
@@ -11,7 +15,17 @@ export const LoopStage = ({ source, caption }: LoopStageProps) => {
           {caption}
         </p>
       ) : (
-        <img src={source} alt={caption} className="size-full object-cover" />
+        <video
+          src={source}
+          aria-label={caption}
+          className="size-full object-cover"
+          autoPlay={!isStill}
+          controls={isStill}
+          loop
+          muted
+          playsInline
+          preload="metadata"
+        />
       )}
     </div>
   )

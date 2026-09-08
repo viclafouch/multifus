@@ -25,18 +25,29 @@ describe('le dialogue d’une vidéo', () => {
   })
 
   it('montre la vidéo, et son titre par-dessus', () => {
-    show('/faux.gif')
+    show('/faux.mp4')
 
-    expect(screen.getByAltText(CAPTION)).not.toBeNull()
+    expect(screen.getByLabelText(CAPTION)).not.toBeNull()
     expect(
       screen.getByRole('heading', { name: 'La roue des personnages' })
     ).not.toBeNull()
   })
 
+  it('joue la vidéo en boucle, sans son et sans jamais passer en plein écran', () => {
+    show('/faux.mp4')
+
+    const video = screen.getByLabelText<HTMLVideoElement>(CAPTION)
+
+    expect(video.autoplay).toBe(true)
+    expect(video.loop).toBe(true)
+    expect(video.muted).toBe(true)
+    expect(video.playsInline).toBe(true)
+  })
+
   it('ne montre que la légende tant qu’aucune vidéo n’est enregistrée', () => {
     show(null)
 
-    expect(screen.queryByAltText(CAPTION)).toBeNull()
+    expect(screen.queryByLabelText(CAPTION)).toBeNull()
     expect(screen.getByText(CAPTION)).not.toBeNull()
   })
 })

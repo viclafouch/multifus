@@ -36,8 +36,8 @@ encore une liste de plaques empilées, et le système est dans
 ## Poser les images qui manquent
 
 - [ ] Enregistrer les cinq vidéos de la mise en route sur le Mac, et les mêmes sur Windows pour les étapes 2, 3 et 4, dont le dessin diffère. `PAGE_SHOTS` gagne son axe plateforme à ce moment-là, et pas avant : deux tables identiques en attendant les images ne seraient qu'une constante écrite deux fois. Posées, `PAGE_SHOTS` les prend et le cadre pointillé disparaît
-- [ ] Enregistrer la roue à l'œuvre dans le jeu. `assets/ankama/wheel-loop.gif` est un bouche-trou, une Crâ qui respire dans l'herbe : l'écraser suffit
-- [ ] Enregistrer le Déplacement rapide et le Tableau des runes à l'œuvre. Leurs dialogues n'ont aucune image et ne montrent que leur légende, `source={null}` : poser le fichier et le passer à `LoopDialog` suffit
+- [ ] Enregistrer la roue à l'œuvre dans le jeu. `assets/ankama/wheel-loop.mp4` montre un personnage qui marche, pas la roue : l'écraser par le skill `make-loop` suffit
+- [ ] Enregistrer le Déplacement rapide et le Tableau des runes à l'œuvre. Leurs dialogues n'ont aucune vidéo et ne montrent que leur légende, `source={null}` : poser le fichier par le skill `make-loop` et le passer à `LoopDialog` suffit
 
 ## Lire le bon interrupteur des notifications de Dofus, sur Windows
 

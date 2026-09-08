@@ -66,7 +66,7 @@ const show = ({
 }
 
 const loop = () => {
-  return screen.queryByAltText(LOOP_CAPTION)
+  return screen.queryByLabelText(LOOP_CAPTION)
 }
 
 describe('la map des personnages', () => {
