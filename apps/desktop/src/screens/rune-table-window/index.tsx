@@ -1,6 +1,6 @@
 import React from 'react'
 import { TABLE_DRAWN_WIDTH } from '@/constants/runes'
-import { useFittedZoom } from '@/hooks/use-fitted-zoom'
+import { useFittedScale } from '@/hooks/use-fitted-scale'
 import { useMeasuredRatio } from '@/hooks/use-measured-ratio'
 import { useRuneTableLook } from '@/hooks/use-rune-table-look'
 import { useWindowDrag } from '@/hooks/use-window-drag'
@@ -34,7 +34,7 @@ export const RuneTableWindow = () => {
   const drag = useWindowDrag({ onMove: moveTable, onSettle: settleTable })
   const look = useRuneTableLook()
 
-  useFittedZoom(TABLE_DRAWN_WIDTH)
+  useFittedScale(TABLE_DRAWN_WIDTH)
   useMeasuredRatio(table, tellRatio)
 
   return <RuneSheet drag={drag} look={look} ref={table} onClose={closeTable} />

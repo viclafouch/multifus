@@ -1,7 +1,7 @@
 import React from 'react'
 
-export const useFittedZoom = (drawn: number) => {
-  React.useEffect(() => {
+export const useFittedScale = (drawn: number) => {
+  React.useLayoutEffect(() => {
     const room = document.documentElement
 
     const fit = () => {
@@ -10,7 +10,8 @@ export const useFittedZoom = (drawn: number) => {
       }
 
       document.body.style.width = `${drawn}px`
-      document.body.style.zoom = `${room.clientWidth / drawn}`
+      document.body.style.transformOrigin = 'top left'
+      document.body.style.transform = `scale(${room.clientWidth / drawn})`
     }
 
     const observer = new ResizeObserver(fit)

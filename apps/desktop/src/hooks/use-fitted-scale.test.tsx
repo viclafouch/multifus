@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { render } from '@testing-library/react'
-import { useFittedZoom } from '@/hooks/use-fitted-zoom'
+import { useFittedScale } from '@/hooks/use-fitted-scale'
 
 const DRAWN = 320
 
@@ -9,7 +9,7 @@ type RuneTableProps = {
 }
 
 const RuneTable = ({ drawn }: RuneTableProps) => {
-  useFittedZoom(drawn)
+  useFittedScale(drawn)
 
   return <div>Tableau des runes</div>
 }
@@ -30,7 +30,8 @@ describe('la page taillée pour la fenêtre qui la porte', () => {
 
     render(<RuneTable drawn={DRAWN} />)
 
-    expect(document.body.style.zoom).toBe('2')
+    expect(document.body.style.transform).toBe('scale(2)')
+    expect(document.body.style.transformOrigin).toBe('top left')
     expect(document.body.style.width).toBe(`${DRAWN}px`)
   })
 
@@ -39,7 +40,16 @@ describe('la page taillée pour la fenêtre qui la porte', () => {
 
     render(<RuneTable drawn={DRAWN} />)
 
-    expect(document.body.style.zoom).toBe('1')
+    expect(document.body.style.transform).toBe('scale(1)')
+  })
+
+  it('rapetisse d’un bloc, sans que le moteur relève l’écriture', () => {
+    roomOf(DRAWN / 2)
+
+    render(<RuneTable drawn={DRAWN} />)
+
+    expect(document.body.style.transform).toBe('scale(0.5)')
+    expect(document.body.style.zoom).toBe('')
   })
 
   it('ne touche à rien tant que personne n’a mesuré la fenêtre', () => {
@@ -47,7 +57,7 @@ describe('la page taillée pour la fenêtre qui la porte', () => {
 
     render(<RuneTable drawn={DRAWN} />)
 
-    expect(document.body.style.zoom).toBe('')
+    expect(document.body.style.transform).toBe('')
     expect(document.body.style.width).toBe('')
   })
 })
