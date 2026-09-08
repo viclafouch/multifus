@@ -141,29 +141,41 @@ pour un écran de travail, c'est la fenêtre Options du client qui répond.
     la zone défilable et la barre paraît une demi-seconde
 19. Un survol change une couleur. Le menu de l'accueil en est la seule exception,
     parce que viser une entrée y est le geste même de l'écran
+20. Une tête du dolmen n'apparaît ni ne s'efface d'un coup. Celle qui arrive
+    éclot sur sa place, celle qui s'en va sort d'abord du flux, figée là où elle
+    était, et les autres glissent de leur ancienne place à la nouvelle. Le
+    glissement se mesure et se joue à la main, dans `useGlide` : une rafale de
+    connexions couperait toute animation que le navigateur mènerait seul, et
+    c'est là qu'il faut être fluide. Il repart de la position où le précédent en
+    était, jamais du début. Ce qui glisse ne porte donc aucune transformation à
+    lui, l'éclosion vivant un cran plus bas, sur ce que la place porte. Les
+    boîtes mesurées se périment dès que la fenêtre change de taille, la tête
+    étant en `vh` : un `ResizeObserver` les reprend, sinon le glissement suivant
+    part d'une position d'avant. Et seul ce qui change vraiment de taille prend
+    l'échelle : la posée sur du texte l'étire
 
 ### Le CSS
 
-20. Chaque `@utility` est complète et ne partage aucune base. Tailwind v4 ne les
+21. Chaque `@utility` est complète et ne partage aucune base. Tailwind v4 ne les
     émet pas dans l'ordre du fichier : deux qui posent la même propriété se
     battent, et c'est le hasard qui gagne
-21. On n'écrit pas une matière avant l'écran qui l'emploie. Une `@utility` sans
+22. On n'écrit pas une matière avant l'écran qui l'emploie. Une `@utility` sans
     appelant est une abstraction pour plus tard
-22. Aucune valeur en dur dans un composant : un jeton, ou rien. Ce qui se pose sur
+23. Aucune valeur en dur dans un composant : un jeton, ou rien. Ce qui se pose sur
     une tête se déduit de `--head`, qui rétrécit quand le roster grossit
-23. Une taille de texte du thème s'ajoute à `cn`, dans `lib/utils.ts`.
+24. Une taille de texte du thème s'ajoute à `cn`, dans `lib/utils.ts`.
     `tailwind-merge` ne connaît que les tailles de Tailwind : sans cette liste il
     lit `text-mark` comme une couleur, le `text-background` qui suit l'écrase, et
     le texte repart à la taille du navigateur sans que rien ne le dise
 
-24. Aucun `backdrop-filter` au-dessus d'une vidéo. Une vidéo qui joue est
+25. Aucun `backdrop-filter` au-dessus d'une vidéo. Une vidéo qui joue est
     composée par le système sur sa propre couche, et le filtre oblige WebKit à
     recomposer les deux : il se trompe alors de géométrie et dessine la vidéo
     plus petite, calée dans un coin. La plaque de `LoopStage` a coûté six essais
     avant qu'on trouve. De toute façon un filtre sous une image opaque ne sature
     rien : il ne rapporte que le bug
 
-25. Un trait fin tient sa propre couche, `transform: translateZ(0)`. Une ligne
+26. Un trait fin tient sa propre couche, `transform: translateZ(0)`. Une ligne
     dont le milieu est en `flex-1` pose ce qui la suit à une coordonnée à
     virgule ; WebKit promeut au survol, cale la couche sur le pixel entier, et le
     trait saute d'un pixel à l'aller comme au retour. L'étoile et la croix du
@@ -174,15 +186,15 @@ pour un écran de travail, c'est la fenêtre Options du client qui répond.
 
 ### Les mots et les formes
 
-26. Un bouton est du texte en Bebas capitales. Pas d'icône à côté d'un mot ; ce
+27. Un bouton est du texte en Bebas capitales. Pas d'icône à côté d'un mot ; ce
     qui reste de `lucide` est un glyphe seul, et s'en ira
-27. Bebas est la fonte de Multifus. Ce que le joueur a écrit reste en Roboto, dans
+28. Bebas est la fonte de Multifus. Ce que le joueur a écrit reste en Roboto, dans
     sa casse à lui
-28. Un corps de texte commence par un verbe, et ne parle pas par métaphore quand
+29. Un corps de texte commence par un verbe, et ne parle pas par métaphore quand
     il y a un geste à faire
-29. Un titre nomme le réglage comme le système l'écrit, et un mot que le joueur
+30. Un titre nomme le réglage comme le système l'écrit, et un mot que le joueur
     lira sur son propre écran passe entre guillemets par `quoted`
-30. Ce qui s'apprend une fois s'ouvre dans un dialogue, pas dans la plaque qui le
+31. Ce qui s'apprend une fois s'ouvre dans un dialogue, pas dans la plaque qui le
     règle. Le bouton qui le rouvre ne vit dans aucun écran : le cadre de la map
     le pose lui-même, en haut à gauche à côté du retour, au même endroit sur
     toutes les maps. Posé dans l'écran il suivait la mise en page, et on le
@@ -193,13 +205,13 @@ pour un écran de travail, c'est la fenêtre Options du client qui répond.
 `app.tsx` pose déjà le décor, les bandes, le cartouche, le crédit et le journal.
 Une nouvelle map n'écrit que son dedans :
 
-31. `Screen` si c'est une liste, `StageScreen` si ça montre le jeu. Les deux
+32. `Screen` si c'est une liste, `StageScreen` si ça montre le jeu. Les deux
     posent `MapHeader`, donc le titre, le fronton et une phrase
-32. `Panel` par groupe, c'est le verre. `FieldRow` pour une ligne de réglage,
+33. `Panel` par groupe, c'est le verre. `FieldRow` pour une ligne de réglage,
     `Tick` pour ce qui s'allume, `Button` pour un geste
-33. Le nom de la map et son décor se déclarent dans `constants/world.ts`, et
+34. Le nom de la map et son décor se déclarent dans `constants/world.ts`, et
     `CurrentMap` la branche
-34. Ni onglet ni barre latérale : on vient de l'accueil, on y retourne par
+35. Ni onglet ni barre latérale : on vient de l'accueil, on y retourne par
     « Retour » ou par Échap
 
 Avant de dessiner, lire `CONTEXT.md` pour les mots. `frontend.md` tient React,

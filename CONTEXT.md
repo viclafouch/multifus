@@ -126,6 +126,6 @@ Les mots de Multifus, et rien d'autre. On en parle en français, on les écrit e
 
 **Dolmen** (`Dolmen`) : la dalle de pierre du décor de l'accueil, où les personnages connus viennent se poser. Elle n'est pas dessinée par Multifus : c'est la pierre de l'image, et les têtes sont placées dessus.
 
-**Tête** (`Head`) : le portrait de classe d'un personnage posé sur le dolmen. En couleur avec un anneau vert s'il est connecté, en gris sinon. Sa couleur est sous elle, jamais sur l'anneau, qui dit l'état.
+**Tête** (`Head`) : le portrait de classe d'un personnage posé sur le dolmen. En couleur avec un anneau vert s'il est connecté, en gris sinon. Sa couleur est sous elle, jamais sur l'anneau, qui dit l'état. Elle éclot à sa place quand elle arrive, elle s'efface sur place quand elle s'en va, et les autres glissent pour lui faire de la place ou reprendre la sienne : le dolmen ne se refait jamais d'un coup sous l'œil, même quand six personnages se connectent coup sur coup.
 
 **Cartouche** (`Cartouche`) : le coin en haut à droite de chaque map, qui porte le numéro de version et les trois drapeaux de langue. Comme le retour qui lui fait face, il flotte au-dessus du décor et ne défile pas avec la map.
