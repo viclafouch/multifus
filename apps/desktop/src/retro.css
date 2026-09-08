@@ -1035,7 +1035,6 @@
   overflow: clip;
   border-radius: 10px;
   border: 2px solid color-mix(in srgb, var(--band), transparent 45%);
-  backdrop-filter: saturate(1.15);
   text-shadow: var(--engrave);
   background-color: color-mix(in srgb, var(--iron), transparent 14%);
   box-shadow:
@@ -1062,6 +1061,7 @@
 
   &[data-ready] .reel-picture {
     opacity: 1;
+    animation: dawn 520ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
   }
 
   &[data-ready] .reel-veil {
@@ -1071,7 +1071,7 @@
 
   &[data-ready] .reel-word {
     opacity: 1;
-    animation: dawn 520ms cubic-bezier(0.22, 1, 0.36, 1) 320ms backwards;
+    animation: lift 520ms cubic-bezier(0.22, 1, 0.36, 1) 320ms backwards;
   }
 
   &[data-ready] .reel-word + .reel-word {

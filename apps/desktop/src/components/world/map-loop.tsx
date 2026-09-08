@@ -18,7 +18,6 @@ export const MapLoop = ({ loop, isSeen, run }: MapLoopProps) => {
   return (
     <>
       <Button variant="slate" size="sm" onClick={once.handleOpen}>
-        <span aria-hidden>▸</span>
         {t`Voir la vidéo`}
       </Button>
       <LoopDialog

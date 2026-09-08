@@ -156,34 +156,41 @@ pour un écran de travail, c'est la fenêtre Options du client qui répond.
     lit `text-mark` comme une couleur, le `text-background` qui suit l'écrase, et
     le texte repart à la taille du navigateur sans que rien ne le dise
 
+24. Aucun `backdrop-filter` au-dessus d'une vidéo. Une vidéo qui joue est
+    composée par le système sur sa propre couche, et le filtre oblige WebKit à
+    recomposer les deux : il se trompe alors de géométrie et dessine la vidéo
+    plus petite, calée dans un coin. La plaque de `LoopStage` a coûté six essais
+    avant qu'on trouve. De toute façon un filtre sous une image opaque ne sature
+    rien : il ne rapporte que le bug
+
 ### Les mots et les formes
 
-24. Un bouton est du texte en Bebas capitales. Pas d'icône à côté d'un mot ; ce
+25. Un bouton est du texte en Bebas capitales. Pas d'icône à côté d'un mot ; ce
     qui reste de `lucide` est un glyphe seul, et s'en ira
-25. Bebas est la fonte de Multifus. Ce que le joueur a écrit reste en Roboto, dans
+26. Bebas est la fonte de Multifus. Ce que le joueur a écrit reste en Roboto, dans
     sa casse à lui
-26. Un corps de texte commence par un verbe, et ne parle pas par métaphore quand
+27. Un corps de texte commence par un verbe, et ne parle pas par métaphore quand
     il y a un geste à faire
-27. Un titre nomme le réglage comme le système l'écrit, et un mot que le joueur
+28. Un titre nomme le réglage comme le système l'écrit, et un mot que le joueur
     lira sur son propre écran passe entre guillemets par `quoted`
-28. Ce qui s'apprend une fois s'ouvre dans un dialogue, pas dans la plaque qui le
-    règle. Le bouton qui le rouvre se pose sous la phrase de la map quand la
-    vidéo montre la map entière, et juste au-dessus de la plaque quand elle ne
-    montre que cette plaque. Jamais dans son en-tête, où il se lit comme un
-    réglage de plus
+29. Ce qui s'apprend une fois s'ouvre dans un dialogue, pas dans la plaque qui le
+    règle. Le bouton qui le rouvre ne vit dans aucun écran : le cadre de la map
+    le pose lui-même, en haut à gauche à côté du retour, au même endroit sur
+    toutes les maps. Posé dans l'écran il suivait la mise en page, et on le
+    cherchait d'une map à l'autre
 
 ## Dessiner une map
 
 `app.tsx` pose déjà le décor, les bandes, le cartouche, le crédit et le journal.
 Une nouvelle map n'écrit que son dedans :
 
-29. `Screen` si c'est une liste, `StageScreen` si ça montre le jeu. Les deux
+30. `Screen` si c'est une liste, `StageScreen` si ça montre le jeu. Les deux
     posent `MapHeader`, donc le titre, le fronton et une phrase
-30. `Panel` par groupe, c'est le verre. `FieldRow` pour une ligne de réglage,
+31. `Panel` par groupe, c'est le verre. `FieldRow` pour une ligne de réglage,
     `Tick` pour ce qui s'allume, `Button` pour un geste
-31. Le nom de la map et son décor se déclarent dans `constants/world.ts`, et
+32. Le nom de la map et son décor se déclarent dans `constants/world.ts`, et
     `CurrentMap` la branche
-32. Ni onglet ni barre latérale : on vient de l'accueil, on y retourne par
+33. Ni onglet ni barre latérale : on vient de l'accueil, on y retourne par
     « Retour » ou par Échap
 
 Avant de dessiner, lire `CONTEXT.md` pour les mots. `frontend.md` tient React,
