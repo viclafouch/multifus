@@ -890,8 +890,12 @@ msgid "Combat"
 msgstr "Combate"
 
 #: src/constants/loops.ts
-msgid "Combat, échange ou défi sur un personnage : sa fenêtre passe devant toute seule."
-msgstr "Combate, intercambio o desafío en un personaje: su ventana pasa al frente sola."
+msgid "Combat, échange ou défi : la fenêtre du personnage passe devant."
+msgstr "Combate, intercambio o desafío: la ventana del personaje pasa al frente."
+
+#: src/constants/loops.ts
+#~ msgid "Combat, échange ou défi sur un personnage : sa fenêtre passe devant toute seule."
+#~ msgstr "Combate, intercambio o desafío en un personaje: su ventana pasa al frente sola."
 
 #: src/helpers/onboarding.ts
 #~ msgid "Combat, échange, groupe, craft, message privé, défi, percepteur : sept appels du jeu. Multifus les entend par les notifications de Dofus, et vous emmène sur le personnage concerné."

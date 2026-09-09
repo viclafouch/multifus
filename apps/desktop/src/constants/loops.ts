@@ -13,7 +13,7 @@ export const MAP_LOOPS = {
     name: 'autoFocus',
     source: autoFocusLoop,
     title: MAP_NAMES.autoFocus,
-    description: msg`Combat, échange ou défi sur un personnage : sa fenêtre passe devant toute seule.`,
+    description: msg`Combat, échange ou défi : la fenêtre du personnage passe devant.`,
     caption: msg`Un défi arrive sur un autre personnage : sa fenêtre passe devant toute seule, la demande déjà à l’écran.`
   },
   characters: {
