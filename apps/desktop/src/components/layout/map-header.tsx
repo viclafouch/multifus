@@ -1,3 +1,4 @@
+import { MapTitle } from '@/components/layout/map-title'
 import { Tale } from '@/components/layout/tale'
 
 type MapHeaderProps = Readonly<{
@@ -8,9 +9,9 @@ type MapHeaderProps = Readonly<{
 export const MapHeader = ({ title, subtitle }: MapHeaderProps) => {
   return (
     <>
-      <h1 className="limelight self-center text-center font-carve text-sign tracking-wide text-balance text-cream uppercase">
+      <MapTitle className="self-center text-center text-balance">
         {title}
-      </h1>
+      </MapTitle>
       {subtitle === undefined ? (
         <span aria-hidden className="crest w-crest self-center" />
       ) : (

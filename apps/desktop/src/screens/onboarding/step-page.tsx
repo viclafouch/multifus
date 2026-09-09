@@ -4,6 +4,7 @@ import { FeatureRoll } from '@/components/retro/features'
 import { SettingPath } from '@/components/retro/setting-path'
 import { StepState } from '@/components/retro/step-state'
 import { checkLine, pageHead, pageWay } from '@/helpers/onboarding'
+import { useArrival } from '@/hooks/use-arrival'
 import { ProofBand } from '@/screens/onboarding/proof-band'
 import { StepActions } from '@/screens/onboarding/step-actions'
 
@@ -26,6 +27,7 @@ export const StepPage = ({
   onNext,
   onAsk
 }: StepPageProps) => {
+  const title = useArrival()
   const way = pageWay(page)
   const check = status?.check ?? 'unknown'
   const head = pageHead(page, check)
@@ -41,7 +43,11 @@ export const StepPage = ({
         className="plate unfurl group mx-auto w-full max-w-scene data-wide:max-w-roll"
       >
         <div className="flex flex-col items-center gap-4 px-8 py-6 text-center group-data-wide:py-4">
-          <h1 className="lift lift-1 limelight font-carve text-sign tracking-wide text-balance text-cream uppercase">
+          <h1
+            ref={title}
+            tabIndex={-1}
+            className="lift lift-1 limelight font-carve text-sign tracking-wide text-balance text-cream uppercase outline-none"
+          >
             {head.title}
           </h1>
           {isDone ? null : (

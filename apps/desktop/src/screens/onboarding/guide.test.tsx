@@ -141,6 +141,16 @@ describe('la mise en route', () => {
     expect(screen.getByText('Accessibilité')).not.toBeNull()
   })
 
+  it('pose le lecteur sur le titre de l’étape où l’on arrive', async () => {
+    await show()
+
+    fireEvent.click(buttonNamed(/C’est parti/u))
+
+    expect(document.activeElement).toBe(
+      screen.getByRole('heading', { level: 1 })
+    )
+  })
+
   it('dit en rouge que Multifus ne peut rien faire sans l’autorisation', async () => {
     await show()
 

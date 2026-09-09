@@ -179,6 +179,22 @@ describe('la fenêtre de Multifus', () => {
     }
   })
 
+  it('pose le lecteur sur le titre de la map où l’on arrive', async () => {
+    await open(snapshotOf())
+
+    navigateTo('settings')
+
+    expect(document.activeElement).toBe(
+      screen.getByRole('heading', { level: 1 })
+    )
+
+    goBack()
+
+    expect(document.activeElement).toBe(
+      screen.getByRole('heading', { level: 1 })
+    )
+  })
+
   it('ferme l’aperçu du tableau des runes à Échap, quel que soit l’écran ouvert', async () => {
     await open(
       snapshotOf({

@@ -8,6 +8,7 @@ import type { Authorization } from '@/@types/system'
 import logo from '@/assets/logo.png'
 import { CharacterDialog } from '@/components/character-dialog'
 import { Lamp } from '@/components/lamp'
+import { MapTitle } from '@/components/layout/map-title'
 import { Dolmen } from '@/components/world/dolmen'
 import { WayList } from '@/components/world/way-list'
 import { CLEARING, MAP_NAMES } from '@/constants/world'
@@ -58,9 +59,7 @@ export const ClearingScreen = ({
           <div className="flex items-center gap-3">
             <img src={logo} alt="" className="emblem size-emblem shrink-0" />
             <div className="flex flex-col gap-1">
-              <h1 className="limelight font-carve text-sign tracking-wide text-cream uppercase">
-                {i18n._(MAP_NAMES[CLEARING])}
-              </h1>
+              <MapTitle>{i18n._(MAP_NAMES[CLEARING])}</MapTitle>
               <p className="limelight text-aside text-khaki-lit">
                 {t`Logiciel communautaire pour Dofus Retro`}
               </p>
