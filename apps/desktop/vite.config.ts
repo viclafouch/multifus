@@ -9,6 +9,8 @@ import react from '@vitejs/plugin-react'
 const host = process.env.TAURI_DEV_HOST ?? ''
 const isRemoteHost = host !== ''
 
+const OLDEST_WEBVIEW = 'safari15.5'
+
 export default defineConfig({
   plugins: [
     react({ compiler: true }),
@@ -24,6 +26,8 @@ export default defineConfig({
   },
 
   build: {
+    target: OLDEST_WEBVIEW,
+    cssTarget: OLDEST_WEBVIEW,
     rolldownOptions: {
       input: {
         main: path.resolve(import.meta.dirname, './index.html'),

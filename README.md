@@ -32,9 +32,11 @@ Le portrait de classe mis à part, ces réglages sont décochés par défaut. Fe
 
 | Système             | Version minimale                    | État                     |
 | ------------------- | ----------------------------------- | ------------------------ |
-| macOS               | 11 Big Sur, Apple Silicon           | Vérifié sur macOS 26     |
+| macOS               | 12.4 Monterey, Apple Silicon        | Vérifié sur macOS 26     |
 | Windows             | 10, mise à jour 1709 d'octobre 2017 | En cours de vérification |
 | Linux, iOS, Android |                                     | Hors périmètre           |
+
+Le plancher de macOS est celui de la webview, pas celui du Rust. L'écran est peint avec `@layer`, que Safari ne connaît qu'à partir de 15.4, livré avec macOS 12.4 : en dessous, la feuille de style tombe en entier et la fenêtre s'affiche nue. Tout ce qui est plus récent a son repli, une couleur `color-mix()` retombant sur sa version opaque, et `vite.config.ts` tient ce plancher dans `build.target`.
 
 Sur macOS, Multifus demande l'**Accessibilité**, et il ne peut rien faire sans elle : ni lire le titre des fenêtres, ni les amener au premier plan, ni entendre les notifications du jeu. L'écran d'accueil mène au bon panneau des Réglages Système.
 
