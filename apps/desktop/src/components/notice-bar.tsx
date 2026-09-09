@@ -19,7 +19,10 @@ export const NoticeBar = ({
   children
 }: NoticeBarProps) => {
   return (
-    <div className="relative z-30 flex items-start gap-3 border-b-2 border-flame/45 bg-iron/95 py-3 pr-44 pl-28">
+    <div
+      role="alert"
+      className="relative z-30 flex items-start gap-3 border-b-2 border-flame/45 bg-iron/95 py-3 pr-44 pl-28"
+    >
       <TriangleAlert
         aria-hidden
         className="mt-0.5 size-4 shrink-0 text-flame"

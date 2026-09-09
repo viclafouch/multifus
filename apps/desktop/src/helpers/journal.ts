@@ -53,6 +53,10 @@ import {
   updateLine
 } from '@/helpers/wording'
 
+export const journalStamp = (milliseconds: number) => {
+  return new Date(milliseconds).toISOString()
+}
+
 export const journalTime = (milliseconds: number) => {
   return new Date(milliseconds).toLocaleTimeString(i18n.locale, {
     hour: '2-digit',

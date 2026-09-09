@@ -8,6 +8,7 @@ import { Button } from '@/components/retro/button'
 import { RevealButton } from '@/components/reveal-button'
 import {
   journalLine,
+  journalStamp,
   journalTime,
   journalTone,
   journalTranscript
@@ -24,6 +25,7 @@ export const JournalPanel = ({ snapshot }: JournalPanelProps) => {
   const entries = snapshot.journal
   const lineCount = entries.length
   const [isOpen, setIsOpen] = React.useState(false)
+  const listId = React.useId()
   const list = React.useRef<HTMLOListElement>(null)
   const isFollowing = React.useRef(true)
 
@@ -63,6 +65,7 @@ export const JournalPanel = ({ snapshot }: JournalPanelProps) => {
           <Button
             variant="bare"
             aria-expanded={isOpen}
+            aria-controls={isOpen ? listId : undefined}
             onClick={handleToggle}
             title={isOpen ? t`Masquer le journal` : t`Afficher le journal`}
             className="h-9 w-full justify-start gap-2 rounded-none px-4 font-carve text-legend tracking-widest text-khaki uppercase"
@@ -91,6 +94,8 @@ export const JournalPanel = ({ snapshot }: JournalPanelProps) => {
       {isOpen ? (
         <ol
           ref={list}
+          id={listId}
+          aria-live="polite"
           onScroll={handleScroll}
           className="h-journal overflow-y-auto border-t border-band/25 px-4 py-2.5 font-mono text-log"
         >
@@ -130,7 +135,10 @@ const JournalLine = ({ entry, quickReplies }: JournalLineProps) => {
         aria-hidden
         className="mt-1.5 size-1 shrink-0 rounded-full bg-muted-foreground/40 group-data-[tone=good]/line:bg-primary/80 group-data-[tone=warning]/line:bg-destructive/85"
       />
-      <time className="shrink-0 text-muted-foreground/55 tabular-nums">
+      <time
+        dateTime={journalStamp(entry.at)}
+        className="shrink-0 text-muted-foreground/55 tabular-nums"
+      >
         {journalTime(entry.at)}
       </time>
       <span className="selectable min-w-0 break-words text-muted-foreground group-data-[tone=warning]/line:text-foreground/90">

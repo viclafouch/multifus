@@ -1,6 +1,7 @@
 import React from 'react'
 import { XIcon } from 'lucide-react'
 import { Dialog as DialogPrimitive } from '@base-ui/react/dialog'
+import { t } from '@lingui/core/macro'
 import { Button } from '@/components/retro/button'
 import { cn } from '@/lib/utils'
 
@@ -71,7 +72,7 @@ function DialogContent({
             }
           >
             <XIcon />
-            <span className="sr-only">Close</span>
+            <span className="sr-only">{t`Fermer`}</span>
           </DialogPrimitive.Close>
         )}
       </DialogPrimitive.Popup>
@@ -91,12 +92,9 @@ function DialogHeader({ className, ...props }: React.ComponentProps<'div'>) {
 
 function DialogFooter({
   className,
-  showCloseButton = false,
   children,
   ...props
-}: React.ComponentProps<'div'> & {
-  showCloseButton?: boolean
-}) {
+}: React.ComponentProps<'div'>) {
   return (
     <div
       data-slot="dialog-footer"
@@ -107,11 +105,6 @@ function DialogFooter({
       {...props}
     >
       {children}
-      {showCloseButton && (
-        <DialogPrimitive.Close render={<Button variant="slate" />}>
-          Close
-        </DialogPrimitive.Close>
-      )}
     </div>
   )
 }

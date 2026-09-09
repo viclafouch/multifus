@@ -1425,6 +1425,7 @@ msgid "Fenêtres illisibles"
 msgstr "Ventanas ilegibles"
 
 #: src/components/loop-dialog.tsx
+#: src/components/ui/dialog.tsx
 #: src/screens/about/tolerance-shot.tsx
 #: src/screens/onboarding/shot-dialog.tsx
 #: src/screens/onboarding/shot-window.tsx
