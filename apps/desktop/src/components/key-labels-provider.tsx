@@ -14,11 +14,7 @@ export const KeyLabelsProvider = ({
   labels,
   children
 }: KeyLabelsProviderProps) => {
-  return (
-    <KeyLabelsContext.Provider value={labels}>
-      {children}
-    </KeyLabelsContext.Provider>
-  )
+  return <KeyLabelsContext value={labels}>{children}</KeyLabelsContext>
 }
 
 export const useKeyLabels = () => {

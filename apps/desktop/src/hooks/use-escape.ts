@@ -1,16 +1,12 @@
 import React from 'react'
 
 export const useEscape = (isListening: boolean, onEscape: () => void) => {
-  const struck = React.useRef(onEscape)
-
-  React.useEffect(() => {
-    struck.current = onEscape
-  }, [onEscape])
+  const strike = React.useEffectEvent(onEscape)
 
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (isListening && event.key === 'Escape') {
-        struck.current()
+        strike()
       }
     }
 

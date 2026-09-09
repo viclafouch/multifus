@@ -1,5 +1,5 @@
 import React from 'react'
-import { matchIsStill } from '@/lib/motion'
+import { useStill } from '@/hooks/use-still'
 import { ignore } from '@/lib/utils'
 
 const GLIDE_MS = 500
@@ -90,13 +90,14 @@ export const useGlide = (
   holder: React.RefObject<HTMLElement | null>,
   roll: string
 ) => {
+  const isStill = useStill()
   const boxes = React.useRef(new Map<string, Box>())
   const moves = React.useRef(new Map<string, Animation>())
 
   React.useLayoutEffect(() => {
     const element = holder.current
 
-    if (element === null || matchIsStill()) {
+    if (element === null || isStill) {
       return ignore
     }
 
@@ -111,12 +112,12 @@ export const useGlide = (
     return () => {
       watcher.disconnect()
     }
-  }, [holder])
+  }, [holder, isStill])
 
   React.useLayoutEffect(() => {
     const element = holder.current
 
-    if (element === null || matchIsStill()) {
+    if (element === null || isStill) {
       return
     }
 
@@ -186,5 +187,5 @@ export const useGlide = (
 
     boxes.current = kept
     // oxlint-disable-next-line react/exhaustive-effect-dependencies -- l’effet lit le DOM, et « roll » n’est là que pour dire qu’il a changé
-  }, [holder, roll])
+  }, [holder, roll, isStill])
 }

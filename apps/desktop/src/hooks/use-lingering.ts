@@ -1,5 +1,5 @@
 import React from 'react'
-import { matchIsStill } from '@/lib/motion'
+import { useStill } from '@/hooks/use-still'
 import { ignore } from '@/lib/utils'
 
 type LingeringParams<Item> = {
@@ -31,6 +31,7 @@ export const useLingering = <Item>({
   keyOf,
   wait
 }: LingeringParams<Item>) => {
+  const isStill = useStill()
   const [source, setSource] = React.useState(items)
   const [shown, setShown] = React.useState(items)
 
@@ -53,7 +54,7 @@ export const useLingering = <Item>({
     }
   }, [items, shown, wait])
 
-  if (matchIsStill()) {
+  if (isStill) {
     return items.map((item) => {
       return { item, isLeaving: false }
     })

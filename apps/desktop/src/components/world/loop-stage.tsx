@@ -1,4 +1,4 @@
-import { matchIsStill } from '@/lib/motion'
+import { useStill } from '@/hooks/use-still'
 
 type LoopStageProps = Readonly<{
   source: string | null
@@ -7,7 +7,7 @@ type LoopStageProps = Readonly<{
 }>
 
 export const LoopStage = ({ source, caption, onReady }: LoopStageProps) => {
-  const isStill = matchIsStill()
+  const isStill = useStill()
 
   return (
     <div className="stage relative aspect-loop w-full">

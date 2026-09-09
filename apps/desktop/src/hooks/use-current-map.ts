@@ -1,12 +1,14 @@
 import React from 'react'
+import type { MapName } from '@/constants/world'
 import { lastSeenMap, rememberMap } from '@/lib/map-memory'
 
 export const useCurrentMap = () => {
   const [map, setMap] = React.useState(lastSeenMap)
 
-  React.useEffect(() => {
-    rememberMap(map)
-  }, [map])
+  const showMap = (next: MapName) => {
+    rememberMap(next)
+    setMap(next)
+  }
 
-  return [map, setMap] as const
+  return [map, showMap] as const
 }

@@ -5,6 +5,8 @@ export const useMeasuredRatio = (
   target: React.RefObject<HTMLElement | null>,
   report: (ratio: number) => void
 ) => {
+  const measured = React.useEffectEvent(report)
+
   React.useEffect(() => {
     const element = target.current
 
@@ -19,7 +21,7 @@ export const useMeasuredRatio = (
         return
       }
 
-      report(box.height / box.width)
+      measured(box.height / box.width)
     }
 
     const observer = new ResizeObserver(measure)
@@ -30,5 +32,5 @@ export const useMeasuredRatio = (
     return () => {
       observer.disconnect()
     }
-  }, [target, report])
+  }, [target])
 }

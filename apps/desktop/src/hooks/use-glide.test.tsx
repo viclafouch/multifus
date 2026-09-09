@@ -6,8 +6,9 @@ const motion = vi.hoisted(() => {
   return { isStill: false }
 })
 
-vi.mock(import('@/lib/motion'), () => {
+vi.mock(import('@/lib/motion'), async (importOriginal) => {
   return {
+    ...(await importOriginal()),
     matchIsStill: () => {
       return motion.isStill
     }

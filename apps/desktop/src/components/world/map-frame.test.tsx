@@ -17,8 +17,8 @@ vi.mock(import('@/lib/multifus'), () => {
   return bridge
 })
 
-vi.mock(import('@/lib/motion'), () => {
-  return motion
+vi.mock(import('@/lib/motion'), async (importOriginal) => {
+  return { ...(await importOriginal()), ...motion }
 })
 
 const { MapFrame } = await import('@/components/world/map-frame')

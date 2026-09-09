@@ -21,11 +21,7 @@ type UseWindowDragParams = {
 
 export const useWindowDrag = ({ onMove, onSettle }: UseWindowDragParams) => {
   const held = React.useRef<Drag | null>(null)
-  const settle = React.useRef(onSettle)
-
-  React.useEffect(() => {
-    settle.current = onSettle
-  }, [onSettle])
+  const settle = React.useEffectEvent(onSettle)
 
   React.useEffect(() => {
     return () => {
@@ -36,7 +32,7 @@ export const useWindowDrag = ({ onMove, onSettle }: UseWindowDragParams) => {
       held.current = null
 
       if (drag?.stirred ?? false) {
-        settle.current()
+        settle()
       }
     }
   }, [])
