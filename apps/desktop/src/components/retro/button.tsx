@@ -3,14 +3,14 @@ import { Button as ButtonPrimitive } from '@base-ui/react/button'
 import { cn } from '@/lib/utils'
 
 const buttonVariants = cva(
-  "group/button inline-flex shrink-0 items-center justify-center gap-2 rounded-full font-carve tracking-wide whitespace-nowrap uppercase select-none sighted active:translate-y-px disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "group/button inline-flex shrink-0 items-center justify-center gap-2 rounded-full font-carve tracking-wide whitespace-nowrap uppercase select-none sighted disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
         leaf: 'btn-leaf',
         slate: 'btn-slate',
         bare: 'btn-bare',
-        way: 'btn-way active:translate-y-0',
+        way: 'btn-way',
         glint: 'btn-glint',
         ember: 'btn-ember',
         token: 'btn-token',

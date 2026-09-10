@@ -139,8 +139,10 @@ pour un écran de travail, c'est la fenêtre Options du client qui répond.
 17. Les délais s'annulent sous `prefers-reduced-motion`, pas seulement les durées
 18. Une translation d'entrée vit dans un conteneur qui coupe, sinon elle agrandit
     la zone défilable et la barre paraît une demi-seconde
-19. Un survol change une couleur. Le menu de l'accueil en est la seule exception,
-    parce que viser une entrée y est le geste même de l'écran
+19. Un survol change une couleur, et un clic aussi. Rien ne bouge de place sous
+    le doigt : le bouton s'assombrit, il ne s'enfonce pas. Le menu de l'accueil
+    est la seule exception au repos, parce que viser une entrée y est le geste
+    même de l'écran
 20. Une tête du dolmen n'apparaît ni ne s'efface d'un coup. Celle qui arrive
     éclot sur sa place, celle qui s'en va sort d'abord du flux, figée là où elle
     était, et les autres glissent de leur ancienne place à la nouvelle. Le
@@ -181,8 +183,7 @@ pour un écran de travail, c'est la fenêtre Options du client qui répond.
     trait saute d'un pixel à l'aller comme au retour. L'étoile et la croix du
     roster ont coûté trois essais, le `backdrop-filter` et les transitions
     accusés à tort. La couche figée ne coûte qu'elle-même, et le trait ne bouge
-    plus. Elle rend net aussi ce qui bougeait déjà : l'enfoncement d'un pixel au
-    clic se voit alors pour de bon, et c'est tant mieux
+    plus
 
 ### Les mots et les formes
 
