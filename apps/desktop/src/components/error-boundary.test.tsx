@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
-import { lastSeenMap, rememberMap } from '@/lib/map-memory'
+import { reloadScreen } from '@/lib/reload'
 import { ignore } from '@/lib/utils'
 import { pending } from '@/test-doubles'
 
@@ -11,6 +11,10 @@ const bridge = {
 
 vi.mock(import('@/lib/multifus'), () => {
   return bridge
+})
+
+vi.mock(import('@/lib/reload'), () => {
+  return { reloadScreen: vi.fn() }
 })
 
 const { ErrorBoundary } = await import('@/components/error-boundary')
@@ -72,16 +76,11 @@ describe('l’écran qui remplace la fenêtre blanche', () => {
     ).not.toBeNull()
   })
 
-  it('oublie l’écran qui vient de casser avant de recharger', () => {
-    const reload = vi.fn()
-
-    rememberMap('settings')
-    vi.stubGlobal('location', { reload })
+  it('recharge l’écran quand on le lui demande', () => {
     drawBroken()
 
     fireEvent.click(screen.getByRole('button', { name: 'Recharger l’écran' }))
 
-    expect(lastSeenMap()).toBe('clearing')
-    expect(reload).toHaveBeenCalledWith()
+    expect(reloadScreen).toHaveBeenCalledWith()
   })
 })

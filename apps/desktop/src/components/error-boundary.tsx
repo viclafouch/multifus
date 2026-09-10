@@ -3,8 +3,8 @@ import { TriangleAlert } from 'lucide-react'
 import { t } from '@lingui/core/macro'
 import { EmptyState, EmptyStateMark } from '@/components/layout/empty-state'
 import { Button } from '@/components/retro/button'
-import { forgetMap } from '@/lib/map-memory'
 import { revealJournal, screenStopped } from '@/lib/multifus'
+import { reloadScreen } from '@/lib/reload'
 import { errorMessage, ignore } from '@/lib/utils'
 
 type ErrorBoundaryProps = Readonly<{
@@ -69,8 +69,7 @@ const CrashScreen = ({ message }: CrashScreenProps) => {
         <Button
           size="sm"
           onClick={() => {
-            forgetMap()
-            window.location.reload()
+            reloadScreen()
           }}
         >
           {t`Recharger l’écran`}
