@@ -54,8 +54,8 @@ export const ClearingScreen = ({
           {authorizationLine(authorization)}
         </p>
       </header>
-      <div className="relative min-h-0 flex-1">
-        <div className="settle absolute top-1/2 left-0 flex -translate-y-1/2 flex-col items-start gap-4">
+      <div className="flex min-h-0 flex-1 flex-col items-start overflow-y-auto">
+        <div className="settle my-auto flex flex-col items-start gap-4">
           <div className="flex items-center gap-3">
             <img src={logo} alt="" className="emblem size-emblem shrink-0" />
             <div className="flex flex-col gap-1">
