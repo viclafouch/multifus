@@ -92,7 +92,7 @@ describe('la mise en route', () => {
     expect(buttonNamed('English').getAttribute('aria-pressed')).toBe('false')
   })
 
-  it('ouvre sur la bienvenue, première des six étapes', async () => {
+  it('ouvre sur ce que Multifus fait, première des six pages', async () => {
     await show()
 
     expect(

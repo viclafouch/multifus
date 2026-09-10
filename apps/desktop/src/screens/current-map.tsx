@@ -87,8 +87,6 @@ export const CurrentMap = ({ map, snapshot, run }: CurrentMapProps) => {
     settings: () => {
       return (
         <SettingsScreen
-          onboarding={snapshot.onboarding}
-          isAutoFocusEnabled={snapshot.autoFocusEnabled}
           startAtLogin={snapshot.startAtLogin}
           maximizeOnLaunch={snapshot.maximizeOnLaunch}
           shortTitles={snapshot.shortTitles}

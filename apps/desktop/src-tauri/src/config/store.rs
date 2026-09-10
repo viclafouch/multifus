@@ -291,6 +291,7 @@ mod tests {
                 maximize_all: Shortcut::new("Alt+KeyA"),
                 wheel: Shortcut::new("Alt+KeyW"),
                 rune_table: Shortcut::new("Alt+KeyR"),
+                health: Shortcut::new("Alt+KeyH"),
             },
             maximize_on_launch: true,
             short_titles: true,

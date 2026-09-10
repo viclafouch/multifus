@@ -95,7 +95,14 @@ pour un écran de travail, c'est la fenêtre Options du client qui répond.
 
 10. Une map occupe la fenêtre entière, et le reste flotte au-dessus, hors du flux.
     Dans le flux, le retour coupait ce qui défile, et ouvrir le journal levait la
-    scène entière
+    scène entière. Ce qui flotte en haut partage une seule ligne, dont
+    `--spacing-crown` donne la hauteur et `items-center` le centre : le retour,
+    le cartouche, la ligne d'écoute de l'accueil. Trois boîtes de hauteurs
+    différentes ancrées au même `top` ne s'alignent pas, un bouton de 28 pixels
+    et des drapeaux de 16 se ratant de six. Un avis n'entre pas dans cette
+    ligne : il se pose au-dessus, dans le flux, et pousse vers le bas la ligne
+    comme la map. Lui réserver sa place à coups de `padding` échoue dès qu'on
+    traduit, la largeur du mot « Retour » n'étant pas celle de « Zurück »
 11. Ce qui flotte a son ombre, `Shade` en haut et en bas, et un écran commence et
     finit hors d'elle : c'est `--spacing-fall` qui donne les deux marges. Le
     texte qui glisse dessous s'efface au lieu de se cogner
@@ -221,7 +228,11 @@ pour un écran de travail, c'est la fenêtre Options du client qui répond.
     cherchée s'y noie ; pliée, elle ne montre que les questions, et elle peut
     grossir sans que la précédente devienne plus dure à trouver. Le repère qui
     dit l'ouverture est le losange de `btn-way`, pas un chevron : le geste est
-    déjà celui de l'accueil, et un bouton ne porte pas d'icône à côté d'un mot
+    déjà celui de l'accueil, et un bouton ne porte pas d'icône à côté d'un mot.
+    Les deux losanges partagent leur côté, leur durée et leur courbe par
+    `--lozenge-side` et `--lozenge-turn`, jamais plus : l'un est un élément,
+    l'autre un `::after` dont la rotation vit dans un `transform` qui translate
+    aussi. Sortir la rotation de là arrête la translation
 
 ## Dessiner une map
 

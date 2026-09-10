@@ -18,18 +18,9 @@ La paire de clés de l'updater existe déjà, dans `~/.tauri/multifus.key` et so
 `tauri.conf.json`. En régénérer une rendrait insignables les mises à jour des
 versions déjà installées.
 
-## Finir la FAQ et la vérification
-
-La revue à deux axes a laissé ces quatre-là ouverts, sciemment.
-
-- [ ] Sur Mac, la réponse « bannière » dit de garder la bannière, et le dialogue tend quand même le chemin et le bouton qui ouvrent le panneau des notifications : `QUESTION_PAGES.banner` ne connaît pas `IS_APPLE`
-- [ ] Le verdict de la vérification compte l'essai parmi les « réglages » fermés, alors que `CONTEXT.md` dit qu'il n'en est pas un. Compter les quatre réglages et dire l'essai à part, ou trouver le mot qui couvre les cinq
-- [ ] `@utility askmark` redessine le losange de `btn-way` au lieu de le partager, et leurs durées divergent, 0,2 s contre 0,3 s. La règle 34 de [design-system.md](./design-system.md) annonce pourtant un seul losange
-- [ ] La FAQ et la vérification s'atteignent en ouvrant la fenêtre et en descendant les Paramètres, sans raccourci ni entrée de la barre système, ce que `CLAUDE.md` interdit. La vérification est justement ce qu'on veut lancer quand rien ne passe devant
-
 ## Poser les images qui manquent
 
-- [ ] Enregistrer les cinq vidéos de la mise en route sur le Mac, et les mêmes sur Windows pour les étapes 2, 3 et 4, dont le dessin diffère. `PAGE_SHOTS` gagne son axe plateforme à ce moment-là, et pas avant : deux tables identiques en attendant les images ne seraient qu'une constante écrite deux fois. Posées, `PAGE_SHOTS` les prend et le cadre pointillé disparaît
+- [ ] Enregistrer les cinq vidéos de la mise en route sur le Mac. Les deux machines montrent les mêmes : `PAGE_SHOTS` reste une table sans axe plateforme. Posées, `PAGE_SHOTS` les prend et le cadre pointillé disparaît
 
 ## Essayer sur les vraies machines
 
@@ -44,8 +35,10 @@ perdant son autorisation d'Accessibilité.
 - [ ] La reprise de l'écoute des notifications, sur le Mac : tuer le centre de notifications, le journal doit porter une ligne, une seule, puis « Écoute des notifications démarrée » cinq secondes plus tard. Windows est essayé et bon, par `Stop-Service WpnUserService_*`, qui rend `0x803E0105`. L'essai casse le jeu et non le logiciel : le client Dofus perd son inscription auprès de la plateforme et n'émet plus rien tant qu'on ne l'a pas relancé, Multifus se rebranchant seul
 - [ ] Le raccourci rendu hors du jeu, sur le Mac : `Shift+Digit1` écrit le 1 dans Chrome, Multifus allumé, et colle toujours la réponse rapide dans le jeu. Puis cliquer sur un client et frapper aussitôt, il répond ; l'AutoFocus ramène une fenêtre devant, le raccourci suivant répond ; la roue maintenue puis relâchée bascule toujours
 - [ ] Le journal ne se remplit pas de « raccourcis liés » quand on entre et sort du jeu vingt fois
+- [ ] Le menu de l'accueil quand deux avis se posent en même temps, fenêtre à sa taille de départ : le bloc du titre est centré en absolu dans ce qui reste, et il déborde par le haut sous la ligne d'écoute. Le centrer dans le flux, ou lui donner une garde
+- [ ] La porte de la vérification, des deux côtés : dans le jeu, frapper le raccourci ; Multifus doit passer devant, sur les Paramètres, la lecture en cours, puis le verdict, et le jeu ne doit rien avoir reçu de la frappe. Puis la même chose par « Est-ce que tout marche ? » de la barre système, Multifus rangé et sa fenêtre fermée
+- [ ] Le temps que la vérification met vraiment, des deux côtés, sur une machine chargée et huit clients ouverts : elle rescanne les fenêtres et relit les réglages du système. Si elle dépasse deux secondes, le plancher de `constants/health.ts` ne sert plus à rien et c'est la lecture qu'il faut regarder
 - [ ] Le crochet de panic, des deux côtés : forcer un panic dans une commande, le journal doit porter « Une partie de Multifus a échoué brutalement » avec le fichier et la ligne ; puis dans le tour, où il doit porter « La lecture des fenêtres a échoué brutalement, et a repris », une seule ligne et non deux. Le verrou tenu par le fil qui panique fait tomber la première dans le fichier seul, sans passer par la fenêtre
-- [ ] Un plantage de rendu dans la bannière, la roue ou le tableau des runes ne laisse aucune trace : elles montent par `boot.tsx` sans barrière, et l'écran de plantage de `main.tsx` ne convient pas à une fenêtre sans bord. Leur donner de quoi écrire au journal sans rien montrer
 - [ ] La webview étranglée en arrière-plan, sur le Mac : ranger Multifus dans la barre système, attendre dix minutes, puis rouvrir la fenêtre. Le roster, le journal et les réglages doivent être à jour tout de suite. macOS 14+ suspend une webview cachée au bout de cinq minutes environ, et `backgroundThrottling: "disabled"` dans `tauri.conf.json` répond si les évènements de Rust n'arrivent plus
 - [ ] Le premier clic sur la fenêtre principale, sur le Mac : revenir du jeu et cliquer droit sur un bouton du roster. Si macOS mange ce clic pour réveiller la fenêtre, `acceptFirstMouse: true` dans `tauri.conf.json` le fait passer, comme il le fait déjà pour les fenêtres à part
 - [ ] Ouvrir Multifus sur un Mac en macOS 12.4, le plus vieux qu'il accepte : `@layer` demande Safari 15.4, et `build.target` de `vite.config.ts` tient ce plancher. Les couleurs translucides y sont opaques, `color-mix()` n'arrivant qu'en 16.2, et c'est voulu : Tailwind pose la couleur pleine puis l'améliore sous `@supports`

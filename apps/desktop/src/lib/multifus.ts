@@ -33,6 +33,16 @@ export const onNavigate = async (handle: (screen: ScreenName) => void) => {
 
 type NavigateEvent = { readonly payload: ScreenName }
 
+const HEALTH_EVENT = 'multifus://health'
+
+export const onHealthAsked = async (handle: (asked: null) => void) => {
+  return listen<null>(HEALTH_EVENT, ({ payload }: HealthEvent) => {
+    handle(payload)
+  })
+}
+
+type HealthEvent = { readonly payload: null }
+
 export const snapshot = async () => {
   return invoke<Snapshot>('snapshot')
 }
@@ -47,6 +57,10 @@ export const setLanguage = async (asked: Language) => {
 
 export const requestAuthorization = async () => {
   return invoke<Snapshot>('request_authorization')
+}
+
+export const checkHealth = async () => {
+  return invoke<Snapshot>('check_health')
 }
 
 export const openSystemPage = async (page: SystemPage) => {

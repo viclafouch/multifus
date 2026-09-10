@@ -301,6 +301,8 @@ trait Mechanisms {
     fn release_wheel(&self);
 
     fn toggle_rune_table(&self, here: WindowId);
+
+    fn ask_health(&self);
 }
 
 struct AppMechanisms<'a>(&'a AppHandle);
@@ -332,6 +334,10 @@ impl Mechanisms for AppMechanisms<'_> {
 
     fn toggle_rune_table(&self, here: WindowId) {
         rune_table::toggle(self.0, Some(here));
+    }
+
+    fn ask_health(&self) {
+        runtime::ask_health(self.0);
     }
 }
 
@@ -404,6 +410,9 @@ fn act_on(press: &Press, binding: Binding, window: &GameWindow) {
         Binding::Action {
             action: ShortcutAction::RuneTable,
         } => press.mechanisms.toggle_rune_table(window.id()),
+        Binding::Action {
+            action: ShortcutAction::Health,
+        } => press.mechanisms.ask_health(),
         Binding::Action { action } => {
             let Some(effect) = hold(press.state).decide_shortcut(action, window.nickname()) else {
                 return;
@@ -526,6 +535,7 @@ mod tests {
         WheelOpened(WindowId),
         WheelReleased,
         RuneTableToggled(WindowId),
+        HealthAsked,
     }
 
     #[derive(Debug, Default)]
@@ -576,6 +586,10 @@ mod tests {
 
         fn toggle_rune_table(&self, here: WindowId) {
             self.write_down(Mechanism::RuneTableToggled(here));
+        }
+
+        fn ask_health(&self) {
+            self.write_down(Mechanism::HealthAsked);
         }
     }
 

@@ -48,7 +48,7 @@ export const ClearingScreen = ({
 
   return (
     <main className="relative flex min-h-0 flex-1 flex-col px-6 pt-3">
-      <header className="relative z-30 flex shrink-0 items-center gap-3 pr-40">
+      <header className="relative z-30 flex h-crown shrink-0 items-center gap-3 pr-40">
         <p className="limelight flex items-center gap-2 text-mark text-khaki">
           <Lamp state={authorizationState(authorization)} />
           {authorizationLine(authorization)}

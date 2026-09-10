@@ -1,4 +1,5 @@
 export type ShortcutAction =
+  | 'health'
   | 'main'
   | 'maximizeAll'
   | 'next'

@@ -66,6 +66,7 @@ struct MenuWords {
     relay_off: &'static str,
     denied: &'static str,
     open_settings: &'static str,
+    health: &'static str,
     journal: &'static str,
 }
 
@@ -101,6 +102,7 @@ const FRENCH_MENU: MenuWords = MenuWords {
     } else {
         "Ouvrir les réglages du système"
     },
+    health: "Est-ce que tout marche ?",
     journal: "Montrer le journal",
 };
 
@@ -136,6 +138,7 @@ const ENGLISH_MENU: MenuWords = MenuWords {
     } else {
         "Open the system settings"
     },
+    health: "Is everything working?",
     journal: "Show the log",
 };
 
@@ -171,6 +174,7 @@ const SPANISH_MENU: MenuWords = MenuWords {
     } else {
         "Abrir la configuración del sistema"
     },
+    health: "¿Funciona todo?",
     journal: "Mostrar el registro",
 };
 
@@ -211,6 +215,8 @@ const RUNE_TABLE_HOME_ID: &str = "multifus://rune-table-home";
 const WAKE_MINIMIZED_ID: &str = "multifus://wake-minimized";
 
 const UPDATE_ID: &str = "multifus://update";
+
+const HEALTH_ID: &str = "multifus://check-health";
 
 const JOURNAL_ID: &str = "multifus://journal";
 
@@ -513,6 +519,14 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
 
     menu.append(&MenuItem::with_id(
         app,
+        HEALTH_ID,
+        words.health,
+        true,
+        None::<&str>,
+    )?)?;
+
+    menu.append(&MenuItem::with_id(
+        app,
         JOURNAL_ID,
         words.journal,
         true,
@@ -549,6 +563,12 @@ fn on_menu_event(app: &AppHandle, event: MenuEvent) {
         lock(app).log(JournalEvent::Quit);
 
         app.exit(0);
+
+        return;
+    }
+
+    if id == HEALTH_ID {
+        runtime::ask_health(app);
 
         return;
     }

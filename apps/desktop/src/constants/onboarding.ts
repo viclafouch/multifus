@@ -1,5 +1,5 @@
 import { msg } from '@lingui/core/macro'
-import type { Page, SystemPage } from '@/@types/onboarding'
+import type { Page, Step, SystemPage } from '@/@types/onboarding'
 import arena from '@/assets/ankama/arena.webp'
 import camp from '@/assets/ankama/camp.webp'
 import forest from '@/assets/ankama/forest.webp'
@@ -12,6 +12,13 @@ import type { Phrase } from '@/lib/i18n'
 export const WELCOME_PAGE = 'welcome' satisfies Page
 
 export const ONBOARDING_ANCHOR = 'prise-en-main'
+
+export const SETTING_STEPS = [
+  'authorization',
+  'notifications',
+  'focus',
+  'gameSetting'
+] as const satisfies readonly Step[]
 
 export const PAGE_SCENES = {
   welcome: camp,

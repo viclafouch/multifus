@@ -1,23 +1,56 @@
 import { plural, t } from '@lingui/core/macro'
-import type { KnownCheck, Onboarding } from '@/@types/onboarding'
+import type { Onboarding, Step } from '@/@types/onboarding'
+import type { StateMark } from '@/components/retro/step-state'
 import type { Move } from '@/constants/moves'
+import { SETTING_STEPS } from '@/constants/onboarding'
+import type { HealthRead } from '@/hooks/use-health-check'
 
-type HealthParams = Readonly<{
+export type HealthSubject = Readonly<{
   onboarding: Onboarding
   isAutoFocusEnabled: boolean
 }>
 
+type HealthParams = HealthSubject &
+  Readonly<{
+    read: HealthRead
+  }>
+
 type Health = {
-  readonly check: KnownCheck | null
+  readonly check: StateMark | null
   readonly verdict: string
   readonly body: string
   readonly move: Move | null
 }
 
+const matchIsSetting = (step: Step) => {
+  return SETTING_STEPS.some((setting) => {
+    return setting === step
+  })
+}
+
 export const healthReport = ({
   onboarding,
-  isAutoFocusEnabled
+  isAutoFocusEnabled,
+  read
 }: HealthParams): Health => {
+  if (read.kind === 'reading') {
+    return {
+      check: 'reading',
+      verdict: t`Multifus relit les réglages`,
+      body: t`Il regarde d’abord s’il voit vos fenêtres, puis ce que le système le laisse lire.`,
+      move: null
+    }
+  }
+
+  if (read.kind === 'failed') {
+    return {
+      check: 'blocked',
+      verdict: t`Multifus n’a pas pu relire les réglages`,
+      body: t`Réessayez. Si ça recommence, le journal en dira plus.`,
+      move: null
+    }
+  }
+
   if (!isAutoFocusEnabled) {
     return {
       check: null,
@@ -27,8 +60,8 @@ export const healthReport = ({
     }
   }
 
-  const blocked = onboarding.steps.filter(({ check }) => {
-    return check === 'blocked'
+  const blocked = onboarding.steps.filter(({ step, check }) => {
+    return matchIsSetting(step) && check === 'blocked'
   }).length
 
   if (blocked > 0) {
@@ -52,7 +85,7 @@ export const healthReport = ({
       check: null,
       verdict: t`Multifus ne peut pas tout lire ici`,
       body: t`Ce que ce système le laisse lire est en place. Pour le reste, seul un appel du jeu qui vous ramène devant tranchera.`,
-      move: null
+      move: 'questions'
     }
   }
 

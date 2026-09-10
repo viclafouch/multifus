@@ -36,6 +36,7 @@ pub fn run() {
             app::commands::language,
             app::commands::set_language,
             app::commands::request_authorization,
+            app::commands::check_health,
             app::commands::open_system_page,
             app::commands::finish_onboarding,
             app::commands::restart_onboarding,

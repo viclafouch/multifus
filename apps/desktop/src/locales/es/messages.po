@@ -695,8 +695,8 @@ msgid "Barre système : le système a refusé de ramener {nickname} au premier p
 msgstr "Bandeja del sistema: el sistema se ha negado a traer a {nickname} al frente ({detail})."
 
 #: src/helpers/onboarding.ts
-msgid "Bienvenue"
-msgstr "Bienvenida"
+#~ msgid "Bienvenue"
+#~ msgstr "Bienvenida"
 
 #: src/helpers/onboarding.ts
 #~ msgid "Bienvenue dans Multifus"
@@ -786,6 +786,10 @@ msgstr "Lo que Ankama permite"
 #: src/screens/onboarding/index.tsx
 #~ msgid "Ce qu’il faut pour que Multifus vous amène devant la bonne fenêtre. Il contrôle ce qu’il peut, et vous montre le reste."
 #~ msgstr "Lo que Multifus necesita para llevarte ante la ventana correcta. Comprueba lo que puede, y te muestra el resto."
+
+#: src/helpers/onboarding.ts
+#~ msgid "Ce que ça fait"
+#~ msgstr "Lo que hace"
 
 #: src/helpers/health.ts
 msgid "Ce que ce système le laisse lire est en place. Pour le reste, seul un appel du jeu qui vous ramène devant tranchera."
@@ -1430,6 +1434,7 @@ msgstr "Enviar una prueba"
 msgid "Envoyez-vous un message maintenant, pour voir ce que ça donne dans Telegram."
 msgstr "Mándate un mensaje ahora, para ver qué tal queda en Telegram."
 
+#: src/constants/shortcuts.ts
 #: src/screens/settings/help-section.tsx
 msgid "Est-ce que tout marche ?"
 msgstr "¿Funciona todo?"
@@ -1599,6 +1604,10 @@ msgstr "Llega aquí"
 #: src/components/silence-notice.tsx
 msgid "Il écoute, l’AutoFocus est allumé, et aucune notification ne lui est parvenue. Reprenez la mise en route : un réglage a pu changer sans le dire."
 msgstr "Está escuchando, el AutoFocus está encendido, y no le ha llegado ninguna notificación. Repase la puesta en marcha: un ajuste puede haber cambiado sin decirlo."
+
+#: src/helpers/health.ts
+msgid "Il regarde d’abord s’il voit vos fenêtres, puis ce que le système le laisse lire."
+msgstr "Primero mira si ve sus ventanas, y luego lo que el sistema le deja leer."
 
 #: src/helpers/questions.ts
 #~ msgid "Ils ne répondent que dans le jeu. Si un autre logiciel les a déjà pris, changez-les dans la map Raccourcis."
@@ -2284,6 +2293,10 @@ msgstr "Actualización: {update}"
 msgid "Mise à jour impossible"
 msgstr "No se puede actualizar"
 
+#: src/helpers/onboarding.ts
+msgid "Mise en route"
+msgstr "Puesta en marcha"
+
 #: src/helpers/wording.ts
 msgid "Modifier"
 msgstr "Editar"
@@ -2401,6 +2414,10 @@ msgstr "Multifus mantiene la pantalla encendida, pero tu salvapantallas arranca 
 #~ msgid "Multifus n’a pas encore entendu le jeu vous appeler."
 #~ msgstr "Multifus todavía no ha oído al juego llamarte."
 
+#: src/helpers/health.ts
+msgid "Multifus n’a pas pu relire les réglages"
+msgstr "Multifus no ha podido releer los ajustes"
+
 #: src/helpers/wording.ts
 msgid "Multifus n’a pas retrouvé le code de votre robot ({detail})."
 msgstr "Multifus no ha vuelto a encontrar el código de tu bot ({detail})."
@@ -2460,6 +2477,10 @@ msgstr "Multifus no ve nada, y no puede hacer nada."
 #: src/components/empty-roster.tsx
 msgid "Multifus regarde vos fenêtres, une fois par seconde."
 msgstr "Multifus mira tus ventanas, una vez por segundo."
+
+#: src/helpers/health.ts
+msgid "Multifus relit les réglages"
+msgstr "Multifus está releyendo los ajustes"
 
 #: src/screens/settings/help-section.tsx
 msgid "Multifus relit les réglages dont l’AutoFocus dépend et vous dit ce qu’il trouve."
@@ -2576,6 +2597,10 @@ msgstr "Osamodas"
 #: src/screens/rune-table/index.tsx
 msgid "Où il se montre"
 msgstr "Dónde se muestra"
+
+#: src/constants/shortcuts.ts
+msgid "Ouvre Multifus sur le verdict des réglages."
+msgstr "Abre Multifus en el veredicto de los ajustes."
 
 #: src/helpers/onboarding.ts
 #~ msgid "Ouvrez Dofus et connectez un personnage : il apparaît ici. Faites-vous ensuite appeler dans le jeu."
@@ -2878,6 +2903,14 @@ msgstr "Recargar la pantalla"
 #: src/helpers/questions.ts
 #~ msgid "Reconnectez-le : Dofus Retro déconnecte un personnage qui ne fait rien pendant un quart d’heure, et Multifus le remet dans le roster."
 #~ msgstr "Vuelva a conectarlo: Dofus Retro desconecta a un personaje que no hace nada durante un cuarto de hora, y Multifus lo devuelve al roster."
+
+#: src/components/health-dialog.tsx
+msgid "Réessayer"
+msgstr "Reintentar"
+
+#: src/helpers/health.ts
+msgid "Réessayez. Si ça recommence, le journal en dira plus."
+msgstr "Reinténtelo. Si vuelve a pasar, el registro dirá más."
 
 #: src/helpers/wording.ts
 msgid "Refusé : un autre logiciel utilise déjà ces touches."
@@ -3651,6 +3684,10 @@ msgstr "Ver el vídeo"
 #: src/components/move-button.tsx
 msgid "Voir le réglage"
 msgstr "Ver el ajuste"
+
+#: src/components/move-button.tsx
+msgid "Voir les questions fréquentes"
+msgstr "Ver las preguntas frecuentes"
 
 #: src/screens/walk-screen/state-panel.tsx
 msgid "Vos clics ne changent pas de personnage."

@@ -24,7 +24,7 @@ export const MapFrame = ({
 
   return (
     <>
-      <header className="absolute top-3 left-6 z-30 flex items-center gap-2">
+      <header className="absolute top-3 left-6 z-30 flex h-crown items-center gap-2">
         <WayBack onGo={onLeave} />
         {loop === null ? null : (
           <MapLoop

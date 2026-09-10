@@ -1,7 +1,9 @@
 import type { KnownCheck } from '@/@types/onboarding'
 
+export type StateMark = KnownCheck | 'reading'
+
 type StepStateProps = Readonly<{
-  check: KnownCheck
+  check: StateMark
   line: string
 }>
 

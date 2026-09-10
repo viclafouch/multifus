@@ -1,5 +1,6 @@
 import { t } from '@lingui/core/macro'
 import type { Snapshot } from '@/@types/snapshot'
+import { useOpenHelp } from '@/components/help-context'
 import { useGoToMap } from '@/components/map-navigation-provider'
 import type { ButtonLook } from '@/components/retro/button'
 import { Button } from '@/components/retro/button'
@@ -22,6 +23,7 @@ export const MoveButton = ({
   size = 'tight'
 }: MoveButtonProps) => {
   const goToMap = useGoToMap()
+  const openHelp = useOpenHelp()
 
   const moves = {
     autoFocus: {
@@ -42,6 +44,12 @@ export const MoveButton = ({
       act: () => {
         onLeave()
         run(restartOnboarding())
+      }
+    },
+    questions: {
+      label: t`Voir les questions fréquentes`,
+      act: () => {
+        openHelp('questions')
       }
     },
     shortcuts: {

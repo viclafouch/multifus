@@ -84,6 +84,7 @@
   --spacing-emblem: 52px;
   --spacing-way: 15.5rem;
   --spacing-rung: clamp(30px, 6.1vh, 40px);
+  --spacing-crown: 28px;
   --spacing-ledger: 37px;
   --spacing-hem: 56px;
   --spacing-fall: 104px;
@@ -165,6 +166,9 @@
 
   --head: clamp(44px, 8.6vh, 66px);
   --cluster: calc(4 * var(--head) + 40px);
+
+  --lozenge-side: 7px;
+  --lozenge-turn: 0.3s;
 }
 
 @utility tint-red {
@@ -418,7 +422,7 @@
 }
 
 @utility btn-way {
-  --waymark: 7px;
+  --waymark: var(--lozenge-side);
   --waymark-from: 12px;
   --waymark-step: 16px;
 
@@ -462,7 +466,7 @@
     box-shadow: 0 0 8px color-mix(in srgb, var(--leaf-glow), transparent 40%);
     transition-property: opacity, transform;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 0.3s;
+    transition-duration: var(--lozenge-turn);
   }
 
   &:hover,
@@ -636,6 +640,16 @@
   box-shadow: inset 0 1px 0 0 rgb(0 0 0 / 0.4);
 }
 
+@keyframes breath {
+  from {
+    opacity: 0.28;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
 @utility badge {
   --mark: var(--leaf-lit);
 
@@ -644,6 +658,14 @@
 
   &[data-check='blocked'] {
     --mark: var(--flame);
+  }
+
+  &[data-check='reading'] {
+    --mark: var(--khaki);
+
+    & .pip {
+      animation: breath 1.1s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+    }
   }
 }
 
@@ -732,15 +754,13 @@
 }
 
 @utility askmark {
-  --lozenge: 7px;
-
-  width: var(--lozenge);
-  height: var(--lozenge);
+  width: var(--lozenge-side);
+  height: var(--lozenge-side);
   transform: rotate(45deg);
   background-color: color-mix(in srgb, var(--band), transparent 20%);
   transition-property: transform, background-color;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 0.2s;
+  transition-duration: var(--lozenge-turn);
 
   [aria-expanded='true'] & {
     transform: none;
@@ -1415,5 +1435,9 @@
   .askmark,
   .unroll {
     transition: none !important;
+  }
+
+  .badge .pip {
+    animation: none !important;
   }
 }

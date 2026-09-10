@@ -11,7 +11,7 @@ paths: ['apps/desktop/src/**/*.{ts,tsx}']
   - Passing callbacks to heavily memoized child components (`React.memo`)
   - Expensive computations that are measurably slow (profile first)
   - Dependencies in `useEffect` that would cause infinite loops without memoization
-- **NEVER return null in child components** - conditional rendering must happen in the parent, not inside the child. If a component might not render, the parent decides whether to render it at all. Child components should always render something when called.
+- **NEVER return null in child components** - conditional rendering must happen in the parent, not inside the child. If a component might not render, the parent decides whether to render it at all. Child components should always render something when called. The one exception is an error boundary, whose whole job is to replace what fell: `QuietBoundary` renders nothing on purpose, a borderless window having no room for a crash screen.
 - **Use functional updates for state derived from previous state** - `setState(prev => !prev)` instead of `setState(!state)`. This avoids bugs with React's batching.
 - **Extract logic into custom hooks** - any useEffect, useState combo, or reusable logic should become a custom hook in `apps/desktop/src/hooks/`. Keep components focused on rendering. Hooks go in dedicated files named `use-*.ts`.
 

@@ -1,6 +1,5 @@
 import { i18n } from '@lingui/core'
 import { t } from '@lingui/core/macro'
-import type { Onboarding } from '@/@types/onboarding'
 import type { Snapshot } from '@/@types/snapshot'
 import { FieldRow } from '@/components/layout/field-row'
 import { Note } from '@/components/layout/note'
@@ -24,8 +23,6 @@ import { ClientsPanel } from '@/screens/settings/clients-panel'
 import { HelpSection } from '@/screens/settings/help-section'
 
 type SettingsScreenProps = Readonly<{
-  onboarding: Onboarding
-  isAutoFocusEnabled: boolean
   startAtLogin: boolean
   maximizeOnLaunch: boolean
   shortTitles: boolean
@@ -36,8 +33,6 @@ type SettingsScreenProps = Readonly<{
 }>
 
 export const SettingsScreen = ({
-  onboarding,
-  isAutoFocusEnabled,
   startAtLogin,
   maximizeOnLaunch,
   shortTitles,
@@ -150,11 +145,7 @@ export const SettingsScreen = ({
           />
         </FieldRow>
       </Panel>
-      <HelpSection
-        onboarding={onboarding}
-        isAutoFocusEnabled={isAutoFocusEnabled}
-        run={run}
-      />
+      <HelpSection run={run} />
     </Screen>
   )
 }

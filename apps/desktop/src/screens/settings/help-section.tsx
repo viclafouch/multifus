@@ -1,28 +1,18 @@
-import React from 'react'
 import { t } from '@lingui/core/macro'
-import type { Onboarding } from '@/@types/onboarding'
 import type { Snapshot } from '@/@types/snapshot'
-import { HealthDialog } from '@/components/health-dialog'
+import { useOpenHelp } from '@/components/help-context'
 import { FieldRow } from '@/components/layout/field-row'
 import { Panel } from '@/components/layout/panel'
-import { QuestionsDialog } from '@/components/questions-dialog'
 import { Button } from '@/components/retro/button'
 import { ONBOARDING_ANCHOR } from '@/constants/onboarding'
 import { restartOnboarding } from '@/lib/multifus'
 
 type HelpSectionProps = Readonly<{
-  onboarding: Onboarding
-  isAutoFocusEnabled: boolean
   run: (action: Promise<Snapshot>) => void
 }>
 
-export const HelpSection = ({
-  onboarding,
-  isAutoFocusEnabled,
-  run
-}: HelpSectionProps) => {
-  const [isCheckOpen, setIsCheckOpen] = React.useState(false)
-  const [areQuestionsOpen, setAreQuestionsOpen] = React.useState(false)
+export const HelpSection = ({ run }: HelpSectionProps) => {
+  const openHelp = useOpenHelp()
 
   return (
     <section id={ONBOARDING_ANCHOR} className="scroll-mt-24">
@@ -35,7 +25,7 @@ export const HelpSection = ({
             variant="slate"
             size="sm"
             onClick={() => {
-              setIsCheckOpen(true)
+              openHelp('health')
             }}
           >
             {t`Vérifier`}
@@ -49,7 +39,7 @@ export const HelpSection = ({
             variant="slate"
             size="sm"
             onClick={() => {
-              setAreQuestionsOpen(true)
+              openHelp('questions')
             }}
           >
             {t`Ouvrir`}
@@ -70,18 +60,6 @@ export const HelpSection = ({
           </Button>
         </FieldRow>
       </Panel>
-      <HealthDialog
-        isOpen={isCheckOpen}
-        onOpenChange={setIsCheckOpen}
-        onboarding={onboarding}
-        isAutoFocusEnabled={isAutoFocusEnabled}
-        run={run}
-      />
-      <QuestionsDialog
-        isOpen={areQuestionsOpen}
-        onOpenChange={setAreQuestionsOpen}
-        run={run}
-      />
     </section>
   )
 }

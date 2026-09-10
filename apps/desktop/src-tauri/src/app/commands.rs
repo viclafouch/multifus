@@ -59,6 +59,13 @@ pub fn request_authorization(app: AppHandle) -> Snapshot {
     runtime::emit_snapshot(&app)
 }
 
+#[tauri::command(async)]
+pub fn check_health(app: AppHandle) -> Snapshot {
+    runtime::read_health(&app);
+
+    lock(&app).snapshot()
+}
+
 #[tauri::command]
 pub fn open_system_page(app: AppHandle, page: SystemPage) {
     links::open_system_page(&app, page);

@@ -50,5 +50,10 @@ export const SHORTCUT_ACTIONS = {
     label: msg`Tableau des runes`,
     description: msg`Pose les poids des runes par-dessus le jeu.`,
     mention: null
+  },
+  health: {
+    label: msg`Est-ce que tout marche ?`,
+    description: msg`Ouvre Multifus sur le verdict des réglages.`,
+    mention: null
   }
 } as const satisfies Record<ShortcutAction, ActionLabel>

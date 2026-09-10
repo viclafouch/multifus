@@ -673,6 +673,7 @@ impl Multifus {
             ShortcutAction::MaximizeAll => &mut self.settings.shortcuts.maximize_all,
             ShortcutAction::Wheel => &mut self.settings.shortcuts.wheel,
             ShortcutAction::RuneTable => &mut self.settings.shortcuts.rune_table,
+            ShortcutAction::Health => &mut self.settings.shortcuts.health,
         };
 
         *slot = shortcut;
@@ -1826,7 +1827,8 @@ impl Multifus {
             ShortcutAction::Walk
             | ShortcutAction::MaximizeAll
             | ShortcutAction::Wheel
-            | ShortcutAction::RuneTable => None,
+            | ShortcutAction::RuneTable
+            | ShortcutAction::Health => None,
         }
     }
 
@@ -1967,6 +1969,7 @@ fn shortcut_in(shortcuts: &Shortcuts, action: ShortcutAction) -> Option<&Shortcu
         ShortcutAction::MaximizeAll => shortcuts.maximize_all.as_ref(),
         ShortcutAction::Wheel => shortcuts.wheel.as_ref(),
         ShortcutAction::RuneTable => shortcuts.rune_table.as_ref(),
+        ShortcutAction::Health => shortcuts.health.as_ref(),
     }
 }
 
@@ -2684,8 +2687,9 @@ mod tests {
                 ShortcutAction::MaximizeAll,
                 ShortcutAction::Wheel,
                 ShortcutAction::RuneTable,
+                ShortcutAction::Health,
             ],
-            "these four set a mechanism going, and no window moves for them"
+            "these five set a mechanism going, and no window moves for them"
         );
     }
 
@@ -3204,7 +3208,7 @@ mod tests {
     }
 
     #[test]
-    fn the_eight_actions_come_before_the_characters_and_the_quick_replies() {
+    fn the_nine_actions_come_before_the_characters_and_the_quick_replies() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
         state.apply_windows(&[window(1, "Alpha")]);
@@ -3215,7 +3219,7 @@ mod tests {
 
         let bindings = state.bindings();
 
-        assert_eq!(bindings.len(), 11);
+        assert_eq!(bindings.len(), 12);
         assert_eq!(
             bindings.first().map(|(binding, _)| binding.clone()),
             Some(Binding::Action {

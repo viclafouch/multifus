@@ -1,4 +1,5 @@
 import type { SystemPage } from '@/@types/onboarding'
+import { IS_APPLE } from '@/constants/keyboard'
 import type { Move } from '@/constants/moves'
 
 export const QUESTIONS = [
@@ -12,7 +13,7 @@ export const QUESTIONS = [
 export type Question = (typeof QUESTIONS)[number]
 
 export const QUESTION_PAGES = {
-  banner: 'notifications',
+  banner: IS_APPLE ? null : 'notifications',
   silence: null,
   maximize: null,
   shortcuts: null,

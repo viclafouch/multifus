@@ -2,6 +2,7 @@ export const MOVES = [
   'autoFocus',
   'maximizeRow',
   'onboarding',
+  'questions',
   'shortcuts'
 ] as const satisfies readonly string[]
 

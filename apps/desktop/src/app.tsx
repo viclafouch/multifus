@@ -1,6 +1,7 @@
 import type { ConfigProblem } from '@/@types/system'
 import { CheckNotice } from '@/components/check-notice'
 import { ConfigNotice } from '@/components/config-notice'
+import { HelpProvider } from '@/components/help-provider'
 import { JournalPanel } from '@/components/journal-panel'
 import { KeyLabelsProvider } from '@/components/key-labels-provider'
 import { Shade } from '@/components/layout/shade'
@@ -66,78 +67,86 @@ export const App = () => {
   return (
     <KeyLabelsProvider labels={snapshot.keyboard}>
       <MapNavigationProvider onGo={setMap}>
-        <TooltipProvider>
-          <div className="relative flex h-screen flex-col overflow-hidden pb-ledger font-plain text-khaki">
-            <WorldScene map={map} />
-            <Shade edge="top" />
-            {snapshot.config.problem === null ? null : (
-              <ConfigNotice
-                problem={snapshot.config.problem}
-                quarantined={quarantinedPath(snapshot.config.problem)}
-                onReveal={() => {
-                  revealQuarantinedConfig().catch(ignore)
-                }}
-                onDismiss={() => {
-                  run(dismissConfigProblem())
-                }}
-              />
-            )}
-            {snapshot.onboarding.hasNotice ? (
-              <CheckNotice
-                onOpen={() => {
-                  showAnchor(ONBOARDING_ANCHOR, () => {
-                    setMap('settings')
-                  })
-                }}
-                onDismiss={() => {
-                  run(dismissCheckNotice())
-                }}
-              />
-            ) : null}
-            {snapshot.onboarding.hasSilence ? (
-              <SilenceNotice
-                onOpen={() => {
-                  showAnchor(ONBOARDING_ANCHOR, () => {
-                    setMap('settings')
-                  })
-                }}
-                onDismiss={() => {
-                  run(dismissSilenceNotice())
-                }}
-              />
-            ) : null}
-            <Cartouche
-              version={snapshot.version}
-              language={snapshot.language}
-            />
-            {map === CLEARING ? (
-              <ClearingScreen
-                characters={snapshot.characters}
-                authorization={snapshot.authorization}
-                onboarding={snapshot.onboarding}
-                paintPortraits={snapshot.paintPortraits}
-                onGo={setMap}
-                run={run}
-              />
-            ) : (
-              <MapFrame
-                map={map}
-                loopsSeen={snapshot.loopsSeen}
-                run={run}
-                onLeave={() => {
-                  setMap(CLEARING)
-                }}
-              >
-                <CurrentMap map={map} snapshot={snapshot} run={run} />
-              </MapFrame>
-            )}
-            <Shade edge="bottom" />
-            <footer className="pointer-events-none absolute inset-x-0 bottom-ledger z-20 flex h-hem items-end px-4 pb-2">
-              <SceneCredit />
-            </footer>
-            <JournalPanel snapshot={snapshot} />
-          </div>
-        </TooltipProvider>
+        <HelpProvider
+          onboarding={snapshot.onboarding}
+          isAutoFocusEnabled={snapshot.autoFocusEnabled}
+          run={run}
+        >
+          <TooltipProvider>
+            <div className="relative flex h-screen flex-col overflow-hidden pb-ledger font-plain text-khaki">
+              <WorldScene map={map} />
+              <Shade edge="top" />
+              {snapshot.config.problem === null ? null : (
+                <ConfigNotice
+                  problem={snapshot.config.problem}
+                  quarantined={quarantinedPath(snapshot.config.problem)}
+                  onReveal={() => {
+                    revealQuarantinedConfig().catch(ignore)
+                  }}
+                  onDismiss={() => {
+                    run(dismissConfigProblem())
+                  }}
+                />
+              )}
+              {snapshot.onboarding.hasNotice ? (
+                <CheckNotice
+                  onOpen={() => {
+                    showAnchor(ONBOARDING_ANCHOR, () => {
+                      setMap('settings')
+                    })
+                  }}
+                  onDismiss={() => {
+                    run(dismissCheckNotice())
+                  }}
+                />
+              ) : null}
+              {snapshot.onboarding.hasSilence ? (
+                <SilenceNotice
+                  onOpen={() => {
+                    showAnchor(ONBOARDING_ANCHOR, () => {
+                      setMap('settings')
+                    })
+                  }}
+                  onDismiss={() => {
+                    run(dismissSilenceNotice())
+                  }}
+                />
+              ) : null}
+              <div className="relative flex min-h-0 flex-1 flex-col">
+                <Cartouche
+                  version={snapshot.version}
+                  language={snapshot.language}
+                />
+                {map === CLEARING ? (
+                  <ClearingScreen
+                    characters={snapshot.characters}
+                    authorization={snapshot.authorization}
+                    onboarding={snapshot.onboarding}
+                    paintPortraits={snapshot.paintPortraits}
+                    onGo={setMap}
+                    run={run}
+                  />
+                ) : (
+                  <MapFrame
+                    map={map}
+                    loopsSeen={snapshot.loopsSeen}
+                    run={run}
+                    onLeave={() => {
+                      setMap(CLEARING)
+                    }}
+                  >
+                    <CurrentMap map={map} snapshot={snapshot} run={run} />
+                  </MapFrame>
+                )}
+              </div>
+              <Shade edge="bottom" />
+              <footer className="pointer-events-none absolute inset-x-0 bottom-ledger z-20 flex h-hem items-end px-4 pb-2">
+                <SceneCredit />
+              </footer>
+              <JournalPanel snapshot={snapshot} />
+            </div>
+          </TooltipProvider>
+        </HelpProvider>
       </MapNavigationProvider>
     </KeyLabelsProvider>
   )

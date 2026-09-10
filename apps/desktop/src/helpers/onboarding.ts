@@ -30,7 +30,7 @@ export const matchIsAsking = (onboarding: Onboarding) => {
 export const pageLabel = (page: Page) => {
   switch (page) {
     case 'welcome': {
-      return t`Bienvenue`
+      return t`Mise en route`
     }
     case 'authorization': {
       return t`L’autorisation`

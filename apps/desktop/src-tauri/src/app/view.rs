@@ -322,10 +322,11 @@ pub enum ShortcutAction {
     MaximizeAll,
     Wheel,
     RuneTable,
+    Health,
 }
 
 impl ShortcutAction {
-    pub const ALL: [Self; 8] = [
+    pub const ALL: [Self; 9] = [
         Self::Next,
         Self::Previous,
         Self::Main,
@@ -334,6 +335,7 @@ impl ShortcutAction {
         Self::MaximizeAll,
         Self::Wheel,
         Self::RuneTable,
+        Self::Health,
     ];
 
     #[must_use]
@@ -873,7 +875,7 @@ mod tests {
     }
 
     #[test]
-    fn the_eight_actions_travel_under_the_names_the_shortcuts_screen_uses() {
+    fn the_nine_actions_travel_under_the_names_the_shortcuts_screen_uses() {
         let actions = ShortcutAction::ALL
             .into_iter()
             .map(|action| {
@@ -895,6 +897,7 @@ mod tests {
                 "maximizeAll",
                 "wheel",
                 "runeTable",
+                "health",
             ]
         );
     }

@@ -218,6 +218,7 @@ pub struct Shortcuts {
     pub maximize_all: Option<Shortcut>,
     pub wheel: Option<Shortcut>,
     pub rune_table: Option<Shortcut>,
+    pub health: Option<Shortcut>,
 }
 
 const DEFAULT_NEXT: &str = "Control+Shift+Right";
@@ -228,6 +229,7 @@ const DEFAULT_WALK: &str = "Control+Shift+KeyD";
 const DEFAULT_MAXIMIZE_ALL: &str = "Control+Shift+KeyA";
 const DEFAULT_WHEEL: &str = "Control+Shift+KeyW";
 const DEFAULT_RUNE_TABLE: &str = "Control+Shift+KeyR";
+const DEFAULT_HEALTH: &str = "Control+Shift+KeyH";
 
 impl Default for Shortcuts {
     fn default() -> Self {
@@ -240,6 +242,7 @@ impl Default for Shortcuts {
             maximize_all: Shortcut::new(DEFAULT_MAXIMIZE_ALL),
             wheel: Shortcut::new(DEFAULT_WHEEL),
             rune_table: Shortcut::new(DEFAULT_RUNE_TABLE),
+            health: Shortcut::new(DEFAULT_HEALTH),
         }
     }
 }
@@ -461,7 +464,7 @@ mod tests {
     }
 
     #[test]
-    fn the_eight_shortcuts_are_bound_by_default_and_all_differ() {
+    fn the_nine_shortcuts_are_bound_by_default_and_all_differ() {
         let shortcuts = Shortcuts::default();
         let bound = [
             shortcuts.next.as_ref(),
@@ -472,20 +475,21 @@ mod tests {
             shortcuts.maximize_all.as_ref(),
             shortcuts.wheel.as_ref(),
             shortcuts.rune_table.as_ref(),
+            shortcuts.health.as_ref(),
         ]
         .into_iter()
         .flatten()
         .map(Shortcut::as_str)
         .collect::<Vec<_>>();
 
-        assert_eq!(bound.len(), 8);
+        assert_eq!(bound.len(), 9);
 
         let mut unique = bound.clone();
         unique.sort_unstable();
         unique.dedup();
         assert_eq!(
             unique.len(),
-            8,
+            9,
             "two actions share a combination: {bound:?}"
         );
     }
@@ -595,6 +599,7 @@ mod tests {
             maximize_all: None,
             wheel: None,
             rune_table: None,
+            health: None,
         };
 
         let json = serde_json::to_string(&shortcuts).expect("shortcuts serialise");

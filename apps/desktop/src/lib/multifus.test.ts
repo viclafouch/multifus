@@ -154,6 +154,12 @@ const CALLS = [
     }
   },
   {
+    name: 'checkHealth',
+    run: () => {
+      return multifus.checkHealth()
+    }
+  },
+  {
     name: 'openSystemPage',
     run: () => {
       return multifus.openSystemPage('authorization')
@@ -590,6 +596,7 @@ const CALLS = [
 const LISTENERS = [
   'onSnapshot',
   'onNavigate',
+  'onHealthAsked',
   'onBannerStep',
   'onClients',
   'onWheelStep',
