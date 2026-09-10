@@ -1,7 +1,6 @@
 import { t } from '@lingui/core/macro'
 import type { ConfigProblem } from '@/@types/system'
 import { NoticeBar } from '@/components/notice-bar'
-import { Button } from '@/components/retro/button'
 import { configProblemLines } from '@/helpers/wording'
 
 type ConfigNoticeProps = Readonly<{
@@ -23,14 +22,9 @@ export const ConfigNotice = ({
     <NoticeBar
       title={title}
       body={body}
+      actionLabel={quarantined === null ? undefined : t`Montrer le fichier`}
+      onAct={onReveal}
       onDismiss={onDismiss}
-      actions={
-        quarantined === null ? null : (
-          <Button variant="slate" size="tight" onClick={onReveal}>
-            {t`Montrer le fichier`}
-          </Button>
-        )
-      }
     >
       {quarantined === null ? null : (
         <p className="selectable font-mono text-log wrap-anywhere text-khaki/75">

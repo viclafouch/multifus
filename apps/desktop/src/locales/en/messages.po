@@ -30,6 +30,11 @@ msgstr "“{name}”"
 msgid "{0, plural, one {# entrée} other {# entrées}}"
 msgstr "{0, plural, one {# entry} other {# entries}}"
 
+#. placeholder {0}: event.minutes
+#: src/helpers/journal.ts
+msgid "{0, plural, one {# minute} other {# minutes}}"
+msgstr "{0, plural, one {# minute} other {# minutes}}"
+
 #. placeholder {0}: outcome.windows
 #: src/helpers/journal.ts
 msgid "{0, plural, one {Agrandir les fenêtres, depuis {surface} : demandé à un client.} other {Agrandir les fenêtres, depuis {surface} : demandé à # clients.}}"
@@ -567,6 +572,14 @@ msgstr "AutoFocus: {autoFocus}, fetching minimized windows {minimized}"
 #: src/helpers/journal.ts
 msgid "AutoFocus activé depuis {surface}."
 msgstr "AutoFocus turned on from {surface}."
+
+#: src/helpers/journal.ts
+#~ msgid "AutoFocus allumé, Multifus écoute, et il n’a rien entendu depuis {minutes} minutes."
+#~ msgstr "AutoFocus is on, Multifus is listening, and it has heard nothing for {minutes} minutes."
+
+#: src/helpers/journal.ts
+msgid "AutoFocus allumé, Multifus écoute, et rien ne lui est parvenu depuis {held}."
+msgstr "AutoFocus on, Multifus listening, and nothing has reached it for {held}."
 
 #: src/helpers/journal.ts
 msgid "AutoFocus désactivé depuis {surface}."
@@ -1488,6 +1501,10 @@ msgstr "A window icon could not be set"
 msgid "Il arrive ici"
 msgstr "They land here"
 
+#: src/components/silence-notice.tsx
+msgid "Il écoute, l’AutoFocus est allumé, et aucune notification ne lui est parvenue. Reprenez la mise en route : un réglage a pu changer sans le dire."
+msgstr "It is listening, AutoFocus is on, and no notification has reached it. Go through the setup again: a setting may have changed without saying so."
+
 #: src/screens/onboarding/step-figure.tsx
 #~ msgid "Image à venir"
 #~ msgstr "Picture to come"
@@ -1555,6 +1572,10 @@ msgstr "The preview"
 #: src/constants/features.ts
 msgid "L’AutoFocus"
 msgstr "AutoFocus"
+
+#: src/components/silence-notice.tsx
+#~ msgid "L’AutoFocus est allumé et Multifus écoute, mais aucune notification n’est arrivée. Reprenez la mise en route : un réglage a pu changer sans le dire."
+#~ msgstr "AutoFocus is on and Multifus is listening, but no notification has come in. Go through the setup again: a setting may have changed without saying so."
 
 #: src/helpers/onboarding.ts
 #~ msgid "L’AutoFocus est en marche. Il vous reste la roue des personnages, le Déplacement rapide et le tableau des runes : tout vous attend dans la barre de gauche."
@@ -1833,6 +1854,10 @@ msgstr "The file could not be read any more. Multifus kept it under another name
 #: src/constants/features.ts
 #~ msgid "Le jeu appelle, sa fenêtre passe devant."
 #~ msgstr "The game calls, its window comes to the front."
+
+#: src/components/silence-notice.tsx
+#~ msgid "Le jeu ne vous a pas appelé depuis longtemps"
+#~ msgstr "The game has not called you in a long while"
 
 #: src/helpers/onboarding.ts
 msgid "Le jeu vous a appelé, Multifus l’a entendu."
@@ -2272,6 +2297,10 @@ msgstr "Multifus has nobody to listen to. Tick a character below, or log one in 
 #: src/screens/about/legal-panel.tsx
 msgid "Multifus n’a rien à voir avec Ankama."
 msgstr "Multifus has nothing to do with Ankama."
+
+#: src/components/silence-notice.tsx
+msgid "Multifus n’a rien entendu depuis longtemps"
+msgstr "Multifus has heard nothing for a long while"
 
 #: src/helpers/onboarding.ts
 #~ msgid "Multifus n’entend rien pour l’instant."
@@ -3373,6 +3402,7 @@ msgstr "Windows only"
 msgid "Vérification en cours…"
 msgstr "Checking…"
 
+#: src/components/silence-notice.tsx
 #: src/screens/about/project-panel.tsx
 msgid "Vérifier"
 msgstr "Check"

@@ -224,19 +224,28 @@ describe('bindingLabel', () => {
 
 describe('authorizationLine', () => {
   it('dit l’écoute active quand le système entend', () => {
-    const line = authorizationLine({ granted: true, listening: true })
+    const line = authorizationLine({
+      granted: true,
+      listening: true
+    })
 
     expect(line).toBe('À l’écoute du jeu')
   })
 
   it('dit l’écoute arrêtée quand elle ne tourne pas', () => {
-    const line = authorizationLine({ granted: true, listening: false })
+    const line = authorizationLine({
+      granted: true,
+      listening: false
+    })
 
     expect(line).toBe('Écoute interrompue')
   })
 
   it('dit l’autorisation manquante avant tout le reste', () => {
-    const line = authorizationLine({ granted: false, listening: true })
+    const line = authorizationLine({
+      granted: false,
+      listening: true
+    })
 
     expect(line).toBe('Autorisation manquante')
   })

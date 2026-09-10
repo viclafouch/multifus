@@ -170,6 +170,8 @@ trait TurnMechanisms {
 
     fn follow_checks(&self) -> bool;
 
+    fn follow_silence(&self) -> bool;
+
     fn announce_relay(&self, change: &ScanChange);
 
     fn follow_display(&self) -> bool;
@@ -198,6 +200,10 @@ impl TurnMechanisms for AppTurnMechanisms<'_> {
 
     fn follow_checks(&self) -> bool {
         follow_checks(self.0)
+    }
+
+    fn follow_silence(&self) -> bool {
+        lock(self.0).follow_silence()
     }
 
     fn announce_relay(&self, change: &ScanChange) {
@@ -279,12 +285,13 @@ fn scan(turn: &Turn, mechanisms: &dyn TurnMechanisms) -> bool {
     let change = refresh_windows(turn);
     let listening_changed = mechanisms.follow_authorization();
     let checks_changed = mechanisms.follow_checks();
+    let silence_changed = mechanisms.follow_silence();
 
     mechanisms.announce_relay(&change);
 
     let display_changed = mechanisms.follow_display();
 
-    change.changed || listening_changed || checks_changed || display_changed
+    change.changed || listening_changed || checks_changed || silence_changed || display_changed
 }
 
 enum ClientsOnScreen {
@@ -978,6 +985,7 @@ mod tests {
         ShortcutsFollowed,
         AuthorizationFollowed,
         ChecksFollowed,
+        SilenceFollowed,
         RelayAnnounced { relayed_gone: Vec<String> },
         DisplayFollowed,
         WalkRefreshed,
@@ -991,6 +999,7 @@ mod tests {
     struct FakeTurnMechanisms {
         set_going: Mutex<Vec<TurnMechanism>>,
         listening_changed: bool,
+        silence_changed: bool,
         checks_changed: bool,
         display_changed: bool,
         walk_stopped: bool,
@@ -1036,6 +1045,12 @@ mod tests {
             self.write_down(TurnMechanism::ChecksFollowed);
 
             self.checks_changed
+        }
+
+        fn follow_silence(&self) -> bool {
+            self.write_down(TurnMechanism::SilenceFollowed);
+
+            self.silence_changed
         }
 
         fn announce_relay(&self, change: &ScanChange) {
@@ -1101,6 +1116,7 @@ mod tests {
                 TurnMechanism::ShortcutsFollowed,
                 TurnMechanism::AuthorizationFollowed,
                 TurnMechanism::ChecksFollowed,
+                TurnMechanism::SilenceFollowed,
                 TurnMechanism::RelayAnnounced {
                     relayed_gone: Vec::new()
                 },

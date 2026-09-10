@@ -21,6 +21,7 @@ export type Onboarding = {
   readonly done: boolean
   readonly steps: readonly StepStatus[]
   readonly hasNotice: boolean
+  readonly hasSilence: boolean
 }
 
 export type SystemPage = 'authorization' | 'focus' | 'notifications'

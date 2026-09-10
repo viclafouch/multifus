@@ -390,6 +390,10 @@ export const dismissCheckNotice = async () => {
   return invoke<Snapshot>('dismiss_check_notice')
 }
 
+export const dismissSilenceNotice = async () => {
+  return invoke<Snapshot>('dismiss_silence_notice')
+}
+
 export const dismissConfigProblem = async () => {
   return invoke<Snapshot>('dismiss_config_problem')
 }

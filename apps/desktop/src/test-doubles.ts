@@ -102,7 +102,8 @@ const BLANK_ONBOARDING: Onboarding = {
     { step: 'gameSetting', check: 'unknown', proven: false },
     { step: 'proof', check: 'unknown', proven: false }
   ],
-  hasNotice: false
+  hasNotice: false,
+  hasSilence: false
 }
 
 export const onboardingOf = (fields: Partial<Onboarding> = {}) => {

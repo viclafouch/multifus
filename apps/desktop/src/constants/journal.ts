@@ -38,6 +38,7 @@ export const TONES = {
   listening: 'good',
   listeningFailed: 'warning',
   listeningLost: 'warning',
+  silentEar: 'warning',
   notificationUnreadable: 'warning',
   panicked: 'warning',
   panickedElsewhere: 'warning',

@@ -25,6 +25,7 @@ const bridge = {
   onClients: vi.fn(pending),
   dismissConfigProblem: vi.fn(pending),
   dismissCheckNotice: vi.fn(pending),
+  dismissSilenceNotice: vi.fn(pending),
   revealJournal: vi.fn(pending),
   revealConfig: vi.fn(pending),
   revealQuarantinedConfig: vi.fn(pending),
@@ -98,6 +99,10 @@ const ARRIVALS = [
   { name: 'settings', mark: 'Les réglages de Multifus :' },
   { name: 'about', mark: 'Mentions légales' }
 ] as const satisfies readonly Arrival[]
+
+const silentSnapshot = () => {
+  return snapshotOf({ onboarding: onboardingOf({ hasSilence: true }) })
+}
 
 describe('la fenêtre de Multifus', () => {
   beforeEach(() => {
@@ -252,7 +257,9 @@ describe('la fenêtre de Multifus', () => {
 
     it('dit qu’il est à l’écoute du jeu', async () => {
       await open(
-        snapshotOf({ authorization: { granted: true, listening: true } })
+        snapshotOf({
+          authorization: { granted: true, listening: true }
+        })
       )
 
       expect(screen.getByText('À l’écoute du jeu')).not.toBeNull()
@@ -260,7 +267,9 @@ describe('la fenêtre de Multifus', () => {
 
     it('dit quand l’écoute s’est interrompue', async () => {
       await open(
-        snapshotOf({ authorization: { granted: true, listening: false } })
+        snapshotOf({
+          authorization: { granted: true, listening: false }
+        })
       )
 
       expect(screen.getByText('Écoute interrompue')).not.toBeNull()
@@ -268,7 +277,9 @@ describe('la fenêtre de Multifus', () => {
 
     it('dit quand l’autorisation manque', async () => {
       await open(
-        snapshotOf({ authorization: { granted: false, listening: false } })
+        snapshotOf({
+          authorization: { granted: false, listening: false }
+        })
       )
 
       expect(screen.getByText('Autorisation manquante')).not.toBeNull()
@@ -384,43 +395,6 @@ describe('la fenêtre de Multifus', () => {
     })
   })
 
-  describe('l’avis sur un contrôle fermé', () => {
-    it('ne dit rien quand aucun réglage lu n’est fermé', async () => {
-      await open(snapshotOf())
-
-      expect(screen.queryByText('L’AutoFocus ne peut pas marcher')).toBeNull()
-    })
-
-    it('dit que l’AutoFocus ne peut pas marcher', async () => {
-      await open(snapshotOf({ onboarding: onboardingOf({ hasNotice: true }) }))
-
-      expect(screen.getByText('L’AutoFocus ne peut pas marcher')).not.toBeNull()
-    })
-
-    it('mène aux paramètres, et reste tant que rien n’est réglé', async () => {
-      const scrolled = vi.spyOn(Element.prototype, 'scrollIntoView')
-
-      await open(snapshotOf({ onboarding: onboardingOf({ hasNotice: true }) }))
-
-      fireEvent.click(screen.getByRole('button', { name: 'Régler' }))
-
-      expect(currentMap()).toBe('Paramètres')
-      expect(bridge.dismissCheckNotice).not.toHaveBeenCalled()
-      expect(screen.getByText('L’AutoFocus ne peut pas marcher')).not.toBeNull()
-      expect(scrolled.mock.contexts).toStrictEqual([
-        document.querySelector(`#${ONBOARDING_ANCHOR}`)
-      ])
-    })
-
-    it('s’efface quand on dit avoir compris', async () => {
-      await open(snapshotOf({ onboarding: onboardingOf({ hasNotice: true }) }))
-
-      fireEvent.click(screen.getByRole('button', { name: 'J’ai compris' }))
-
-      expect(bridge.dismissCheckNotice).toHaveBeenCalledWith()
-    })
-  })
-
   it('porte le journal en bas, quel que soit l’écran', async () => {
     await open(snapshotOf())
 
@@ -428,5 +402,82 @@ describe('la fenêtre de Multifus', () => {
 
     expect(screen.getByText('Journal')).not.toBeNull()
     expect(screen.getByText('0 entrée')).not.toBeNull()
+  })
+})
+
+describe('l’avis sur un contrôle fermé', () => {
+  it('ne dit rien quand aucun réglage lu n’est fermé', async () => {
+    await open(snapshotOf())
+
+    expect(screen.queryByText('L’AutoFocus ne peut pas marcher')).toBeNull()
+  })
+
+  it('dit que l’AutoFocus ne peut pas marcher', async () => {
+    await open(snapshotOf({ onboarding: onboardingOf({ hasNotice: true }) }))
+
+    expect(screen.getByText('L’AutoFocus ne peut pas marcher')).not.toBeNull()
+  })
+
+  it('mène aux paramètres, et reste tant que rien n’est réglé', async () => {
+    const scrolled = vi.spyOn(Element.prototype, 'scrollIntoView')
+
+    await open(snapshotOf({ onboarding: onboardingOf({ hasNotice: true }) }))
+
+    fireEvent.click(screen.getByRole('button', { name: 'Régler' }))
+
+    expect(currentMap()).toBe('Paramètres')
+    expect(bridge.dismissCheckNotice).not.toHaveBeenCalled()
+    expect(screen.getByText('L’AutoFocus ne peut pas marcher')).not.toBeNull()
+    expect(scrolled.mock.contexts).toStrictEqual([
+      document.querySelector(`#${ONBOARDING_ANCHOR}`)
+    ])
+  })
+
+  it('s’efface quand on dit avoir compris', async () => {
+    await open(snapshotOf({ onboarding: onboardingOf({ hasNotice: true }) }))
+
+    fireEvent.click(screen.getByRole('button', { name: 'J’ai compris' }))
+
+    expect(bridge.dismissCheckNotice).toHaveBeenCalledWith()
+  })
+})
+
+describe('l’avis sur une oreille restée sourde', () => {
+  it('ne dit rien tant que Multifus entend le jeu', async () => {
+    await open(snapshotOf())
+
+    expect(
+      screen.queryByText('Multifus n’a rien entendu depuis longtemps')
+    ).toBeNull()
+  })
+
+  it('dit que rien ne lui est parvenu depuis longtemps', async () => {
+    await open(silentSnapshot())
+
+    expect(
+      screen.getByText('Multifus n’a rien entendu depuis longtemps')
+    ).not.toBeNull()
+  })
+
+  it('mène aux paramètres', async () => {
+    const scrolled = vi.spyOn(Element.prototype, 'scrollIntoView')
+
+    await open(silentSnapshot())
+
+    fireEvent.click(screen.getByRole('button', { name: 'Vérifier' }))
+
+    expect(currentMap()).toBe('Paramètres')
+    expect(bridge.dismissSilenceNotice).not.toHaveBeenCalled()
+    expect(scrolled.mock.contexts).toStrictEqual([
+      document.querySelector(`#${ONBOARDING_ANCHOR}`)
+    ])
+  })
+
+  it('s’efface quand on dit avoir compris', async () => {
+    await open(silentSnapshot())
+
+    fireEvent.click(screen.getByRole('button', { name: 'J’ai compris' }))
+
+    expect(bridge.dismissSilenceNotice).toHaveBeenCalledWith()
   })
 })

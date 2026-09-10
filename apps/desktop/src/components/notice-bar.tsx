@@ -7,7 +7,8 @@ type NoticeBarProps = Readonly<{
   title: string
   body: string
   onDismiss: () => void
-  actions?: React.ReactNode
+  actionLabel?: string
+  onAct?: () => void
   children?: React.ReactNode
 }>
 
@@ -15,7 +16,8 @@ export const NoticeBar = ({
   title,
   body,
   onDismiss,
-  actions,
+  actionLabel,
+  onAct,
   children
 }: NoticeBarProps) => {
   return (
@@ -34,7 +36,11 @@ export const NoticeBar = ({
         {children}
       </div>
       <div className="flex shrink-0 items-center gap-1.5 self-center">
-        {actions}
+        {actionLabel === undefined ? null : (
+          <Button variant="slate" size="tight" onClick={onAct}>
+            {actionLabel}
+          </Button>
+        )}
         <Button variant="slate" size="tight" onClick={onDismiss}>
           {t`J’ai compris`}
         </Button>

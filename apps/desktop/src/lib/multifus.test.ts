@@ -550,6 +550,12 @@ const CALLS = [
     }
   },
   {
+    name: 'dismissSilenceNotice',
+    run: () => {
+      return multifus.dismissSilenceNotice()
+    }
+  },
+  {
     name: 'screenStopped',
     run: () => {
       return multifus.screenStopped('Cannot read properties of undefined')

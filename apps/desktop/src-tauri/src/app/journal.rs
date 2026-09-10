@@ -84,6 +84,10 @@ pub enum JournalEvent {
         detail: String,
     },
 
+    SilentEar {
+        minutes: u64,
+    },
+
     NotificationUnreadable {
         detail: String,
     },

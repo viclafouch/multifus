@@ -18,37 +18,9 @@ La paire de clés de l'updater existe déjà, dans `~/.tauri/multifus.key` et so
 `tauri.conf.json`. En régénérer une rendrait insignables les mises à jour des
 versions déjà installées.
 
-## Finir les maps
-
-Trois sont reprises, `characters`, `shortcuts` et `walk`. Les six autres portent
-encore une liste de plaques empilées, et le système est dans
-[design-system.md](./design-system.md).
-
-- [ ] **AutoFocus** : il a déjà sa vidéo en dialogue ; le reste de la map est encore une pile de plaques
-- [ ] **Réponses rapides**, **Messages privés** : passer aux plaques et à leur vidéo en dialogue, comme le Déplacement rapide
-- [ ] **Tableau des runes** : il a déjà sa vidéo en dialogue et sa plaque d'aperçu porte le vrai tableau ; le reste de la map est encore une pile de plaques
-- [ ] **Paramètres** : le plus chargé, six réglages et la mise en route. À découper en dialogues, un par sujet
-- [ ] **À propos** : trois lignes suffisent
-- [ ] Une phrase par map, et rien de plus. Le reste va dans un dialogue. Une vidéo, elle, s'ajoute à `MAP_LOOPS` et rien d'autre : le cadre pose le bouton et le dialogue tout seul
-- [ ] Donner leur matière aux trois fenêtres à part, `banner.html`, `wheel.html` et `rune-table.html`. Elles importent déjà `retro.css`
-- [ ] Sortir `lucide-react` du dépôt. Il en reste dans une vingtaine de fichiers, tous des glyphes seuls : le chevron d'un `Select`, la croix d'un `Dialog`, le cadenas de l'autorisation. Chacun demande un mot ou un caractère à sa place
-- [ ] Sortir `theme.css` quand plus aucun composant shadcn ne sert. Il ne porte plus de couleur à lui, seulement des espacements et les matières de la roue
-
 ## Poser les images qui manquent
 
 - [ ] Enregistrer les cinq vidéos de la mise en route sur le Mac, et les mêmes sur Windows pour les étapes 2, 3 et 4, dont le dessin diffère. `PAGE_SHOTS` gagne son axe plateforme à ce moment-là, et pas avant : deux tables identiques en attendant les images ne seraient qu'une constante écrite deux fois. Posées, `PAGE_SHOTS` les prend et le cadre pointillé disparaît
-
-## Lire le bon interrupteur des notifications de Dofus, sur Windows
-
-L'AutoFocus s'est tu une soirée entière, et la Mise en route affichait l'étape au
-vert. Multifus lit `Enabled` sous
-`Notifications\Settings\com.dofus.d1elauncher`, une valeur qui n'existait pas.
-L'interrupteur que les Paramètres montrent est ailleurs, dans `wpndatabase.db`,
-sous `HandlerSettings` : `s:toast` valait zéro, et Dofus n'émettait plus rien
-depuis une heure et demie. Vu le 04/09/2026.
-
-- [ ] Lire `s:toast` du handler `com.dofus.d1elauncher` dans `%LOCALAPPDATA%\Microsoft\Windows\Notifications\wpndatabase.db`, ou trouver l'API qui le dit, et faire de ce contrôle celui de l'étape. `Enabled` du registre reste vrai quand il existe, mais son absence ne prouve rien
-- [ ] Poser un avis quand Multifus écoute, l'AutoFocus allumé, et n'a rien entendu depuis longtemps : c'est le seul symptôme qu'a vu le joueur
 
 ## Essayer sur les vraies machines
 
@@ -69,6 +41,8 @@ perdant son autorisation d'Accessibilité.
 - [ ] Le premier clic sur la fenêtre principale, sur le Mac : revenir du jeu et cliquer droit sur un bouton du roster. Si macOS mange ce clic pour réveiller la fenêtre, `acceptFirstMouse: true` dans `tauri.conf.json` le fait passer, comme il le fait déjà pour les fenêtres à part
 - [ ] Ouvrir Multifus sur un Mac en macOS 12.4, le plus vieux qu'il accepte : `@layer` demande Safari 15.4, et `build.target` de `vite.config.ts` tient ce plancher. Les couleurs translucides y sont opaques, `color-mix()` n'arrivant qu'en 16.2, et c'est voulu : Tailwind pose la couleur pleine puis l'améliore sous `@supports`
 - [ ] L'instance unique, sur Windows : lancer Multifus une deuxième fois, le second lancement doit s'arrêter tout seul, la fenêtre du premier revenir devant, et le journal porter « Multifus tournait déjà ». À essayer aussi Multifus rangé dans la barre système, fenêtre fermée
+- [ ] Le contrôle des notifications de Dofus, sur Windows : décocher Dofus dans « Notifications » des Paramètres, l'étape doit passer au rouge, et un avis se poser l'AutoFocus allumé. Multifus lit `ToastNotifier.Setting`, pas `Enabled` du registre, qui n'existait pas le soir où l'AutoFocus s'est tu
+- [ ] L'avis de l'oreille sourde, sur les deux : AutoFocus allumé, Multifus qui écoute, et le jeu qui n'appelle pas pendant trois quarts d'heure. Le bandeau doit se poser une fois, le journal porter une ligne, et la première notification entendue doit tout éteindre pour le reste du lancement
 - [ ] Un client Dofus lancé en administrateur, sur Windows : le titre court, la tête de classe et la bascule échouent tous en silence sur sa fenêtre, et le personnage reste pourtant dans le roster. Vérifier ce que dit le journal
 - [ ] Est-ce que Dofus Retro passe vraiment sa fenêtre devant au début d'un tour, sur Windows, ou est-ce qu'il fait seulement clignoter son bouton dans la barre des tâches. La réponse décide s'il faut protéger un exclu du geste du jeu, et [audit-concurrents.md](./audit-concurrents.md) dit ce que ça coûterait
 

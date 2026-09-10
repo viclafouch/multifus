@@ -944,6 +944,16 @@ const JOURNAL_CASES = {
       line: `Écoute des notifications perdue, Multifus la reprend : ${DETAIL}`
     }
   ],
+  silentEar: [
+    {
+      event: { kind: 'silentEar', minutes: 45 },
+      line: 'AutoFocus allumé, Multifus écoute, et rien ne lui est parvenu depuis 45 minutes.'
+    },
+    {
+      event: { kind: 'silentEar', minutes: 1 },
+      line: 'AutoFocus allumé, Multifus écoute, et rien ne lui est parvenu depuis 1 minute.'
+    }
+  ],
   notificationUnreadable: [
     {
       event: { kind: 'notificationUnreadable', detail: DETAIL },
@@ -1425,7 +1435,7 @@ const SNAPSHOT = {
   ungroupTaskbar: false,
   taskbarCombines: true,
   authorization: { granted: true, listening: true },
-  onboarding: { done: true, steps: [], hasNotice: false },
+  onboarding: { done: true, steps: [], hasNotice: false, hasSilence: false },
   config: { path: '/tmp/multifus/config.json', problem: null },
   update: { kind: 'upToDate' },
   relay: {

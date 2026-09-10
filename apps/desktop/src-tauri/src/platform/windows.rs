@@ -25,6 +25,8 @@ use windows::UI::Notifications::KnownNotificationBindings;
 use windows::UI::Notifications::Management::UserNotificationListener;
 use windows::UI::Notifications::Management::UserNotificationListenerAccessStatus;
 use windows::UI::Notifications::NotificationKinds;
+use windows::UI::Notifications::NotificationSetting;
+use windows::UI::Notifications::ToastNotificationManager;
 use windows::UI::Notifications::UserNotification;
 use windows::Win32::Foundation::CloseHandle;
 use windows::Win32::Foundation::ERROR_INVALID_WINDOW_HANDLE;
@@ -161,6 +163,7 @@ use windows::Win32::UI::WindowsAndMessaging::WM_SETTEXT;
 use windows::Win32::UI::WindowsAndMessaging::WNDENUMPROC;
 use windows::Win32::UI::WindowsAndMessaging::WindowFromPoint;
 use windows::core::BOOL;
+use windows::core::HSTRING;
 use windows::core::PCWSTR;
 use windows::core::PWSTR;
 use windows::core::w;
@@ -680,13 +683,23 @@ fn system_checks() -> SystemChecks {
 fn game_notifications() -> Option<bool> {
     let application_id = dofus_application_id()?;
 
-    Some(
+    toast_setting(&application_id).or_else(|| {
         registry_flag(
             &format!(r"{NOTIFICATION_SETTINGS_KEY}\{application_id}"),
             NOTIFICATION_ENABLED,
         )
-        .unwrap_or(ALLOWED_UNTIL_TURNED_OFF),
-    )
+    })
+}
+
+fn toast_setting(application_id: &str) -> Option<bool> {
+    enter_apartment();
+
+    let setting =
+        ToastNotificationManager::CreateToastNotifierWithId(&HSTRING::from(application_id))
+            .and_then(|notifier| notifier.Setting())
+            .ok()?;
+
+    Some(setting == NotificationSetting::Enabled)
 }
 
 fn focus_off() -> Option<bool> {

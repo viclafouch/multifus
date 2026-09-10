@@ -5,6 +5,7 @@ import { JournalPanel } from '@/components/journal-panel'
 import { KeyLabelsProvider } from '@/components/key-labels-provider'
 import { Shade } from '@/components/layout/shade'
 import { SceneCredit } from '@/components/retro/scene-credit'
+import { SilenceNotice } from '@/components/silence-notice'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { Cartouche } from '@/components/world/cartouche'
 import { MapFrame } from '@/components/world/map-frame'
@@ -20,6 +21,7 @@ import {
   closeRuneTable,
   dismissCheckNotice,
   dismissConfigProblem,
+  dismissSilenceNotice,
   revealQuarantinedConfig
 } from '@/lib/multifus'
 import { ignore } from '@/lib/utils'
@@ -87,6 +89,18 @@ export const App = () => {
               }}
               onDismiss={() => {
                 run(dismissCheckNotice())
+              }}
+            />
+          ) : null}
+          {snapshot.onboarding.hasSilence ? (
+            <SilenceNotice
+              onOpen={() => {
+                showAnchor(ONBOARDING_ANCHOR, () => {
+                  setMap('settings')
+                })
+              }}
+              onDismiss={() => {
+                run(dismissSilenceNotice())
               }}
             />
           ) : null}

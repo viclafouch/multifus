@@ -102,6 +102,7 @@ pub fn run() {
             app::commands::install_update,
             app::commands::dismiss_config_problem,
             app::commands::dismiss_check_notice,
+            app::commands::dismiss_silence_notice,
             app::commands::screen_stopped,
             app::commands::reveal_journal,
             app::commands::reveal_config,

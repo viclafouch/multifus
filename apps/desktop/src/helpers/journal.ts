@@ -763,6 +763,7 @@ type RunEventKind =
   | 'relayNoticeSent'
   | 'relaySent'
   | 'shortcutsBound'
+  | 'silentEar'
   | 'startAtLoginReconciled'
   | 'started'
   | 'updateAvailable'
@@ -782,6 +783,7 @@ const RUN_KINDS = new Set<ComposedEventKind>([
   'relayNoticeSent',
   'relaySent',
   'shortcutsBound',
+  'silentEar',
   'startAtLoginReconciled',
   'started',
   'updateAvailable'
@@ -822,6 +824,14 @@ const runLine = (
     }
     case 'check': {
       return checkEventLine(event)
+    }
+    case 'silentEar': {
+      const held = plural(event.minutes, {
+        one: '# minute',
+        other: '# minutes'
+      })
+
+      return t`AutoFocus allumé, Multifus écoute, et rien ne lui est parvenu depuis ${held}.`
     }
     case 'characterOnline': {
       const { nickname } = event

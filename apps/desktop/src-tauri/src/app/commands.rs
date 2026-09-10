@@ -555,6 +555,13 @@ pub fn dismiss_check_notice(app: AppHandle) -> Snapshot {
 }
 
 #[tauri::command]
+pub fn dismiss_silence_notice(app: AppHandle) -> Snapshot {
+    lock(&app).dismiss_silence_notice();
+
+    runtime::emit_snapshot(&app)
+}
+
+#[tauri::command]
 pub fn screen_stopped(app: AppHandle, detail: String) {
     lock(&app).log_unless_repeated(JournalEvent::ScreenStopped { detail });
 }
