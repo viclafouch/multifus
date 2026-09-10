@@ -186,37 +186,6 @@ the code under test reads. Walking a table to check every member reaches the
 screen is another thing, and it is welcome. No test writes an English word: the
 build refuses a catalogue with a hole.
 
-### Where things live
-
-- `apps/desktop/src/@types/` - What crosses the bridge, without a single runtime import
-- `apps/desktop/src/constants/` - Tables and nothing else, the `msg` ones included
-- `apps/desktop/src/helpers/` - Pure functions that know the domain, neither React nor Tauri
-- `apps/desktop/src/lib/` - What talks to the outside world: the IPC bridge, the
-  catalogues, and `cn`
-- `apps/desktop/src/locales/` - One `messages.po` per language, written by
-  `lingui extract` and never by hand except to translate
-- `apps/desktop/src/hooks/` - Custom hooks, one per file, named `use-*.ts`
-- `apps/desktop/src/components/` - Shared components
-- `apps/desktop/src/components/layout/` - The frame a screen sits in, one file per component
-- `apps/desktop/src/components/ui/` - What is left of shadcn. Nothing is regenerated anymore, so a file here may be edited to take the retro matter, as `dialog.tsx` and `alert-dialog.tsx` did; `oxlint.config.ts` keeps its override for them
-- `apps/desktop/src/screens/` - One screen per file, or per folder whose `index.tsx`
-  orchestrates and does not implement
-- `*.test.ts` - Next to the module it reads and named after it, one file per
-  module. Run by `vitest`, whose configuration is the `test` key of
-  `apps/desktop/vite.config.ts`
-- `*.test.tsx` - The same, for what renders: a hook through `renderHook`, a
-  screen through `render`. `@testing-library/react` on `jsdom`, and a query by
-  role or by the French text the user reads, never by class name
-- `apps/desktop/src/test-setup.ts` - What jsdom lacks and a library asks for, and the
-  teardown between two tests. Nothing that a single test needs
-- `apps/desktop/src/test-doubles.ts` - What every test needs and no module owns: the
-  snapshot Rust hands over and the domain records inside it, each at their
-  emptiest, plus the user agents, the promise that never settles, and the wait
-  for a dialogue that opens late. A test writes only the fields it reads.
-  Nothing a single test needs
-- `vitest` hands every `vi.fn` back new between two tests (`mockReset`): a
-  `beforeEach` that only clears them is noise, do not write it
-
 **Rules:**
 
 - Pure functions, no side effects
