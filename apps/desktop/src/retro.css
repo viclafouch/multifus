@@ -95,6 +95,7 @@
   --spacing-fence: 30px;
   --spacing-crest: 9rem;
   --spacing-shot: 76vh;
+  --spacing-answers: 64vh;
 
   --tracking-chapter: 0.3em;
 
@@ -728,6 +729,36 @@
     0 2px 0 color-mix(in srgb, var(--iron), transparent 40%),
     0 1px 4px rgb(0 0 0 / 0.95),
     0 4px 22px rgb(0 0 0 / 0.8);
+}
+
+@utility askmark {
+  --lozenge: 7px;
+
+  width: var(--lozenge);
+  height: var(--lozenge);
+  transform: rotate(45deg);
+  background-color: color-mix(in srgb, var(--band), transparent 20%);
+  transition-property: transform, background-color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 0.2s;
+
+  [aria-expanded='true'] & {
+    transform: none;
+    background-color: var(--cream);
+  }
+}
+
+@utility unroll {
+  overflow: hidden;
+  height: var(--accordion-panel-height);
+  transition-property: height;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 0.2s;
+
+  &[data-starting-style],
+  &[data-ending-style] {
+    height: 0;
+  }
 }
 
 @utility rule {
@@ -1379,5 +1410,10 @@
   .reel .reel-veil,
   .reel .reel-word {
     animation: none !important;
+  }
+
+  .askmark,
+  .unroll {
+    transition: none !important;
   }
 }

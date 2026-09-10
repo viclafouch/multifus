@@ -1,14 +1,21 @@
 import React from 'react'
+import { cn } from '@/lib/utils'
 
 type SettingPathProps = Readonly<{
   path: readonly string[]
+  className?: string
 }>
 
-export const SettingPath = ({ path }: SettingPathProps) => {
+export const SettingPath = ({ path, className }: SettingPathProps) => {
   const last = path.length - 1
 
   return (
-    <p className="flex flex-wrap items-center justify-center gap-x-1.5 text-aside text-khaki/70">
+    <p
+      className={cn(
+        'flex flex-wrap items-center justify-center gap-x-1.5 text-aside text-khaki/70',
+        className
+      )}
+    >
       {path.map((label, rank) => {
         return (
           <React.Fragment key={label}>

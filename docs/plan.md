@@ -18,6 +18,15 @@ La paire de clés de l'updater existe déjà, dans `~/.tauri/multifus.key` et so
 `tauri.conf.json`. En régénérer une rendrait insignables les mises à jour des
 versions déjà installées.
 
+## Finir la FAQ et la vérification
+
+La revue à deux axes a laissé ces quatre-là ouverts, sciemment.
+
+- [ ] Sur Mac, la réponse « bannière » dit de garder la bannière, et le dialogue tend quand même le chemin et le bouton qui ouvrent le panneau des notifications : `QUESTION_PAGES.banner` ne connaît pas `IS_APPLE`
+- [ ] Le verdict de la vérification compte l'essai parmi les « réglages » fermés, alors que `CONTEXT.md` dit qu'il n'en est pas un. Compter les quatre réglages et dire l'essai à part, ou trouver le mot qui couvre les cinq
+- [ ] `@utility askmark` redessine le losange de `btn-way` au lieu de le partager, et leurs durées divergent, 0,2 s contre 0,3 s. La règle 34 de [design-system.md](./design-system.md) annonce pourtant un seul losange
+- [ ] La FAQ et la vérification s'atteignent en ouvrant la fenêtre et en descendant les Paramètres, sans raccourci ni entrée de la barre système, ce que `CLAUDE.md` interdit. La vérification est justement ce qu'on veut lancer quand rien ne passe devant
+
 ## Poser les images qui manquent
 
 - [ ] Enregistrer les cinq vidéos de la mise en route sur le Mac, et les mêmes sur Windows pour les étapes 2, 3 et 4, dont le dessin diffère. `PAGE_SHOTS` gagne son axe plateforme à ce moment-là, et pas avant : deux tables identiques en attendant les images ne seraient qu'une constante écrite deux fois. Posées, `PAGE_SHOTS` les prend et le cadre pointillé disparaît

@@ -202,28 +202,39 @@ pour un écran de travail, c'est la fenêtre Options du client qui répond.
     la fonte annonce une capitale plus basse que celle qu'elle dessine, et
     Chromium arrondit l'ascendant au pixel. `text-box` dirait tout ça en une
     ligne le jour où le plancher des webviews l'atteindra
-30. Un corps de texte commence par un verbe, et ne parle pas par métaphore quand
+30. Bebas ne porte pas une phrase. Bebas Neue n'a pas de bas de casse, et ce
+    qu'on lui donne en minuscules ressort en petites capitales : une question
+    entière y devient un mur qu'on relit deux fois. Elle tient les titres et les
+    boutons, où le mot est court et attendu ; une phrase que le joueur lit pour
+    la première fois est en Roboto
+31. Un corps de texte commence par un verbe, et ne parle pas par métaphore quand
     il y a un geste à faire
-31. Un titre nomme le réglage comme le système l'écrit, et un mot que le joueur
+32. Un titre nomme le réglage comme le système l'écrit, et un mot que le joueur
     lira sur son propre écran passe entre guillemets par `quoted`
-32. Ce qui s'apprend une fois s'ouvre dans un dialogue, pas dans la plaque qui le
+33. Ce qui s'apprend une fois s'ouvre dans un dialogue, pas dans la plaque qui le
     règle. Le bouton qui le rouvre ne vit dans aucun écran : le cadre de la map
     le pose lui-même, en haut à gauche à côté du retour, au même endroit sur
     toutes les maps. Posé dans l'écran il suivait la mise en page, et on le
     cherchait d'une map à l'autre
+34. Une liste qu'on ne lit que le jour où ça coince se plie, une entrée ouverte
+    à la fois. Dépliée d'un bloc, elle se lit comme un mur et la réponse
+    cherchée s'y noie ; pliée, elle ne montre que les questions, et elle peut
+    grossir sans que la précédente devienne plus dure à trouver. Le repère qui
+    dit l'ouverture est le losange de `btn-way`, pas un chevron : le geste est
+    déjà celui de l'accueil, et un bouton ne porte pas d'icône à côté d'un mot
 
 ## Dessiner une map
 
 `app.tsx` pose déjà le décor, les bandes, le cartouche, le crédit et le journal.
 Une nouvelle map n'écrit que son dedans :
 
-33. `Screen` si c'est une liste, `StageScreen` si ça montre le jeu. Les deux
+35. `Screen` si c'est une liste, `StageScreen` si ça montre le jeu. Les deux
     posent `MapHeader`, donc le titre, le fronton et une phrase
-34. `Panel` par groupe, c'est le verre. `FieldRow` pour une ligne de réglage,
+36. `Panel` par groupe, c'est le verre. `FieldRow` pour une ligne de réglage,
     `Tick` pour ce qui s'allume, `Button` pour un geste
-35. Le nom de la map et son décor se déclarent dans `constants/world.ts`, et
+37. Le nom de la map et son décor se déclarent dans `constants/world.ts`, et
     `CurrentMap` la branche
-36. Ni onglet ni barre latérale : on vient de l'accueil, on y retourne par
+38. Ni onglet ni barre latérale : on vient de l'accueil, on y retourne par
     « Retour » ou par Échap
 
 Avant de dessiner, lire `CONTEXT.md` pour les mots. `frontend.md` tient React,

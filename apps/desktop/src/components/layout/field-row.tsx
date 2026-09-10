@@ -4,6 +4,7 @@ type FieldRowProps = Readonly<{
   label: string
   description: string
   mention?: string
+  id?: string
   children: React.ReactNode
 }>
 
@@ -11,10 +12,14 @@ export const FieldRow = ({
   label,
   description,
   mention,
+  id,
   children
 }: FieldRowProps) => {
   return (
-    <div className="flex items-center gap-4 border-b border-band/25 px-4 py-3 last:border-b-0">
+    <div
+      id={id}
+      className="flex scroll-mt-24 items-center gap-4 border-b border-band/25 px-4 py-3 last:border-b-0"
+    >
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-tale leading-snug text-cream">
           {label}

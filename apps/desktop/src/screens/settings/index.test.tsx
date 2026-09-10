@@ -6,6 +6,7 @@ import { ignore } from '@/lib/utils'
 import {
   APPLE_AGENT,
   WINDOWS_AGENT,
+  onboardingOf,
   snapshotOf,
   speakFrench
 } from '@/test-doubles'
@@ -57,6 +58,8 @@ const show = async ({
   const shown = render(
     <TooltipProvider>
       <SettingsScreen
+        onboarding={onboardingOf()}
+        isAutoFocusEnabled
         startAtLogin={false}
         maximizeOnLaunch={false}
         shortTitles={false}

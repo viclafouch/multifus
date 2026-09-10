@@ -1,5 +1,6 @@
 import { i18n } from '@lingui/core'
 import { t } from '@lingui/core/macro'
+import type { Onboarding } from '@/@types/onboarding'
 import type { Snapshot } from '@/@types/snapshot'
 import { FieldRow } from '@/components/layout/field-row'
 import { Note } from '@/components/layout/note'
@@ -9,6 +10,7 @@ import { Tick } from '@/components/retro/tick'
 import { UnavailableTick } from '@/components/unavailable-tick'
 import { WindowsTick } from '@/components/windows-tick'
 import { IS_APPLE } from '@/constants/keyboard'
+import { MAXIMIZE_ANCHOR } from '@/constants/moves'
 import { MAP_NAMES } from '@/constants/world'
 import { useClients } from '@/hooks/use-clients'
 import {
@@ -18,10 +20,12 @@ import {
   setStartAtLogin,
   setUngroupTaskbar
 } from '@/lib/multifus'
-import { OnboardingSection } from '@/screens/onboarding'
 import { ClientsPanel } from '@/screens/settings/clients-panel'
+import { HelpSection } from '@/screens/settings/help-section'
 
 type SettingsScreenProps = Readonly<{
+  onboarding: Onboarding
+  isAutoFocusEnabled: boolean
   startAtLogin: boolean
   maximizeOnLaunch: boolean
   shortTitles: boolean
@@ -32,6 +36,8 @@ type SettingsScreenProps = Readonly<{
 }>
 
 export const SettingsScreen = ({
+  onboarding,
+  isAutoFocusEnabled,
   startAtLogin,
   maximizeOnLaunch,
   shortTitles,
@@ -73,6 +79,7 @@ export const SettingsScreen = ({
           />
         </FieldRow>
         <FieldRow
+          id={MAXIMIZE_ANCHOR}
           label={maximizeLabel}
           description={
             IS_APPLE
@@ -143,7 +150,11 @@ export const SettingsScreen = ({
           />
         </FieldRow>
       </Panel>
-      <OnboardingSection run={run} />
+      <HelpSection
+        onboarding={onboarding}
+        isAutoFocusEnabled={isAutoFocusEnabled}
+        run={run}
+      />
     </Screen>
   )
 }
