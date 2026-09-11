@@ -1,11 +1,11 @@
 import { Footprints } from 'lucide-react'
 import { t } from '@lingui/core/macro'
+import { cn } from '@multifus/retro'
 import type { BannerStep } from '@/@types/walk'
 import { CharacterMedallion } from '@/components/character-medallion'
 import { ColorStripe } from '@/components/color-stripe'
 import { CORNER_PLACEMENT } from '@/constants/banner'
 import { portraitFor } from '@/helpers/portrait'
-import { cn } from '@/lib/utils'
 
 type BannerPillProps = Readonly<{
   step: BannerStep

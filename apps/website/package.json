@@ -1,4 +1,50 @@
 {
   "name": "@multifus/website",
-  "private": true
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "i18n:extract": "lingui extract",
+    "i18n:check": "lingui compile --strict",
+    "verify:html": "node scripts/verify-html.mjs",
+    "check": "pnpm run i18n:check && pnpm run typecheck && pnpm run test && pnpm run build && pnpm run verify:html"
+  },
+  "dependencies": {
+    "@fontsource/bebas-neue": "^5.3.0",
+    "@fontsource/roboto": "^5.3.0",
+    "@lingui/core": "^6.6.0",
+    "@lingui/react": "^6.6.0",
+    "@multifus/ankama": "workspace:*",
+    "@multifus/retro": "workspace:*",
+    "@tanstack/react-router": "^1.170.34",
+    "@tanstack/react-start": "^1.168.51",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^8.0.1",
+    "@lingui/babel-plugin-lingui-macro": "^6.6.0",
+    "@lingui/cli": "^6.6.0",
+    "@lingui/format-po": "^6.6.0",
+    "@lingui/vite-plugin": "^6.6.0",
+    "@rolldown/plugin-babel": "^0.2.4",
+    "@tailwindcss/vite": "^4.3.3",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/react": "^16.3.3",
+    "@types/node": "^22.20.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.1",
+    "jsdom": "^30.0.1",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.0",
+    "vitest": "^5.0.0"
+  }
 }

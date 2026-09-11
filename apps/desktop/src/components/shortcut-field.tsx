@@ -1,7 +1,7 @@
 import React from 'react'
 import { t } from '@lingui/core/macro'
+import { Button } from '@multifus/retro'
 import { KeyCap } from '@/components/key-cap'
-import { Button } from '@/components/retro/button'
 import { ShortcutUndoButton } from '@/components/shortcut-undo-button'
 import type { CaptureRejection } from '@/constants/keyboard'
 import { IS_APPLE } from '@/constants/keyboard'

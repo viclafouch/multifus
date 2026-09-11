@@ -1,9 +1,8 @@
 import { t } from '@lingui/core/macro'
+import { Button, Panel } from '@multifus/retro'
 import type { TestStatus } from '@/@types/relay'
 import type { Snapshot } from '@/@types/snapshot'
-import { Panel } from '@/components/layout/panel'
 import { SectionRow } from '@/components/layout/section-row'
-import { Button } from '@/components/retro/button'
 import { relayFailureLine } from '@/helpers/wording'
 import { testRelay } from '@/lib/multifus'
 

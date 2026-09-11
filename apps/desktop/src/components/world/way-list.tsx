@@ -1,7 +1,7 @@
 import { i18n } from '@lingui/core'
 import { t } from '@lingui/core/macro'
+import { Button } from '@multifus/retro'
 import type { ScreenName } from '@/@types/snapshot'
-import { Button } from '@/components/retro/button'
 import { MAP_NAMES, MAPS } from '@/constants/world'
 
 type WayListProps = Readonly<{

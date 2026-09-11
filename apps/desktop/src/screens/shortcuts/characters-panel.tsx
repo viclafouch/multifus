@@ -1,7 +1,7 @@
 import { t } from '@lingui/core/macro'
+import { Panel } from '@multifus/retro'
 import type { Character } from '@/@types/roster'
 import type { Binding, QuickReply } from '@/@types/shortcuts'
-import { Panel } from '@/components/layout/panel'
 import { PanelHeader } from '@/components/layout/panel-header'
 import { IS_APPLE } from '@/constants/keyboard'
 import { characterShortcutStatusLine } from '@/helpers/wording'

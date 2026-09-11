@@ -1,6 +1,4 @@
-import type { ButtonLook } from '@/components/retro/button'
-import { Button } from '@/components/retro/button'
-import { cn } from '@/lib/utils'
+import { Button, type ButtonLook, cn } from '@multifus/retro'
 
 const CROSS_PATH = 'M6 6 L18 18 M18 6 L6 18'
 

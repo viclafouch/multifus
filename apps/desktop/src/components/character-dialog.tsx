@@ -2,6 +2,7 @@ import React from 'react'
 import { Ban, ChevronLeft, X } from 'lucide-react'
 import { i18n } from '@lingui/core'
 import { t } from '@lingui/core/macro'
+import { Button } from '@multifus/retro'
 import type { Character, Class, Color, Gender, Portrait } from '@/@types/roster'
 import { CharacterMedallion } from '@/components/character-medallion'
 import { ClassVignette } from '@/components/class-vignette'
@@ -9,7 +10,6 @@ import { ColorGrid } from '@/components/color-grid'
 import { ColorStripe } from '@/components/color-stripe'
 import { GenderSigil } from '@/components/gender-sigil'
 import { Legend } from '@/components/layout/legend'
-import { Button } from '@/components/retro/button'
 import {
   Dialog,
   DialogClose,

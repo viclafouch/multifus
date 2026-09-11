@@ -1,6 +1,6 @@
 import React from 'react'
+import { cn } from '@multifus/retro'
 import { SCREEN_SCENE } from '@/constants/world'
-import { cn } from '@/lib/utils'
 
 type ScreenFrameProps = Readonly<{
   ratio: number

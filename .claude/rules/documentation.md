@@ -7,6 +7,8 @@
 - **`docs/plan.md`** = what remains to do, one line per thing. A line done is deleted, not ticked
 - **`docs/design-system.md`** = the rules that decide what a screen looks like. It copies no value: the CSS holds them
 - **`docs/plan-<subject>.md`** = the subject being worked right now. Deleted once shipped, handing back to `docs/plan.md` whatever it did not finish
+- **`apps/website/CONTEXT.md`** = the words the site alone uses, and the traps its i18n has already paid for
+- **`packages/*/README.md`** = what a shared package holds, and what it refuses to hold
 - **`apps/desktop/package.json` / `apps/desktop/src-tauri/Cargo.toml`** = source of truth for versions
 
 The root `package.json` carries no version: only the software is numbered, and

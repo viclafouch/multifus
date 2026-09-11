@@ -1,5 +1,5 @@
 import React from 'react'
-import { cn } from '@/lib/utils'
+import { cn } from '@multifus/retro'
 
 type SettingPathProps = Readonly<{
   path: readonly string[]

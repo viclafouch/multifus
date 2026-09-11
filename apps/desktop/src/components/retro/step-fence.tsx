@@ -1,4 +1,4 @@
-import { Button } from '@/components/retro/button'
+import { Button } from '@multifus/retro'
 
 type StepFenceProps = Readonly<{
   labels: readonly string[]

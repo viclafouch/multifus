@@ -1,5 +1,5 @@
 import { Check, Copy } from 'lucide-react'
-import { Button } from '@/components/retro/button'
+import { Button } from '@multifus/retro'
 import { useCopy } from '@/hooks/use-copy'
 
 type CopyButtonProps = Readonly<{

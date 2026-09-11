@@ -1,6 +1,6 @@
+import { Button } from '@multifus/retro'
 import type { Gender } from '@/@types/roster'
 import { GenderSigil } from '@/components/gender-sigil'
-import { Button } from '@/components/retro/button'
 import {
   Tooltip,
   TooltipContent,

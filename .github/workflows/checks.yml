@@ -52,16 +52,4 @@ jobs:
 
       - run: pnpm audit --audit-level high
 
-      - run: pnpm run lint
-
-      - run: pnpm run format:check
-
-      - run: pnpm --filter @multifus/desktop run test
-
-      - run: pnpm --filter @multifus/desktop run build
-
-      - run: pnpm --filter @multifus/desktop run format:rust:check
-
-      - run: pnpm --filter @multifus/desktop run lint:rust
-
-      - run: pnpm --filter @multifus/desktop run test:rust
+      - run: pnpm run check

@@ -1,9 +1,8 @@
 import React from 'react'
 import { t } from '@lingui/core/macro'
+import { Button, Panel } from '@multifus/retro'
 import type { Snapshot } from '@/@types/snapshot'
-import { Panel } from '@/components/layout/panel'
 import { SectionRow } from '@/components/layout/section-row'
-import { Button } from '@/components/retro/button'
 import {
   AlertDialog,
   AlertDialogAction,

@@ -1,11 +1,10 @@
 import { t } from '@lingui/core/macro'
+import { Button, Panel } from '@multifus/retro'
 import type { Snapshot } from '@/@types/snapshot'
 import type { UpdateStatus } from '@/@types/system'
 import { FieldRow } from '@/components/layout/field-row'
-import { Panel } from '@/components/layout/panel'
 import { PanelHeader } from '@/components/layout/panel-header'
 import { LinkButton } from '@/components/link-button'
-import { Button } from '@/components/retro/button'
 import { updateLine } from '@/helpers/wording'
 import { checkUpdate, installUpdate, openAboutLink } from '@/lib/multifus'
 

@@ -1,10 +1,9 @@
 import { t } from '@lingui/core/macro'
+import { Button, Panel } from '@multifus/retro'
 import type { RuneTableStatus } from '@/@types/rune'
 import type { Snapshot } from '@/@types/snapshot'
 import { GaugeRow } from '@/components/gauge-row'
-import { Panel } from '@/components/layout/panel'
 import { PanelHeader } from '@/components/layout/panel-header'
-import { Button } from '@/components/retro/button'
 import { useDraft } from '@/hooks/use-draft'
 import {
   fadeRuneTable,

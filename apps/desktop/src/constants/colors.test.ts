@@ -6,17 +6,42 @@ import type { Color } from '@/@types/roster'
 import { COLORS, COLOR_TINTS } from '@/constants/colors'
 import { COLOR_LABELS } from '@/constants/roster'
 
-const styleSheet = (name: string) => {
-  return readFileSync(join(import.meta.dirname, '..', name), 'utf8')
+const RETRO_STYLES = '@multifus/retro/styles/'
+
+const pathOf = (specifier: string) => {
+  return specifier.startsWith(RETRO_STYLES)
+    ? join(
+        import.meta.dirname,
+        '..',
+        '..',
+        '..',
+        '..',
+        'packages',
+        'retro',
+        'src',
+        'styles',
+        specifier.slice(RETRO_STYLES.length)
+      )
+    : join(import.meta.dirname, '..', specifier.replace('./', ''))
 }
 
-const THEME = ['index.css', 'theme.css', 'retro.css'].map(styleSheet).join('\n')
+const styleSheet = (specifier: string) => {
+  return readFileSync(pathOf(specifier), 'utf8')
+}
+
+const THEME = [
+  'index.css',
+  `${RETRO_STYLES}theme.css`,
+  `${RETRO_STYLES}retro.css`
+]
+  .map(styleSheet)
+  .join('\n')
 
 const importsOf = (name: string) => {
   const imported: string[] = []
 
   for (const found of styleSheet(name).matchAll(
-    /@import '\.\/([\w-]+\.css)'/gu
+    /@import '((?:\.\/|@multifus\/retro\/styles\/)[\w-]+\.css)'/gu
   )) {
     imported.push(found[1])
   }

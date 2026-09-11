@@ -4,8 +4,8 @@
 @import '@fontsource/roboto/500.css';
 @import '@fontsource/roboto/700.css';
 
-@import './theme.css';
-@import './retro.css';
+@import '@multifus/retro/styles/theme.css';
+@import '@multifus/retro/styles/retro.css';
 
 @layer base {
   html,

@@ -1,6 +1,6 @@
 import { TriangleAlert } from 'lucide-react'
 import { t } from '@lingui/core/macro'
-import { Panel } from '@/components/layout/panel'
+import { Panel } from '@multifus/retro'
 import { screenSaverDelay } from '@/helpers/format'
 
 const screenSaverLine = (seconds: number) => {

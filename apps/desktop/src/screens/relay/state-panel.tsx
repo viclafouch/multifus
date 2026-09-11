@@ -1,7 +1,7 @@
 import { t } from '@lingui/core/macro'
+import { Panel } from '@multifus/retro'
 import type { RelayLiveState, RelayStatus } from '@/@types/relay'
 import type { Snapshot } from '@/@types/snapshot'
-import { Panel } from '@/components/layout/panel'
 import { Tick } from '@/components/retro/tick'
 import { StateBadge } from '@/components/state-badge'
 import { relayFailureLine } from '@/helpers/wording'

@@ -1,0 +1,86 @@
+import { describe, expect, it } from 'vitest'
+import { LANGUAGES } from '@/constants/languages'
+import { MENU_FEATURES, PAGES, PAGE_IDS } from '@/constants/pages'
+import { PAGE_NAMES, PAGE_PROMISES } from '@/constants/wording'
+
+const SLUG_SHAPE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/u
+
+const WITHOUT_HOME = PAGE_IDS.filter((page) => {
+  return page !== 'home'
+})
+
+const alphabetical = (one: string, other: string) => {
+  return one.localeCompare(other)
+}
+
+describe('la table des pages', () => {
+  it('donne quatorze pages', () => {
+    expect(PAGE_IDS).toHaveLength(14)
+  })
+
+  it('énumère exactement ce que la table porte', () => {
+    expect(Object.keys(PAGES).toSorted(alphabetical)).toStrictEqual(
+      [...PAGE_IDS].toSorted(alphabetical)
+    )
+  })
+
+  it('laisse la racine à l’accueil, dans les trois langues', () => {
+    const rooted = LANGUAGES.map((language) => {
+      return PAGES.home.slugs[language]
+    })
+
+    expect(rooted).toStrictEqual(['', '', ''])
+  })
+
+  it.each(WITHOUT_HOME)('donne une adresse à %s dans chaque langue', (page) => {
+    const slugs = LANGUAGES.map((language) => {
+      return PAGES[page].slugs[language]
+    })
+
+    expect(slugs.filter(Boolean)).toHaveLength(LANGUAGES.length)
+  })
+
+  it.each(WITHOUT_HOME)(
+    'écrit l’adresse de %s sans majuscule ni accent',
+    (page) => {
+      for (const language of LANGUAGES) {
+        expect(PAGES[page].slugs[language]).toMatch(SLUG_SHAPE)
+      }
+    }
+  )
+
+  it.each(LANGUAGES)(
+    'ne donne pas deux fois la même adresse en %s',
+    (language) => {
+      const slugs = PAGE_IDS.map((page) => {
+        return PAGES[page].slugs[language]
+      })
+
+      expect(new Set(slugs).size).toBe(slugs.length)
+    }
+  )
+
+  it.each(PAGE_IDS)('nomme et promet %s', (page) => {
+    expect(PAGE_NAMES[page]).toBeDefined()
+    expect(PAGE_PROMISES[page]).toBeDefined()
+  })
+
+  it.each(MENU_FEATURES)(
+    'ne met au menu que des fonctionnalités, %s',
+    (page) => {
+      expect(PAGES[page].kind).toBe('feature')
+    }
+  )
+
+  it('ne pose une vidéo que sur une fonctionnalité', () => {
+    const filmed = PAGE_IDS.filter((page) => {
+      return PAGES[page].loop !== null
+    })
+
+    const kinds = filmed.map((page) => {
+      return PAGES[page].kind
+    })
+
+    expect(new Set(kinds)).toStrictEqual(new Set(['feature']))
+  })
+})

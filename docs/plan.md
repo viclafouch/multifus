@@ -22,14 +22,8 @@ versions déjà installées.
 
 ## Ouvrir le site
 
-La place est prise, `apps/website`, et elle est vide : le paquet n'a qu'un nom,
-aucune dépendance et aucun script. Le site présente Multifus, donne les deux
-téléchargements tirés de la dernière version publiée sur GitHub, porte la
-commande d'attestation que le README porte déjà, et publie le journal des
-versions que `commit-and-tag-version` écrit dans `apps/desktop/CHANGELOG.md`.
-
-- [ ] Trancher le framework. Le site est presque tout statique
-- [ ] Trancher l'hébergement et le nom de domaine
-- [ ] Trancher ce que le site montre en marche, les vrais composants du logiciel ou des images. La réponse ouvre `packages/` et Turborepo, ou les laisse fermés. La roue et le tableau des runes sont déjà purs, tout Tauri tenant dans `lib/multifus.ts` et `hooks/use-copy.ts`
-- [ ] Publier le journal des versions à une adresse qui ne bougera plus, puis poser dans À propos un lien qui ouvre le navigateur, à côté de « Aller voir » et « Aller le dire »
-- [ ] Décider si le panneau de mise à jour renvoie au journal quand une version est prête
+Le sujet est en cours, et tout est dans [plan-site.md](./plan-site.md) : ce que
+le site doit faire, ses quatorze pages, son socle et ce qui reste à poser. Le
+socle tourne depuis le 11 septembre 2026, quarante-deux pages prérendues dans
+trois langues ; restent le dessin, le texte et la mise en ligne. Il rendra ici le
+journal des versions et le lien qui l'ouvre depuis À propos.

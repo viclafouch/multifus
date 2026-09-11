@@ -6,6 +6,9 @@ export default defineConfig({
   ignorePatterns: [
     '**/node_modules/**',
     '**/dist/**',
+    '**/.turbo/**',
+    'apps/website/.output/**',
+    'apps/website/src/routeTree.gen.ts',
     'apps/desktop/src-tauri/**',
     'pnpm-lock.yaml',
     '**/CHANGELOG.md'

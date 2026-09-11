@@ -1,9 +1,18 @@
 Gestionnaire de fenêtres Dofus Retro en multicompte, macOS et Windows.
 
-Monorepo pnpm : le logiciel dans `apps/desktop`, le site dans `apps/website`.
-Rien n'est partagé encore, `packages/` s'ouvrira quand le site le demandera.
+Monorepo pnpm et Turborepo : le logiciel dans `apps/desktop`, le site dans
+`apps/website`. Ce qu'ils portent tous les deux vit dans `packages/` :
+`@multifus/ankama` tient les images d'Ankama, hors licence MIT, et
+`@multifus/retro` la matière, `retro.css`, `theme.css`, `cn` et les composants
+portables. Chacun a son README.
 
-- [CONTEXT.md](./CONTEXT.md) : les mots du projet, à employer partout, code compris.
+**Aucun service payant.** La règle tient le site entier : Vercel en plan Hobby,
+Vercel Analytics dans son quota gratuit, la Search Console, et rien d'autre. Une
+fonctionnalité qui demande une carte bancaire n'existe pas.
+
+- [CONTEXT.md](./CONTEXT.md) : les mots du projet, à employer partout, code
+  compris. [apps/website/CONTEXT.md](./apps/website/CONTEXT.md) y ajoute ceux du
+  site et les pièges de son i18n.
 - [docs/plan.md](./docs/plan.md) : ce qui reste à faire, et la seule liste. Une
   ligne faite s'enlève.
 - [docs/design-system.md](./docs/design-system.md) : la vision, les deux sources
@@ -51,7 +60,10 @@ dépôt : `cargo install cargo-deny --locked` pour lancer `pnpm --filter
 faudrait le réseau à chaque commit.
 
 Le français est la source et Lingui porte le reste. Le menu de la barre système
-a sa propre table, en Rust, parce qu'il doit exister sans fenêtre.
+a sa propre table, en Rust, parce qu'il doit exister sans fenêtre. Le texte ne se
+partage pas entre le logiciel et le site : chacun garde son catalogue, et le
+logiciel active une instance globale là où le site en tient trois, une par
+langue, parce qu'il prérend les trois en parallèle.
 
 Le skill `/frontend-design` avant de dessiner un écran, et Tauri v2 :
 `https://v2.tauri.app/llms.txt`.

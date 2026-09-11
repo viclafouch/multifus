@@ -1,7 +1,6 @@
 import { t } from '@lingui/core/macro'
+import { Button, Panel } from '@multifus/retro'
 import type { Clients, Snapshot } from '@/@types/snapshot'
-import { Panel } from '@/components/layout/panel'
-import { Button } from '@/components/retro/button'
 import { StateBadge } from '@/components/state-badge'
 import { clientsLines } from '@/helpers/wording'
 import { maximizeAllClients } from '@/lib/multifus'

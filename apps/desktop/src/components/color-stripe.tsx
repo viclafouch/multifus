@@ -1,6 +1,6 @@
+import { cn } from '@multifus/retro'
 import type { Color } from '@/@types/roster'
 import { COLOR_TINTS } from '@/constants/colors'
-import { cn } from '@/lib/utils'
 
 type ColorStripeProps = Readonly<{
   color: Color

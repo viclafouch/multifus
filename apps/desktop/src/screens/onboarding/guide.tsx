@@ -1,15 +1,15 @@
 import React from 'react'
 import { t } from '@lingui/core/macro'
+import { Button, Scene } from '@multifus/retro'
 import type { Language } from '@/@types/language'
 import type { Onboarding } from '@/@types/onboarding'
 import type { Character } from '@/@types/roster'
 import type { Snapshot } from '@/@types/snapshot'
 import { LanguagePicker } from '@/components/language-picker'
-import { Button } from '@/components/retro/button'
 import { ChapterCard } from '@/components/retro/chapter-card'
-import { Scene } from '@/components/retro/scene'
 import { SceneCredit } from '@/components/retro/scene-credit'
 import { StepFence } from '@/components/retro/step-fence'
+import { PAGE_SCENES } from '@/constants/onboarding'
 import { pageLabel, pagesOf } from '@/helpers/onboarding'
 import { finishOnboarding, requestAuthorization } from '@/lib/multifus'
 import { StepPage } from '@/screens/onboarding/step-page'
@@ -45,7 +45,7 @@ export const OnboardingGuide = ({
 
   return (
     <div className="relative flex h-screen flex-col font-plain text-khaki">
-      <Scene page={page} />
+      <Scene scenes={PAGE_SCENES} here={page} />
       <ChapterCard
         key={page}
         legend={t`Étape ${rank} sur ${count}`}

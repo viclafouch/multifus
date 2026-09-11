@@ -1,6 +1,6 @@
 import { t } from '@lingui/core/macro'
+import { Button } from '@multifus/retro'
 import type { Display } from '@/@types/display'
-import { Button } from '@/components/retro/button'
 
 type ScreenChipProps = Readonly<{
   screen: Display

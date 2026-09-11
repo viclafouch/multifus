@@ -1,0 +1,166 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2026-09-11 12:17+0200\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: fr\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
+
+#: src/components/skip-link.tsx
+msgid "Aller au contenu"
+msgstr "Aller au contenu"
+
+#: src/constants/wording.ts
+msgid "AutoFocus"
+msgstr "AutoFocus"
+
+#: src/constants/wording.ts
+msgid "Ce que chaque version a changé."
+msgstr "Ce que chaque version a changé."
+
+#: src/screens/lost-screen.tsx
+msgid "Cette page n’existe pas"
+msgstr "Cette page n’existe pas"
+
+#: src/constants/wording.ts
+msgid "Comparatif"
+msgstr "Comparatif"
+
+#: src/constants/wording.ts
+msgid "D’où vient chaque image, et à quelle condition."
+msgstr "D’où vient chaque image, et à quelle condition."
+
+#: src/constants/wording.ts
+msgid "Déplacement rapide"
+msgstr "Déplacement rapide"
+
+#: src/components/site-footer.tsx
+msgid "Images et vidéos © Ankama Games. Dofus Retro est une marque d’Ankama."
+msgstr "Images et vidéos © Ankama Games. Dofus Retro est une marque d’Ankama."
+
+#: src/constants/wording.ts
+msgid "Jouez en multicompte sur Dofus Retro sans jamais chercher une fenêtre."
+msgstr "Jouez en multicompte sur Dofus Retro sans jamais chercher une fenêtre."
+
+#: src/constants/wording.ts
+msgid "Journal des versions"
+msgstr "Journal des versions"
+
+#: src/screens/lost-screen.tsx
+msgid "L’adresse est peut-être mal recopiée, ou la page a changé de nom. L’accueil vous remet sur le chemin."
+msgstr "L’adresse est peut-être mal recopiée, ou la page a changé de nom. L’accueil vous remet sur le chemin."
+
+#: src/constants/wording.ts
+msgid "La fenêtre du personnage qui joue passe devant toute seule."
+msgstr "La fenêtre du personnage qui joue passe devant toute seule."
+
+#: src/components/site-footer.tsx
+msgid "La langue du site"
+msgstr "La langue du site"
+
+#: src/constants/wording.ts
+msgid "La table des poids de runes, lisible et gratuite."
+msgstr "La table des poids de runes, lisible et gratuite."
+
+#: src/components/site-footer.tsx
+msgid "Le pied de page"
+msgstr "Le pied de page"
+
+#: src/constants/wording.ts
+msgid "Le poids des runes posé par-dessus le jeu, sans quitter l’atelier."
+msgstr "Le poids des runes posé par-dessus le jeu, sans quitter l’atelier."
+
+#: src/components/site-header.tsx
+msgid "Les fonctionnalités de Multifus"
+msgstr "Les fonctionnalités de Multifus"
+
+#: src/constants/wording.ts
+msgid "Les images"
+msgstr "Les images"
+
+#: src/constants/wording.ts
+msgid "Les messages privés vous suivent sur le téléphone."
+msgstr "Les messages privés vous suivent sur le téléphone."
+
+#: src/constants/wording.ts
+msgid "Messages privés"
+msgstr "Messages privés"
+
+#: src/constants/wording.ts
+msgid "Multifus"
+msgstr "Multifus"
+
+#: src/constants/wording.ts
+msgid "Multifus et les autres gestionnaires, ligne par ligne."
+msgstr "Multifus et les autres gestionnaires, ligne par ligne."
+
+#: src/constants/wording.ts
+msgid "Multifus sur Mac"
+msgstr "Multifus sur Mac"
+
+#: src/constants/wording.ts
+msgid "Multifus tourne sur Mac, signé et notarisé par Apple."
+msgstr "Multifus tourne sur Mac, signé et notarisé par Apple."
+
+#: src/constants/wording.ts
+msgid "Multifus, le multicompte sur Dofus Retro"
+msgstr "Multifus, le multicompte sur Dofus Retro"
+
+#: src/constants/wording.ts
+msgid "Poids des runes"
+msgstr "Poids des runes"
+
+#: src/constants/wording.ts
+msgid "Prenez Multifus pour macOS ou pour Windows."
+msgstr "Prenez Multifus pour macOS ou pour Windows."
+
+#: src/constants/wording.ts
+msgid "Projet indépendant, sans lien avec Ankama."
+msgstr "Projet indépendant, sans lien avec Ankama."
+
+#: src/constants/wording.ts
+msgid "Raccourcis"
+msgstr "Raccourcis"
+
+#: src/constants/wording.ts
+msgid "Réponses rapides"
+msgstr "Réponses rapides"
+
+#: src/screens/lost-screen.tsx
+msgid "Retour à l’accueil"
+msgstr "Retour à l’accueil"
+
+#: src/constants/wording.ts
+msgid "Roue des personnages"
+msgstr "Roue des personnages"
+
+#: src/constants/wording.ts
+msgid "Tableau des runes"
+msgstr "Tableau des runes"
+
+#: src/constants/wording.ts
+msgid "Télécharger"
+msgstr "Télécharger"
+
+#: src/constants/wording.ts
+msgid "Un clic gauche, et toute la team marche au même endroit."
+msgstr "Un clic gauche, et toute la team marche au même endroit."
+
+#: src/constants/wording.ts
+msgid "Un disque de têtes sous le pouce, et la bonne fenêtre arrive."
+msgstr "Un disque de têtes sous le pouce, et la bonne fenêtre arrive."
+
+#: src/constants/wording.ts
+msgid "Un texte tout prêt part sous une combinaison de touches."
+msgstr "Un texte tout prêt part sous une combinaison de touches."
+
+#: src/constants/wording.ts
+msgid "Une touche par personnage, et le tour du roster au clavier."
+msgstr "Une touche par personnage, et le tour du roster au clavier."

@@ -1,0 +1,166 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2026-09-11 12:17+0200\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: es\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
+
+#: src/components/skip-link.tsx
+msgid "Aller au contenu"
+msgstr "Ir al contenido"
+
+#: src/constants/wording.ts
+msgid "AutoFocus"
+msgstr "AutoFocus"
+
+#: src/constants/wording.ts
+msgid "Ce que chaque version a changé."
+msgstr "Lo que ha cambiado cada versión."
+
+#: src/screens/lost-screen.tsx
+msgid "Cette page n’existe pas"
+msgstr "Esta página no existe"
+
+#: src/constants/wording.ts
+msgid "Comparatif"
+msgstr "Comparativa"
+
+#: src/constants/wording.ts
+msgid "D’où vient chaque image, et à quelle condition."
+msgstr "De dónde viene cada imagen, y en qué condiciones."
+
+#: src/constants/wording.ts
+msgid "Déplacement rapide"
+msgstr "Movimiento rápido"
+
+#: src/components/site-footer.tsx
+msgid "Images et vidéos © Ankama Games. Dofus Retro est une marque d’Ankama."
+msgstr "Imágenes y vídeos © Ankama Games. Dofus Retro es una marca de Ankama."
+
+#: src/constants/wording.ts
+msgid "Jouez en multicompte sur Dofus Retro sans jamais chercher une fenêtre."
+msgstr "Juega con varias cuentas en Dofus Retro sin buscar nunca una ventana."
+
+#: src/constants/wording.ts
+msgid "Journal des versions"
+msgstr "Novedades"
+
+#: src/screens/lost-screen.tsx
+msgid "L’adresse est peut-être mal recopiée, ou la page a changé de nom. L’accueil vous remet sur le chemin."
+msgstr "Puede que la dirección esté mal copiada, o que la página haya cambiado de nombre. La página de inicio te devuelve al camino."
+
+#: src/constants/wording.ts
+msgid "La fenêtre du personnage qui joue passe devant toute seule."
+msgstr "La ventana del personaje que juega pasa al frente sola."
+
+#: src/components/site-footer.tsx
+msgid "La langue du site"
+msgstr "El idioma del sitio"
+
+#: src/constants/wording.ts
+msgid "La table des poids de runes, lisible et gratuite."
+msgstr "La tabla de pesos de runas, legible y gratuita."
+
+#: src/components/site-footer.tsx
+msgid "Le pied de page"
+msgstr "El pie de página"
+
+#: src/constants/wording.ts
+msgid "Le poids des runes posé par-dessus le jeu, sans quitter l’atelier."
+msgstr "El peso de las runas puesto sobre el juego, sin salir del taller."
+
+#: src/components/site-header.tsx
+msgid "Les fonctionnalités de Multifus"
+msgstr "Lo que hace Multifus"
+
+#: src/constants/wording.ts
+msgid "Les images"
+msgstr "Las imágenes"
+
+#: src/constants/wording.ts
+msgid "Les messages privés vous suivent sur le téléphone."
+msgstr "Los mensajes privados te siguen al teléfono."
+
+#: src/constants/wording.ts
+msgid "Messages privés"
+msgstr "Mensajes privados"
+
+#: src/constants/wording.ts
+msgid "Multifus"
+msgstr "Multifus"
+
+#: src/constants/wording.ts
+msgid "Multifus et les autres gestionnaires, ligne par ligne."
+msgstr "Multifus y los demás gestores, línea por línea."
+
+#: src/constants/wording.ts
+msgid "Multifus sur Mac"
+msgstr "Multifus en Mac"
+
+#: src/constants/wording.ts
+msgid "Multifus tourne sur Mac, signé et notarisé par Apple."
+msgstr "Multifus funciona en Mac, firmado y notarizado por Apple."
+
+#: src/constants/wording.ts
+msgid "Multifus, le multicompte sur Dofus Retro"
+msgstr "Multifus, varias cuentas en Dofus Retro"
+
+#: src/constants/wording.ts
+msgid "Poids des runes"
+msgstr "Pesos de las runas"
+
+#: src/constants/wording.ts
+msgid "Prenez Multifus pour macOS ou pour Windows."
+msgstr "Coge Multifus para macOS o para Windows."
+
+#: src/constants/wording.ts
+msgid "Projet indépendant, sans lien avec Ankama."
+msgstr "Proyecto independiente, sin vínculo con Ankama."
+
+#: src/constants/wording.ts
+msgid "Raccourcis"
+msgstr "Atajos"
+
+#: src/constants/wording.ts
+msgid "Réponses rapides"
+msgstr "Respuestas rápidas"
+
+#: src/screens/lost-screen.tsx
+msgid "Retour à l’accueil"
+msgstr "Volver al inicio"
+
+#: src/constants/wording.ts
+msgid "Roue des personnages"
+msgstr "Rueda de personajes"
+
+#: src/constants/wording.ts
+msgid "Tableau des runes"
+msgstr "Tabla de runas"
+
+#: src/constants/wording.ts
+msgid "Télécharger"
+msgstr "Descargar"
+
+#: src/constants/wording.ts
+msgid "Un clic gauche, et toute la team marche au même endroit."
+msgstr "Un clic izquierdo, y todo el equipo camina al mismo sitio."
+
+#: src/constants/wording.ts
+msgid "Un disque de têtes sous le pouce, et la bonne fenêtre arrive."
+msgstr "Un disco de cabezas bajo el pulgar, y llega la ventana correcta."
+
+#: src/constants/wording.ts
+msgid "Un texte tout prêt part sous une combinaison de touches."
+msgstr "Un texto ya listo sale bajo una combinación de teclas."
+
+#: src/constants/wording.ts
+msgid "Une touche par personnage, et le tour du roster au clavier."
+msgstr "Una tecla por personaje, y todo el roster desde el teclado."

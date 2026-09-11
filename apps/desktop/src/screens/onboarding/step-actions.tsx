@@ -1,7 +1,7 @@
 import { i18n } from '@lingui/core'
 import { t } from '@lingui/core/macro'
+import { Button } from '@multifus/retro'
 import type { Page } from '@/@types/onboarding'
-import { Button } from '@/components/retro/button'
 import { PAGE_SHOTS, SYSTEM_PAGES } from '@/constants/onboarding'
 import { leadOf, nextLabel } from '@/helpers/onboarding'
 import { OpenButton } from '@/screens/onboarding/open-button'

@@ -15,11 +15,12 @@
   "type": "module",
   "scripts": {
     "dev:app": "pnpm --filter @multifus/desktop dev:app",
+    "dev:site": "pnpm --filter @multifus/website dev",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix && oxfmt",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
-    "check": "pnpm run format:check && pnpm run lint && pnpm -r run check",
+    "check": "pnpm run format:check && pnpm run lint && turbo run check",
     "prepare": "husky"
   },
   "devDependencies": {
@@ -28,6 +29,7 @@
     "oxfmt": "^0.65.0",
     "oxlint": "^1.80.0",
     "oxlint-tsgolint": "^7.0.2001",
+    "turbo": "^2.10.12",
     "typescript": "^7.0.2"
   },
   "packageManager": "pnpm@12.3.4+sha512.961aa41fb077da3a04a441d9f8e15ebc0c96da8ef710b2eb67bf9ee7cb0610eabd48f1fd85f51cffe73846785fa0f87c56a3a872a1d893f8446741b5cce45457"

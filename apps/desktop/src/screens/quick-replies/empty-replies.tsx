@@ -1,7 +1,7 @@
 import { t } from '@lingui/core/macro'
+import { Button } from '@multifus/retro'
 import { KeyCap } from '@/components/key-cap'
 import { EmptyState } from '@/components/layout/empty-state'
-import { Button } from '@/components/retro/button'
 import { acceleratorParts } from '@/helpers/accelerator'
 
 const EXAMPLE_ACCELERATOR = 'Control+Alt+KeyB'

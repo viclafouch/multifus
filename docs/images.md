@@ -25,8 +25,9 @@ l'usage gratuit, et la courte citation ne couvrant pas les images.
 Le point le plus exposé est **la licence MIT du dépôt**. Poser une image
 d'Ankama dans un dépôt MIT revient à concéder au monde le droit de la copier et
 de la vendre, ce que Multifus ne peut pas donner. Les images tiennent parce
-qu'elles vivent dans des dossiers qu'un `git rm` retire d'un coup, et que la
-[licence](../LICENSE) exclut du MIT. Toute image gardée suit cette discipline.
+qu'elles vivent toutes dans `packages/ankama`, qu'un `git rm -r` retire d'un
+coup, et que la [licence](../LICENSE) exclut du MIT. Toute image gardée suit
+cette discipline, le logiciel et le site puisant au même dossier.
 
 **La voie sûre est d'écrire à Ankama**, `contact@ankama.com`, et de demander
 l'autorisation pour un logiciel gratuit et ouvert : c'est le seul chemin qui
@@ -72,8 +73,8 @@ vignettes que par lots de 240.
 
 ## Les décors du dépôt
 
-Ils vivent dans `apps/desktop/src/assets/ankama/`, et chaque fenêtre porte la
-mention d'Ankama en bas.
+Ils vivent dans `packages/ankama/images/`, les boucles dans
+`packages/ankama/loops/`, et chaque fenêtre porte la mention d'Ankama en bas.
 
 | Fichier               | Source                                                                          |
 | --------------------- | ------------------------------------------------------------------------------- |
@@ -90,6 +91,11 @@ mention d'Ankama en bas.
 | `walk-loop.mp4`       | idem                                                                            |
 | `auto-focus-loop.mp4` | idem                                                                            |
 | `rune-table-loop.mp4` | idem                                                                            |
+
+La fenêtre Options du client, `dofus-options-general.png`, vit dans le même
+dossier et n'est pas un décor : c'est la capture d'où
+[design-system.md](./design-system.md) tire la matière, et la mise en route la
+montre pour dire où cocher.
 
 `arena.webp` n'est plus un décor de map depuis que la roue a rejoint les
 Personnages : la mise en route s'en sert pour l'étape de l'essai.

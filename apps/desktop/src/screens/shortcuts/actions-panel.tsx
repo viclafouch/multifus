@@ -1,5 +1,6 @@
 import { i18n } from '@lingui/core'
 import { t } from '@lingui/core/macro'
+import { Button, Panel } from '@multifus/retro'
 import type {
   Binding,
   QuickReply,
@@ -7,8 +8,6 @@ import type {
   ShortcutBinding
 } from '@/@types/shortcuts'
 import { FieldRow } from '@/components/layout/field-row'
-import { Panel } from '@/components/layout/panel'
-import { Button } from '@/components/retro/button'
 import { ShortcutField } from '@/components/shortcut-field'
 import { SHORTCUT_ACTIONS } from '@/constants/shortcuts'
 import { matchIsSameBinding } from '@/helpers/binding'

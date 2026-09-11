@@ -27,3 +27,13 @@ target/
 *.njsproj
 *.sln
 *.sw?
+
+# TanStack Start
+apps/website/.output
+apps/website/.nitro
+apps/website/.tanstack
+apps/website/src/routeTree.gen.ts
+apps/website/src/locales/*/messages.js
+
+# Turborepo
+.turbo

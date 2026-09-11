@@ -1,4 +1,5 @@
 import { t } from '@lingui/core/macro'
+import { cn } from '@multifus/retro'
 import type { Character } from '@/@types/roster'
 import { MainMark } from '@/components/main-mark'
 import { RemoveButton } from '@/components/remove-button'
@@ -11,7 +12,6 @@ import {
   characterState,
   characterSubLine
 } from '@/helpers/wording'
-import { cn } from '@/lib/utils'
 
 type HeadProps = Readonly<{
   character: Character

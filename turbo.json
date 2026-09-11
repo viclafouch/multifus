@@ -1,0 +1,13 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "ui": "stream",
+  "tasks": {
+    "build": {
+      "outputs": ["dist/**", ".output/**", ".vercel/**"]
+    },
+    "typecheck": {},
+    "test": {},
+    "i18n:check": {},
+    "check": {}
+  }
+}

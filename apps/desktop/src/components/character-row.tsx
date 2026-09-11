@@ -2,6 +2,7 @@ import React from 'react'
 import { GripVertical } from 'lucide-react'
 import { useSortable } from '@dnd-kit/react/sortable'
 import { t } from '@lingui/core/macro'
+import { Button } from '@multifus/retro'
 import type { Character } from '@/@types/roster'
 import { CharacterDialog } from '@/components/character-dialog'
 import { CharacterMedallion } from '@/components/character-medallion'
@@ -9,7 +10,6 @@ import { ColorStripe } from '@/components/color-stripe'
 import { CycleToggle } from '@/components/cycle-toggle'
 import { MainToggle } from '@/components/main-toggle'
 import { RemoveButton } from '@/components/remove-button'
-import { Button } from '@/components/retro/button'
 import {
   Tooltip,
   TooltipContent,

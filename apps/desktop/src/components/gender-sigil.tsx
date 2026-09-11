@@ -1,5 +1,5 @@
+import { cn } from '@multifus/retro'
 import type { Gender } from '@/@types/roster'
-import { cn } from '@/lib/utils'
 
 const SIGIL_GLYPHS = {
   male: '♂',

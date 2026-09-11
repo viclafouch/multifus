@@ -88,7 +88,7 @@ Le dépôt est un monorepo pnpm : le logiciel dans `apps/desktop`, le site dans 
 
 Une release se prépare par `pnpm --filter @multifus/desktop release`, qui écrit le changelog et pose le tag, puis se déclenche en poussant ce tag : le workflow compile, signe, notarise et dépose un brouillon qu'il reste à publier.
 
-Les vingt-quatre portraits de `apps/desktop/src/assets/portraits` appartiennent à Ankama. Ils sont repris d'un outil communautaire, et ils vivent dans un dossier qu'un `git rm` suffit à retirer. Leurs vingt-quatre `.ico` de `apps/desktop/src-tauri/icons/portraits`, que Rust embarque, en ont été tirés une fois pour toutes. Les décors de `apps/desktop/src/assets/ankama` suivent la même règle. La [licence](./LICENSE) exclut ces trois dossiers du MIT, qui ne peut pas concéder ce que Multifus ne possède pas, et [docs/images.md](./docs/images.md) dit d'où vient chaque image.
+Les vingt-quatre portraits, leurs vingt-quatre `.ico` que Rust embarque, les décors des maps et les boucles appartiennent à Ankama. Ils vivent tous dans `packages/ankama`, qu'un `git rm -r` suffit à retirer. La [licence](./LICENSE) exclut ce dossier du MIT, qui ne peut pas concéder ce que Multifus ne possède pas, et [docs/images.md](./docs/images.md) dit d'où vient chaque image.
 
 Les mots du projet sont dans [CONTEXT.md](./CONTEXT.md), ce qui reste à faire dans [docs/plan.md](./docs/plan.md).
 

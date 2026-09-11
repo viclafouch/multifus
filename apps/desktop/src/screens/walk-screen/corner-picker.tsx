@@ -1,13 +1,12 @@
 import { t } from '@lingui/core/macro'
+import { Button, cn } from '@multifus/retro'
 import type { Display } from '@/@types/display'
 import type { BannerCorner } from '@/@types/walk'
 import { Legend } from '@/components/layout/legend'
 import { ScreenFrame } from '@/components/layout/screen-frame'
-import { Button } from '@/components/retro/button'
 import { CORNER_PLACEMENT, CORNERS } from '@/constants/banner'
 import { monitorShape } from '@/helpers/banner'
 import { useBoxWidth } from '@/hooks/use-box-width'
-import { cn } from '@/lib/utils'
 
 type CornerPickerProps = Readonly<{
   corner: BannerCorner

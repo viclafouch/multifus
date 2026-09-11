@@ -1,5 +1,4 @@
-import type { ButtonLook } from '@/components/retro/button'
-import { Button } from '@/components/retro/button'
+import { Button, type ButtonLook } from '@multifus/retro'
 import { ignore } from '@/lib/utils'
 
 type LinkButtonProps = Readonly<{

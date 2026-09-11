@@ -1,7 +1,7 @@
 import { t } from '@lingui/core/macro'
+import { Panel } from '@multifus/retro'
 import type { Snapshot } from '@/@types/snapshot'
 import type { WalkLiveState, WalkStatus } from '@/@types/walk'
-import { Panel } from '@/components/layout/panel'
 import { Tick } from '@/components/retro/tick'
 import { ShortcutRecall } from '@/components/shortcut-recall'
 import { StateBadge } from '@/components/state-badge'

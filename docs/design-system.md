@@ -12,17 +12,22 @@ Une table recopiée ici serait fausse dans la semaine.
 
 ## Où le code dit
 
-| Fichier                           | Ce qu'il tient                                                                                                                 |
-| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `src/retro.css`                   | Le système entier : les jetons du `:root`, les corps et les espacements du `@theme inline`, les matières `@utility`, le rythme |
-| `src/theme.css`                   | Le pont vers shadcn et Base UI : chaque jeton de couleur pointe sur `retro.css`. Des espacements en propre, jamais une couleur |
-| `src/index.css`                   | Le fonds neutre de la fenêtre principale, et les réglages du navigateur                                                        |
-| `src/components/retro/button.tsx` | Les huit faces de bouton et leurs tailles                                                                                      |
-| `src/components/layout/`          | Le cadre d'une map : `Screen`, `StageScreen`, `MapHeader`, `Panel`, `FieldRow`                                                 |
-| `src/components/world/`           | Le monde : le décor, le dolmen, les têtes, le menu, le retour, le cartouche                                                    |
-| `src/constants/world.ts`          | Les dix maps, leurs noms et leurs décors                                                                                       |
-| `CONTEXT.md`                      | Les mots. Un nom de composant en sort                                                                                          |
-| `.claude/rules/frontend.md`       | React, l'accessibilité, Tailwind, le survol, les durées                                                                        |
+La matière vit dans `packages/retro`, que le logiciel et le site importent tous
+les deux. Ce qui tient au cadre d'une map reste dans le logiciel.
+
+| Fichier                               | Ce qu'il tient                                                                                                                 |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `packages/retro/src/styles/retro.css` | Le système entier : les jetons du `:root`, les corps et les espacements du `@theme inline`, les matières `@utility`, le rythme |
+| `packages/retro/src/styles/theme.css` | Le pont vers shadcn et Base UI : chaque jeton de couleur pointe sur `retro.css`. Des espacements en propre, jamais une couleur |
+| `packages/retro/src/cn.ts`            | `tailwind-merge` étendu des tailles et des conteneurs du thème                                                                 |
+| `packages/retro/src/components/`      | Ce qui se porte des deux côtés : `Button` et ses huit faces, `Panel`, `Shade`, `Tale`, `Scene`                                 |
+| `apps/desktop/src/index.css`          | Le fonds neutre de la fenêtre principale, et les réglages du navigateur                                                        |
+| `apps/desktop/src/components/layout/` | Le cadre d'une map : `Screen`, `StageScreen`, `MapHeader`, `MapTitle`, `FieldRow`                                              |
+| `apps/desktop/src/components/world/`  | Le monde : le décor, le dolmen, les têtes, le menu, le retour, le cartouche                                                    |
+| `apps/desktop/src/constants/world.ts` | Les dix maps, leurs noms et leurs décors                                                                                       |
+| `apps/website/src/styles.css`         | Le fonds du site, qui défile et se sélectionne, là où la fenêtre ne fait ni l'un ni l'autre                                    |
+| `CONTEXT.md`                          | Les mots. Un nom de composant en sort                                                                                          |
+| `.claude/rules/frontend.md`           | React, l'accessibilité, Tailwind, le survol, les durées                                                                        |
 
 `index.css` n'est chargé que par la fenêtre principale. Ce qu'une fenêtre
 satellite peint, la bannière, la roue, le tableau des runes, se déclare dans
@@ -36,7 +41,7 @@ Deux sources, relevées et jamais devinées.
 Le site officiel `www.dofus-retro.com` donne les fontes, le vert d'action et la
 structure d'un panneau. Sa feuille est
 `https://static.ankama.com/dofus-retro/www/modules/common/common.css`. Le client,
-capturé dans `apps/desktop/src/assets/dofus-options-general.png`, donne la
+capturé dans `packages/ankama/images/dofus-options-general.png`, donne la
 matière : le cadre presque noir, le brun, le kaki, la crème.
 
 **Le site tranche pour les couleurs d'action, le client tranche pour la
@@ -172,7 +177,7 @@ pour un écran de travail, c'est la fenêtre Options du client qui répond.
     appelant est une abstraction pour plus tard
 23. Aucune valeur en dur dans un composant : un jeton, ou rien. Ce qui se pose sur
     une tête se déduit de `--head`, qui rétrécit quand le roster grossit
-24. Une taille de texte du thème s'ajoute à `cn`, dans `lib/utils.ts`.
+24. Une taille de texte du thème s'ajoute à `cn`, dans `packages/retro/src/cn.ts`.
     `tailwind-merge` ne connaît que les tailles de Tailwind : sans cette liste il
     lit `text-mark` comme une couleur, le `text-background` qui suit l'écrase, et
     le texte repart à la taille du navigateur sans que rien ne le dise

@@ -1,9 +1,9 @@
 import { i18n } from '@lingui/core'
 import { t } from '@lingui/core/macro'
+import { Button } from '@multifus/retro'
 import type { Loop } from '@/@types/loop'
 import type { Snapshot } from '@/@types/snapshot'
 import { LoopDialog } from '@/components/loop-dialog'
-import { Button } from '@/components/retro/button'
 import { useLoopOnce } from '@/hooks/use-loop-once'
 
 type MapLoopProps = Readonly<{

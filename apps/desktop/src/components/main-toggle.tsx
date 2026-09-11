@@ -1,6 +1,6 @@
 import { t } from '@lingui/core/macro'
+import { Button } from '@multifus/retro'
 import { MainMark } from '@/components/main-mark'
-import { Button } from '@/components/retro/button'
 import {
   Tooltip,
   TooltipContent,

@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils'
+import { cn } from '@multifus/retro'
 
 export type LampState = 'excluded' | 'live' | 'offline'
 

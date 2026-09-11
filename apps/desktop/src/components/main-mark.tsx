@@ -1,5 +1,5 @@
 import { t } from '@lingui/core/macro'
-import { cn } from '@/lib/utils'
+import { cn } from '@multifus/retro'
 
 const STAR_PATH =
   'M12 2.4 L14.59 9.44 L22.08 9.72 L16.18 14.36 L18.23 21.58 L12 17.4 L5.77 21.58 L7.82 14.36 L1.92 9.72 L9.41 9.44 Z'

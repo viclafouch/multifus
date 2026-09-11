@@ -1,6 +1,6 @@
 import { t } from '@lingui/core/macro'
+import { Button } from '@multifus/retro'
 import { KeyCap } from '@/components/key-cap'
-import { Button } from '@/components/retro/button'
 import { acceleratorParts } from '@/helpers/accelerator'
 import type { ShortcutUndo } from '@/hooks/use-shortcut-undo'
 

@@ -1,0 +1,30 @@
+@import 'tailwindcss';
+
+@import '@fontsource/roboto/400.css';
+@import '@fontsource/roboto/500.css';
+@import '@fontsource/roboto/700.css';
+
+@import '@multifus/retro/styles/theme.css';
+@import '@multifus/retro/styles/retro.css';
+
+@layer base {
+  html {
+    @apply font-sans;
+
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+
+  ::selection {
+    @apply bg-primary/25;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}

@@ -1,7 +1,7 @@
 import { t } from '@lingui/core/macro'
+import { Button } from '@multifus/retro'
 import type { AboutLink } from '@/@types/about'
 import { LinkButton } from '@/components/link-button'
-import { Button } from '@/components/retro/button'
 import { ShotSheet } from '@/components/shot-sheet'
 import { Dialog, DialogClose, DialogTrigger } from '@/components/ui/dialog'
 import { openAboutLink } from '@/lib/multifus'

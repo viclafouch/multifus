@@ -1,5 +1,5 @@
+import { Tale } from '@multifus/retro'
 import { MapTitle } from '@/components/layout/map-title'
-import { Tale } from '@/components/layout/tale'
 
 type MapHeaderProps = Readonly<{
   title: string

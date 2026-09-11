@@ -1,6 +1,6 @@
 import React from 'react'
+import { cn } from '@multifus/retro'
 import { useArrival } from '@/hooks/use-arrival'
-import { cn } from '@/lib/utils'
 
 type MapTitleProps = Readonly<{
   children: React.ReactNode

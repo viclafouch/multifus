@@ -1,7 +1,7 @@
 import React from 'react'
 import { X } from 'lucide-react'
 import { t } from '@lingui/core/macro'
-import { Button } from '@/components/retro/button'
+import { Button } from '@multifus/retro'
 import {
   Dialog,
   DialogClose,

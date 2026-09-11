@@ -1,5 +1,5 @@
 import { FolderOpen } from 'lucide-react'
-import { Button } from '@/components/retro/button'
+import { Button } from '@multifus/retro'
 import { ignore } from '@/lib/utils'
 
 type RevealButtonProps = Readonly<{

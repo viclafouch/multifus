@@ -1,9 +1,8 @@
 import { t } from '@lingui/core/macro'
+import { Button, Panel } from '@multifus/retro'
 import type { Snapshot } from '@/@types/snapshot'
 import { useOpenHelp } from '@/components/help-context'
 import { FieldRow } from '@/components/layout/field-row'
-import { Panel } from '@/components/layout/panel'
-import { Button } from '@/components/retro/button'
 import { ONBOARDING_ANCHOR } from '@/constants/onboarding'
 import { restartOnboarding } from '@/lib/multifus'
 

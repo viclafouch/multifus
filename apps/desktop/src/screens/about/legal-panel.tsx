@@ -1,6 +1,6 @@
 import { i18n } from '@lingui/core'
 import { t } from '@lingui/core/macro'
-import { Panel } from '@/components/layout/panel'
+import { Panel } from '@multifus/retro'
 import { TOLERANCE_PROOFS } from '@/constants/tolerance'
 import { ToleranceShot } from '@/screens/about/tolerance-shot'
 

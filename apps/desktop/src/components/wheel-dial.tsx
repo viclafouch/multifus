@@ -1,10 +1,10 @@
+import { cn } from '@multifus/retro'
 import type { WheelSlice } from '@/@types/wheel'
 import { WheelHead } from '@/components/wheel-head'
 import { COLOR_TINTS } from '@/constants/colors'
 import { DIAL_BOX, DIAL_RADIUS } from '@/constants/wheel'
 import { portraitFor } from '@/helpers/portrait'
 import { dialShape, headPlace, slicePath } from '@/helpers/wheel'
-import { cn } from '@/lib/utils'
 
 const VIEW_BOX = `${-DIAL_BOX / 2} ${-DIAL_BOX / 2} ${DIAL_BOX} ${DIAL_BOX}`
 

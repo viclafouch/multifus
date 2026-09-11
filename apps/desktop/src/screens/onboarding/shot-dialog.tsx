@@ -1,7 +1,6 @@
 import { Expand, X } from 'lucide-react'
 import { t } from '@lingui/core/macro'
-import type { ButtonLook } from '@/components/retro/button'
-import { Button } from '@/components/retro/button'
+import { Button, type ButtonLook } from '@multifus/retro'
 import { ShotSheet } from '@/components/shot-sheet'
 import { Dialog, DialogClose, DialogTrigger } from '@/components/ui/dialog'
 

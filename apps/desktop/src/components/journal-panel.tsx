@@ -1,10 +1,10 @@
 import React from 'react'
 import { plural, t } from '@lingui/core/macro'
+import { Button } from '@multifus/retro'
 import type { JournalEntry } from '@/@types/journal'
 import type { QuickReply } from '@/@types/shortcuts'
 import type { Snapshot } from '@/@types/snapshot'
 import { CopyButton } from '@/components/copy-button'
-import { Button } from '@/components/retro/button'
 import { RevealButton } from '@/components/reveal-button'
 import {
   journalLine,

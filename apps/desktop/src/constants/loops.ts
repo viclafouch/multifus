@@ -1,10 +1,10 @@
 import { msg } from '@lingui/core/macro'
+import autoFocusLoop from '@multifus/ankama/loops/auto-focus-loop.mp4'
+import runeTableLoop from '@multifus/ankama/loops/rune-table-loop.mp4'
+import walkLoop from '@multifus/ankama/loops/walk-loop.mp4'
+import wheelLoop from '@multifus/ankama/loops/wheel-loop.mp4'
 import type { Loop } from '@/@types/loop'
 import type { ScreenName } from '@/@types/snapshot'
-import autoFocusLoop from '@/assets/ankama/auto-focus-loop.mp4'
-import runeTableLoop from '@/assets/ankama/rune-table-loop.mp4'
-import walkLoop from '@/assets/ankama/walk-loop.mp4'
-import wheelLoop from '@/assets/ankama/wheel-loop.mp4'
 import { MAP_NAMES } from '@/constants/world'
 
 export const MAP_LOOPS = {

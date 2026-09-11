@@ -1,5 +1,5 @@
 import { Switch as SwitchPrimitive } from '@base-ui/react/switch'
-import { cn } from '@/lib/utils'
+import { cn } from '@multifus/retro'
 
 export const Tick = ({ className, ...props }: SwitchPrimitive.Root.Props) => {
   return (

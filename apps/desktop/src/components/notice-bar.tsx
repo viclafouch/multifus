@@ -1,7 +1,7 @@
 import React from 'react'
 import { TriangleAlert } from 'lucide-react'
 import { t } from '@lingui/core/macro'
-import { Button } from '@/components/retro/button'
+import { Button } from '@multifus/retro'
 
 type NoticeBarProps = Readonly<{
   title: string

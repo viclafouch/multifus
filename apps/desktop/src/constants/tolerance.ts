@@ -1,7 +1,7 @@
 import { msg } from '@lingui/core/macro'
+import forum from '@multifus/ankama/images/tolerance-forum.webp'
+import post from '@multifus/ankama/images/tolerance-post.webp'
 import type { AboutLink } from '@/@types/about'
-import forum from '@/assets/ankama/tolerance-forum.webp'
-import post from '@/assets/ankama/tolerance-post.webp'
 import type { Phrase } from '@/lib/i18n'
 
 type ToleranceProof = {

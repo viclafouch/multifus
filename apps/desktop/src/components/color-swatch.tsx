@@ -1,6 +1,5 @@
 import React from 'react'
-import { Button } from '@/components/retro/button'
-import { cn } from '@/lib/utils'
+import { Button, cn } from '@multifus/retro'
 
 type ColorSwatchProps = Readonly<{
   label: string

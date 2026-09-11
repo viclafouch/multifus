@@ -1,7 +1,7 @@
 import { t } from '@lingui/core/macro'
+import { Panel } from '@multifus/retro'
 import type { RelayStatus } from '@/@types/relay'
 import type { Snapshot } from '@/@types/snapshot'
-import { Panel } from '@/components/layout/panel'
 import { PanelHeader } from '@/components/layout/panel-header'
 import { Step } from '@/screens/relay/step'
 import { TokenForm } from '@/screens/relay/token-form'

@@ -8,8 +8,8 @@
 @import '@fontsource/ibm-plex-mono/400.css';
 @import '@fontsource/ibm-plex-mono/500.css';
 
-@import './theme.css';
-@import './retro.css';
+@import '@multifus/retro/styles/theme.css';
+@import '@multifus/retro/styles/retro.css';
 
 @custom-variant dark (&:is(.dark *));
 

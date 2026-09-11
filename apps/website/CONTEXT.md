@@ -1,0 +1,74 @@
+# Les mots du site
+
+Le vocabulaire partagé est [CONTEXT.md](../../CONTEXT.md) à la racine : la roue
+des personnages, le tableau des runes, l'AutoFocus, le Déplacement rapide. Le
+site les reprend mot pour mot. Il n'y a pas deux modèles, il y a un logiciel et
+une vitrine posée dessus.
+
+Ce fichier ne porte que les mots qui naissent ici, et les pièges que le site a
+déjà payés.
+
+## Les mots
+
+**Fonctionnalité** : ce que le site vend, une par page. Le logiciel dit « map »
+pour un de ses lieux ; le site ne dit jamais « map », et il ne dit jamais
+« écran » non plus. Un visiteur n'a rien installé.
+
+**Page** : une adresse du site, et une ligne de `constants/pages.ts`. Son
+identifiant est le même dans les trois langues, ses trois adresses sont
+différentes. Une page ajoutée sans son espagnol ne compile pas.
+
+**Promesse** : la phrase sous le titre, ce que la fonctionnalité fait pour le
+joueur. Elle sert aussi de `meta description` et de légende de la vidéo, donc
+elle se lit toute seule, hors de sa page.
+
+**Avant d'installer** : la levée de doute, sur `/telecharger`. Le site ne dit
+**pas** « questions fréquentes » : `CONTEXT.md` réserve déjà ce mot à la liste
+des pannes pliée dans les Paramètres, pour quelqu'un qui a installé. Deux mots
+identiques pour deux choses, c'est ce que `CONTEXT.md` interdit.
+
+**Comparatif** : `/comparatif`. Cinq concurrents au maximum. Aucune case n'est
+remplie depuis la page d'accueil d'un concurrent, seulement depuis son code.
+
+**Voix** : une instance de Lingui, une par langue. `SPEAKERS.fr`, `SPEAKERS.en`,
+`SPEAKERS.es`. Elles ne s'activent pas, elles ne se muent pas, elles parlent.
+
+## Où les imports changent de forme
+
+Presque tout le site importe par l'alias `@/`. Cinq fichiers ne le font pas :
+`constants/pages.ts`, `constants/languages.ts`, `helpers/page.ts`,
+`helpers/language.ts` et les types de `@types/`. Ils importent **en relatif, avec
+l'extension `.ts`**, parce que `vite.config.ts` les lit pour énumérer le
+prérendu, et qu'il les lit avant que l'alias existe. Aucun d'eux ne touche une
+image : les vidéos vivent dans `constants/loops.ts`, que la config ne lit pas.
+
+## Ce que le site ne dit jamais
+
+Ni fenêtre, ni processus, ni autorisation système, ni webview. Ça, c'est le
+logiciel qui le dit, une fois installé.
+
+Jamais le mot « officiel ». Jamais le logo ni la typographie de Dofus, jamais le
+vert et l'orange de l'en-tête d'Ankama. Quatre sites jumeaux se font passer pour
+Ankama, et un site de fan qui imite leur bandeau devient indiscernable d'eux.
+
+## Comment une phrase s'écrit
+
+Le français est la source, Lingui porte l'anglais et l'espagnol, et
+`pnpm --filter @multifus/website run i18n:extract` suit chaque phrase touchée.
+
+**`msg` au module, jamais `t`.** Un module est évalué avant qu'une voix parle :
+un `t` au module figerait le français. La phrase se rend dans le corps du
+composant, par `i18n._(...)`, l'`i18n` venant de `useLingui()` de `@lingui/react`.
+
+**`@lingui/react/macro` n'est pas transformé ici.** `<Trans>` sort du build sans
+son import et casse le rendu serveur en silence : la page se prérend avec un
+corps vide, et seul le HTML livré le montre. Le dépôt entier n'emploie que
+`@lingui/core/macro`, et le site fait pareil. Le jour où une phrase a besoin d'un
+lien à l'intérieur, c'est l'ordre des greffons Vite qu'il faut reprendre, pas la
+phrase.
+
+**Une voix ne se mute jamais.** Le logiciel a `speak()`, qui active une instance
+globale, et il a raison : une fenêtre, une langue. Le site prérend quatorze pages
+en parallèle dans trois langues ; sur un singleton muté ce sont des pages
+mélangées, et le bogue ne se voit qu'à la compilation. Les trois voix vivent dans
+`lib/i18n.ts` et passent par `I18nProvider`.

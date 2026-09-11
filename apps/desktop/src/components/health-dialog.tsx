@@ -1,7 +1,7 @@
 import { t } from '@lingui/core/macro'
+import { Button } from '@multifus/retro'
 import type { Snapshot } from '@/@types/snapshot'
 import { MoveButton } from '@/components/move-button'
-import { Button } from '@/components/retro/button'
 import { StepState } from '@/components/retro/step-state'
 import {
   Dialog,

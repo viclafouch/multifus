@@ -185,6 +185,82 @@ La référence à battre est la page de Focus Retro : comparatif intégré, capt
 avertissement de sécurité, deux systèmes. Attention, son comparatif est faux, il
 coche « pas d'auto-focus » en face de Dracoon dont c'est l'argument principal.
 
+## Ce que leur texte dit
+
+Relevé le 11 septembre 2026. Les phrases sont recopiées telles qu'elles sont
+écrites.
+
+**Tous promettent la même chose, et aucun ne promet la même façon de le dire.**
+Focus Retro ouvre sur « Le multicompte, sans la prise de tête. » Dosoft sur
+« Révolutionnons ensemble le multi-compte Dofus. » Retro Toolbox sur « Logiciel
+Multi-Compte Dofus Rétro Gratuit ». Multi-Tofu, en anglais, sur « Play Dofus
+multi-account on a Mac without fighting your windows. »
+
+**Le titre qui marche est celui qui dit la douleur.** « sans la prise de tête »
+et « without fighting your windows » nomment ce que le joueur vit ;
+« Révolutionnons ensemble » ne parle que de celui qui écrit ; le titre de Retro
+Toolbox n'est pas une phrase, c'est une requête Google recopiée, et c'est
+pourtant lui qui tient la première page. Les deux ne s'excluent pas : la balise
+`title` peut porter la requête et le `h1` la douleur.
+
+**Gratuit est répété partout, donc il ne distingue rien.** Dosoft l'écrit trois
+fois, « Gratuit · Open Source · Toléré par Ankama », « Gratuit pour toujours »,
+« Télécharger Dosoft — Gratuit » ; Retro Toolbox met « gratuitement » dans ses
+deux boutons. Le mot doit être là, il ne doit pas porter la page.
+
+**La sécurité est déjà un argument de vente, et mal tenu.** Focus Retro écrit
+« Téléchargez uniquement depuis GitHub » et « Des sites tiers redistribuent des
+binaires modifiés d'outils communautaires Dofus, certains contiennent des
+keyloggers ou des stealers » : il nomme le danger sans rien prouver du sien.
+Retro Toolbox affirme « Aucun virus, malware ou code de vol de données
+personnelles n'a été trouvé », une phrase qui ne vaut que ce que vaut celui qui
+la signe. SquadMaster reconnaît le problème en note technique, « un antivirus
+peut être plus curieux avec ce type de binaire self-contained ». **Personne ne
+montre une attestation vérifiable.** C'est là que Multifus passe devant, et
+`gh attestation verify` est la phrase que personne d'autre ne peut écrire.
+
+**Personne ne se dit officiel, tous se dédouanent en pied de page.** « Non
+affilié à Ankama », « Dosoft n'est pas affilié à Ankama Games », « Certaines
+illustrations sont la propriété d'Ankama Games ». Notre ligne visible sans
+défiler est donc un vrai écart, pas une précaution de plus.
+
+**Deux formules à ne pas reprendre.** « 100 % CGU Ankama » (Retro Toolbox) et
+« Toléré par Ankama » (Dosoft) affirment un accord qu'aucun des deux ne produit.
+Le README de Multifus cite les deux messages publics d'Ankama en entier : montrer
+la source bat l'affirmation.
+
+**Dosoft chiffre ce qu'il promet, et c'est ce qui se retient** : « 0ms de délai
+de switch », « Plus rapide qu'Organizer. Par design ». En face, « Des centaines
+de joueurs utilisent déjà Dosoft » est la seule preuve sociale du marché, et elle
+est vague. Xixou, lui, chiffre vraiment : « 6 000+ objets », « 1 452 lieux »,
+« 2 217 membres ».
+
+**Xixou tient « poids des runes » avec une seule phrase**, « Poids des runes : la
+référence forgemagie ». Le mot « référence » est le mot à prendre, et la table
+elle-même est ce qui le mérite.
+
+**Multi-Tofu est le seul à écrire ce que le logiciel ne fait pas**, en intertitre
+et non en note : « It does not automate anything ». Et il transforme sa faiblesse
+en explication honnête, « The app is not signed with a paid Apple developer
+account, so the first launch needs a right click then Open ». C'est exactement
+l'endroit où `/mac` gagne : Multifus est signé et notarisé, donc il n'a pas cette
+phrase à écrire, et c'est cette absence qu'il faut rendre visible.
+
+**Les intertitres qui reviennent**, dans cet ordre : ce que ça fait, la démo, le
+comparatif, l'installation, la FAQ, « C'est autorisé par Ankama ? ». Le dernier
+est une question que tout le monde se pose, et `/telecharger` y répond sous
+« Avant d'installer », sans employer le mot « FAQ » que `CONTEXT.md` réserve
+ailleurs.
+
+**Les boutons.** « Télécharger le .dmg (Apple Silicon) », « Télécharger
+l'installeur .exe », « Tous les téléchargements sur GitHub » chez Focus Retro ;
+« Download for macOS » chez Multi-Tofu. Le système dans le libellé, l'extension
+entre parenthèses : le joueur sait où il clique avant de cliquer.
+
+Trois sites n'ont pas pu être lus : `organizer-dofus.com` et `dofus-console.com`
+répondent 403 à un client automatisé, et `rorganizer.loulouw-labs.fr` ne rend
+qu'un choix de langue avant tout contenu.
+
 ## Le reste du recensement
 
 Une soixantaine d'autres dépôts, la plupart à zéro étoile et sans version

@@ -22,8 +22,12 @@ export default defineConfig({
   ignorePatterns: [
     '**/node_modules/**',
     '**/dist/**',
+    '**/.turbo/**',
+    'apps/website/.output/**',
+    'apps/website/src/routeTree.gen.ts',
     'apps/desktop/src-tauri/**',
     'apps/desktop/scripts/*.cjs',
+    'apps/website/scripts/*.mjs',
     '.claude/skills/**'
   ],
   options: {
@@ -34,7 +38,9 @@ export default defineConfig({
     {
       files: [
         'apps/desktop/src/**/*.test.ts',
-        'apps/desktop/src/**/*.test.tsx'
+        'apps/desktop/src/**/*.test.tsx',
+        'apps/website/src/**/*.test.ts',
+        'apps/website/src/**/*.test.tsx'
       ],
       plugins: TEST_PLUGINS,
       rules: {
@@ -56,10 +62,7 @@ export default defineConfig({
       }
     },
     {
-      files: [
-        'apps/desktop/src/components/ui/**',
-        'apps/desktop/src/lib/utils.ts'
-      ],
+      files: ['apps/desktop/src/components/ui/**', 'packages/retro/src/cn.ts'],
       rules: {
         'typescript/prefer-readonly-parameter-types': 'off',
         'react/function-component-definition': 'off',
@@ -74,7 +77,9 @@ export default defineConfig({
         'apps/desktop/src/hooks/**',
         'apps/desktop/src/screens/**',
         'apps/desktop/src/lib/character-marks.ts',
-        'apps/desktop/src/lib/drag.ts'
+        'apps/desktop/src/lib/drag.ts',
+        'apps/website/src/**',
+        'packages/retro/src/components/**'
       ],
       rules: {
         'typescript/prefer-readonly-parameter-types': 'off'

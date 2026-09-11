@@ -1,5 +1,8 @@
 ---
-paths: ['apps/desktop/src/**/*.{ts,tsx}']
+paths:
+  - 'apps/desktop/src/**/*.{ts,tsx}'
+  - 'apps/website/src/**/*.{ts,tsx}'
+  - 'packages/retro/src/**/*.{ts,tsx}'
 ---
 
 ## Frontend design
@@ -62,7 +65,7 @@ paths: ['apps/desktop/src/**/*.{ts,tsx}']
 ### Tailwind CSS
 
 - **No arbitrary values in components** (e.g., `font-[Bricolage_Grotesque]`, `text-[14px]`)
-- Define custom utilities in `apps/desktop/src/retro.css`, which holds the design system, and reuse them. `index.css` keeps only what the main window needs
+- Define custom utilities in `packages/retro/src/styles/retro.css`, which holds the design system for the software and the site alike, and reuse them. `apps/desktop/src/index.css` keeps only what the main window needs, `apps/website/src/styles.css` only what the site needs
 - Keep styling consistent: one source of truth for design tokens (fonts, colors, spacing)
 - If a value is used more than once, it should be a utility class or CSS variable
 - **Prefer `gap`/`space-y`/`space-x`** over `mt-*`/`mb-*` for spacing between siblings

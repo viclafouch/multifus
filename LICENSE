@@ -2,11 +2,9 @@ MIT License
 
 Copyright (c) 2026 Victor de la Fouchardiere
 
-The MIT License does not cover the images of apps/desktop/src/assets/ankama
-and apps/desktop/src/assets/portraits, nor the icons of
-apps/desktop/src-tauri/icons/portraits drawn from them. They belong to Ankama
-Games, no right over them is granted here, and this project is not affiliated
-with Ankama.
+The MIT License does not cover packages/ankama. Everything in that directory,
+images, videos and icons alike, belongs to Ankama Games, no right over it is
+granted here, and this project is not affiliated with Ankama.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

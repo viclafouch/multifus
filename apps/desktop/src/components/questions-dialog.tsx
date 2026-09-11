@@ -1,9 +1,9 @@
 import { X } from 'lucide-react'
 import { Accordion } from '@base-ui/react/accordion'
 import { t } from '@lingui/core/macro'
+import { Button } from '@multifus/retro'
 import type { Snapshot } from '@/@types/snapshot'
 import { QuestionRow } from '@/components/question-row'
-import { Button } from '@/components/retro/button'
 import {
   Dialog,
   DialogClose,
