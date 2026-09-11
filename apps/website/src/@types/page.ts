@@ -20,6 +20,7 @@ export type PageKind =
   | 'download'
   | 'feature'
   | 'home'
+  | 'images'
   | 'plain'
   | 'runes'
 

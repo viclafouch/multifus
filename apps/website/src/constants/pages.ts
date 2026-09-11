@@ -94,7 +94,7 @@ export const PAGES = {
     slugs: { fr: 'journal', en: 'changelog', es: 'novedades' }
   },
   images: {
-    kind: 'plain',
+    kind: 'images',
     loop: null,
     kin: ['download', 'comparison'],
     slugs: { fr: 'images', en: 'images', es: 'imagenes' }

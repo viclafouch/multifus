@@ -1,6 +1,7 @@
 import { msg } from '@lingui/core/macro'
 import { useLingui } from '@lingui/react'
 import type { PageScreenProps } from '@/@types/screen'
+import { AnkamaSources } from '@/components/ankama-sources'
 import { Band } from '@/components/band'
 import { BandTitle } from '@/components/band-title'
 import { DownloadPair } from '@/components/download-pair'
@@ -10,7 +11,7 @@ import { PageKin } from '@/components/page-kin'
 import { Prose } from '@/components/prose'
 import { ProseBlock } from '@/components/prose-block'
 import { PAGES } from '@/constants/pages'
-import { ANKAMA_FORUM, ANKAMA_POST, REPOSITORY } from '@/constants/site'
+import { REPOSITORY } from '@/constants/site'
 import {
   BEFORE_INSTALL,
   LIMITS_TITLE,
@@ -31,10 +32,6 @@ const ATTESTATION_BODY = msg`GitHub signe chaque paquet publié et dit de quel c
 const ATTESTATION_COMMAND = msg`gh attestation verify <fichier> --repo viclafouch/multifus`
 
 const LIMITS_SOURCES = msg`Ankama a posé cette limite deux fois en public, et c’est elle qui tient le projet :`
-
-const ANKAMA_POST_NAME = msg`le compte Dofus Retro sur X, le 10 mars 2026`
-
-const ANKAMA_FORUM_NAME = msg`le forum de Dofus Retro, le 1ᵉʳ avril 2026`
 
 const SOURCE_TITLE = msg`Le code est publié`
 
@@ -68,14 +65,7 @@ export const DownloadScreen = ({ page }: PageScreenProps) => {
           <Prose>{i18n._(NO_HARM)}</Prose>
           <Prose>{i18n._(ONE_AT_A_TIME)}</Prose>
           <Prose>{i18n._(LIMITS_SOURCES)}</Prose>
-          <ul className="flex flex-col gap-2 text-tale">
-            <li>
-              <OutLink href={ANKAMA_POST}>{i18n._(ANKAMA_POST_NAME)}</OutLink>
-            </li>
-            <li>
-              <OutLink href={ANKAMA_FORUM}>{i18n._(ANKAMA_FORUM_NAME)}</OutLink>
-            </li>
-          </ul>
+          <AnkamaSources />
         </ProseBlock>
         <ProseBlock level={3} title={i18n._(SOURCE_TITLE)}>
           <Prose>{i18n._(SOURCE_BODY)}</Prose>

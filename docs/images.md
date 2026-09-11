@@ -93,6 +93,20 @@ Ils vivent dans `packages/ankama/images/`, les boucles dans
 | `rune-table-loop.mp4` | idem                                                                            |
 | `*-loop-poster.webp`  | une image de la boucle qui la porte, tirée à `ffmpeg` et pesée à `cwebp`        |
 
+## Les portraits de classe
+
+`packages/ankama/portraits/` tient les douze classes, deux sexes, en `.png`, et
+`packages/ankama/icons/` les mêmes en `.ico`, que Rust pose sur la fenêtre du
+jeu. Ils viennent des visuels de classe publiés par Ankama sur son site, relevés
+à la main comme les décors, et ils suivent la même discipline que le reste du
+dossier. Ce sont eux que porte une tête de la roue des personnages.
+
+Leur origine n'était écrite nulle part avant le 11 septembre 2026, ni ici, ni
+dans le relevé, ni dans un message de commit : quarante-huit fichiers, les plus
+visibles du logiciel, sans provenance. `/images` sur le site la publie
+maintenant, et une image dont on ne sait plus d'où elle vient n'entre plus dans
+le dépôt.
+
 La fenêtre Options du client, `dofus-options-general.png`, vit dans le même
 dossier et n'est pas un décor : c'est la capture d'où
 [design-system.md](./design-system.md) tire la matière, et la mise en route la

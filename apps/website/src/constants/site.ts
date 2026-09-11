@@ -4,6 +4,8 @@ export const REPOSITORY = 'https://github.com/viclafouch/multifus'
 
 export const RELEASES = `${REPOSITORY}/releases/latest`
 
+export const ANKAMA_FOLDER = `${REPOSITORY}/tree/main/packages/ankama`
+
 export const ANKAMA_POST =
   'https://x.com/DOFUSRetro_FR/status/2031323028072681799'
 

@@ -96,6 +96,14 @@ la vidéo, le fil d'Ariane. Sa forme vient de `schema-dts`, pas de nous : une
 propriété mal tapée ne compile plus, et `Addressed` n'ajoute que ce que le site
 exige en plus, l'adresse chez nous sur chaque fiche.
 
+**Provenance** (`Provenance`) : une famille d'images du dépôt, ce qu'elle est et
+d'où elle vient. Six familles, une par ligne de `/images`, et le mot est celui
+d'un musée parce que la page fait le même travail qu'une cartouche de salle.
+Cette page ne montre aucune image : une galerie de décors d'Ankama sur un site de
+fan est exactement ce que le reste du site refuse d'être. Elle est aussi le seul
+endroit qui nomme un dossier du dépôt, parce que c'est là que le visiteur peut
+vérifier.
+
 **Poids** (`RUNE_WEIGHTS`) : ce qu'une stat vaut en forgemagie, et le mot que le
 jeu emploie. Les chiffres viennent de `@multifus/runes`, le paquet que le
 logiciel lit aussi ; le site n'en garde que les noms, dans son catalogue à lui.

@@ -59,6 +59,18 @@ msgstr "Backing out is as easy as going"
 msgid "appels du jeu vous emmènent sur le bon personnage"
 msgstr "calls from the game take you to the right character"
 
+#: src/screens/images-screen.tsx
+msgid "Aucun droit sur ces images. Elles restent celles d’Ankama, et cette page dit seulement laquelle vient d’où et comment elles sont rangées. Vous n’avez pas plus le droit de les reprendre après les avoir vues ici qu’avant."
+msgstr "No rights over these images. They remain Ankama’s, and this page only says which one comes from where and how they are kept. You have no more right to reuse them after seeing them here than you had before."
+
+#: src/screens/images-screen.tsx
+msgid "Aucun fichier du jeu installé. Le client pose sur votre disque des milliers d’icônes d’objets et de sorts, et Multifus n’en ouvre pas une. Ankama ne tolère les gestionnaires de fenêtres qu’à la condition qu’ils ne touchent jamais aux fichiers du jeu, et c’est cette phrase-là qui fait vivre le projet."
+msgstr "No file from the installed game. The client puts thousands of item and spell icons on your disk, and Multifus opens none of them. Ankama tolerates window managers only on the condition that they never touch the game’s files, and that sentence is what keeps this project alive."
+
+#: src/screens/images-screen.tsx
+msgid "Aucune collecte automatique. Les conditions d’utilisation d’Ankama qualifient le moissonnage de leurs sites de contrefaçon, et c’est un mot qu’on prend au sérieux : le relevé a été fait à la main, page par page, et il n’a gardé que des adresses."
+msgstr "No automated harvesting. Ankama’s terms of use call scraping their sites counterfeiting, and that is a word worth taking seriously: the survey was done by hand, page by page, and it kept nothing but addresses."
+
 #: src/constants/wording.ts
 msgid "AutoFocus"
 msgstr "AutoFocus"
@@ -107,9 +119,17 @@ msgstr "What it does"
 msgid "Ce qu’il y a sur le disque"
 msgstr "What sits on the disc"
 
+#: src/screens/images-screen.tsx
+msgid "Ce qu’on ne prend jamais"
+msgstr "What we never take"
+
 #: src/screens/rune-screen.tsx
 msgid "Ce que cette page ne fait pas"
 msgstr "What this page does not do"
+
+#: src/screens/images-screen.tsx
+msgid "Ce que cette page ne vous donne pas"
+msgstr "What this page does not give you"
 
 #: src/constants/wording.ts
 msgid "Ce que chaque version a changé."
@@ -155,9 +175,21 @@ msgstr "What Multifus does not do"
 msgid "Ce que Multifus ne fait pas sur Mac"
 msgstr "What Multifus does not do on Mac"
 
+#: src/screens/images-screen.tsx
+msgid "Ce qui est dessiné ici"
+msgstr "What is drawn here"
+
+#: src/screens/images-screen.tsx
+msgid "Ce qui vient d’Ankama"
+msgstr "What comes from Ankama"
+
 #: src/constants/bodies.ts
 msgid "Celle qu’un premier lancement vous offre est en français, même si vous lisez Multifus en anglais : une réponse rapide se tape dans le jeu, et la langue de votre client Dofus n’est pas celle de Multifus. Les vôtres, vous les écrivez comme vous voulez."
 msgstr "The one a first launch gives you is written in French, even if you read Multifus in English: a quick reply is typed into the game, and the language of your Dofus client is not the language of Multifus. Your own, you write as you please."
+
+#: src/screens/images-screen.tsx
+msgid "Cette limite, Ankama l’a posée deux fois en public, et il vaut mieux la lire chez eux que nous croire sur parole :"
+msgstr "Ankama set that limit twice in public, and it is better read on their own pages than taken from us:"
 
 #: src/screens/lost-screen.tsx
 msgid "Cette page n’existe pas"
@@ -170,6 +202,10 @@ msgstr "This rune does not exist"
 #: src/screens/comparison-screen.tsx
 msgid "Chaque case de ce tableau est lue dans le code de l’outil, jamais sur sa page d’accueil. Un outil qui garde son code fermé n’a pas de colonne ici : rien de ce qu’il promet ne se vérifie. Et vous trouverez deux lignes que Multifus ne coche pas, parce qu’un comparatif où l’on gagne partout ne vaut rien."
 msgstr "Every box in this table is read in the tool’s own code, never on its home page. A tool that keeps its code closed gets no column here: nothing it promises can be checked. And you will find two rows Multifus does not tick, because a comparison you win everywhere is worth nothing."
+
+#: src/screens/images-screen.tsx
+msgid "Chaque image de Multifus vient d’Ankama, et aucune n’est là par hasard. Cette page dit laquelle vient d’où, ce qu’on refuse de prendre, et ce qui arrive à ces images le jour où Ankama demande leur retrait."
+msgstr "Every image in Multifus comes from Ankama, and none of them is here by accident. This page says which one comes from where, what we refuse to take, and what happens to these images the day Ankama asks for them to go."
 
 #: src/constants/bodies.ts
 msgid "Chaque message nomme le personnage appelé, parce qu’à quatre connectés la question se pose. Un réglage y ajoute le texte reçu ; laissé de côté, vous savez seulement qu’on vous a écrit."
@@ -203,6 +239,14 @@ msgstr "Comparison"
 msgid "Compositions d’équipe enregistrées"
 msgstr "Saved team line-ups"
 
+#: src/screens/images-screen.tsx
+msgid "Conditions d’utilisation lues le {readOn}."
+msgstr "Terms of use read on {readOn}."
+
+#: src/screens/images-screen.tsx
+msgid "Créditer ne donne aucun droit"
+msgstr "Crediting grants no rights"
+
 #: src/constants/runes.ts
 msgid "Critique"
 msgstr "Critical"
@@ -214,6 +258,14 @@ msgstr "Where each image comes from, and on what terms."
 #: src/constants/wording.ts
 msgid "Déplacement rapide"
 msgstr "Quick move"
+
+#: src/constants/provenance.ts
+msgid "Des captures d’écran faites ici, muettes et sans montage, que le site et le logiciel montrent tous les deux. Filmer son écran ne rend pas le décor moins celui d’Ankama, et c’est pour ça qu’elles sont dans cette liste."
+msgstr "Screen recordings made here, silent and unedited, shown by the site and by the software alike. Filming your own screen does not make the artwork any less Ankama’s, and that is why they are on this list."
+
+#: src/constants/provenance.ts
+msgid "Deux captures de ce qu’Ankama a écrit en public sur les gestionnaires de fenêtres, l’une sur le forum de Dofus Retro, l’autre sur son compte X. Le logiciel les montre en entier, datées, et rouvre la page d’origine d’un clic."
+msgstr "Two screenshots of what Ankama wrote in public about window managers, one on the Dofus Retro forum, the other on its X account. The software shows them in full, dated, and reopens the original page in one click."
 
 #: src/screens/rune-screen.tsx
 msgid "Deux lignes ne suivent pas ce calcul. La vitalité porte une Ra à 8 là où la règle dirait 10, et les pods une Pa à 8 et une Ra à 25 là où elle dirait 9 et 30. Ce sont les deux seules stats dont un point pèse un quart, et le jeu ne les a jamais alignées sur la règle."
@@ -234,6 +286,10 @@ msgstr "Damage"
 #: src/constants/runes.ts
 msgid "Dommages piège"
 msgstr "Trap damage"
+
+#: src/screens/images-screen.tsx
+msgid "Écrire le nom d’Ankama sous une image ne donne pas le droit de la poser là. En droit français, nommer l’auteur satisfait son droit moral, jamais le droit de reproduire, qui est celui qu’il faudrait avoir. Gratuit n’y change rien non plus : le droit d’auteur ne connaît pas d’exception pour l’usage gratuit."
+msgstr "Writing Ankama’s name under an image does not grant the right to put it there. Under French law, naming the author satisfies their moral right, never the right to reproduce, which is the one you would need. Free changes nothing either: copyright has no exception for free use."
 
 #: src/constants/bodies.ts
 msgid "Écrites dans la langue de votre jeu"
@@ -359,6 +415,10 @@ msgstr "Intelligence, Strength, Agility, Chance"
 msgid "Invocation"
 msgstr "Summons"
 
+#: src/screens/images-screen.tsx
+msgid "Jamais le logo de Dofus, jamais sa typographie, jamais le vert et l’orange de l’en-tête d’Ankama. Plusieurs sites se font déjà passer pour eux pour faire installer n’importe quoi, et un site de fan qui imite leur bandeau devient indiscernable de ceux-là."
+msgstr "Never the Dofus logo, never its typeface, never the green and orange of Ankama’s header. Several sites already pass themselves off as them to get anything at all installed, and a fan site that imitates their banner becomes indistinguishable from those."
+
 #: src/constants/bodies.ts
 msgid "Je vends des runes, écrivez-moi en privé. Je reviens dans deux minutes. Bienvenue dans la guilde. Ce sont toujours les mêmes phrases, elles sont longues à taper, et vous les tapez au pire moment, pendant un combat ou au milieu d’un échange."
 msgstr "Selling runes, message me. Back in two minutes. Welcome to the guild. It is always the same sentences, they are long to type, and you type them at the worst moment, mid-fight or in the middle of a trade."
@@ -387,6 +447,10 @@ msgstr "AutoFocus switches off with one toggle, without closing Multifus, and ev
 msgid "L’AutoFocus, la roue des personnages, le Déplacement rapide, le tableau des runes, les réponses rapides et les messages privés sont tous là."
 msgstr "AutoFocus, the character wheel, Quick move, the rune table, the quick replies and the private messages are all there."
 
+#: src/constants/provenance.ts
+msgid "L’image posée sur une vidéo"
+msgstr "The still laid over a video"
+
 #: src/constants/bodies.ts
 msgid "L’ordre du tour est le vôtre"
 msgstr "The running order is yours"
@@ -394,6 +458,10 @@ msgstr "The running order is yours"
 #: src/constants/wording.ts
 msgid "La fenêtre du personnage qui joue passe devant toute seule."
 msgstr "The window of the character who plays comes to the front on its own."
+
+#: src/constants/provenance.ts
+msgid "La fenêtre Options du client"
+msgstr "The client’s Options window"
 
 #: src/constants/bodies.ts
 msgid "La forgemagie sans le deuxième écran"
@@ -447,6 +515,10 @@ msgstr "Let go in the centre or outside the disc: nothing happens, and you stay 
 msgid "langues, français, anglais, espagnol"
 msgstr "languages: French, English, Spanish"
 
+#: src/screens/images-screen.tsx
+msgid "Le code de Multifus est sous licence MIT : n’importe qui peut le copier, le modifier et même le vendre. Ce droit-là se donne sur du code qu’on a écrit, jamais sur une image qu’on n’a pas faite. Les images sont donc rassemblées dans un seul dossier, que la licence exclut nommément, et aucune autre partie du dépôt n’en contient."
+msgstr "The Multifus code is under the MIT licence: anyone may copy it, modify it, even sell it. That right can be granted over code we wrote, never over an image we did not make. The images are therefore gathered in a single folder, which the licence excludes by name, and no other part of the repository holds any."
+
 #: src/screens/download-screen.tsx
 msgid "Le code est publié"
 msgstr "The code is published"
@@ -455,7 +527,7 @@ msgstr "The code is published"
 msgid "Le commerce ne s’arrête pas quand vous partez"
 msgstr "Trade does not stop when you leave"
 
-#: src/screens/download-screen.tsx
+#: src/components/ankama-sources.tsx
 msgid "le compte Dofus Retro sur X, le 10 mars 2026"
 msgstr "the Dofus Retro account on X, 10 March 2026"
 
@@ -471,7 +543,7 @@ msgstr "The Multifus repository on GitHub"
 msgid "Le dépôt sur GitHub"
 msgstr "The repository on GitHub"
 
-#: src/screens/download-screen.tsx
+#: src/components/ankama-sources.tsx
 msgid "le forum de Dofus Retro, le 1ᵉʳ avril 2026"
 msgstr "the Dofus Retro forum, 1 April 2026"
 
@@ -482,6 +554,10 @@ msgstr "The gain is counted in seconds per turn, and a Dofus Retro fight has doz
 #: src/constants/bodies.ts
 msgid "Le jeu vous appelle de sept façons : c’est à votre tour de jouer, quelqu’un vous propose un échange, on vous invite dans un groupe ou une guilde, quelqu’un vous écrit en privé, quelqu’un vous lance un défi, on vous appelle pour un craft, votre percepteur est attaqué. Chacun de ces sept appels amène devant vous la fenêtre du personnage concerné."
 msgstr "The game calls you in seven ways: it is your turn to play, someone offers you a trade, you are invited to a group or a guild, someone writes to you privately, someone challenges you to a duel, you are called for a craft, your tax collector is under attack. Each of these seven calls brings the right character's window in front of you."
+
+#: src/screens/images-screen.tsx
+msgid "Le jour où Ankama demande leur retrait, elles partent toutes en même temps. Les fenêtres perdraient leur fond, la roue ses portraits de classe et ce site ses vidéos : il y aurait à redessiner, jamais à réécrire."
+msgstr "The day Ankama asks for them to go, they all leave at once. Windows would lose their backdrop, the wheel its class portraits and this site its videos: there would be drawing to redo, never writing."
 
 #: src/constants/bodies.ts
 msgid "Le multicompte sur Mac n’avait presque personne"
@@ -535,9 +611,29 @@ msgstr "The fight turn you stop missing"
 msgid "Le trajet à quatre personnages"
 msgstr "A trip with four characters"
 
+#: src/constants/provenance.ts
+msgid "Les boucles vidéo"
+msgstr "The video loops"
+
 #: src/screens/rune-screen.tsx
 msgid "Les chiffres de cette table sont ceux du jeu, jamais ceux du calcul. C’est exactement là que les tables recopiées se trompent."
 msgstr "The numbers in this table are the game’s own, never the ones the arithmetic would give. That is exactly where copied tables go wrong."
+
+#: src/screens/images-screen.tsx
+msgid "Les conditions d’utilisation de Dofus Retro demandent une autorisation écrite pour toute reproduction, et prévoient qu’Ankama peut autoriser la diffusion de sites de fans à sa seule discrétion. Multifus n’a pas cette autorisation, et ne se présente nulle part comme un outil approuvé par Ankama."
+msgstr "The Dofus Retro terms of use require written permission for any reproduction, and provide that Ankama may allow fan sites to be published at its sole discretion. Multifus does not have that permission, and nowhere presents itself as a tool approved by Ankama."
+
+#: src/constants/provenance.ts
+msgid "Les décors des fenêtres"
+msgstr "The window backdrops"
+
+#: src/constants/provenance.ts
+msgid "Les deux messages d’Ankama"
+msgstr "Ankama’s two messages"
+
+#: src/screens/images-screen.tsx
+msgid "Les fichiers sont tous rangés dans un seul dossier du dépôt, et cette liste en est la table."
+msgstr "The files all sit in a single folder of the repository, and this list is its table of contents."
 
 #: src/constants/bodies.ts
 msgid "Les gestionnaires de fenêtres pour Dofus Retro sont des logiciels Windows, et un joueur sur Mac finit par monter une machine virtuelle ou par s’en passer. Un seul autre outil vise le Mac aujourd’hui, et il n’avance plus."
@@ -567,6 +663,10 @@ msgstr "The messages go to a Telegram conversation of your own. You choose who i
 msgid "Les messages privés vous suivent sur le téléphone."
 msgstr "Private messages follow you to your phone."
 
+#: src/constants/provenance.ts
+msgid "Les pages de découverte et les articles de dofus-retro.com, recadrés. Multifus en pose un derrière ce qu’il y a à lire, assez sombre pour qu’un texte se lise par-dessus."
+msgstr "The discovery pages and the articles of dofus-retro.com, cropped. Multifus lays one behind whatever there is to read, dark enough for text to sit on top."
+
 #: src/components/site-header.tsx
 msgid "Les pages de Multifus"
 msgstr "The pages of Multifus"
@@ -575,9 +675,17 @@ msgstr "The pages of Multifus"
 msgid "Les phrases qu’on retape vingt fois par jour"
 msgstr "The sentences you retype twenty times a day"
 
+#: src/constants/provenance.ts
+msgid "Les portraits des douze classes"
+msgstr "The twelve class portraits"
+
 #: src/constants/bodies.ts
 msgid "Les sept appels ont chacun leur interrupteur. Si les crafts des autres ne vous intéressent pas, vous coupez celui-là et vous gardez les six autres."
 msgstr "Each of the seven calls has its own switch. If other people's crafts are of no interest to you, you turn that one off and keep the other six."
+
+#: src/constants/provenance.ts
+msgid "Les visuels de classe publiés par Ankama, un par classe et par sexe. On les voit sur la roue des personnages, et le même en petit sur la fenêtre du jeu, pour reconnaître un personnage sans lire son pseudo."
+msgstr "The class artwork published by Ankama, one per class and per sex. You see them on the character wheel, and the same one small on the game window, to recognise a character without reading their name."
 
 #: src/components/language-offer.tsx
 msgid "Lire cette page en français"
@@ -686,6 +794,10 @@ msgstr "Pods"
 #: src/constants/wording.ts
 msgid "Poids des runes"
 msgstr "Rune weights"
+
+#: src/screens/images-screen.tsx
+msgid "Pourquoi elles vivent toutes au même endroit"
+msgstr "Why they all live in the same place"
 
 #: src/screens/rune-screen.tsx
 msgid "Prenez la ligne des éléments. Un point d’Intelligence pèse 1, et les trois runes qui le portent pèsent 1, 3 et 10 : le jeu les appelle Ine, Pa Ine et Ra Ine. Une Pa vaut donc trois simples, une Ra en vaut dix, et les vingt lignes se lisent de la même façon. Un tiret dit simplement que ce stade-là n’existe pas dans le jeu."
@@ -823,6 +935,10 @@ msgstr "Download the .dmg (Apple Silicon)"
 msgid "Tout ce que Multifus fait se lit ligne par ligne, sous licence MIT. Vous pouvez le compiler vous-même et comparer."
 msgstr "Everything Multifus does can be read line by line, under the MIT licence. You can build it yourself and compare."
 
+#: src/screens/images-screen.tsx
+msgid "Tout le reste de ce que vous voyez est à nous : les couleurs, le bois, les boutons, les ombres, la façon dont une fenêtre est taillée. Un style graphique ne se protège pas, une image si, et c’est toute la différence entre s’inspirer d’un univers et se servir dedans."
+msgstr "Everything else you see is ours: the colours, the wood, the buttons, the shadows, the way a window is cut. A graphic style is not protected, an image is, and that is the whole difference between drawing on a world and helping yourself to it."
+
 #: src/constants/wording.ts
 msgid "Un clic gauche, et toute la team marche au même endroit."
 msgstr "One left click, and the whole team walks to the same spot."
@@ -863,6 +979,14 @@ msgstr "A ready-made line goes out under a key combination."
 msgid "Une annonce en vente, et les réponses arrivent quand elles veulent. Sans relais, vous les découvrez une heure plus tard, et l’acheteur est déjà reparti."
 msgstr "One sale posted, and the answers come when they please. Without a relay you find them an hour later, and the buyer is long gone."
 
+#: src/constants/provenance.ts
+msgid "Une capture de l’écran des options du client, que Multifus montre une fois, à l’installation, pour dire où cocher. Elle ne sert nulle part ailleurs."
+msgstr "A screenshot of the client’s options screen, which Multifus shows once, during setup, to say where to tick. It is used nowhere else."
+
+#: src/constants/provenance.ts
+msgid "Une image tirée de la vidéo qu’elle couvre, prise sur la seconde où la fonctionnalité se voit. Elle reste affichée tant que la lecture n’a pas commencé, et sert de vignette dans les résultats de recherche."
+msgstr "A still taken from the video it covers, picked on the second where the feature shows. It stays up until playback starts, and serves as the thumbnail in search results."
+
 #: src/constants/bodies.ts
 msgid "Une petite bannière se pose au coin de l’écran et dit sur quel personnage vous venez d’arriver, pour que vous ne cliquiez pas dans le vide. Vous choisissez le coin."
 msgstr "A small banner appears in the corner of the screen and says which character you have just landed on, so you do not click into thin air. You choose the corner."
@@ -878,6 +1002,10 @@ msgstr "A quick reply files them under a key, and you find them again on any of 
 #: src/constants/bodies.ts
 msgid "Une réponse rapide tient sur une ligne. Elle pose du texte, et elle ne fait rien d’autre."
 msgstr "A quick reply fits on one line. It lays down text, and it does nothing else."
+
+#: src/screens/images-screen.tsx
+msgid "Une seule commande retire ce dossier en entier. C’est ce qui rend la promesse tenable plutôt que polie : le jour où Ankama le demande, il n’y a rien à trier et rien à négocier."
+msgstr "A single command removes that folder whole. That is what makes the promise workable rather than polite: the day Ankama asks, there is nothing to sort through and nothing to negotiate."
 
 #: src/constants/bodies.ts
 msgid "Une touche par personnage marche jusqu’à trois ou quatre. À huit, vous ne savez plus si votre Crâ est sur F5 ou sur F6, et vous passez plus de temps à chercher la touche qu’à jouer."
@@ -898,6 +1026,10 @@ msgstr "Vitality"
 #: src/screens/home-screen.tsx
 msgid "Voir le code"
 msgstr "See the code"
+
+#: src/screens/images-screen.tsx
+msgid "Voir le dossier sur GitHub"
+msgstr "See the folder on GitHub"
 
 #: src/screens/rune-screen.tsx
 msgid "Voir le tableau des runes"

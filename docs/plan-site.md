@@ -458,8 +458,64 @@ Ine, la Pa Ine et la Ra Ine une fois, parce que c'est sous ce nom-là qu'une run
 se cherche et se vend.
 
 `/poids-des-runes` a pris une sixième sorte de page, `kind: 'runes'`, comme
-`/comparatif` avait pris la sienne. Restent deux pages de `kind: 'plain'`, le
-journal et les images.
+`/comparatif` avait pris la sienne.
+
+## D'où vient chaque image
+
+**Posé le 11 septembre 2026.** `/images` a pris une septième sorte de page,
+`kind: 'images'`, et `plain` ne garde plus que le journal. La page est la version
+publique de [images.md](./images.md), et elle ne montre aucune image : une
+galerie de neuf décors d'Ankama sur un site de fan, c'est exactement ce que la
+règle du décor interdit ailleurs. Elle liste, elle n'expose pas.
+
+**Six familles, et une seule question par ligne** : ce que c'est, d'où ça vient.
+`PROVENANCES` les porte, `ProvenanceList` les rend en `<dl>` sur une plaque, le
+nom en Bebas dans la colonne de gauche et l'origine en prose sur les deux autres.
+Les décors, les portraits de classe, les vidéos du site, l'affiche posée sur une
+vidéo, les deux messages d'Ankama et la fenêtre Options du client. Le test refuse
+une famille absente de la liste ordonnée, deux noms identiques, deux origines
+recopiées l'une sur l'autre, et une origine de moins de cent signes.
+
+**Les portraits n'étaient sourcés nulle part.** Ni `images.md`, ni le relevé, ni
+un commit : quarante-huit fichiers, les plus visibles du logiciel, sans origine
+écrite. Ils viennent des visuels de classe publiés par Ankama, comme les décors,
+et `images.md` porte maintenant leur ligne. Une page qui promet « d'où vient
+chaque image » ne pouvait pas sauter celle-là.
+
+Le corps dit ensuite ce que le dépôt refuse de prendre, pourquoi créditer ne
+donne aucun droit, pourquoi les fichiers vivent tous dans un seul dossier, et ce
+qui est dessiné ici. La limite est sur une plaque, et elle est franche : cette
+page ne donne aucun droit sur ces images, et le jour où Ankama demande leur
+retrait, les fenêtres perdent leur fond, la roue ses portraits et le site ses
+vidéos. **Le compte n'était pas bon au premier jet** : le dossier tient aussi les
+quarante-huit portraits, donc un `git rm` coûte une fonctionnalité nommée et pas
+seulement des fonds. La page le dit maintenant, et ce plan avec elle.
+
+**La page montre ses sources plutôt que de les affirmer.** Le premier jet
+écrivait la tolérance d'Ankama sans lien, alors que « montrer la source bat
+l'affirmation » est la règle que ce plan a tirée des concurrents et que
+`/telecharger` applique déjà. Les deux messages sont maintenant liés des deux
+côtés, par `AnkamaSources`, né de ce doublon.
+
+**Deux phrases promettaient ce qui n'existe pas.** Le logo et l'image Open Graph
+sont encore à dessiner, et la page en parlait au présent : le paragraphe est
+parti, il reviendra avec les images. La capture des options du client, elle,
+montre les notifications en arrière-plan et non le mode fenêtré ; elle ne nomme
+plus la case, une ligne de provenance disant d'où vient une image et non comment
+on s'en sert.
+
+## Les liens internes restent des liens
+
+**Tranché le 11 septembre 2026**, la barre du haut étant dessinée. `PageLink`
+garde son `<a href>`, et le site ne navigue pas côté client. Treize pages
+prérendues de dix-sept kilo-octets, servies par un cache de bord, avec le CSS et
+le JavaScript déjà pris : ce qu'on gagnerait à naviguer dans le routeur se compte
+en dizaines de millisecondes. Ce qu'on perdrait se compte en modes de panne, la
+langue de la balise `html` que React repeint au vol, la position de défilement,
+le focus, et le `render` de Base UI sous le bouton de téléchargement, qui
+demanderait une `ref` traversante. Le site promet de ne rien devoir à
+JavaScript pour s'afficher ; un lien qui est un lien est cette promesse écrite en
+HTML.
 
 ## Le cartouche et la proposition de langue
 
@@ -625,9 +681,7 @@ de cliquer.
 - [ ] Écrire à `contact@ankama.com` le jour où le domaine est acheté, pour un logiciel et un site gratuits et ouverts. Un site existant se défend mieux qu'un projet
 - [ ] Créer le projet Vercel, racine `apps/website`, et vérifier qu'il sert bien `dist/client`
 - [ ] Dessiner l'image Open Graph, et la poser dans `headOf`. `twitter:card` est retombé à `summary` en attendant : annoncer `summary_large_image` sans `og:image` donne une carte vide dans Discord et sur X
-- [ ] Brancher `/journal` sur `apps/desktop/CHANGELOG.md`. La page existe, elle est vide, et rien ne dit d'où son contenu viendra
-- [ ] Trancher les liens internes. `PageLink` pose un `<a href>`, parce que le `to` de `Link` est typé sur l'arbre des routes et qu'une adresse calculée n'y entre pas. Un site statique de treize pages s'en accommode, mais on perd le préchargement : à reprendre en dessinant la barre du haut
-- [ ] Écrire le corps des deux pages de `kind: 'plain'`. Le journal attend son `CHANGELOG.md` ; `/images` est la seule page du site qui n'a que son titre et sa promesse, et `docs/images.md` porte déjà tout ce qu'elle doit dire
+- [ ] Brancher `/journal` sur `apps/desktop/CHANGELOG.md`, que la première release écrira. C'est la dernière page de `kind: 'plain'`, elle n'a que son titre et sa promesse, et rien ne dit encore comment le fichier devient la page
 - [ ] Donner leur vraie adresse aux deux boutons de `/telecharger`. Ils pointent aujourd'hui sur `releases/latest`, la page, faute de savoir le nom du fichier : c'est la lecture de l'API GitHub à la compilation qui la leur donnera, et `RELEASES` est l'unique endroit à reprendre. C'est là que `zod` entre, et pas avant : une réponse d'API qu'on lit sans la valider casse le build en silence le jour où GitHub change un champ
 - [ ] Tourner les boucles qui manquent, les messages privés, les réponses rapides, et celle de l'accueil, avec `make-loop`. La table les attend, `loop: null` les marque
 - [ ] Le crochet de déploiement Vercel dans le workflow `release`, et la lecture de l'API GitHub à la compilation
