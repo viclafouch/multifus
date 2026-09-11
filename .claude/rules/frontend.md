@@ -16,13 +16,16 @@ paths:
   - Dependencies in `useEffect` that would cause infinite loops without memoization
 - **NEVER return null in child components** - conditional rendering must happen in the parent, not inside the child. If a component might not render, the parent decides whether to render it at all. Child components should always render something when called. The one exception is an error boundary, whose whole job is to replace what fell: `QuietBoundary` renders nothing on purpose, a borderless window having no room for a crash screen.
 - **Use functional updates for state derived from previous state** - `setState(prev => !prev)` instead of `setState(!state)`. This avoids bugs with React's batching.
-- **Extract logic into custom hooks** - any useEffect, useState combo, or reusable logic should become a custom hook in `apps/desktop/src/hooks/`. Keep components focused on rendering. Hooks go in dedicated files named `use-*.ts`.
+- **Never nest a hook call inside another hook call**, `useOffer(useLanguage())`. Give the inner one its own `const` on its own line, then pass it. No exception: it is ugly, and it hides the order in which the two run.
+- **Extract logic into custom hooks** - any useEffect, useState combo, or reusable logic should become a custom hook in the `src/hooks/` of the application you are in. Keep components focused on rendering. Hooks go in dedicated files named `use-*.ts`.
 
 ### Libraries
 
-- ALWAYS use shadcn components instead of raw HTML elements, `<Input>` instead of `<input>`, `<Textarea>` instead of `<textarea>`, etc.
+- **Reach for `packages/retro` first**, in both applications: `Button`, `Panel`, `Shade`, `Tale`, `Scene`, `cn`. A component the two would both hold belongs there, and `packages/retro/README.md` says what it refuses
+- **In the software, use shadcn components instead of raw HTML elements**, `<Input>` instead of `<input>`, `<Textarea>` instead of `<textarea>`, etc.
 - **Edit `apps/desktop/src/components/ui` only to give a component the retro matter** - nothing is regenerated from shadcn anymore. Run `pnpm run lint:fix` first (auto-fixes formatting), then rely on the override in `oxlint.config.ts` for the remaining errors
-- **No margins on icons in buttons** - shadcn Button has built-in `gap` spacing
+- **The site adds neither shadcn nor Base UI of its own**, and plain HTML carries what `packages/retro` does not. It reaches Base UI only through `Button`, which `packages/retro` builds on it. A page that needs JavaScript to show itself has no place in a prerendered site: `<details>` holds the features menu, and the seven addresses sit in the delivered HTML, robot included
+- **No margins on icons in buttons** - `Button` has built-in `gap` spacing
 
 ### Accessibility (WCAG 2.1 AA)
 
@@ -66,6 +69,7 @@ paths:
 
 - **No arbitrary values in components** (e.g., `font-[Bricolage_Grotesque]`, `text-[14px]`)
 - Define custom utilities in `packages/retro/src/styles/retro.css`, which holds the design system for the software and the site alike, and reuse them. `apps/desktop/src/index.css` keeps only what the main window needs, `apps/website/src/styles.css` only what the site needs
+- A utility that moves to `retro.css` must keep its `@media (prefers-reduced-motion: reduce)` block with it, and `retro.css` carries its own `@source '../components'`: without that line Tailwind never emits a class that lives only in the package, nothing breaks, nothing warns, and the screen paints unstyled
 - Keep styling consistent: one source of truth for design tokens (fonts, colors, spacing)
 - If a value is used more than once, it should be a utility class or CSS variable
 - **Prefer `gap`/`space-y`/`space-x`** over `mt-*`/`mb-*` for spacing between siblings
@@ -82,10 +86,10 @@ paths:
 - **No custom hover effects** that don't exist elsewhere in the application
 - **Forbidden hover effects**: `hover:scale-*`, `hover:rotate-*`, `hover:-translate-y-*` (lift effects)
 - **Allowed hover effects**: `hover:bg-*`, `hover:text-*`, `hover:border-*` (color transitions only)
-- Buttons already have built-in hover states via shadcn - don't override with custom transforms
-- Links use `hover:text-primary` or `hover:text-foreground` - keep it simple
+- Buttons already have built-in hover states - don't override with custom transforms
+- Links use `hover:text-primary` or `hover:text-foreground` in the software, `hover:text-cream` on the site - keep it simple
 - **Consistency over creativity**: match existing patterns, don't invent new interactions
-- The clearing menu (`btn-way`) is the one place that moves on hover, and `docs/design-system.md` holds that exception under « Le mouvement ». Leave it alone
+- `btn-way` is the one place that moves on hover, and `docs/design-system.md` holds that exception under « Le mouvement ». It carries the clearing menu of the software and the features list of the site's home, which are the same menu. Leave it alone
 
 ### Animations
 

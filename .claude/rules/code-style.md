@@ -127,8 +127,10 @@ Always use native modern APIs (Intl, URLSearchParams, structuredClone, etc.) ins
 
 **Global constants and helpers** (used across multiple screens):
 
-- `apps/desktop/src/helpers/` - One file per domain (`accelerator.ts`, `portrait.ts`)
-- `apps/desktop/src/constants/` - One file per domain too (`keyboard.ts`, `journal.ts`)
+- `src/helpers/` of the application you are in - One file per domain (`accelerator.ts`, `portrait.ts` in the software, `page.ts`, `schema.ts` on the site). **Pure functions only**, computing from what they are given
+- `src/lib/` of the same application - What talks to something outside the code: the platform, the browser, a library's setup. `lib/i18n.ts`, `lib/motion.ts`, `lib/keepsake.ts`. A function that reads `window` or calls out belongs here, never in `helpers/`
+- `src/constants/` of the same application - One file per domain too (`keyboard.ts`, `journal.ts` in the software, `pages.ts`, `rivals.ts` on the site)
+- What the two applications would both hold goes to `packages/retro`, and `packages/retro/README.md` says what it refuses
 
 **Component-specific constants** (used only by one component/screen):
 
@@ -164,9 +166,23 @@ Before writing ANY function, component, type, or constant inside a feature file,
 
 The phrase lives where it is read, in French, and Lingui carries it elsewhere.
 
-- **`t` in a function body, `msg` at module scope, never `t` at module scope.** A
-  module is evaluated before the language is activated, so a `t` there freezes
-  the French
+- **`msg` at module scope, never `t` at module scope.** A module is evaluated
+  before any language is activated, so a `t` there freezes the French. This one
+  holds in both applications
+- **Only `@lingui/core/macro`, in both applications.** `@lingui/react/macro` is
+  not transformed here: a `<Trans>` leaves the build without its import, and on
+  the site it prerenders the page with an empty body without a word of warning
+- **The software renders with `t` in a function body**, because it activates one
+  global instance and has one window and one language at a time
+- **The site renders through `i18n._()`**, the `i18n` coming from `useLingui()`.
+  It holds three instances, none of them global, and prerenders fourteen pages in
+  three languages in parallel, so a `t` has no instance to read. The explicit
+  form with the instance says the same thing and the macro transforms it, but
+  Lingui v6 deprecates `t` and oxlint refuses the line
+- **A phrase written in a language other than the page's takes that language's
+  own voice**, `SPEAKERS[language]._()`, never `useLingui()`. One component does
+  this on purpose, the line offering the other language, and it is the whole
+  reason the three instances are kept apart
 - **A count goes through `plural`**, and `Intl` takes `i18n.locale`
 - The same French twice in one file is one `const`. The same French meaning two
   things takes a `context`
@@ -176,10 +192,14 @@ The phrase lives where it is read, in French, and Lingui carries it elsewhere.
   menu of the game, a checkbox. The guillemets say Multifus is quoting, not
   inventing. A list where every word is the system's own needs none: the shape
   already says it. `systemWords` holds those words, once, for every screen that
-  names them
+  names them. This is the software's business alone: the site never names a
+  system panel, and `apps/website/CONTEXT.md` says why
 - **No metaphor stands in for the word the system uses.** The screen and the
   system have to be searchable with the same word
-- `pnpm --filter @multifus/desktop run i18n:extract` after touching a phrase
+- `pnpm --filter @multifus/desktop run i18n:extract`, or
+  `pnpm --filter @multifus/website run i18n:extract`, after touching a phrase.
+  The two catalogues never meet: the software's phrases are instructions to
+  someone who has installed, the site's are a promise to someone who has nothing
 
 Tests read the French the user reads, written out in full, never the `msg` table
 the code under test reads. Walking a table to check every member reaches the

@@ -28,8 +28,15 @@ a value the code already holds: point at the file instead.
 1. Check if already installed, in the root and in every package
 2. Consult official docs for peer dependencies
 3. Install with exact required versions, in the package that imports it:
-   `pnpm --filter @multifus/desktop add <name>`. The root takes only what the
-   whole repository needs, the linters and the formatter
+   `pnpm --filter @multifus/desktop add <name>`,
+   `pnpm --filter @multifus/website add <name>`, or `--filter @multifus/retro`
+   when both applications import it. The root takes only what the whole
+   repository needs, the linters and the formatter
+4. A types-only package goes to `devDependencies`, whichever package takes it
+5. **A dependency without a consumer today does not get installed.** An idea
+   worth keeping goes on a line of the plan that owns the subject, naming what
+   would trigger it: `docs/plan-<subject>.md` while one is open, `docs/plan.md`
+   otherwise
 
 ### Removing a Dependency
 
