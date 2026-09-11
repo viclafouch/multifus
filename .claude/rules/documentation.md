@@ -2,7 +2,7 @@
 
 ### Where a fact lives
 
-- **CLAUDE.md** = operational instructions: stack without versions, commands, tools
+- **CLAUDE.md** = operational instructions: stack without versions, commands, tools. The root holds what both applications share, `apps/desktop/CLAUDE.md` and `apps/website/CLAUDE.md` what concerns one of them alone
 - **`CONTEXT.md`** = the words of the domain
 - **`docs/plan.md`** = what remains to do, one line per thing. A line done is deleted, not ticked
 - **`docs/design-system.md`** = the rules that decide what a screen looks like. It copies no value: the CSS holds them
