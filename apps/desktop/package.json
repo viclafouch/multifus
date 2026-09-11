@@ -34,6 +34,7 @@
     "@lingui/core": "^6.6.0",
     "@multifus/ankama": "workspace:*",
     "@multifus/retro": "workspace:*",
+    "@multifus/runes": "workspace:*",
     "@tauri-apps/api": "^2.11.1",
     "@tauri-apps/plugin-clipboard-manager": "^2.3.3",
     "class-variance-authority": "^0.7.1",

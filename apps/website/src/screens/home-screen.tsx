@@ -54,7 +54,7 @@ const TALLY = [
 
 const FEATURES_TITLE = msg`Ce que Multifus fait`
 
-const FEATURES_LEAD = msg`Sept mécanismes, et un seul but : ne plus jamais chercher le personnage qui vous attend.`
+const FEATURES_LEAD = msg`Six mécanismes, et un seul but : ne plus jamais chercher le personnage qui vous attend.`
 
 const TRUST_PROOF = msg`Le paquet est signé et notarisé, il porte son attestation de provenance, et le code entier est publié. Ces trois-là se vérifient avant d’installer.`
 

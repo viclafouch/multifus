@@ -10,13 +10,13 @@ export const PAGES = {
   autoFocus: {
     kind: 'feature',
     loop: 'autoFocus',
-    kin: ['relay', 'shortcuts'],
+    kin: ['relay', 'wheel'],
     slugs: { fr: 'autofocus', en: 'autofocus', es: 'autofocus' }
   },
   wheel: {
     kind: 'feature',
     loop: 'wheel',
-    kin: ['shortcuts', 'walk'],
+    kin: ['walk', 'autoFocus'],
     slugs: {
       fr: 'roue-des-personnages',
       en: 'character-wheel',
@@ -39,12 +39,6 @@ export const PAGES = {
     kin: ['runeWeights', 'quickReplies'],
     slugs: { fr: 'tableau-des-runes', en: 'rune-table', es: 'tabla-de-runas' }
   },
-  shortcuts: {
-    kind: 'feature',
-    loop: null,
-    kin: ['wheel', 'quickReplies'],
-    slugs: { fr: 'raccourcis', en: 'shortcuts', es: 'atajos' }
-  },
   relay: {
     kind: 'feature',
     loop: null,
@@ -58,7 +52,7 @@ export const PAGES = {
   quickReplies: {
     kind: 'feature',
     loop: null,
-    kin: ['shortcuts', 'relay'],
+    kin: ['relay', 'runeTable'],
     slugs: {
       fr: 'reponses-rapides',
       en: 'quick-replies',
@@ -78,7 +72,7 @@ export const PAGES = {
     slugs: { fr: 'comparatif', en: 'comparison', es: 'comparativa' }
   },
   runeWeights: {
-    kind: 'plain',
+    kind: 'runes',
     loop: null,
     kin: ['runeTable', 'download'],
     slugs: {
@@ -113,7 +107,6 @@ export const PAGE_IDS = [
   'wheel',
   'walk',
   'runeTable',
-  'shortcuts',
   'relay',
   'quickReplies',
   'mac',
@@ -129,7 +122,6 @@ export const MENU_FEATURES = [
   'wheel',
   'walk',
   'runeTable',
-  'shortcuts',
   'relay',
   'quickReplies'
 ] as const satisfies readonly PageId[]

@@ -24,7 +24,7 @@ paths:
 - **Reach for `packages/retro` first**, in both applications: `Button`, `Panel`, `Shade`, `Tale`, `Scene`, `cn`. A component the two would both hold belongs there, and `packages/retro/README.md` says what it refuses
 - **In the software, use shadcn components instead of raw HTML elements**, `<Input>` instead of `<input>`, `<Textarea>` instead of `<textarea>`, etc.
 - **Edit `apps/desktop/src/components/ui` only to give a component the retro matter** - nothing is regenerated from shadcn anymore. Run `pnpm run lint:fix` first (auto-fixes formatting), then rely on the override in `oxlint.config.ts` for the remaining errors
-- **The site adds neither shadcn nor Base UI of its own**, and plain HTML carries what `packages/retro` does not. It reaches Base UI only through `Button`, which `packages/retro` builds on it. A page that needs JavaScript to show itself has no place in a prerendered site: `<details>` holds the features menu, and the seven addresses sit in the delivered HTML, robot included
+- **The site adds neither shadcn nor Base UI of its own**, and plain HTML carries what `packages/retro` does not. It reaches Base UI only through `Button`, which `packages/retro` builds on it. A page that needs JavaScript to show itself has no place in a prerendered site: `<details>` holds the features menu, and the six addresses sit in the delivered HTML, robot included
 - **No margins on icons in buttons** - `Button` has built-in `gap` spacing
 
 ### Accessibility (WCAG 2.1 AA)

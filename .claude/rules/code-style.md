@@ -40,6 +40,7 @@ Avoid over-simplification that could:
 - Booleans: `is*`, `has*`, `should*`, `can*`
 - Boolean functions: `matchIs*`, `matchAs*`
 - Event handlers: `handle*`, `on*`
+- A helper that turns a value into the string an eye reads is `format*`, whatever it formats: `formatDate`, `formatWeight`. Never `written*`, never the domain word alone
 - No single-letter variables
 - No abbreviations unless universal (`id`, `url`, `api`)
 
@@ -130,7 +131,7 @@ Always use native modern APIs (Intl, URLSearchParams, structuredClone, etc.) ins
 - `src/helpers/` of the application you are in - One file per domain (`accelerator.ts`, `portrait.ts` in the software, `page.ts`, `schema.ts` on the site). **Pure functions only**, computing from what they are given
 - `src/lib/` of the same application - What talks to something outside the code: the platform, the browser, a library's setup. `lib/i18n.ts`, `lib/motion.ts`, `lib/keepsake.ts`. A function that reads `window` or calls out belongs here, never in `helpers/`
 - `src/constants/` of the same application - One file per domain too (`keyboard.ts`, `journal.ts` in the software, `pages.ts`, `rivals.ts` on the site)
-- What the two applications would both hold goes to `packages/retro`, and `packages/retro/README.md` says what it refuses
+- What the two applications would both hold goes to a shared package, and each package's README says what it refuses. `packages/retro` takes the matter and the portable components; `packages/runes` takes the game's own numbers. A shared package holds **no phrase**: a word on a screen is text, and each application names the shared identifiers in its own catalogue
 
 **Component-specific constants** (used only by one component/screen):
 

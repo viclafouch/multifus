@@ -3,8 +3,9 @@ Gestionnaire de fenêtres Dofus Retro en multicompte, macOS et Windows.
 Monorepo pnpm et Turborepo : le logiciel dans `apps/desktop`, le site dans
 `apps/website`, chacun avec son `CLAUDE.md` pour ce qui ne regarde que lui. Ce
 qu'ils portent tous les deux vit dans `packages/` : `@multifus/ankama` tient les
-images d'Ankama, hors licence MIT, et `@multifus/retro` la matière, `retro.css`,
-`theme.css`, `cn` et les composants portables. Chacun a son README.
+images d'Ankama, hors licence MIT, `@multifus/retro` la matière, `retro.css`,
+`theme.css`, `cn` et les composants portables, et `@multifus/runes` les chiffres
+du jeu, le poids de chaque rune. Chacun a son README.
 
 - [CONTEXT.md](./CONTEXT.md) : les mots du projet, à employer partout, code
   compris.

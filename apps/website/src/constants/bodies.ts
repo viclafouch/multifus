@@ -136,38 +136,6 @@ export const PAGE_BODIES = {
       ]
     }
   },
-  shortcuts: {
-    lead: msg`Une touche par personnage, et vous y êtes. F1 sur l’Eniripsa, F2 sur le Sacrieur, et le tour de votre roster au clavier sans lâcher ce que vous faites.`,
-    passages: [
-      {
-        title: msg`Trois touches qui ne changent jamais`,
-        lines: [
-          msg`Personnage suivant, personnage précédent, personnage principal. Les deux premières font le tour de votre roster dans l’ordre que vous avez rangé ; la troisième vous ramène sur votre principal où que vous soyez, et c’est celle qu’on garde sous le pouce.`
-        ]
-      },
-      {
-        title: msg`Et une touche par personnage`,
-        lines: [
-          msg`À côté, chaque personnage peut avoir la sienne, rangée comme vous voulez.`,
-          msg`Multifus écrit la lettre qui est imprimée sur votre clavier : sur un AZERTY, il affiche Z là où un QWERTY affiche W. Vous lisez ce qui est sur la touche, et vous appuyez dessus.`
-        ]
-      },
-      {
-        title: msg`Elles ne valent que dans le jeu`,
-        lines: [
-          msg`Une combinaison n’est prise que pendant que le jeu est devant vous. Dès que vous passez sur votre navigateur ou sur Discord, la touche vous est rendue.`,
-          msg`Un raccourci de Multifus ne coûte donc rien au reste de votre machine, et vous pouvez lui donner une touche dont vous vous servez ailleurs.`
-        ]
-      }
-    ],
-    limit: {
-      title: msg`Ce que les raccourcis ne font pas`,
-      lines: [
-        msg`Ils ne frappent rien dans le jeu. Aucune touche de Multifus n’envoie un sort, un déplacement ou un message à votre place : elles changent de fenêtre, ou elles commandent Multifus lui-même, agrandir vos clients ou vérifier vos réglages.`,
-        msg`Et une touche ne vaut jamais pour plusieurs personnages à la fois.`
-      ]
-    }
-  },
   relay: {
     lead: msg`Vous êtes parti manger, vos personnages sont restés connectés, et quelqu’un vous écrit en privé. Votre téléphone vous dit lequel de vos personnages vient d’être appelé.`,
     passages: [
@@ -253,7 +221,7 @@ export const PAGE_BODIES = {
       {
         title: msg`Les mêmes mécanismes, les mêmes touches`,
         lines: [
-          msg`L’AutoFocus, la roue des personnages, le Déplacement rapide, le tableau des runes, les raccourcis, les réponses rapides et les messages privés sont tous là.`,
+          msg`L’AutoFocus, la roue des personnages, le Déplacement rapide, le tableau des runes, les réponses rapides et les messages privés sont tous là.`,
           msg`Multifus écrit la touche telle qu’elle est imprimée sur votre clavier, AZERTY comme QWERTY.`
         ]
       }

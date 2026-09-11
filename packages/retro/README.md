@@ -27,6 +27,9 @@ partent en 404, le build se tait, et le titre le plus gros de la page sort en
 fonte de repli. C'est pour cela qu'elle est en `peerDependencies` ici, pour que
 pnpm réclame.
 
+Elle ne tient aucun chiffre du jeu : le poids des runes vit dans
+[@multifus/runes](../runes/README.md), que les deux applications lisent aussi.
+
 Ce qui n'est **pas** ici tient aux types de Tauri ou au cadre d'une map :
 `MapFrame`, `WayList`, `Dolmen`, `MapTitle` et `MapHeader` restent dans le
 logiciel. `MapTitle` pose le focus du lecteur d'écran à l'arrivée sur une map,

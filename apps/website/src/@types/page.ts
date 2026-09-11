@@ -12,11 +12,16 @@ export type PageId =
   | 'relay'
   | 'runeTable'
   | 'runeWeights'
-  | 'shortcuts'
   | 'walk'
   | 'wheel'
 
-export type PageKind = 'comparison' | 'download' | 'feature' | 'home' | 'plain'
+export type PageKind =
+  | 'comparison'
+  | 'download'
+  | 'feature'
+  | 'home'
+  | 'plain'
+  | 'runes'
 
 export type LoopId = 'autoFocus' | 'runeTable' | 'walk' | 'wheel'
 

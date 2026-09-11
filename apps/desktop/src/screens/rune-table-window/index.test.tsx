@@ -1,7 +1,8 @@
 import { describe, expect, it, vi } from 'vitest'
 import { i18n } from '@lingui/core'
+import { RUNE_FAMILY_IDS } from '@multifus/runes'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { TABLE_DRAWN_WIDTH, RUNE_FAMILIES } from '@/constants/runes'
+import { RUNE_FAMILY_NAMES, TABLE_DRAWN_WIDTH } from '@/constants/runes'
 import { pending } from '@/test-doubles'
 
 const bridge = {
@@ -66,10 +67,10 @@ describe('le tableau des runes posé sur le jeu', () => {
 
     expect(screen.getByText('Tableau des runes')).not.toBeNull()
 
-    for (const family of RUNE_FAMILIES) {
+    for (const family of RUNE_FAMILY_IDS) {
       expect(
         screen.getByRole('columnheader', {
-          name: i18n._(family.label)
+          name: i18n._(RUNE_FAMILY_NAMES[family])
         })
       ).not.toBeNull()
     }

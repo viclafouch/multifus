@@ -1,8 +1,6 @@
+import type { MessageDescriptor } from '@lingui/core'
 import { msg } from '@lingui/core/macro'
 import type { RuneFamilyId, RuneStatId } from '@multifus/runes'
-import type { Phrase } from '@/lib/i18n'
-
-export const TABLE_DRAWN_WIDTH = 320
 
 export const RUNE_FAMILY_NAMES = {
   heavy: msg`Les lourdes`,
@@ -10,7 +8,7 @@ export const RUNE_FAMILY_NAMES = {
   resistance: msg`Résistances`,
   secondary: msg`Secondaires`,
   primary: msg`Les légères`
-} as const satisfies Record<RuneFamilyId, Phrase>
+} as const satisfies Record<RuneFamilyId, MessageDescriptor>
 
 export const RUNE_STAT_NAMES = {
   actionPoint: msg`PA`,
@@ -29,8 +27,8 @@ export const RUNE_STAT_NAMES = {
   wisdom: msg`Sagesse`,
   prospecting: msg`Prospection`,
   hunt: msg`Chasse`,
-  elements: msg`Ine / Fo / Age / Cha`,
+  elements: msg`Intelligence, Force, Agilité, Chance`,
   initiative: msg`Initiative`,
   vitality: msg`Vitalité`,
   pods: msg`Pods`
-} as const satisfies Record<RuneStatId, Phrase>
+} as const satisfies Record<RuneStatId, MessageDescriptor>

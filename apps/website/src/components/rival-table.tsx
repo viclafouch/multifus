@@ -10,7 +10,7 @@ import {
   TRAIT_NAMES,
   TRAITS
 } from '@/constants/rivals'
-import { writtenDay } from '@/helpers/day'
+import { formatDate } from '@/helpers/day'
 
 const TRAIT_COLUMN = msg`Ce qu’il fait`
 
@@ -18,7 +18,7 @@ const SURVEY_ANCHOR = 'releve'
 
 export const RivalTable = () => {
   const { i18n } = useLingui()
-  const surveyed = writtenDay({ day: SURVEYED_ON, locale: i18n.locale })
+  const surveyed = formatDate({ day: SURVEYED_ON, locale: i18n.locale })
 
   return (
     <div className="flex flex-col gap-3">

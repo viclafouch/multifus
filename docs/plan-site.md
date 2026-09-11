@@ -44,8 +44,8 @@ en face de Dracoon, dont c'est l'argument principal.
 
 ## Les pages
 
-Quatorze. La barre du haut porte Multifus, un menu déroulant « Fonctionnalités »
-qui tient les sept du milieu, puis Comparatif, Télécharger. Pas de barre
+Treize. La barre du haut porte Multifus, un menu déroulant « Fonctionnalités »
+qui tient les six du milieu, puis Comparatif, Télécharger. Pas de barre
 latérale : c'est le motif d'une documentation de bibliothèque, et on ne vend pas
 une documentation.
 
@@ -56,7 +56,6 @@ une documentation.
 | `/roue-des-personnages` | Le disque de têtes au maintien d'une combinaison              | existe    |
 | `/deplacement-rapide`   | Un clic gauche, la team suit                                  | existe    |
 | `/tableau-des-runes`    | Les poids posés par-dessus le jeu                             | existe    |
-| `/raccourcis`           | Une touche par personnage, suivant, précédent, principal      | à tourner |
 | `/messages-prives`      | Les messages privés sur le téléphone                          | à tourner |
 | `/reponses-rapides`     | Un texte tout prêt sous une combinaison                       | à tourner |
 | `/mac`                  | Multifus sur Mac                                              | reprises  |
@@ -70,11 +69,18 @@ une documentation.
 site : d'après `concurrents.md`, Focus Retro est le seul autre outil sur Mac, et
 il est au ralenti. Personne ne tient « multi compte dofus retro mac ».
 
-Le menu annonce sept fonctionnalités, et **les réponses rapides gardent la
-leur**, tranché en écrivant la page. Elle tient sans remplissage parce qu'elle a
-trois choses à dire que les raccourcis n'ont pas : les phrases qu'on retape vingt
-fois par jour, le collage qui n'envoie pas, et la langue du client Dofus qui
-n'est pas celle de Multifus.
+**Les raccourcis n'ont plus la leur.** Une touche n'est pas une fonctionnalité,
+c'est la porte des autres : la roue s'ouvre à une combinaison, le tableau des
+runes se pose à une touche, le Déplacement rapide s'allume à une touche. Chaque
+page dit déjà la sienne, et une page de plus ne faisait que les répéter. Tous les
+concurrents ont des raccourcis, donc il n'y avait rien à gagner sur ce mot-là non
+plus.
+
+Le menu annonce six fonctionnalités, et **les réponses rapides gardent la leur**,
+tranché en écrivant la page. Elle tient sans remplissage parce qu'elle a trois
+choses à dire qu'aucune autre page ne dit : les phrases qu'on retape vingt fois
+par jour, le collage qui n'envoie pas, et la langue du client Dofus qui n'est pas
+celle de Multifus.
 
 ## Chaque page de fonctionnalité
 
@@ -130,16 +136,15 @@ espagnol. C'est `MAP_SCENES` et `MAP_LOOPS`, transposés.
 ## Le socle
 
 **Posé le 11 septembre 2026, et il tourne.** `pnpm --filter @multifus/website run
-build` écrit quarante-deux fichiers HTML, un par page et par langue, et un
-`sitemap.xml` de quarante-deux adresses. Chaque page sort avec son contenu dans
+build` écrit trente-neuf fichiers HTML, un par page et par langue, et un
+`sitemap.xml` de trente-neuf adresses. Chaque page sort avec son contenu dans
 le HTML livré, son `lang`, son `canonical` et ses quatre `hreflang`.
 
 TanStack Start, entièrement prérendu, déployé sur Vercel. `sitemap: { enabled,
 host }` est dans le greffon Vite, et `prerender.pages` reçoit la table.
 `autoStaticPathsDiscovery` et `crawlLinks` sont **éteints** : allumés, ils
-ajoutent `/en/` à côté du `/en` de la table, et le sitemap comptait
-quarante-quatre adresses pour quarante-deux pages. La table énumère, et elle
-seule.
+ajoutent `/en/` à côté du `/en` de la table, et le sitemap portait deux adresses
+de trop. La table énumère, et elle seule.
 
 **Aucun service payant.** Cette règle tient le site entier, et elle est
 maintenant dans `apps/website/CLAUDE.md`. Vercel en plan Hobby, Vercel Analytics
@@ -158,9 +163,9 @@ des greffons Vite qu'il faut reprendre, `@vitejs/plugin-react` compilant le JSX
 avant que babel ne le voie.
 
 **Le site n'emploie pas le motif de `apps/desktop/src/lib/i18n.ts`.** `speak()`
-mute une instance globale. Au prérendu, TanStack Start lance quatorze rendus en
-parallèle par défaut : trois langues sur un singleton muté, ce sont des pages
-mélangées, et le bogue ne se voit qu'à la compilation. Le site prend trois
+mute une instance globale. Au prérendu, TanStack Start rend les pages en
+parallèle : trois langues sur un singleton muté, ce sont des pages mélangées, et
+le bogue ne se voit qu'à la compilation. Le site prend trois
 instances isolées par `setupI18n()`, une par langue, jamais mutées, et les passe
 par le contexte React, ce que la documentation de Lingui recommande pour le rendu
 serveur. Le logiciel garde la sienne, il n'a qu'une fenêtre et qu'une langue à la
@@ -270,7 +275,7 @@ suffit.
 
 **Le menu déroulant est un `<details>`.** Base UI n'est pas une dépendance du
 site, et un menu qui a besoin de JavaScript pour s'ouvrir n'a pas sa place sur
-une page prérendue : les sept adresses sont dans le HTML livré, robot compris.
+une page prérendue : les six adresses sont dans le HTML livré, robot compris.
 `useDismiss` ne rajoute que ce que `<details>` ne sait pas faire, Échap et le
 clic dehors. Le losange est celui des questions fréquentes, `askmark`, qui
 répond désormais à `[open]` autant qu'à `aria-expanded`.
@@ -381,7 +386,7 @@ qu'une fois le composant rendu. `.claude/rules/code-style.md` demandait encore
 `t` dans un corps ; il dit maintenant pourquoi les deux applications diffèrent,
 le logiciel ayant une instance globale et le site trois qui ne le sont pas.
 
-## Le corps des huit fonctionnalités
+## Le corps des sept fonctionnalités
 
 **Posé le 11 septembre 2026.** Chaque page de fonctionnalité a maintenant, sous
 sa vidéo, une amorce, trois passages et une limite. `constants/bodies.ts` porte
@@ -416,6 +421,46 @@ forme de toute limite. `Opening` porte l'amorce, avec le filet à gauche des
 chiffres de l'accueil. `ProseLines` rend une suite de paragraphes et se clé sur
 la phrase rendue, un `MessageDescriptor` n'ayant pas d'identifiant garanti.
 
+## Les poids des runes
+
+**Posés le 11 septembre 2026.** La table entière est sur `/poids-des-runes`,
+avant toute explication : qui cherche « poids des runes » veut les chiffres, et
+il n'y a qu'une amorce de trois phrases entre le titre et elle. Vingt lignes,
+cinq familles, la stat puis quatre colonnes de chiffres. Les six passages sont
+dessous, où ils ne gênent personne.
+
+**Les chiffres ont pris un paquet à eux**, `@multifus/runes`. C'est la décision
+d'architecture que ce plan gardait en attente, et elle s'est tranchée toute
+seule : une table recopiée de l'un à l'autre finit par diverger, et le seul
+mérite de cette page est d'être juste. Le paquet ne porte que des identifiants,
+des chiffres, et l'écriture d'un poids, qui doit tomber au même centième des deux
+côtés. Aucune phrase ne le traverse : chaque application nomme
+`wisdom` et `heavy` dans son propre catalogue, et `satisfies Record<RuneStatId,
+…>` refuse celle qui en oublie un. Les invariants du jeu, la Pa qui pèse trois
+fois la simple et la Ra dix fois, sont testés là où vivent les chiffres.
+
+Le logiciel n'a pas bougé à l'écran : il a perdu son type `RuneRow` et lu ses
+poids ailleurs, ses noms de stats étant restés chez lui avec sa largeur dessinée
+et la constante Rust qui la borne.
+
+**La table du site n'a pas les couleurs de famille du logiciel.** Le tableau
+posé sur le jeu tient dans 320 points, et ses cinq tons y font gagner du temps ;
+sur une page de vente, cinq bandes de couleur disputeraient l'œil au seul bouton
+vert, ce que la règle 1 de [design-system.md](./design-system.md) interdit. La
+famille se dit ici en Bebas et en capitales, et un filet sépare les trois
+colonnes de runes de la colonne du point, qui ne répond pas à la même question.
+
+**Le site écrit les éléments en toutes lettres**, « Intelligence, Force,
+Agilité, Chance », là où le logiciel serre « Ine / Fo / Age / Cha » dans sa
+fenêtre. Même table, même ordre, et deux places qui n'ont pas la même largeur.
+Les abréviations ne disparaissent pas pour autant : le corps de la page nomme la
+Ine, la Pa Ine et la Ra Ine une fois, parce que c'est sous ce nom-là qu'une rune
+se cherche et se vend.
+
+`/poids-des-runes` a pris une sixième sorte de page, `kind: 'runes'`, comme
+`/comparatif` avait pris la sienne. Restent deux pages de `kind: 'plain'`, le
+journal et les images.
+
 ## Le cartouche et la proposition de langue
 
 **Posés le 11 septembre 2026.** Les trois drapeaux sont en haut à droite de la
@@ -437,7 +482,7 @@ bloc `prefers-reduced-motion`, où il manquait.
 `navigator.languages`, saute ce que le site ne parle pas, s'arrête à la première
 qu'il parle, et se tait si c'est déjà celle de la page. `useOffer` pose le
 souvenir à la seconde où la ligne s'affiche, donc elle ne revient pas. Elle naît
-après l'hydratation : au prérendu, les quarante-deux fichiers porteraient la
+après l'hydratation : au prérendu, les trente-neuf fichiers porteraient la
 langue d'un seul visiteur. `setState` dans un effet vaut un `oxlint-disable`, et
 sa raison est écrite sur la ligne.
 
@@ -581,14 +626,14 @@ de cliquer.
 - [ ] Créer le projet Vercel, racine `apps/website`, et vérifier qu'il sert bien `dist/client`
 - [ ] Dessiner l'image Open Graph, et la poser dans `headOf`. `twitter:card` est retombé à `summary` en attendant : annoncer `summary_large_image` sans `og:image` donne une carte vide dans Discord et sur X
 - [ ] Brancher `/journal` sur `apps/desktop/CHANGELOG.md`. La page existe, elle est vide, et rien ne dit d'où son contenu viendra
-- [ ] Trancher les liens internes. `PageLink` pose un `<a href>`, parce que le `to` de `Link` est typé sur l'arbre des routes et qu'une adresse calculée n'y entre pas. Un site statique de quatorze pages s'en accommode, mais on perd le préchargement : à reprendre en dessinant la barre du haut
-- [ ] Écrire le corps des trois pages de `kind: 'plain'`. Les huit fonctionnalités, l'accueil, `/telecharger` et `/comparatif` sont écrits ; restent les poids des runes, le journal et les images, qui n'ont que leur titre et leur promesse. Le journal attend son `CHANGELOG.md`, et les poids des runes attendent qu'on décide d'où vient la table : elle vit dans `apps/desktop/src/constants/runes.ts` avec ses `msg`, et la partager contre « chacun garde son catalogue » est une décision d'architecture à part
+- [ ] Trancher les liens internes. `PageLink` pose un `<a href>`, parce que le `to` de `Link` est typé sur l'arbre des routes et qu'une adresse calculée n'y entre pas. Un site statique de treize pages s'en accommode, mais on perd le préchargement : à reprendre en dessinant la barre du haut
+- [ ] Écrire le corps des deux pages de `kind: 'plain'`. Le journal attend son `CHANGELOG.md` ; `/images` est la seule page du site qui n'a que son titre et sa promesse, et `docs/images.md` porte déjà tout ce qu'elle doit dire
 - [ ] Donner leur vraie adresse aux deux boutons de `/telecharger`. Ils pointent aujourd'hui sur `releases/latest`, la page, faute de savoir le nom du fichier : c'est la lecture de l'API GitHub à la compilation qui la leur donnera, et `RELEASES` est l'unique endroit à reprendre. C'est là que `zod` entre, et pas avant : une réponse d'API qu'on lit sans la valider casse le build en silence le jour où GitHub change un champ
-- [ ] Tourner les boucles qui manquent, les raccourcis, les messages privés, les réponses rapides, et celle de l'accueil, avec `make-loop`. La table les attend, `loop: null` les marque
+- [ ] Tourner les boucles qui manquent, les messages privés, les réponses rapides, et celle de l'accueil, avec `make-loop`. La table les attend, `loop: null` les marque
 - [ ] Le crochet de déploiement Vercel dans le workflow `release`, et la lecture de l'API GitHub à la compilation
 - [ ] Vercel Analytics, un seul événement personnalisé, le clic sur « Télécharger » avec le système dedans
 - [ ] Déclarer le site à la Search Console et y déposer le sitemap
-- [ ] Relire l'anglais et l'espagnol une fois le français figé. Les trois catalogues sont pleins, et ils portent maintenant le corps des huit fonctionnalités : c'est du texte suivi, et il n'a été relu par personne
+- [ ] Relire l'anglais et l'espagnol une fois le français figé. Les trois catalogues sont pleins, et ils portent maintenant le corps des sept fonctionnalités : c'est du texte suivi, et il n'a été relu par personne
 
 ## Ce que ce plan rendra à `plan.md`
 

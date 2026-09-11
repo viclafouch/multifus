@@ -23,7 +23,7 @@ versions déjà installées.
 ## Ouvrir le site
 
 Le sujet est en cours, et tout est dans [plan-site.md](./plan-site.md) : ce que
-le site doit faire, ses quatorze pages, son socle et ce qui reste à poser. Le
-socle tourne depuis le 11 septembre 2026, quarante-deux pages prérendues dans
+le site doit faire, ses treize pages, son socle et ce qui reste à poser. Le
+socle tourne depuis le 11 septembre 2026, trente-neuf pages prérendues dans
 trois langues ; restent le dessin, le texte et la mise en ligne. Il rendra ici le
 journal des versions et le lien qui l'ouvre depuis À propos.

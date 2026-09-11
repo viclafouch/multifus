@@ -8,12 +8,14 @@ import { DownloadScreen } from '@/screens/download-screen'
 import { FeatureScreen } from '@/screens/feature-screen'
 import { HomeScreen } from '@/screens/home-screen'
 import { PlainScreen } from '@/screens/plain-screen'
+import { RuneScreen } from '@/screens/rune-screen'
 
 const PAGE_BODIES = {
   home: HomeScreen,
   feature: FeatureScreen,
   download: DownloadScreen,
   comparison: ComparisonScreen,
+  runes: RuneScreen,
   plain: PlainScreen
 } as const satisfies Record<PageKind, React.ComponentType<PageScreenProps>>
 

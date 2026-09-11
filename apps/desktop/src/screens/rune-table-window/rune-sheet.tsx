@@ -3,7 +3,12 @@ import { X } from 'lucide-react'
 import { i18n } from '@lingui/core'
 import { t } from '@lingui/core/macro'
 import { Button } from '@multifus/retro'
-import { RUNE_FAMILIES } from '@/constants/runes'
+import {
+  RUNE_FAMILY_IDS,
+  RUNE_FAMILY_STATS,
+  RUNE_WEIGHTS
+} from '@multifus/runes'
+import { RUNE_FAMILY_NAMES, RUNE_STAT_NAMES } from '@/constants/runes'
 import type { useWindowDrag } from '@/hooks/use-window-drag'
 import { RuneLine } from '@/screens/rune-table-window/rune-line'
 
@@ -64,22 +69,22 @@ export const RuneSheet = ({ drag, look, onClose, ref }: RuneSheetProps) => {
             </th>
           </tr>
         </thead>
-        {RUNE_FAMILIES.map((family) => {
+        {RUNE_FAMILY_IDS.map((family) => {
           return (
-            <tbody
-              key={family.name}
-              className="rune-family"
-              data-family={family.name}
-            >
+            <tbody key={family} className="rune-family" data-family={family}>
               <tr>
                 <th scope="colgroup" colSpan={5} className="rune-clan">
-                  {i18n._(family.label)}
+                  {i18n._(RUNE_FAMILY_NAMES[family])}
                 </th>
               </tr>
-              {family.rows.map((row) => {
-                const stat = i18n._(row.stat)
-
-                return <RuneLine key={stat} stat={stat} row={row} />
+              {RUNE_FAMILY_STATS[family].map((stat) => {
+                return (
+                  <RuneLine
+                    key={stat}
+                    stat={i18n._(RUNE_STAT_NAMES[stat])}
+                    weights={RUNE_WEIGHTS[stat]}
+                  />
+                )
               })}
             </tbody>
           )

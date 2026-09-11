@@ -1,22 +1,25 @@
+import { i18n } from '@lingui/core'
 import { t } from '@lingui/core/macro'
-import type { RuneRow } from '@/constants/runes'
-import { runeWeight } from '@/helpers/rune'
+import type { RuneWeights } from '@multifus/runes'
+import { formatWeight } from '@multifus/runes'
 
 type RuneLineProps = Readonly<{
-  row: RuneRow
   stat: string
+  weights: RuneWeights
 }>
 
-export const RuneLine = ({ row, stat }: RuneLineProps) => {
+export const RuneLine = ({ stat, weights }: RuneLineProps) => {
   return (
     <tr>
       <th scope="row" className="rune-stat">
         {stat}
       </th>
-      <RuneCell weight={row.simple} />
-      <RuneCell weight={row.pa} />
-      <RuneCell weight={row.ra} />
-      <td className="rune-unit">{runeWeight(row.unit)}</td>
+      <RuneCell weight={weights.simple} />
+      <RuneCell weight={weights.pa} />
+      <RuneCell weight={weights.ra} />
+      <td className="rune-unit">
+        {formatWeight({ weight: weights.unit, locale: i18n.locale })}
+      </td>
     </tr>
   )
 }
@@ -35,5 +38,9 @@ const RuneCell = ({ weight }: RuneCellProps) => {
     )
   }
 
-  return <td className="rune-cell">{runeWeight(weight)}</td>
+  return (
+    <td className="rune-cell">
+      {formatWeight({ weight, locale: i18n.locale })}
+    </td>
+  )
 }

@@ -1,9 +1,9 @@
-type WrittenDayParams = Readonly<{
+type FormatDateParams = Readonly<{
   day: string
   locale: string
 }>
 
-export const writtenDay = ({ day, locale }: WrittenDayParams) => {
+export const formatDate = ({ day, locale }: FormatDateParams) => {
   return new Intl.DateTimeFormat(locale, {
     dateStyle: 'long',
     timeZone: 'UTC'

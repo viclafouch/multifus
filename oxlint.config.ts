@@ -40,7 +40,8 @@ export default defineConfig({
         'apps/desktop/src/**/*.test.ts',
         'apps/desktop/src/**/*.test.tsx',
         'apps/website/src/**/*.test.ts',
-        'apps/website/src/**/*.test.tsx'
+        'apps/website/src/**/*.test.tsx',
+        'packages/runes/src/**/*.test.ts'
       ],
       plugins: TEST_PLUGINS,
       rules: {

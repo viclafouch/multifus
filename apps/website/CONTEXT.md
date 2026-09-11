@@ -96,6 +96,25 @@ la vidéo, le fil d'Ariane. Sa forme vient de `schema-dts`, pas de nous : une
 propriété mal tapée ne compile plus, et `Addressed` n'ajoute que ce que le site
 exige en plus, l'adresse chez nous sur chaque fiche.
 
+**Poids** (`RUNE_WEIGHTS`) : ce qu'une stat vaut en forgemagie, et le mot que le
+jeu emploie. Les chiffres viennent de `@multifus/runes`, le paquet que le
+logiciel lit aussi ; le site n'en garde que les noms, dans son catalogue à lui.
+
+**Concasseur** et **enclume** : les deux endroits du jeu où un poids sert, celui
+où l'on brise et celui où l'on forge. Ce sont les mots du jeu, et
+`/poids-des-runes` est la seule page qui les emploie.
+
+**Stade** : la simple, la Pa, la Ra. Ce sont les trois forces d'une même rune, et
+« Pa » ne dit rien des points d'action, ce que `/poids-des-runes` écrit noir sur
+blanc parce que c'est la confusion du débutant. La colonne s'appelle donc « Rune
+Pa » sur le site, quand le tableau du logiciel, qui n'a pas la place, écrit
+« Pa ».
+
+Le site écrit **« Intelligence, Force, Agilité, Chance »** là où le logiciel
+serre « Ine / Fo / Age / Cha ». Ce sont les quatre mêmes stats dans le même
+ordre : une page se lit sans abréviation, une fenêtre de 320 points ne le peut
+pas.
+
 **Cartouche** (`Cartouche`) : les trois drapeaux, en haut à droite de la bande
 qui porte la ligne d'indépendance. C'est le cartouche des maps du logiciel, moins
 le numéro de version, que le site n'a pas. Chaque drapeau est un lien vers **la
@@ -107,7 +126,7 @@ couleur.
 haut, et qui propose l'autre langue à qui arrive dans la mauvaise. Elle ne
 redirige jamais, et elle ne se montre qu'**une fois** : `useOffer` pose le
 souvenir à la seconde où elle s'affiche. Elle naît après l'hydratation et jamais
-au prérendu, sinon les quarante-deux fichiers livrés porteraient la langue d'un
+au prérendu, sinon les trente-neuf fichiers livrés porteraient la langue d'un
 seul visiteur, et `verify-html.mjs` refuse son `data-offer` dans une page livrée.
 Elle recouvre le début du contenu au lieu de le pousser : dans le flux, elle
 décalait la page une fois par visiteur.
@@ -169,7 +188,7 @@ lien à l'intérieur, c'est l'ordre des greffons Vite qu'il faut reprendre, pas 
 phrase.
 
 **Une voix ne se mute jamais.** Le logiciel a `speak()`, qui active une instance
-globale, et il a raison : une fenêtre, une langue. Le site prérend quatorze pages
-en parallèle dans trois langues ; sur un singleton muté ce sont des pages
+globale, et il a raison : une fenêtre, une langue. Le site prérend ses pages en
+parallèle dans trois langues ; sur un singleton muté ce sont des pages
 mélangées, et le bogue ne se voit qu'à la compilation. Les trois voix vivent dans
 `lib/i18n.ts` et passent par `I18nProvider`.
