@@ -12,7 +12,7 @@ export const LoopPlate = ({ loop, caption }: LoopPlateProps) => {
   const { source, poster } = LOOPS[loop]
 
   return (
-    <div className="stage relative aspect-loop w-full max-w-stage">
+    <div className="stage relative aspect-loop w-full">
       <video
         src={source}
         poster={poster}

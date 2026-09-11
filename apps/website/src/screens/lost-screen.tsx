@@ -16,13 +16,13 @@ export const LostScreen = () => {
   return (
     <SiteShell page="home">
       <Band className="pb-20">
-        <h1 className="font-carve text-banner tracking-hero text-cream uppercase">
+        <h1 className="surface-1 font-carve text-banner tracking-hero text-cream uppercase">
           {i18n._(LOST_TITLE)}
         </h1>
-        <p className="max-w-lead text-herald text-balance">
+        <p className="surface-2 max-w-lead text-herald text-balance text-band">
           {i18n._(LOST_PROMISE)}
         </p>
-        <PageLink page="home" className="text-way">
+        <PageLink page="home" className="surface-3 tab text-deed">
           {i18n._(BACK_HOME)}
         </PageLink>
       </Band>

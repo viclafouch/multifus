@@ -5,7 +5,7 @@ export const ProvenanceList = () => {
   const { i18n } = useLingui()
 
   return (
-    <dl className="plate flex flex-col">
+    <dl className="glass flex flex-col">
       {PROVENANCE_IDS.map((provenance) => {
         const { name, origin } = PROVENANCES[provenance]
 

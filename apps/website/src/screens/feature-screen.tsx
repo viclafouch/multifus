@@ -23,12 +23,14 @@ export const FeatureScreen = ({ page }: PageScreenProps) => {
       <Band className="pb-8">
         <PageHead page={page} />
         {loop === null ? null : (
-          <LoopPlate loop={loop} caption={i18n._(PAGE_PROMISES[page])} />
+          <div className="w-full max-w-roll">
+            <LoopPlate loop={loop} caption={i18n._(PAGE_PROMISES[page])} />
+          </div>
         )}
       </Band>
       {body === null ? null : (
         <>
-          <Band className="pt-2">
+          <Band className="reveal pt-2">
             <Opening>{i18n._(body.lead)}</Opening>
             {body.passages.map((passage) => {
               const title = i18n._(passage.title)
@@ -40,7 +42,7 @@ export const FeatureScreen = ({ page }: PageScreenProps) => {
               )
             })}
           </Band>
-          <Band className="pt-0">
+          <Band className="reveal pt-0">
             <PlateBlock title={i18n._(body.limit.title)}>
               <ProseLines lines={body.limit.lines} />
             </PlateBlock>

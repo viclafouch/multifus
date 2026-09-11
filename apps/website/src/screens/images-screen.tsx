@@ -70,7 +70,7 @@ export const ImagesScreen = ({ page }: PageScreenProps) => {
         <PageHead page={page} />
         <Opening>{i18n._(OPENING)}</Opening>
       </Band>
-      <Band className="gap-4 py-0">
+      <Band className="reveal gap-4 py-0">
         <BandTitle>{i18n._(FROM_ANKAMA)}</BandTitle>
         <ProvenanceList />
         <p className="max-w-tale text-aside text-band">
@@ -78,7 +78,7 @@ export const ImagesScreen = ({ page }: PageScreenProps) => {
           <OutLink href={ANKAMA_FOLDER}>{i18n._(FOLDER_LINK)}</OutLink>
         </p>
       </Band>
-      <Band className="pt-12">
+      <Band className="reveal pt-12">
         <ProseBlock level={2} title={i18n._(NEVER_TITLE)}>
           <Prose>{i18n._(NEVER_CLIENT)}</Prose>
           <Prose>{i18n._(NEVER_SOURCES)}</Prose>
@@ -101,7 +101,7 @@ export const ImagesScreen = ({ page }: PageScreenProps) => {
           <Prose>{i18n._(OURS_PHISHING)}</Prose>
         </ProseBlock>
       </Band>
-      <Band className="pt-0">
+      <Band className="reveal pt-0">
         <PlateBlock title={i18n._(LIMIT_TITLE)}>
           <Prose>{i18n._(LIMIT_RIGHTS)}</Prose>
           <Prose>{i18n._(LIMIT_REMOVAL)}</Prose>

@@ -10,7 +10,7 @@ export const SkipLink = () => {
   return (
     <a
       href={`#${CONTENT_ANCHOR}`}
-      className="plate sighted absolute top-2 left-2 z-50 -translate-y-[200%] px-4 py-2 text-way focus:translate-y-0"
+      className="canopy sighted absolute top-2 left-2 z-50 -translate-y-[200%] px-4 py-2 text-deed focus:translate-y-0"
     >
       {i18n._(SKIP_TO_CONTENT)}
     </a>

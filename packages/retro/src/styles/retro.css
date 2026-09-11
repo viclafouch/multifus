@@ -101,7 +101,6 @@
   --spacing-lath: 3px;
   --spacing-fence: 30px;
   --spacing-crest: 9rem;
-  --spacing-horizon: clamp(17rem, 40vh, 26rem);
   --spacing-shot: 76vh;
   --spacing-answers: 64vh;
 

@@ -5,7 +5,5 @@ type ProseProps = Readonly<{
 }>
 
 export const Prose = ({ children }: ProseProps) => {
-  return (
-    <p className="max-w-tale text-tale text-muted-foreground">{children}</p>
-  )
+  return <p className="max-w-tale text-tale text-band">{children}</p>
 }

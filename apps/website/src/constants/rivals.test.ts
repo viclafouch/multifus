@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { LANGUAGES } from '@/constants/languages'
 import {
+  HALF_NOTES,
   MARK_NAMES,
   RIVAL_IDS,
   RIVALS,
@@ -72,6 +73,29 @@ describe('la table du comparatif', () => {
     })
 
     expect(won.length).toBeGreaterThan(0)
+  })
+
+  it('donne une note à chaque case à moitié, et rien qu’à elles', () => {
+    const halves = TRAIT_IDS.flatMap((trait) => {
+      return RIVAL_IDS.filter((rival) => {
+        return TRAITS[trait].theirs[rival] === 'half'
+      }).map((rival) => {
+        return `${trait}-${rival}`
+      })
+    })
+    const noted = HALF_NOTES.map((note) => {
+      return `${note.trait}-${note.rival}`
+    })
+
+    expect(noted.toSorted(alphabetical)).toStrictEqual(
+      halves.toSorted(alphabetical)
+    )
+  })
+
+  it.each(LANGUAGES)('écrit chaque note à moitié en %s', (language) => {
+    for (const note of HALF_NOTES) {
+      expect(SPEAKERS[language]._(note.line)).not.toBe('')
+    }
   })
 
   it('date son relevé', () => {

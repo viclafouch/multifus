@@ -31,7 +31,7 @@ export const RuneTable = () => {
   const { i18n } = useLingui()
 
   return (
-    <div className="plate">
+    <div className="glass">
       <table className="w-full border-collapse text-left">
         <caption className="sr-only">{i18n._(TABLE_SUMMARY)}</caption>
         <thead>

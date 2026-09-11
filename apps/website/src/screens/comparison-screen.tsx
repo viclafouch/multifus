@@ -14,6 +14,8 @@ import { REPOSITORY } from '@/constants/site'
 
 const HOW_READ = msg`Chaque case de ce tableau est lue dans le code de l’outil, jamais sur sa page d’accueil. Un outil qui garde son code fermé n’a pas de colonne ici : rien de ce qu’il promet ne se vérifie. Et vous trouverez deux lignes que Multifus ne coche pas, parce qu’un comparatif où l’on gagne partout ne vaut rien.`
 
+const HOW_HALF = msg`Une case à moitié dit ce qui manque : posez le curseur dessus, ou touchez-la.`
+
 const MISSING_TITLE = msg`Ce que Multifus laisse aux autres`
 
 const MISSING_BODY = msg`Multifus ne range pas les fenêtres côte à côte : c’est un choix, et il ne changera pas. Il amène devant vous celle du personnage qui joue, il ne redessine pas votre bureau. Et il ne garde pas encore de compositions d’équipe.`
@@ -33,11 +35,12 @@ export const ComparisonScreen = ({ page }: PageScreenProps) => {
       <Band className="pb-6">
         <PageHead page={page} />
         <Prose>{i18n._(HOW_READ)}</Prose>
+        <Prose>{i18n._(HOW_HALF)}</Prose>
       </Band>
       <Band className="py-0">
         <RivalTable />
       </Band>
-      <Band className="pt-10">
+      <Band className="reveal pt-12">
         <ProseBlock level={2} title={i18n._(MISSING_TITLE)}>
           <Prose>{i18n._(MISSING_BODY)}</Prose>
         </ProseBlock>

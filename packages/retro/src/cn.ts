@@ -27,8 +27,7 @@ const CONTAINERS = [
   'world',
   'loop',
   'blurb',
-  'lead',
-  'stage'
+  'lead'
 ] as const satisfies readonly string[]
 
 const twMerge = extendTailwindMerge({

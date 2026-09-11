@@ -15,7 +15,7 @@ export const PageKin = ({ pages }: PageKinProps) => {
   const { i18n } = useLingui()
 
   return (
-    <Band>
+    <Band className="reveal">
       <BandTitle>{i18n._(ALSO_SEE)}</BandTitle>
       <ul className="grid gap-4 sm:grid-cols-2">
         {pages.map((page) => {

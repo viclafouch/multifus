@@ -7,15 +7,22 @@ import { useLanguage } from '@/hooks/use-language'
 type PageLinkProps = Readonly<{
   page: PageId
   children: React.ReactNode
+  isHere?: boolean
   className?: string
 }>
 
-export const PageLink = ({ page, children, className }: PageLinkProps) => {
+export const PageLink = ({
+  page,
+  children,
+  isHere = false,
+  className
+}: PageLinkProps) => {
   const language = useLanguage()
 
   return (
     <a
       href={pathOf({ page, language })}
+      aria-current={isHere ? 'page' : undefined}
       className={cn('sighted transition-colors hover:text-cream', className)}
     >
       {children}

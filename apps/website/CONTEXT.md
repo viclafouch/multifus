@@ -45,9 +45,24 @@ y mettre.
 reprennent le nom de leur page, et c'est le même mot des deux côtés. Le code dit
 `Trait` parce que `Ligne` est déjà pris par le menu de l'accueil.
 
-**Case** (`Mark`) : `yes`, `half` ou `no`, et rien d'autre. Un disque plein, un
-demi-disque, un anneau vide, jamais une couleur. Deux lignes au moins portent
-`no` en face de Multifus : un comparatif qu'on gagne partout ne se croit pas.
+**Case** (`Mark`) : `yes`, `half` ou `no`, et rien d'autre. Un disque plein en
+vert feuille, un demi-disque en ambre, un anneau vide en flamme. Un SVG, jamais
+un fond CSS : en contraste forcé, le tracé survit et trois fonds deviendraient
+trois cercles identiques. La forme suffit seule, la
+couleur ne fait que presser le pas, et `MARK_NAMES` donne le mot au lecteur
+d'écran. Deux lignes au moins portent `no` en face de Multifus : un comparatif
+qu'on gagne partout ne se croit pas.
+
+**Légende** (`MarkKey`) : les trois cases et ce que chacune veut dire,
+`MARK_MEANINGS`, posées au-dessus du tableau. Elle ouvre le comparatif, parce que
+le demi-disque se devine et que personne ne devine juste.
+
+**Note** (`HalfNote`) : une phrase par case à moitié, une seule ligne, qui dit ce
+qui manque à l'outil. `MarkTip` la lève en bulle au survol et au focus, par un
+portail vers le `body` : dans le tableau, l'`overflow-x` la trancherait. Elle est
+aussi dans le HTML livré, en `sr-only`, donc elle ne dépend pas du JavaScript.
+`constants/rivals.test.ts` tient la bijection : une case à moitié sans note, ou
+une note sans case, ne compile plus.
 
 **Voisines** (`kin`) : les deux ou trois pages vers lesquelles une page renvoie
 en bas, choisies à la main dans `constants/pages.ts`. C'est le maillage interne,
@@ -83,7 +98,8 @@ tournée vers une seule page : ce qui se donne sans manque ne se croit pas.
 
 **Ligne** (`WayLink`) : une entrée de la liste des fonctionnalités de l'accueil,
 qui est le menu de l'accueil du logiciel. **Carte** (`PageCard`) est ce qu'une
-voisine montre en bas d'une page.
+voisine montre en bas d'une page. **Onglet** (`MastLink`) est un lien de la barre
+du haut, et il sait dire qu'on est déjà sur sa page.
 
 **Affiche** (`poster`) : l'image tirée d'une boucle, posée sur le lecteur tant
 que la vidéo ne joue pas, et donnée à Google comme vignette du résultat. Elle
@@ -123,9 +139,11 @@ serre « Ine / Fo / Age / Cha ». Ce sont les quatre mêmes stats dans le même
 ordre : une page se lit sans abréviation, une fenêtre de 320 points ne le peut
 pas.
 
-**Cartouche** (`Cartouche`) : les trois drapeaux, en haut à droite de la bande
-qui porte la ligne d'indépendance. C'est le cartouche des maps du logiciel, moins
-le numéro de version, que le site n'a pas. Chaque drapeau est un lien vers **la
+**Cartouche** (`Cartouche`) : les trois drapeaux, dans la barre du haut, entre le
+comparatif et le bouton. C'est le cartouche des maps du logiciel, moins le numéro
+de version, que le site n'a pas. Il a quitté la bande d'indépendance le jour où
+cette bande a cessé de coller : la langue se change à tout moment, pas seulement
+en haut de page. Chaque drapeau est un lien vers **la
 même page** dans sa langue, jamais vers l'accueil : changer de langue ne fait pas
 perdre sa place. Celui de la langue en cours porte `aria-current` et reste seul en
 couleur.

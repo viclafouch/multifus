@@ -49,7 +49,7 @@ export const DownloadScreen = ({ page }: PageScreenProps) => {
         <PageHead page={page} />
         <DownloadPair />
       </Band>
-      <Band className="pt-4">
+      <Band className="reveal pt-4">
         <BandTitle>{i18n._(BEFORE_INSTALL)}</BandTitle>
         <Prose>{i18n._(BEFORE_LEAD)}</Prose>
         <ProseBlock level={3} title={i18n._(SIGNED_TITLE)}>
@@ -57,7 +57,7 @@ export const DownloadScreen = ({ page }: PageScreenProps) => {
         </ProseBlock>
         <ProseBlock level={3} title={i18n._(ATTESTATION_TITLE)}>
           <Prose>{i18n._(ATTESTATION_BODY)}</Prose>
-          <code className="note block max-w-tale overflow-x-auto px-4 py-3 font-mono text-aside text-cream">
+          <code className="glass block max-w-tale overflow-x-auto px-4 py-3 font-mono text-aside text-cream">
             {i18n._(ATTESTATION_COMMAND)}
           </code>
         </ProseBlock>

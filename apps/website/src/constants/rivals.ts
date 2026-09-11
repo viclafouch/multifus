@@ -1,6 +1,13 @@
 import type { MessageDescriptor } from '@lingui/core'
 import { msg } from '@lingui/core/macro'
-import type { Mark, Rival, RivalId, Trait, TraitId } from '@/@types/rival'
+import type {
+  HalfNote,
+  Mark,
+  Rival,
+  RivalId,
+  Trait,
+  TraitId
+} from '@/@types/rival'
 import { PAGE_NAMES } from '@/constants/wording'
 
 export const SURVEYED_ON = '2026-08-31'
@@ -189,8 +196,51 @@ export const TRAIT_NAMES = {
   source: msg`Code publié`
 } as const satisfies Record<TraitId, MessageDescriptor>
 
+export const MARK_IDS = ['yes', 'half', 'no'] as const satisfies readonly Mark[]
+
 export const MARK_NAMES = {
   yes: msg`oui`,
   half: msg`à moitié`,
   no: msg`non`
 } as const satisfies Record<Mark, MessageDescriptor>
+
+export const MARK_MEANINGS = {
+  yes: msg`L’outil fait cette ligne en entier.`,
+  half: msg`Il en fait une partie, et la case dit laquelle.`,
+  no: msg`Son code ne porte rien sur cette ligne.`
+} as const satisfies Record<Mark, MessageDescriptor>
+
+const LAST_TEAM = msg`Retient la dernière équipe, pas des compositions nommées.`
+
+export const HALF_NOTES = [
+  {
+    trait: 'runeTable',
+    rival: 'retroToolbox',
+    line: msg`Dans sa fenêtre à lui, pas par-dessus le jeu.`
+  },
+  {
+    trait: 'split',
+    rival: 'dosoft',
+    line: msg`Aligne les fenêtres, sans la grille à quatre.`
+  },
+  {
+    trait: 'teams',
+    rival: 'dosoft',
+    line: LAST_TEAM
+  },
+  {
+    trait: 'teams',
+    rival: 'retroToolbox',
+    line: LAST_TEAM
+  },
+  {
+    trait: 'signed',
+    rival: 'focusRetro',
+    line: msg`Pas signé, mais l’attestation GitHub y est.`
+  },
+  {
+    trait: 'source',
+    rival: 'retroToolbox',
+    line: msg`Code publié, sans licence libre.`
+  }
+] as const satisfies readonly HalfNote[]

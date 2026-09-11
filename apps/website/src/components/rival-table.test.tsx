@@ -1,6 +1,13 @@
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { I18nProvider } from '@lingui/react'
-import { cleanup, render, screen, within } from '@testing-library/react'
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  within
+} from '@testing-library/react'
 import { RivalTable } from '@/components/rival-table'
 import { RIVAL_IDS, RIVALS, TRAIT_IDS, TRAIT_NAMES } from '@/constants/rivals'
 import { SPEAKERS } from '@/lib/i18n'
@@ -66,6 +73,35 @@ describe('le tableau du comparatif', () => {
     expect(
       screen.getAllByRole('img', { name: 'à moitié' }).length
     ).toBeGreaterThan(0)
+  })
+
+  it('livre la raison d’une case à moitié sans qu’on la survole', () => {
+    show()
+
+    expect(screen.getByText('Code publié, sans licence libre.')).toBeDefined()
+  })
+
+  it('lève la bulle quand le curseur se pose sur une case à moitié', () => {
+    show()
+
+    const asked = screen.getAllByRole('button')[0]
+
+    expect(screen.queryByRole('tooltip')).toBeNull()
+
+    fireEvent.mouseEnter(asked)
+
+    expect(screen.getByRole('tooltip').textContent).toBe(
+      'Dans sa fenêtre à lui, pas par-dessus le jeu.'
+    )
+
+    vi.useFakeTimers()
+    fireEvent.mouseLeave(asked)
+    act(() => {
+      vi.runAllTimers()
+    })
+    vi.useRealTimers()
+
+    expect(screen.queryByRole('tooltip')).toBeNull()
   })
 
   it('date son relevé en français', () => {

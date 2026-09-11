@@ -1,3 +1,5 @@
+import type { MessageDescriptor } from '@lingui/core'
+
 export type RivalId =
   | 'dosoft'
   | 'dracoon'
@@ -29,4 +31,10 @@ export type TraitId =
 export type Trait = Readonly<{
   mine: Mark
   theirs: Readonly<Record<RivalId, Mark>>
+}>
+
+export type HalfNote = Readonly<{
+  trait: TraitId
+  rival: RivalId
+  line: MessageDescriptor
 }>

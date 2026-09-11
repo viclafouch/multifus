@@ -60,7 +60,7 @@ export const RuneScreen = ({ page }: PageScreenProps) => {
         <RuneTable />
         <p className="max-w-tale text-aside text-band">{i18n._(STAGES)}</p>
       </Band>
-      <Band className="pt-12">
+      <Band className="reveal pt-12">
         <ProseBlock level={2} title={i18n._(READ_TITLE)}>
           <Prose>{i18n._(READ_BODY)}</Prose>
         </ProseBlock>

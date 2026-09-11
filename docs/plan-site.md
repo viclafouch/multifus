@@ -268,7 +268,7 @@ pas sans son espagnol. C'est le maillage interne, et il fait le travail d'une
 barre latérale sans en avoir l'air.
 
 **La liste des fonctionnalités de l'accueil est le menu de l'accueil du
-logiciel**, `btn-way` compris, et la règle 19 de
+logiciel**, `btn-way` compris, et la règle 21 de
 [design-system.md](./design-system.md) le dit maintenant. Le voile du survol ne
 se voit pas sur un fond uni, faute de décor dessous ; le losange qui entre
 suffit.
@@ -361,10 +361,32 @@ règle, et `constants/rivals.test.ts` la tient : un comparatif sans une seule
 défaite ne compile plus. Le test tient aussi le plancher inverse, chaque
 concurrent gardant au moins un trait, faute de quoi il n'est là que pour perdre.
 
-**La case n'a pas de couleur.** Un disque plein, un demi-disque, un anneau vide,
-et son mot en toutes lettres pour le lecteur d'écran. La règle 1 de
-[design-system.md](./design-system.md) le dit maintenant : soixante-douze cases
-vertes noieraient le seul bouton vert de la page.
+**La case porte une couleur depuis le 11 septembre 2026**, et le comparatif est
+la seule table qui en porte : jade pour ce qui est fait, miel pour ce qui l'est à
+moitié, corail pour ce qui ne l'est pas. La forme reste seule à suffire, disque
+plein, demi-disque, anneau vide, et le mot en toutes lettres pour le lecteur
+d'écran. Ce qui noyait le bouton du bas dans le premier jet, ce n'était pas la
+couleur, c'était le vert d'action employé deux fois ; trois teintes séparées et
+sourdes lisent la table d'un coup d'œil sans y toucher. La règle 3 de
+[design-system.md](./design-system.md) le dit maintenant.
+
+**Une case à moitié dit pourquoi, dans une bulle.** `HALF_NOTES` en porte une
+phrase par case, une seule ligne, et `MarkTip` la lève au survol comme au focus.
+La bulle sort du tableau par un portail vers le `body` : le tableau glisse de
+côté dans un `overflow-x`, qui coupe aussi ce qui déborde en hauteur, et une
+bulle posée dedans serait tranchée. Elle se ferme au défilement, à la sortie du
+curseur et sur Échap.
+
+La phrase, elle, n'attend pas le JavaScript : elle est dans le HTML livré, en
+`sr-only` sous la case, et `aria-describedby` l'y rattache. Le `title` natif la
+redonne au survol si rien n'a chargé. `constants/rivals.test.ts` tient la
+bijection : une case à moitié sans note, ou une note sans case, ne compile plus.
+Deux cases partagent la même phrase, et c'est un seul `msg`, comme le demande
+`code-style.md`.
+
+**Une légende ouvre le tableau**, `MarkKey`, trois pilules qui disent ce que
+chaque case veut dire. Sans elle, le demi-disque se devine, et personne ne devine
+juste du premier coup.
 
 `/comparatif` a pris une cinquième sorte de page, `kind: 'comparison'`, plutôt
 que de se glisser dans `plain` : la table des sortes était déjà là pour ça. Sept
@@ -416,7 +438,7 @@ fenêtres » plus haut dans ce plan est morte de la même façon, le CONTEXT aya
 gardé « fenêtre » parce que c'est ce qui se tape dans Google.
 
 `PlateBlock` est né de l'accueil, qui posait déjà « Ce que Multifus ne fait pas »
-sur du verre : la règle 35 de [design-system.md](./design-system.md) en fait la
+sur du verre : la règle 37 de [design-system.md](./design-system.md) en fait la
 forme de toute limite. `Opening` porte l'amorce, avec le filet à gauche des
 chiffres de l'accueil. `ProseLines` rend une suite de paragraphes et se clé sur
 la phrase rendue, un `MessageDescriptor` n'ayant pas d'identifiant garanti.
@@ -446,7 +468,7 @@ et la constante Rust qui la borne.
 **La table du site n'a pas les couleurs de famille du logiciel.** Le tableau
 posé sur le jeu tient dans 320 points, et ses cinq tons y font gagner du temps ;
 sur une page de vente, cinq bandes de couleur disputeraient l'œil au seul bouton
-vert, ce que la règle 1 de [design-system.md](./design-system.md) interdit. La
+vert, ce que la règle 2 de [design-system.md](./design-system.md) interdit. La
 famille se dit ici en Bebas et en capitales, et un filet sépare les trois
 colonnes de runes de la colonne du point, qui ne répond pas à la même question.
 
@@ -585,9 +607,10 @@ On n'est ni dans un jeu ni dans un logiciel. Un site normal, navigable, un menu
 en haut, du défilement. Mais on sent l'univers de Dofus.
 
 `packages/retro` donne la matière, jamais la mise en page : les jetons, Bebas
-pour les titres et les boutons, Roboto pour tout ce qui se lit, le vert pour un
-seul bouton par page et c'est « Télécharger », l'`iron`, les ombres en courbe.
-La règle 30 de `design-system.md` compte double ici : Bebas ne porte pas une
+pour les titres et les boutons, Roboto pour tout ce qui se lit, le vert pour
+l'action et c'est « Télécharger », l'`iron`, les ombres en courbe. Le site ajoute
+`--deep` et `--page`, et ses propres matières pour un fond sans décor.
+La règle 32 de `design-system.md` compte double ici : Bebas ne porte pas une
 phrase, et un site de vente est fait de phrases.
 
 **Ce n'est pas un site de phishing d'Ankama**, et c'est la contrainte la plus
@@ -675,6 +698,69 @@ de cliquer.
 **« Poids des runes : la référence forgemagie »** est la phrase de Xixou. Le mot
 « référence » est à prendre, la table est ce qui le mérite.
 
+## Le dessin du site
+
+**Repris en entier le 11 septembre 2026.** La page d'accueil était terne : un
+nom en capitales, un bouton, une vidéo bornée au milieu d'un grand vide, et une
+barre dont les liens étaient plus gros que le nom du site.
+
+**La palette du jeu est restée, après un aller-retour.** Une encre bleu-nuit avec
+un jade d'accent a été posée puis retirée le même jour. Elle était plus moderne
+et elle ne disait plus rien de Dofus Retro, quand c'est tout ce que le site a de
+propre ; plusieurs concurrents tiennent déjà ce sombre-froid-accent-vif.
+`design-system.md` garde la leçon : ce qui manquait n'était pas la couleur,
+c'était l'air.
+
+**La barre du haut ne fait plus qu'une ligne.** La ligne d'indépendance passe
+au-dessus, dans le flux, et s'en va au premier défilement ; ce qui colle, c'est
+la barre seule. Elle porte le nom, le menu des fonctionnalités, le comparatif,
+les trois drapeaux et le bouton « Télécharger ». Elle arrive transparente sur le
+décor de l'accueil et se pose en défilant, `animation-timeline: scroll()`. Elle
+n'a pas de `backdrop-filter` : la vidéo de l'accueil passe dessous, et la règle
+27 de [design-system.md](./design-system.md) a déjà payé ce bug.
+
+**Les tailles de la barre ne dépendent plus de la hauteur de la fenêtre.**
+`text-way` est un `clamp` en `vh`, fait pour une fenêtre de 320 points : sur un
+écran de bureau il montait les liens à 22 pixels, au-dessus du nom du site. La
+barre est en `text-deed` pour les liens et `text-action` pour le nom, et la
+hiérarchie se voit.
+
+**On sait enfin où l'on est.** `MastLink` porte `aria-current="page"`, le menu
+des fonctionnalités porte `data-here` quand la page en est une, et `tab` tire un
+trait de jade sous l'onglet courant. La barre n'avait aucun repère de lieu.
+
+**Le menu des fonctionnalités montre les promesses.** Six entrées sur deux
+colonnes, nom en Bebas et promesse dessous. Il reste un `<details>` : les six
+adresses sont dans le HTML livré, robot compris.
+
+**L'accueil dit une phrase, pas un nom.** Le titre est « Jouez en multicompte
+sans chercher une fenêtre », le second membre en vert, et il est en Roboto gras,
+non en Bebas : la règle 32 interdit une phrase en Bebas, qui n'a pas de bas de
+casse. Le nom Multifus reste dans la barre et dans le titre de la page. `headline`
+porte le corps de ce titre, que le thème n'avait pas.
+
+**Le décor monte sous la barre**, le titre et le bouton tiennent la colonne de
+gauche, et la boucle de l'AutoFocus occupe la droite en débordant jusqu'au bord de
+la fenêtre, `spill`. Le débordement se mesure depuis `--page`, jamais en
+pourcentage : la figure est une case de grille, donc un `50%` y vaut la moitié de
+sa colonne et la vidéo se faisait couper. `ebb` l'éteint vers la droite par un
+voile posé dessus, jamais par un masque : un masque sur une vidéo qui joue
+rejoue le bug de la règle 27.
+
+**Les quatre chiffres de l'accueil sont partis.** Sept, zéro, deux, trois : la
+forme se voit sur tous les sites de logiciel, et ce qu'ils disaient est déjà dans
+« Ce que Multifus ne fait pas », écrit en phrases.
+
+**Le mouvement se fait au défilement, en CSS seul.** `surface-1` à `surface-5`
+échelonnent l'arrivée du hero et des titres de page, `reveal` lève chaque bande
+quand elle entre, par `animation-timeline: view()`. Aucun observateur, aucun état
+React, rien de monté ni démonté. Les deux vivent dans un `@supports`, et sans lui
+la barre arrive posée et les bandes sont là : le repli est écrit, pas espéré.
+Chaque `surface-N` porte son animation entière, nom, durée, courbe et délai, la
+règle 23 refusant une matière qui ne vaut rien sans une autre. `reveal` ne se pose
+pas sur la bande du comparatif, dont la première colonne est collée : un
+`transform` sur un ancêtre est exactement ce qui décolle un `sticky`.
+
 ## Ce qui reste à faire
 
 - [ ] Acheter `multifus.app`. Libre au 11 septembre 2026, aucun serveur de nom sur `.app`, `.io`, `.gg`, `.net` ni `.org`. Pas de `.fr`, le site parlera trois langues. Jamais « dofus » dans le domaine, l'article 13.3 des CGU demandant une autorisation écrite pour les marques. `HOST` est déjà `https://multifus.app` dans `apps/website/src/constants/site.ts`
@@ -687,6 +773,8 @@ de cliquer.
 - [ ] Le crochet de déploiement Vercel dans le workflow `release`, et la lecture de l'API GitHub à la compilation
 - [ ] Vercel Analytics, un seul événement personnalisé, le clic sur « Télécharger » avec le système dedans
 - [ ] Déclarer le site à la Search Console et y déposer le sitemap
+- [ ] Revérifier dans le code des concurrents les quatre notes à moitié qui ont été déduites du tableau de [concurrents.md](./concurrents.md) et non lues ligne à ligne : le tableau des runes de Retro Toolbox, le rangement de Dosoft, et les compositions d'équipe de Dosoft et de Retro Toolbox. Les deux autres sont sourcées, l'attestation de Focus Retro et la licence de Retro Toolbox. La page promet une case lue dans le code, donc une note qui ne l'est pas est exactement ce qu'elle reproche aux autres
+- [ ] Ouvrir le site dans Firefox, qui ne connaît pas `animation-timeline` : le repli est écrit dans un `@supports`, il n'a pas été vu tourner
 - [ ] Relire l'anglais et l'espagnol une fois le français figé. Les trois catalogues sont pleins, et ils portent maintenant le corps des sept fonctionnalités : c'est du texte suivi, et il n'a été relu par personne
 
 ## Ce que ce plan rendra à `plan.md`

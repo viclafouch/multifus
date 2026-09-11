@@ -43,6 +43,10 @@ msgstr "partly"
 msgid "À voir aussi"
 msgstr "See also"
 
+#: src/constants/rivals.ts
+msgid "Aligne les fenêtres, sans la grille à quatre."
+msgstr "Lines the windows up, without the four-way grid."
+
 #: src/components/skip-link.tsx
 msgid "Aller au contenu"
 msgstr "Skip to content"
@@ -56,8 +60,8 @@ msgid "Annuler est aussi simple qu’aller"
 msgstr "Backing out is as easy as going"
 
 #: src/screens/home-screen.tsx
-msgid "appels du jeu vous emmènent sur le bon personnage"
-msgstr "calls from the game take you to the right character"
+#~ msgid "appels du jeu vous emmènent sur le bon personnage"
+#~ msgstr "calls from the game take you to the right character"
 
 #: src/screens/images-screen.tsx
 msgid "Aucun droit sur ces images. Elles restent celles d’Ankama, et cette page dit seulement laquelle vient d’où et comment elles sont rangées. Vous n’avez pas plus le droit de les reprendre après les avoir vues ici qu’avant."
@@ -134,6 +138,10 @@ msgstr "What this page does not give you"
 #: src/constants/wording.ts
 msgid "Ce que chaque version a changé."
 msgstr "What each version changed."
+
+#: src/components/mark-key.tsx
+msgid "Ce que dit chaque case"
+msgstr "What each cell says"
 
 #: src/constants/bodies.ts
 msgid "Ce que l’AutoFocus ne fait pas"
@@ -231,6 +239,10 @@ msgstr "Hunting"
 msgid "Code publié"
 msgstr "Published code"
 
+#: src/constants/rivals.ts
+msgid "Code publié, sans licence libre."
+msgstr "Code published, with no free licence."
+
 #: src/constants/wording.ts
 msgid "Comparatif"
 msgstr "Comparison"
@@ -254,6 +266,10 @@ msgstr "Critical"
 #: src/constants/wording.ts
 msgid "D’où vient chaque image, et à quelle condition."
 msgstr "Where each image comes from, and on what terms."
+
+#: src/constants/rivals.ts
+msgid "Dans sa fenêtre à lui, pas par-dessus le jeu."
+msgstr "In a window of its own, not over the game."
 
 #: src/constants/wording.ts
 msgid "Déplacement rapide"
@@ -286,6 +302,14 @@ msgstr "Damage"
 #: src/constants/runes.ts
 msgid "Dommages piège"
 msgstr "Trap damage"
+
+#: src/constants/rivals.ts
+#~ msgid "Dosoft aligne les fenêtres, sans offrir les deux dispositions, à deux et à quatre, qu’un rangement complet donne."
+#~ msgstr "Dosoft lines the windows up, without offering both layouts, two and four, that a full tiling gives."
+
+#: src/constants/rivals.ts
+#~ msgid "Dosoft retrouve l’équipe d’une session à l’autre, mais aucune composition ne s’enregistre sous un nom qu’on rappelle."
+#~ msgstr "Dosoft finds the team again from one session to the next, but no line-up is saved under a name you can call back."
 
 #: src/screens/images-screen.tsx
 msgid "Écrire le nom d’Ankama sous une image ne donne pas le droit de la poser là. En droit français, nommer l’auteur satisfait son droit moral, jamais le droit de reproduire, qui est celui qu’il faudrait avoir. Gratuit n’y change rien non plus : le droit d’auteur ne connaît pas d’exception pour l’usage gratuit."
@@ -328,8 +352,8 @@ msgid "Fenêtres rangées côte à côte"
 msgstr "Windows laid side by side"
 
 #: src/screens/home-screen.tsx
-msgid "fichier du jeu lu, modifié ou extrait"
-msgstr "game files read, changed or extracted"
+#~ msgid "fichier du jeu lu, modifié ou extrait"
+#~ msgstr "game files read, changed or extracted"
 
 #: src/components/features-menu.tsx
 msgid "Fonctionnalités"
@@ -346,6 +370,14 @@ msgstr "GitHub signs every published package and says which commit and which rep
 #: src/screens/home-screen.tsx
 msgid "Gratuit, code publié, paquet signé et notarisé."
 msgstr "Free, published code, signed and notarised package."
+
+#: src/constants/rivals.ts
+msgid "Il en fait une partie, et la case dit laquelle."
+msgstr "It does part of it, and the cell says which part."
+
+#: src/constants/rivals.ts
+#~ msgid "Il en fait une partie, et la note dit laquelle."
+#~ msgstr "It does part of it, and the note says which part."
 
 #: src/constants/bodies.ts
 msgid "Il ne déplace pas plusieurs personnages d’un seul clic. Chaque clic vaut pour le personnage qui est devant vous, et pour lui seul. Les macros qui font marcher toute une team ensemble sont bannissables, et elles restent hors de ce projet."
@@ -423,6 +455,10 @@ msgstr "Never the Dofus logo, never its typeface, never the green and orange of 
 msgid "Je vends des runes, écrivez-moi en privé. Je reviens dans deux minutes. Bienvenue dans la guilde. Ce sont toujours les mêmes phrases, elles sont longues à taper, et vous les tapez au pire moment, pendant un combat ou au milieu d’un échange."
 msgstr "Selling runes, message me. Back in two minutes. Welcome to the guild. It is always the same sentences, they are long to type, and you type them at the worst moment, mid-fight or in the middle of a trade."
 
+#: src/screens/home-screen.tsx
+msgid "Jouez en multicompte"
+msgstr "Play multi-account"
+
 #: src/constants/wording.ts
 msgid "Jouez en multicompte sur Dofus Retro sans jamais chercher une fenêtre."
 msgstr "Play several accounts on Dofus Retro without ever hunting for a window."
@@ -454,6 +490,10 @@ msgstr "The still laid over a video"
 #: src/constants/bodies.ts
 msgid "L’ordre du tour est le vôtre"
 msgstr "The running order is yours"
+
+#: src/constants/rivals.ts
+msgid "L’outil fait cette ligne en entier."
+msgstr "The tool does this row in full."
 
 #: src/constants/wording.ts
 msgid "La fenêtre du personnage qui joue passe devant toute seule."
@@ -512,12 +552,16 @@ msgid "Lâchez au centre ou hors du disque : il ne se passe rien, et vous restez
 msgstr "Let go in the centre or outside the disc: nothing happens, and you stay where you are. A gesture started by mistake does not cost you a window."
 
 #: src/screens/home-screen.tsx
-msgid "langues, français, anglais, espagnol"
-msgstr "languages: French, English, Spanish"
+#~ msgid "langues, français, anglais, espagnol"
+#~ msgstr "languages: French, English, Spanish"
 
 #: src/screens/images-screen.tsx
 msgid "Le code de Multifus est sous licence MIT : n’importe qui peut le copier, le modifier et même le vendre. Ce droit-là se donne sur du code qu’on a écrit, jamais sur une image qu’on n’a pas faite. Les images sont donc rassemblées dans un seul dossier, que la licence exclut nommément, et aucune autre partie du dépôt n’en contient."
 msgstr "The Multifus code is under the MIT licence: anyone may copy it, modify it, even sell it. That right can be granted over code we wrote, never over an image we did not make. The images are therefore gathered in a single folder, which the licence excludes by name, and no other part of the repository holds any."
+
+#: src/constants/rivals.ts
+#~ msgid "Le code de Retro Toolbox est publié, sans licence libre : le lire est permis, le reprendre ne l’est pas."
+#~ msgstr "Retro Toolbox publishes its code, with no free licence: reading it is allowed, reusing it is not."
 
 #: src/screens/download-screen.tsx
 msgid "Le code est publié"
@@ -562,6 +606,10 @@ msgstr "The day Ankama asks for them to go, they all leave at once. Windows woul
 #: src/constants/bodies.ts
 msgid "Le multicompte sur Mac n’avait presque personne"
 msgstr "Multi-accounting on Mac had almost nobody"
+
+#: src/constants/rivals.ts
+#~ msgid "Le paquet de Focus Retro n’est pas signé, mais chaque version publiée porte son attestation de provenance GitHub."
+#~ msgstr "The Focus Retro package is not signed, but every published release carries its GitHub provenance attestation."
 
 #: src/screens/download-screen.tsx
 msgid "Le paquet est signé et notarisé"
@@ -707,6 +755,10 @@ msgstr "Private messages"
 msgid "Multifus"
 msgstr "Multifus"
 
+#: src/screens/home-screen.tsx
+msgid "Multifus amène devant vous la fenêtre du personnage qui joue. Vous gardez les mains sur le jeu, et la team suit."
+msgstr "Multifus brings the window of the character whose turn it is right in front of you. Your hands stay on the game, and the team follows."
+
 #: src/constants/bodies.ts
 msgid "Multifus démarre toujours avec le Déplacement rapide éteint, et il ne s’allume que par un geste de votre part, un interrupteur ou une touche. Il s’éteint seul dès qu’il n’a plus de fenêtre où aller."
 msgstr "Multifus always starts with Quick move switched off, and it only comes on through an act of yours, a toggle or a key. It switches itself off as soon as it has no window left to go to."
@@ -775,6 +827,10 @@ msgstr "Signed package"
 msgid "Par Telegram, et personnage par personnage"
 msgstr "Through Telegram, and character by character"
 
+#: src/constants/rivals.ts
+msgid "Pas signé, mais l’attestation GitHub y est."
+msgstr "Not signed, but the GitHub attestation is there."
+
 #: src/constants/bodies.ts
 msgid "Perdu de vue, il revient"
 msgstr "Lost from sight, it comes back"
@@ -794,6 +850,10 @@ msgstr "Pods"
 #: src/constants/wording.ts
 msgid "Poids des runes"
 msgstr "Rune weights"
+
+#: src/components/half-notes.tsx
+#~ msgid "Pourquoi ces cases ne sont qu’à moitié"
+#~ msgstr "Why these cells are only half"
 
 #: src/screens/images-screen.tsx
 msgid "Pourquoi elles vivent toutes au même endroit"
@@ -839,9 +899,21 @@ msgstr "Flat resistance"
 msgid "Résistances"
 msgstr "Resistances"
 
+#: src/constants/rivals.ts
+msgid "Retient la dernière équipe, pas des compositions nommées."
+msgstr "Remembers the last team, not named line-ups."
+
 #: src/screens/lost-screen.tsx
 msgid "Retour à l’accueil"
 msgstr "Back to the home page"
+
+#: src/constants/rivals.ts
+#~ msgid "Retro Toolbox donne les poids de runes, mais dans sa propre fenêtre : il faut quitter celle du jeu pour les lire."
+#~ msgstr "Retro Toolbox gives the rune weights, but in a window of its own: you leave the game window to read them."
+
+#: src/constants/rivals.ts
+#~ msgid "Retro Toolbox retient lui aussi la dernière équipe ouverte, et pas plusieurs compositions nommées."
+#~ msgstr "Retro Toolbox also remembers the last team opened, and not several named line-ups."
 
 #: src/constants/bodies.ts
 msgid "Rien à contourner pour l’installer"
@@ -867,6 +939,10 @@ msgstr "Basic rune"
 msgid "Sagesse"
 msgstr "Wisdom"
 
+#: src/screens/home-screen.tsx
+msgid "sans chercher une fenêtre"
+msgstr "without hunting for a window"
+
 #: src/constants/runes.ts
 msgid "Secondaires"
 msgstr "Secondary"
@@ -891,6 +967,10 @@ msgstr "Six mechanisms, and a single goal: never hunt again for the character wa
 msgid "Soin"
 msgstr "Heals"
 
+#: src/constants/rivals.ts
+msgid "Son code ne porte rien sur cette ligne."
+msgstr "Its code holds nothing on this row."
+
 #: src/components/rune-table.tsx
 msgid "Stat"
 msgstr "Stat"
@@ -908,8 +988,8 @@ msgid "Sur Windows"
 msgstr "On Windows"
 
 #: src/screens/home-screen.tsx
-msgid "systèmes, macOS et Windows"
-msgstr "systems, macOS and Windows"
+#~ msgid "systèmes, macOS et Windows"
+#~ msgstr "systems, macOS and Windows"
 
 #: src/constants/wording.ts
 msgid "Tableau des runes"
@@ -982,6 +1062,18 @@ msgstr "One sale posted, and the answers come when they please. Without a relay 
 #: src/constants/provenance.ts
 msgid "Une capture de l’écran des options du client, que Multifus montre une fois, à l’installation, pour dire où cocher. Elle ne sert nulle part ailleurs."
 msgstr "A screenshot of the client’s options screen, which Multifus shows once, during setup, to say where to tick. It is used nowhere else."
+
+#: src/screens/comparison-screen.tsx
+msgid "Une case à moitié dit ce qui manque : posez le curseur dessus, ou touchez-la."
+msgstr "A half cell says what is missing: rest the cursor on it, or tap it."
+
+#: src/screens/comparison-screen.tsx
+#~ msgid "Une case à moitié dit ce qui manque : posez le curseur dessus."
+#~ msgstr "A half cell says what is missing: rest the cursor on it."
+
+#: src/screens/comparison-screen.tsx
+#~ msgid "Une case à moitié porte un numéro : il mène à la ligne, sous le tableau, qui dit ce qui manque."
+#~ msgstr "A half cell carries a number: it leads to the line, below the table, that says what is missing."
 
 #: src/constants/provenance.ts
 msgid "Une image tirée de la vidéo qu’elle couvre, prise sur la seconde où la fonctionnalité se voit. Elle reste affichée tant que la lecture n’a pas commencé, et sert de vignette dans les résultats de recherche."
