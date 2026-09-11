@@ -1,6 +1,4 @@
-import { Button, type ButtonLook, cn } from '@multifus/retro'
-
-const CROSS_PATH = 'M6 6 L18 18 M18 6 L6 18'
+import { Button, type ButtonLook, Cross, cn } from '@multifus/retro'
 
 type RemoveButtonProps = Readonly<{
   label: string
@@ -25,13 +23,7 @@ export const RemoveButton = ({
       onClick={onRemove}
       className={cn('relative', className)}
     >
-      <svg
-        aria-hidden
-        viewBox="0 0 24 24"
-        className="cross absolute inset-0 m-auto size-2/3"
-      >
-        <path d={CROSS_PATH} />
-      </svg>
+      <Cross className="absolute inset-0 m-auto size-2/3" />
     </Button>
   )
 }

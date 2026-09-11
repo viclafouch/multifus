@@ -217,6 +217,36 @@ mot le plus gros de la page sort en fonte de repli. Elle est en
 et ne touchent aucune image. Les vidéos vivent dans `constants/loops.ts`, que la
 config ne lit pas. Le reste du site emploie l'alias `@/` normalement.
 
+## Ce que le site emprunte ailleurs
+
+Relevé du 11 septembre 2026 sur les dépendances d'un autre projet à nous, pour
+voir ce qui manquait ici. Une seule est entrée, et la règle qui a tranché est
+dans `.claude/rules/documentation.md` : **une dépendance sans consommateur
+aujourd'hui ne s'installe pas.**
+
+`schema-dts` est prise, en `devDependencies`, parce qu'elle n'est que des types.
+`SchemaNode` était écrit à la main avec `'@type': string` et une signature
+d'index qui laissait passer n'importe quelle propriété ; `donwloadUrl` compilait.
+Elle ne compile plus. C'est exactement ce que `.claude/rules/typescript.md`
+interdit, une union recopiée à la place de celle de la bibliothèque, et le test
+du balisage y a gagné un `nodeOf` typé sur le `@type` demandé : une faute de
+frappe dans le nom d'une fiche est maintenant une erreur de compilation.
+
+Refusées, avec leur raison : `motion`, parce que le site n'a pas d'animation que
+le CSS ne fasse déjà et que `frontend.md` interdit les effets de survol qui
+soulèvent ; `lucide-react`, parce que le seul dessin du site est la case du
+comparatif, qui est de la matière et non une icône ; `filesize`, parce que
+`Intl.NumberFormat` le fait et que `code-style.md` demande l'API native ;
+`tw-animate-css`, `zustand`, `sonner`, `vaul`, `cmdk` et les composants Radix,
+parce qu'une page prérendue ne doit rien devoir à JavaScript pour s'afficher.
+`zod` attend son consommateur, la lecture de l'API GitHub, et la ligne plus bas
+le dit. Tout ce qui tient à un service payant ne se discute pas.
+
+`@testing-library/user-event` a été essayée puis retirée : pnpm 12 la résout ici
+sans son pair `@testing-library/dom` et pose un lien mort, quatre installations
+de suite. Le site clique par `fireEvent`, qui vient déjà de
+`@testing-library/react`. Le logiciel garde la sienne, qui est correctement liée.
+
 ## Le cadre, l'accueil et le téléchargement
 
 **Posés le 11 septembre 2026.** `PageScreen` n'est plus un gabarit : c'est le
@@ -343,11 +373,13 @@ de Focus Retro refaite à l'identique. Le trait recopie maintenant la ligne
 « AutoFocus sur notification » telle quelle, et les sept appels restent sur
 `/autofocus`, qui a la place de les nommer.
 
-**La date du relevé passe par `i18n._(msg\`... ${{ jour }}\`)`, dans le corps.**
-`t(i18n)`disait la même chose et le macro le transforme, mais Lingui v6 déprécie`t`et oxlint refuse la ligne.`msg`au module ne pouvait pas porter cette
-phrase : la date se formate avec la langue, et`Intl`ne la connaît qu'une fois
-le composant rendu.`.claude/rules/code-style.md`demande encore`t` dans un
-corps, et c'est à reprendre.
+**La date du relevé se rend dans le corps du composant, par `i18n._()`.** La
+forme avec l'instance disait la même chose et le macro la transforme, mais Lingui
+v6 déprécie `t` et oxlint refuse la ligne. Un `msg` au module ne pouvait pas
+porter cette phrase : la date se formate avec la langue, et `Intl` ne la connaît
+qu'une fois le composant rendu. `.claude/rules/code-style.md` demandait encore
+`t` dans un corps ; il dit maintenant pourquoi les deux applications diffèrent,
+le logiciel ayant une instance globale et le site trois qui ne le sont pas.
 
 ## Le corps des huit fonctionnalités
 
@@ -383,6 +415,49 @@ sur du verre : la règle 35 de [design-system.md](./design-system.md) en fait la
 forme de toute limite. `Opening` porte l'amorce, avec le filet à gauche des
 chiffres de l'accueil. `ProseLines` rend une suite de paragraphes et se clé sur
 la phrase rendue, un `MessageDescriptor` n'ayant pas d'identifiant garanti.
+
+## Le cartouche et la proposition de langue
+
+**Posés le 11 septembre 2026.** Les trois drapeaux sont en haut à droite de la
+bande qui porte la ligne d'indépendance, et chacun mène à **la même page** dans
+sa langue. Le pied de page a perdu sa liste de langues : elle renvoyait à
+l'accueil, donc changer de langue faisait perdre sa place, et deux endroits pour
+un seul choix ne valent pas mieux qu'un.
+
+`Flag` a quitté le logiciel pour `packages/retro` : c'est du dessin, il ne tient
+à rien de Tauri, et sa matière `ensign` était déjà partagée. Son type de langue
+se dérive de sa propre table de drapeaux, `keyof typeof FLAGS`, donc une
+quatrième langue ajoutée à une application sans son drapeau ne compile plus.
+`Cross` a suivi par le même chemin, le tracé de la croix étant écrit deux fois.
+`ensign` répond maintenant à `aria-current` autant qu'à `aria-pressed`, comme
+`askmark` répond à `[open]` autant qu'à `aria-expanded`, et il est entré dans le
+bloc `prefers-reduced-motion`, où il manquait.
+
+**La proposition ne redirige jamais et ne se montre qu'une fois.** `offerOf` lit
+`navigator.languages`, saute ce que le site ne parle pas, s'arrête à la première
+qu'il parle, et se tait si c'est déjà celle de la page. `useOffer` pose le
+souvenir à la seconde où la ligne s'affiche, donc elle ne revient pas. Elle naît
+après l'hydratation : au prérendu, les quarante-deux fichiers porteraient la
+langue d'un seul visiteur. `setState` dans un effet vaut un `oxlint-disable`, et
+sa raison est écrite sur la ligne.
+
+**Et elle ne pousse rien.** Elle pend sous la barre du haut en `absolute
+top-full`, donc elle recouvre le début du contenu au lieu de le descendre. Posée
+dans le flux, elle décalait la page une fois par visiteur, juste après
+l'hydratation, et la seule mesure du site est la recherche. `verify-html.mjs`
+refuse maintenant un `data-offer` dans une page livrée, et compte les trois
+drapeaux du cartouche et le seul allumé : la promesse du prérendu est gardée par
+le script, pas par la mémoire.
+
+**Elle s'écrit dans la langue proposée**, par `SPEAKERS[offered]`, et c'est le
+premier endroit où les trois voix isolées servent à autre chose qu'au prérendu.
+Sa phrase source nomme le français, et chaque catalogue y nomme sa propre langue :
+`apps/website/CONTEXT.md` le dit, parce qu'une relecture la corrigerait.
+
+`recall` et `keep` avalent l'exception de `localStorage` : Safari en « bloquer
+tous les cookies » lève, et une levée dans un effet casse l'hydratation de la
+page entière. Un souvenir qui n'a pas pu être posé vaut refus, faute de quoi la
+ligne reviendrait à chaque page.
 
 ## Ce que le site a le droit de montrer
 
@@ -508,8 +583,7 @@ de cliquer.
 - [ ] Brancher `/journal` sur `apps/desktop/CHANGELOG.md`. La page existe, elle est vide, et rien ne dit d'où son contenu viendra
 - [ ] Trancher les liens internes. `PageLink` pose un `<a href>`, parce que le `to` de `Link` est typé sur l'arbre des routes et qu'une adresse calculée n'y entre pas. Un site statique de quatorze pages s'en accommode, mais on perd le préchargement : à reprendre en dessinant la barre du haut
 - [ ] Écrire le corps des trois pages de `kind: 'plain'`. Les huit fonctionnalités, l'accueil, `/telecharger` et `/comparatif` sont écrits ; restent les poids des runes, le journal et les images, qui n'ont que leur titre et leur promesse. Le journal attend son `CHANGELOG.md`, et les poids des runes attendent qu'on décide d'où vient la table : elle vit dans `apps/desktop/src/constants/runes.ts` avec ses `msg`, et la partager contre « chacun garde son catalogue » est une décision d'architecture à part
-- [ ] Donner leur vraie adresse aux deux boutons de `/telecharger`. Ils pointent aujourd'hui sur `releases/latest`, la page, faute de savoir le nom du fichier : c'est la lecture de l'API GitHub à la compilation qui la leur donnera, et `RELEASES` est l'unique endroit à reprendre
-- [ ] Poser la ligne discrète qui propose l'autre langue, une fois, sans jamais rediriger. Les trois drapeaux dans le cartouche, comme sur les maps
+- [ ] Donner leur vraie adresse aux deux boutons de `/telecharger`. Ils pointent aujourd'hui sur `releases/latest`, la page, faute de savoir le nom du fichier : c'est la lecture de l'API GitHub à la compilation qui la leur donnera, et `RELEASES` est l'unique endroit à reprendre. C'est là que `zod` entre, et pas avant : une réponse d'API qu'on lit sans la valider casse le build en silence le jour où GitHub change un champ
 - [ ] Tourner les boucles qui manquent, les raccourcis, les messages privés, les réponses rapides, et celle de l'accueil, avec `make-loop`. La table les attend, `loop: null` les marque
 - [ ] Le crochet de déploiement Vercel dans le workflow `release`, et la lecture de l'API GitHub à la compilation
 - [ ] Vercel Analytics, un seul événement personnalisé, le clic sur « Télécharger » avec le système dedans

@@ -375,7 +375,7 @@ msgstr "La fenêtre du personnage qui joue passe devant toute seule."
 msgid "La forgemagie sans le deuxième écran"
 msgstr "La forgemagie sans le deuxième écran"
 
-#: src/components/site-footer.tsx
+#: src/components/cartouche.tsx
 msgid "La langue du site"
 msgstr "La langue du site"
 
@@ -475,6 +475,10 @@ msgstr "Le pire moment du multicompte, c’est le combat à plusieurs personnage
 msgid "Le poids des runes posé par-dessus le jeu, sans quitter l’atelier."
 msgstr "Le poids des runes posé par-dessus le jeu, sans quitter l’atelier."
 
+#: src/components/language-offer.tsx
+msgid "Le site dans votre langue"
+msgstr "Le site dans votre langue"
+
 #: src/constants/bodies.ts
 msgid "Le tableau des poids de runes se pose par-dessus la fenêtre du jeu, à la touche que vous avez choisie. Vous brisez, vous lisez le poids, vous continuez. L’atelier ne se quitte pas, et le navigateur reste fermé."
 msgstr "Le tableau des poids de runes se pose par-dessus la fenêtre du jeu, à la touche que vous avez choisie. Vous brisez, vous lisez le poids, vous continuez. L’atelier ne se quitte pas, et le navigateur reste fermé."
@@ -522,6 +526,14 @@ msgstr "Les phrases qu’on retape vingt fois par jour"
 #: src/constants/bodies.ts
 msgid "Les sept appels ont chacun leur interrupteur. Si les crafts des autres ne vous intéressent pas, vous coupez celui-là et vous gardez les six autres."
 msgstr "Les sept appels ont chacun leur interrupteur. Si les crafts des autres ne vous intéressent pas, vous coupez celui-là et vous gardez les six autres."
+
+#: src/components/language-offer.tsx
+msgid "Lire cette page en français"
+msgstr "Lire cette page en français"
+
+#: src/components/language-offer.tsx
+msgid "Masquer cette proposition"
+msgstr "Masquer cette proposition"
 
 #: src/constants/wording.ts
 msgid "Messages privés"

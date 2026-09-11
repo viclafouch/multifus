@@ -72,6 +72,22 @@ for (const pathname of addresses) {
   if (!/<html lang="(?:fr|en|es)">/u.test(html)) {
     complain(pathname, 'aucune langue sur la balise html')
   }
+
+  if (body.includes('data-offer')) {
+    complain(pathname, 'la proposition de langue est dans le HTML prérendu')
+  }
+
+  const flags = [...body.matchAll(/class="ensign/gu)]
+
+  if (flags.length !== 3) {
+    complain(pathname, `${flags.length} drapeaux au cartouche au lieu de trois`)
+  }
+
+  const lit = [...body.matchAll(/aria-current="true"/gu)]
+
+  if (lit.length !== 1) {
+    complain(pathname, `${lit.length} drapeaux allumés au lieu d’un`)
+  }
 }
 
 if (addresses.length === 0) {

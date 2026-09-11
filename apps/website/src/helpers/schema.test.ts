@@ -5,6 +5,7 @@ import { LOOPS } from '@/constants/loops'
 import { PAGES, PAGE_IDS } from '@/constants/pages'
 import { HOST, RELEASES } from '@/constants/site'
 import type { PathParams } from '@/helpers/page'
+import type { SchemaNode } from '@/helpers/schema'
 import { schemaOf, scriptOf } from '@/helpers/schema'
 
 const ADDRESS_KEYS = new Set([
@@ -16,10 +17,12 @@ const ADDRESS_KEYS = new Set([
   'downloadUrl'
 ])
 
-type NodeOfParams = Readonly<{
+type SchemaType = SchemaNode['@type']
+
+type NodeOfParams<Wanted extends SchemaType> = Readonly<{
   page: PageId
   language: Language
-  type: string
+  type: Wanted
 }>
 
 const typesOf = ({ page, language }: PathParams) => {
@@ -28,10 +31,16 @@ const typesOf = ({ page, language }: PathParams) => {
   })
 }
 
-const nodeOf = ({ page, language, type }: NodeOfParams) => {
-  return schemaOf({ page, language }).find((node) => {
-    return node['@type'] === type
-  })
+const nodeOf = <Wanted extends SchemaType>({
+  page,
+  language,
+  type
+}: NodeOfParams<Wanted>) => {
+  return schemaOf({ page, language }).find(
+    (node): node is Extract<SchemaNode, { '@type': Wanted }> => {
+      return node['@type'] === type
+    }
+  )
 }
 
 const FILMED = PAGE_IDS.filter((page) => {
@@ -82,10 +91,8 @@ describe('la fiche du logiciel', () => {
       language: 'fr',
       type: 'SoftwareApplication'
     })
-    const systems = String(software?.operatingSystem)
-
-    expect(systems).toContain('macOS')
-    expect(systems).toContain('Windows')
+    expect(software?.operatingSystem).toContain('macOS')
+    expect(software?.operatingSystem).toContain('Windows')
   })
 
   it('ne décrit qu’un seul logiciel sur les deux pages', () => {

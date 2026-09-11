@@ -375,7 +375,7 @@ msgstr "The window of the character who plays comes to the front on its own."
 msgid "La forgemagie sans le deuxième écran"
 msgstr "Forgemagic without the second screen"
 
-#: src/components/site-footer.tsx
+#: src/components/cartouche.tsx
 msgid "La langue du site"
 msgstr "The language of the site"
 
@@ -475,6 +475,10 @@ msgstr "The worst moment in multi-accounting is a fight with several characters:
 msgid "Le poids des runes posé par-dessus le jeu, sans quitter l’atelier."
 msgstr "Rune weights laid over the game, without leaving the workshop."
 
+#: src/components/language-offer.tsx
+msgid "Le site dans votre langue"
+msgstr "The site in your language"
+
 #: src/constants/bodies.ts
 msgid "Le tableau des poids de runes se pose par-dessus la fenêtre du jeu, à la touche que vous avez choisie. Vous brisez, vous lisez le poids, vous continuez. L’atelier ne se quitte pas, et le navigateur reste fermé."
 msgstr "The table of rune weights sits on top of the game window, on the key you chose. You break, you read the weight, you carry on. You never leave the workshop, and the browser stays closed."
@@ -522,6 +526,14 @@ msgstr "The sentences you retype twenty times a day"
 #: src/constants/bodies.ts
 msgid "Les sept appels ont chacun leur interrupteur. Si les crafts des autres ne vous intéressent pas, vous coupez celui-là et vous gardez les six autres."
 msgstr "Each of the seven calls has its own switch. If other people's crafts are of no interest to you, you turn that one off and keep the other six."
+
+#: src/components/language-offer.tsx
+msgid "Lire cette page en français"
+msgstr "Read this page in English"
+
+#: src/components/language-offer.tsx
+msgid "Masquer cette proposition"
+msgstr "Hide this suggestion"
 
 #: src/constants/wording.ts
 msgid "Messages privés"

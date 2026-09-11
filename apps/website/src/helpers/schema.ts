@@ -1,3 +1,10 @@
+import type {
+  BreadcrumbList,
+  JsonLdObject,
+  SoftwareApplication,
+  VideoObject,
+  WithContext
+} from 'schema-dts'
 import type { Language } from '@/@types/language'
 import type { LoopId, PageId } from '@/@types/page'
 import { LOOPS } from '@/constants/loops'
@@ -9,12 +16,13 @@ import type { PathParams } from '@/helpers/page'
 import { addressOf } from '@/helpers/page'
 import { SPEAKERS } from '@/lib/i18n'
 
-export type SchemaNode = Readonly<{
-  '@context': 'https://schema.org'
-  '@type': string
-  '@id': string
-  [key: string]: unknown
-}>
+type Addressed<Node extends JsonLdObject> = WithContext<Node> &
+  Required<Pick<JsonLdObject, '@id'>>
+
+export type SchemaNode =
+  | Addressed<BreadcrumbList>
+  | Addressed<SoftwareApplication>
+  | Addressed<VideoObject>
 
 const CONTEXT = 'https://schema.org'
 
@@ -43,7 +51,7 @@ const softwareOf = (language: Language) => {
       price: '0',
       priceCurrency: 'EUR'
     }
-  } satisfies SchemaNode
+  } satisfies Addressed<SoftwareApplication>
 }
 
 type VideoOfParams = Readonly<{
@@ -68,7 +76,7 @@ const videoOf = ({ page, language, loop }: VideoOfParams) => {
     uploadDate: filmed,
     duration: `PT${seconds}S`,
     inLanguage: language
-  } satisfies SchemaNode
+  } satisfies Addressed<VideoObject>
 }
 
 const crumbsOf = ({ page, language }: PathParams) => {
@@ -93,7 +101,7 @@ const crumbsOf = ({ page, language }: PathParams) => {
         item: address
       }
     ]
-  } satisfies SchemaNode
+  } satisfies Addressed<BreadcrumbList>
 }
 
 export const schemaOf = ({

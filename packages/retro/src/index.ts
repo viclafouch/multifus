@@ -1,5 +1,7 @@
 export { cn } from './cn'
 export { Button, buttonVariants, type ButtonLook } from './components/button'
+export { Cross } from './components/cross'
+export { Flag, type FlagLanguage } from './components/flag'
 export { Panel } from './components/panel'
 export { Scene } from './components/scene'
 export { Shade } from './components/shade'

@@ -12,7 +12,7 @@ dans [docs/design-system.md](../../docs/design-system.md), et les mots sont dans
 | `src/styles/retro.css` | Le système entier : Bebas, les jetons du `:root`, les corps, les matières `@utility` |
 | `src/styles/theme.css` | Le pont vers shadcn et Base UI, chaque jeton de couleur pointant sur `retro.css`     |
 | `src/cn.ts`            | `tailwind-merge` étendu des tailles et des conteneurs du thème                       |
-| `src/components/`      | `Button`, `Panel`, `Shade`, `Tale`, `Scene`                                          |
+| `src/components/`      | `Button`, `Panel`, `Shade`, `Tale`, `Scene`, `Flag`, `Cross`                         |
 
 `retro.css` porte son propre `@source` : qui l'importe fait scanner les
 composants d'ici par Tailwind, sans rien déclarer. Sans cette ligne, une classe

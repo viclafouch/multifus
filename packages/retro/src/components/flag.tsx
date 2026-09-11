@@ -1,5 +1,4 @@
 import React from 'react'
-import type { Language } from '@/@types/language'
 
 const FLAGS = {
   fr: (
@@ -24,10 +23,12 @@ const FLAGS = {
       <rect y="10" width="60" height="20" fill="#f1bf00" />
     </>
   )
-} as const satisfies Record<Language, React.JSX.Element>
+} as const satisfies Record<string, React.JSX.Element>
+
+export type FlagLanguage = keyof typeof FLAGS
 
 type FlagProps = Readonly<{
-  language: Language
+  language: FlagLanguage
 }>
 
 export const Flag = ({ language }: FlagProps) => {

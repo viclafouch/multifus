@@ -1,7 +1,7 @@
 import React from 'react'
 import { t } from '@lingui/core/macro'
+import { Flag } from '@multifus/retro'
 import type { Language } from '@/@types/language'
-import { Flag } from '@/components/flag'
 import {
   AlertDialog,
   AlertDialogAction,

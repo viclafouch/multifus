@@ -21,7 +21,7 @@ export const PageScreen = ({ page }: PageScreenProps) => {
   const PageBody = PAGE_BODIES[PAGES[page].kind]
 
   return (
-    <SiteShell>
+    <SiteShell page={page}>
       <PageBody page={page} />
     </SiteShell>
   )

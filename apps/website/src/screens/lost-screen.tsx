@@ -14,7 +14,7 @@ export const LostScreen = () => {
   const { i18n } = useLingui()
 
   return (
-    <SiteShell>
+    <SiteShell page="home">
       <Band className="pb-20">
         <h1 className="font-carve text-banner tracking-hero text-cream uppercase">
           {i18n._(LOST_TITLE)}

@@ -92,7 +92,37 @@ fonctionnalité se voit.
 
 **Fiche** (`SchemaNode`) : un bloc de balisage schema.org. Une page en porte une
 à trois, et elles sortent toutes de la table : la fiche du logiciel, la fiche de
-la vidéo, le fil d'Ariane.
+la vidéo, le fil d'Ariane. Sa forme vient de `schema-dts`, pas de nous : une
+propriété mal tapée ne compile plus, et `Addressed` n'ajoute que ce que le site
+exige en plus, l'adresse chez nous sur chaque fiche.
+
+**Cartouche** (`Cartouche`) : les trois drapeaux, en haut à droite de la bande
+qui porte la ligne d'indépendance. C'est le cartouche des maps du logiciel, moins
+le numéro de version, que le site n'a pas. Chaque drapeau est un lien vers **la
+même page** dans sa langue, jamais vers l'accueil : changer de langue ne fait pas
+perdre sa place. Celui de la langue en cours porte `aria-current` et reste seul en
+couleur.
+
+**Proposition** (`LanguageOffer`) : la ligne discrète qui pend sous la barre du
+haut, et qui propose l'autre langue à qui arrive dans la mauvaise. Elle ne
+redirige jamais, et elle ne se montre qu'**une fois** : `useOffer` pose le
+souvenir à la seconde où elle s'affiche. Elle naît après l'hydratation et jamais
+au prérendu, sinon les quarante-deux fichiers livrés porteraient la langue d'un
+seul visiteur, et `verify-html.mjs` refuse son `data-offer` dans une page livrée.
+Elle recouvre le début du contenu au lieu de le pousser : dans le flux, elle
+décalait la page une fois par visiteur.
+
+Elle s'écrit dans la langue **proposée**, pas dans celle de la page : c'est
+`SPEAKERS[offered]` qui la rend, et c'est à ça que servent les trois voix. Sa
+phrase source est « Lire cette page en français » et chaque catalogue y nomme sa
+propre langue, l'anglais « in English », l'espagnol « en español ». Une relecture
+qui la corrigerait en « in French » casserait la seule chose qu'elle fait.
+
+**Souvenir** (`keepsake`) : ce que le navigateur garde d'une visite, `recall` et
+`keep`. Les deux avalent l'exception : Safari en « bloquer tous les cookies »
+lève sur `localStorage`, et une levée dans un effet casse l'hydratation de toute
+la page. Un souvenir qui n'a pas pu être posé vaut refus, donc la proposition ne
+se montre pas plutôt que de se montrer à chaque page.
 
 **Voix** : une instance de Lingui, une par langue. `SPEAKERS.fr`, `SPEAKERS.en`,
 `SPEAKERS.es`. Elles ne s'activent pas, elles ne se muent pas, elles parlent.

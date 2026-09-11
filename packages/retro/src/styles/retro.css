@@ -1009,7 +1009,8 @@
     border-color: var(--cream);
   }
 
-  &[aria-pressed='true'] {
+  &[aria-pressed='true'],
+  &[aria-current='true'] {
     opacity: 1;
     filter: none;
     border-color: var(--leaf-lit);
@@ -1447,6 +1448,7 @@
   }
 
   .askmark,
+  .ensign,
   .unroll {
     transition: none !important;
   }
