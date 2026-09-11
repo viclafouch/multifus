@@ -52,8 +52,12 @@
   --color-stone: var(--stone);
   --color-flame: var(--flame);
 
+  --text-banner: clamp(2.75rem, 9vw, 5rem);
+  --text-banner--line-height: 0.9;
   --text-chapter: 2.875rem;
   --text-chapter--line-height: 0.94;
+  --text-herald: clamp(1.125rem, 2.2vw, 1.5rem);
+  --text-herald--line-height: 1.4;
   --text-sign: clamp(1.875rem, 5vh, 2.375rem);
   --text-sign--line-height: 1.02;
   --text-motto: 1.125rem;
@@ -97,6 +101,7 @@
   --spacing-lath: 3px;
   --spacing-fence: 30px;
   --spacing-crest: 9rem;
+  --spacing-horizon: clamp(17rem, 40vh, 26rem);
   --spacing-shot: 76vh;
   --spacing-answers: 64vh;
 
@@ -227,6 +232,12 @@
 
 @utility grove {
   background-color: var(--iron);
+}
+
+@utility grain {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  opacity: 0.035;
+  mix-blend-mode: overlay;
 }
 
 @utility grove-shade {
@@ -764,7 +775,8 @@
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: var(--lozenge-turn);
 
-  [aria-expanded='true'] & {
+  [aria-expanded='true'] &,
+  [open] & {
     transform: none;
     background-color: var(--cream);
   }

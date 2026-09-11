@@ -4,16 +4,19 @@ export const PAGES = {
   home: {
     kind: 'home',
     loop: null,
+    kin: [],
     slugs: { fr: '', en: '', es: '' }
   },
   autoFocus: {
     kind: 'feature',
     loop: 'autoFocus',
+    kin: ['relay', 'shortcuts'],
     slugs: { fr: 'autofocus', en: 'autofocus', es: 'autofocus' }
   },
   wheel: {
     kind: 'feature',
     loop: 'wheel',
+    kin: ['shortcuts', 'walk'],
     slugs: {
       fr: 'roue-des-personnages',
       en: 'character-wheel',
@@ -23,6 +26,7 @@ export const PAGES = {
   walk: {
     kind: 'feature',
     loop: 'walk',
+    kin: ['wheel', 'autoFocus'],
     slugs: {
       fr: 'deplacement-rapide',
       en: 'quick-move',
@@ -32,16 +36,19 @@ export const PAGES = {
   runeTable: {
     kind: 'feature',
     loop: 'runeTable',
+    kin: ['runeWeights', 'quickReplies'],
     slugs: { fr: 'tableau-des-runes', en: 'rune-table', es: 'tabla-de-runas' }
   },
   shortcuts: {
     kind: 'feature',
     loop: null,
+    kin: ['wheel', 'quickReplies'],
     slugs: { fr: 'raccourcis', en: 'shortcuts', es: 'atajos' }
   },
   relay: {
     kind: 'feature',
     loop: null,
+    kin: ['autoFocus', 'quickReplies'],
     slugs: {
       fr: 'messages-prives',
       en: 'private-messages',
@@ -51,6 +58,7 @@ export const PAGES = {
   quickReplies: {
     kind: 'feature',
     loop: null,
+    kin: ['shortcuts', 'relay'],
     slugs: {
       fr: 'reponses-rapides',
       en: 'quick-replies',
@@ -60,16 +68,19 @@ export const PAGES = {
   mac: {
     kind: 'feature',
     loop: null,
+    kin: ['autoFocus', 'download'],
     slugs: { fr: 'mac', en: 'mac', es: 'mac' }
   },
   comparison: {
     kind: 'plain',
     loop: null,
+    kin: ['download', 'mac'],
     slugs: { fr: 'comparatif', en: 'comparison', es: 'comparativa' }
   },
   runeWeights: {
     kind: 'plain',
     loop: null,
+    kin: ['runeTable', 'download'],
     slugs: {
       fr: 'poids-des-runes',
       en: 'rune-weights',
@@ -79,16 +90,19 @@ export const PAGES = {
   download: {
     kind: 'download',
     loop: null,
+    kin: ['mac', 'comparison'],
     slugs: { fr: 'telecharger', en: 'download', es: 'descargar' }
   },
   journal: {
     kind: 'plain',
     loop: null,
+    kin: ['download', 'mac'],
     slugs: { fr: 'journal', en: 'changelog', es: 'novedades' }
   },
   images: {
     kind: 'plain',
     loop: null,
+    kin: ['download', 'comparison'],
     slugs: { fr: 'images', en: 'images', es: 'imagenes' }
   }
 } as const satisfies Record<PageId, Page>

@@ -91,6 +91,7 @@ Ils vivent dans `packages/ankama/images/`, les boucles dans
 | `walk-loop.mp4`       | idem                                                                            |
 | `auto-focus-loop.mp4` | idem                                                                            |
 | `rune-table-loop.mp4` | idem                                                                            |
+| `*-loop-poster.webp`  | une image de la boucle qui la porte, tirée à `ffmpeg` et pesée à `cwebp`        |
 
 La fenêtre Options du client, `dofus-options-general.png`, vit dans le même
 dossier et n'est pas un décor : c'est la capture d'où
@@ -101,6 +102,14 @@ montre pour dire où cocher.
 Personnages : la mise en route s'en sert pour l'étape de l'essai.
 Les vidéos passent par le skill `make-loop`, qui les rend au format et à la
 largeur de la plaque.
+
+**Une affiche n'est pas la première image de sa boucle.** Elle se choisit à
+l'œil, sur la seconde où la fonctionnalité est visible : le tableau des runes
+n'est posé qu'au milieu de sa boucle, et l'image du début ne montre que la
+forgemagie. Elle sert deux fois, d'affiche au lecteur tant que la vidéo n'a pas
+démarré, et de vignette à Google, qui refuse un `VideoObject` sans
+`thumbnailUrl`. Sans elle, la plaque reste noire pour qui a demandé moins
+d'animations, puisque la vidéo ne part alors pas toute seule.
 
 **Un décor a été écarté**, `2020-12-03/e01dbec5…png` : un montage de presse
 KrosmoNote, cinq vignettes séparées par des traits blancs et filigranées. Chaque

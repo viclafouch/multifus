@@ -26,13 +26,17 @@ les deux. Ce qui tient au cadre d'une map reste dans le logiciel.
 | `apps/desktop/src/components/world/`  | Le monde : le décor, le dolmen, les têtes, le menu, le retour, le cartouche                                                    |
 | `apps/desktop/src/constants/world.ts` | Les dix maps, leurs noms et leurs décors                                                                                       |
 | `apps/website/src/styles.css`         | Le fonds du site, qui défile et se sélectionne, là où la fenêtre ne fait ni l'un ni l'autre                                    |
+| `apps/website/src/components/`        | Le cadre d'une page : `SiteShell`, `SiteHeader`, `Band`, `DecorBand`, `WayLink`, `PageCard`, `ProseBlock`                      |
 | `CONTEXT.md`                          | Les mots. Un nom de composant en sort                                                                                          |
 | `.claude/rules/frontend.md`           | React, l'accessibilité, Tailwind, le survol, les durées                                                                        |
 
 `index.css` n'est chargé que par la fenêtre principale. Ce qu'une fenêtre
 satellite peint, la bannière, la roue, le tableau des runes, se déclare dans
 `theme.css` ou `retro.css` : ailleurs il se peint sans couleur, et aucun test ne
-le voit, puisqu'ils lisent les feuilles collées bout à bout.
+le voit, puisqu'ils lisent les feuilles collées bout à bout. La même règle vaut
+pour ce qu'un composant de `packages/retro` nomme : `grain` vivait dans
+`index.css` alors que `Scene` l'emploie, donc le site l'aurait peint sans son
+bruit. Il est dans `retro.css`, avec ce qui s'y rattache.
 
 ## D'où vient la matière
 
@@ -61,7 +65,10 @@ pour un écran de travail, c'est la fenêtre Options du client qui répond.
 ### La couleur
 
 1. Le vert dit l'action du moment et ce qui est en place, rien d'autre. Un seul
-   bouton vert par map, jamais un titre, jamais un avancement
+   bouton vert par map, jamais un titre, jamais un avancement. Sur le site, cette
+   action porte un nom, « Télécharger », et un seul bouton vert par page le dit.
+   `/telecharger` en porte deux, le Mac et Windows : c'est la même action coupée
+   en deux par le système, pas deux actions qui se disputent l'œil
 2. L'or et l'ambre ne vivent que dans le logo du jeu. Ils survivent aux deux
    endroits que `CONTEXT.md` nomme, la part sans couleur de la roue et l'étoile
    du principal, et nulle part ailleurs
@@ -154,7 +161,12 @@ pour un écran de travail, c'est la fenêtre Options du client qui répond.
 19. Un survol change une couleur, et un clic aussi. Rien ne bouge de place sous
     le doigt : le bouton s'assombrit, il ne s'enfonce pas. Le menu de l'accueil
     est la seule exception au repos, parce que viser une entrée y est le geste
-    même de l'écran
+    même de l'écran. La liste des fonctionnalités de l'accueil du site est ce
+    même menu, et elle porte donc le même `btn-way` : choisir où aller y est
+    aussi le geste de la page. Elle ne l'invente pas, elle le reprend, et c'est
+    à cette condition que l'exception reste unique. Sur le fond uni du site, le
+    voile de `btn-way` ne se voit plus, faute de décor dessous : ce qui reste,
+    et qui suffit, c'est le losange qui entre et le titre qui s'éclaircit
 20. Une tête du dolmen n'apparaît ni ne s'efface d'un coup. Celle qui arrive
     éclot sur sa place, celle qui s'en va sort d'abord du flux, figée là où elle
     était, et les autres glissent de leur ancienne place à la nouvelle. Le

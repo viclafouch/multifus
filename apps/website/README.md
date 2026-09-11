@@ -12,9 +12,12 @@ mots dans [CONTEXT.md](./CONTEXT.md).
 ## La table des pages
 
 `src/constants/pages.ts` est la seule vérité. Elle porte pour chaque page son
-identifiant, ses trois adresses, sa vidéo et son type. Tout en sort : le
-prérendu, le sitemap, les `hreflang`, le menu. `as const satisfies Record<PageId,
-Page>` refuse une page ajoutée sans son espagnol.
+identifiant, ses trois adresses, sa vidéo, son type et ses voisines. Tout en
+sort : le prérendu, le sitemap, les `hreflang`, le menu, le corps que
+`PageScreen` ouvre et les cartes du bas. `as const satisfies Record<PageId,
+Page>` refuse une page ajoutée sans son espagnol, comme sans son champ
+`kin` ; ce champ a le droit d'être vide, et l'écran ne pose alors pas la
+section.
 
 Cette table est lue par `vite.config.ts`, donc la chaîne qui y mène,
 `constants/pages.ts`, `constants/languages.ts`, `helpers/page.ts` et les types,

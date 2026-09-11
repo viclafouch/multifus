@@ -1,14 +1,10 @@
 import type { PageId } from '@/@types/page'
 import { LANGUAGES, SOURCE_LANGUAGE } from '@/constants/languages'
-import { HOST } from '@/constants/site'
 import { PAGE_NAMES, PAGE_PROMISES, SITE_TITLE } from '@/constants/wording'
 import type { PathParams } from '@/helpers/page'
-import { pathOf } from '@/helpers/page'
+import { addressOf } from '@/helpers/page'
+import { scriptOf } from '@/helpers/schema'
 import { SPEAKERS } from '@/lib/i18n'
-
-export const addressOf = ({ page, language }: PathParams) => {
-  return `${HOST}${pathOf({ page, language })}`
-}
 
 export const alternatesOf = (page: PageId) => {
   const translated = LANGUAGES.map((language) => {
@@ -50,6 +46,12 @@ export const headOf = ({ page, language }: PathParams) => {
       { property: 'og:locale', content: language },
       { name: 'twitter:card', content: 'summary' }
     ],
-    links: [{ rel: 'canonical', href: address }, ...alternatesOf(page)]
+    links: [{ rel: 'canonical', href: address }, ...alternatesOf(page)],
+    scripts: [
+      {
+        type: 'application/ld+json',
+        children: scriptOf({ page, language })
+      }
+    ]
   }
 }

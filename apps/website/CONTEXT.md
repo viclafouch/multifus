@@ -30,22 +30,56 @@ identiques pour deux choses, c'est ce que `CONTEXT.md` interdit.
 **Comparatif** : `/comparatif`. Cinq concurrents au maximum. Aucune case n'est
 remplie depuis la page d'accueil d'un concurrent, seulement depuis son code.
 
+**Voisines** (`kin`) : les deux ou trois pages vers lesquelles une page renvoie
+en bas, choisies à la main dans `constants/pages.ts`. C'est le maillage interne,
+et il remplace la barre latérale d'une documentation. Le champ est obligatoire,
+donc une page ajoutée sans lui ne compile pas ; il a le droit d'être vide, et
+c'est le cas de l'accueil, qui renvoie déjà partout. Vide, la section ne se pose
+pas : c'est l'écran qui décide, jamais `PageKin`.
+
+**Bande** (`Band`) : une tranche horizontale d'une page, sa largeur et son
+rythme. Une page est une pile de bandes, jamais une grille. `BandTitle` en porte
+le titre, `PageHead` porte le nom et la promesse d'une page.
+
+**Prose** (`Prose`) : un paragraphe de corps, à la largeur où il se lit.
+`ProseBlock` en groupe plusieurs sous un intertitre.
+
+**Ligne** (`WayLink`) : une entrée de la liste des fonctionnalités de l'accueil,
+qui est le menu de l'accueil du logiciel. **Carte** (`PageCard`) est ce qu'une
+voisine montre en bas d'une page.
+
+**Affiche** (`poster`) : l'image tirée d'une boucle, posée sur le lecteur tant
+que la vidéo ne joue pas, et donnée à Google comme vignette du résultat. Elle
+n'est pas la première image de sa boucle : elle se choisit sur la seconde où la
+fonctionnalité se voit.
+
+**Fiche** (`SchemaNode`) : un bloc de balisage schema.org. Une page en porte une
+à trois, et elles sortent toutes de la table : la fiche du logiciel, la fiche de
+la vidéo, le fil d'Ariane.
+
 **Voix** : une instance de Lingui, une par langue. `SPEAKERS.fr`, `SPEAKERS.en`,
 `SPEAKERS.es`. Elles ne s'activent pas, elles ne se muent pas, elles parlent.
 
 ## Où les imports changent de forme
 
-Presque tout le site importe par l'alias `@/`. Cinq fichiers ne le font pas :
-`constants/pages.ts`, `constants/languages.ts`, `helpers/page.ts`,
-`helpers/language.ts` et les types de `@types/`. Ils importent **en relatif, avec
-l'extension `.ts`**, parce que `vite.config.ts` les lit pour énumérer le
-prérendu, et qu'il les lit avant que l'alias existe. Aucun d'eux ne touche une
-image : les vidéos vivent dans `constants/loops.ts`, que la config ne lit pas.
+Presque tout le site importe par l'alias `@/`. Six fichiers ne le font pas :
+`constants/pages.ts`, `constants/languages.ts`, `constants/site.ts`,
+`helpers/page.ts`, `helpers/language.ts` et les types de `@types/`. Ils importent
+**en relatif, avec l'extension `.ts`**, parce que `vite.config.ts` les lit pour
+énumérer le prérendu et pour le sitemap, et qu'il les lit avant que l'alias
+existe. Aucun d'eux ne touche une image : les vidéos et leurs affiches vivent
+dans `constants/loops.ts`, que la config ne lit pas.
 
 ## Ce que le site ne dit jamais
 
-Ni fenêtre, ni processus, ni autorisation système, ni webview. Ça, c'est le
-logiciel qui le dit, une fois installé.
+Il ne raconte pas comment il s'y prend : ni processus, ni autorisation système,
+ni notification système, ni webview. Ça, c'est le logiciel qui le dit, une fois
+installé, à quelqu'un qui a un réglage à cocher.
+
+Le mot « fenêtre » reste, parce que c'est ce que le joueur voit et cherche, et
+« gestionnaire de fenêtres » avec lui : c'est le nom de la catégorie, c'est ce
+qu'Ankama a écrit deux fois en public, et c'est ce qui se tape dans Google. Ce
+qui est proscrit, c'est de décrire la plomberie derrière.
 
 Jamais le mot « officiel ». Jamais le logo ni la typographie de Dofus, jamais le
 vert et l'orange de l'en-tête d'Ankama. Quatre sites jumeaux se font passer pour

@@ -13,21 +13,63 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
+#. placeholder {0}: SYSTEM_VERSIONS.macos
+#: src/constants/systems.ts
+msgid "{0} Monterey ou plus récent"
+msgstr "{0} Monterey ou plus récent"
+
+#. placeholder {0}: SYSTEM_VERSIONS.windows
+#: src/constants/systems.ts
+msgid "{0}, mise à jour 1709 d’octobre 2017"
+msgstr "{0}, mise à jour 1709 d’octobre 2017"
+
+#: src/components/page-kin.tsx
+msgid "À voir aussi"
+msgstr "À voir aussi"
+
 #: src/components/skip-link.tsx
 msgid "Aller au contenu"
 msgstr "Aller au contenu"
+
+#: src/screens/download-screen.tsx
+msgid "Ankama a posé cette limite deux fois en public, et c’est elle qui tient le projet :"
+msgstr "Ankama a posé cette limite deux fois en public, et c’est elle qui tient le projet :"
+
+#: src/screens/home-screen.tsx
+msgid "appels du jeu vous emmènent sur le bon personnage"
+msgstr "appels du jeu vous emmènent sur le bon personnage"
 
 #: src/constants/wording.ts
 msgid "AutoFocus"
 msgstr "AutoFocus"
 
 #: src/constants/wording.ts
+msgid "Avant d’installer"
+msgstr "Avant d’installer"
+
+#: src/screens/download-screen.tsx
+msgid "Ce marché est plein de clones, et vous avez raison de vous méfier. Voici les quatre choses que vous pouvez vérifier vous-même, avant même de double-cliquer."
+msgstr "Ce marché est plein de clones, et vous avez raison de vous méfier. Voici les quatre choses que vous pouvez vérifier vous-même, avant même de double-cliquer."
+
+#: src/constants/wording.ts
 msgid "Ce que chaque version a changé."
 msgstr "Ce que chaque version a changé."
+
+#: src/screens/home-screen.tsx
+msgid "Ce que Multifus fait"
+msgstr "Ce que Multifus fait"
+
+#: src/constants/wording.ts
+msgid "Ce que Multifus ne fait pas"
+msgstr "Ce que Multifus ne fait pas"
 
 #: src/screens/lost-screen.tsx
 msgid "Cette page n’existe pas"
 msgstr "Cette page n’existe pas"
+
+#: src/screens/download-screen.tsx
+msgid "Chaque paquet porte son attestation"
+msgstr "Chaque paquet porte son attestation"
 
 #: src/constants/wording.ts
 msgid "Comparatif"
@@ -40,6 +82,30 @@ msgstr "D’où vient chaque image, et à quelle condition."
 #: src/constants/wording.ts
 msgid "Déplacement rapide"
 msgstr "Déplacement rapide"
+
+#: src/screens/home-screen.tsx
+msgid "Dofus Retro · macOS et Windows · Gratuit"
+msgstr "Dofus Retro · macOS et Windows · Gratuit"
+
+#: src/screens/home-screen.tsx
+msgid "fichier du jeu lu, modifié ou extrait"
+msgstr "fichier du jeu lu, modifié ou extrait"
+
+#: src/components/features-menu.tsx
+msgid "Fonctionnalités"
+msgstr "Fonctionnalités"
+
+#: src/screens/download-screen.tsx
+msgid "gh attestation verify <fichier> --repo viclafouch/multifus"
+msgstr "gh attestation verify <fichier> --repo viclafouch/multifus"
+
+#: src/screens/download-screen.tsx
+msgid "GitHub signe chaque paquet publié et dit de quel commit et de quel dépôt il sort. Une coquille ne peut pas montrer ça. La commande rend un verdict, et elle ne demande rien d’autre que le fichier que vous venez de télécharger :"
+msgstr "GitHub signe chaque paquet publié et dit de quel commit et de quel dépôt il sort. Une coquille ne peut pas montrer ça. La commande rend un verdict, et elle ne demande rien d’autre que le fichier que vous venez de télécharger :"
+
+#: src/screens/home-screen.tsx
+msgid "Gratuit, code publié, paquet signé et notarisé."
+msgstr "Gratuit, code publié, paquet signé et notarisé."
 
 #: src/components/site-footer.tsx
 msgid "Images et vidéos © Ankama Games. Dofus Retro est une marque d’Ankama."
@@ -57,6 +123,10 @@ msgstr "Journal des versions"
 msgid "L’adresse est peut-être mal recopiée, ou la page a changé de nom. L’accueil vous remet sur le chemin."
 msgstr "L’adresse est peut-être mal recopiée, ou la page a changé de nom. L’accueil vous remet sur le chemin."
 
+#: src/screens/home-screen.tsx
+msgid "L’AutoFocus à l’œuvre dans le jeu"
+msgstr "L’AutoFocus à l’œuvre dans le jeu"
+
 #: src/constants/wording.ts
 msgid "La fenêtre du personnage qui joue passe devant toute seule."
 msgstr "La fenêtre du personnage qui joue passe devant toute seule."
@@ -69,6 +139,34 @@ msgstr "La langue du site"
 msgid "La table des poids de runes, lisible et gratuite."
 msgstr "La table des poids de runes, lisible et gratuite."
 
+#: src/screens/home-screen.tsx
+msgid "langues, français, anglais, espagnol"
+msgstr "langues, français, anglais, espagnol"
+
+#: src/screens/download-screen.tsx
+msgid "Le code est publié"
+msgstr "Le code est publié"
+
+#: src/screens/download-screen.tsx
+msgid "le compte Dofus Retro sur X, le 10 mars 2026"
+msgstr "le compte Dofus Retro sur X, le 10 mars 2026"
+
+#: src/screens/download-screen.tsx
+msgid "Le dépôt sur GitHub"
+msgstr "Le dépôt sur GitHub"
+
+#: src/screens/download-screen.tsx
+msgid "le forum de Dofus Retro, le 1ᵉʳ avril 2026"
+msgstr "le forum de Dofus Retro, le 1ᵉʳ avril 2026"
+
+#: src/screens/download-screen.tsx
+msgid "Le paquet est signé et notarisé"
+msgstr "Le paquet est signé et notarisé"
+
+#: src/screens/home-screen.tsx
+msgid "Le paquet est signé et notarisé, il porte son attestation de provenance, et le code entier est publié. Ces trois-là se vérifient avant d’installer."
+msgstr "Le paquet est signé et notarisé, il porte son attestation de provenance, et le code entier est publié. Ces trois-là se vérifient avant d’installer."
+
 #: src/components/site-footer.tsx
 msgid "Le pied de page"
 msgstr "Le pied de page"
@@ -77,10 +175,6 @@ msgstr "Le pied de page"
 msgid "Le poids des runes posé par-dessus le jeu, sans quitter l’atelier."
 msgstr "Le poids des runes posé par-dessus le jeu, sans quitter l’atelier."
 
-#: src/components/site-header.tsx
-msgid "Les fonctionnalités de Multifus"
-msgstr "Les fonctionnalités de Multifus"
-
 #: src/constants/wording.ts
 msgid "Les images"
 msgstr "Les images"
@@ -88,6 +182,10 @@ msgstr "Les images"
 #: src/constants/wording.ts
 msgid "Les messages privés vous suivent sur le téléphone."
 msgstr "Les messages privés vous suivent sur le téléphone."
+
+#: src/components/site-header.tsx
+msgid "Les pages de Multifus"
+msgstr "Les pages de Multifus"
 
 #: src/constants/wording.ts
 msgid "Messages privés"
@@ -102,6 +200,10 @@ msgid "Multifus et les autres gestionnaires, ligne par ligne."
 msgstr "Multifus et les autres gestionnaires, ligne par ligne."
 
 #: src/constants/wording.ts
+msgid "Multifus ne lit pas la mémoire du jeu, ne touche à aucun de ses fichiers, ne joue à votre place sur aucun personnage et ne vous garde pas connecté quand vous ne faites rien. Il regarde qui vous appelle, et il vous emmène."
+msgstr "Multifus ne lit pas la mémoire du jeu, ne touche à aucun de ses fichiers, ne joue à votre place sur aucun personnage et ne vous garde pas connecté quand vous ne faites rien. Il regarde qui vous appelle, et il vous emmène."
+
+#: src/constants/wording.ts
 msgid "Multifus sur Mac"
 msgstr "Multifus sur Mac"
 
@@ -110,8 +212,8 @@ msgid "Multifus tourne sur Mac, signé et notarisé par Apple."
 msgstr "Multifus tourne sur Mac, signé et notarisé par Apple."
 
 #: src/constants/wording.ts
-msgid "Multifus, le multicompte sur Dofus Retro"
-msgstr "Multifus, le multicompte sur Dofus Retro"
+msgid "Multifus, logiciel multicompte gratuit pour Dofus Retro"
+msgstr "Multifus, logiciel multicompte gratuit pour Dofus Retro"
 
 #: src/constants/wording.ts
 msgid "Poids des runes"
@@ -141,6 +243,22 @@ msgstr "Retour à l’accueil"
 msgid "Roue des personnages"
 msgstr "Roue des personnages"
 
+#: src/screens/home-screen.tsx
+msgid "Sept mécanismes, et un seul but : ne plus jamais chercher le personnage qui vous attend."
+msgstr "Sept mécanismes, et un seul but : ne plus jamais chercher le personnage qui vous attend."
+
+#: src/screens/home-screen.tsx
+msgid "Six gestionnaires de fenêtres, ligne par ligne, chaque case relevée dans le code et non sur la page d’accueil de son auteur."
+msgstr "Six gestionnaires de fenêtres, ligne par ligne, chaque case relevée dans le code et non sur la page d’accueil de son auteur."
+
+#: src/screens/download-screen.tsx
+msgid "Sur Mac, le .dmg est signé par un identifiant de développeur Apple et notarisé par Apple : il s’ouvre sans avertissement, et le système vous dira qui l’a construit. Aucun autre outil de multicompte Dofus Retro ne le fait aujourd’hui."
+msgstr "Sur Mac, le .dmg est signé par un identifiant de développeur Apple et notarisé par Apple : il s’ouvre sans avertissement, et le système vous dira qui l’a construit. Aucun autre outil de multicompte Dofus Retro ne le fait aujourd’hui."
+
+#: src/screens/home-screen.tsx
+msgid "systèmes, macOS et Windows"
+msgstr "systèmes, macOS et Windows"
+
 #: src/constants/wording.ts
 msgid "Tableau des runes"
 msgstr "Tableau des runes"
@@ -148,6 +266,18 @@ msgstr "Tableau des runes"
 #: src/constants/wording.ts
 msgid "Télécharger"
 msgstr "Télécharger"
+
+#: src/constants/systems.ts
+msgid "Télécharger l’installeur .exe"
+msgstr "Télécharger l’installeur .exe"
+
+#: src/constants/systems.ts
+msgid "Télécharger le .dmg (Apple Silicon)"
+msgstr "Télécharger le .dmg (Apple Silicon)"
+
+#: src/screens/download-screen.tsx
+msgid "Tout ce que Multifus fait se lit ligne par ligne, sous licence MIT. Vous pouvez le compiler vous-même et comparer."
+msgstr "Tout ce que Multifus fait se lit ligne par ligne, sous licence MIT. Vous pouvez le compiler vous-même et comparer."
 
 #: src/constants/wording.ts
 msgid "Un clic gauche, et toute la team marche au même endroit."
@@ -158,9 +288,17 @@ msgid "Un disque de têtes sous le pouce, et la bonne fenêtre arrive."
 msgstr "Un disque de têtes sous le pouce, et la bonne fenêtre arrive."
 
 #: src/constants/wording.ts
+msgid "Un geste ne vaut que pour le personnage qui est devant vous, jamais pour toute la team d’un coup. Les macros qui déplacent plusieurs personnages ensemble sont bannissables, et elles restent hors de ce projet."
+msgstr "Un geste ne vaut que pour le personnage qui est devant vous, jamais pour toute la team d’un coup. Les macros qui déplacent plusieurs personnages ensemble sont bannissables, et elles restent hors de ce projet."
+
+#: src/constants/wording.ts
 msgid "Un texte tout prêt part sous une combinaison de touches."
 msgstr "Un texte tout prêt part sous une combinaison de touches."
 
 #: src/constants/wording.ts
 msgid "Une touche par personnage, et le tour du roster au clavier."
 msgstr "Une touche par personnage, et le tour du roster au clavier."
+
+#: src/screens/home-screen.tsx
+msgid "Voir le code"
+msgstr "Voir le code"

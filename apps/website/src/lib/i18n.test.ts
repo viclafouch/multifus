@@ -16,7 +16,7 @@ describe('les trois voix', () => {
 
   it('rendent la phrase française telle quelle', () => {
     expect(SPEAKERS.fr._(SITE_TITLE)).toBe(
-      'Multifus, le multicompte sur Dofus Retro'
+      'Multifus, logiciel multicompte gratuit pour Dofus Retro'
     )
     expect(SPEAKERS.fr._(PAGE_NAMES.wheel)).toBe('Roue des personnages')
   })

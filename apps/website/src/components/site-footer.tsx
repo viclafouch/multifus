@@ -1,5 +1,6 @@
 import { msg } from '@lingui/core/macro'
 import { useLingui } from '@lingui/react'
+import type { PageId } from '@/@types/page'
 import { PageLink } from '@/components/page-link'
 import { LANGUAGE_NAMES, LANGUAGES } from '@/constants/languages'
 import { REPOSITORY } from '@/constants/site'
@@ -11,6 +12,13 @@ const ANKAMA_CREDIT = msg`Images et vidéos © Ankama Games. Dofus Retro est une
 const LANGUAGES_NAV = msg`La langue du site`
 
 const FOOTER_NAV = msg`Le pied de page`
+
+const FOOTER_PAGES = [
+  'mac',
+  'runeWeights',
+  'journal',
+  'images'
+] as const satisfies readonly PageId[]
 
 export const SiteFooter = () => {
   const { i18n } = useLingui()
@@ -38,12 +46,13 @@ export const SiteFooter = () => {
         </nav>
         <nav aria-label={i18n._(FOOTER_NAV)}>
           <ul className="flex flex-wrap gap-4">
-            <li>
-              <PageLink page="journal">{i18n._(PAGE_NAMES.journal)}</PageLink>
-            </li>
-            <li>
-              <PageLink page="images">{i18n._(PAGE_NAMES.images)}</PageLink>
-            </li>
+            {FOOTER_PAGES.map((page) => {
+              return (
+                <li key={page}>
+                  <PageLink page={page}>{i18n._(PAGE_NAMES[page])}</PageLink>
+                </li>
+              )
+            })}
             <li>
               <a
                 href={REPOSITORY}

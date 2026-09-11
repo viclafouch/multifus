@@ -2,7 +2,9 @@ import { clsx, type ClassValue } from 'clsx'
 import { extendTailwindMerge } from 'tailwind-merge'
 
 const FONT_SIZES = [
+  'banner',
   'chapter',
+  'herald',
   'sign',
   'motto',
   'action',

@@ -1,36 +1,31 @@
 import { msg } from '@lingui/core/macro'
 import { useLingui } from '@lingui/react'
+import { FeaturesMenu } from '@/components/features-menu'
 import { PageLink } from '@/components/page-link'
-import { MENU_FEATURES } from '@/constants/pages'
 import { INDEPENDENCE, PAGE_NAMES } from '@/constants/wording'
 
-const FEATURES_NAV = msg`Les fonctionnalités de Multifus`
+const SITE_NAV = msg`Les pages de Multifus`
 
 export const SiteHeader = () => {
   const { i18n } = useLingui()
 
   return (
-    <header className="border-b border-border">
-      <p className="bg-iron px-4 py-1.5 text-center text-legend text-muted-foreground">
+    <header className="sticky top-0 z-40 border-b border-border bg-iron">
+      <p className="border-b border-border/60 px-4 py-1.5 text-center text-aside text-muted-foreground">
         {i18n._(INDEPENDENCE)}
       </p>
       <nav
-        aria-label={i18n._(FEATURES_NAV)}
-        className="mx-auto flex max-w-world items-center gap-6 px-4 py-4"
+        aria-label={i18n._(SITE_NAV)}
+        className="mx-auto flex max-w-world flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3"
       >
-        <PageLink page="home" className="font-carve text-sign tracking-wide">
+        <PageLink
+          page="home"
+          className="font-carve text-bar tracking-chapter text-cream"
+        >
           Multifus
         </PageLink>
-        <ul className="flex flex-wrap items-center gap-4 text-way">
-          {MENU_FEATURES.map((page) => {
-            return (
-              <li key={page}>
-                <PageLink page={page}>{i18n._(PAGE_NAMES[page])}</PageLink>
-              </li>
-            )
-          })}
-        </ul>
-        <PageLink page="comparison" className="ml-auto text-way">
+        <FeaturesMenu />
+        <PageLink page="comparison" className="text-way sm:ml-auto">
           {i18n._(PAGE_NAMES.comparison)}
         </PageLink>
         <PageLink page="download" className="text-way">

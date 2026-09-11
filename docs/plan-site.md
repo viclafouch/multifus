@@ -214,6 +214,51 @@ mot le plus gros de la page sort en fonte de repli. Elle est en
 et ne touchent aucune image. Les vidéos vivent dans `constants/loops.ts`, que la
 config ne lit pas. Le reste du site emploie l'alias `@/` normalement.
 
+## Le cadre, l'accueil et le téléchargement
+
+**Posés le 11 septembre 2026.** `PageScreen` n'est plus un gabarit : c'est le
+cartouche qui choisit un corps dans une table, `kind` par `kind`, et qui l'ouvre
+dans `SiteShell`. Quatre corps, `HomeScreen`, `FeatureScreen`, `DownloadScreen`
+et `PlainScreen`. Un `switch` avait été écrit d'abord, et il demandait un
+`default` qu'aucune valeur ne peut atteindre : une table
+`Record<PageKind, ComponentType>` dit la même chose sans la branche morte, et
+c'est le motif du reste du dépôt.
+
+La table des pages porte maintenant `kin`, deux ou trois voisines choisies à la
+main. Une page ajoutée sans ses voisines ne compile pas, comme elle ne compilait
+pas sans son espagnol. C'est le maillage interne, et il fait le travail d'une
+barre latérale sans en avoir l'air.
+
+**La liste des fonctionnalités de l'accueil est le menu de l'accueil du
+logiciel**, `btn-way` compris, et la règle 19 de
+[design-system.md](./design-system.md) le dit maintenant. Le voile du survol ne
+se voit pas sur un fond uni, faute de décor dessous ; le losange qui entre
+suffit.
+
+**Le menu déroulant est un `<details>`.** Base UI n'est pas une dépendance du
+site, et un menu qui a besoin de JavaScript pour s'ouvrir n'a pas sa place sur
+une page prérendue : les sept adresses sont dans le HTML livré, robot compris.
+`useDismiss` ne rajoute que ce que `<details>` ne sait pas faire, Échap et le
+clic dehors. Le losange est celui des questions fréquentes, `askmark`, qui
+répond désormais à `[open]` autant qu'à `aria-expanded`.
+
+**L'accueil montre la boucle de l'AutoFocus, et ne porte pourtant pas de
+`VideoObject`.** Ce n'est pas une fuite de la table : une vidéo n'a qu'une page
+canonique, celle de sa fonctionnalité, et la décrire deux fois la dédoublerait
+aux yeux de Google. L'accueil l'emprunte donc, et le dit : la plaque est une
+`figure` dont la légende mène à `/autofocus`. Le jour où l'accueil aura sa propre
+boucle, la table le dira et le balisage suivra tout seul.
+
+**Le décor ne se pose que sur l'accueil.** Une bande en haut, `village.webp`,
+noyée par `hem-deep` : un fond derrière notre mobilier, jamais l'habillage du
+site. Sur une page de fonctionnalité, c'est la vidéo qui tient ce rôle, et deux
+images à la suite se seraient battues.
+
+`grain` a quitté `apps/desktop/src/index.css` pour `retro.css` : `Scene` l'emploie
+et `Scene` est partagé, donc le site l'aurait peint sans son bruit. Trois corps
+de texte sont nés avec l'accueil, `--text-banner` pour le nom, `--text-herald`
+pour la phrase qui le suit, et `--spacing-horizon` pour la hauteur du décor.
+
 ## Le téléchargement
 
 Le site lit l'API GitHub à la compilation, et le workflow `release` appelle un
@@ -224,16 +269,40 @@ pointe sur le bon fichier, donc lire à la compilation est la seule voie propre.
 
 Les deux boutons, Mac et Windows, sont **toujours** dans le HTML livré. Le robot
 les voit tous les deux, le visiteur sans JavaScript aussi. Le navigateur ne fait
-que mettre en avant celui qui correspond. Jamais de détection côté serveur : elle
-casse le prérendu et ne montre qu'un système au robot.
+que mettre en avant celui qui correspond, et cette mise en avant reste à écrire.
+Jamais de détection côté serveur : elle casse le prérendu et ne montre qu'un
+système au robot.
+
+Chacun porte son système et son extension, et la ligne sous lui porte le plancher
+de version. Ils ne tiennent pas sur une ligne en Bebas sur un téléphone : la
+pilule grandit au lieu de déborder, et c'est pour ça que leur hauteur est libre.
 
 ## Le balisage
 
-`SoftwareApplication` sur l'accueil et sur `/telecharger`. `VideoObject` sur
+**Posé le 11 septembre 2026.** `SoftwareApplication` sur l'accueil et sur
+`/telecharger`, une seule et même identité sur les deux pages. `VideoObject` sur
 chaque page qui a une boucle : c'est le gain caché, Google pose une vignette dans
-le résultat, et aucun concurrent n'a de vidéo. `BreadcrumbList` sur les pages de
-fonctionnalité. Les trois se génèrent depuis la table des pages, donc ils ne
-peuvent pas mentir sur une page qui a changé.
+le résultat, et aucun concurrent n'a de vidéo. `BreadcrumbList` partout sauf sur
+l'accueil, qui en est la première marche : le plan ne le prévoyait que sur les
+fonctionnalités, mais il se déduit de la table pour n'importe quelle page, donc
+le restreindre coûtait une condition sans rien protéger.
+
+Les trois sortent de `kind` et de `loop`, donc ils ne peuvent pas mentir sur une
+page qui a changé. `helpers/schema.ts` les rend, `headOf` les pose dans la tête,
+et `scripts/verify-html.mjs` ouvre chaque page livrée, lit le `ld+json` et refuse
+un balisage vide ou hors de schema.org.
+
+**Google refuse un `VideoObject` sans `thumbnailUrl`**, et les boucles n'avaient
+pas d'affiche. Les quatre sont tirées de leur propre vidéo, et
+[images.md](./images.md) dit comment on choisit la seconde. Elles servent deux
+fois : `LoopPlate` les pose en `poster`, donc la plaque n'est plus noire pendant
+le chargement, ni pour qui a demandé moins d'animations et n'a pas encore appuyé
+sur lecture.
+
+`addressOf` a quitté `helpers/head.ts` pour `helpers/page.ts` : le balisage en a
+besoin autant que la tête, et les laisser s'importer l'un l'autre faisait un
+cycle. `helpers/page.ts` lit donc `constants/site.ts` en relatif, comme le reste
+de la chaîne que `vite.config.ts` ouvre.
 
 `FAQPage` ne rapporte plus rien depuis que Google a réservé ses résultats
 enrichis aux sites officiels et de santé. `aggregateRating` afficherait des
@@ -359,14 +428,12 @@ de cliquer.
 - [ ] Acheter `multifus.app`. Libre au 11 septembre 2026, aucun serveur de nom sur `.app`, `.io`, `.gg`, `.net` ni `.org`. Pas de `.fr`, le site parlera trois langues. Jamais « dofus » dans le domaine, l'article 13.3 des CGU demandant une autorisation écrite pour les marques. `HOST` est déjà `https://multifus.app` dans `apps/website/src/constants/site.ts`
 - [ ] Écrire à `contact@ankama.com` le jour où le domaine est acheté, pour un logiciel et un site gratuits et ouverts. Un site existant se défend mieux qu'un projet
 - [ ] Créer le projet Vercel, racine `apps/website`, et vérifier qu'il sert bien `dist/client`
-- [ ] **Poser les deux boutons, Mac et Windows, sur `/telecharger`.** Aujourd'hui `PageScreen` cache son unique bouton sur cette page-là, pour ne pas lier une page à elle-même : la page qui porte le nom « Télécharger » est donc la seule sans rien à cliquer. Les deux boutons portent le système et l'extension, « Télécharger le .dmg (Apple Silicon) », « Télécharger l'installeur .exe », et la commande `gh attestation verify` se pose juste à côté
-- [ ] Dessiner l'accueil avec `/frontend-design`, puis le cadre d'une page de fonctionnalité. `PageScreen` est aujourd'hui un gabarit nu, titre, promesse, vidéo, bouton : il est là pour que le prérendu se vérifie, pas pour rester
-- [ ] Les deux ou trois cartes de maillage interne en bas d'une page de fonctionnalité, choisies à la main. C'est ce qui remplace la barre latérale d'une documentation
 - [ ] Dessiner l'image Open Graph, et la poser dans `headOf`. `twitter:card` est retombé à `summary` en attendant : annoncer `summary_large_image` sans `og:image` donne une carte vide dans Discord et sur X
 - [ ] Brancher `/journal` sur `apps/desktop/CHANGELOG.md`. La page existe, elle est vide, et rien ne dit d'où son contenu viendra
 - [ ] Trancher les liens internes. `PageLink` pose un `<a href>`, parce que le `to` de `Link` est typé sur l'arbre des routes et qu'une adresse calculée n'y entre pas. Un site statique de quatorze pages s'en accommode, mais on perd le préchargement : à reprendre en dessinant la barre du haut
-- [ ] Poser le balisage. `SoftwareApplication` sur l'accueil et `/telecharger`, `VideoObject` sur les pages à boucle, `BreadcrumbList` sur les fonctionnalités. Tout se déduit de `kind` et de `loop` dans la table, donc rien ne peut mentir
-- [ ] Écrire les quatorze pages en français. Simple, long, aucun point technique. `PAGE_PROMISES` ne porte aujourd'hui qu'une phrase par page, celle qui sert de `meta description` et de légende de vidéo
+- [ ] Écrire le corps des pages en français. Simple, long, aucun point technique. L'accueil et `/telecharger` sont écrits ; les quatre pages de `kind: 'plain'`, le comparatif, les poids des runes, le journal et les images, n'ont que leur titre et leur promesse, et les huit fonctionnalités n'ont que leur titre, leur promesse et leur vidéo
+- [ ] Donner leur vraie adresse aux deux boutons de `/telecharger`. Ils pointent aujourd'hui sur `releases/latest`, la page, faute de savoir le nom du fichier : c'est la lecture de l'API GitHub à la compilation qui la leur donnera, et `RELEASES` est l'unique endroit à reprendre
+- [ ] Dessiner le comparatif. `/comparatif` est annoncé depuis l'accueil et depuis la barre du haut, et il n'a rien à montrer
 - [ ] Poser la ligne discrète qui propose l'autre langue, une fois, sans jamais rediriger. Les trois drapeaux dans le cartouche, comme sur les maps
 - [ ] Tourner les boucles qui manquent, les raccourcis, les messages privés, les réponses rapides, et celle de l'accueil, avec `make-loop`. La table les attend, `loop: null` les marque
 - [ ] Le crochet de déploiement Vercel dans le workflow `release`, et la lecture de l'API GitHub à la compilation

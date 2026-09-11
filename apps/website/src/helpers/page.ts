@@ -2,6 +2,7 @@ import type { Language } from '../@types/language.ts'
 import type { PageId } from '../@types/page.ts'
 import { LANGUAGES, SOURCE_LANGUAGE } from '../constants/languages.ts'
 import { PAGES, PAGE_IDS } from '../constants/pages.ts'
+import { HOST } from '../constants/site.ts'
 
 export type PathParams = Readonly<{
   page: PageId
@@ -16,6 +17,10 @@ export const pathOf = ({ page, language }: PathParams) => {
   }
 
   return language === SOURCE_LANGUAGE ? `/${slug}` : `/${language}/${slug}`
+}
+
+export const addressOf = ({ page, language }: PathParams) => {
+  return `${HOST}${pathOf({ page, language })}`
 }
 
 type PageOfParams = Readonly<{

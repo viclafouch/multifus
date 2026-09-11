@@ -72,6 +72,22 @@ describe('la table des pages', () => {
     }
   )
 
+  it.each(PAGE_IDS)('ne donne à %s que des voisines connues', (page) => {
+    for (const neighbour of PAGES[page].kin) {
+      expect(PAGE_IDS).toContain(neighbour)
+    }
+  })
+
+  it.each(PAGE_IDS)('ne rend pas %s voisine d’elle-même', (page) => {
+    expect(PAGES[page].kin).not.toContain(page)
+  })
+
+  it.each(PAGE_IDS)('ne nomme pas deux fois la même voisine de %s', (page) => {
+    const { kin } = PAGES[page]
+
+    expect(new Set(kin).size).toBe(kin.length)
+  })
+
   it('ne pose une vidéo que sur une fonctionnalité', () => {
     const filmed = PAGE_IDS.filter((page) => {
       return PAGES[page].loop !== null

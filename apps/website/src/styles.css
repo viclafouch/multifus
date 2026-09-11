@@ -21,6 +21,14 @@
   ::selection {
     @apply bg-primary/25;
   }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+}
+
+@utility dusk {
+  opacity: 0.55;
 }
 
 @media (prefers-reduced-motion: reduce) {

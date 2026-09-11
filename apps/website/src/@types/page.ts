@@ -20,8 +20,16 @@ export type PageKind = 'download' | 'feature' | 'home' | 'plain'
 
 export type LoopId = 'autoFocus' | 'runeTable' | 'walk' | 'wheel'
 
+export type Loop = Readonly<{
+  source: string
+  poster: string
+  seconds: number
+  filmed: string
+}>
+
 export type Page = Readonly<{
   kind: PageKind
   slugs: Readonly<Record<Language, string>>
   loop: LoopId | null
+  kin: readonly PageId[]
 }>

@@ -26,12 +26,31 @@ const complain = (pathname, what) => {
   complaints.push(`${pathname} : ${what}`)
 }
 
+const SCHEMA = /<script type="application\/ld\+json">(.+?)<\/script>/su
+
 for (const pathname of addresses) {
   const html = readFileSync(fileOf(pathname), 'utf8')
   const body = html.slice(html.indexOf('<body>'))
+  const marked = SCHEMA.exec(html)
 
   if (body.includes(SUSPENSE_ERROR)) {
     complain(pathname, 'le rendu serveur a échoué, le corps est vide')
+  }
+
+  if (marked === null) {
+    complain(pathname, 'aucun balisage schema.org')
+  } else {
+    const nodes = JSON.parse(marked[1])
+
+    if (nodes.length === 0) {
+      complain(pathname, 'un balisage vide')
+    }
+
+    for (const node of nodes) {
+      if (node['@context'] !== 'https://schema.org') {
+        complain(pathname, `une fiche ${node['@type']} hors de schema.org`)
+      }
+    }
   }
 
   if (!body.includes('<h1')) {

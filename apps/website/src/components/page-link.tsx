@@ -16,7 +16,7 @@ export const PageLink = ({ page, children, className }: PageLinkProps) => {
   return (
     <a
       href={pathOf({ page, language })}
-      className={cn('sighted transition-colors hover:text-primary', className)}
+      className={cn('sighted transition-colors hover:text-cream', className)}
     >
       {children}
     </a>

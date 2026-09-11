@@ -36,6 +36,14 @@ export const PAGE_PROMISES = {
   images: msg`D’où vient chaque image, et à quelle condition.`
 } as const satisfies Record<PageId, MessageDescriptor>
 
-export const SITE_TITLE = msg`Multifus, le multicompte sur Dofus Retro`
+export const SITE_TITLE = msg`Multifus, logiciel multicompte gratuit pour Dofus Retro`
 
 export const INDEPENDENCE = msg`Projet indépendant, sans lien avec Ankama.`
+
+export const LIMITS_TITLE = msg`Ce que Multifus ne fait pas`
+
+export const NO_HARM = msg`Multifus ne lit pas la mémoire du jeu, ne touche à aucun de ses fichiers, ne joue à votre place sur aucun personnage et ne vous garde pas connecté quand vous ne faites rien. Il regarde qui vous appelle, et il vous emmène.`
+
+export const ONE_AT_A_TIME = msg`Un geste ne vaut que pour le personnage qui est devant vous, jamais pour toute la team d’un coup. Les macros qui déplacent plusieurs personnages ensemble sont bannissables, et elles restent hors de ce projet.`
+
+export const BEFORE_INSTALL = msg`Avant d’installer`
