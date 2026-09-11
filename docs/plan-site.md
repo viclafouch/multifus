@@ -70,9 +70,11 @@ une documentation.
 site : d'après `concurrents.md`, Focus Retro est le seul autre outil sur Mac, et
 il est au ralenti. Personne ne tient « multi compte dofus retro mac ».
 
-Le menu annonce sept fonctionnalités, et six suffiraient si les réponses rapides
-rejoignaient les raccourcis. À trancher en écrivant la page : si elle tient en
-trois paragraphes, elle n'est pas une page.
+Le menu annonce sept fonctionnalités, et **les réponses rapides gardent la
+leur**, tranché en écrivant la page. Elle tient sans remplissage parce qu'elle a
+trois choses à dire que les raccourcis n'ont pas : les phrases qu'on retape vingt
+fois par jour, le collage qui n'envoie pas, et la langue du client Dofus qui
+n'est pas celle de Multifus.
 
 ## Chaque page de fonctionnalité
 
@@ -88,8 +90,9 @@ d'un écran elles pixellisent. Une plaque autour, la largeur du texte, et la rè
 Sous la vidéo, une page longue et simple. Ce que ça fait pour vous, quand ça
 sert, ce que ça ne fait pas. Le référencement demande des mots, et une page de
 trois paragraphes ne se range nulle part. Mais on allonge par le contenu, jamais
-par le remplissage : on ne parle ni de fenêtres, ni de processus, ni
-d'autorisations système. Ça, c'est le logiciel qui le dit, une fois installé.
+par le remplissage : on ne parle ni de processus, ni d'autorisations système. Ça,
+c'est le logiciel qui le dit, une fois installé. Le mot « fenêtre », lui, reste :
+c'est ce que le joueur voit et ce qu'il tape dans Google.
 
 En bas, deux ou trois cartes vers d'autres fonctionnalités, choisies à la main.
 C'est le maillage interne, et il fait le même travail qu'une barre latérale sans
@@ -346,6 +349,41 @@ phrase : la date se formate avec la langue, et`Intl`ne la connaît qu'une fois
 le composant rendu.`.claude/rules/code-style.md`demande encore`t` dans un
 corps, et c'est à reprendre.
 
+## Le corps des huit fonctionnalités
+
+**Posé le 11 septembre 2026.** Chaque page de fonctionnalité a maintenant, sous
+sa vidéo, une amorce, trois passages et une limite. `constants/bodies.ts` porte
+le tout, `PAGE_BODIES` valant `null` pour les six autres pages, exactement comme
+`loop`.
+
+**La limite est obligatoire, et le test refuse un titre où « ne fait pas » ne
+s'écrit pas.** C'est la règle des deux défaites du comparatif ramenée à l'échelle
+d'une page, et c'est le conseil de `concurrents.md` pris au mot : Multi-Tofu est
+le seul du marché à écrire ce que son outil ne fait pas, et il l'écrit en
+intertitre. Trois autres planchers tiennent avec elle : deux passages au moins,
+mille deux cents signes de français au moins, parce qu'une page de trois
+paragraphes ne se range nulle part, et aucune phrase écrite deux fois dans les
+huit pages, qui est le seul garde-fou contre le remplissage.
+
+**Le corps ne dit toujours pas comment Multifus s'y prend.** Ni processus, ni
+autorisation, ni notification : les sept appels du jeu sont nommés par ce que le
+joueur voit, c'est à votre tour de jouer, on vous invite dans un groupe, votre
+percepteur est attaqué.
+
+**« Map » et « écran » reviennent, au sens du joueur.** La team change de map, le
+tableau des runes évite le deuxième écran, un personnage déconnecté revient à
+l'écran de connexion. `apps/website/CONTEXT.md` disait les deux mots interdits ;
+il dit maintenant ce qu'il voulait dire, qu'aucune **page** ne se nomme ainsi.
+Les mots du jeu restent les mots du jeu, et la ligne « on ne parle ni de
+fenêtres » plus haut dans ce plan est morte de la même façon, le CONTEXT ayant
+gardé « fenêtre » parce que c'est ce qui se tape dans Google.
+
+`PlateBlock` est né de l'accueil, qui posait déjà « Ce que Multifus ne fait pas »
+sur du verre : la règle 35 de [design-system.md](./design-system.md) en fait la
+forme de toute limite. `Opening` porte l'amorce, avec le filet à gauche des
+chiffres de l'accueil. `ProseLines` rend une suite de paragraphes et se clé sur
+la phrase rendue, un `MessageDescriptor` n'ayant pas d'identifiant garanti.
+
 ## Ce que le site a le droit de montrer
 
 Les images restent celles d'Ankama, avec la même discipline que le dépôt : un
@@ -469,14 +507,14 @@ de cliquer.
 - [ ] Dessiner l'image Open Graph, et la poser dans `headOf`. `twitter:card` est retombé à `summary` en attendant : annoncer `summary_large_image` sans `og:image` donne une carte vide dans Discord et sur X
 - [ ] Brancher `/journal` sur `apps/desktop/CHANGELOG.md`. La page existe, elle est vide, et rien ne dit d'où son contenu viendra
 - [ ] Trancher les liens internes. `PageLink` pose un `<a href>`, parce que le `to` de `Link` est typé sur l'arbre des routes et qu'une adresse calculée n'y entre pas. Un site statique de quatorze pages s'en accommode, mais on perd le préchargement : à reprendre en dessinant la barre du haut
-- [ ] Écrire le corps des pages en français. Simple, long, aucun point technique. L'accueil, `/telecharger` et `/comparatif` sont écrits ; les trois pages de `kind: 'plain'`, les poids des runes, le journal et les images, n'ont que leur titre et leur promesse, et les huit fonctionnalités n'ont que leur titre, leur promesse et leur vidéo
+- [ ] Écrire le corps des trois pages de `kind: 'plain'`. Les huit fonctionnalités, l'accueil, `/telecharger` et `/comparatif` sont écrits ; restent les poids des runes, le journal et les images, qui n'ont que leur titre et leur promesse. Le journal attend son `CHANGELOG.md`, et les poids des runes attendent qu'on décide d'où vient la table : elle vit dans `apps/desktop/src/constants/runes.ts` avec ses `msg`, et la partager contre « chacun garde son catalogue » est une décision d'architecture à part
 - [ ] Donner leur vraie adresse aux deux boutons de `/telecharger`. Ils pointent aujourd'hui sur `releases/latest`, la page, faute de savoir le nom du fichier : c'est la lecture de l'API GitHub à la compilation qui la leur donnera, et `RELEASES` est l'unique endroit à reprendre
 - [ ] Poser la ligne discrète qui propose l'autre langue, une fois, sans jamais rediriger. Les trois drapeaux dans le cartouche, comme sur les maps
 - [ ] Tourner les boucles qui manquent, les raccourcis, les messages privés, les réponses rapides, et celle de l'accueil, avec `make-loop`. La table les attend, `loop: null` les marque
 - [ ] Le crochet de déploiement Vercel dans le workflow `release`, et la lecture de l'API GitHub à la compilation
 - [ ] Vercel Analytics, un seul événement personnalisé, le clic sur « Télécharger » avec le système dedans
 - [ ] Déclarer le site à la Search Console et y déposer le sitemap
-- [ ] Relire l'anglais et l'espagnol une fois le français figé. Les trois catalogues sont pleins, mais les quarante-deux phrases d'aujourd'hui ne sont que des titres et des promesses
+- [ ] Relire l'anglais et l'espagnol une fois le français figé. Les trois catalogues sont pleins, et ils portent maintenant le corps des huit fonctionnalités : c'est du texte suivi, et il n'a été relu par personne
 
 ## Ce que ce plan rendra à `plan.md`
 

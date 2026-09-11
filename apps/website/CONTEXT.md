@@ -11,8 +11,14 @@ déjà payés.
 ## Les mots
 
 **Fonctionnalité** : ce que le site vend, une par page. Le logiciel dit « map »
-pour un de ses lieux ; le site ne dit jamais « map », et il ne dit jamais
-« écran » non plus. Un visiteur n'a rien installé.
+pour un de ses lieux et « écran » pour ce qu'on y lit ; le site ne nomme jamais
+une de ses pages ainsi. Un visiteur n'a rien installé, et les lieux de Multifus
+ne lui disent rien.
+
+Les deux mots gardent en revanche leur sens de joueur, et le corps des pages s'en
+sert : la map qu'une team traverse, l'écran sur lequel on joue, l'écran de
+connexion où revient un personnage déconnecté. Ce sont les mots du jeu, et le
+site les emploie comme le jeu les emploie.
 
 **Page** : une adresse du site, et une ligne de `constants/pages.ts`. Son
 identifiant est le même dans les trois langues, ses trois adresses sont
@@ -56,6 +62,24 @@ le titre, `PageHead` porte le nom et la promesse d'une page.
 
 **Prose** (`Prose`) : un paragraphe de corps, à la largeur où il se lit.
 `ProseBlock` en groupe plusieurs sous un intertitre.
+
+**Corps** (`Body`) : ce qu'une page de fonctionnalité dit sous sa vidéo, dans
+`constants/bodies.ts`. Une amorce, deux ou trois passages, et la limite.
+`PAGE_BODIES` vaut `null` pour une page qui n'en a pas, comme `loop` : le test
+refuse un corps ailleurs que sur une fonctionnalité, et une fonctionnalité sans
+corps.
+
+**Passage** (`Passage`) : un intertitre et ses paragraphes. Le mot est celui du
+texte, `Bande` étant déjà la tranche d'une page.
+
+**Amorce** (`Opening`) : le premier paragraphe d'un corps. Il raconte la scène
+que la vidéo montre, et il porte un filet à sa gauche pour qu'on le distingue des
+passages, qui expliquent.
+
+**Limite** (`limit`) : le passage qui dit ce que la fonctionnalité ne fait pas.
+Il est obligatoire, il se lit sur une plaque, et `constants/bodies.test.ts`
+refuse un titre où « ne fait pas » ne s'écrit pas. C'est la règle du comparatif
+tournée vers une seule page : ce qui se donne sans manque ne se croit pas.
 
 **Ligne** (`WayLink`) : une entrée de la liste des fonctionnalités de l'accueil,
 qui est le menu de l'accueil du logiciel. **Carte** (`PageCard`) est ce qu'une

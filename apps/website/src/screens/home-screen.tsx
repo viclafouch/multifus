@@ -2,7 +2,7 @@ import type { MessageDescriptor } from '@lingui/core'
 import { msg } from '@lingui/core/macro'
 import { useLingui } from '@lingui/react'
 import village from '@multifus/ankama/images/village.webp'
-import { Button, Panel } from '@multifus/retro'
+import { Button } from '@multifus/retro'
 import type { PageScreenProps } from '@/@types/screen'
 import { Band } from '@/components/band'
 import { BandTitle } from '@/components/band-title'
@@ -11,6 +11,7 @@ import { DownloadButton } from '@/components/download-button'
 import { LoopPlate } from '@/components/loop-plate'
 import { OutLink } from '@/components/out-link'
 import { PageLink } from '@/components/page-link'
+import { PlateBlock } from '@/components/plate-block'
 import { Prose } from '@/components/prose'
 import { WayLink } from '@/components/way-link'
 import { MENU_FEATURES } from '@/constants/pages'
@@ -125,8 +126,7 @@ export const HomeScreen = ({ page }: PageScreenProps) => {
         </ul>
       </Band>
       <Band>
-        <Panel className="flex flex-col gap-4 p-6 sm:p-8">
-          <BandTitle>{i18n._(LIMITS_TITLE)}</BandTitle>
+        <PlateBlock title={i18n._(LIMITS_TITLE)}>
           <Prose>{i18n._(NO_HARM)}</Prose>
           <Prose>{i18n._(TRUST_PROOF)}</Prose>
           <div className="flex flex-wrap items-center gap-6">
@@ -145,7 +145,7 @@ export const HomeScreen = ({ page }: PageScreenProps) => {
             </Button>
             <OutLink href={REPOSITORY}>{i18n._(SOURCE)}</OutLink>
           </div>
-        </Panel>
+        </PlateBlock>
       </Band>
       <Band className="pb-20">
         <BandTitle>{i18n._(PAGE_NAMES.comparison)}</BandTitle>

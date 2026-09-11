@@ -15,20 +15,20 @@ Une table recopiée ici serait fausse dans la semaine.
 La matière vit dans `packages/retro`, que le logiciel et le site importent tous
 les deux. Ce qui tient au cadre d'une map reste dans le logiciel.
 
-| Fichier                               | Ce qu'il tient                                                                                                                 |
-| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `packages/retro/src/styles/retro.css` | Le système entier : les jetons du `:root`, les corps et les espacements du `@theme inline`, les matières `@utility`, le rythme |
-| `packages/retro/src/styles/theme.css` | Le pont vers shadcn et Base UI : chaque jeton de couleur pointe sur `retro.css`. Des espacements en propre, jamais une couleur |
-| `packages/retro/src/cn.ts`            | `tailwind-merge` étendu des tailles et des conteneurs du thème                                                                 |
-| `packages/retro/src/components/`      | Ce qui se porte des deux côtés : `Button` et ses huit faces, `Panel`, `Shade`, `Tale`, `Scene`                                 |
-| `apps/desktop/src/index.css`          | Le fonds neutre de la fenêtre principale, et les réglages du navigateur                                                        |
-| `apps/desktop/src/components/layout/` | Le cadre d'une map : `Screen`, `StageScreen`, `MapHeader`, `MapTitle`, `FieldRow`                                              |
-| `apps/desktop/src/components/world/`  | Le monde : le décor, le dolmen, les têtes, le menu, le retour, le cartouche                                                    |
-| `apps/desktop/src/constants/world.ts` | Les dix maps, leurs noms et leurs décors                                                                                       |
-| `apps/website/src/styles.css`         | Le fonds du site, qui défile et se sélectionne, là où la fenêtre ne fait ni l'un ni l'autre, et la case du comparatif          |
-| `apps/website/src/components/`        | Le cadre d'une page : `SiteShell`, `SiteHeader`, `Band`, `DecorBand`, `WayLink`, `PageCard`, `ProseBlock`, `RivalTable`        |
-| `CONTEXT.md`                          | Les mots. Un nom de composant en sort                                                                                          |
-| `.claude/rules/frontend.md`           | React, l'accessibilité, Tailwind, le survol, les durées                                                                        |
+| Fichier                               | Ce qu'il tient                                                                                                                                   |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `packages/retro/src/styles/retro.css` | Le système entier : les jetons du `:root`, les corps et les espacements du `@theme inline`, les matières `@utility`, le rythme                   |
+| `packages/retro/src/styles/theme.css` | Le pont vers shadcn et Base UI : chaque jeton de couleur pointe sur `retro.css`. Des espacements en propre, jamais une couleur                   |
+| `packages/retro/src/cn.ts`            | `tailwind-merge` étendu des tailles et des conteneurs du thème                                                                                   |
+| `packages/retro/src/components/`      | Ce qui se porte des deux côtés : `Button` et ses huit faces, `Panel`, `Shade`, `Tale`, `Scene`                                                   |
+| `apps/desktop/src/index.css`          | Le fonds neutre de la fenêtre principale, et les réglages du navigateur                                                                          |
+| `apps/desktop/src/components/layout/` | Le cadre d'une map : `Screen`, `StageScreen`, `MapHeader`, `MapTitle`, `FieldRow`                                                                |
+| `apps/desktop/src/components/world/`  | Le monde : le décor, le dolmen, les têtes, le menu, le retour, le cartouche                                                                      |
+| `apps/desktop/src/constants/world.ts` | Les dix maps, leurs noms et leurs décors                                                                                                         |
+| `apps/website/src/styles.css`         | Le fonds du site, qui défile et se sélectionne, là où la fenêtre ne fait ni l'un ni l'autre, et la case du comparatif                            |
+| `apps/website/src/components/`        | Le cadre d'une page : `SiteShell`, `SiteHeader`, `Band`, `DecorBand`, `WayLink`, `PageCard`, `Opening`, `ProseBlock`, `PlateBlock`, `RivalTable` |
+| `CONTEXT.md`                          | Les mots. Un nom de composant en sort                                                                                                            |
+| `.claude/rules/frontend.md`           | React, l'accessibilité, Tailwind, le survol, les durées                                                                                          |
 
 `index.css` n'est chargé que par la fenêtre principale. Ce qu'une fenêtre
 satellite peint, la bannière, la roue, le tableau des runes, se déclare dans
@@ -253,19 +253,27 @@ pour un écran de travail, c'est la fenêtre Options du client qui répond.
     `--lozenge-side` et `--lozenge-turn`, jamais plus : l'un est un élément,
     l'autre un `::after` dont la rotation vit dans un `transform` qui translate
     aussi. Sortir la rotation de là arrête la translation
+35. Ce qu'une page du site ne fait pas se lit en intertitre, jamais en note de bas
+    de page. Quand c'est la page entière qui l'avoue, ça se pose sur une plaque,
+    `PlateBlock` : l'accueil et les huit fonctionnalités. `/telecharger` est
+    l'exception, et elle se voit : sa limite est l'une des quatre preuves
+    d'« Avant d'installer », et les quatre gardent le même rythme. Une plaque
+    posée partout ne dirait plus rien. Le paragraphe qui ouvre un corps porte,
+    lui, un filet à sa gauche et la couleur crème, comme les chiffres de
+    l'accueil : il raconte, et les passages expliquent
 
 ## Dessiner une map
 
 `app.tsx` pose déjà le décor, les bandes, le cartouche, le crédit et le journal.
 Une nouvelle map n'écrit que son dedans :
 
-35. `Screen` si c'est une liste, `StageScreen` si ça montre le jeu. Les deux
+36. `Screen` si c'est une liste, `StageScreen` si ça montre le jeu. Les deux
     posent `MapHeader`, donc le titre, le fronton et une phrase
-36. `Panel` par groupe, c'est le verre. `FieldRow` pour une ligne de réglage,
+37. `Panel` par groupe, c'est le verre. `FieldRow` pour une ligne de réglage,
     `Tick` pour ce qui s'allume, `Button` pour un geste
-37. Le nom de la map et son décor se déclarent dans `constants/world.ts`, et
+38. Le nom de la map et son décor se déclarent dans `constants/world.ts`, et
     `CurrentMap` la branche
-38. Ni onglet ni barre latérale : on vient de l'accueil, on y retourne par
+39. Ni onglet ni barre latérale : on vient de l'accueil, on y retourne par
     « Retour » ou par Échap
 
 Avant de dessiner, lire `CONTEXT.md` pour les mots. `frontend.md` tient React,

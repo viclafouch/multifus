@@ -38,10 +38,10 @@ export const ComparisonScreen = ({ page }: PageScreenProps) => {
         <RivalTable />
       </Band>
       <Band className="pt-10">
-        <ProseBlock title={i18n._(MISSING_TITLE)}>
+        <ProseBlock level={2} title={i18n._(MISSING_TITLE)}>
           <Prose>{i18n._(MISSING_BODY)}</Prose>
         </ProseBlock>
-        <ProseBlock title={i18n._(CHECK_TITLE)}>
+        <ProseBlock level={2} title={i18n._(CHECK_TITLE)}>
           <Prose>{i18n._(CHECK_BODY)}</Prose>
           <p className="text-tale">
             <OutLink href={REPOSITORY}>{i18n._(CHECK_NAME)}</OutLink>
