@@ -16,7 +16,7 @@ export type PageId =
   | 'walk'
   | 'wheel'
 
-export type PageKind = 'download' | 'feature' | 'home' | 'plain'
+export type PageKind = 'comparison' | 'download' | 'feature' | 'home' | 'plain'
 
 export type LoopId = 'autoFocus' | 'runeTable' | 'walk' | 'wheel'
 

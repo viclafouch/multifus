@@ -2,16 +2,13 @@ import { describe, expect, it } from 'vitest'
 import { LANGUAGES } from '@/constants/languages'
 import { MENU_FEATURES, PAGES, PAGE_IDS } from '@/constants/pages'
 import { PAGE_NAMES, PAGE_PROMISES } from '@/constants/wording'
+import { alphabetical } from '@/test-order'
 
 const SLUG_SHAPE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/u
 
 const WITHOUT_HOME = PAGE_IDS.filter((page) => {
   return page !== 'home'
 })
-
-const alphabetical = (one: string, other: string) => {
-  return one.localeCompare(other)
-}
 
 describe('la table des pages', () => {
   it('donne quatorze pages', () => {

@@ -139,8 +139,8 @@ quarante-quatre adresses pour quarante-deux pages. La table énumère, et elle
 seule.
 
 **Aucun service payant.** Cette règle tient le site entier, et elle est
-maintenant dans `CLAUDE.md`. Vercel en plan Hobby, Vercel Analytics dans son
-quota gratuit, la Search Console, et rien d'autre.
+maintenant dans `apps/website/CLAUDE.md`. Vercel en plan Hobby, Vercel Analytics
+dans son quota gratuit, la Search Console, et rien d'autre.
 
 Lingui, la même bibliothèque que le logiciel, avec le même `@rolldown/plugin-babel`
 et le même format `.po`.
@@ -308,6 +308,44 @@ de la chaîne que `vite.config.ts` ouvre.
 enrichis aux sites officiels et de santé. `aggregateRating` afficherait des
 étoiles et vaudrait une action manuelle, faute de vrais avis. Ni l'un ni l'autre.
 
+## Le comparatif
+
+**Posé le 11 septembre 2026.** Cinq concurrents, Dracoon, Focus Retro, Dosoft,
+Retro Toolbox et ROrganizer, choisis parce qu'ils publient assez de code pour
+qu'on les lise. nAiO et Xixou n'ont pas de colonne : sans code, une case ne
+serait qu'une recopie de leur page d'accueil, et c'est exactement ce que la page
+reproche aux autres. Douze traits, tirés du tableau de trente de
+[concurrents.md](./concurrents.md), qui reste le tableau d'ingénieur.
+
+**Deux traits portent `no` en face de Multifus**, les fenêtres rangées côte à
+côte et les compositions d'équipe. C'est la faute de Focus Retro retournée en
+règle, et `constants/rivals.test.ts` la tient : un comparatif sans une seule
+défaite ne compile plus. Le test tient aussi le plancher inverse, chaque
+concurrent gardant au moins un trait, faute de quoi il n'est là que pour perdre.
+
+**La case n'a pas de couleur.** Un disque plein, un demi-disque, un anneau vide,
+et son mot en toutes lettres pour le lecteur d'écran. La règle 1 de
+[design-system.md](./design-system.md) le dit maintenant : soixante-douze cases
+vertes noieraient le seul bouton vert de la page.
+
+`/comparatif` a pris une cinquième sorte de page, `kind: 'comparison'`, plutôt
+que de se glisser dans `plain` : la table des sortes était déjà là pour ça. Sept
+colonnes ne tiennent pas sur un téléphone, donc le tableau glisse de côté dans sa
+plaque, la colonne des traits restant collée à gauche.
+
+**Un trait ne fusionne jamais deux lignes de la source.** Le premier jet cochait
+« AutoFocus sur les sept appels du jeu », et donnait le même demi-disque à Focus
+Retro, qui en couvre un, et à Retro Toolbox, qui en couvre cinq. C'était la faute
+de Focus Retro refaite à l'identique. Le trait recopie maintenant la ligne
+« AutoFocus sur notification » telle quelle, et les sept appels restent sur
+`/autofocus`, qui a la place de les nommer.
+
+**La date du relevé passe par `i18n._(msg\`... ${{ jour }}\`)`, dans le corps.**
+`t(i18n)`disait la même chose et le macro le transforme, mais Lingui v6 déprécie`t`et oxlint refuse la ligne.`msg`au module ne pouvait pas porter cette
+phrase : la date se formate avec la langue, et`Intl`ne la connaît qu'une fois
+le composant rendu.`.claude/rules/code-style.md`demande encore`t` dans un
+corps, et c'est à reprendre.
+
 ## Ce que le site a le droit de montrer
 
 Les images restent celles d'Ankama, avec la même discipline que le dépôt : un
@@ -431,9 +469,8 @@ de cliquer.
 - [ ] Dessiner l'image Open Graph, et la poser dans `headOf`. `twitter:card` est retombé à `summary` en attendant : annoncer `summary_large_image` sans `og:image` donne une carte vide dans Discord et sur X
 - [ ] Brancher `/journal` sur `apps/desktop/CHANGELOG.md`. La page existe, elle est vide, et rien ne dit d'où son contenu viendra
 - [ ] Trancher les liens internes. `PageLink` pose un `<a href>`, parce que le `to` de `Link` est typé sur l'arbre des routes et qu'une adresse calculée n'y entre pas. Un site statique de quatorze pages s'en accommode, mais on perd le préchargement : à reprendre en dessinant la barre du haut
-- [ ] Écrire le corps des pages en français. Simple, long, aucun point technique. L'accueil et `/telecharger` sont écrits ; les quatre pages de `kind: 'plain'`, le comparatif, les poids des runes, le journal et les images, n'ont que leur titre et leur promesse, et les huit fonctionnalités n'ont que leur titre, leur promesse et leur vidéo
+- [ ] Écrire le corps des pages en français. Simple, long, aucun point technique. L'accueil, `/telecharger` et `/comparatif` sont écrits ; les trois pages de `kind: 'plain'`, les poids des runes, le journal et les images, n'ont que leur titre et leur promesse, et les huit fonctionnalités n'ont que leur titre, leur promesse et leur vidéo
 - [ ] Donner leur vraie adresse aux deux boutons de `/telecharger`. Ils pointent aujourd'hui sur `releases/latest`, la page, faute de savoir le nom du fichier : c'est la lecture de l'API GitHub à la compilation qui la leur donnera, et `RELEASES` est l'unique endroit à reprendre
-- [ ] Dessiner le comparatif. `/comparatif` est annoncé depuis l'accueil et depuis la barre du haut, et il n'a rien à montrer
 - [ ] Poser la ligne discrète qui propose l'autre langue, une fois, sans jamais rediriger. Les trois drapeaux dans le cartouche, comme sur les maps
 - [ ] Tourner les boucles qui manquent, les raccourcis, les messages privés, les réponses rapides, et celle de l'accueil, avec `make-loop`. La table les attend, `loop: null` les marque
 - [ ] Le crochet de déploiement Vercel dans le workflow `release`, et la lecture de l'API GitHub à la compilation

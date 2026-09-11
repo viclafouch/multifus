@@ -72,7 +72,7 @@ export const PAGES = {
     slugs: { fr: 'mac', en: 'mac', es: 'mac' }
   },
   comparison: {
-    kind: 'plain',
+    kind: 'comparison',
     loop: null,
     kin: ['download', 'mac'],
     slugs: { fr: 'comparatif', en: 'comparison', es: 'comparativa' }

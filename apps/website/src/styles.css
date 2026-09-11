@@ -31,6 +31,34 @@
   opacity: 0.55;
 }
 
+@utility mark {
+  fill: none;
+  stroke: var(--band);
+  stroke-width: 2;
+  transform: translateZ(0);
+
+  & > path {
+    fill: none;
+    stroke: none;
+  }
+
+  &[data-mark='yes'] {
+    stroke: var(--cream);
+
+    & > circle {
+      fill: var(--cream);
+    }
+  }
+
+  &[data-mark='half'] {
+    stroke: var(--cream);
+
+    & > path {
+      fill: var(--cream);
+    }
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

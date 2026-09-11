@@ -30,6 +30,19 @@ identiques pour deux choses, c'est ce que `CONTEXT.md` interdit.
 **Comparatif** : `/comparatif`. Cinq concurrents au maximum. Aucune case n'est
 remplie depuis la page d'accueil d'un concurrent, seulement depuis son code.
 
+**Concurrent** (`Rival`) : une colonne du comparatif, son nom propre et l'adresse
+de son dépôt, jamais celle de sa vitrine. Le lien mène là où la case a été lue.
+Il n'y a pas de colonne pour un outil qui ne publie rien : on ne saurait pas quoi
+y mettre.
+
+**Trait** (`Trait`) : ce que le comparatif compare, entre dix et douze. Cinq
+reprennent le nom de leur page, et c'est le même mot des deux côtés. Le code dit
+`Trait` parce que `Ligne` est déjà pris par le menu de l'accueil.
+
+**Case** (`Mark`) : `yes`, `half` ou `no`, et rien d'autre. Un disque plein, un
+demi-disque, un anneau vide, jamais une couleur. Deux lignes au moins portent
+`no` en face de Multifus : un comparatif qu'on gagne partout ne se croit pas.
+
 **Voisines** (`kin`) : les deux ou trois pages vers lesquelles une page renvoie
 en bas, choisies à la main dans `constants/pages.ts`. C'est le maillage interne,
 et il remplace la barre latérale d'une documentation. Le champ est obligatoire,

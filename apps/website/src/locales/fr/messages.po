@@ -23,6 +23,10 @@ msgstr "{0} Monterey ou plus récent"
 msgid "{0}, mise à jour 1709 d’octobre 2017"
 msgstr "{0}, mise à jour 1709 d’octobre 2017"
 
+#: src/constants/rivals.ts
+msgid "à moitié"
+msgstr "à moitié"
+
 #: src/components/page-kin.tsx
 msgid "À voir aussi"
 msgstr "À voir aussi"
@@ -43,6 +47,10 @@ msgstr "appels du jeu vous emmènent sur le bon personnage"
 msgid "AutoFocus"
 msgstr "AutoFocus"
 
+#: src/constants/rivals.ts
+msgid "AutoFocus quand le jeu vous appelle"
+msgstr "AutoFocus quand le jeu vous appelle"
+
 #: src/constants/wording.ts
 msgid "Avant d’installer"
 msgstr "Avant d’installer"
@@ -50,6 +58,10 @@ msgstr "Avant d’installer"
 #: src/screens/download-screen.tsx
 msgid "Ce marché est plein de clones, et vous avez raison de vous méfier. Voici les quatre choses que vous pouvez vérifier vous-même, avant même de double-cliquer."
 msgstr "Ce marché est plein de clones, et vous avez raison de vous méfier. Voici les quatre choses que vous pouvez vérifier vous-même, avant même de double-cliquer."
+
+#: src/components/rival-table.tsx
+msgid "Ce qu’il fait"
+msgstr "Ce qu’il fait"
 
 #: src/constants/wording.ts
 msgid "Ce que chaque version a changé."
@@ -59,6 +71,10 @@ msgstr "Ce que chaque version a changé."
 msgid "Ce que Multifus fait"
 msgstr "Ce que Multifus fait"
 
+#: src/screens/comparison-screen.tsx
+msgid "Ce que Multifus laisse aux autres"
+msgstr "Ce que Multifus laisse aux autres"
+
 #: src/constants/wording.ts
 msgid "Ce que Multifus ne fait pas"
 msgstr "Ce que Multifus ne fait pas"
@@ -67,13 +83,29 @@ msgstr "Ce que Multifus ne fait pas"
 msgid "Cette page n’existe pas"
 msgstr "Cette page n’existe pas"
 
+#: src/screens/comparison-screen.tsx
+msgid "Chaque case de ce tableau est lue dans le code de l’outil, jamais sur sa page d’accueil. Un outil qui garde son code fermé n’a pas de colonne ici : rien de ce qu’il promet ne se vérifie. Et vous trouverez deux lignes que Multifus ne coche pas, parce qu’un comparatif où l’on gagne partout ne vaut rien."
+msgstr "Chaque case de ce tableau est lue dans le code de l’outil, jamais sur sa page d’accueil. Un outil qui garde son code fermé n’a pas de colonne ici : rien de ce qu’il promet ne se vérifie. Et vous trouverez deux lignes que Multifus ne coche pas, parce qu’un comparatif où l’on gagne partout ne vaut rien."
+
+#: src/screens/comparison-screen.tsx
+msgid "Chaque nom de colonne mène au dépôt de l’outil, là où nous avons lu ses cases. Une case qui vous paraît fausse se vérifie dans le même code que nous, et elle se corrige ici :"
+msgstr "Chaque nom de colonne mène au dépôt de l’outil, là où nous avons lu ses cases. Une case qui vous paraît fausse se vérifie dans le même code que nous, et elle se corrige ici :"
+
 #: src/screens/download-screen.tsx
 msgid "Chaque paquet porte son attestation"
 msgstr "Chaque paquet porte son attestation"
 
+#: src/constants/rivals.ts
+msgid "Code publié"
+msgstr "Code publié"
+
 #: src/constants/wording.ts
 msgid "Comparatif"
 msgstr "Comparatif"
+
+#: src/constants/rivals.ts
+msgid "Compositions d’équipe enregistrées"
+msgstr "Compositions d’équipe enregistrées"
 
 #: src/constants/wording.ts
 msgid "D’où vient chaque image, et à quelle condition."
@@ -86,6 +118,10 @@ msgstr "Déplacement rapide"
 #: src/screens/home-screen.tsx
 msgid "Dofus Retro · macOS et Windows · Gratuit"
 msgstr "Dofus Retro · macOS et Windows · Gratuit"
+
+#: src/constants/rivals.ts
+msgid "Fenêtres rangées côte à côte"
+msgstr "Fenêtres rangées côte à côte"
 
 #: src/screens/home-screen.tsx
 msgid "fichier du jeu lu, modifié ou extrait"
@@ -151,6 +187,10 @@ msgstr "Le code est publié"
 msgid "le compte Dofus Retro sur X, le 10 mars 2026"
 msgstr "le compte Dofus Retro sur X, le 10 mars 2026"
 
+#: src/screens/comparison-screen.tsx
+msgid "Le dépôt de Multifus sur GitHub"
+msgstr "Le dépôt de Multifus sur GitHub"
+
 #: src/screens/download-screen.tsx
 msgid "Le dépôt sur GitHub"
 msgstr "Le dépôt sur GitHub"
@@ -203,6 +243,10 @@ msgstr "Multifus et les autres gestionnaires, ligne par ligne."
 msgid "Multifus ne lit pas la mémoire du jeu, ne touche à aucun de ses fichiers, ne joue à votre place sur aucun personnage et ne vous garde pas connecté quand vous ne faites rien. Il regarde qui vous appelle, et il vous emmène."
 msgstr "Multifus ne lit pas la mémoire du jeu, ne touche à aucun de ses fichiers, ne joue à votre place sur aucun personnage et ne vous garde pas connecté quand vous ne faites rien. Il regarde qui vous appelle, et il vous emmène."
 
+#: src/screens/comparison-screen.tsx
+msgid "Multifus ne range pas les fenêtres côte à côte : c’est un choix, et il ne changera pas. Il amène devant vous celle du personnage qui joue, il ne redessine pas votre bureau. Et il ne garde pas encore de compositions d’équipe."
+msgstr "Multifus ne range pas les fenêtres côte à côte : c’est un choix, et il ne changera pas. Il amène devant vous celle du personnage qui joue, il ne redessine pas votre bureau. Et il ne garde pas encore de compositions d’équipe."
+
 #: src/constants/wording.ts
 msgid "Multifus sur Mac"
 msgstr "Multifus sur Mac"
@@ -214,6 +258,18 @@ msgstr "Multifus tourne sur Mac, signé et notarisé par Apple."
 #: src/constants/wording.ts
 msgid "Multifus, logiciel multicompte gratuit pour Dofus Retro"
 msgstr "Multifus, logiciel multicompte gratuit pour Dofus Retro"
+
+#: src/constants/rivals.ts
+msgid "non"
+msgstr "non"
+
+#: src/constants/rivals.ts
+msgid "oui"
+msgstr "oui"
+
+#: src/constants/rivals.ts
+msgid "Paquet signé"
+msgstr "Paquet signé"
 
 #: src/constants/wording.ts
 msgid "Poids des runes"
@@ -230,6 +286,10 @@ msgstr "Projet indépendant, sans lien avec Ankama."
 #: src/constants/wording.ts
 msgid "Raccourcis"
 msgstr "Raccourcis"
+
+#: src/components/rival-table.tsx
+msgid "Relevé le {surveyed}, dans le code de chaque outil."
+msgstr "Relevé le {surveyed}, dans le code de chaque outil."
 
 #: src/constants/wording.ts
 msgid "Réponses rapides"
@@ -251,9 +311,17 @@ msgstr "Sept mécanismes, et un seul but : ne plus jamais chercher le personnage
 msgid "Six gestionnaires de fenêtres, ligne par ligne, chaque case relevée dans le code et non sur la page d’accueil de son auteur."
 msgstr "Six gestionnaires de fenêtres, ligne par ligne, chaque case relevée dans le code et non sur la page d’accueil de son auteur."
 
+#: src/constants/rivals.ts
+msgid "Sur Mac"
+msgstr "Sur Mac"
+
 #: src/screens/download-screen.tsx
 msgid "Sur Mac, le .dmg est signé par un identifiant de développeur Apple et notarisé par Apple : il s’ouvre sans avertissement, et le système vous dira qui l’a construit. Aucun autre outil de multicompte Dofus Retro ne le fait aujourd’hui."
 msgstr "Sur Mac, le .dmg est signé par un identifiant de développeur Apple et notarisé par Apple : il s’ouvre sans avertissement, et le système vous dira qui l’a construit. Aucun autre outil de multicompte Dofus Retro ne le fait aujourd’hui."
+
+#: src/constants/rivals.ts
+msgid "Sur Windows"
+msgstr "Sur Windows"
 
 #: src/screens/home-screen.tsx
 msgid "systèmes, macOS et Windows"
@@ -298,6 +366,10 @@ msgstr "Un texte tout prêt part sous une combinaison de touches."
 #: src/constants/wording.ts
 msgid "Une touche par personnage, et le tour du roster au clavier."
 msgstr "Une touche par personnage, et le tour du roster au clavier."
+
+#: src/screens/comparison-screen.tsx
+msgid "Vérifiez ce tableau vous-même"
+msgstr "Vérifiez ce tableau vous-même"
 
 #: src/screens/home-screen.tsx
 msgid "Voir le code"

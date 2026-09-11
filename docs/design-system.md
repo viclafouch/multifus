@@ -25,8 +25,8 @@ les deux. Ce qui tient au cadre d'une map reste dans le logiciel.
 | `apps/desktop/src/components/layout/` | Le cadre d'une map : `Screen`, `StageScreen`, `MapHeader`, `MapTitle`, `FieldRow`                                              |
 | `apps/desktop/src/components/world/`  | Le monde : le décor, le dolmen, les têtes, le menu, le retour, le cartouche                                                    |
 | `apps/desktop/src/constants/world.ts` | Les dix maps, leurs noms et leurs décors                                                                                       |
-| `apps/website/src/styles.css`         | Le fonds du site, qui défile et se sélectionne, là où la fenêtre ne fait ni l'un ni l'autre                                    |
-| `apps/website/src/components/`        | Le cadre d'une page : `SiteShell`, `SiteHeader`, `Band`, `DecorBand`, `WayLink`, `PageCard`, `ProseBlock`                      |
+| `apps/website/src/styles.css`         | Le fonds du site, qui défile et se sélectionne, là où la fenêtre ne fait ni l'un ni l'autre, et la case du comparatif          |
+| `apps/website/src/components/`        | Le cadre d'une page : `SiteShell`, `SiteHeader`, `Band`, `DecorBand`, `WayLink`, `PageCard`, `ProseBlock`, `RivalTable`        |
 | `CONTEXT.md`                          | Les mots. Un nom de composant en sort                                                                                          |
 | `.claude/rules/frontend.md`           | React, l'accessibilité, Tailwind, le survol, les durées                                                                        |
 
@@ -68,7 +68,10 @@ pour un écran de travail, c'est la fenêtre Options du client qui répond.
    bouton vert par map, jamais un titre, jamais un avancement. Sur le site, cette
    action porte un nom, « Télécharger », et un seul bouton vert par page le dit.
    `/telecharger` en porte deux, le Mac et Windows : c'est la même action coupée
-   en deux par le système, pas deux actions qui se disputent l'œil
+   en deux par le système, pas deux actions qui se disputent l'œil. Le comparatif
+   ne coche donc rien en vert : soixante-douze cases vertes noieraient le seul
+   bouton qui compte, et le disque plein, le demi-disque et l'anneau vide se
+   distinguent sans couleur
 2. L'or et l'ambre ne vivent que dans le logo du jeu. Ils survivent aux deux
    endroits que `CONTEXT.md` nomme, la part sans couleur de la roue et l'étoile
    du principal, et nulle part ailleurs
