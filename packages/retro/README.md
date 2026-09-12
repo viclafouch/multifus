@@ -3,8 +3,7 @@
 La matière de Multifus : les jetons, les fontes, les matières, et les composants
 que le logiciel et le site portent tous les deux.
 
-Elle donne la matière, jamais la mise en page. Ce que chaque règle a coûté est
-dans [docs/design-system.md](../../docs/design-system.md), et les mots sont dans
+Elle donne la matière, jamais la mise en page. Les mots sont dans
 [CONTEXT.md](../../CONTEXT.md).
 
 | Chemin                 | Ce qu'il tient                                                                       |

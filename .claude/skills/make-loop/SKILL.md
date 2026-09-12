@@ -34,4 +34,4 @@ taille d'une vidéo à l'autre, sinon les trois plaques montrent le jeu à trois
 
 **gifski, jamais `palettegen`.** La chaîne `palettegen`/`paletteuse` de ffmpeg, palette neuve à chaque image, rend un fichier dix fois plus lourd pour le même œil : 127 Mo là où gifski en fait 12. Le script n'appelle ffmpeg que pour sortir les images.
 
-**Une capture du jeu est une image d'Ankama.** Avant de la poser dans le dépôt, lire [docs/images.md](../../../docs/images.md), qui dit ce que les CGU permettent.
+**Une capture du jeu est une image d'Ankama.** Elle se pose dans `packages/ankama`, que la licence exclut du MIT, et nulle part ailleurs.

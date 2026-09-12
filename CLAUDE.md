@@ -11,16 +11,6 @@ du jeu, le poids de chaque rune. Chacun a son README.
   compris.
 - [docs/plan.md](./docs/plan.md) : ce qui reste à faire, et la seule liste. Une
   ligne faite s'enlève.
-- [docs/design-system.md](./docs/design-system.md) : la vision, les deux sources
-  de la matière, et le peu qui ne se rejoue pas. À lire avant de dessiner un
-  écran, et **à ne pas modifier** : il n'est pas le journal de ce qu'on vient de
-  faire, il ne nomme ni fichier ni composant, et une modification du logiciel ou
-  du site ne le touche pas. Une leçon technique tirée d'un essai raté va dans
-  `.claude/rules/frontend.md`, jamais là. Ce n'est pas non plus un gabarit : une
-  page qu'on redessine repart de zéro, et on retourne voir dofus-retro.com dès
-  qu'une matière manque plutôt que de l'inventer.
-- [docs/images.md](./docs/images.md) : d'où vient chaque image d'Ankama et ce que
-  ses CGU permettent. À lire avant d'ajouter une image au dépôt.
 - [docs/concurrents.md](./docs/concurrents.md) : qui sont les autres et ce qu'ils
   font. [docs/audit-concurrents.md](./docs/audit-concurrents.md) dit ce que leur
   code fait, ce qu'on en prend et ce qu'on refuse, et `docs/concurrents.html`

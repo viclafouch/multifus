@@ -8,8 +8,6 @@ Elles **ne sont pas couvertes par la licence MIT** du dépôt. La
 retire toutes d'un coup. Aucun droit sur elles n'est concédé, et Multifus n'a
 aucun lien avec Ankama.
 
-D'où vient chaque fichier, et à quelle condition : [docs/images.md](../../docs/images.md).
-
 | Dossier      | Ce qu'il tient                                                      |
 | ------------ | ------------------------------------------------------------------- |
 | `images/`    | Les décors des maps, les deux messages d'Ankama, la fenêtre Options |
