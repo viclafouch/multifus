@@ -12,10 +12,13 @@ du jeu, le poids de chaque rune. Chacun a son README.
 - [docs/plan.md](./docs/plan.md) : ce qui reste à faire, et la seule liste. Une
   ligne faite s'enlève.
 - [docs/design-system.md](./docs/design-system.md) : la vision, les deux sources
-  de la matière, et les règles qui tranchent. À lire avant de dessiner un écran,
-  à écrire quand une règle naît d'un essai raté. Il ne recopie aucune valeur, le
-  code les tient, et on retourne voir dofus-retro.com dès qu'une matière manque
-  plutôt que de l'inventer.
+  de la matière, et le peu qui ne se rejoue pas. À lire avant de dessiner un
+  écran, et **à ne pas modifier** : il n'est pas le journal de ce qu'on vient de
+  faire, il ne nomme ni fichier ni composant, et une modification du logiciel ou
+  du site ne le touche pas. Une leçon technique tirée d'un essai raté va dans
+  `.claude/rules/frontend.md`, jamais là. Ce n'est pas non plus un gabarit : une
+  page qu'on redessine repart de zéro, et on retourne voir dofus-retro.com dès
+  qu'une matière manque plutôt que de l'inventer.
 - [docs/images.md](./docs/images.md) : d'où vient chaque image d'Ankama et ce que
   ses CGU permettent. À lire avant d'ajouter une image au dépôt.
 - [docs/logo.md](./docs/logo.md) : le prompt du logo, et le test qui tranche. Il
@@ -44,4 +47,10 @@ installé : casser est permis, sans migration, et on pousse sur `main`.
 Le français est la source et Lingui porte le reste. Le texte ne se partage pas
 entre le logiciel et le site : chacun garde son catalogue.
 
-Le skill `/frontend-design` avant de dessiner un écran.
+Le skill `/frontend-design` avant de dessiner un écran, et le skill
+`/mattpocock-skills:writing-for-agents` avant de toucher un `.md` du dépôt, sauf
+ceux qu'un lecteur lit à l'écran, `CHANGELOG.md`.
+
+Le logiciel ne tourne que dans les deux webviews de Tauri, WebKit sur Mac et
+Chromium sur Windows, donc ses replis ne visent que ces deux-là. Le site est
+ouvert à tous les navigateurs, et ses replis s'écrivent au lieu de s'espérer.

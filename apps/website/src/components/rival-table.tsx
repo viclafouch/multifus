@@ -3,7 +3,6 @@ import { useLingui } from '@lingui/react'
 import { cn } from '@multifus/retro'
 import type { Mark, RivalId, TraitId } from '@/@types/rival'
 import { MarkGlyph } from '@/components/mark-glyph'
-import { MarkKey } from '@/components/mark-key'
 import { MarkTip } from '@/components/mark-tip'
 import { OutLink } from '@/components/out-link'
 import {
@@ -31,7 +30,6 @@ export const RivalTable = () => {
 
   return (
     <div className="flex flex-col gap-5">
-      <MarkKey />
       <div className="glass ledger overflow-x-auto">
         <table
           aria-describedby={SURVEY_ANCHOR}

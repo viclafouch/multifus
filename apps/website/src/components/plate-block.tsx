@@ -1,5 +1,6 @@
 import React from 'react'
 import { BandTitle } from '@/components/band-title'
+import { Plate } from '@/components/plate'
 
 type PlateBlockProps = Readonly<{
   title: string
@@ -8,9 +9,9 @@ type PlateBlockProps = Readonly<{
 
 export const PlateBlock = ({ title, children }: PlateBlockProps) => {
   return (
-    <div className="glass flex flex-col gap-4 p-6 sm:p-8">
+    <Plate isBare className="sm:p-8">
       <BandTitle>{title}</BandTitle>
       {children}
-    </div>
+    </Plate>
   )
 }

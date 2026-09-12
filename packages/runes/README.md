@@ -1,8 +1,9 @@
 # @multifus/runes
 
 Le poids des runes de Dofus Retro : vingt stats, cinq familles, et les quatre
-chiffres de chacune. Le logiciel les pose sur la fenêtre du jeu, le site les
-publie en entier sur `/poids-des-runes`, et les deux lisent la même table.
+chiffres de chacune. Le logiciel les pose sur la fenêtre du jeu, et il est seul
+à les lire depuis le 12 septembre 2026 : le site avait une page qui publiait la
+table, `/poids-des-runes`, et elle a été supprimée.
 
 | Ce qu'il tient      | Ce que c'est                                                       |
 | ------------------- | ------------------------------------------------------------------ |

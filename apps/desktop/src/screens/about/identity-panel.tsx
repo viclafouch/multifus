@@ -1,7 +1,7 @@
 import React from 'react'
 import { t } from '@lingui/core/macro'
 import { Panel } from '@multifus/retro'
-import logo from '@/assets/logo.png'
+import logo from '@multifus/retro/assets/logo.png'
 import { CopyButton } from '@/components/copy-button'
 import { RevealButton } from '@/components/reveal-button'
 import { revealConfig } from '@/lib/multifus'

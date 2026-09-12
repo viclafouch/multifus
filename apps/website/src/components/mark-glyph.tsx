@@ -4,20 +4,10 @@ import { MARK_NAMES } from '@/constants/rivals'
 
 type MarkGlyphProps = Readonly<{
   mark: Mark
-  isMute?: boolean
 }>
 
-export const MarkGlyph = ({ mark, isMute = false }: MarkGlyphProps) => {
+export const MarkGlyph = ({ mark }: MarkGlyphProps) => {
   const { i18n } = useLingui()
-
-  if (isMute) {
-    return (
-      <svg aria-hidden data-mark={mark} viewBox="0 0 24 24" className="mark">
-        <circle cx="12" cy="12" r="8" />
-        <path d="M12 4a8 8 0 000 16Z" />
-      </svg>
-    )
-  }
 
   return (
     <svg

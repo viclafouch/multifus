@@ -36,7 +36,7 @@ export const PAGES = {
   runeTable: {
     kind: 'feature',
     loop: 'runeTable',
-    kin: ['runeWeights', 'quickReplies'],
+    kin: ['quickReplies', 'download'],
     slugs: { fr: 'tableau-des-runes', en: 'rune-table', es: 'tabla-de-runas' }
   },
   relay: {
@@ -68,23 +68,13 @@ export const PAGES = {
   comparison: {
     kind: 'comparison',
     loop: null,
-    kin: ['download', 'mac'],
+    kin: ['download', 'ankama'],
     slugs: { fr: 'comparatif', en: 'comparison', es: 'comparativa' }
-  },
-  runeWeights: {
-    kind: 'runes',
-    loop: null,
-    kin: ['runeTable', 'download'],
-    slugs: {
-      fr: 'poids-des-runes',
-      en: 'rune-weights',
-      es: 'pesos-de-las-runas'
-    }
   },
   download: {
     kind: 'download',
     loop: null,
-    kin: ['mac', 'comparison'],
+    kin: ['ankama', 'mac'],
     slugs: { fr: 'telecharger', en: 'download', es: 'descargar' }
   },
   journal: {
@@ -93,11 +83,11 @@ export const PAGES = {
     kin: ['download', 'mac'],
     slugs: { fr: 'journal', en: 'changelog', es: 'novedades' }
   },
-  images: {
-    kind: 'images',
+  ankama: {
+    kind: 'ankama',
     loop: null,
     kin: ['download', 'comparison'],
-    slugs: { fr: 'images', en: 'images', es: 'imagenes' }
+    slugs: { fr: 'ankama', en: 'ankama', es: 'ankama' }
   }
 } as const satisfies Record<PageId, Page>
 
@@ -111,10 +101,9 @@ export const PAGE_IDS = [
   'quickReplies',
   'mac',
   'comparison',
-  'runeWeights',
   'download',
   'journal',
-  'images'
+  'ankama'
 ] as const satisfies readonly PageId[]
 
 export const MENU_FEATURES = [

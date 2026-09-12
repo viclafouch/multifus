@@ -11,9 +11,8 @@ const FOOTER_NAV = msg`Le pied de page`
 
 const FOOTER_PAGES = [
   'mac',
-  'runeWeights',
-  'journal',
-  'images'
+  'ankama',
+  'journal'
 ] as const satisfies readonly PageId[]
 
 type SiteFooterProps = Readonly<{

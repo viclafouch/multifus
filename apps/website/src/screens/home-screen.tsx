@@ -34,15 +34,15 @@ const HERO_FLOOR = msg`Gratuit, code publié, paquet signé et notarisé.`
 
 const FEATURES_TITLE = msg`Ce que Multifus fait`
 
-const FEATURES_LEAD = msg`Six mécanismes, et un seul but : ne plus jamais chercher le personnage qui vous attend.`
+const FEATURES_LEAD = msg`Six mécanismes, un seul but : ne plus chercher le personnage qui vous attend.`
 
-const TRUST_PROOF = msg`Le paquet est signé et notarisé, il porte son attestation de provenance, et le code entier est publié. Ces trois-là se vérifient avant d’installer.`
+const TRUST_PROOF = msg`Le paquet est signé par Apple, le code est ouvert, et Ankama tolère ce genre d’outil tant qu’il ne touche pas au jeu. Les trois se vérifient.`
 
 const SOURCE = msg`Voir le code`
 
 const LOOP_CAPTION = msg`Les six mécanismes à l’œuvre dans le jeu`
 
-const COMPARISON_LEAD = msg`Six gestionnaires de fenêtres, ligne par ligne, chaque case relevée dans le code et non sur la page d’accueil de son auteur.`
+const COMPARISON_LEAD = msg`Six gestionnaires de fenêtres, ligne par ligne. Chaque case est relevée dans le code, pas sur la page d’accueil de son auteur.`
 
 export const HomeScreen = (_props: PageScreenProps) => {
   const { i18n } = useLingui()

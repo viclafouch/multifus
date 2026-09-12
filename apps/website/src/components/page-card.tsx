@@ -17,9 +17,7 @@ export const PageCard = ({ page }: PageCardProps) => {
       href={pathOf({ page, language })}
       className="card sighted flex h-full flex-col gap-2 p-5"
     >
-      <span className="font-carve text-action tracking-wide text-cream uppercase">
-        {i18n._(PAGE_NAMES[page])}
-      </span>
+      <span className="nameplate">{i18n._(PAGE_NAMES[page])}</span>
       <span className="text-tale text-band">{i18n._(PAGE_PROMISES[page])}</span>
     </a>
   )

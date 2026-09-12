@@ -6,8 +6,8 @@ TanStack Start, entièrement prérendu, déployé sur Vercel. Aucun serveur ne t
 en production : `pnpm --filter @multifus/website run build` écrit quarante-deux
 fichiers HTML et le `sitemap.xml`.
 
-Ce qui reste à faire est dans [docs/plan-site.md](../../docs/plan-site.md), les
-mots dans [CONTEXT.md](./CONTEXT.md).
+Ce qui reste à faire est dans [docs/plan.md](../../docs/plan.md), les mots dans
+[CONTEXT.md](./CONTEXT.md).
 
 ## La table des pages
 

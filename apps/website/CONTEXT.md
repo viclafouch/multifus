@@ -28,10 +28,39 @@ différentes. Une page ajoutée sans son espagnol ne compile pas.
 joueur. Elle sert aussi de `meta description` et de légende de la vidéo, donc
 elle se lit toute seule, hors de sa page.
 
-**Avant d'installer** : la levée de doute, sur `/telecharger`. Le site ne dit
-**pas** « questions fréquentes » : `CONTEXT.md` réserve déjà ce mot à la liste
-des pannes pliée dans les Paramètres, pour quelqu'un qui a installé. Deux mots
-identiques pour deux choses, c'est ce que `CONTEXT.md` interdit.
+**Avant d'installer** : la levée de doute, sur `/telecharger`. Quatre points, en
+colonne, et deux d'entre eux portent en plus ce qui les prouve, la commande
+d'attestation et un lien. Le site ne dit **pas** « questions fréquentes » :
+`CONTEXT.md` réserve déjà ce mot à la liste des pannes pliée dans les
+Paramètres, pour quelqu'un qui a installé. Deux mots identiques pour deux
+choses, c'est ce que `CONTEXT.md` interdit.
+
+**Point** (`Point`) : une amorce en gras de quatre à six mots, puis une phrase.
+C'est la forme du corps de toute page du site, sans exception. `Point` en rend
+un et peut lui accrocher ce qui le prouve, une commande ou un lien ; `PointList`
+en rend une suite quand aucun n'a rien à accrocher, et il passe par `Point`. Le
+gras n'existe nulle part ailleurs. L'amorce et la phrase sont deux `msg`
+séparés, parce que `<Trans>` ne passe pas ici et que c'est la seule façon
+d'avoir du gras dans une phrase traduite.
+
+**Geste** (`SYSTEM_MOVES`) : une des trois choses à faire pour installer Multifus, une
+liste par système. Le logiciel dit « étape » (`Step`) pour ce qui se coche dans
+la mise en route, et le site n'emploie jamais ce mot-là : un geste se fait une
+fois, avant d'avoir lancé quoi que ce soit, et il n'a pas d'état.
+
+**Prise** (`DownloadTake`) : le bouton de `/telecharger`, et lui seul. Il porte
+le système du visiteur, que le navigateur reconnaît après l'hydratation ; avant,
+et sans JavaScript, c'est `SOURCE_SYSTEM` qui tient la place. L'autre système
+pend dessous en une ligne, jamais en second bouton : deux boutons de même poids
+se comparent au lieu de se choisir.
+
+**Plaque** (`Plate`) : le verre sur lequel le site pose un bloc, et il n'y en a
+qu'une sorte. C'est son titre qui la décide : un titre court en Bebas,
+`nameplate`, et elle porte son filet de jade en haut, comme les trois gestes et
+les deux messages d'Ankama ; un titre de bande, `BandTitle`, qui porte déjà son
+filet, et la plaque se pose **nue**, `isBare`, faute de quoi deux filets verts
+se répondent à quarante pixels. `glass` reste la matière du seul bloc qui n'a
+pas de titre du tout, le tableau du comparatif.
 
 **Comparatif** : `/comparatif`. Cinq concurrents au maximum. Aucune case n'est
 remplie depuis la page d'accueil d'un concurrent, seulement depuis son code.
@@ -52,10 +81,6 @@ trois cercles identiques. La forme suffit seule, la
 couleur ne fait que presser le pas, et `MARK_NAMES` donne le mot au lecteur
 d'écran. Deux lignes au moins portent `no` en face de Multifus : un comparatif
 qu'on gagne partout ne se croit pas.
-
-**Légende** (`MarkKey`) : les trois cases et ce que chacune veut dire,
-`MARK_MEANINGS`, posées au-dessus du tableau. Elle ouvre le comparatif, parce que
-le demi-disque se devine et que personne ne devine juste.
 
 **Note** (`HalfNote`) : une phrase par case à moitié, une seule ligne, qui dit ce
 qui manque à l'outil. `MarkTip` la lève en bulle au survol et au focus, par un
@@ -84,7 +109,7 @@ le titre, `PageHead` porte le nom et la promesse d'une page.
 refuse un corps ailleurs que sur une fonctionnalité, et une fonctionnalité sans
 corps.
 
-**Passage** (`Passage`) : un intertitre et ses paragraphes. Le mot est celui du
+**Passage** (`Passage`) : un intertitre et ses points. Le mot est celui du
 texte, `Bande` étant déjà la tranche d'une page.
 
 **Amorce** (`Opening`) : le premier paragraphe d'un corps. Il raconte la scène
@@ -120,32 +145,13 @@ la vidéo, le fil d'Ariane. Sa forme vient de `schema-dts`, pas de nous : une
 propriété mal tapée ne compile plus, et `Addressed` n'ajoute que ce que le site
 exige en plus, l'adresse chez nous sur chaque fiche.
 
-**Provenance** (`Provenance`) : une famille d'images du dépôt, ce qu'elle est et
-d'où elle vient. Six familles, une par ligne de `/images`, et le mot est celui
-d'un musée parce que la page fait le même travail qu'une cartouche de salle.
-Cette page ne montre aucune image : une galerie de décors d'Ankama sur un site de
-fan est exactement ce que le reste du site refuse d'être. Elle est aussi le seul
-endroit qui nomme un dossier du dépôt, parce que c'est là que le visiteur peut
-vérifier.
-
-**Poids** (`RUNE_WEIGHTS`) : ce qu'une stat vaut en forgemagie, et le mot que le
-jeu emploie. Les chiffres viennent de `@multifus/runes`, le paquet que le
-logiciel lit aussi ; le site n'en garde que les noms, dans son catalogue à lui.
-
-**Concasseur** et **enclume** : les deux endroits du jeu où un poids sert, celui
-où l'on brise et celui où l'on forge. Ce sont les mots du jeu, et
-`/poids-des-runes` est la seule page qui les emploie.
-
-**Stade** : la simple, la Pa, la Ra. Ce sont les trois forces d'une même rune, et
-« Pa » ne dit rien des points d'action, ce que `/poids-des-runes` écrit noir sur
-blanc parce que c'est la confusion du débutant. La colonne s'appelle donc « Rune
-Pa » sur le site, quand le tableau du logiciel, qui n'a pas la place, écrit
-« Pa ».
-
-Le site écrit **« Intelligence, Force, Agilité, Chance »** là où le logiciel
-serre « Ine / Fo / Age / Cha ». Ce sont les quatre mêmes stats dans le même
-ordre : une page se lit sans abréviation, une fenêtre de 320 points ne le peut
-pas.
+**Message** (`AnkamaWord`) : une des deux réponses publiques d'Ankama sur les
+gestionnaires de fenêtres, et il n'y en a que deux. `/ankama` les montre en
+entier, en capture, avec la phrase qui tranche citée au-dessus. **Une citation
+d'Ankama ne se traduit pas** : elle est en clair dans `constants/ankama.ts`,
+jamais un `msg`, parce que la capture est en français et qu'une citation
+traduite n'est plus la citation. Ce qui l'entoure passe par Lingui comme le
+reste.
 
 **Cartouche** (`Cartouche`) : les trois drapeaux, dans la barre du haut, entre le
 comparatif et le bouton. C'est le cartouche des maps du logiciel, moins le numéro

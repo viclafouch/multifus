@@ -7,8 +7,8 @@ import { Opening } from '@/components/opening'
 import { PageHead } from '@/components/page-head'
 import { PageKin } from '@/components/page-kin'
 import { PlateBlock } from '@/components/plate-block'
+import { PointList } from '@/components/point-list'
 import { ProseBlock } from '@/components/prose-block'
-import { ProseLines } from '@/components/prose-lines'
 import { PAGE_BODIES } from '@/constants/bodies'
 import { PAGES } from '@/constants/pages'
 import { PAGE_PROMISES } from '@/constants/wording'
@@ -37,14 +37,14 @@ export const FeatureScreen = ({ page }: PageScreenProps) => {
 
               return (
                 <ProseBlock key={title} level={2} title={title}>
-                  <ProseLines lines={passage.lines} />
+                  <PointList points={passage.points} />
                 </ProseBlock>
               )
             })}
           </Band>
           <Band className="reveal pt-0">
             <PlateBlock title={i18n._(body.limit.title)}>
-              <ProseLines lines={body.limit.lines} />
+              <PointList points={body.limit.points} />
             </PlateBlock>
           </Band>
         </>

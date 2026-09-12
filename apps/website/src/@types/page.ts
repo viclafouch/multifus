@@ -1,28 +1,26 @@
 import type { Language } from './language'
 
 export type PageId =
+  | 'ankama'
   | 'autoFocus'
   | 'comparison'
   | 'download'
   | 'home'
-  | 'images'
   | 'journal'
   | 'mac'
   | 'quickReplies'
   | 'relay'
   | 'runeTable'
-  | 'runeWeights'
   | 'walk'
   | 'wheel'
 
 export type PageKind =
+  | 'ankama'
   | 'comparison'
   | 'download'
   | 'feature'
   | 'home'
-  | 'images'
   | 'plain'
-  | 'runes'
 
 export type LoopId =
   | 'autoFocus'

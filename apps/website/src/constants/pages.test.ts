@@ -14,8 +14,8 @@ const WITHOUT_HOME = PAGE_IDS.filter((page) => {
 const FILMED = ['home', ...MENU_FEATURES] as const satisfies readonly PageId[]
 
 describe('la table des pages', () => {
-  it('donne treize pages', () => {
-    expect(PAGE_IDS).toHaveLength(13)
+  it('donne douze pages', () => {
+    expect(PAGE_IDS).toHaveLength(12)
   })
 
   it('énumère exactement ce que la table porte', () => {

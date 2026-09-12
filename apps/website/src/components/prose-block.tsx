@@ -11,9 +11,7 @@ export const ProseBlock = ({ level, title, children }: ProseBlockProps) => {
 
   return (
     <section className="rule flex flex-col gap-3 border-t pt-6">
-      <Heading className="font-carve text-action tracking-wide text-cream uppercase">
-        {title}
-      </Heading>
+      <Heading className="nameplate">{title}</Heading>
       {children}
     </section>
   )

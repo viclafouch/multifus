@@ -13,6 +13,7 @@ export const DownloadButton = () => {
       variant="leaf"
       size="lead"
       nativeButton={false}
+      className="self-start"
       render={
         /* oxlint-disable-next-line anchor-has-content, control-has-associated-label -- Base UI pose les enfants du Button dans ce lien, que les deux règles lisent vide */
         <a className="sighted" href={pathOf({ page: 'download', language })} />

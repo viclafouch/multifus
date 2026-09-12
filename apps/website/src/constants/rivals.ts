@@ -196,18 +196,10 @@ export const TRAIT_NAMES = {
   source: msg`Code publié`
 } as const satisfies Record<TraitId, MessageDescriptor>
 
-export const MARK_IDS = ['yes', 'half', 'no'] as const satisfies readonly Mark[]
-
 export const MARK_NAMES = {
   yes: msg`oui`,
   half: msg`à moitié`,
   no: msg`non`
-} as const satisfies Record<Mark, MessageDescriptor>
-
-export const MARK_MEANINGS = {
-  yes: msg`L’outil fait cette ligne en entier.`,
-  half: msg`Il en fait une partie, et la case dit laquelle.`,
-  no: msg`Son code ne porte rien sur cette ligne.`
 } as const satisfies Record<Mark, MessageDescriptor>
 
 const LAST_TEAM = msg`Retient la dernière équipe, pas des compositions nommées.`

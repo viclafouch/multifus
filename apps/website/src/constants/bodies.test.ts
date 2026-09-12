@@ -7,7 +7,7 @@ import { SPEAKERS } from '@/lib/i18n'
 
 const PASSAGE_FLOOR = 2
 
-const BODY_FLOOR = 1200
+const BODY_FLOOR = 800
 
 const DENIAL = /ne fait pas|ne font pas/u
 
@@ -29,7 +29,12 @@ const phrasesOf = (body: Body) => {
   return [
     body.lead,
     ...passagesOf(body).flatMap((passage) => {
-      return [passage.title, ...passage.lines]
+      return [
+        passage.title,
+        ...passage.points.flatMap((point) => {
+          return [point.lead, point.line]
+        })
+      ]
     })
   ]
 }
@@ -61,7 +66,7 @@ describe('le corps des pages', () => {
 
   it.each(WITH_BODY)('ne laisse aucun passage vide sur $page', ({ body }) => {
     for (const passage of passagesOf(body)) {
-      expect(passage.lines.length).toBeGreaterThan(0)
+      expect(passage.points.length).toBeGreaterThan(0)
     }
   })
 

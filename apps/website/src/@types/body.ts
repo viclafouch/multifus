@@ -1,8 +1,13 @@
 import type { MessageDescriptor } from '@lingui/core'
 
+export type Point = Readonly<{
+  lead: MessageDescriptor
+  line: MessageDescriptor
+}>
+
 export type Passage = Readonly<{
   title: MessageDescriptor
-  lines: readonly MessageDescriptor[]
+  points: readonly Point[]
 }>
 
 export type Body = Readonly<{

@@ -12,10 +12,9 @@ export const PAGE_NAMES = {
   quickReplies: msg`Réponses rapides`,
   mac: msg`Multifus sur Mac`,
   comparison: msg`Comparatif`,
-  runeWeights: msg`Poids des runes`,
   download: msg`Télécharger`,
   journal: msg`Journal des versions`,
-  images: msg`Les images`
+  ankama: msg`Ce qu’Ankama en dit`
 } as const satisfies Record<PageId, MessageDescriptor>
 
 export const PAGE_PROMISES = {
@@ -28,10 +27,9 @@ export const PAGE_PROMISES = {
   quickReplies: msg`Un texte tout prêt part sous une combinaison de touches.`,
   mac: msg`Multifus tourne sur Mac, signé et notarisé par Apple.`,
   comparison: msg`Multifus et les autres gestionnaires, ligne par ligne.`,
-  runeWeights: msg`La table des poids de runes, lisible et gratuite.`,
-  download: msg`Prenez Multifus pour macOS ou pour Windows.`,
+  download: msg`Gratuit, code publié, paquet signé. Pour macOS et pour Windows.`,
   journal: msg`Ce que chaque version a changé.`,
-  images: msg`D’où vient chaque image, et à quelle condition.`
+  ankama: msg`Ankama tolère les gestionnaires de fenêtres. Voici ses deux messages.`
 } as const satisfies Record<PageId, MessageDescriptor>
 
 export const SITE_TITLE = msg`Multifus, logiciel multicompte gratuit pour Dofus Retro`
@@ -40,8 +38,6 @@ export const INDEPENDENCE = msg`Projet indépendant, sans lien avec Ankama.`
 
 export const LIMITS_TITLE = msg`Ce que Multifus ne fait pas`
 
-export const NO_HARM = msg`Multifus ne lit pas la mémoire du jeu, ne touche à aucun de ses fichiers, ne joue à votre place sur aucun personnage et ne vous garde pas connecté quand vous ne faites rien. Il regarde qui vous appelle, et il vous emmène.`
-
-export const ONE_AT_A_TIME = msg`Un geste ne vaut que pour le personnage qui est devant vous, jamais pour toute la team d’un coup. Les macros qui déplacent plusieurs personnages ensemble sont bannissables, et elles restent hors de ce projet.`
+export const NO_HARM = msg`Multifus ne lit pas la mémoire du jeu, ne touche à aucun de ses fichiers, et ne joue à votre place sur aucun personnage.`
 
 export const BEFORE_INSTALL = msg`Avant d’installer`

@@ -26,9 +26,7 @@ export const Vignette = ({ page }: VignetteProps) => {
         decoding="async"
         className="vignette"
       />
-      <span className="px-5 pt-4 font-carve text-action tracking-wide text-cream uppercase">
-        {i18n._(PAGE_NAMES[page])}
-      </span>
+      <span className="nameplate px-5 pt-4">{i18n._(PAGE_NAMES[page])}</span>
       <span className="px-5 pt-1.5 pb-5 text-tale text-band">
         {i18n._(PAGE_PROMISES[page])}
       </span>

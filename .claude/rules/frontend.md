@@ -89,7 +89,7 @@ paths:
 - Buttons already have built-in hover states - don't override with custom transforms
 - Links use `hover:text-primary` or `hover:text-foreground` in the software, `hover:text-cream` on the site - keep it simple
 - **Consistency over creativity**: match existing patterns, don't invent new interactions
-- `btn-way` is the one place that moves on hover, and `docs/design-system.md` holds that exception under « Le mouvement ». It carries the clearing menu of the software and the features list of the site's home, which are the same menu. Leave it alone
+- `btn-way` is the one place that moves on hover. It carries the clearing menu of the software and the features list of the site's home, which are the same menu. Leave it alone
 
 ### Animations
 
@@ -97,3 +97,16 @@ paths:
 - **Standard durations**: 0.2s (fast), 0.3s (normal), 0.5s (slow)
 - **Standard easings**: `[0.4, 0, 0.2, 1]` (ease-out), `[0.4, 0, 1, 1]` (ease-in)
 - When CSS transitions or keyframes are used, add a named class and include it in the `@media (prefers-reduced-motion: reduce)` block of the sheet that declares it, `retro.css` or `index.css`. Cancel the delays too, not only the durations
+
+### Traps already paid for
+
+None of these can be guessed, each cost several attempts, and each is a bug rather than a choice. A fresh design would pay for them a second time. This is where they live: `docs/design-system.md` holds the vision and names no file.
+
+- No `backdrop-filter` above a playing video: WebKit redraws it smaller, tucked in a corner
+- Every `@utility` is complete and shares no base, Tailwind v4 not emitting them in file order
+- A theme text size must be added to `cn`, otherwise `tailwind-merge` reads it as a colour and lets the next class overwrite it
+- A thin rule gets its own layer, `transform: translateZ(0)`, or it jumps a pixel on hover
+- Bebas carries our own metrics, measured in the webview: its own put the baseline too high, and the two systems do not even read the same ones
+- A dialog takes its position from its component; a position class in its `className` drops it back into the flow
+- Whatever a `packages/retro` component names must be declared in `retro.css`: elsewhere the other application paints it unstyled, and no test sees it
+- A material is not written before the screen that uses it, and a material with no caller is deleted

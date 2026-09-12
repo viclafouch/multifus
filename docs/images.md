@@ -4,10 +4,11 @@ Presque chaque image du dépôt vient d'Ankama. Ce document dit d'où, à quelle
 condition, et pourquoi certaines pistes sont fermées. Le système graphique, lui,
 est dans [design-system.md](./design-system.md).
 
-La seule exception est le logo, `apps/website/src/assets/logo.svg`, qui est de la
-matière à nous : [logo.md](./logo.md) le dessine, et l'or qu'il porte est celui
-du logo officiel, relevé à l'œil et non copié d'un fichier. C'est pour cette
-raison qu'il n'entre pas dans `packages/ankama`, que la licence exclut du MIT.
+La seule exception est le logo, `packages/retro/src/assets/logo.png`, que la
+clairière, l'écran À propos et la barre du site lisent tous les trois. Il ne
+porte rien d'Ankama, et c'est pour cette raison qu'il n'entre pas dans
+`packages/ankama`, que la licence exclut du MIT. Celui qui est là est encore
+celui du scaffolder Tauri, et [logo.md](./logo.md) dessine son remplaçant.
 
 ## Les droits
 
@@ -111,9 +112,11 @@ dossier. Ce sont eux que porte une tête de la roue des personnages.
 
 Leur origine n'était écrite nulle part avant le 11 septembre 2026, ni ici, ni
 dans le relevé, ni dans un message de commit : quarante-huit fichiers, les plus
-visibles du logiciel, sans provenance. `/images` sur le site la publie
-maintenant, et une image dont on ne sait plus d'où elle vient n'entre plus dans
-le dépôt.
+visibles du logiciel, sans provenance. Ce fichier la porte depuis, et une image
+dont on ne sait plus d'où elle vient n'entre plus dans le dépôt. Le site avait
+une page qui publiait cette table, `/images` ; elle a été supprimée le
+12 septembre 2026, et la protection tient sans elle : la licence exclut le
+dossier, et le pied de page crédite Ankama sur chaque page.
 
 La fenêtre Options du client, `dofus-options-general.png`, vit dans le même
 dossier et n'est pas un décor : c'est la capture d'où
@@ -130,7 +133,7 @@ fonctionnalité vaut une vidéo, donc les six du menu en ont une et l'accueil
 aussi ; trois n'étaient pas tournées, et une capture déjà là tient la place le
 temps qu'elles le soient. Elles ne posent pas de question de droits, mais elles
 montrent autre chose que ce que leur page raconte : c'est écrit dans
-`docs/plan-site.md`, avec ce qu'il reste à tourner.
+[plan.md](./plan.md), avec ce qu'il reste à tourner.
 
 **Une doublure se réencode, elle ne se copie pas.** Un fichier copié octet pour
 octet a la même empreinte que son original, donc Vite n'en livre qu'un, et les

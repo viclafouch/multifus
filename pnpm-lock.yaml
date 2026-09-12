@@ -284,9 +284,6 @@ importers:
       '@multifus/retro':
         specifier: workspace:*
         version: link:../../packages/retro
-      '@multifus/runes':
-        specifier: workspace:*
-        version: link:../../packages/runes
       '@tanstack/react-router':
         specifier: ^1.170.34
         version: 1.170.34(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
