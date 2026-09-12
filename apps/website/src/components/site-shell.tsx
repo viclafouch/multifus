@@ -16,7 +16,7 @@ export const SiteShell = ({ page, children }: SiteShellProps) => {
   const decor = PAGE_DECORS[page]
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="relative flex min-h-screen flex-col">
       <SkipLink />
       {decor === null ? null : <SiteWorld decor={decor} />}
       <SiteHeader page={page} />
@@ -27,7 +27,7 @@ export const SiteShell = ({ page, children }: SiteShellProps) => {
       >
         {children}
       </main>
-      <SiteFooter page={page} />
+      <SiteFooter />
     </div>
   )
 }

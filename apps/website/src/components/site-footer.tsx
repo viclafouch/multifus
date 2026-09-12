@@ -15,11 +15,7 @@ const FOOTER_PAGES = [
   'journal'
 ] as const satisfies readonly PageId[]
 
-type SiteFooterProps = Readonly<{
-  page: PageId
-}>
-
-export const SiteFooter = ({ page }: SiteFooterProps) => {
+export const SiteFooter = () => {
   const { i18n } = useLingui()
 
   return (
@@ -28,7 +24,6 @@ export const SiteFooter = ({ page }: SiteFooterProps) => {
         <div className="flex flex-wrap items-start justify-between gap-x-10 gap-y-6">
           <PageLink
             page="home"
-            isHere={page === 'home'}
             className="font-carve text-action tracking-chapter text-cream"
           >
             Multifus
@@ -38,7 +33,7 @@ export const SiteFooter = ({ page }: SiteFooterProps) => {
               {FOOTER_PAGES.map((footer) => {
                 return (
                   <li key={footer}>
-                    <PageLink page={footer} isHere={footer === page}>
+                    <PageLink page={footer}>
                       {i18n._(PAGE_NAMES[footer])}
                     </PageLink>
                   </li>

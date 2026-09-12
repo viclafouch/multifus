@@ -29,9 +29,13 @@
 
 :root {
   --page: 72rem;
-  --gutter: 1rem;
 
   --deep: #1b1712;
+
+  --horizon: min(100svh, 48rem);
+  --horizon-stops:
+    #000 0%, #000 24%, rgb(0 0 0 / 0.74) 46%, rgb(0 0 0 / 0.4) 66%,
+    rgb(0 0 0 / 0.14) 84%, transparent 100%;
 }
 
 @layer base {
@@ -65,55 +69,48 @@
   }
 }
 
-@keyframes sink {
-  to {
-    opacity: 0.3;
-  }
+@utility world {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  z-index: -10;
+  height: var(--horizon);
+  overflow: clip;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(180deg, var(--horizon-stops));
+  mask-image: linear-gradient(180deg, var(--horizon-stops));
 }
 
 @utility decor {
-  opacity: 0.72;
-  filter: saturate(0.88);
-
-  @supports ((animation-timeline: scroll()) and (animation-range: entry)) {
-    animation: sink linear both;
-    animation-timeline: scroll();
-    animation-range: 0 100vh;
-  }
+  opacity: 0.5;
+  filter: saturate(0.78);
 }
 
 @utility gloam {
-  background-image: linear-gradient(
-    180deg,
-    transparent 0%,
-    color-mix(in srgb, var(--iron), transparent 80%) 38%,
-    color-mix(in srgb, var(--iron), transparent 40%) 70%,
-    color-mix(in srgb, var(--iron), transparent 6%) 100%
-  );
-}
-
-@utility wash {
-  background-image: radial-gradient(
-    88% 70% at 38% 50%,
-    color-mix(in srgb, var(--iron), transparent 6%) 0%,
-    color-mix(in srgb, var(--iron), transparent 34%) 52%,
-    transparent 100%
-  );
+  background-image:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--iron), transparent 18%) 0%,
+      color-mix(in srgb, var(--iron), transparent 54%) 34%,
+      color-mix(in srgb, var(--iron), transparent 34%) 100%
+    ),
+    linear-gradient(
+      96deg,
+      color-mix(in srgb, var(--iron), transparent 16%) 0%,
+      color-mix(in srgb, var(--iron), transparent 48%) 46%,
+      color-mix(in srgb, var(--iron), transparent 66%) 100%
+    );
 }
 
 @utility scrim {
   background-image: linear-gradient(
     180deg,
     transparent 0%,
-    color-mix(in srgb, var(--iron), transparent 64%) 24%,
-    color-mix(in srgb, var(--iron), transparent 22%) 52%,
-    color-mix(in srgb, var(--iron), transparent 4%) 78%,
-    var(--iron) 100%
+    color-mix(in srgb, var(--night), transparent 72%) 20%,
+    color-mix(in srgb, var(--night), transparent 34%) 44%,
+    color-mix(in srgb, var(--night), transparent 12%) 70%,
+    var(--night) 100%
   );
-}
-
-@utility sheet {
-  background-image: linear-gradient(180deg, transparent 0%, var(--iron) 4rem);
 }
 
 @utility ledge {
@@ -131,19 +128,6 @@
     var(--leaf-lit) 0%,
     color-mix(in srgb, var(--leaf), transparent 62%) 38%,
     transparent 100%
-  );
-}
-
-@utility ebb {
-  background-image: linear-gradient(
-    90deg,
-    transparent 0%,
-    transparent 44%,
-    color-mix(in srgb, var(--iron), transparent 92%) 58%,
-    color-mix(in srgb, var(--iron), transparent 66%) 72%,
-    color-mix(in srgb, var(--iron), transparent 30%) 84%,
-    color-mix(in srgb, var(--iron), transparent 8%) 93%,
-    var(--iron) 100%
   );
 }
 
@@ -285,10 +269,6 @@
   @media (width >= 64rem) {
     grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr);
   }
-}
-
-@utility spill {
-  margin-right: min(0px, calc(var(--page) / 2 - 50vw - var(--gutter)));
 }
 
 @utility shelf {
@@ -549,10 +529,6 @@
   }
 }
 
-@view-transition {
-  navigation: auto;
-}
-
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation-duration: 0.3s;
@@ -565,8 +541,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  @view-transition {
-    navigation: none;
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
 
   html {
@@ -579,7 +557,6 @@
   .surface-4,
   .reveal,
   .mast,
-  .decor,
   [open] .unfold {
     animation: none !important;
   }

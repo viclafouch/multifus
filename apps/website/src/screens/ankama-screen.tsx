@@ -4,7 +4,6 @@ import type { PageScreenProps } from '@/@types/screen'
 import { AnkamaWord } from '@/components/ankama-word'
 import { Band } from '@/components/band'
 import { BandTitle } from '@/components/band-title'
-import { DownloadButton } from '@/components/download-button'
 import { Opening } from '@/components/opening'
 import { PageHead } from '@/components/page-head'
 import { PageKin } from '@/components/page-kin'
@@ -28,7 +27,7 @@ export const AnkamaScreen = ({ page }: PageScreenProps) => {
 
   return (
     <>
-      <Band id={FOLD_ANCHOR} className="pb-6">
+      <Band id={FOLD_ANCHOR} className="pt-12 pb-6">
         <PageHead page={page} />
         <Opening>{i18n._(OPENING)}</Opening>
       </Band>
@@ -54,9 +53,6 @@ export const AnkamaScreen = ({ page }: PageScreenProps) => {
         </PlateBlock>
       </Band>
       <PageKin pages={kin} />
-      <Band className="pb-20">
-        <DownloadButton />
-      </Band>
     </>
   )
 }

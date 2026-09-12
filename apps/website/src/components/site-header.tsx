@@ -9,7 +9,6 @@ import { LanguageOffer } from '@/components/language-offer'
 import { MastLink } from '@/components/mast-link'
 import { PageLink } from '@/components/page-link'
 import { INDEPENDENCE, PAGE_NAMES } from '@/constants/wording'
-import { pathOf } from '@/helpers/page'
 import { useLanguage } from '@/hooks/use-language'
 import { useOffer } from '@/hooks/use-offer'
 
@@ -39,26 +38,18 @@ export const SiteHeader = ({ page }: SiteHeaderProps) => {
         >
           <PageLink
             page="home"
-            isHere={page === 'home'}
             className="flex items-center gap-2.5 font-carve text-action tracking-chapter text-cream"
           >
             <img src={logo} alt="" className="size-8" />
             Multifus
           </PageLink>
           <FeaturesMenu page={page} />
-          <MastLink page="comparison" current={page} />
-          <Cartouche page={page} current={current} className="ml-auto" />
+          <MastLink page="comparison" />
+          <Cartouche page={page} className="ml-auto" />
           <Button
             variant={isOnDownload ? 'slate' : 'leaf'}
             nativeButton={false}
-            render={
-              /* oxlint-disable-next-line anchor-has-content, control-has-associated-label -- Base UI pose les enfants du Button dans ce lien, que les deux règles lisent vide */
-              <a
-                className="sighted"
-                aria-current={isOnDownload ? 'page' : undefined}
-                href={pathOf({ page: 'download', language: current })}
-              />
-            }
+            render={<PageLink page="download" isBare className="sighted" />}
           >
             {i18n._(PAGE_NAMES.download)}
           </Button>

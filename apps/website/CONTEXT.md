@@ -96,31 +96,33 @@ donc une page ajoutée sans lui ne compile pas ; il a le droit d'être vide, et
 c'est le cas de l'accueil, qui renvoie déjà partout. Vide, la section ne se pose
 pas : c'est l'écran qui décide, jamais `PageKin`.
 
+Une voisine est toujours une **fonctionnalité filmée**, `FeatureId` le tient, et
+`constants/pages.test.ts` refuse le reste. Chaque carte a donc son affiche, et
+« À voir aussi » montre six cartes de même forme d'un bout à l'autre du site.
+Télécharger n'y entre pas : le bouton est dans la barre du haut, sur chaque page,
+et une carte de plus qui y mène ne dit rien à qui l'a déjà sous les yeux.
+
 **Bande** (`Band`) : une tranche horizontale d'une page, sa largeur et son
 rythme. Une page est une pile de bandes, jamais une grille. `BandTitle` en porte
 le titre, `PageHead` porte le nom et la promesse d'une page.
 
-**Décor** (`PAGE_DECORS`) : le décor du jeu posé derrière une page, celui de la
-map où la fonctionnalité vit dans le logiciel. Il ne bouge pas avec le
-défilement, il couvre la fenêtre entière, et une page qui montre des documents
-plutôt que le jeu vaut `null` : le journal et les messages d'Ankama n'en ont
-pas. La table couvre les douze pages, donc ajouter une page force à dire si elle
-a un décor. Il reste **net** et bien présent, comme dans le logiciel : ce qui le
-sépare de la vidéo, c'est le cadre de celle-ci, son ombre et sa taille, jamais un
-flou, qui ne ferait que le rendre invisible. Le logiciel monte ses neuf décors
-d'un coup et fait glisser leurs opacités ; le site n'en charge qu'un par page et
-laisse le navigateur croiser les deux documents, ce qui donne le même fondu pour
-un neuvième du poids.
+**Décor** (`PAGE_DECORS`) : le décor du jeu posé derrière le haut d'une page,
+celui de la map où la fonctionnalité vit dans le logiciel. Une page qui montre
+des documents plutôt que le jeu vaut `null` : le journal et les messages
+d'Ankama n'en ont pas. La table couvre les douze pages, donc ajouter une page
+force à dire si elle a un décor. Il reste **net**, comme dans le logiciel :
+jamais un flou, qui ne ferait que le rendre invisible.
 
-**Feuille** (`Sheet`) : le fond uni sur lequel une page pose ce qui se lit. Elle
-commence là où le décor s'arrête, d'un fondu de quatre rem, et elle va jusqu'au
-pied de page. Tout texte de corps vit dessus, parce que le gris du site ne tient
-pas son contraste au-dessus d'une herbe verte. Ce qui reste sur le décor est
-soit un titre en crème avec son ombre, soit une plaque opaque.
+Il tient le haut du document, il défile avec lui, et il se **dissout** dans
+l'encre : un masque le fait disparaître sur sa moitié basse, `--horizon` en dit
+la hauteur. Rien ne vient le recouvrir, donc il n'y a nulle part une couture où
+l'image s'arrête et où le fond commence. C'est ce qui a remplacé la feuille, un
+panneau qui glissait par-dessus lui et qui coupait chaque page courte au ras du
+titre.
 
 **Scène** (`FeatureStage`) : la vidéo en grand et le blason posé sur sa bande du
-bas. Rien d'autre : l'appel au téléchargement et l'amorce se lisent dessous, sur
-la feuille. Sa largeur se prend à la hauteur de la fenêtre, en `svh` et jamais
+bas. Rien d'autre : l'amorce se lit dessous. Sa largeur se prend à la hauteur de
+la fenêtre, en `svh` et jamais
 en `vh` : sur un téléphone, `vh` compte la barre d'adresse rétractée, et le bas
 de la vidéo passe sous le bord de l'écran. La scène tient dans le premier écran,
 et il reste de quoi voir qu'on peut défiler.
@@ -145,9 +147,8 @@ corps.
 texte, `Bande` étant déjà la tranche d'une page.
 
 **Amorce** (`Opening`) : le premier paragraphe d'un corps. Il raconte la scène
-que la vidéo montre, il se lit donc juste dessous, à droite de l'appel au
-téléchargement, et il porte un filet à sa gauche pour qu'on le distingue des
-passages, qui expliquent.
+que la vidéo montre, il se lit donc juste dessous, et il porte un filet à sa
+gauche pour qu'on le distingue des passages, qui expliquent.
 
 **Limite** (`limit`) : le passage qui dit ce que la fonctionnalité ne fait pas.
 Il est obligatoire, `LimitPlate` le pose sur une plaque, le titre à gauche et
@@ -159,8 +160,7 @@ tournée vers une seule page : ce qui se donne sans manque ne se croit pas.
 son nom et sa promesse, et le tout mène là-bas. C'est la seule carte du site :
 les six de l'accueil et les deux voisines du bas d'une page sont la même chose.
 Elle ne joue pas la vidéo : six lecteurs sur l'accueil coûteraient plus que la
-page entière, et la vidéo est le sujet de la page où l'on va. Une page sans
-vidéo n'a pas d'affiche, et la vignette montre alors ses deux phrases seules.
+page entière, et la vidéo est le sujet de la page où l'on va.
 Les six de l'accueil se posent en **mosaïque** (`mosaic`), qui alterne les
 largeurs pour que six vignettes ne fassent pas une grille de catalogue.
 
@@ -223,31 +223,46 @@ se montre pas plutôt que de se montrer à chaque page.
 
 ## Comment on passe d'une page à l'autre
 
-Chaque lien interne est une vraie navigation, `<a href>`, et le site reste douze
-documents prérendus. Ce qui rend le passage fluide est du navigateur, pas du
-JavaScript à nous.
+Le site reste douze documents prérendus : la première arrivée est un document
+entier, servi tout fait. **Ensuite, plus aucun document ne se recharge.** Chaque
+lien interne passe par le `Link` de TanStack Router, la page suivante se rend
+dans le même document, et il n'y a rien à aller chercher : tout ce qu'une page
+dit vit dans `constants/`, donc dans le paquet déjà chargé.
 
-**Le fondu** vient de `@view-transition { navigation: auto }`, dans
-`styles.css`. Le document entier se croise, décor compris, et deux
-choses traversent sans se croiser : la barre du haut, qui ne bouge pas, et la
-scène, qui garde la place de la vidéo d'une page à l'autre. Elles portent pour
-cela un `view-transition-name`, et **deux éléments d'une même page ne peuvent
-pas porter le même nom**, sinon le navigateur annule toute la transition.
-Chrome et Safari le font, Firefox ne le fait pas encore et navigue sans fondu,
-ce qui est exactement ce que le site faisait avant. Une préférence de mouvement
-réduit repasse `navigation: none`.
+**`PageLink` est le seul à connaître l'arbre des routes.** Il prend une page et
+une langue, et lui seul sait que l'accueil vaut `/`, `/en` ou `/es`, et qu'une
+autre page vaut `/$slug` avec son `slug` en paramètre. Aucun autre fichier
+n'écrit une adresse : le cartouche, la vignette, la ligne, le blason du pied de
+page et le bouton du haut passent tous par lui. `pathOf` reste, mais pour les
+adresses absolues, `head.ts` et le sitemap, jamais pour un lien.
 
-**Le fondu attend le contenu.** Chaque page porte
+**C'est `Link` qui dit où l'on est**, avec `activeOptions: { exact: true }` :
+il pose `aria-current="page"` sur le lien de la page en cours, et rien
+n'exprime plus cette vérité deux fois. Sans `exact`, `/` serait tenu pour actif
+sur toutes les pages. `ensign` allume le drapeau du cartouche sur ce marqueur,
+et `verify-html.mjs` refuse une page qui n'en allume pas exactement un.
+
+**Le fondu** vient de `defaultViewTransition: true`, dans `router.tsx` : le
+routeur enveloppe chaque navigation dans `document.startViewTransition()`. Le
+document entier se croise, décor compris, et deux choses traversent sans se
+croiser : la barre du haut, qui ne bouge pas, et la scène, qui garde la place de
+la vidéo d'une page à l'autre. Elles portent pour cela un `view-transition-name`,
+et **deux éléments d'une même page ne peuvent pas porter le même nom**, sinon le
+navigateur annule toute la transition. Chrome, Safari et Firefox le font tous
+les trois depuis Firefox 144 ; le fondu entre deux **documents**, lui, n'a jamais
+marché sur Firefox, et c'est une des raisons d'être passé au même document. Une
+préférence de mouvement réduit coupe les animations des pseudo-éléments, et la
+page change alors d'un coup.
+
+**Le premier rendu attend le contenu.** Chaque page porte
 `<link rel="expect" href="#ouverture" blocking="render">`, et `#ouverture`
-(`FOLD_ANCHOR`) est l'identifiant de la première bande de chaque écran. Sans
-lui, le navigateur croise l'ancienne page avec une page encore vide.
+(`FOLD_ANCHOR`) est l'identifiant de la première bande de chaque écran.
 `verify-html.mjs` refuse une page livrée sans les deux.
 
-**Le préchargement** vient des règles de spéculation, dans `__root.tsx` : le
-navigateur va chercher le document d'un lien survolé, et rien de plus. C'est
-`prefetch` et non `prerender`, parce qu'une page prérendue exécuterait son
-JavaScript sans être vue, et la proposition de langue brûlerait son souvenir
-pour un écran que personne n'a regardé.
+**Le préchargement** est celui du routeur, `defaultPreload: 'intent'`, et les
+règles de spéculation sont parties avec les navigations qu'elles servaient :
+aller chercher un document qu'on ne chargera jamais ne coûte que de la bande
+passante.
 
 ## Où les imports changent de forme
 

@@ -7,6 +7,7 @@ export function getRouter() {
     routeTree,
     scrollRestoration: true,
     defaultPreload: 'intent',
+    defaultViewTransition: true,
     defaultNotFoundComponent: LostScreen
   })
 }

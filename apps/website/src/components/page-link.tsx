@@ -1,31 +1,54 @@
 import React from 'react'
 import { cn } from '@multifus/retro'
+import { Link } from '@tanstack/react-router'
+import type { Language } from '@/@types/language'
 import type { PageId } from '@/@types/page'
-import { pathOf } from '@/helpers/page'
+import { PAGES } from '@/constants/pages'
 import { useLanguage } from '@/hooks/use-language'
 
-type PageLinkProps = Readonly<{
-  page: PageId
-  children: React.ReactNode
-  isHere?: boolean
-  className?: string
-}>
+const HOME_ROUTES = {
+  fr: '/',
+  en: '/en',
+  es: '/es'
+} as const satisfies Record<Language, string>
+
+const SLUG_ROUTES = {
+  fr: '/$slug',
+  en: '/en/$slug',
+  es: '/es/$slug'
+} as const satisfies Record<Language, string>
+
+type PageLinkProps = Readonly<
+  Omit<React.ComponentProps<'a'>, 'href'> & {
+    page: PageId
+    language?: Language
+    isBare?: boolean
+  }
+>
 
 export const PageLink = ({
   page,
+  language,
+  isBare = false,
+  className,
   children,
-  isHere = false,
-  className
+  ...rest
 }: PageLinkProps) => {
-  const language = useLanguage()
+  const reading = useLanguage()
+  const spoken = language ?? reading
+  const slug = PAGES[page].slugs[spoken]
+  const shared = {
+    ...rest,
+    activeOptions: { exact: true },
+    className: isBare
+      ? className
+      : cn('sighted transition-colors hover:text-cream', className),
+    children
+  }
 
-  return (
-    <a
-      href={pathOf({ page, language })}
-      aria-current={isHere ? 'page' : undefined}
-      className={cn('sighted transition-colors hover:text-cream', className)}
-    >
-      {children}
-    </a>
+  return slug === '' ? (
+    <Link {...shared} to={HOME_ROUTES[spoken]} />
+  ) : (
+    <Link {...shared} to={SLUG_ROUTES[spoken]} params={{ slug }} />
   )
 }

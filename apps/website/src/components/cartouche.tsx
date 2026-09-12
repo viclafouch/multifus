@@ -1,20 +1,18 @@
 import { msg } from '@lingui/core/macro'
 import { useLingui } from '@lingui/react'
 import { cn, Flag } from '@multifus/retro'
-import type { Language } from '@/@types/language'
 import type { PageId } from '@/@types/page'
+import { PageLink } from '@/components/page-link'
 import { LANGUAGE_NAMES, LANGUAGES } from '@/constants/languages'
-import { pathOf } from '@/helpers/page'
 
 const TONGUES = msg`La langue du site`
 
 type CartoucheProps = Readonly<{
   page: PageId
-  current: Language
   className?: string
 }>
 
-export const Cartouche = ({ page, current, className }: CartoucheProps) => {
+export const Cartouche = ({ page, className }: CartoucheProps) => {
   const { i18n } = useLingui()
 
   return (
@@ -27,17 +25,18 @@ export const Cartouche = ({ page, current, className }: CartoucheProps) => {
 
         return (
           <li key={language} className="flex">
-            <a
-              href={pathOf({ page, language })}
+            <PageLink
+              page={page}
+              language={language}
+              isBare
               hrefLang={language}
               lang={language}
-              aria-current={language === current}
               aria-label={name}
               title={name}
               className="ensign h-4 w-6 sighted"
             >
               <Flag language={language} />
-            </a>
+            </PageLink>
           </li>
         )
       })}

@@ -1009,7 +1009,8 @@
   }
 
   &[aria-pressed='true'],
-  &[aria-current='true'] {
+  &[aria-current='true'],
+  &[aria-current='page'] {
     opacity: 1;
     filter: none;
     border-color: var(--leaf-lit);

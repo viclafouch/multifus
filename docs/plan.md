@@ -40,5 +40,5 @@ mise en ligne, trois vidéos qui mentent et deux défauts vus.
 - [ ] Vercel Analytics, un seul événement personnalisé, le clic sur « Télécharger » avec le système dedans
 - [ ] Déclarer le site à la Search Console et y déposer le sitemap
 - [ ] Revérifier dans le code des concurrents les quatre notes à moitié du comparatif, déduites du tableau de [concurrents.md](./concurrents.md) et non lues ligne à ligne : le tableau des runes de Retro Toolbox, le rangement de Dosoft, et les compositions d'équipe de Dosoft et de Retro Toolbox. Les deux autres sont sourcées, l'attestation de Focus Retro et la licence de Retro Toolbox. La page promet une case lue dans le code, donc une note qui ne l'est pas est exactement ce qu'elle reproche aux autres
-- [ ] Ouvrir le site dans Firefox, qui ne connaît ni `animation-timeline` ni le fondu entre deux documents : les replis sont écrits, ils n'ont pas été vus tourner
+- [ ] Ouvrir le site dans Firefox, qui ne connaît pas `animation-timeline` : les replis sont écrits, ils n'ont pas été vus tourner. Le fondu entre deux pages, lui, y marche depuis Firefox 144, la navigation se faisant dans un seul document
 - [ ] Relire l'anglais et l'espagnol une fois le français figé. Les trois catalogues sont pleins, et ils portent le corps des sept fonctionnalités : c'est du texte suivi, et il n'a été relu par personne

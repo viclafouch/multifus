@@ -1,9 +1,10 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, screen } from '@testing-library/react'
 import type { Language } from '@/@types/language'
 import { LanguageOffer } from '@/components/language-offer'
 import { LANGUAGES, SOURCE_LANGUAGE } from '@/constants/languages'
 import { pathOf } from '@/helpers/page'
+import { showAt } from '@/test-router'
 
 const OFFER_IN_FRENCH = 'Lire cette page en français'
 
@@ -14,9 +15,10 @@ const OTHERS = LANGUAGES.filter((language) => {
 })
 
 const show = (offered: Language, onHide = () => {}) => {
-  return render(
-    <LanguageOffer page="wheel" offered={offered} onHide={onHide} />
-  )
+  return showAt({
+    at: pathOf({ page: 'wheel', language: SOURCE_LANGUAGE }),
+    children: <LanguageOffer page="wheel" offered={offered} onHide={onHide} />
+  })
 }
 
 describe('la proposition de langue', () => {

@@ -22,14 +22,15 @@ export type PageKind =
   | 'home'
   | 'plain'
 
-export type LoopId =
+export type FeatureId =
   | 'autoFocus'
-  | 'home'
   | 'quickReplies'
   | 'relay'
   | 'runeTable'
   | 'walk'
   | 'wheel'
+
+export type LoopId = FeatureId | 'home'
 
 export type Loop = Readonly<{
   source: string
@@ -42,5 +43,5 @@ export type Page = Readonly<{
   kind: PageKind
   slugs: Readonly<Record<Language, string>>
   loop: LoopId | null
-  kin: readonly PageId[]
+  kin: readonly FeatureId[]
 }>

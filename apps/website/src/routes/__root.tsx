@@ -33,10 +33,6 @@ const RootDocument = () => {
   )
 }
 
-const SPECULATION = JSON.stringify({
-  prefetch: [{ where: { href_matches: '/*' }, eagerness: 'moderate' }]
-})
-
 export const Route = createRootRoute({
   head: () => {
     return {
@@ -44,8 +40,7 @@ export const Route = createRootRoute({
         { charSet: 'utf8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' }
       ],
-      links: [{ rel: 'stylesheet', href: styles }],
-      scripts: [{ type: 'speculationrules', children: SPECULATION }]
+      links: [{ rel: 'stylesheet', href: styles }]
     }
   },
   component: RootDocument

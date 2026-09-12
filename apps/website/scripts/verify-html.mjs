@@ -86,13 +86,21 @@ for (const pathname of addresses) {
     complain(pathname, 'la proposition de langue est dans le HTML prérendu')
   }
 
-  const flags = [...body.matchAll(/class="ensign/gu)]
+  const flags = [...body.matchAll(/<a\b[^>]*>/gu)]
+    .map((found) => {
+      return found[0]
+    })
+    .filter((tag) => {
+      return tag.includes('class="ensign')
+    })
 
   if (flags.length !== 3) {
     complain(pathname, `${flags.length} drapeaux au cartouche au lieu de trois`)
   }
 
-  const lit = [...body.matchAll(/aria-current="true"/gu)]
+  const lit = flags.filter((tag) => {
+    return tag.includes('aria-current="page"')
+  })
 
   if (lit.length !== 1) {
     complain(pathname, `${lit.length} drapeaux allumés au lieu d’un`)

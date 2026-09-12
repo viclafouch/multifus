@@ -3,7 +3,6 @@ import { useLingui } from '@lingui/react'
 import type { Point } from '@/@types/body'
 import type { PageScreenProps } from '@/@types/screen'
 import { Band } from '@/components/band'
-import { DownloadButton } from '@/components/download-button'
 import { OutLink } from '@/components/out-link'
 import { PageHead } from '@/components/page-head'
 import { PageKin } from '@/components/page-kin'
@@ -11,7 +10,6 @@ import { PointList } from '@/components/point-list'
 import { Prose } from '@/components/prose'
 import { ProseBlock } from '@/components/prose-block'
 import { RivalTable } from '@/components/rival-table'
-import { Sheet } from '@/components/sheet'
 import { PAGES } from '@/constants/pages'
 import { FOLD_ANCHOR, REPOSITORY } from '@/constants/site'
 
@@ -49,31 +47,26 @@ export const ComparisonScreen = ({ page }: PageScreenProps) => {
 
   return (
     <>
-      <Band id={FOLD_ANCHOR} className="pt-10 pb-16">
+      <Band id={FOLD_ANCHOR} className="pt-12 pb-2">
         <PageHead page={page} />
       </Band>
-      <Sheet>
-        <Band className="gap-7 pt-16 pb-6">
-          <Prose>{i18n._(HOW_READ)}</Prose>
-          <RivalTable />
-        </Band>
-        <Band className="reveal pt-12">
-          <ProseBlock level={2} title={i18n._(MISSING_TITLE)}>
-            <PointList points={MISSING_POINTS} />
-          </ProseBlock>
-          <ProseBlock level={2} title={i18n._(CHECK_TITLE)}>
-            <PointList points={CHECK_POINTS} />
-            <p className="max-w-tale text-tale text-band">
-              {i18n._(CHECK_LEAD)}{' '}
-              <OutLink href={REPOSITORY}>{i18n._(CHECK_NAME)}</OutLink>
-            </p>
-          </ProseBlock>
-        </Band>
-        <PageKin pages={kin} />
-        <Band className="pb-20">
-          <DownloadButton />
-        </Band>
-      </Sheet>
+      <Band className="gap-7 pt-8 pb-10">
+        <Prose>{i18n._(HOW_READ)}</Prose>
+        <RivalTable />
+      </Band>
+      <Band className="reveal gap-10 py-10">
+        <ProseBlock level={2} title={i18n._(MISSING_TITLE)}>
+          <PointList points={MISSING_POINTS} />
+        </ProseBlock>
+        <ProseBlock level={2} title={i18n._(CHECK_TITLE)}>
+          <PointList points={CHECK_POINTS} />
+          <p className="max-w-tale text-tale text-band">
+            {i18n._(CHECK_LEAD)}{' '}
+            <OutLink href={REPOSITORY}>{i18n._(CHECK_NAME)}</OutLink>
+          </p>
+        </ProseBlock>
+      </Band>
+      <PageKin pages={kin} />
     </>
   )
 }

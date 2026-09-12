@@ -88,6 +88,13 @@ describe('la table des pages', () => {
     }
   })
 
+  it.each(PAGE_IDS)('ne donne à %s que des voisines à affiche', (page) => {
+    for (const neighbour of PAGES[page].kin) {
+      expect(MENU_FEATURES).toContain(neighbour)
+      expect(PAGES[neighbour].loop).not.toBeNull()
+    }
+  })
+
   it.each(PAGE_IDS)('ne rend pas %s voisine d’elle-même', (page) => {
     expect(PAGES[page].kin).not.toContain(page)
   })

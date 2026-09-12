@@ -2,7 +2,7 @@ import { msg } from '@lingui/core/macro'
 import { Button, Cross, Flag } from '@multifus/retro'
 import type { Language } from '@/@types/language'
 import type { PageId } from '@/@types/page'
-import { pathOf } from '@/helpers/page'
+import { PageLink } from '@/components/page-link'
 import { SPEAKERS } from '@/lib/i18n'
 
 const TONGUE_ASIDE = msg`Le site dans votre langue`
@@ -35,13 +35,15 @@ export const LanguageOffer = ({
         <span aria-hidden className="h-4 w-6 shrink-0">
           <Flag language={offered} />
         </span>
-        <a
-          href={pathOf({ page, language: offered })}
+        <PageLink
+          page={page}
+          language={offered}
+          isBare
           hrefLang={offered}
           className="flex-1 text-aside text-cream underline-offset-4 transition-colors sighted hover:underline"
         >
           {speaker._(TONGUE_OFFER)}
-        </a>
+        </PageLink>
         <Button
           variant="bare"
           size="icon-tight"

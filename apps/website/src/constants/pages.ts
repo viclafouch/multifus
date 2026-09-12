@@ -1,4 +1,4 @@
-import type { Page, PageId } from '../@types/page.ts'
+import type { FeatureId, Page, PageId } from '../@types/page.ts'
 
 export const PAGES = {
   home: {
@@ -36,7 +36,7 @@ export const PAGES = {
   runeTable: {
     kind: 'feature',
     loop: 'runeTable',
-    kin: ['quickReplies', 'download'],
+    kin: ['quickReplies', 'wheel'],
     slugs: { fr: 'tableau-des-runes', en: 'rune-table', es: 'tabla-de-runas' }
   },
   relay: {
@@ -62,31 +62,31 @@ export const PAGES = {
   mac: {
     kind: 'feature',
     loop: null,
-    kin: ['autoFocus', 'download'],
+    kin: ['autoFocus', 'walk'],
     slugs: { fr: 'mac', en: 'mac', es: 'mac' }
   },
   comparison: {
     kind: 'comparison',
     loop: null,
-    kin: ['download', 'ankama'],
+    kin: ['autoFocus', 'wheel'],
     slugs: { fr: 'comparatif', en: 'comparison', es: 'comparativa' }
   },
   download: {
     kind: 'download',
     loop: null,
-    kin: ['ankama', 'mac'],
+    kin: ['wheel', 'walk'],
     slugs: { fr: 'telecharger', en: 'download', es: 'descargar' }
   },
   journal: {
     kind: 'plain',
     loop: null,
-    kin: ['download', 'mac'],
+    kin: ['runeTable', 'quickReplies'],
     slugs: { fr: 'journal', en: 'changelog', es: 'novedades' }
   },
   ankama: {
     kind: 'ankama',
     loop: null,
-    kin: ['download', 'comparison'],
+    kin: ['autoFocus', 'relay'],
     slugs: { fr: 'ankama', en: 'ankama', es: 'ankama' }
   }
 } as const satisfies Record<PageId, Page>
@@ -113,4 +113,4 @@ export const MENU_FEATURES = [
   'runeTable',
   'relay',
   'quickReplies'
-] as const satisfies readonly PageId[]
+] as const satisfies readonly FeatureId[]
