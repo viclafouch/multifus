@@ -24,8 +24,8 @@ versions déjà installées.
 
 Le socle, le dessin et le texte sont posés : douze pages prérendues dans trois
 langues, une par adresse. [apps/website/README.md](../apps/website/README.md) dit
-comment il tient, [CONTEXT.md](../apps/website/CONTEXT.md) ses mots. Restent la
-mise en ligne, trois vidéos qui mentent et deux défauts vus.
+comment il tient. Restent la mise en ligne, trois vidéos qui mentent et deux
+défauts vus.
 
 - [ ] Acheter `multifus.app`. Libre au 11 septembre 2026, aucun serveur de nom sur `.app`, `.io`, `.gg`, `.net` ni `.org`. Pas de `.fr`, le site parle trois langues. Jamais « dofus » dans le domaine, l'article 13.3 des CGU demandant une autorisation écrite pour les marques. `HOST` le vise déjà dans `apps/website/src/constants/site.ts`
 - [ ] Écrire à `contact@ankama.com` le jour où le domaine est acheté, pour un logiciel et un site gratuits et ouverts. Un site existant se défend mieux qu'un projet

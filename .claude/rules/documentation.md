@@ -3,10 +3,8 @@
 ### Where a fact lives
 
 - **CLAUDE.md** = operational instructions: stack without versions, commands, tools. The root holds what both applications share, `apps/desktop/CLAUDE.md` and `apps/website/CLAUDE.md` what concerns one of them alone
-- **`CONTEXT.md`** = the words of the domain
 - **`docs/plan.md`** = what remains to do, one line per thing. A line done is deleted, not ticked
 - **`docs/plan-<subject>.md`** = the subject being worked right now. Deleted once shipped, handing back to `docs/plan.md` whatever it did not finish
-- **`apps/website/CONTEXT.md`** = the words the site alone uses, and the traps its i18n has already paid for
 - **`packages/*/README.md`** = what a shared package holds, and what it refuses to hold
 - **`apps/desktop/package.json` / `apps/desktop/src-tauri/Cargo.toml`** = source of truth for versions
 

@@ -90,7 +90,7 @@ Une release se prépare par `pnpm --filter @multifus/desktop release`, qui écri
 
 Les vingt-quatre portraits, leurs vingt-quatre `.ico` que Rust embarque, les décors des maps et les boucles appartiennent à Ankama. Ils vivent tous dans `packages/ankama`, qu'un `git rm -r` suffit à retirer. La [licence](./LICENSE) exclut ce dossier du MIT, qui ne peut pas concéder ce que Multifus ne possède pas.
 
-Les mots du projet sont dans [CONTEXT.md](./CONTEXT.md), ce qui reste à faire dans [docs/plan.md](./docs/plan.md).
+Ce qui reste à faire est dans [docs/plan.md](./docs/plan.md).
 
 ## Licence
 

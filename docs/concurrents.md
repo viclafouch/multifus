@@ -249,8 +249,8 @@ phrase à écrire, et c'est cette absence qu'il faut rendre visible.
 **Les intertitres qui reviennent**, dans cet ordre : ce que ça fait, la démo, le
 comparatif, l'installation, la FAQ, « C'est autorisé par Ankama ? ». Le dernier
 est une question que tout le monde se pose, et `/telecharger` y répond sous
-« Avant d'installer », sans employer le mot « FAQ » que `CONTEXT.md` réserve
-ailleurs.
+« Avant d'installer », sans employer le mot « FAQ », que les Paramètres du
+logiciel gardent pour la liste des pannes.
 
 **Les boutons.** « Télécharger le .dmg (Apple Silicon) », « Télécharger
 l'installeur .exe », « Tous les téléchargements sur GitHub » chez Focus Retro ;

@@ -34,8 +34,7 @@ Nous lisons les quatre depuis, une fois par tour, et le journal porte chaque
 bascule d'une étape. Rien n'a encore été essayé sur une vraie machine Windows.
 
 La mise en route a repris le sujet en entier : les contrôles, ce que le Mac ne
-sait pas lire, et l'écran qui les montre. `CONTEXT.md` tient les mots, aux
-entrées **Étape** et **Contrôle**.
+sait pas lire, et l'écran qui les montre.
 
 ### 2. Le personnage exclu vole quand même le premier plan
 

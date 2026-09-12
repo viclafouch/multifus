@@ -7,8 +7,6 @@ images d'Ankama, hors licence MIT, `@multifus/retro` la matière, `retro.css`,
 `theme.css`, `cn` et les composants portables, et `@multifus/runes` les chiffres
 du jeu, le poids de chaque rune. Chacun a son README.
 
-- [CONTEXT.md](./CONTEXT.md) : les mots du projet, à employer partout, code
-  compris.
 - [docs/plan.md](./docs/plan.md) : ce qui reste à faire, et la seule liste. Une
   ligne faite s'enlève.
 - [docs/concurrents.md](./docs/concurrents.md) : qui sont les autres et ce qu'ils
