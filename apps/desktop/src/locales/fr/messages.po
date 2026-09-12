@@ -2141,6 +2141,10 @@ msgid "Les réponses rapides"
 msgstr "Les réponses rapides"
 
 #: src/constants/loops.ts
+msgid "Les touches frappées dans le jeu : le texte tout prêt s’écrit dans la fenêtre du personnage et part, sans quitter le combat."
+msgstr "Les touches frappées dans le jeu : le texte tout prêt s’écrit dans la fenêtre du personnage et part, sans quitter le combat."
+
+#: src/constants/loops.ts
 msgid "Les touches frappées pendant une casse : le tableau s’ouvre sur le jeu, les poids sous les yeux, et la souris ne quitte pas l’atelier."
 msgstr "Les touches frappées pendant une casse : le tableau s’ouvre sur le jeu, les poids sous les yeux, et la souris ne quitte pas l’atelier."
 
@@ -3541,6 +3545,10 @@ msgstr "Un essai vient de partir. Attendez une trentaine de secondes avant le su
 #~ msgid "Un exclu est sauté par le défilement, le Déplacement rapide et l’AutoFocus. Ses messages privés arrivent quand même."
 #~ msgstr "Un exclu est sauté par le défilement, le Déplacement rapide et l’AutoFocus. Ses messages privés arrivent quand même."
 
+#: src/constants/loops.ts
+msgid "Un joueur écrit à un personnage : son message part sur le téléphone."
+msgstr "Un joueur écrit à un personnage : son message part sur le téléphone."
+
 #: src/screens/relay/index.tsx
 msgid "Un joueur vous écrit pendant que vous êtes ailleurs ? Son message arrive sur votre téléphone, dans Telegram."
 msgstr "Un joueur vous écrit pendant que vous êtes ailleurs ? Son message arrive sur votre téléphone, dans Telegram."
@@ -3552,6 +3560,10 @@ msgstr "Un joueur vous écrit pendant que vous êtes ailleurs ? Son message arri
 #: src/screens/about/legal-panel.tsx
 msgid "Un logiciel qui ouvre ses fichiers, ou qui joue à votre place, fait bannir le compte. Multifus range des fenêtres, et rien d’autre."
 msgstr "Un logiciel qui ouvre ses fichiers, ou qui joue à votre place, fait bannir le compte. Multifus range des fenêtres, et rien d’autre."
+
+#: src/constants/loops.ts
+msgid "Un message privé arrive sur un personnage pendant qu’on joue ailleurs : Multifus le pose sur le téléphone, dans Telegram, avec le nom de qui l’a écrit."
+msgstr "Un message privé arrive sur un personnage pendant qu’on joue ailleurs : Multifus le pose sur le téléphone, dans Telegram, avec le nom de qui l’a écrit."
 
 #: src/screens/characters-screen.tsx
 #~ msgid "Un personnage exclu est sauté par le défilement et par le Déplacement rapide, et l’AutoFocus ne le fait plus passer devant. Ses messages privés continuent d’arriver."
@@ -3600,6 +3612,10 @@ msgstr "Une bannière me cache le jeu à chaque message"
 #: src/helpers/onboarding.ts
 #~ msgid "Une case, dans les options de Dofus. Sans elle, le client se tait dès qu’il passe derrière, et Multifus n’a plus rien à écouter."
 #~ msgstr "Une case, dans les options de Dofus. Sans elle, le client se tait dès qu’il passe derrière, et Multifus n’a plus rien à écouter."
+
+#: src/constants/loops.ts
+msgid "Une combinaison de touches, et le texte part dans la fenêtre du personnage."
+msgstr "Une combinaison de touches, et le texte part dans la fenêtre du personnage."
 
 #: src/constants/journal.ts
 msgid "Une partie de Multifus a échoué brutalement"

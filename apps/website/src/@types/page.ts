@@ -24,7 +24,14 @@ export type PageKind =
   | 'plain'
   | 'runes'
 
-export type LoopId = 'autoFocus' | 'runeTable' | 'walk' | 'wheel'
+export type LoopId =
+  | 'autoFocus'
+  | 'home'
+  | 'quickReplies'
+  | 'relay'
+  | 'runeTable'
+  | 'walk'
+  | 'wheel'
 
 export type Loop = Readonly<{
   source: string

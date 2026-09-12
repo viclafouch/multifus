@@ -2141,6 +2141,10 @@ msgid "Les réponses rapides"
 msgstr "Quick replies"
 
 #: src/constants/loops.ts
+msgid "Les touches frappées dans le jeu : le texte tout prêt s’écrit dans la fenêtre du personnage et part, sans quitter le combat."
+msgstr "The keys pressed in the game: the ready-made text is typed into the character's window and sent, without leaving the fight."
+
+#: src/constants/loops.ts
 msgid "Les touches frappées pendant une casse : le tableau s’ouvre sur le jeu, les poids sous les yeux, et la souris ne quitte pas l’atelier."
 msgstr "The keys struck while breaking runes: the table opens over the game, the weights in plain sight, and the mouse never leaves the workshop."
 
@@ -3541,6 +3545,10 @@ msgstr "A test just went out. Wait thirty seconds or so before the next one."
 #~ msgid "Un exclu est sauté par le défilement, le Déplacement rapide et l’AutoFocus. Ses messages privés arrivent quand même."
 #~ msgstr "An excluded character is skipped by cycling, by Quick Move and by AutoFocus. Their private messages still arrive."
 
+#: src/constants/loops.ts
+msgid "Un joueur écrit à un personnage : son message part sur le téléphone."
+msgstr "A player writes to a character: their message goes to your phone."
+
 #: src/screens/relay/index.tsx
 msgid "Un joueur vous écrit pendant que vous êtes ailleurs ? Son message arrive sur votre téléphone, dans Telegram."
 msgstr "A player writes to you while you are away? Their message lands on your phone, in Telegram."
@@ -3552,6 +3560,10 @@ msgstr "A player writes to you while you are away? Their message lands on your p
 #: src/screens/about/legal-panel.tsx
 msgid "Un logiciel qui ouvre ses fichiers, ou qui joue à votre place, fait bannir le compte. Multifus range des fenêtres, et rien d’autre."
 msgstr "Software that opens its files, or plays for you, gets the account banned. Multifus arranges windows, and nothing else."
+
+#: src/constants/loops.ts
+msgid "Un message privé arrive sur un personnage pendant qu’on joue ailleurs : Multifus le pose sur le téléphone, dans Telegram, avec le nom de qui l’a écrit."
+msgstr "A private message reaches a character while you are playing elsewhere: Multifus puts it on your phone, in Telegram, with the name of whoever wrote it."
 
 #: src/screens/characters-screen.tsx
 #~ msgid "Un personnage exclu est sauté par le défilement et par le Déplacement rapide, et l’AutoFocus ne le fait plus passer devant. Ses messages privés continuent d’arriver."
@@ -3600,6 +3612,10 @@ msgstr "A banner covers the game on every message"
 #: src/helpers/onboarding.ts
 #~ msgid "Une case, dans les options de Dofus. Sans elle, le client se tait dès qu’il passe derrière, et Multifus n’a plus rien à écouter."
 #~ msgstr "One checkbox, in the Dofus options. Without it, the client goes quiet the moment it moves behind, and Multifus has nothing left to hear."
+
+#: src/constants/loops.ts
+msgid "Une combinaison de touches, et le texte part dans la fenêtre du personnage."
+msgstr "One key combination, and the text goes out in the character's window."
 
 #: src/constants/journal.ts
 msgid "Une partie de Multifus a échoué brutalement"

@@ -96,10 +96,18 @@ Il est obligatoire, il se lit sur une plaque, et `constants/bodies.test.ts`
 refuse un titre où « ne fait pas » ne s'écrit pas. C'est la règle du comparatif
 tournée vers une seule page : ce qui se donne sans manque ne se croit pas.
 
-**Ligne** (`WayLink`) : une entrée de la liste des fonctionnalités de l'accueil,
-qui est le menu de l'accueil du logiciel. **Carte** (`PageCard`) est ce qu'une
-voisine montre en bas d'une page. **Onglet** (`MastLink`) est un lien de la barre
-du haut, et il sait dire qu'on est déjà sur sa page.
+**Vignette** (`Vignette`) : ce qu'une fonctionnalité montre sur l'accueil, son
+affiche, son nom et sa promesse, et le tout mène à sa page. Elle ne joue pas la
+vidéo : six lecteurs sur l'accueil coûteraient plus que la page entière, et la
+vidéo est le sujet de la page où l'on va. Les six se posent en **mosaïque**
+(`mosaic`), qui alterne les largeurs pour que six vignettes ne fassent pas une
+grille de catalogue.
+
+**Ligne** (`WayLink`) : le menu de l'accueil du logiciel posé sur le site. Il
+portait les six fonctionnalités, il ne porte plus que le comparatif. **Carte**
+(`PageCard`) est ce qu'une voisine montre en bas d'une page. **Onglet**
+(`MastLink`) est un lien de la barre du haut, et il sait dire qu'on est déjà sur
+sa page.
 
 **Affiche** (`poster`) : l'image tirée d'une boucle, posée sur le lecteur tant
 que la vidéo ne joue pas, et donnée à Google comme vignette du résultat. Elle

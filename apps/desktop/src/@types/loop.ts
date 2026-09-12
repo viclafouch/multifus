@@ -5,6 +5,8 @@ export type LoopsSeen = {
   readonly walk: boolean
   readonly runeTable: boolean
   readonly autoFocus: boolean
+  readonly relay: boolean
+  readonly quickReplies: boolean
 }
 
 export type LoopName = keyof LoopsSeen

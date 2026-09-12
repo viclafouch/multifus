@@ -1,8 +1,13 @@
 # Les images d'Ankama, et les droits
 
-Chaque image du dépôt vient d'Ankama. Ce document dit d'où, à quelle condition,
-et pourquoi certaines pistes sont fermées. Le système graphique, lui, est dans
-[design-system.md](./design-system.md).
+Presque chaque image du dépôt vient d'Ankama. Ce document dit d'où, à quelle
+condition, et pourquoi certaines pistes sont fermées. Le système graphique, lui,
+est dans [design-system.md](./design-system.md).
+
+La seule exception est le logo, `apps/website/src/assets/logo.svg`, qui est de la
+matière à nous : [logo.md](./logo.md) le dessine, et l'or qu'il porte est celui
+du logo officiel, relevé à l'œil et non copié d'un fichier. C'est pour cette
+raison qu'il n'entre pas dans `packages/ankama`, que la licence exclut du MIT.
 
 ## Les droits
 
@@ -76,22 +81,25 @@ vignettes que par lots de 240.
 Ils vivent dans `packages/ankama/images/`, les boucles dans
 `packages/ankama/loops/`, et chaque fenêtre porte la mention d'Ankama en bas.
 
-| Fichier               | Source                                                                          |
-| --------------------- | ------------------------------------------------------------------------------- |
-| `camp.webp`           | `www/modules/mmorpg/discover/assets/screens/`, recadré en 4:3                   |
-| `village.webp`        | idem                                                                            |
-| `harbour.webp`        | idem                                                                            |
-| `forest.webp`         | idem                                                                            |
-| `pen.webp`            | idem                                                                            |
-| `arena.webp`          | `upload/backoffice/direct/2021-02-22/827fd3d5…png`                              |
-| `dolmen.webp`         | `upload/backoffice/direct/2026-06-24/d865ca61…png`, quatre menhirs et une dalle |
-| `workshop.webp`       | `upload/backoffice/direct/2023-03-21/04ba16cf…png`, l'enclume et les potions    |
-| `battle.webp`         | `upload/backoffice/direct/2025-02-10/3620d31a…png`, braseros et ossements       |
-| `wheel-loop.mp4`      | une capture du jeu faite ici, H.264 muet                                        |
-| `walk-loop.mp4`       | idem                                                                            |
-| `auto-focus-loop.mp4` | idem                                                                            |
-| `rune-table-loop.mp4` | idem                                                                            |
-| `*-loop-poster.webp`  | une image de la boucle qui la porte, tirée à `ffmpeg` et pesée à `cwebp`        |
+| Fichier                  | Source                                                                          |
+| ------------------------ | ------------------------------------------------------------------------------- |
+| `camp.webp`              | `www/modules/mmorpg/discover/assets/screens/`, recadré en 4:3                   |
+| `village.webp`           | idem                                                                            |
+| `harbour.webp`           | idem                                                                            |
+| `forest.webp`            | idem                                                                            |
+| `pen.webp`               | idem                                                                            |
+| `arena.webp`             | `upload/backoffice/direct/2021-02-22/827fd3d5…png`                              |
+| `dolmen.webp`            | `upload/backoffice/direct/2026-06-24/d865ca61…png`, quatre menhirs et une dalle |
+| `workshop.webp`          | `upload/backoffice/direct/2023-03-21/04ba16cf…png`, l'enclume et les potions    |
+| `battle.webp`            | `upload/backoffice/direct/2025-02-10/3620d31a…png`, braseros et ossements       |
+| `wheel-loop.mp4`         | une capture du jeu faite ici, H.264 muet                                        |
+| `walk-loop.mp4`          | idem                                                                            |
+| `auto-focus-loop.mp4`    | idem                                                                            |
+| `rune-table-loop.mp4`    | idem                                                                            |
+| `relay-loop.mp4`         | `auto-focus-loop.mp4` réencodé, doublure à retourner                            |
+| `quick-replies-loop.mp4` | `walk-loop.mp4` réencodé, doublure à retourner                                  |
+| `home-loop.mp4`          | `wheel-loop.mp4` réencodé, doublure du montage de l'accueil                     |
+| `*-loop-poster.webp`     | une image de la boucle qui la porte, tirée à `ffmpeg` et pesée à `cwebp`        |
 
 ## Les portraits de classe
 
@@ -116,6 +124,21 @@ montre pour dire où cocher.
 Personnages : la mise en route s'en sert pour l'étape de l'essai.
 Les vidéos passent par le skill `make-loop`, qui les rend au format et à la
 largeur de la plaque.
+
+**Trois boucles sont des doublures, et le dépôt les porte quand même.** Une
+fonctionnalité vaut une vidéo, donc les six du menu en ont une et l'accueil
+aussi ; trois n'étaient pas tournées, et une capture déjà là tient la place le
+temps qu'elles le soient. Elles ne posent pas de question de droits, mais elles
+montrent autre chose que ce que leur page raconte : c'est écrit dans
+`docs/plan-site.md`, avec ce qu'il reste à tourner.
+
+**Une doublure se réencode, elle ne se copie pas.** Un fichier copié octet pour
+octet a la même empreinte que son original, donc Vite n'en livre qu'un, et les
+deux pages qui le montrent déclarent à Google la même vidéo sous la même adresse.
+C'est le dédoublement qu'un `VideoObject` par page existe pour éviter. Chaque
+doublure est donc passée par `ffmpeg -crf 26`, et son affiche est tirée sur une
+autre seconde que celle de sa source : sept pages, sept adresses, et six
+vignettes qui ne se ressemblent pas sur l'accueil.
 
 **Une affiche n'est pas la première image de sa boucle.** Elle se choisit à
 l'œil, sur la seconde où la fonctionnalité est visible : le tableau des runes

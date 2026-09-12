@@ -1471,7 +1471,14 @@ const SNAPSHOT = {
     everywhere: false,
     previewing: false
   },
-  loopsSeen: { wheel: true, walk: true, runeTable: true, autoFocus: true },
+  loopsSeen: {
+    wheel: true,
+    walk: true,
+    runeTable: true,
+    autoFocus: true,
+    relay: true,
+    quickReplies: true
+  },
   journal: [
     { id: 1, at: MORNING, event: { kind: 'listening' } },
     { id: 2, at: NOON, event: { kind: 'characterOnline', nickname: NICKNAME } }

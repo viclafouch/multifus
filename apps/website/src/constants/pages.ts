@@ -3,7 +3,7 @@ import type { Page, PageId } from '../@types/page.ts'
 export const PAGES = {
   home: {
     kind: 'home',
-    loop: null,
+    loop: 'home',
     kin: [],
     slugs: { fr: '', en: '', es: '' }
   },
@@ -41,7 +41,7 @@ export const PAGES = {
   },
   relay: {
     kind: 'feature',
-    loop: null,
+    loop: 'relay',
     kin: ['autoFocus', 'quickReplies'],
     slugs: {
       fr: 'messages-prives',
@@ -51,7 +51,7 @@ export const PAGES = {
   },
   quickReplies: {
     kind: 'feature',
-    loop: null,
+    loop: 'quickReplies',
     kin: ['relay', 'runeTable'],
     slugs: {
       fr: 'reponses-rapides',

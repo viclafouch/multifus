@@ -235,6 +235,49 @@
   }
 }
 
+@utility mosaic {
+  display: grid;
+  gap: var(--spacing-drop);
+
+  @media (width >= 40rem) {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+
+    & > li {
+      grid-column: span 6;
+    }
+  }
+
+  @media (width >= 64rem) {
+    & > li:nth-child(6n + 1),
+    & > li:nth-child(6n + 4),
+    & > li:nth-child(6n + 5) {
+      grid-column: span 7;
+    }
+
+    & > li:nth-child(6n + 2),
+    & > li:nth-child(6n + 3),
+    & > li:nth-child(6n) {
+      grid-column: span 5;
+    }
+  }
+}
+
+@utility vignette {
+  display: block;
+  width: 100%;
+  flex-grow: 1;
+  aspect-ratio: var(--aspect-loop);
+  object-fit: cover;
+  border-bottom: 1px solid color-mix(in srgb, var(--band), transparent 66%);
+  opacity: 0.82;
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  .card:hover &,
+  .card:focus-visible & {
+    opacity: 1;
+  }
+}
+
 @utility mark {
   display: block;
   margin-inline: auto;
@@ -365,10 +408,6 @@
   animation: surface 700ms cubic-bezier(0.22, 1, 0.36, 1) 390ms backwards;
 }
 
-@utility surface-5 {
-  animation: surface 700ms cubic-bezier(0.22, 1, 0.36, 1) 500ms backwards;
-}
-
 @keyframes reveal {
   from {
     opacity: 0;
@@ -398,7 +437,6 @@
   .surface-2,
   .surface-3,
   .surface-4,
-  .surface-5,
   .reveal,
   .mast,
   [open] .unfold {
@@ -414,6 +452,7 @@
   .tab::after,
   .card,
   .card::after,
+  .vignette,
   .hinted,
   .ledger tbody tr {
     transition: none !important;

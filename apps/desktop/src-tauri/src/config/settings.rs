@@ -126,6 +126,8 @@ pub struct LoopsSeen {
     pub walk: bool,
     pub rune_table: bool,
     pub auto_focus: bool,
+    pub relay: bool,
+    pub quick_replies: bool,
 }
 
 impl LoopsSeen {
@@ -135,6 +137,8 @@ impl LoopsSeen {
             Loop::Walk => self.walk = true,
             Loop::RuneTable => self.rune_table = true,
             Loop::AutoFocus => self.auto_focus = true,
+            Loop::Relay => self.relay = true,
+            Loop::QuickReplies => self.quick_replies = true,
         }
     }
 }
@@ -146,6 +150,8 @@ pub enum Loop {
     Walk,
     RuneTable,
     AutoFocus,
+    Relay,
+    QuickReplies,
 }
 
 impl Wheel {

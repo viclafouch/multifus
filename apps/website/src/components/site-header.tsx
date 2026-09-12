@@ -2,6 +2,7 @@ import { msg } from '@lingui/core/macro'
 import { useLingui } from '@lingui/react'
 import { Button } from '@multifus/retro'
 import type { PageId } from '@/@types/page'
+import logo from '@/assets/logo.svg'
 import { Cartouche } from '@/components/cartouche'
 import { FeaturesMenu } from '@/components/features-menu'
 import { LanguageOffer } from '@/components/language-offer'
@@ -39,8 +40,9 @@ export const SiteHeader = ({ page }: SiteHeaderProps) => {
           <PageLink
             page="home"
             isHere={page === 'home'}
-            className="font-carve text-action tracking-chapter text-cream"
+            className="flex items-center gap-2.5 font-carve text-action tracking-chapter text-cream"
           >
+            <img src={logo} alt="" className="size-8" />
             Multifus
           </PageLink>
           <FeaturesMenu page={page} />

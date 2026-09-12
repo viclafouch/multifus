@@ -82,6 +82,41 @@ choses à dire qu'aucune autre page ne dit : les phrases qu'on retape vingt fois
 par jour, le collage qui n'envoie pas, et la langue du client Dofus qui n'est pas
 celle de Multifus.
 
+## Une fonctionnalité, une vidéo
+
+**C'est le principe, et il ne souffre pas d'exception** : les six
+fonctionnalités du menu ont chacune leur boucle, et l'accueil a la sienne.
+`constants/pages.test.ts` le tient, `PAGES[page].loop` valant le nom de la page.
+`/mac` reste hors du compte : il parle d'un réglage du système, et il n'y a rien
+du jeu à filmer.
+
+Ce qu'il manquait, ce sont les Messages privés et les Réponses rapides, qui
+n'avaient pas de boucle. **Trois doublures sont posées, et elles mentent** :
+`relay-loop.mp4` vient de l'AutoFocus, `quick-replies-loop.mp4` du Déplacement
+rapide, `home-loop.mp4` de la roue. Elles tiennent la place le temps que les
+vraies soient tournées, et le site comme le logiciel les servent déjà. Tant
+qu'elles sont là, une vidéo montre autre chose que ce que sa page raconte : c'est
+à reprendre avant toute mise en ligne.
+
+**Une doublure se réencode, elle ne se copie pas**, et c'est la relecture qui
+l'a trouvé. Copiée octet pour octet, elle porte l'empreinte de son original,
+donc Vite n'en livre qu'un fichier et deux pages déclarent à Google la même
+vidéo sous la même adresse : l'accueil et la roue, les messages privés et
+l'AutoFocus. C'est exactement le dédoublement qu'on évitait en ne posant pas de
+fiche sur l'accueil. `ffmpeg -crf 26` suffit à les séparer, et l'affiche se tire
+sur une autre seconde que celle de la source, faute de quoi l'accueil montre six
+vignettes pour quatre images. Le Déplacement rapide a remplacé le tableau des
+runes comme source des Réponses rapides pour la même raison : son affiche disait
+« Tableau des runes » en gros sur la tuile.
+
+**L'accueil aura sa propre vidéo, un montage**, un enchaînement des six
+mécanismes plutôt qu'une seule fonctionnalité. La table le dit déjà,
+`PAGES.home.loop` valant `home` : la page porte donc sa fiche `VideoObject`, sa
+légende ne renvoie plus à `/autofocus`, et remonter le montage ne demandera que
+de remplacer le fichier. `make-loop` en tient le format.
+
+Les affiches suivent la même règle, et le skill `make-loop` les tire.
+
 ## Chaque page de fonctionnalité
 
 La vidéo au-dessus de la ligne de flottaison, toujours. Un joueur comprend le
@@ -267,11 +302,17 @@ main. Une page ajoutée sans ses voisines ne compile pas, comme elle ne compilai
 pas sans son espagnol. C'est le maillage interne, et il fait le travail d'une
 barre latérale sans en avoir l'air.
 
-**La liste des fonctionnalités de l'accueil est le menu de l'accueil du
-logiciel**, `btn-way` compris, et la règle 21 de
-[design-system.md](./design-system.md) le dit maintenant. Le voile du survol ne
-se voit pas sur un fond uni, faute de décor dessous ; le losange qui entre
-suffit.
+**La liste des fonctionnalités de l'accueil est devenue six vignettes.** Elle
+était le menu de l'accueil du logiciel, `btn-way` compris : six titres et six
+phrases, l'un sous l'autre, séparés d'un filet. Ça ne donnait rien à voir, et
+rien à cliquer que du texte, alors qu'on a une capture par fonctionnalité. Une
+vignette montre l'affiche de sa boucle, son nom et sa promesse, et mène à sa
+page. Elle ne joue pas : six vidéos sur l'accueil coûteraient plus que la page
+entière, et la vidéo est le sujet de la page où l'on va. La mosaïque alterne les
+largeurs, sept douzièmes et cinq, pour que six vignettes ne fassent pas une
+grille de catalogue. La règle 21 de [design-system.md](./design-system.md) tient
+toujours, et l'exception de `btn-way` ne porte plus sur le site que la ligne du
+comparatif.
 
 **Le menu déroulant est un `<details>`.** Base UI n'est pas une dépendance du
 site, et un menu qui a besoin de JavaScript pour s'ouvrir n'a pas sa place sur
@@ -280,12 +321,10 @@ une page prérendue : les six adresses sont dans le HTML livré, robot compris.
 clic dehors. Le losange est celui des questions fréquentes, `askmark`, qui
 répond désormais à `[open]` autant qu'à `aria-expanded`.
 
-**L'accueil montre la boucle de l'AutoFocus, et ne porte pourtant pas de
-`VideoObject`.** Ce n'est pas une fuite de la table : une vidéo n'a qu'une page
-canonique, celle de sa fonctionnalité, et la décrire deux fois la dédoublerait
-aux yeux de Google. L'accueil l'emprunte donc, et le dit : la plaque est une
-`figure` dont la légende mène à `/autofocus`. Le jour où l'accueil aura sa propre
-boucle, la table le dira et le balisage suivra tout seul.
+**L'accueil a sa boucle et porte donc sa fiche `VideoObject`.** Il empruntait
+celle de l'AutoFocus, et sa légende menait à `/autofocus` pour ne pas dédoubler
+la vidéo aux yeux de Google : une vidéo n'a qu'une page canonique. Le montage de
+l'accueil est le sien, la table le dit, et le balisage a suivi tout seul.
 
 **Le décor ne se pose que sur l'accueil.** Une bande en haut, `village.webp`,
 noyée par `hem-deep` : un fond derrière notre mobilier, jamais l'habillage du
@@ -519,9 +558,10 @@ l'affirmation » est la règle que ce plan a tirée des concurrents et que
 `/telecharger` applique déjà. Les deux messages sont maintenant liés des deux
 côtés, par `AnkamaSources`, né de ce doublon.
 
-**Deux phrases promettaient ce qui n'existe pas.** Le logo et l'image Open Graph
-sont encore à dessiner, et la page en parlait au présent : le paragraphe est
-parti, il reviendra avec les images. La capture des options du client, elle,
+**Deux phrases promettaient ce qui n'existe pas.** Le logo définitif et l'image
+Open Graph sont encore à dessiner, et la page en parlait au présent : le
+paragraphe est parti, il reviendra avec les images. La doublure que la barre
+porte depuis ne change rien à cette page, qui ne parle que des images d'Ankama. La capture des options du client, elle,
 montre les notifications en arrière-plan et non le mode fenêtré ; elle ne nomme
 plus la case, une ligne de provenance disant d'où vient une image et non comment
 on s'en sert.
@@ -740,7 +780,7 @@ casse. Le nom Multifus reste dans la barre et dans le titre de la page. `headlin
 porte le corps de ce titre, que le thème n'avait pas.
 
 **Le décor monte sous la barre**, le titre et le bouton tiennent la colonne de
-gauche, et la boucle de l'AutoFocus occupe la droite en débordant jusqu'au bord de
+gauche, et la boucle de l'accueil occupe la droite en débordant jusqu'au bord de
 la fenêtre, `spill`. Le débordement se mesure depuis `--page`, jamais en
 pourcentage : la figure est une case de grille, donc un `50%` y vaut la moitié de
 sa colonne et la vidéo se faisait couper. `ebb` l'éteint vers la droite par un
@@ -750,6 +790,20 @@ rejoue le bug de la règle 27.
 **Les quatre chiffres de l'accueil sont partis.** Sept, zéro, deux, trois : la
 forme se voit sur tous les sites de logiciel, et ce qu'ils disaient est déjà dans
 « Ce que Multifus ne fait pas », écrit en phrases.
+
+**La ligne au-dessus du titre est partie aussi.** « Dofus Retro · macOS et
+Windows · Gratuit » : trois promesses en capitales espacées, la forme même du
+badge de sur-titre qu'on voit partout, et les trois se redisent plus bas, le nom
+du jeu dans la phrase du hero, les deux systèmes sur les boutons de
+`/telecharger`, la gratuité sous le bouton. Le nom du jeu est donc entré dans la
+phrase : un visiteur qui arrive doit lire « Dofus Retro » dans la première
+phrase qu'il lit, pas dans un sur-titre qu'il saute.
+
+**La barre porte le logo, à gauche du nom.** C'est une doublure, la piste « La
+ponte » de [logo-pistes.html](./logo-pistes.html) sortie en SVG dans
+`apps/website/src/assets/logo.svg` ; elle pèse moins de quatre kilooctets, donc
+Vite l'inline dans la page et elle ne coûte aucune requête. Elle tombe le jour où
+[logo.md](./logo.md) aboutit, et ce sera le même fichier à remplacer.
 
 **Le mouvement se fait au défilement, en CSS seul.** `surface-1` à `surface-5`
 échelonnent l'arrivée du hero et des titres de page, `reveal` lève chaque bande
@@ -769,7 +823,9 @@ pas sur la bande du comparatif, dont la première colonne est collée : un
 - [ ] Dessiner l'image Open Graph, et la poser dans `headOf`. `twitter:card` est retombé à `summary` en attendant : annoncer `summary_large_image` sans `og:image` donne une carte vide dans Discord et sur X
 - [ ] Brancher `/journal` sur `apps/desktop/CHANGELOG.md`, que la première release écrira. C'est la dernière page de `kind: 'plain'`, elle n'a que son titre et sa promesse, et rien ne dit encore comment le fichier devient la page
 - [ ] Donner leur vraie adresse aux deux boutons de `/telecharger`. Ils pointent aujourd'hui sur `releases/latest`, la page, faute de savoir le nom du fichier : c'est la lecture de l'API GitHub à la compilation qui la leur donnera, et `RELEASES` est l'unique endroit à reprendre. C'est là que `zod` entre, et pas avant : une réponse d'API qu'on lit sans la valider casse le build en silence le jour où GitHub change un champ
-- [ ] Tourner les boucles qui manquent, les messages privés, les réponses rapides, et celle de l'accueil, avec `make-loop`. La table les attend, `loop: null` les marque
+- [ ] Tourner les trois boucles qui sont aujourd'hui des doublures, avec `make-loop` : les messages privés, les réponses rapides, et le montage de l'accueil. Les fichiers existent et mentent, `relay-loop.mp4` montrant l'AutoFocus, `quick-replies-loop.mp4` le tableau des runes, `home-loop.mp4` la roue. Chacune porte aussi son affiche, et sa durée en secondes est à corriger dans `constants/loops.ts` des deux côtés
+- [ ] Corriger « muettes et sans montage » dans la provenance des boucles de `/images` le jour où le montage de l'accueil existe : ce sera la seule vidéo montée du dépôt, et la phrase dira le contraire
+- [ ] Reprendre les quatre phrases neuves du logiciel, la description et la légende des deux vidéos des Messages privés et des Réponses rapides : elles racontent ce que la vraie boucle montrera, et la doublure montre autre chose
 - [ ] Le crochet de déploiement Vercel dans le workflow `release`, et la lecture de l'API GitHub à la compilation
 - [ ] Vercel Analytics, un seul événement personnalisé, le clic sur « Télécharger » avec le système dedans
 - [ ] Déclarer le site à la Search Console et y déposer le sitemap

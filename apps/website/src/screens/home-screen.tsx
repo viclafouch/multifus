@@ -9,9 +9,9 @@ import { DecorBand } from '@/components/decor-band'
 import { DownloadButton } from '@/components/download-button'
 import { LoopPlate } from '@/components/loop-plate'
 import { OutLink } from '@/components/out-link'
-import { PageLink } from '@/components/page-link'
 import { PlateBlock } from '@/components/plate-block'
 import { Prose } from '@/components/prose'
+import { Vignette } from '@/components/vignette'
 import { WayLink } from '@/components/way-link'
 import { MENU_FEATURES } from '@/constants/pages'
 import { REPOSITORY } from '@/constants/site'
@@ -24,13 +24,11 @@ import {
 import { pathOf } from '@/helpers/page'
 import { useLanguage } from '@/hooks/use-language'
 
-const EYEBROW = msg`Dofus Retro · macOS et Windows · Gratuit`
-
 const HERO_LEAD = msg`Jouez en multicompte`
 
 const HERO_TURN = msg`sans chercher une fenêtre`
 
-const HERO_UNDER = msg`Multifus amène devant vous la fenêtre du personnage qui joue. Vous gardez les mains sur le jeu, et la team suit.`
+const HERO_UNDER = msg`Multifus amène devant vous la fenêtre du personnage qui joue sur Dofus Retro. Vous gardez les mains sur le jeu, et la team suit.`
 
 const HERO_FLOOR = msg`Gratuit, code publié, paquet signé et notarisé.`
 
@@ -42,7 +40,7 @@ const TRUST_PROOF = msg`Le paquet est signé et notarisé, il porte son attestat
 
 const SOURCE = msg`Voir le code`
 
-const LOOP_CAPTION = msg`L’AutoFocus à l’œuvre dans le jeu`
+const LOOP_CAPTION = msg`Les six mécanismes à l’œuvre dans le jeu`
 
 const COMPARISON_LEAD = msg`Six gestionnaires de fenêtres, ligne par ligne, chaque case relevée dans le code et non sur la page d’accueil de son auteur.`
 
@@ -56,31 +54,28 @@ export const HomeScreen = (_props: PageScreenProps) => {
         <DecorBand scene={village} />
         <Band className="marquee relative grid gap-x-12 gap-y-14 pt-fall pb-24">
           <div className="flex flex-col gap-8">
-            <p className="surface-1 text-aside tracking-micro text-band uppercase">
-              {i18n._(EYEBROW)}
-            </p>
-            <h1 className="surface-2 headline limelight max-w-lintel text-balance">
+            <h1 className="surface-1 headline limelight max-w-lintel text-balance">
               <span className="text-cream">{i18n._(HERO_LEAD)}</span>{' '}
               <span className="text-leaf-lit">{i18n._(HERO_TURN)}</span>
             </h1>
-            <p className="surface-3 max-w-blurb text-herald text-band">
+            <p className="surface-2 max-w-blurb text-herald text-band">
               {i18n._(HERO_UNDER)}
             </p>
-            <div className="surface-4 flex flex-col items-start gap-3">
+            <div className="surface-3 flex flex-col items-start gap-3">
               <DownloadButton />
               <p className="text-aside text-band">{i18n._(HERO_FLOOR)}</p>
             </div>
           </div>
-          <figure className="surface-5 flex flex-col items-stretch gap-3 lg:spill">
+          <figure className="surface-4 flex flex-col items-stretch gap-3 lg:spill">
             <div className="relative">
-              <LoopPlate loop="autoFocus" caption={i18n._(LOOP_CAPTION)} />
+              <LoopPlate loop="home" caption={i18n._(LOOP_CAPTION)} />
               <div
                 aria-hidden
                 className="ebb pointer-events-none absolute inset-0 hidden lg:block"
               />
             </div>
             <figcaption className="text-aside text-band">
-              <PageLink page="autoFocus">{i18n._(LOOP_CAPTION)}</PageLink>
+              {i18n._(LOOP_CAPTION)}
             </figcaption>
           </figure>
         </Band>
@@ -88,11 +83,11 @@ export const HomeScreen = (_props: PageScreenProps) => {
       <Band className="reveal py-20">
         <BandTitle>{i18n._(FEATURES_TITLE)}</BandTitle>
         <Prose>{i18n._(FEATURES_LEAD)}</Prose>
-        <ul className="flex flex-col divide-y divide-border">
+        <ul className="mosaic">
           {MENU_FEATURES.map((feature) => {
             return (
               <li key={feature}>
-                <WayLink page={feature} />
+                <Vignette page={feature} />
               </li>
             )
           })}

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffeeb0" />
+      <stop offset=".42" stop-color="#f4c752" />
+      <stop offset="1" stop-color="#c4881f" />
+    </linearGradient>
+    <linearGradient id="wood" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8a5c33" />
+      <stop offset="1" stop-color="#4a2d18" />
+    </linearGradient>
+    <radialGradient id="glint" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".95" />
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0" />
+    </radialGradient>
+    <path id="egg" d="M60 13C82 35 98 57 98 74a38 38 0 1 1-76 0c0-17 16-39 38-61Z" />
+  </defs>
+  <g stroke="#2d1c10" stroke-linejoin="round">
+    <use href="#egg" transform="translate(23 74) scale(.44) translate(-60 -64)" fill="url(#wood)" stroke-width="11" />
+    <use href="#egg" transform="translate(97 74) scale(.44) translate(-60 -64)" fill="url(#wood)" stroke-width="11" />
+    <use href="#egg" transform="translate(60 62) scale(.84) translate(-60 -64)" fill="url(#gold)" stroke-width="6" />
+  </g>
+  <path d="M56 26c-7 8-13 16-15 22-2 4 2 7 5 4 6-4 11-13 13-20 1-4-1-8-3-6Z" fill="url(#glint)" />
+  <path d="M72 54c0-8-13-10-17-2-4 8 4 12 10 15 6 3 6 12-2 13-5 1-9-3-9-8" fill="none" stroke="#8a5a12" stroke-width="8" stroke-linecap="round" opacity=".85" />
+  <circle cx="59" cy="58" r="4" fill="#8a5a12" opacity=".85" />
+</svg>

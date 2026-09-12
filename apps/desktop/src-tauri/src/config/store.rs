@@ -318,6 +318,8 @@ mod tests {
                 walk: false,
                 rune_table: false,
                 auto_focus: false,
+                relay: false,
+                quick_replies: false,
             },
             rune_table: RuneTable {
                 width: 480,

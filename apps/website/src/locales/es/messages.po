@@ -288,8 +288,8 @@ msgid "Deux lignes ne suivent pas ce calcul. La vitalité porte une Ra à 8 là 
 msgstr "Dos filas no siguen ese cálculo. La vitalidad lleva una Ra en 8 donde la regla diría 10, y los pods una Pa en 8 y una Ra en 25 donde diría 9 y 30. Son las dos únicas características cuyo punto pesa un cuarto, y el juego nunca las alineó con la regla."
 
 #: src/screens/home-screen.tsx
-msgid "Dofus Retro · macOS et Windows · Gratuit"
-msgstr "Dofus Retro · macOS y Windows · Gratis"
+#~ msgid "Dofus Retro · macOS et Windows · Gratuit"
+#~ msgstr "Dofus Retro · macOS y Windows · Gratis"
 
 #: src/constants/bodies.ts
 msgid "Dofus Retro déconnecte tout seul un personnage qui ne fait rien depuis un moment. Quand ça arrive, le relais se tait pour lui, et il vous le dit plutôt que de vous laisser croire que personne ne vous écrit."
@@ -472,8 +472,8 @@ msgid "L’adresse est peut-être mal recopiée, ou la page a changé de nom. L�
 msgstr "Puede que la dirección esté mal copiada, o que la página haya cambiado de nombre. La página de inicio te devuelve al camino."
 
 #: src/screens/home-screen.tsx
-msgid "L’AutoFocus à l’œuvre dans le jeu"
-msgstr "El AutoFocus en acción en el juego"
+#~ msgid "L’AutoFocus à l’œuvre dans le jeu"
+#~ msgstr "El AutoFocus en acción en el juego"
 
 #: src/constants/bodies.ts
 msgid "L’AutoFocus s’éteint d’un interrupteur, sans fermer Multifus, et tout le reste continue de marcher."
@@ -731,6 +731,10 @@ msgstr "Los retratos de las doce clases"
 msgid "Les sept appels ont chacun leur interrupteur. Si les crafts des autres ne vous intéressent pas, vous coupez celui-là et vous gardez les six autres."
 msgstr "Cada una de las siete llamadas tiene su interruptor. Si los crafteos de los demás no te interesan, apagas esa y te quedas con las otras seis."
 
+#: src/screens/home-screen.tsx
+msgid "Les six mécanismes à l’œuvre dans le jeu"
+msgstr "Los seis mecanismos en acción en el juego"
+
 #: src/constants/provenance.ts
 msgid "Les visuels de classe publiés par Ankama, un par classe et par sexe. On les voit sur la roue des personnages, et le même en petit sur la fenêtre du jeu, pour reconnaître un personnage sans lire son pseudo."
 msgstr "Las ilustraciones de clase publicadas por Ankama, una por clase y por sexo. Se ven en la rueda de personajes, y la misma en pequeño sobre la ventana del juego, para reconocer a un personaje sin leer su nombre."
@@ -756,8 +760,12 @@ msgid "Multifus"
 msgstr "Multifus"
 
 #: src/screens/home-screen.tsx
-msgid "Multifus amène devant vous la fenêtre du personnage qui joue. Vous gardez les mains sur le jeu, et la team suit."
-msgstr "Multifus trae ante ti la ventana del personaje que juega. Tus manos siguen en el juego, y el equipo te sigue."
+msgid "Multifus amène devant vous la fenêtre du personnage qui joue sur Dofus Retro. Vous gardez les mains sur le jeu, et la team suit."
+msgstr "Multifus trae ante ti la ventana del personaje que juega a Dofus Retro. Tus manos siguen en el juego, y el equipo te sigue."
+
+#: src/screens/home-screen.tsx
+#~ msgid "Multifus amène devant vous la fenêtre du personnage qui joue. Vous gardez les mains sur le jeu, et la team suit."
+#~ msgstr "Multifus trae ante ti la ventana del personaje que juega. Tus manos siguen en el juego, y el equipo te sigue."
 
 #: src/constants/bodies.ts
 msgid "Multifus démarre toujours avec le Déplacement rapide éteint, et il ne s’allume que par un geste de votre part, un interrupteur ou une touche. Il s’éteint seul dès qu’il n’a plus de fenêtre où aller."

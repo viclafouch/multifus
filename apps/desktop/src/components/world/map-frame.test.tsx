@@ -23,7 +23,14 @@ vi.mock(import('@/lib/motion'), async (importOriginal) => {
 
 const { MapFrame } = await import('@/components/world/map-frame')
 
-const MAPS_WITH_A_LOOP = ['characters', 'autoFocus', 'walk', 'runeTable']
+const MAPS_WITH_A_LOOP = [
+  'characters',
+  'autoFocus',
+  'walk',
+  'runeTable',
+  'relay',
+  'quickReplies'
+]
 
 const BUTTON = 'Voir la vidéo'
 
@@ -39,7 +46,9 @@ const SEEN: LoopsSeen = {
   wheel: true,
   walk: true,
   runeTable: true,
-  autoFocus: true
+  autoFocus: true,
+  relay: true,
+  quickReplies: true
 }
 
 describe('le cadre d’une map', () => {

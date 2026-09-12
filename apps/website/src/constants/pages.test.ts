@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import type { PageId } from '@/@types/page'
 import { LANGUAGES } from '@/constants/languages'
 import { MENU_FEATURES, PAGES, PAGE_IDS } from '@/constants/pages'
 import { PAGE_NAMES, PAGE_PROMISES } from '@/constants/wording'
@@ -9,6 +10,8 @@ const SLUG_SHAPE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/u
 const WITHOUT_HOME = PAGE_IDS.filter((page) => {
   return page !== 'home'
 })
+
+const FILMED = ['home', ...MENU_FEATURES] as const satisfies readonly PageId[]
 
 describe('la table des pages', () => {
   it('donne treize pages', () => {
@@ -85,15 +88,17 @@ describe('la table des pages', () => {
     expect(new Set(kin).size).toBe(kin.length)
   })
 
-  it('ne pose une vidéo que sur une fonctionnalité', () => {
+  it.each(FILMED)('donne sa propre boucle à %s', (page) => {
+    expect(PAGES[page].loop).toBe(page)
+  })
+
+  it('ne filme que l’accueil et les fonctionnalités du menu', () => {
     const filmed = PAGE_IDS.filter((page) => {
       return PAGES[page].loop !== null
     })
 
-    const kinds = filmed.map((page) => {
-      return PAGES[page].kind
-    })
-
-    expect(new Set(kinds)).toStrictEqual(new Set(['feature']))
+    expect(filmed.toSorted(alphabetical)).toStrictEqual(
+      [...FILMED].toSorted(alphabetical)
+    )
   })
 })
