@@ -23,7 +23,7 @@ export const SiteFooter = ({ page }: SiteFooterProps) => {
   const { i18n } = useLingui()
 
   return (
-    <footer className="mt-24 border-t border-border bg-night/25">
+    <footer className="border-t border-border bg-iron">
       <div className="mx-auto flex max-w-world flex-col gap-8 px-4 py-12">
         <div className="flex flex-wrap items-start justify-between gap-x-10 gap-y-6">
           <PageLink

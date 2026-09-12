@@ -1,11 +1,9 @@
 import { msg } from '@lingui/core/macro'
 import { useLingui } from '@lingui/react'
-import harbour from '@multifus/ankama/images/harbour.webp'
 import type { Point as PointShape } from '@/@types/body'
 import type { PageScreenProps } from '@/@types/screen'
 import { Band } from '@/components/band'
 import { BandTitle } from '@/components/band-title'
-import { DecorBand } from '@/components/decor-band'
 import { DownloadTake } from '@/components/download-take'
 import { OutLink } from '@/components/out-link'
 import { PageHead } from '@/components/page-head'
@@ -13,9 +11,11 @@ import { PageKin } from '@/components/page-kin'
 import { PageLink } from '@/components/page-link'
 import { Point } from '@/components/point'
 import { Prose } from '@/components/prose'
+import { Sheet } from '@/components/sheet'
 import { SystemMoves } from '@/components/system-moves'
+import { Wash } from '@/components/wash'
 import { PAGES } from '@/constants/pages'
-import { REPOSITORY } from '@/constants/site'
+import { FOLD_ANCHOR, REPOSITORY } from '@/constants/site'
 import { SYSTEM_IDS } from '@/constants/systems'
 import { BEFORE_INSTALL, PAGE_NAMES } from '@/constants/wording'
 
@@ -57,54 +57,57 @@ export const DownloadScreen = ({ page }: PageScreenProps) => {
 
   return (
     <>
-      <div className="relative -mt-mast overflow-x-clip">
-        <DecorBand scene={harbour} />
-        <Band className="relative gap-7 pt-fall pb-28">
+      <Band id={FOLD_ANCHOR} className="gap-7 pt-10 pb-24">
+        <Wash className="max-w-roll gap-7">
           <PageHead page={page} />
           <div className="surface-4">
             <DownloadTake />
           </div>
-          <p className="surface-4 text-aside text-band">{i18n._(NO_STRINGS)}</p>
+          <p className="surface-4 engraved text-aside text-khaki">
+            {i18n._(NO_STRINGS)}
+          </p>
+        </Wash>
+      </Band>
+      <Sheet>
+        <Band className="reveal py-16">
+          <BandTitle>{i18n._(MOVES_TITLE)}</BandTitle>
+          <Prose>{i18n._(MOVES_LEAD)}</Prose>
+          <ul className="grid gap-6 sm:grid-cols-2">
+            {SYSTEM_IDS.map((system) => {
+              return (
+                <li key={system}>
+                  <SystemMoves system={system} />
+                </li>
+              )
+            })}
+          </ul>
         </Band>
-      </div>
-      <Band className="reveal py-16">
-        <BandTitle>{i18n._(MOVES_TITLE)}</BandTitle>
-        <Prose>{i18n._(MOVES_LEAD)}</Prose>
-        <ul className="grid gap-6 sm:grid-cols-2">
-          {SYSTEM_IDS.map((system) => {
-            return (
-              <li key={system}>
-                <SystemMoves system={system} />
-              </li>
-            )
-          })}
-        </ul>
-      </Band>
-      <Band className="reveal py-16">
-        <BandTitle>{i18n._(BEFORE_INSTALL)}</BandTitle>
-        <Prose>{i18n._(BEFORE_LEAD)}</Prose>
-        <ul className="flex flex-col gap-6">
-          <Point point={SIGNED} />
-          <Point point={SEAL}>
-            <code className="rule block max-w-tale overflow-x-auto rounded-md border bg-night/35 px-4 py-3 font-mono text-aside text-cream">
-              {i18n._(SEAL_COMMAND)}
-            </code>
-          </Point>
-          <Point point={SOURCE}>
-            <p>
-              <OutLink href={REPOSITORY}>{i18n._(SOURCE_NAME)}</OutLink>
-            </p>
-          </Point>
-          <Point point={UNTOUCHED}>
-            <p>
-              <PageLink page="ankama" className="rule border-b text-cream">
-                {i18n._(PAGE_NAMES.ankama)}
-              </PageLink>
-            </p>
-          </Point>
-        </ul>
-      </Band>
-      <PageKin pages={kin} />
+        <Band className="reveal py-16">
+          <BandTitle>{i18n._(BEFORE_INSTALL)}</BandTitle>
+          <Prose>{i18n._(BEFORE_LEAD)}</Prose>
+          <ul className="flex flex-col gap-6">
+            <Point point={SIGNED} />
+            <Point point={SEAL}>
+              <code className="rule block max-w-tale overflow-x-auto rounded-md border bg-night/35 px-4 py-3 font-mono text-aside text-cream">
+                {i18n._(SEAL_COMMAND)}
+              </code>
+            </Point>
+            <Point point={SOURCE}>
+              <p>
+                <OutLink href={REPOSITORY}>{i18n._(SOURCE_NAME)}</OutLink>
+              </p>
+            </Point>
+            <Point point={UNTOUCHED}>
+              <p>
+                <PageLink page="ankama" className="rule border-b text-cream">
+                  {i18n._(PAGE_NAMES.ankama)}
+                </PageLink>
+              </p>
+            </Point>
+          </ul>
+        </Band>
+        <PageKin pages={kin} />
+      </Sheet>
     </>
   )
 }

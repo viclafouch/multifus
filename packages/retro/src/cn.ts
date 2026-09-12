@@ -3,7 +3,9 @@ import { extendTailwindMerge } from 'tailwind-merge'
 
 const FONT_SIZES = [
   'banner',
+  'blazon',
   'chapter',
+  'passage',
   'herald',
   'sign',
   'motto',
@@ -27,7 +29,8 @@ const CONTAINERS = [
   'world',
   'loop',
   'blurb',
-  'lead'
+  'lead',
+  'theatre'
 ] as const satisfies readonly string[]
 
 const twMerge = extendTailwindMerge({

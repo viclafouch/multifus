@@ -100,10 +100,42 @@ pas : c'est l'écran qui décide, jamais `PageKin`.
 rythme. Une page est une pile de bandes, jamais une grille. `BandTitle` en porte
 le titre, `PageHead` porte le nom et la promesse d'une page.
 
+**Décor** (`PAGE_DECORS`) : le décor du jeu posé derrière une page, celui de la
+map où la fonctionnalité vit dans le logiciel. Il ne bouge pas avec le
+défilement, il couvre la fenêtre entière, et une page qui montre des documents
+plutôt que le jeu vaut `null` : le journal et les messages d'Ankama n'en ont
+pas. La table couvre les douze pages, donc ajouter une page force à dire si elle
+a un décor. Il reste **net** et bien présent, comme dans le logiciel : ce qui le
+sépare de la vidéo, c'est le cadre de celle-ci, son ombre et sa taille, jamais un
+flou, qui ne ferait que le rendre invisible. Le logiciel monte ses neuf décors
+d'un coup et fait glisser leurs opacités ; le site n'en charge qu'un par page et
+laisse le navigateur croiser les deux documents, ce qui donne le même fondu pour
+un neuvième du poids.
+
+**Feuille** (`Sheet`) : le fond uni sur lequel une page pose ce qui se lit. Elle
+commence là où le décor s'arrête, d'un fondu de quatre rem, et elle va jusqu'au
+pied de page. Tout texte de corps vit dessus, parce que le gris du site ne tient
+pas son contraste au-dessus d'une herbe verte. Ce qui reste sur le décor est
+soit un titre en crème avec son ombre, soit une plaque opaque.
+
+**Scène** (`FeatureStage`) : la vidéo en grand et le blason posé sur sa bande du
+bas. Rien d'autre : l'appel au téléchargement et l'amorce se lisent dessous, sur
+la feuille. Sa largeur se prend à la hauteur de la fenêtre, en `svh` et jamais
+en `vh` : sur un téléphone, `vh` compte la barre d'adresse rétractée, et le bas
+de la vidéo passe sous le bord de l'écran. La scène tient dans le premier écran,
+et il reste de quoi voir qu'on peut défiler.
+
+**Blason** (`Blazon`) : le nom, le filet et la promesse, posés sur la bande du
+bas de la vidéo. Ils se lisent sur un voile (`scrim`) qui descend vers l'encre :
+la vidéo se voit en entier, et le texte tient son contraste quelle que soit
+l'image. Sous 640 points, le blason passe sous la vidéo, dans le flux : un voile
+de cent cinquante points sur une vidéo qui en fait deux cents la couvrirait.
+Une fonctionnalité sans vidéo n'a pas de blason, elle garde le titre de page.
+
 **Prose** (`Prose`) : un paragraphe de corps, à la largeur où il se lit.
 `ProseBlock` en groupe plusieurs sous un intertitre.
 
-**Corps** (`Body`) : ce qu'une page de fonctionnalité dit sous sa vidéo, dans
+**Corps** (`Body`) : ce qu'une page de fonctionnalité dit de sa scène, dans
 `constants/bodies.ts`. Une amorce, deux ou trois passages, et la limite.
 `PAGE_BODIES` vaut `null` pour une page qui n'en a pas, comme `loop` : le test
 refuse un corps ailleurs que sur une fonctionnalité, et une fonctionnalité sans
@@ -113,24 +145,27 @@ corps.
 texte, `Bande` étant déjà la tranche d'une page.
 
 **Amorce** (`Opening`) : le premier paragraphe d'un corps. Il raconte la scène
-que la vidéo montre, et il porte un filet à sa gauche pour qu'on le distingue des
+que la vidéo montre, il se lit donc juste dessous, à droite de l'appel au
+téléchargement, et il porte un filet à sa gauche pour qu'on le distingue des
 passages, qui expliquent.
 
 **Limite** (`limit`) : le passage qui dit ce que la fonctionnalité ne fait pas.
-Il est obligatoire, il se lit sur une plaque, et `constants/bodies.test.ts`
+Il est obligatoire, `LimitPlate` le pose sur une plaque, le titre à gauche et
+les points à droite, et `constants/bodies.test.ts`
 refuse un titre où « ne fait pas » ne s'écrit pas. C'est la règle du comparatif
 tournée vers une seule page : ce qui se donne sans manque ne se croit pas.
 
-**Vignette** (`Vignette`) : ce qu'une fonctionnalité montre sur l'accueil, son
-affiche, son nom et sa promesse, et le tout mène à sa page. Elle ne joue pas la
-vidéo : six lecteurs sur l'accueil coûteraient plus que la page entière, et la
-vidéo est le sujet de la page où l'on va. Les six se posent en **mosaïque**
-(`mosaic`), qui alterne les largeurs pour que six vignettes ne fassent pas une
-grille de catalogue.
+**Vignette** (`Vignette`) : ce qu'une page montre d'une autre page, son affiche,
+son nom et sa promesse, et le tout mène là-bas. C'est la seule carte du site :
+les six de l'accueil et les deux voisines du bas d'une page sont la même chose.
+Elle ne joue pas la vidéo : six lecteurs sur l'accueil coûteraient plus que la
+page entière, et la vidéo est le sujet de la page où l'on va. Une page sans
+vidéo n'a pas d'affiche, et la vignette montre alors ses deux phrases seules.
+Les six de l'accueil se posent en **mosaïque** (`mosaic`), qui alterne les
+largeurs pour que six vignettes ne fassent pas une grille de catalogue.
 
 **Ligne** (`WayLink`) : le menu de l'accueil du logiciel posé sur le site. Il
-portait les six fonctionnalités, il ne porte plus que le comparatif. **Carte**
-(`PageCard`) est ce qu'une voisine montre en bas d'une page. **Onglet**
+portait les six fonctionnalités, il ne porte plus que le comparatif. **Onglet**
 (`MastLink`) est un lien de la barre du haut, et il sait dire qu'on est déjà sur
 sa page.
 
@@ -186,6 +221,34 @@ se montre pas plutôt que de se montrer à chaque page.
 **Voix** : une instance de Lingui, une par langue. `SPEAKERS.fr`, `SPEAKERS.en`,
 `SPEAKERS.es`. Elles ne s'activent pas, elles ne se muent pas, elles parlent.
 
+## Comment on passe d'une page à l'autre
+
+Chaque lien interne est une vraie navigation, `<a href>`, et le site reste douze
+documents prérendus. Ce qui rend le passage fluide est du navigateur, pas du
+JavaScript à nous.
+
+**Le fondu** vient de `@view-transition { navigation: auto }`, dans
+`styles.css`. Le document entier se croise, décor compris, et deux
+choses traversent sans se croiser : la barre du haut, qui ne bouge pas, et la
+scène, qui garde la place de la vidéo d'une page à l'autre. Elles portent pour
+cela un `view-transition-name`, et **deux éléments d'une même page ne peuvent
+pas porter le même nom**, sinon le navigateur annule toute la transition.
+Chrome et Safari le font, Firefox ne le fait pas encore et navigue sans fondu,
+ce qui est exactement ce que le site faisait avant. Une préférence de mouvement
+réduit repasse `navigation: none`.
+
+**Le fondu attend le contenu.** Chaque page porte
+`<link rel="expect" href="#ouverture" blocking="render">`, et `#ouverture`
+(`FOLD_ANCHOR`) est l'identifiant de la première bande de chaque écran. Sans
+lui, le navigateur croise l'ancienne page avec une page encore vide.
+`verify-html.mjs` refuse une page livrée sans les deux.
+
+**Le préchargement** vient des règles de spéculation, dans `__root.tsx` : le
+navigateur va chercher le document d'un lien survolé, et rien de plus. C'est
+`prefetch` et non `prerender`, parce qu'une page prérendue exécuterait son
+JavaScript sans être vue, et la proposition de langue brûlerait son souvenir
+pour un écran que personne n'a regardé.
+
 ## Où les imports changent de forme
 
 Presque tout le site importe par l'alias `@/`. Six fichiers ne le font pas :
@@ -194,7 +257,9 @@ Presque tout le site importe par l'alias `@/`. Six fichiers ne le font pas :
 **en relatif, avec l'extension `.ts`**, parce que `vite.config.ts` les lit pour
 énumérer le prérendu et pour le sitemap, et qu'il les lit avant que l'alias
 existe. Aucun d'eux ne touche une image : les vidéos et leurs affiches vivent
-dans `constants/loops.ts`, que la config ne lit pas.
+dans `constants/loops.ts`, que la config ne lit pas. `scripts/verify-html.mjs`
+en est le second lecteur : Node retire les types lui-même, et le script prend
+`FOLD_ANCHOR` à `constants/site.ts` plutôt que de le recopier.
 
 ## Ce que le site ne dit jamais
 

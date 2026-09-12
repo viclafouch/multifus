@@ -12,6 +12,7 @@ import { PlateBlock } from '@/components/plate-block'
 import { PointList } from '@/components/point-list'
 import { ANKAMA_KEPT, ANKAMA_LIMIT, ANKAMA_WORD_IDS } from '@/constants/ankama'
 import { PAGES } from '@/constants/pages'
+import { FOLD_ANCHOR } from '@/constants/site'
 
 const OPENING = msg`Ankama n’a jamais publié de règle écrite sur les gestionnaires de fenêtres. Il a répondu deux fois en public, et c’est tout ce qui existe. Les voici, en entier.`
 
@@ -27,7 +28,7 @@ export const AnkamaScreen = ({ page }: PageScreenProps) => {
 
   return (
     <>
-      <Band className="pb-6">
+      <Band id={FOLD_ANCHOR} className="pb-6">
         <PageHead page={page} />
         <Opening>{i18n._(OPENING)}</Opening>
       </Band>

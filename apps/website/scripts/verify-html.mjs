@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import process from 'node:process'
+import { FOLD_ANCHOR } from '../src/constants/site.ts'
 
 const CLIENT = join(import.meta.dirname, '..', 'dist', 'client')
 
@@ -55,6 +56,14 @@ for (const pathname of addresses) {
 
   if (!body.includes('<h1')) {
     complain(pathname, 'aucun titre dans le HTML livré')
+  }
+
+  if (!html.includes('rel="expect"')) {
+    complain(pathname, 'aucune attente de rendu pour la transition')
+  }
+
+  if (!body.includes(`id="${FOLD_ANCHOR}"`)) {
+    complain(pathname, `aucune bande ${FOLD_ANCHOR} à attendre`)
   }
 
   if (!body.includes('Ankama')) {

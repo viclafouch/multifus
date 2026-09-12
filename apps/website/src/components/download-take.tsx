@@ -30,7 +30,9 @@ export const DownloadTake = () => {
         >
           {i18n._(SYSTEM_PACKAGES[shown])}
         </Button>
-        <p className="text-aside text-band">{i18n._(SYSTEM_FLOORS[shown])}</p>
+        <p className="engraved text-aside text-khaki">
+          {i18n._(SYSTEM_FLOORS[shown])}
+        </p>
       </div>
       <p className="text-tale">
         <OutLink href={RELEASES}>{i18n._(SYSTEM_ELSEWHERE[other])}</OutLink>

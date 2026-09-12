@@ -11,8 +11,9 @@ import { PointList } from '@/components/point-list'
 import { Prose } from '@/components/prose'
 import { ProseBlock } from '@/components/prose-block'
 import { RivalTable } from '@/components/rival-table'
+import { Sheet } from '@/components/sheet'
 import { PAGES } from '@/constants/pages'
-import { REPOSITORY } from '@/constants/site'
+import { FOLD_ANCHOR, REPOSITORY } from '@/constants/site'
 
 const HOW_READ = msg`Chaque case est lue dans le code de l’outil, jamais sur sa page d’accueil. Un outil qui garde son code fermé n’a pas de colonne ici. Et Multifus perd deux lignes, parce qu’un comparatif qu’on gagne partout ne vaut rien.`
 
@@ -48,29 +49,31 @@ export const ComparisonScreen = ({ page }: PageScreenProps) => {
 
   return (
     <>
-      <Band className="pb-6">
+      <Band id={FOLD_ANCHOR} className="pt-10 pb-16">
         <PageHead page={page} />
-        <Prose>{i18n._(HOW_READ)}</Prose>
       </Band>
-      <Band className="py-0">
-        <RivalTable />
-      </Band>
-      <Band className="reveal pt-12">
-        <ProseBlock level={2} title={i18n._(MISSING_TITLE)}>
-          <PointList points={MISSING_POINTS} />
-        </ProseBlock>
-        <ProseBlock level={2} title={i18n._(CHECK_TITLE)}>
-          <PointList points={CHECK_POINTS} />
-          <p className="max-w-tale text-tale text-band">
-            {i18n._(CHECK_LEAD)}{' '}
-            <OutLink href={REPOSITORY}>{i18n._(CHECK_NAME)}</OutLink>
-          </p>
-        </ProseBlock>
-      </Band>
-      <PageKin pages={kin} />
-      <Band className="pb-20">
-        <DownloadButton />
-      </Band>
+      <Sheet>
+        <Band className="gap-7 pt-16 pb-6">
+          <Prose>{i18n._(HOW_READ)}</Prose>
+          <RivalTable />
+        </Band>
+        <Band className="reveal pt-12">
+          <ProseBlock level={2} title={i18n._(MISSING_TITLE)}>
+            <PointList points={MISSING_POINTS} />
+          </ProseBlock>
+          <ProseBlock level={2} title={i18n._(CHECK_TITLE)}>
+            <PointList points={CHECK_POINTS} />
+            <p className="max-w-tale text-tale text-band">
+              {i18n._(CHECK_LEAD)}{' '}
+              <OutLink href={REPOSITORY}>{i18n._(CHECK_NAME)}</OutLink>
+            </p>
+          </ProseBlock>
+        </Band>
+        <PageKin pages={kin} />
+        <Band className="pb-20">
+          <DownloadButton />
+        </Band>
+      </Sheet>
     </>
   )
 }

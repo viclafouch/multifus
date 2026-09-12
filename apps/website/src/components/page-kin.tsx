@@ -3,7 +3,7 @@ import { useLingui } from '@lingui/react'
 import type { PageId } from '@/@types/page'
 import { Band } from '@/components/band'
 import { BandTitle } from '@/components/band-title'
-import { PageCard } from '@/components/page-card'
+import { Vignette } from '@/components/vignette'
 
 const ALSO_SEE = msg`À voir aussi`
 
@@ -17,11 +17,11 @@ export const PageKin = ({ pages }: PageKinProps) => {
   return (
     <Band className="reveal">
       <BandTitle>{i18n._(ALSO_SEE)}</BandTitle>
-      <ul className="grid gap-4 sm:grid-cols-2">
+      <ul className="grid gap-drop sm:grid-cols-2">
         {pages.map((page) => {
           return (
             <li key={page}>
-              <PageCard page={page} />
+              <Vignette page={page} />
             </li>
           )
         })}

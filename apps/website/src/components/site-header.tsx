@@ -27,7 +27,7 @@ export const SiteHeader = ({ page }: SiteHeaderProps) => {
 
   return (
     <>
-      <div className="border-b border-border/45">
+      <div className="ledge">
         <p className="mx-auto max-w-world px-4 py-2 text-aside text-band">
           {i18n._(INDEPENDENCE)}
         </p>
@@ -35,7 +35,7 @@ export const SiteHeader = ({ page }: SiteHeaderProps) => {
       <header className="mast sticky top-0 z-40">
         <nav
           aria-label={i18n._(SITE_NAV)}
-          className="mx-auto flex min-h-mast max-w-world flex-wrap items-center gap-x-7 gap-y-3 px-4 py-2.5"
+          className="relative mx-auto flex min-h-mast max-w-world flex-wrap items-center gap-x-7 gap-y-3 px-4 py-2.5"
         >
           <PageLink
             page="home"

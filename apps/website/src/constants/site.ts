@@ -11,3 +11,5 @@ export const ANKAMA_FORUM =
   'https://www.dofus-retro.com/fr/forum/12-suggestions-retours/2950-pourquoi-ankama-autorise-outils-crees-communaute'
 
 export const CONTENT_ANCHOR = 'contenu'
+
+export const FOLD_ANCHOR = 'ouverture'

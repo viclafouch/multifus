@@ -176,8 +176,11 @@ une image d'Ankama et suit la discipline du dossier.
 ## Choisir un décor
 
 Deux questions, dans cet ordre : **est-ce qu'il dit ce que la map fait**, et
-**est-ce qu'un texte s'y lit**. La table est dans
-`apps/desktop/src/constants/world.ts`, qui seule est vraie.
+**est-ce qu'un texte s'y lit**. Il y a deux tables, et chacune est vraie chez
+elle : `apps/desktop/src/constants/world.ts` donne le décor d'une map du
+logiciel, `apps/website/src/constants/decors.ts` celui d'une page du site. Cinq
+pages reprennent le décor de la map dont elles parlent, et les autres choisissent
+librement.
 
 **Les décors sombres vont aux maps qui parlent le plus.** `battle` et `workshop`
 sont les moins saturés, et ce sont AutoFocus, Tableau des runes et Paramètres

@@ -11,7 +11,7 @@ export const Point = ({ point, children }: PointProps) => {
   const { i18n } = useLingui()
 
   return (
-    <li className="flex max-w-tale flex-col gap-3 text-tale text-band">
+    <li className="pointed flex max-w-tale flex-col gap-3 text-tale text-band">
       <span>
         <strong className="font-medium text-cream">{i18n._(point.lead)}</strong>{' '}
         {i18n._(point.line)}

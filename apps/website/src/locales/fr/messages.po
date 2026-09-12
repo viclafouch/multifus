@@ -356,7 +356,7 @@ msgstr "GitHub pose un sceau sur chaque version publiée. Cette commande le vér
 msgid "Glissez Multifus dans vos Applications."
 msgstr "Glissez Multifus dans vos Applications."
 
-#: src/screens/home-screen.tsx
+#: src/constants/wording.ts
 msgid "Gratuit, code publié, paquet signé et notarisé."
 msgstr "Gratuit, code publié, paquet signé et notarisé."
 
@@ -680,6 +680,10 @@ msgstr "Les six mécanismes à l’œuvre dans le jeu"
 msgid "Les six mécanismes sont là."
 msgstr "Les six mécanismes sont là."
 
+#: src/components/loop-switch.tsx
+msgid "Lire"
+msgstr "Lire"
+
 #: src/components/language-offer.tsx
 msgid "Lire cette page en français"
 msgstr "Lire cette page en français"
@@ -779,6 +783,10 @@ msgstr "Pas de clic droit pour forcer l’ouverture."
 #: src/constants/rivals.ts
 msgid "Pas signé, mais l’attestation GitHub y est."
 msgstr "Pas signé, mais l’attestation GitHub y est."
+
+#: src/components/loop-switch.tsx
+msgid "Pause"
+msgstr "Pause"
 
 #: src/constants/bodies.ts
 msgid "Perdu de vue, il revient."

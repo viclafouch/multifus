@@ -2,7 +2,9 @@ import React from 'react'
 import type { PageId } from '@/@types/page'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
+import { SiteWorld } from '@/components/site-world'
 import { SkipLink } from '@/components/skip-link'
+import { PAGE_DECORS } from '@/constants/decors'
 import { CONTENT_ANCHOR } from '@/constants/site'
 
 type SiteShellProps = Readonly<{
@@ -11,9 +13,12 @@ type SiteShellProps = Readonly<{
 }>
 
 export const SiteShell = ({ page, children }: SiteShellProps) => {
+  const decor = PAGE_DECORS[page]
+
   return (
     <div className="flex min-h-screen flex-col">
       <SkipLink />
+      {decor === null ? null : <SiteWorld decor={decor} />}
       <SiteHeader page={page} />
       <main
         id={CONTENT_ANCHOR}

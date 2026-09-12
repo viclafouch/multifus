@@ -1,5 +1,8 @@
 import type { PageId } from '@/@types/page'
 import { LANGUAGES, SOURCE_LANGUAGE } from '@/constants/languages'
+import { LOOPS } from '@/constants/loops'
+import { PAGES } from '@/constants/pages'
+import { FOLD_ANCHOR } from '@/constants/site'
 import { PAGE_NAMES, PAGE_PROMISES, SITE_TITLE } from '@/constants/wording'
 import type { PathParams } from '@/helpers/page'
 import { addressOf } from '@/helpers/page'
@@ -25,6 +28,22 @@ export const alternatesOf = (page: PageId) => {
   ]
 }
 
+const POSTER_PRELOAD = {
+  rel: 'preload',
+  as: 'image',
+  fetchPriority: 'high'
+} as const
+
+const posterOf = (page: PageId) => {
+  const { loop } = PAGES[page]
+
+  if (loop === null) {
+    return []
+  }
+
+  return [{ ...POSTER_PRELOAD, href: LOOPS[loop].poster }]
+}
+
 export const headOf = ({ page, language }: PathParams) => {
   const speaker = SPEAKERS[language]
   const address = addressOf({ page, language })
@@ -46,7 +65,12 @@ export const headOf = ({ page, language }: PathParams) => {
       { property: 'og:locale', content: language },
       { name: 'twitter:card', content: 'summary' }
     ],
-    links: [{ rel: 'canonical', href: address }, ...alternatesOf(page)],
+    links: [
+      { rel: 'canonical', href: address },
+      { rel: 'expect', href: `#${FOLD_ANCHOR}`, blocking: 'render' },
+      ...posterOf(page),
+      ...alternatesOf(page)
+    ],
     scripts: [
       {
         type: 'application/ld+json',

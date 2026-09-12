@@ -356,7 +356,7 @@ msgstr "GitHub seals every published release. This command checks it:"
 msgid "Glissez Multifus dans vos Applications."
 msgstr "Drag Multifus into your Applications."
 
-#: src/screens/home-screen.tsx
+#: src/constants/wording.ts
 msgid "Gratuit, code publié, paquet signé et notarisé."
 msgstr "Free, published code, signed and notarised package."
 
@@ -680,6 +680,10 @@ msgstr "The six mechanisms at work in the game"
 msgid "Les six mécanismes sont là."
 msgstr "All six mechanisms are there."
 
+#: src/components/loop-switch.tsx
+msgid "Lire"
+msgstr "Play"
+
 #: src/components/language-offer.tsx
 msgid "Lire cette page en français"
 msgstr "Read this page in English"
@@ -779,6 +783,10 @@ msgstr "No right-click to force it open."
 #: src/constants/rivals.ts
 msgid "Pas signé, mais l’attestation GitHub y est."
 msgstr "Not signed, but the GitHub attestation is there."
+
+#: src/components/loop-switch.tsx
+msgid "Pause"
+msgstr "Pause"
 
 #: src/constants/bodies.ts
 msgid "Perdu de vue, il revient."
