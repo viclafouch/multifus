@@ -1,6 +1,7 @@
 import type { MessageDescriptor } from '@lingui/core'
 import { msg } from '@lingui/core/macro'
 import type { PageId } from '@/@types/page'
+import type { MENU_FEATURES } from '@/constants/pages'
 
 export const PAGE_NAMES = {
   home: msg`Multifus`,
@@ -31,6 +32,15 @@ export const PAGE_PROMISES = {
   journal: msg`Ce que chaque version a changé.`,
   ankama: msg`Ankama tolère les gestionnaires de fenêtres. Voici ses deux messages.`
 } as const satisfies Record<PageId, MessageDescriptor>
+
+export const MENU_HINTS = {
+  autoFocus: msg`La fenêtre qui joue passe devant.`,
+  wheel: msg`Une roue de têtes sous le pouce.`,
+  walk: msg`Un clic gauche, et la team suit.`,
+  runeTable: msg`Le poids des runes posé sur le jeu.`,
+  relay: msg`Ils vous suivent sur le téléphone.`,
+  quickReplies: msg`Un texte prêt part au raccourci.`
+} as const satisfies Record<(typeof MENU_FEATURES)[number], MessageDescriptor>
 
 export const SITE_TITLE = msg`Multifus, logiciel multicompte gratuit pour Dofus Retro`
 

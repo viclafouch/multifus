@@ -87,13 +87,10 @@ msgstr "Aucun fichier de Dofus n’est lu ni modifié, et sa mémoire n’est ja
 msgid "Aucun geste ne déplace deux personnages à la fois. C’est exactement la macro qu’Ankama dit bannissable."
 msgstr "Aucun geste ne déplace deux personnages à la fois. C’est exactement la macro qu’Ankama dit bannissable."
 
+#: src/constants/rivals.ts
 #: src/constants/wording.ts
 msgid "AutoFocus"
 msgstr "AutoFocus"
-
-#: src/constants/rivals.ts
-msgid "AutoFocus quand le jeu vous appelle"
-msgstr "AutoFocus quand le jeu vous appelle"
 
 #: src/constants/wording.ts
 msgid "Avant d’installer"
@@ -459,6 +456,10 @@ msgstr "Il se règle pour ne pas gêner"
 msgid "Il vous dit aussi quand il se tait."
 msgstr "Il vous dit aussi quand il se tait."
 
+#: src/constants/wording.ts
+msgid "Ils vous suivent sur le téléphone."
+msgstr "Ils vous suivent sur le téléphone."
+
 #: src/components/site-footer.tsx
 msgid "Images et vidéos © Ankama Games. Dofus Retro est une marque d’Ankama."
 msgstr "Images et vidéos © Ankama Games. Dofus Retro est une marque d’Ankama."
@@ -510,6 +511,10 @@ msgstr "La fenêtre du personnage qui doit jouer arrive devant vous avant que le
 #: src/constants/wording.ts
 msgid "La fenêtre du personnage qui joue passe devant toute seule."
 msgstr "La fenêtre du personnage qui joue passe devant toute seule."
+
+#: src/constants/wording.ts
+msgid "La fenêtre qui joue passe devant."
+msgstr "La fenêtre qui joue passe devant."
 
 #: src/constants/bodies.ts
 msgid "La forgemagie sans le deuxième écran"
@@ -614,6 +619,10 @@ msgstr "Le pied de page"
 #: src/constants/wording.ts
 msgid "Le poids des runes posé par-dessus le jeu, sans quitter l’atelier."
 msgstr "Le poids des runes posé par-dessus le jeu, sans quitter l’atelier."
+
+#: src/constants/wording.ts
+msgid "Le poids des runes posé sur le jeu."
+msgstr "Le poids des runes posé sur le jeu."
 
 #: src/constants/bodies.ts
 msgid "Le pseudo, la tête de classe et le bouton par personnage n’existent que sur la barre des tâches de Windows."
@@ -932,6 +941,10 @@ msgid "Tout ce que Multifus fait se lit sur GitHub, et vous pouvez le compiler v
 msgstr "Tout ce que Multifus fait se lit sur GitHub, et vous pouvez le compiler vous-même."
 
 #: src/constants/wording.ts
+msgid "Un clic gauche, et la team suit."
+msgstr "Un clic gauche, et la team suit."
+
+#: src/constants/wording.ts
 msgid "Un clic gauche, et toute la team marche au même endroit."
 msgstr "Un clic gauche, et toute la team marche au même endroit."
 
@@ -972,6 +985,10 @@ msgid "Un jour, dans le mauvais canal, devant tout le monde."
 msgstr "Un jour, dans le mauvais canal, devant tout le monde."
 
 #: src/constants/wording.ts
+msgid "Un texte prêt part au raccourci."
+msgstr "Un texte prêt part au raccourci."
+
+#: src/constants/wording.ts
 msgid "Un texte tout prêt part sous une combinaison de touches."
 msgstr "Un texte tout prêt part sous une combinaison de touches."
 
@@ -1006,6 +1023,10 @@ msgstr "Une phrase qui partirait seule finirait mal."
 #: src/constants/bodies.ts
 msgid "Une réponse rapide marche sur n’importe lequel de vos personnages."
 msgstr "Une réponse rapide marche sur n’importe lequel de vos personnages."
+
+#: src/constants/wording.ts
+msgid "Une roue de têtes sous le pouce."
+msgstr "Une roue de têtes sous le pouce."
 
 #: src/constants/ankama.ts
 msgid "Une tolérance n’est pas une autorisation."

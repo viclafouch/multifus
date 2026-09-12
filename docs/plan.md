@@ -6,7 +6,7 @@ se coche pas. C'est la seule liste : un sujet en cours ouvre son
 
 ## Publier la première version
 
-- [ ] Dessiner le logo de Multifus. [logo.md](./logo.md) porte le prompt et le test qui tranche, la silhouette noire à 16 pixels. Il remplace `packages/retro/src/assets/logo.png`, celui du scaffolder Tauri, que la clairière, l'écran À propos et la barre du site montrent tous les trois : un seul fichier à changer pour les trois. Et `apps/desktop/src-tauri/icons`, que Tauri tire à part
+- [ ] Tirer les icônes de `apps/desktop/src-tauri/icons` du logo. Tauri les prend à part, et elles portent encore celles du scaffolder
 - [ ] Créer un certificat **Developer ID Application** sur developer.apple.com, et l'exporter en `.p12`
 - [ ] Poser les huit secrets du workflow `release` dans les réglages du dépôt : `APPLE_CERTIFICATE` (le `.p12` en base64), `APPLE_CERTIFICATE_PASSWORD`, `APPLE_SIGNING_IDENTITY`, `APPLE_ID`, `APPLE_PASSWORD` (un mot de passe d'application), `APPLE_TEAM_ID`, `TAURI_SIGNING_PRIVATE_KEY`, `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` (vide)
 - [ ] Trancher les Mac Intel : le workflow ne compile que `aarch64-apple-darwin`, et le README annonce Apple Silicon. Ajouter la cible `x86_64-apple-darwin`, ou s'en tenir là. `/mac` l'écrit maintenant en toutes lettres dans ce que Multifus ne fait pas, donc la trancher retouche aussi `apps/website/src/constants/bodies.ts`

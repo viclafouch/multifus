@@ -186,7 +186,7 @@ export const TRAIT_NAMES = {
   windows: msg`Sur Windows`,
   wheel: PAGE_NAMES.wheel,
   walk: PAGE_NAMES.walk,
-  autoFocus: msg`AutoFocus quand le jeu vous appelle`,
+  autoFocus: msg`AutoFocus`,
   runeTable: PAGE_NAMES.runeTable,
   relay: PAGE_NAMES.relay,
   quickReplies: PAGE_NAMES.quickReplies,

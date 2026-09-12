@@ -4,7 +4,7 @@ import { useLingui } from '@lingui/react'
 import type { PageId } from '@/@types/page'
 import { PageLink } from '@/components/page-link'
 import { MENU_FEATURES } from '@/constants/pages'
-import { PAGE_NAMES, PAGE_PROMISES } from '@/constants/wording'
+import { MENU_HINTS, PAGE_NAMES } from '@/constants/wording'
 import { useDismiss } from '@/hooks/use-dismiss'
 
 const FEATURES = msg`Fonctionnalités`
@@ -43,7 +43,7 @@ export const FeaturesMenu = ({ page }: FeaturesMenuProps) => {
                   {i18n._(PAGE_NAMES[feature])}
                 </span>
                 <span className="text-mark text-band">
-                  {i18n._(PAGE_PROMISES[feature])}
+                  {i18n._(MENU_HINTS[feature])}
                 </span>
               </PageLink>
             </li>

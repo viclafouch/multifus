@@ -21,8 +21,6 @@ du jeu, le poids de chaque rune. Chacun a son README.
   qu'une matière manque plutôt que de l'inventer.
 - [docs/images.md](./docs/images.md) : d'où vient chaque image d'Ankama et ce que
   ses CGU permettent. À lire avant d'ajouter une image au dépôt.
-- [docs/logo.md](./docs/logo.md) : le prompt du logo, et le test qui tranche. Il
-  s'efface le jour où le logo existe.
 - [docs/concurrents.md](./docs/concurrents.md) : qui sont les autres et ce qu'ils
   font. [docs/audit-concurrents.md](./docs/audit-concurrents.md) dit ce que leur
   code fait, ce qu'on en prend et ce qu'on refuse, et `docs/concurrents.html`

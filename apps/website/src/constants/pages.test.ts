@@ -2,10 +2,12 @@ import { describe, expect, it } from 'vitest'
 import type { PageId } from '@/@types/page'
 import { LANGUAGES } from '@/constants/languages'
 import { MENU_FEATURES, PAGES, PAGE_IDS } from '@/constants/pages'
-import { PAGE_NAMES, PAGE_PROMISES } from '@/constants/wording'
+import { MENU_HINTS, PAGE_NAMES, PAGE_PROMISES } from '@/constants/wording'
 import { alphabetical } from '@/test-order'
 
 const SLUG_SHAPE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/u
+
+const HINT_LENGTH = 38
 
 const WITHOUT_HOME = PAGE_IDS.filter((page) => {
   return page !== 'home'
@@ -69,6 +71,14 @@ describe('la table des pages', () => {
     'ne met au menu que des fonctionnalités, %s',
     (page) => {
       expect(PAGES[page].kind).toBe('feature')
+    }
+  )
+
+  it.each(MENU_FEATURES)(
+    'tient la phrase du menu de %s en une ligne',
+    (page) => {
+      expect(MENU_HINTS[page].message).toBeDefined()
+      expect(MENU_HINTS[page].message?.length).toBeLessThanOrEqual(HINT_LENGTH)
     }
   )
 
