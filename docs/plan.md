@@ -15,7 +15,7 @@
 - [ ] Acheter `multifus.app`, sans « dofus » dedans, `HOST` le visant déjà
 - [ ] Écrire à `contact@ankama.com` le jour où le domaine est acheté
 - [ ] Créer le projet Vercel, racine `apps/website`, sur `dist/client`, sans réécriture attrape-tout
-- [ ] Tourner les trois boucles doublures avec `make-loop` : messages privés, réponses rapides, accueil
+- [ ] Tourner les trois boucles doublures avec `make-loop` : messages privés, réponses rapides, accueil, et recouper les deux aperçus qui en descendent
 - [ ] Réduire les sept boucles, onze mégaoctets, `walk-loop.mp4` en pesant 2,2 à lui seul
 - [ ] Reprendre les quatre phrases des Messages privés et des Réponses rapides, les vraies boucles tournées
 - [ ] Donner leur vraie adresse aux deux liens de `/telecharger`, par l'API GitHub lue avec `zod`

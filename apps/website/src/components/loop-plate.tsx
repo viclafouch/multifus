@@ -2,8 +2,9 @@ import type { LoopId } from '@/@types/page'
 import { LoopChip } from '@/components/loop-chip'
 import { LoopCurtain } from '@/components/loop-curtain'
 import { LOOPS } from '@/constants/loops'
+import { useMedia } from '@/hooks/use-media'
 import { usePlayer } from '@/hooks/use-player'
-import { useStill } from '@/hooks/use-still'
+import { STILL } from '@/lib/media'
 
 type LoopPlateProps = Readonly<{
   loop: LoopId
@@ -16,7 +17,7 @@ export const LoopPlate = ({
   caption,
   isAmbient = false
 }: LoopPlateProps) => {
-  const isStill = useStill()
+  const isStill = useMedia(STILL)
   const { video, isPlaying, toggle } = usePlayer({ isStill, isAuto: isAmbient })
   const { source, poster } = LOOPS[loop]
   const Toggle = isAmbient ? LoopChip : LoopCurtain

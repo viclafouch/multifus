@@ -72,7 +72,7 @@ export const HomeScreen = (_props: PageScreenProps) => {
           {MENU_FEATURES.map((feature) => {
             return (
               <li key={feature}>
-                <Vignette page={feature} />
+                <Vignette page={feature} hasPeek />
               </li>
             )
           })}
