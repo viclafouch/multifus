@@ -1,11 +1,12 @@
 import type { PageId } from '@/@types/page'
 import { LANGUAGES, SOURCE_LANGUAGE } from '@/constants/languages'
 import { LOOPS } from '@/constants/loops'
+import { OG_HEIGHT, OG_IMAGE, OG_WIDTH } from '@/constants/og'
 import { PAGES } from '@/constants/pages'
 import { FOLD_ANCHOR } from '@/constants/site'
 import { PAGE_NAMES, PAGE_PROMISES, SITE_TITLE } from '@/constants/wording'
+import { addressOf, ogAddressOf } from '@/helpers/address'
 import type { PathParams } from '@/helpers/page'
-import { addressOf } from '@/helpers/page'
 import { scriptOf } from '@/helpers/schema'
 import { SPEAKERS } from '@/lib/i18n'
 
@@ -51,11 +52,9 @@ export const titleOf = (name: string) => {
 export const headOf = ({ page, language }: PathParams) => {
   const speaker = SPEAKERS[language]
   const address = addressOf({ page, language })
+  const name = speaker._(PAGE_NAMES[page])
   const description = speaker._(PAGE_PROMISES[page])
-  const title =
-    page === 'home'
-      ? speaker._(SITE_TITLE)
-      : titleOf(speaker._(PAGE_NAMES[page]))
+  const title = page === 'home' ? speaker._(SITE_TITLE) : titleOf(name)
 
   return {
     meta: [
@@ -67,7 +66,12 @@ export const headOf = ({ page, language }: PathParams) => {
       { property: 'og:type', content: 'website' },
       { property: 'og:url', content: address },
       { property: 'og:locale', content: language },
-      { name: 'twitter:card', content: 'summary' }
+      { property: 'og:image', content: ogAddressOf({ page, language }) },
+      { property: 'og:image:type', content: OG_IMAGE.type },
+      { property: 'og:image:width', content: String(OG_WIDTH) },
+      { property: 'og:image:height', content: String(OG_HEIGHT) },
+      { property: 'og:image:alt', content: `${name}. ${description}` },
+      { name: 'twitter:card', content: 'summary_large_image' }
     ],
     links: [
       { rel: 'canonical', href: address },

@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { HOST } from '@/constants/site'
+import { HOST } from '@/constants/host'
 
 const ROBOTS = `User-agent: *
 Allow: /

@@ -5,8 +5,9 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "dev": "vite dev",
-    "build": "vite build",
+    "dev": "pnpm run draw:og && vite dev",
+    "build": "pnpm run draw:og && vite build",
+    "draw:og": "node scripts/draw-og.mjs",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
@@ -45,6 +46,7 @@
     "jsdom": "^30.0.1",
     "schema-dts": "^2.0.0",
     "tailwindcss": "^4.3.3",
+    "takumi-js": "^2.13.7",
     "typescript": "^7.0.2",
     "vite": "^8.3.0",
     "vitest": "^5.0.0"

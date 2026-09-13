@@ -1,8 +1,8 @@
 import type { Language } from '../@types/language.ts'
 import type { PageId } from '../@types/page.ts'
 import { LANGUAGES, SOURCE_LANGUAGE } from '../constants/languages.ts'
+import { OG_DIR, OG_IMAGE } from '../constants/og.ts'
 import { PAGES, PAGE_IDS } from '../constants/pages.ts'
-import { HOST } from '../constants/site.ts'
 
 export type PathParams = Readonly<{
   page: PageId
@@ -19,8 +19,12 @@ export const pathOf = ({ page, language }: PathParams) => {
   return language === SOURCE_LANGUAGE ? `/${slug}` : `/${language}/${slug}`
 }
 
-export const addressOf = ({ page, language }: PathParams) => {
-  return `${HOST}${pathOf({ page, language })}`
+export const ogPathOf = ({ page, language }: PathParams) => {
+  const slug = PAGES[page].slugs[language]
+
+  const name = slug === '' ? 'index' : slug
+
+  return `/${OG_DIR}/${language}/${name}.${OG_IMAGE.extension}`
 }
 
 type PageOfParams = Readonly<{

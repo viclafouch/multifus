@@ -1,4 +1,4 @@
-export const HOST = 'https://multifus.app'
+export const SITE_DOMAIN = 'multifus.app'
 
 export const REPOSITORY = 'https://github.com/viclafouch/multifus'
 

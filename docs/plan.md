@@ -20,7 +20,6 @@
 - [ ] Reprendre les quatre phrases des Messages privés et des Réponses rapides, les vraies boucles tournées
 - [ ] Donner leur vraie adresse aux deux liens de `/telecharger`, par l'API GitHub lue avec `zod`
 - [ ] Poser le crochet de déploiement Vercel dans le workflow `release`, après la publication
-- [ ] Dessiner l'image Open Graph sans fichier d'Ankama, la poser dans `headOf`, et rendre `summary_large_image`
 - [ ] Brancher `/journal` sur `apps/desktop/CHANGELOG.md`, que la première release écrira
 - [ ] Ouvrir `/journal` depuis À propos, et trancher si le panneau de mise à jour y renvoie
 - [ ] Poser Vercel Analytics, un seul événement, le clic sur « Télécharger » avec le système dedans

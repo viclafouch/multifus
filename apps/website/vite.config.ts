@@ -1,16 +1,12 @@
 import path from 'node:path'
+import { loadEnv } from 'vite'
 import { defineConfig } from 'vitest/config'
 import { lingui, linguiTransformerBabelPreset } from '@lingui/vite-plugin'
 import babel from '@rolldown/plugin-babel'
 import tailwindcss from '@tailwindcss/vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import react from '@vitejs/plugin-react'
-import {
-  HOST,
-  LOST_FILE,
-  LOST_PATH,
-  ROBOTS_PATH
-} from './src/constants/site.ts'
+import { LOST_FILE, LOST_PATH, ROBOTS_PATH } from './src/constants/site.ts'
 import { everyPath } from './src/helpers/page.ts'
 
 type StartPage = NonNullable<
@@ -30,42 +26,65 @@ const ASIDE_PAGES = [
   }
 ] as const satisfies readonly StartPage[]
 
-export default defineConfig({
-  plugins: [
-    tanstackStart({
-      prerender: {
-        enabled: true,
-        autoStaticPathsDiscovery: false,
-        crawlLinks: false,
-        failOnError: true
-      },
-      pages: [
-        ...everyPath().map((route) => {
-          return { path: route, prerender: { enabled: true } }
-        }),
-        ...ASIDE_PAGES
-      ],
-      sitemap: {
-        enabled: true,
-        host: HOST
-      }
-    }),
-    react({ compiler: true }),
-    tailwindcss(),
-    lingui({ failOnMissing: true, failOnCompileError: true }),
-    babel({ presets: [linguiTransformerBabelPreset()] })
-  ],
+export const SOURCE_ALIAS = {
+  '@': path.resolve(import.meta.dirname, './src')
+}
 
-  resolve: {
-    alias: {
-      '@': path.resolve(import.meta.dirname, './src')
+export const SOURCE_PLUGINS = [
+  react({ compiler: true }),
+  lingui({ failOnMissing: true, failOnCompileError: true }),
+  babel({ presets: [linguiTransformerBabelPreset()] })
+]
+
+const originOf = (mode: string) => {
+  const { VITE_SITE_URL } = loadEnv(mode, import.meta.dirname, 'VITE_')
+
+  try {
+    return new URL(VITE_SITE_URL).origin
+  } catch {
+    throw new Error(
+      `VITE_SITE_URL absente ou invalide pour le mode ${mode} : ajoutez-la au .env du site`
+    )
+  }
+}
+
+// oxlint-disable-next-line prefer-readonly-parameter-types -- la signature du rappel appartient à ConfigEnv de Vite
+export default defineConfig(({ mode }) => {
+  return {
+    plugins: [
+      tanstackStart({
+        prerender: {
+          enabled: true,
+          autoStaticPathsDiscovery: false,
+          crawlLinks: false,
+          failOnError: true
+        },
+        pages: [
+          ...everyPath().map((route) => {
+            return { path: route, prerender: { enabled: true } }
+          }),
+          ...ASIDE_PAGES
+        ],
+        sitemap: {
+          enabled: true,
+          host: originOf(mode)
+        }
+      }),
+      tailwindcss(),
+      ...SOURCE_PLUGINS
+    ],
+    resolve: {
+      alias: SOURCE_ALIAS
+    },
+    server: {
+      port: Number(new URL(originOf('development')).port),
+      strictPort: true
+    },
+    test: {
+      include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
+      environment: 'jsdom',
+      pool: 'vmThreads',
+      mockReset: true
     }
-  },
-
-  test: {
-    include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
-    environment: 'jsdom',
-    pool: 'vmThreads',
-    mockReset: true
   }
 })

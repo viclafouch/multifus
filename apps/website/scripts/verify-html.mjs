@@ -1,12 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import process from 'node:process'
-import {
-  FOLD_ANCHOR,
-  HOST,
-  LOST_FILE,
-  ROBOTS_PATH
-} from '../src/constants/site.ts'
+import { FOLD_ANCHOR, LOST_FILE, ROBOTS_PATH } from '../src/constants/site.ts'
 
 const CLIENT = join(import.meta.dirname, '..', 'dist', 'client')
 
@@ -14,11 +9,15 @@ const SITEMAP = readFileSync(join(CLIENT, 'sitemap.xml'), 'utf8')
 
 const SUSPENSE_ERROR = '<!--$!-->'
 
-const addresses = [...SITEMAP.matchAll(/<loc>([^<]+)<\/loc>/gu)].map(
-  (found) => {
-    return new URL(found[1]).pathname
-  }
-)
+const located = [...SITEMAP.matchAll(/<loc>([^<]+)<\/loc>/gu)].map((found) => {
+  return new URL(found[1])
+})
+
+const addresses = located.map((url) => {
+  return url.pathname
+})
+
+const host = located[0]?.origin
 
 const fileOf = (pathname) => {
   return pathname === '/'
@@ -33,6 +32,8 @@ const complain = (pathname, what) => {
 }
 
 const SCHEMA = /<script type="application\/ld\+json">(.+?)<\/script>/su
+
+const OG_IMAGE = /<meta[^>]*property="og:image"[^>]*content="([^"]+)"/u
 
 const checkRendered = (pathname, html) => {
   const body = html.slice(html.indexOf('<body>'))
@@ -93,6 +94,18 @@ for (const pathname of addresses) {
     complain(pathname, 'aucune adresse canonique')
   }
 
+  const drawn = OG_IMAGE.exec(html)
+
+  if (drawn === null) {
+    complain(pathname, 'aucune image Open Graph')
+  } else if (!existsSync(join(CLIENT, new URL(drawn[1]).pathname))) {
+    complain(pathname, `l’image ${drawn[1]} n’est pas livrée`)
+  }
+
+  if (!html.includes('content="summary_large_image"')) {
+    complain(pathname, 'la carte Twitter n’est pas en grand format')
+  }
+
   if (!/<html lang="(?:fr|en|es)">/u.test(html)) {
     complain(pathname, 'aucune langue sur la balise html')
   }
@@ -147,7 +160,7 @@ for (const name of missing) {
 if (!missing.includes(ROBOTS_PATH)) {
   const robots = readFileSync(join(CLIENT, ROBOTS_PATH), 'utf8')
 
-  if (!robots.includes(`Sitemap: ${HOST}/sitemap.xml`)) {
+  if (!robots.includes(`Sitemap: ${host}/sitemap.xml`)) {
     complain(ROBOTS_PATH, 'aucun renvoi vers le sitemap')
   }
 }

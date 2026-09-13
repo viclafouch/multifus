@@ -9,6 +9,8 @@ import village from '@multifus/ankama/images/village.webp'
 import workshop from '@multifus/ankama/images/workshop.webp'
 import type { PageId } from '@/@types/page'
 
+const DECOR_DIR = '@multifus/ankama/images'
+
 export const PAGE_DECORS = {
   home: village,
   autoFocus: battle,
@@ -23,3 +25,18 @@ export const PAGE_DECORS = {
   journal: null,
   ankama: null
 } as const satisfies Record<PageId, string | null>
+
+export const OG_DECOR_FILES = {
+  home: `${DECOR_DIR}/village.webp`,
+  autoFocus: `${DECOR_DIR}/battle.webp`,
+  wheel: `${DECOR_DIR}/camp.webp`,
+  walk: `${DECOR_DIR}/forest.webp`,
+  runeTable: `${DECOR_DIR}/workshop.webp`,
+  relay: `${DECOR_DIR}/pen.webp`,
+  quickReplies: `${DECOR_DIR}/harbour.webp`,
+  mac: `${DECOR_DIR}/village.webp`,
+  comparison: `${DECOR_DIR}/arena.webp`,
+  download: `${DECOR_DIR}/dolmen.webp`,
+  journal: `${DECOR_DIR}/dolmen.webp`,
+  ankama: `${DECOR_DIR}/village.webp`
+} as const satisfies Record<PageId, string>

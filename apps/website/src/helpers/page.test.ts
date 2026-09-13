@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { LANGUAGES } from '@/constants/languages'
+import { OG_IMAGE } from '@/constants/og'
 import { PAGES, PAGE_IDS } from '@/constants/pages'
-import { everyPath, pageOf, pathOf } from '@/helpers/page'
+import { everyPath, ogPathOf, pageOf, pathOf } from '@/helpers/page'
 
 describe('pathOf', () => {
   it('laisse le français à la racine', () => {
@@ -54,6 +55,38 @@ describe('pageOf', () => {
         expect(pageOf({ slug, language })).toBe(page)
       }
     }
+  })
+})
+
+describe('ogPathOf', () => {
+  const drawn = OG_IMAGE.extension
+
+  it('range l’image sous sa langue', () => {
+    expect(ogPathOf({ page: 'wheel', language: 'fr' })).toBe(
+      `/og/fr/roue-des-personnages.${drawn}`
+    )
+    expect(ogPathOf({ page: 'wheel', language: 'es' })).toBe(
+      `/og/es/rueda-de-personajes.${drawn}`
+    )
+  })
+
+  it('nomme les trois accueils', () => {
+    expect(ogPathOf({ page: 'home', language: 'fr' })).toBe(
+      `/og/fr/index.${drawn}`
+    )
+    expect(ogPathOf({ page: 'home', language: 'en' })).toBe(
+      `/og/en/index.${drawn}`
+    )
+  })
+
+  it('donne un fichier par page et par langue', () => {
+    const files = LANGUAGES.flatMap((language) => {
+      return PAGE_IDS.map((page) => {
+        return ogPathOf({ page, language })
+      })
+    })
+
+    expect(new Set(files).size).toBe(PAGE_IDS.length * LANGUAGES.length)
   })
 })
 

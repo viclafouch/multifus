@@ -35,5 +35,12 @@ apps/website/.tanstack
 apps/website/src/routeTree.gen.ts
 apps/website/src/locales/*/messages.js
 
+# Drawn by scripts/draw-og.mjs
+apps/website/public/og
+
+# Local env overrides, never the committed .env
+.env.local
+.env.*.local
+
 # Turborepo
 .turbo

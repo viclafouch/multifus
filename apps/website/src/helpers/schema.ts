@@ -7,13 +7,14 @@ import type {
 } from 'schema-dts'
 import type { Language } from '@/@types/language'
 import type { LoopId, PageId } from '@/@types/page'
+import { HOST } from '@/constants/host'
 import { LOOPS } from '@/constants/loops'
 import { PAGES } from '@/constants/pages'
-import { HOST, RELEASES } from '@/constants/site'
+import { RELEASES } from '@/constants/site'
 import { SYSTEM_IDS, SYSTEM_VERSIONS } from '@/constants/systems'
 import { PAGE_NAMES, PAGE_PROMISES } from '@/constants/wording'
+import { addressOf } from '@/helpers/address'
 import type { PathParams } from '@/helpers/page'
-import { addressOf } from '@/helpers/page'
 import { SPEAKERS } from '@/lib/i18n'
 
 type Addressed<Node extends JsonLdObject> = WithContext<Node> &
