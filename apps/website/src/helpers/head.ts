@@ -44,6 +44,10 @@ const posterOf = (page: PageId) => {
   return [{ ...POSTER_PRELOAD, href: LOOPS[loop].poster }]
 }
 
+export const titleOf = (name: string) => {
+  return `${name} · Multifus`
+}
+
 export const headOf = ({ page, language }: PathParams) => {
   const speaker = SPEAKERS[language]
   const address = addressOf({ page, language })
@@ -51,7 +55,7 @@ export const headOf = ({ page, language }: PathParams) => {
   const title =
     page === 'home'
       ? speaker._(SITE_TITLE)
-      : `${speaker._(PAGE_NAMES[page])} · Multifus`
+      : titleOf(speaker._(PAGE_NAMES[page]))
 
   return {
     meta: [

@@ -40,7 +40,12 @@ export const Route = createRootRoute({
         { charSet: 'utf8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' }
       ],
-      links: [{ rel: 'stylesheet', href: styles }]
+      links: [
+        { rel: 'icon', href: '/favicon.ico', sizes: '48x48 32x32 16x16' },
+        { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
+        { rel: 'manifest', href: '/site.webmanifest' },
+        { rel: 'stylesheet', href: styles }
+      ]
     }
   },
   component: RootDocument

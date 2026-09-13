@@ -2,6 +2,14 @@ export const HOST = 'https://multifus.app'
 
 export const REPOSITORY = 'https://github.com/viclafouch/multifus'
 
+export const AUTHOR = 'https://x.com/TrustedSheriff'
+
+export const LOST_PATH = '/404'
+
+export const LOST_FILE = '/404.html'
+
+export const ROBOTS_PATH = '/robots.txt'
+
 export const RELEASES = `${REPOSITORY}/releases/latest`
 
 export const ANKAMA_POST =

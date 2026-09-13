@@ -288,6 +288,10 @@ msgstr "Dofus Retro logs out a character who does nothing, and the relay says so
 msgid "Échange, groupe, guilde, message privé, défi, craft, percepteur attaqué : sept appels, et pas un de plus."
 msgstr "Trade, party, guild, private message, challenge, craft, tax collector attacked: seven calls, and not one more."
 
+#: src/components/site-footer.tsx
+msgid "Écrire à l’auteur"
+msgstr "Write to the author"
+
 #: src/constants/bodies.ts
 msgid "Elle ignore vos personnages déconnectés."
 msgstr "It ignores your offline characters."

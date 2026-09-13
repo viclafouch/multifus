@@ -288,6 +288,10 @@ msgstr "Dofus Retro desconecta a un personaje que no hace nada, y el relevo lo a
 msgid "Échange, groupe, guilde, message privé, défi, craft, percepteur attaqué : sept appels, et pas un de plus."
 msgstr "Intercambio, grupo, gremio, mensaje privado, desafío, oficio, recaudador atacado: siete llamadas, y ni una más."
 
+#: src/components/site-footer.tsx
+msgid "Écrire à l’auteur"
+msgstr "Escribir al autor"
+
 #: src/constants/bodies.ts
 msgid "Elle ignore vos personnages déconnectés."
 msgstr "Ignora a tus personajes desconectados."

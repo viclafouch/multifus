@@ -23,13 +23,12 @@ versions déjà installées.
 ## Ouvrir le site
 
 Le socle, le dessin et le texte sont posés : douze pages prérendues dans trois
-langues, une par adresse. [apps/website/README.md](../apps/website/README.md) dit
-comment il tient. Restent la mise en ligne, trois vidéos qui mentent et deux
-défauts vus.
+langues, une par adresse. Restent la mise en ligne, trois vidéos qui mentent et
+deux défauts vus.
 
 - [ ] Acheter `multifus.app`. Libre au 11 septembre 2026, aucun serveur de nom sur `.app`, `.io`, `.gg`, `.net` ni `.org`. Pas de `.fr`, le site parle trois langues. Jamais « dofus » dans le domaine, l'article 13.3 des CGU demandant une autorisation écrite pour les marques. `HOST` le vise déjà dans `apps/website/src/constants/site.ts`
 - [ ] Écrire à `contact@ankama.com` le jour où le domaine est acheté, pour un logiciel et un site gratuits et ouverts. Un site existant se défend mieux qu'un projet
-- [ ] Créer le projet Vercel, racine `apps/website`, et vérifier qu'il sert bien `dist/client`
+- [ ] Créer le projet Vercel, racine `apps/website`, et vérifier qu'il sert bien `dist/client`. Aucune réécriture attrape-tout : elle avalerait le `404.html`, que Vercel sert tout seul depuis la racine de la sortie
 - [ ] Tourner les trois boucles qui sont aujourd'hui des doublures, avec `make-loop` : les messages privés, les réponses rapides, et le montage de l'accueil. Les fichiers existent et mentent, `relay-loop.mp4` montrant l'AutoFocus, `quick-replies-loop.mp4` le Déplacement rapide, `home-loop.mp4` la roue. Chacune porte aussi son affiche, réencodée et non copiée, et sa durée en secondes est à corriger dans `constants/loops.ts` des deux côtés
 - [ ] Reprendre les quatre phrases neuves du logiciel, la description et la légende des deux vidéos des Messages privés et des Réponses rapides : elles racontent ce que la vraie boucle montrera, et la doublure montre autre chose
 - [ ] Donner leur vraie adresse aux deux liens de `/telecharger`, le bouton et la ligne qui offre l'autre système. Ils pointent tous les deux sur `releases/latest`, la page, faute de savoir le nom du fichier : c'est la lecture de l'API GitHub à la compilation qui la leur donnera, et `RELEASES` est l'unique endroit à reprendre. C'est là que `zod` entre, et pas avant : une réponse d'API qu'on lit sans la valider casse le build en silence le jour où GitHub change un champ
@@ -42,3 +41,38 @@ défauts vus.
 - [ ] Revérifier dans le code des concurrents les quatre notes à moitié du comparatif, déduites du tableau de [concurrents.md](./concurrents.md) et non lues ligne à ligne : le tableau des runes de Retro Toolbox, le rangement de Dosoft, et les compositions d'équipe de Dosoft et de Retro Toolbox. Les deux autres sont sourcées, l'attestation de Focus Retro et la licence de Retro Toolbox. La page promet une case lue dans le code, donc une note qui ne l'est pas est exactement ce qu'elle reproche aux autres
 - [ ] Ouvrir le site dans Firefox, qui ne connaît pas `animation-timeline` : les replis sont écrits, ils n'ont pas été vus tourner. Le fondu entre deux pages, lui, y marche depuis Firefox 144, la navigation se faisant dans un seul document
 - [ ] Relire l'anglais et l'espagnol une fois le français figé. Les trois catalogues sont pleins, et ils portent le corps des sept fonctionnalités : c'est du texte suivi, et il n'a été relu par personne
+
+## Les vingt du site
+
+La liste reçue, mot pour mot :
+
+> - Custom 404 page
+> - Meta title on every page
+> - Meta description on every page
+> - CTA above the fold
+> - Favicon set
+> - robots.txt file
+> - sitemap.xml
+> - Open Graph image
+> - Alt text on every image
+> - Mobile breakpoints
+> - Sticky mobile CTA
+> - Loading states
+> - Form error states
+> - Thank you page
+> - Privacy policy page
+> - Terms and conditions
+> - Cookie banner
+> - Analytics installed
+> - Real contact address
+> - Compressed images
+
+Douze sont faites. Trois ne veulent rien dire ici, rien ne se chargeant après le
+rendu et aucun formulaire n'existant. L'image Open Graph et Vercel Analytics ont
+leur ligne plus haut. Restent :
+
+- [ ] Trancher la langue de la page perdue. Vercel ne sert qu'un `404.html`, donc il est en français, et un visiteur qui se trompe d'adresse sous `/en` ou `/es` tombe dessus. Le routeur, lui, la rend dans la bonne langue dès que le paquet est chargé : reste à savoir si le document livré doit se corriger tout seul à l'arrivée
+- [ ] Trancher les mentions légales, une page ou rien : ce que le site garde du visiteur, le souvenir de la proposition de langue en `localStorage` et ce que Vercel Analytics compte sans cookie, et à quelles conditions le logiciel se donne, le MIT étant déjà dans le dépôt
+- [ ] Trancher le bandeau de cookies. Le site n'en pose aucun et Vercel Analytics n'en pose pas : la question se rouvre le jour où un outil en pose un
+- [ ] Réduire les sept boucles, onze mégaoctets à elles seules, `walk-loop.mp4` pesant 2,2 Mo à lui tout seul. `make-loop` sait les réencoder, et c'est à faire en même temps que les trois doublures à tourner
+- [ ] Repasser les vingt une fois le site en ligne, sur l'adresse réelle et sur un vrai téléphone : les icônes dans l'onglet et sur l'écran d'accueil d'un iPhone, le `robots.txt` servi, et une adresse inventée qui tombe bien sur notre 404

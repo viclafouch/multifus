@@ -1,7 +1,12 @@
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import process from 'node:process'
-import { FOLD_ANCHOR } from '../src/constants/site.ts'
+import {
+  FOLD_ANCHOR,
+  HOST,
+  LOST_FILE,
+  ROBOTS_PATH
+} from '../src/constants/site.ts'
 
 const CLIENT = join(import.meta.dirname, '..', 'dist', 'client')
 
@@ -29,14 +34,28 @@ const complain = (pathname, what) => {
 
 const SCHEMA = /<script type="application\/ld\+json">(.+?)<\/script>/su
 
-for (const pathname of addresses) {
-  const html = readFileSync(fileOf(pathname), 'utf8')
+const checkRendered = (pathname, html) => {
   const body = html.slice(html.indexOf('<body>'))
-  const marked = SCHEMA.exec(html)
 
   if (body.includes(SUSPENSE_ERROR)) {
     complain(pathname, 'le rendu serveur a échoué, le corps est vide')
   }
+
+  if (!body.includes('<h1')) {
+    complain(pathname, 'aucun titre dans le HTML livré')
+  }
+
+  if (!html.includes('name="description"')) {
+    complain(pathname, 'aucune description')
+  }
+
+  return body
+}
+
+for (const pathname of addresses) {
+  const html = readFileSync(fileOf(pathname), 'utf8')
+  const body = checkRendered(pathname, html)
+  const marked = SCHEMA.exec(html)
 
   if (marked === null) {
     complain(pathname, 'aucun balisage schema.org')
@@ -52,10 +71,6 @@ for (const pathname of addresses) {
         complain(pathname, `une fiche ${node['@type']} hors de schema.org`)
       }
     }
-  }
-
-  if (!body.includes('<h1')) {
-    complain(pathname, 'aucun titre dans le HTML livré')
   }
 
   if (!html.includes('rel="expect"')) {
@@ -109,6 +124,36 @@ for (const pathname of addresses) {
 
 if (addresses.length === 0) {
   complain('sitemap.xml', 'aucune adresse')
+}
+
+const SERVED = [
+  ROBOTS_PATH,
+  LOST_FILE,
+  '/favicon.ico',
+  '/apple-touch-icon.png',
+  '/icon-192.png',
+  '/icon-512.png',
+  '/site.webmanifest'
+]
+
+const missing = SERVED.filter((name) => {
+  return !existsSync(join(CLIENT, name))
+})
+
+for (const name of missing) {
+  complain(name, 'absent du paquet livré')
+}
+
+if (!missing.includes(ROBOTS_PATH)) {
+  const robots = readFileSync(join(CLIENT, ROBOTS_PATH), 'utf8')
+
+  if (!robots.includes(`Sitemap: ${HOST}/sitemap.xml`)) {
+    complain(ROBOTS_PATH, 'aucun renvoi vers le sitemap')
+  }
+}
+
+if (!missing.includes(LOST_FILE)) {
+  checkRendered(LOST_FILE, readFileSync(join(CLIENT, LOST_FILE), 'utf8'))
 }
 
 if (complaints.length > 0) {

@@ -6,3 +6,6 @@ fonctionnalité qui demande une carte bancaire n'existe pas.
 
 Le site tient trois instances de Lingui, une par langue, parce qu'il prérend les
 trois en parallèle.
+
+Ce que tu connais de TanStack Start est faux, ce lien est la doc officielle :
+https://tanstack.com/start/latest/llms.txt

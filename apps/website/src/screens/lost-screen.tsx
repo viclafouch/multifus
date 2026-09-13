@@ -4,9 +4,9 @@ import { Band } from '@/components/band'
 import { PageLink } from '@/components/page-link'
 import { SiteShell } from '@/components/site-shell'
 
-const LOST_TITLE = msg`Cette page n’existe pas`
+export const LOST_TITLE = msg`Cette page n’existe pas`
 
-const LOST_PROMISE = msg`L’adresse est peut-être mal recopiée, ou la page a changé de nom. L’accueil vous remet sur le chemin.`
+export const LOST_PROMISE = msg`L’adresse est peut-être mal recopiée, ou la page a changé de nom. L’accueil vous remet sur le chemin.`
 
 const BACK_HOME = msg`Retour à l’accueil`
 

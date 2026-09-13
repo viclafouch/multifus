@@ -2,12 +2,14 @@ import { msg } from '@lingui/core/macro'
 import { useLingui } from '@lingui/react'
 import type { PageId } from '@/@types/page'
 import { PageLink } from '@/components/page-link'
-import { REPOSITORY } from '@/constants/site'
+import { AUTHOR, REPOSITORY } from '@/constants/site'
 import { PAGE_NAMES } from '@/constants/wording'
 
 const ANKAMA_CREDIT = msg`Images et vidéos © Ankama Games. Dofus Retro est une marque d’Ankama.`
 
 const FOOTER_NAV = msg`Le pied de page`
+
+const WRITE_TO_AUTHOR = msg`Écrire à l’auteur`
 
 const FOOTER_PAGES = [
   'mac',
@@ -45,6 +47,14 @@ export const SiteFooter = () => {
                   className="sighted transition-colors hover:text-cream"
                 >
                   GitHub
+                </a>
+              </li>
+              <li>
+                <a
+                  href={AUTHOR}
+                  className="sighted transition-colors hover:text-cream"
+                >
+                  {i18n._(WRITE_TO_AUTHOR)}
                 </a>
               </li>
             </ul>
