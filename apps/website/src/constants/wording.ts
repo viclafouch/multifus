@@ -42,6 +42,10 @@ export const MENU_HINTS = {
   quickReplies: msg`Un texte prêt part au raccourci.`
 } as const satisfies Record<(typeof MENU_FEATURES)[number], MessageDescriptor>
 
+export const LOOP_PLAY = msg`Lire`
+
+export const LOOP_HOLD = msg`Pause`
+
 export const SITE_TITLE = msg`Multifus, logiciel multicompte gratuit pour Dofus Retro`
 
 export const INDEPENDENCE = msg`Projet indépendant, sans lien avec Ankama.`

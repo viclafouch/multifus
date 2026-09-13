@@ -11,7 +11,7 @@ export const Blazon = ({ page }: BlazonProps) => {
   const { i18n } = useLingui()
 
   return (
-    <div className="scrim flex flex-col gap-3.5 p-6 sm:absolute sm:inset-x-0 sm:bottom-0 sm:p-10">
+    <div className="scrim flex flex-col gap-3.5 p-6 sm:pointer-events-none sm:absolute sm:inset-x-0 sm:bottom-0 sm:p-10">
       <h1 className="carved limelight text-blazon">
         {i18n._(PAGE_NAMES[page])}
       </h1>

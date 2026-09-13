@@ -684,7 +684,7 @@ msgstr "Les six mécanismes à l’œuvre dans le jeu"
 msgid "Les six mécanismes sont là."
 msgstr "Les six mécanismes sont là."
 
-#: src/components/loop-switch.tsx
+#: src/constants/wording.ts
 msgid "Lire"
 msgstr "Lire"
 
@@ -788,7 +788,7 @@ msgstr "Pas de clic droit pour forcer l’ouverture."
 msgid "Pas signé, mais l’attestation GitHub y est."
 msgstr "Pas signé, mais l’attestation GitHub y est."
 
-#: src/components/loop-switch.tsx
+#: src/constants/wording.ts
 msgid "Pause"
 msgstr "Pause"
 

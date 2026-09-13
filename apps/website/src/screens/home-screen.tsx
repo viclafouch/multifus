@@ -59,7 +59,7 @@ export const HomeScreen = (_props: PageScreenProps) => {
           <DownloadCall className="surface-3" />
         </div>
         <figure className="surface-4 flex flex-col items-stretch gap-3">
-          <LoopPlate loop="home" caption={i18n._(LOOP_CAPTION)} />
+          <LoopPlate loop="home" caption={i18n._(LOOP_CAPTION)} isAmbient />
           <figcaption className="engraved text-aside text-khaki">
             {i18n._(LOOP_CAPTION)}
           </figcaption>

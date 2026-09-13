@@ -1,6 +1,11 @@
 import React from 'react'
 
-export const usePlayer = (isStill: boolean) => {
+type PlayerParams = Readonly<{
+  isStill: boolean
+  isAuto: boolean
+}>
+
+export const usePlayer = ({ isStill, isAuto }: PlayerParams) => {
   const video = React.useRef<HTMLVideoElement>(null)
   const [isPlaying, setIsPlaying] = React.useState(false)
 
@@ -16,7 +21,7 @@ export const usePlayer = (isStill: boolean) => {
 
     if (isStill) {
       element?.pause()
-    } else {
+    } else if (isAuto) {
       element?.play().catch(handlePlayback)
     }
 
@@ -24,7 +29,7 @@ export const usePlayer = (isStill: boolean) => {
       element?.removeEventListener('play', handlePlayback)
       element?.removeEventListener('pause', handlePlayback)
     }
-  }, [isStill])
+  }, [isStill, isAuto])
 
   const toggle = () => {
     const element = video.current
