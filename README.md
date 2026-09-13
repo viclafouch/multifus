@@ -1,97 +1,42 @@
 # Multifus
 
-Gestionnaire de fenêtres pour **Dofus Retro** en multicompte, sur macOS et Windows.
+A multi-account window manager for Dofus Retro, on macOS and Windows.
 
-Une notification arrive dans le jeu, Multifus met devant vous la fenêtre du personnage concerné. On le lance, on l'oublie.
+Downloads, features and documentation: [multifus.app](https://multifus.app).
 
-## Ce qu'il sait faire
+## Architecture
 
-- [x] Ramener une fenêtre au premier plan sur sept événements : combat, échange, groupe, craft, message privé, défi, percepteur
-- [x] Deux raccourcis pour passer au personnage suivant ou précédent, dans l'ordre que vous rangez vous-même
-- [x] Un raccourci pour exclure un personnage : il sort du défilement, et sa fenêtre ne passe plus devant sur une notification
-- [x] Un sexe par personnage, et deux sigils qui excluent ou réintègrent tous vos hommes, ou toutes vos femmes, d'un clic
-- [x] Un raccourci qui vous ramène sur votre personnage principal, d'où que vous veniez dans le jeu
-- [x] Une touche par personnage si vous voulez, et sa fenêtre passe devant. Elle ne vous est prise qu'au-dessus du jeu : dans votre navigateur ou votre éditeur, elle reste la vôtre et écrit ce qu'elle a toujours écrit. Sur Windows, une touche de fonction se pose seule : F1 sur l'Eniripsa, F2 sur le Sacrieur
-- [x] Le Déplacement rapide : chaque clic gauche passe au personnage suivant, et vous emmenez toute votre team d'une map à l'autre sans lâcher la souris. Une bannière dit sur qui vous venez d'arriver
-- [x] La roue des personnages : maintenez `Ctrl+Maj+W` dans le jeu, votre team s'ouvre en disque au milieu de l'écran. Visez une tête de classe, lâchez, sa fenêtre passe devant
-- [x] Le tableau des runes : une combinaison pose les poids des runes par-dessus la fenêtre du jeu, à la taille et à la transparence que vous voulez. Vous le posez où vous voulez, il y revient au lancement suivant
-- [x] Des réponses rapides : une combinaison colle un texte tout prêt dans le chat, la touche Entrée reste la vôtre
-- [x] Vos messages privés sur votre téléphone par Telegram, tant que vous êtes loin du clavier
-- [x] Un client qui s'ouvre s'agrandit tout seul, une seule fois
-- [x] Un raccourci, ou un bouton, qui agrandit d'un coup les clients déjà ouverts
-- [x] Une fenêtre de client titrée du seul pseudo, six clients lisibles d'un coup d'œil dans la barre des tâches (Windows)
-- [x] Une classe par personnage, et la fenêtre du client porte le portrait de sa classe dans la barre des tâches (Windows)
-- [x] Une icône de barre système qui liste les personnages connectés, un clic ramène la fenêtre
-- [x] Un démarrage à l'ouverture de session
-- [x] Un journal qui se copie d'un clic, pour le jour où rien ne se passe
-- [x] Une mise à jour proposée quand une version sort, à installer d'un clic
+A pnpm workspace driven by Turborepo.
 
-Le portrait de classe mis à part, ces réglages sont décochés par défaut. Fermer la fenêtre ne quitte pas Multifus, qui continue dans la barre système ; on le quitte par le menu de son icône.
-
-## Compatibilité
-
-| Système             | Version minimale                    | État                     |
-| ------------------- | ----------------------------------- | ------------------------ |
-| macOS               | 12.4 Monterey, Apple Silicon        | Vérifié sur macOS 26     |
-| Windows             | 10, mise à jour 1709 d'octobre 2017 | En cours de vérification |
-| Linux, iOS, Android |                                     | Hors périmètre           |
-
-Le plancher de macOS est celui de la webview, pas celui du Rust. L'écran est peint avec `@layer`, que Safari ne connaît qu'à partir de 15.4, livré avec macOS 12.4 : en dessous, la feuille de style tombe en entier et la fenêtre s'affiche nue. Tout ce qui est plus récent a son repli, une couleur `color-mix()` retombant sur sa version opaque, et `vite.config.ts` tient ce plancher dans `build.target`.
-
-Sur macOS, Multifus demande l'**Accessibilité**, et il ne peut rien faire sans elle : ni lire le titre des fenêtres, ni les amener au premier plan, ni entendre les notifications du jeu. L'écran d'accueil mène au bon panneau des Réglages Système.
-
-Sur macOS toujours, gardez vos clients Dofus Retro en **fenêtre agrandie**, jamais en plein écran. Le bouton vert donne un bureau à chaque client : chaque bascule fait alors glisser tout l'écran, et le cœur avec. La bannière, elle, ne peut plus se poser par-dessus. `⌥` + clic sur ce même bouton vert agrandit la fenêtre sans passer en plein écran, et c'est ce que Multifus fait à l'ouverture d'un client.
-
-Sur Windows, il demande l'**accès aux notifications**. La mise à jour 1709 est le plancher, c'est elle qui a apporté l'écoute des notifications.
-
-Dans les deux cas, les notifications en arrière-plan doivent être activées dans le jeu, par Options puis Général. Sur macOS, les bannières de Dofus doivent rester visibles dans les réglages du système, faute de quoi Multifus n'a rien à lire.
-
-Le portrait de classe et le bouton par personnage dans la barre des tâches sont réservés à Windows : on ne repeint pas le Dock d'une autre application. Le médaillon et la modale, eux, marchent partout.
-
-Le titre court est le seul autre réglage réservé à un système : le client de macOS garde son titre quoi qu'on lui demande, et l'interrupteur y est grisé.
-
-## Installation
-
-Sur macOS, télécharger le DMG de la [dernière release](https://github.com/viclafouch/multifus/releases/latest) et glisser Multifus dans les Applications. Le paquet est signé et notarisé par Apple, il s'ouvre donc sans avertissement. Les versions suivantes se proposent d'elles-mêmes, depuis l'écran À propos et depuis la barre système.
-
-Chaque paquet publié porte une attestation de provenance de GitHub, qui dit de quel commit et de quel workflow il sort. Pour la vérifier avant d'installer :
-
-```sh
-gh attestation verify <fichier> --repo viclafouch/multifus
+```
+apps/
+  desktop/    Tauri application, React and TypeScript front end, Rust back end
+  website/    TanStack Start website, prerendered and served by Vercel
+packages/
+  ankama/     Ankama artwork, excluded from the MIT licence
+  retro/      Shared styles and components
+  runes/      Rune weights from the game
 ```
 
-## Ce qu'il ne fait pas
+## Requirements
 
-Multifus ne lit pas la mémoire du client, ne touche à aucun de ses paquets, ne simule aucune action de jeu, n'empêche pas la déconnexion pour inactivité et ne modifie aucun fichier. Il gère des fenêtres et lit des notifications système, rien d'autre. Les outils de type macro sont interdits par Ankama et restent hors de ce projet.
+- [Node](https://nodejs.org) 24
+- [pnpm](https://pnpm.io/installation) 12, or `corepack enable`
+- [Rust](https://www.rust-lang.org/tools/install) stable, for `apps/desktop`
+- The [Tauri prerequisites](https://tauri.app/start/prerequisites/) of your system
 
-Ankama a posé la limite deux fois, en ces mots :
+## Getting started
 
-> L'utilisation d'un logiciel tiers est tolérée UNIQUEMENT s'il ne modifie/n'interagit pas avec les fichiers du jeu ou le jeu en lui-même. [...] Il est également important de distinguer un outil de gestion de fenêtre d'autres outils tiers comme les macros, ces dernières sont strictement interdites.
-
-— [le compte DOFUS Rétro sur X, le 10 mars 2026](https://x.com/DOFUSRetro_FR/status/2031323028072681799)
-
-> Nous avons une certaine tolérance pour ce qui est des logiciels de « gestion de fenêtres », mais il est important de rappeler qu'il ne s'agit pas d'outils officiellement pris en charge par Ankama. [...] L'utilisation de macros apportant un avantage déloyal, comme le déplacement de plusieurs personnages simultanément sans changer de fenêtre, est strictement bannissable. [...] vérifiez bien que l'outil que vous vous apprêtez à utiliser n'interagit jamais avec les fichiers du jeu.
-
-— [le forum de Dofus Retro, le 1ᵉʳ avril 2026](https://www.dofus-retro.com/fr/forum/12-suggestions-retours/2950-pourquoi-ankama-autorise-outils-crees-communaute)
-
-L'écran À propos montre ces deux messages en entier et mène à leur page.
-
-Deux règles en sortent, et elles tiennent le projet. Une action ne vaut que pour la fenêtre au premier plan, jamais pour plusieurs à la fois. Aucun fichier du jeu n'est lu, ni extrait, ni converti, ni embarqué.
-
-Cette tolérance ne couvre que le comportement du logiciel. Les images d'Ankama restent régies par ses conditions d'utilisation, qui demandent une autorisation écrite.
-
-Dofus et Dofus Retro sont des marques déposées d'Ankama. Ce projet n'y est pas affilié.
-
-## Développement
-
-Le dépôt est un monorepo pnpm : le logiciel dans `apps/desktop`, le site dans `apps/website`. Construit avec [Tauri](https://v2.tauri.app), React et TypeScript pour l'interface, Rust pour la couche système. Prérequis : [Rust](https://www.rust-lang.org/tools/install), Node 24, pnpm, et les [prérequis Tauri](https://tauri.app/start/prerequisites/) de votre système. Les commandes sont les scripts des `package.json`, et `pnpm install` pose le hook git qui rejoue les contrôles de la CI à chaque commit : le format, les lints des deux langages, et les tests des deux côtés.
-
-Une release se prépare par `pnpm --filter @multifus/desktop release`, qui écrit le changelog et pose le tag, puis se déclenche en poussant ce tag : le workflow compile, signe, notarise et dépose un brouillon qu'il reste à publier.
-
-Les vingt-quatre portraits, leurs vingt-quatre `.ico` que Rust embarque, les décors des maps et les boucles appartiennent à Ankama. Ils vivent tous dans `packages/ankama`, qu'un `git rm -r` suffit à retirer. La [licence](./LICENSE) exclut ce dossier du MIT, qui ne peut pas concéder ce que Multifus ne possède pas.
-
-Ce qui reste à faire est dans [docs/plan.md](./docs/plan.md).
+```sh
+pnpm install    # also installs the git hook that replays the CI checks
+pnpm dev:app    # runs the desktop application
+pnpm dev:site   # runs the website
+pnpm check      # formatting, lints and tests, both languages, every workspace
+```
 
 ## Licence
 
-MIT
+[MIT](./LICENSE), except `packages/ankama`, which holds artwork owned by Ankama.
+
+Dofus and Dofus Retro are trademarks of Ankama. This project is not affiliated
+with them.
