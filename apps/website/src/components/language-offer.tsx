@@ -1,5 +1,6 @@
 import { msg } from '@lingui/core/macro'
-import { Button, Cross, Flag } from '@multifus/retro'
+import { Button, Flag } from '@multifus/retro'
+import { XIcon } from '@phosphor-icons/react/dist/ssr/X'
 import type { Language } from '@/@types/language'
 import type { PageId } from '@/@types/page'
 import { PageLink } from '@/components/page-link'
@@ -49,9 +50,8 @@ export const LanguageOffer = ({
           size="icon-tight"
           aria-label={speaker._(TONGUE_CLOSE)}
           onClick={onHide}
-          className="relative"
         >
-          <Cross className="absolute inset-0 m-auto size-2/3" />
+          <XIcon weight="bold" aria-hidden />
         </Button>
       </div>
     </aside>

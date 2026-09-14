@@ -479,33 +479,18 @@
   width: var(--spacing-marker);
   height: var(--spacing-marker);
   transform: translateZ(0);
-  fill: none;
-  stroke: var(--band);
-  stroke-width: 2;
-
-  & > path {
-    fill: none;
-    stroke: none;
-  }
+  color: var(--band);
 
   &[data-mark='yes'] {
-    stroke: var(--leaf-lit);
-
-    & > circle {
-      fill: var(--leaf-lit);
-    }
+    color: var(--leaf-lit);
   }
 
   &[data-mark='half'] {
-    stroke: var(--amber);
-
-    & > path {
-      fill: var(--amber);
-    }
+    color: var(--amber);
   }
 
   &[data-mark='no'] {
-    stroke: color-mix(in srgb, var(--flame), transparent 32%);
+    color: color-mix(in srgb, var(--flame), transparent 32%);
   }
 }
 
