@@ -10,7 +10,7 @@ import type {
 } from '@/@types/rival'
 import { PAGE_NAMES } from '@/constants/wording'
 
-export const SURVEYED_ON = '2026-08-31'
+export const SURVEYED_ON = '2026-09-14'
 
 export const RIVAL_IDS = [
   'dracoon',
@@ -144,8 +144,8 @@ export const TRAITS = {
     theirs: {
       dracoon: 'no',
       focusRetro: 'yes',
-      dosoft: 'half',
-      retroToolbox: 'yes',
+      dosoft: 'no',
+      retroToolbox: 'no',
       rorganizer: 'no'
     }
   },
@@ -155,7 +155,7 @@ export const TRAITS = {
       dracoon: 'yes',
       focusRetro: 'no',
       dosoft: 'half',
-      retroToolbox: 'half',
+      retroToolbox: 'yes',
       rorganizer: 'no'
     }
   },
@@ -202,8 +202,6 @@ export const MARK_NAMES = {
   no: msg`non`
 } as const satisfies Record<Mark, MessageDescriptor>
 
-const LAST_TEAM = msg`Retient la dernière équipe, pas des compositions nommées.`
-
 export const HALF_NOTES = [
   {
     trait: 'runeTable',
@@ -211,19 +209,9 @@ export const HALF_NOTES = [
     line: msg`Dans sa fenêtre à lui, pas par-dessus le jeu.`
   },
   {
-    trait: 'split',
-    rival: 'dosoft',
-    line: msg`Aligne les fenêtres, sans la grille à quatre.`
-  },
-  {
     trait: 'teams',
     rival: 'dosoft',
-    line: LAST_TEAM
-  },
-  {
-    trait: 'teams',
-    rival: 'retroToolbox',
-    line: LAST_TEAM
+    line: msg`Deux équipes fixes, T1 et T2, qu’on ne nomme pas.`
   },
   {
     trait: 'signed',

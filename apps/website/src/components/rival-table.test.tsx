@@ -107,6 +107,6 @@ describe('le tableau du comparatif', () => {
   it('date son relevé en français', () => {
     show()
 
-    expect(screen.getByText(/31 août 2026/u)).toBeDefined()
+    expect(screen.getByText(/14 septembre 2026/u)).toBeDefined()
   })
 })
