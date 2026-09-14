@@ -15,7 +15,8 @@ export const PAGE_NAMES = {
   comparison: msg`Comparatif`,
   download: msg`Télécharger`,
   journal: msg`Journal des versions`,
-  ankama: msg`Ce qu’Ankama en dit`
+  ankama: msg`Ce qu’Ankama en dit`,
+  legal: msg`Mentions légales`
 } as const satisfies Record<PageId, MessageDescriptor>
 
 export const PAGE_PROMISES = {
@@ -30,7 +31,8 @@ export const PAGE_PROMISES = {
   comparison: msg`Multifus et les autres gestionnaires, ligne par ligne.`,
   download: msg`Gratuit, code publié, paquet signé. Pour macOS et pour Windows.`,
   journal: msg`Ce que chaque version a changé.`,
-  ankama: msg`Ankama tolère les gestionnaires de fenêtres. Voici ses deux messages.`
+  ankama: msg`Ankama tolère les gestionnaires de fenêtres. Voici ses deux messages.`,
+  legal: msg`Qui publie ce site, qui l’héberge, et le peu qu’il garde de vous.`
 } as const satisfies Record<PageId, MessageDescriptor>
 
 export const MENU_HINTS = {

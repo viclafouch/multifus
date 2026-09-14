@@ -14,7 +14,8 @@ const WRITE_TO_AUTHOR = msg`Écrire à l’auteur`
 const FOOTER_PAGES = [
   'mac',
   'ankama',
-  'journal'
+  'journal',
+  'legal'
 ] as const satisfies readonly PageId[]
 
 export const SiteFooter = () => {

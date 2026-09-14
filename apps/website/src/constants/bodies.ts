@@ -347,5 +347,6 @@ export const PAGE_BODIES = {
   comparison: null,
   download: null,
   journal: null,
-  ankama: null
+  ankama: null,
+  legal: null
 } as const satisfies Record<PageId, Body | null>

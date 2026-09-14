@@ -7,6 +7,7 @@ export type PageId =
   | 'download'
   | 'home'
   | 'journal'
+  | 'legal'
   | 'mac'
   | 'quickReplies'
   | 'relay'
@@ -20,6 +21,7 @@ export type PageKind =
   | 'download'
   | 'feature'
   | 'home'
+  | 'legal'
   | 'plain'
 
 export type FeatureId =

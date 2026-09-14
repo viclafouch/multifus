@@ -88,6 +88,16 @@ export const PAGES = {
     loop: null,
     kin: ['autoFocus', 'relay'],
     slugs: { fr: 'ankama', en: 'ankama', es: 'ankama' }
+  },
+  legal: {
+    kind: 'legal',
+    loop: null,
+    kin: [],
+    slugs: {
+      fr: 'mentions-legales',
+      en: 'legal-notice',
+      es: 'aviso-legal'
+    }
   }
 } as const satisfies Record<PageId, Page>
 
@@ -103,7 +113,8 @@ export const PAGE_IDS = [
   'comparison',
   'download',
   'journal',
-  'ankama'
+  'ankama',
+  'legal'
 ] as const satisfies readonly PageId[]
 
 export const MENU_FEATURES = [

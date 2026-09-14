@@ -23,7 +23,8 @@ export const PAGE_DECORS = {
   comparison: arena,
   download: dolmen,
   journal: null,
-  ankama: null
+  ankama: null,
+  legal: null
 } as const satisfies Record<PageId, string | null>
 
 export const OG_DECOR_FILES = {
@@ -38,5 +39,6 @@ export const OG_DECOR_FILES = {
   comparison: `${DECOR_DIR}/arena.webp`,
   download: `${DECOR_DIR}/dolmen.webp`,
   journal: `${DECOR_DIR}/dolmen.webp`,
-  ankama: `${DECOR_DIR}/village.webp`
+  ankama: `${DECOR_DIR}/village.webp`,
+  legal: `${DECOR_DIR}/dolmen.webp`
 } as const satisfies Record<PageId, string>
