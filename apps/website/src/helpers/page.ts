@@ -40,10 +40,26 @@ export const pageOf = ({ slug, language }: PageOfParams) => {
   return found ?? null
 }
 
-export const everyPath = () => {
+const pathsOf = (pages: readonly PageId[]) => {
   return LANGUAGES.flatMap((language) => {
-    return PAGE_IDS.map((page) => {
+    return pages.map((page) => {
       return pathOf({ page, language })
     })
   })
+}
+
+export const everyPath = () => {
+  return pathsOf(PAGE_IDS)
+}
+
+const LOOP_PATHS = new Set(
+  pathsOf(
+    PAGE_IDS.filter((page) => {
+      return PAGES[page].loop !== null
+    })
+  )
+)
+
+export const matchHasLoop = (pathname: string) => {
+  return LOOP_PATHS.has(pathname)
 }

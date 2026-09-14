@@ -2,7 +2,13 @@ import { describe, expect, it } from 'vitest'
 import { LANGUAGES } from '@/constants/languages'
 import { OG_IMAGE } from '@/constants/og'
 import { PAGES, PAGE_IDS } from '@/constants/pages'
-import { everyPath, ogPathOf, pageOf, pathOf } from '@/helpers/page'
+import {
+  everyPath,
+  matchHasLoop,
+  ogPathOf,
+  pageOf,
+  pathOf
+} from '@/helpers/page'
 
 describe('pathOf', () => {
   it('laisse le français à la racine', () => {
@@ -87,6 +93,55 @@ describe('ogPathOf', () => {
     })
 
     expect(new Set(files).size).toBe(PAGE_IDS.length * LANGUAGES.length)
+  })
+})
+
+const FEATURE_LOOP_PATHS = [
+  '/autofocus',
+  '/roue-des-personnages',
+  '/deplacement-rapide',
+  '/tableau-des-runes',
+  '/messages-prives',
+  '/reponses-rapides'
+]
+
+describe('matchHasLoop', () => {
+  it('compte les six pages de fonctionnalité qui portent une boucle', () => {
+    const carried = FEATURE_LOOP_PATHS.filter((path) => {
+      return matchHasLoop(path)
+    })
+
+    expect(carried).toStrictEqual(FEATURE_LOOP_PATHS)
+  })
+
+  it('compte les trois accueils, qui portent la boucle d’ambiance', () => {
+    expect(matchHasLoop('/')).toBe(true)
+    expect(matchHasLoop('/en')).toBe(true)
+    expect(matchHasLoop('/es')).toBe(true)
+  })
+
+  it('écarte mac, qui est une fonctionnalité sans boucle', () => {
+    expect(matchHasLoop('/mac')).toBe(false)
+    expect(matchHasLoop('/en/mac')).toBe(false)
+  })
+
+  it('écarte les pages qui ne montrent aucune boucle', () => {
+    expect(matchHasLoop('/comparatif')).toBe(false)
+    expect(matchHasLoop('/telecharger')).toBe(false)
+    expect(matchHasLoop('/journal')).toBe(false)
+    expect(matchHasLoop('/ankama')).toBe(false)
+    expect(matchHasLoop('/mentions-legales')).toBe(false)
+  })
+
+  it('répond pareil dans les trois langues', () => {
+    expect(matchHasLoop('/en/character-wheel')).toBe(true)
+    expect(matchHasLoop('/es/rueda-de-personajes')).toBe(true)
+    expect(matchHasLoop('/en/comparison')).toBe(false)
+    expect(matchHasLoop('/es/aviso-legal')).toBe(false)
+  })
+
+  it('refuse une adresse qui n’est pas une page', () => {
+    expect(matchHasLoop('/n-importe-quoi')).toBe(false)
   })
 })
 

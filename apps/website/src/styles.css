@@ -576,6 +576,10 @@
 
 @utility surface-4 {
   animation: surface 700ms cubic-bezier(0.22, 1, 0.36, 1) 390ms backwards;
+
+  &[data-carried] {
+    animation: none;
+  }
 }
 
 @utility pointed {

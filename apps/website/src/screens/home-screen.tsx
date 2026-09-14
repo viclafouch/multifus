@@ -20,6 +20,7 @@ import {
   NO_HARM,
   PAGE_NAMES
 } from '@/constants/wording'
+import { useLoopCarriedIn } from '@/hooks/use-loop-carried-in'
 
 const HERO_LEAD = msg`Jouez en multicompte`
 
@@ -41,6 +42,7 @@ const COMPARISON_LEAD = msg`Six gestionnaires de fenêtres, ligne par ligne. Cha
 
 export const HomeScreen = (_props: PageScreenProps) => {
   const { i18n } = useLingui()
+  const isCarriedIn = useLoopCarriedIn()
 
   return (
     <>
@@ -58,7 +60,10 @@ export const HomeScreen = (_props: PageScreenProps) => {
           </p>
           <DownloadCall className="surface-3" />
         </div>
-        <figure className="surface-4 flex flex-col items-stretch gap-3">
+        <figure
+          className="surface-4 flex flex-col items-stretch gap-3"
+          data-carried={isCarriedIn ? '' : undefined}
+        >
           <LoopPlate loop="home" caption={i18n._(LOOP_CAPTION)} isAmbient />
           <figcaption className="engraved text-aside text-khaki">
             {i18n._(LOOP_CAPTION)}
