@@ -8,31 +8,31 @@ const ONE_HOUR = 3600
 const ONE_MILLISECOND = 1000
 
 describe('screenSaverDelay', () => {
-  it('dit une heure ronde en heures', () => {
+  it('says a round hour in hours', () => {
     const delay = screenSaverDelay(ONE_HOUR)
 
     expect(delay).toBe(`1${NO_BREAK_SPACE}heure`)
   })
 
-  it('accorde le pluriel des heures', () => {
+  it('agrees the plural of the hours', () => {
     const delay = screenSaverDelay(2 * ONE_HOUR)
 
     expect(delay).toBe(`2${NO_BREAK_SPACE}heures`)
   })
 
-  it('dit en minutes ce qui dépasse l’heure sans tomber juste', () => {
+  it('says in minutes what goes past the hour without falling right', () => {
     const delay = screenSaverDelay(ONE_HOUR + 30 * ONE_MINUTE)
 
     expect(delay).toBe('90 minutes')
   })
 
-  it('dit en minutes ce qui est plus court qu’une heure', () => {
+  it('says in minutes what is shorter than an hour', () => {
     const delay = screenSaverDelay(20 * ONE_MINUTE)
 
     expect(delay).toBe('20 minutes')
   })
 
-  it('arrondit à la minute un délai qui tombe entre deux', () => {
+  it('rounds to the minute a delay that falls between two', () => {
     const delay = screenSaverDelay(90)
 
     expect(delay).toBe('2 minutes')
@@ -40,23 +40,23 @@ describe('screenSaverDelay', () => {
 })
 
 describe('focusDuration', () => {
-  it('garde une décimale à un focus plus court qu’une milliseconde', () => {
+  it('keeps one decimal for a focus shorter than a millisecond', () => {
     expect(focusDuration(340)).toBe(`0,3${NARROW_NO_BREAK_SPACE}ms`)
   })
 
-  it('garde cette décimale tant que le focus reste sous dix millisecondes', () => {
+  it('keeps that decimal while the focus stays under ten milliseconds', () => {
     expect(focusDuration(4.2 * ONE_MILLISECOND)).toBe(
       `4,2${NARROW_NO_BREAK_SPACE}ms`
     )
   })
 
-  it('arrondit à la milliseconde au-delà, où la décimale ne dit plus rien', () => {
+  it('rounds to the millisecond beyond, where the decimal says nothing more', () => {
     expect(focusDuration(12.4 * ONE_MILLISECOND)).toBe(
       `12${NARROW_NO_BREAK_SPACE}ms`
     )
   })
 
-  it('reste en millisecondes quand le focus dure une seconde entière', () => {
+  it('stays in milliseconds when the focus lasts a whole second', () => {
     expect(focusDuration(2000 * ONE_MILLISECOND)).toBe(
       `2${NARROW_NO_BREAK_SPACE}000${NARROW_NO_BREAK_SPACE}ms`
     )

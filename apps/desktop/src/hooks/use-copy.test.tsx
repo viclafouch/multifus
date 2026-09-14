@@ -24,7 +24,7 @@ describe('useCopy', () => {
     vi.useRealTimers()
   })
 
-  it('ne dit rien tant que rien n’a été copié', () => {
+  it('says nothing while nothing has been copied', () => {
     const { result } = renderHook(() => {
       return useCopy()
     })
@@ -32,7 +32,7 @@ describe('useCopy', () => {
     expect(result.current.hasCopied).toBe(false)
   })
 
-  it('pose le texte dans le presse-papiers et le dit', async () => {
+  it('puts the text in the clipboard and says so', async () => {
     const { result } = renderHook(() => {
       return useCopy()
     })
@@ -45,7 +45,7 @@ describe('useCopy', () => {
     expect(result.current.hasCopied).toBe(true)
   })
 
-  it('cesse de le dire au bout de deux secondes', async () => {
+  it('stops saying it after two seconds', async () => {
     const { result } = renderHook(() => {
       return useCopy()
     })
@@ -60,7 +60,7 @@ describe('useCopy', () => {
     expect(result.current.hasCopied).toBe(false)
   })
 
-  it('repart pour deux secondes à chaque copie', async () => {
+  it('starts again for two seconds on every copy', async () => {
     const { result } = renderHook(() => {
       return useCopy()
     })
@@ -81,8 +81,8 @@ describe('useCopy', () => {
     expect(result.current.hasCopied).toBe(true)
   })
 
-  it('ne dit rien quand le presse-papiers refuse', async () => {
-    clipboard.write.mockRejectedValue(new Error('le presse-papiers a refusé'))
+  it('says nothing when the clipboard refuses', async () => {
+    clipboard.write.mockRejectedValue(new Error('the clipboard refused'))
 
     const { result } = renderHook(() => {
       return useCopy()

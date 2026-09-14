@@ -5,7 +5,7 @@ import { matchHasLoop } from '@/helpers/page'
 export const useLoopCarriedIn = () => {
   const router = useRouter()
 
-  // oxlint-disable-next-line react/hook-use-state -- la réponse est figée au montage, elle n'a pas de setter
+  // oxlint-disable-next-line react/hook-use-state -- the answer is frozen on mount, it has no setter
   const [isCarriedIn] = React.useState(() => {
     const from = router.state.resolvedLocation?.pathname
 

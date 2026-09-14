@@ -7,27 +7,27 @@ const TRANSLATED = LANGUAGES.filter((language) => {
   return language !== SOURCE_LANGUAGE
 })
 
-describe('les trois voix', () => {
-  it('gardent chacune sa langue', () => {
+describe('the three voices', () => {
+  it('each keep their own language', () => {
     for (const language of LANGUAGES) {
       expect(SPEAKERS[language].locale).toBe(language)
     }
   })
 
-  it('rendent la phrase française telle quelle', () => {
+  it('return the French sentence as it is', () => {
     expect(SPEAKERS.fr._(SITE_TITLE)).toBe(
       'Multifus, logiciel multicompte gratuit pour Dofus Retro'
     )
     expect(SPEAKERS.fr._(PAGE_NAMES.wheel)).toBe('Roue des personnages')
   })
 
-  it.each(TRANSLATED)('ne laisse pas le français passer en %s', (language) => {
+  it.each(TRANSLATED)('does not let French go through in %s', (language) => {
     expect(SPEAKERS[language]._(PAGE_NAMES.wheel)).not.toBe(
       SPEAKERS.fr._(PAGE_NAMES.wheel)
     )
   })
 
-  it('ne dit pas la même chose dans deux langues', () => {
+  it('does not say the same thing in two languages', () => {
     const spoken = LANGUAGES.map((language) => {
       return SPEAKERS[language]._(PAGE_NAMES.wheel)
     })
@@ -35,7 +35,7 @@ describe('les trois voix', () => {
     expect(new Set(spoken).size).toBe(LANGUAGES.length)
   })
 
-  it('ne laisse aucune page sans nom, dans aucune langue', () => {
+  it('leaves no page without a name, in any language', () => {
     for (const language of LANGUAGES) {
       for (const name of Object.values(PAGE_NAMES)) {
         expect(SPEAKERS[language]._(name)).not.toBe('')

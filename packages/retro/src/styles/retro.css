@@ -84,7 +84,7 @@
   --spacing-head: var(--head);
   --spacing-pebble: calc(var(--head) * 0.42);
   --spacing-nook: calc(var(--head) * 0.147);
-  --spacing-dolmen: clamp(15rem, 38vw, 24rem);
+  --spacing-standing-stone: clamp(15rem, 38vw, 24rem);
   --spacing-paving: clamp(6.5rem, 18vw, 11rem);
   --spacing-board: clamp(8.25rem, 16vw, 11.5rem);
   --spacing-emblem: 52px;
@@ -964,7 +964,7 @@
   }
 }
 
-@utility dolmen-field {
+@utility standing-stone-field {
   position: fixed;
   top: 50%;
   left: 50%;
@@ -973,7 +973,7 @@
   height: max(100vh, calc(100vw * 864 / 1484));
 }
 
-@utility dolmen-seat {
+@utility standing-stone-seat {
   position: absolute;
   top: 46.2%;
   left: 62.1%;

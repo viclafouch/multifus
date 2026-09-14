@@ -4,8 +4,8 @@ import { Button } from '@multifus/retro'
 import logo from '@multifus/retro/assets/logo.png'
 import { DownloadSimpleIcon } from '@phosphor-icons/react/dist/ssr/DownloadSimple'
 import type { PageId } from '@/@types/page'
-import { Cartouche } from '@/components/cartouche'
 import { FeaturesMenu } from '@/components/features-menu'
+import { LanguageBar } from '@/components/language-bar'
 import { LanguageOffer } from '@/components/language-offer'
 import { MastLink } from '@/components/mast-link'
 import { PageLink } from '@/components/page-link'
@@ -46,7 +46,7 @@ export const SiteHeader = ({ page }: SiteHeaderProps) => {
           </PageLink>
           <FeaturesMenu page={page} />
           <MastLink page="comparison" />
-          <Cartouche page={page} className="ml-auto" />
+          <LanguageBar page={page} className="ml-auto" />
           <Button
             variant={isOnDownload ? 'slate' : 'leaf'}
             nativeButton={false}

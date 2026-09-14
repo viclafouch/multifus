@@ -47,8 +47,8 @@ const show = ({ characters = [], isStill = false }: ShowParams = {}) => {
   )
 }
 
-describe('la map des personnages', () => {
-  it('invite à entrer en jeu quand le roster est vide', () => {
+describe('the characters map', () => {
+  it('invites to enter the game when the roster is empty', () => {
     show()
 
     expect(screen.getByText('Votre roster est vide')).not.toBeNull()
@@ -62,7 +62,7 @@ describe('la map des personnages', () => {
     ).toBeNull()
   })
 
-  it('déroule les trois temps du joueur quand le roster est vide', () => {
+  it('unfolds the three moments of the player when the roster is empty', () => {
     show()
 
     const titles = screen.getAllByRole('listitem').map((row) => {
@@ -76,7 +76,7 @@ describe('la map des personnages', () => {
     ])
   })
 
-  it('n’offre rien à cliquer d’autre que la roue quand le roster est vide', () => {
+  it('offers nothing to click other than the wheel when the roster is empty', () => {
     show()
 
     const offered = screen.getAllByRole('button').map((button) => {
@@ -86,7 +86,7 @@ describe('la map des personnages', () => {
     expect(offered).toStrictEqual(['Voir en vrai'])
   })
 
-  it('porte la roue des personnages sous le roster', () => {
+  it('carries the wheel of the characters under the roster', () => {
     show({ characters: [characterOf({ nickname: 'Alpha' })] })
 
     expect(
@@ -95,7 +95,7 @@ describe('la map des personnages', () => {
     expect(screen.getByRole('button', { name: 'Voir en vrai' })).not.toBeNull()
   })
 
-  it('montre la roue à qui n’a pas encore un seul personnage', () => {
+  it('shows the wheel to whoever does not have a single character yet', () => {
     show()
 
     expect(

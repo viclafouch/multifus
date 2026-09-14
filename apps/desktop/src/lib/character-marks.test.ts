@@ -26,12 +26,12 @@ const settled = async () => {
   })
 }
 
-describe('les gestes d’un personnage', () => {
+describe('the moves of a character', () => {
   afterEach(() => {
     clearMocks()
   })
 
-  it('donne son genre au personnage nommé', async () => {
+  it('gives its gender to the named character', async () => {
     const invoked = listenIPC()
     const run = vi.fn()
 
@@ -47,7 +47,7 @@ describe('les gestes d’un personnage', () => {
     expect(run).toHaveBeenCalledTimes(1)
   })
 
-  it('donne sa classe, sous le nom que le Rust attend', async () => {
+  it('gives its class, under the name Rust expects', async () => {
     const invoked = listenIPC()
 
     characterMarks({ run: vi.fn() }).handleSetClass('Kanpaï', 'iop')
@@ -58,7 +58,7 @@ describe('les gestes d’un personnage', () => {
     ])
   })
 
-  it('donne sa couleur, et l’enlève quand elle est nulle', async () => {
+  it('gives its color, and takes it away when it is null', async () => {
     const invoked = listenIPC()
     const marks = characterMarks({ run: vi.fn() })
 
@@ -72,7 +72,7 @@ describe('les gestes d’un personnage', () => {
     ])
   })
 
-  it('retire le personnage nommé du roster', async () => {
+  it('removes the named character from the roster', async () => {
     const invoked = listenIPC()
     const run = vi.fn()
 
@@ -85,7 +85,7 @@ describe('les gestes d’un personnage', () => {
     expect(run).toHaveBeenCalledTimes(1)
   })
 
-  it('pose un portrait en deux temps, la classe puis le genre', async () => {
+  it('sets a portrait in two steps, the class then the gender', async () => {
     const invoked = listenIPC()
     const run = vi.fn()
 

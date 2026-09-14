@@ -81,13 +81,13 @@ describe('useCycleOrder', () => {
     bridge.reorder.mockClear()
   })
 
-  it('montre le roster dans l’ordre que Rust donne', () => {
+  it('shows the roster in the order Rust gives', () => {
     const { result } = cycleOrder(ROSTER)
 
     expect(result.current.rows).toBe(ROSTER)
   })
 
-  it('déplace la ligne tirée et le dit à Rust', () => {
+  it('moves the dragged row and tells Rust about it', () => {
     const { result } = cycleOrder(ROSTER)
 
     act(() => {
@@ -105,7 +105,7 @@ describe('useCycleOrder', () => {
     expect(bridge.reorder).toHaveBeenCalledWith(['Charlie', 'Alpha', 'Bravo'])
   })
 
-  it('ne bouge rien quand le tirage est abandonné', () => {
+  it('moves nothing when the drag is given up', () => {
     const { result } = cycleOrder(ROSTER)
 
     act(() => {
@@ -123,7 +123,7 @@ describe('useCycleOrder', () => {
     expect(bridge.reorder).not.toHaveBeenCalled()
   })
 
-  it('ne bouge rien quand la ligne est reposée là où elle était', () => {
+  it('moves nothing when the row is put back where it was', () => {
     const { result } = cycleOrder(ROSTER)
 
     act(() => {
@@ -141,7 +141,7 @@ describe('useCycleOrder', () => {
     expect(bridge.reorder).not.toHaveBeenCalled()
   })
 
-  it('ne bouge rien quand ce qui est tiré n’est pas une ligne du roster', () => {
+  it('moves nothing when what is dragged is not a row of the roster', () => {
     const { result } = cycleOrder(ROSTER)
 
     act(() => {
@@ -159,7 +159,7 @@ describe('useCycleOrder', () => {
     expect(bridge.reorder).not.toHaveBeenCalled()
   })
 
-  it('tient l’ordre tiré tant que l’instantané ne l’a pas rattrapé', () => {
+  it('holds the dragged order while the snapshot has not caught up with it', () => {
     const { result, rerender } = cycleOrder(ROSTER)
 
     act(() => {
@@ -177,7 +177,7 @@ describe('useCycleOrder', () => {
     ])
   })
 
-  it('rend la main à Rust une fois qu’il dit la même chose', () => {
+  it('hands back to Rust once it says the same thing', () => {
     const { result, rerender } = cycleOrder(ROSTER)
 
     act(() => {
@@ -194,7 +194,7 @@ describe('useCycleOrder', () => {
     expect(result.current.rows).toBe(settled)
   })
 
-  it('laisse un personnage qui se connecte pendant un tirage arriver ensuite', () => {
+  it('lets a character who comes online during a drag arrive afterwards', () => {
     const { result, rerender } = cycleOrder(ROSTER)
 
     act(() => {
@@ -210,7 +210,7 @@ describe('useCycleOrder', () => {
     ])
   })
 
-  it('laisse partir un personnage qui se déconnecte après le tirage', () => {
+  it('lets go a character who goes offline after the drag', () => {
     const { result, rerender } = cycleOrder(ROSTER)
 
     act(() => {

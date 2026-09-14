@@ -43,13 +43,13 @@ describe('useBannerScreens', () => {
     rust.refuse = null
   })
 
-  it('n’a aucun écran à offrir avant la réponse du système', () => {
+  it('has no screen to offer before the answer of the system', () => {
     const { result } = listen()
 
     expect(result.current).toStrictEqual([])
   })
 
-  it('prend les écrans que le système lui donne', async () => {
+  it('takes the screens the system gives it', async () => {
     const { result } = listen()
 
     await waitFor(() => {
@@ -65,20 +65,20 @@ describe('useBannerScreens', () => {
     })
   })
 
-  it('reste sans écran quand le système refuse de répondre', async () => {
+  it('stays without a screen when the system refuses to answer', async () => {
     const { result } = listen()
 
     await waitFor(() => {
       expect(rust.refuse).not.toBeNull()
     })
 
-    rust.refuse?.(new Error('aucun écran'))
+    rust.refuse?.(new Error('no screen'))
     await settle()
 
     expect(result.current).toStrictEqual([])
   })
 
-  it('ne demande les écrans qu’une fois', async () => {
+  it('asks for the screens only once', async () => {
     const { rerender } = listen()
 
     await waitFor(() => {

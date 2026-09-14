@@ -91,19 +91,19 @@ const maximizeButton = () => {
   return screen.getByRole('button', { name: 'Agrandir les fenêtres' })
 }
 
-describe('l’écran des paramètres', () => {
+describe('the settings screen', () => {
   beforeEach(() => {
     counter.told = null
   })
 
-  it('porte la mise en route sous les réglages, en une ligne', async () => {
+  it('carries the setup under the settings, on one row', async () => {
     await show({ agent: APPLE_AGENT })
 
     expect(screen.getByText('Revoir la mise en route')).not.toBeNull()
     expect(screen.getByRole('button', { name: 'Revoir' })).not.toBeNull()
   })
 
-  it('porte les six lignes de réglages, sur les deux systèmes', async () => {
+  it('carries the six setting rows, on both systems', async () => {
     await show({ agent: WINDOWS_AGENT })
 
     for (const label of [
@@ -116,7 +116,7 @@ describe('l’écran des paramètres', () => {
     }
   })
 
-  it('compte les clients restés en petit, et propose de les agrandir', async () => {
+  it('counts the clients left small, and offers to enlarge them', async () => {
     await show({
       agent: WINDOWS_AGENT,
       clients: { open: 3, small: 2, readable: true }
@@ -130,7 +130,7 @@ describe('l’écran des paramètres', () => {
     ).not.toBeNull()
   })
 
-  it('dit que tout est déjà agrandi quand plus rien n’est en petit', async () => {
+  it('says everything is already enlarged when nothing is small any more', async () => {
     await show({
       agent: WINDOWS_AGENT,
       clients: { open: 3, small: 0, readable: true }
@@ -142,7 +142,7 @@ describe('l’écran des paramètres', () => {
     ).not.toBeNull()
   })
 
-  it('dit qu’aucun client n’est ouvert, et garde le bouton', async () => {
+  it('says no client is open, and keeps the button', async () => {
     await show({
       agent: WINDOWS_AGENT,
       clients: { open: 0, small: 0, readable: true }
@@ -152,7 +152,7 @@ describe('l’écran des paramètres', () => {
     expect(maximizeButton()).not.toBeNull()
   })
 
-  it('dit qu’il ne peut pas lire les fenêtres, plutôt qu’il n’en voit aucune', async () => {
+  it('says it cannot read the windows, rather than that it sees none', async () => {
     await show({
       agent: WINDOWS_AGENT,
       clients: { open: 0, small: 0, readable: false }
@@ -162,7 +162,7 @@ describe('l’écran des paramètres', () => {
     expect(screen.queryByText('Aucun client ouvert')).toBeNull()
   })
 
-  it('agrandit les clients d’un clic', async () => {
+  it('enlarges the clients in one click', async () => {
     await show({ agent: WINDOWS_AGENT })
 
     fireEvent.click(maximizeButton())
@@ -170,7 +170,7 @@ describe('l’écran des paramètres', () => {
     expect(bridge.maximizeAllClients).toHaveBeenCalledWith()
   })
 
-  it('suit la taille des fenêtres sans qu’on quitte l’écran', async () => {
+  it('follows the size of the windows without the screen being left', async () => {
     await show({
       agent: WINDOWS_AGENT,
       clients: { open: 3, small: 2, readable: true }
@@ -191,7 +191,7 @@ describe('l’écran des paramètres', () => {
     expect(screen.getByText('1 client en petit')).not.toBeNull()
   })
 
-  it('cesse de suivre dès qu’on quitte l’écran', async () => {
+  it('stops following as soon as the screen is left', async () => {
     const { unmount } = await show({ agent: WINDOWS_AGENT })
 
     unmount()
@@ -201,13 +201,13 @@ describe('l’écran des paramètres', () => {
     })
   })
 
-  it('garde le bouton d’agrandissement sur un Mac', async () => {
+  it('keeps the enlarge button on a Mac', async () => {
     await show({ agent: APPLE_AGENT })
 
     expect(maximizeButton()).not.toBeNull()
   })
 
-  it('lance Multifus au démarrage quand on bouge l’interrupteur', async () => {
+  it('starts Multifus at boot when the switch is moved', async () => {
     await show({ agent: WINDOWS_AGENT })
 
     fireEvent.click(switchNamed('Lancer Multifus au démarrage de l’ordinateur'))
@@ -215,7 +215,7 @@ describe('l’écran des paramètres', () => {
     expect(bridge.setStartAtLogin).toHaveBeenCalledWith(true)
   })
 
-  it('agrandit les clients à leur ouverture quand on bouge l’interrupteur', async () => {
+  it('enlarges the clients when they open when the switch is moved', async () => {
     await show({ agent: WINDOWS_AGENT })
 
     fireEvent.click(switchNamed('Agrandir les clients à leur ouverture'))
@@ -223,7 +223,7 @@ describe('l’écran des paramètres', () => {
     expect(bridge.setMaximizeOnLaunch).toHaveBeenCalledWith(true)
   })
 
-  it('coupe la tête de classe quand on bouge l’interrupteur, sur Windows', async () => {
+  it('cuts the class head when the switch is moved, on Windows', async () => {
     await show({ agent: WINDOWS_AGENT })
 
     fireEvent.click(switchNamed('La tête de classe dans la barre des tâches'))
@@ -231,7 +231,7 @@ describe('l’écran des paramètres', () => {
     expect(bridge.setPaintPortraits).toHaveBeenCalledWith(false)
   })
 
-  it('offre les trois lignes de Windows sur Windows', async () => {
+  it('offers the three Windows rows on Windows', async () => {
     await show({ agent: WINDOWS_AGENT })
 
     for (const label of WINDOWS_ONLY_LABELS) {
@@ -241,7 +241,7 @@ describe('l’écran des paramètres', () => {
     expect(screen.queryByText('Uniquement sur Windows')).toBeNull()
   })
 
-  it('dit que les trois lignes de Windows n’existent pas sur un Mac', async () => {
+  it('says the three Windows rows do not exist on a Mac', async () => {
     await show({ agent: APPLE_AGENT })
 
     for (const label of WINDOWS_ONLY_LABELS) {
@@ -253,7 +253,7 @@ describe('l’écran des paramètres', () => {
     )
   })
 
-  it('garde le démarrage et l’agrandissement sur un Mac', async () => {
+  it('keeps the boot and the enlargement on a Mac', async () => {
     await show({ agent: APPLE_AGENT })
 
     expect(
@@ -262,7 +262,7 @@ describe('l’écran des paramètres', () => {
     expect(querySwitch('Agrandir les clients à leur ouverture')).not.toBeNull()
   })
 
-  it('conseille la fenêtre agrandie plutôt que le plein écran, sur un Mac', async () => {
+  it('advises the enlarged window rather than full screen, on a Mac', async () => {
     await show({ agent: APPLE_AGENT })
 
     expect(
@@ -272,7 +272,7 @@ describe('l’écran des paramètres', () => {
     ).not.toBeNull()
   })
 
-  it('ne dit rien du plein écran sur Windows', async () => {
+  it('says nothing about full screen on Windows', async () => {
     await show({ agent: WINDOWS_AGENT })
 
     expect(
@@ -282,7 +282,7 @@ describe('l’écran des paramètres', () => {
     ).toBeNull()
   })
 
-  it('n’offre jamais de quitter l’arrière-plan', async () => {
+  it('never offers to leave the background', async () => {
     await show({ agent: WINDOWS_AGENT })
 
     const background = switchNamed('Garder Multifus en arrière-plan')
@@ -291,7 +291,7 @@ describe('l’écran des paramètres', () => {
     expect(background.getAttribute('aria-checked')).toBe('true')
   })
 
-  it('dit que la barre des tâches ne colle déjà rien, quand c’est le cas', async () => {
+  it('says the taskbar already sticks nothing together, when it is the case', async () => {
     await show({ agent: WINDOWS_AGENT, taskbarCombines: false })
 
     expect(
@@ -306,7 +306,7 @@ describe('l’écran des paramètres', () => {
     ).toBeNull()
   })
 
-  it('explique le regroupement quand la barre des tâches colle les fenêtres', async () => {
+  it('explains the grouping when the taskbar sticks the windows together', async () => {
     await show({ agent: WINDOWS_AGENT, taskbarCombines: true })
 
     expect(

@@ -1,10 +1,10 @@
 import { msg } from '@lingui/core/macro'
 import battle from '@multifus/ankama/images/battle.webp'
 import camp from '@multifus/ankama/images/camp.webp'
-import dolmen from '@multifus/ankama/images/dolmen.webp'
 import forest from '@multifus/ankama/images/forest.webp'
 import harbour from '@multifus/ankama/images/harbour.webp'
 import pen from '@multifus/ankama/images/pen.webp'
+import standingStone from '@multifus/ankama/images/standing-stone.webp'
 import village from '@multifus/ankama/images/village.webp'
 import workshop from '@multifus/ankama/images/workshop.webp'
 import type { ScreenName } from '@/@types/snapshot'
@@ -29,7 +29,7 @@ export const MAPS = [
 ] as const satisfies readonly ScreenName[]
 
 export const MAP_SCENES = {
-  clearing: dolmen,
+  clearing: standingStone,
   characters: camp,
   shortcuts: village,
   quickReplies: harbour,

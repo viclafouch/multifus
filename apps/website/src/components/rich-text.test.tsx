@@ -16,8 +16,8 @@ const Sentence = () => {
   )
 }
 
-describe('le texte à liens', () => {
-  it('laisse la macro Trans poser le lien au milieu de la phrase', () => {
+describe('the text with links', () => {
+  it('lets the Trans macro lay the link in the middle of the sentence', () => {
     render(
       <I18nProvider i18n={SPEAKERS[SOURCE_LANGUAGE]}>
         <Sentence />

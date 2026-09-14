@@ -62,7 +62,7 @@ const gaugeUnder = (label: string) => {
     })
 
   if (found === undefined) {
-    throw new Error(`Aucune jauge nommée ${label}`)
+    throw new Error(`No gauge named ${label}`)
   }
 
   return found
@@ -76,8 +76,8 @@ const crowd = () => {
   return gaugeUnder('Personnages')
 }
 
-describe('la plaque de la roue des personnages', () => {
-  it('rappelle la combinaison, et dit qu’elle se maintient', async () => {
+describe('the plate of the characters wheel', () => {
+  it('recalls the combination, and says it is held down', async () => {
     await show()
 
     expect(screen.getByText('au maintien')).not.toBeNull()
@@ -88,7 +88,7 @@ describe('la plaque de la roue des personnages', () => {
     ).toBeNull()
   })
 
-  it('dit en tête que la roue n’existe plus sans combinaison', async () => {
+  it('says at the top that the wheel no longer exists without a combination', async () => {
     await show({ shortcuts: [wheelShortcut(null)] })
 
     expect(
@@ -98,7 +98,7 @@ describe('la plaque de la roue des personnages', () => {
     ).not.toBeNull()
   })
 
-  it('porte la jauge de taille, ses bornes et la valeur du moment', async () => {
+  it('carries the size gauge, its bounds and the current value', async () => {
     await show()
 
     expect(gauge().getAttribute('min')).toBe('280')
@@ -108,7 +108,7 @@ describe('la plaque de la roue des personnages', () => {
     expect(screen.getByText('400 px')).not.toBeNull()
   })
 
-  it('suit la jauge à la touche, et n’enregistre qu’une fois lâchée', async () => {
+  it('follows the gauge while it is touched, and records only once released', async () => {
     await show()
 
     gauge().focus()
@@ -119,7 +119,7 @@ describe('la plaque de la roue des personnages', () => {
     expect(bridge.setWheelDiameter).toHaveBeenCalledWith(420)
   })
 
-  it('dessine six personnages d’exemple, comme on joue le plus souvent', async () => {
+  it('draws six example characters, the way it is most often played', async () => {
     await show()
 
     expect(namesOf()).toStrictEqual(
@@ -129,7 +129,7 @@ describe('la plaque de la roue des personnages', () => {
     )
   })
 
-  it('descend l’aperçu jusqu’au joueur tout seul', async () => {
+  it('brings the preview down to the player alone', async () => {
     await show()
 
     crowd().focus()
@@ -144,7 +144,7 @@ describe('la plaque de la roue des personnages', () => {
     expect(bridge.setWheelDiameter).not.toHaveBeenCalled()
   })
 
-  it('monte l’aperçu jusqu’à la team de huit', async () => {
+  it('brings the preview up to the team of eight', async () => {
     await show()
 
     crowd().focus()
@@ -158,7 +158,7 @@ describe('la plaque de la roue des personnages', () => {
     expect(namesOf()).toHaveLength(SIZE.demo.length)
   })
 
-  it('allume la part que la souris survole', async () => {
+  it('lights the slice the mouse hovers', async () => {
     await show()
 
     const slices = [...document.querySelectorAll('.wheel-slice')]
@@ -169,7 +169,7 @@ describe('la plaque de la roue des personnages', () => {
     expect(slices[0].hasAttribute('data-hovered')).toBe(false)
   })
 
-  it('pose la vraie roue au bouton, avec le monde de la jauge', async () => {
+  it('lays the real wheel on the button, with the world of the gauge', async () => {
     await show()
 
     fireEvent.click(screen.getByRole('button', { name: 'Voir en vrai' }))
@@ -177,7 +177,7 @@ describe('la plaque de la roue des personnages', () => {
     expect(bridge.previewWheel).toHaveBeenCalledWith(DEMO_USUAL)
   })
 
-  it('emmène dans la vraie roue le nombre que la jauge montre', async () => {
+  it('takes into the real wheel the number the gauge shows', async () => {
     await show()
 
     crowd().focus()

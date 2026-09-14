@@ -27,7 +27,7 @@ const show = (generation: number | null) => {
 }
 
 describe('useWheelWiped', () => {
-  it('ne dit rien à Rust tant que la roue est à l’écran', async () => {
+  it('says nothing to Rust while the wheel is on the screen', async () => {
     show(null)
 
     await waitFor(() => {
@@ -35,7 +35,7 @@ describe('useWheelWiped', () => {
     })
   })
 
-  it('dit à Rust que la fenêtre est vide, roue par roue', async () => {
+  it('tells Rust the window is empty, wheel after wheel', async () => {
     const { rerender } = show(null)
 
     rerender({ wiped: 4 })
@@ -51,7 +51,7 @@ describe('useWheelWiped', () => {
     })
   })
 
-  it('se tait si la fenêtre s’en va avant l’image', async () => {
+  it('keeps quiet if the window leaves before the frame', async () => {
     const { rerender, unmount } = show(null)
 
     rerender({ wiped: 4 })

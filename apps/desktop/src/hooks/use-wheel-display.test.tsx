@@ -43,13 +43,13 @@ describe('useWheelDisplay', () => {
     rust.refuse = null
   })
 
-  it('n’a aucun écran à mettre à l’échelle avant la réponse du système', () => {
+  it('has no screen to scale before the answer of the system', () => {
     const { result } = listen()
 
     expect(result.current).toBeNull()
   })
 
-  it('prend l’écran qui porte la fenêtre de Multifus', async () => {
+  it('takes the screen that carries the Multifus window', async () => {
     const { result } = listen()
 
     await waitFor(() => {
@@ -65,14 +65,14 @@ describe('useWheelDisplay', () => {
     })
   })
 
-  it('reste sans écran quand le système refuse de répondre', async () => {
+  it('stays without a screen when the system refuses to answer', async () => {
     const { result } = listen()
 
     await waitFor(() => {
       expect(rust.refuse).not.toBeNull()
     })
 
-    rust.refuse?.(new Error('aucun écran'))
+    rust.refuse?.(new Error('no screen'))
     await settle()
 
     expect(result.current).toBeNull()

@@ -17,14 +17,14 @@ const show = (source: string | null, onOpenChange = () => {}) => {
   )
 }
 
-describe('le dialogue d’une vidéo', () => {
-  it('se pose au-dessus de la page, jamais dans le flux', () => {
+describe('the dialog of a video', () => {
+  it('sits above the page, never in the flow', () => {
     show('/faux.gif')
 
     expect([...screen.getByRole('dialog').classList]).toContain('fixed')
   })
 
-  it('montre la vidéo, et son titre par-dessus', () => {
+  it('shows the video, and its title on top of it', () => {
     show('/faux.mp4')
 
     expect(screen.getByLabelText(CAPTION)).not.toBeNull()
@@ -33,7 +33,7 @@ describe('le dialogue d’une vidéo', () => {
     ).not.toBeNull()
   })
 
-  it('joue la vidéo en boucle, sans son et sans jamais passer en plein écran', () => {
+  it('plays the video in a loop, without sound and never going full screen', () => {
     show('/faux.mp4')
 
     const video = screen.getByLabelText<HTMLVideoElement>(CAPTION)
@@ -44,7 +44,7 @@ describe('le dialogue d’une vidéo', () => {
     expect(video.playsInline).toBe(true)
   })
 
-  it('se ferme à la croix, seul bouton posé sur la vidéo', () => {
+  it('closes on the cross, the only button laid on the video', () => {
     const close = vi.fn()
 
     show('/faux.mp4', close)
@@ -56,14 +56,14 @@ describe('le dialogue d’une vidéo', () => {
     expect(close.mock.calls[0]?.[0]).toBe(false)
   })
 
-  it('ne montre que la légende tant qu’aucune vidéo n’est enregistrée', () => {
+  it('shows only the caption while no video is recorded', () => {
     show(null)
 
     expect(screen.queryByLabelText(CAPTION)).toBeNull()
     expect(screen.getByText(CAPTION)).not.toBeNull()
   })
 
-  it('retient le titre tant que la vidéo ne joue pas', () => {
+  it('holds the title back while the video is not playing', () => {
     show('/faux.mp4')
 
     expect(screen.getByRole('dialog').dataset.ready).toBeUndefined()
@@ -73,13 +73,13 @@ describe('le dialogue d’une vidéo', () => {
     expect(screen.getByRole('dialog').dataset.ready).toBe('')
   })
 
-  it('montre le titre tout de suite quand aucune vidéo n’est enregistrée', () => {
+  it('shows the title right away when no video is recorded', () => {
     show(null)
 
     expect(screen.getByRole('dialog').dataset.ready).toBe('')
   })
 
-  it('montre le titre quand même quand la vidéo casse', () => {
+  it('shows the title anyway when the video breaks', () => {
     show('/faux.mp4')
 
     fireEvent.error(screen.getByLabelText(CAPTION))
@@ -87,7 +87,7 @@ describe('le dialogue d’une vidéo', () => {
     expect(screen.getByRole('dialog').dataset.ready).toBe('')
   })
 
-  it('garde son titre sous la souris, quoi qu’elle fasse', () => {
+  it('keeps its title under the mouse, whatever it does', () => {
     show('/faux.mp4')
 
     fireEvent.playing(screen.getByLabelText(CAPTION))

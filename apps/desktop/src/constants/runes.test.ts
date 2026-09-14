@@ -12,7 +12,7 @@ const rustCount = (source: string, name: string) => {
   const found = new RegExp(`const ${name}: u32 = (\\d+);`, 'u').exec(source)
 
   if (found === null) {
-    throw new Error(`Aucune constante nommée ${name}`)
+    throw new Error(`No constant named ${name}`)
   }
 
   return Number(found[1])
@@ -22,14 +22,14 @@ const STAT_NAMES = RUNE_STAT_IDS.map((stat) => {
   return i18n._(RUNE_STAT_NAMES[stat])
 })
 
-describe('le tableau des poids de runes', () => {
-  it('est dessiné pour la plus étroite des largeurs que la jauge donne', () => {
+describe('the table of the rune weights', () => {
+  it('is drawn for the narrowest of the widths the gauge gives', () => {
     expect(TABLE_DRAWN_WIDTH).toBe(
       rustCount(SETTINGS_SOURCE, 'RUNE_TABLE_NARROWEST')
     )
   })
 
-  it('donne à chaque famille le nom que le tableau écrit', () => {
+  it('gives each family the name the table writes', () => {
     const named = RUNE_FAMILY_IDS.map((family) => {
       return i18n._(RUNE_FAMILY_NAMES[family])
     })
@@ -43,11 +43,11 @@ describe('le tableau des poids de runes', () => {
     ])
   })
 
-  it('nomme chaque stat une seule fois', () => {
+  it('names each stat only once', () => {
     expect(new Set(STAT_NAMES).size).toBe(STAT_NAMES.length)
   })
 
-  it('écrit les stats du jeu comme le jeu les écrit', () => {
+  it('writes the stats of the game as the game writes them', () => {
     expect(STAT_NAMES).toStrictEqual([
       'PA',
       'PM',

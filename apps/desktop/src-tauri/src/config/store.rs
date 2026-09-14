@@ -444,7 +444,7 @@ mod tests {
     }
 
     #[test]
-    fn the_veille_never_reaches_the_file() {
+    fn the_exclusion_never_reaches_the_file() {
         let (_directory, store) = store();
         let settings = Settings {
             roster: Roster::from_characters(vec![

@@ -16,7 +16,7 @@ try {
   const { drawEveryCard } = await server.ssrLoadModule('/src/og/draw.ts')
   const drawn = await drawEveryCard()
 
-  process.stdout.write(`${drawn} images Open Graph tirées\n`)
+  process.stdout.write(`${drawn} Open Graph images drawn\n`)
 } finally {
   await server.close()
 }

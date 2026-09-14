@@ -48,26 +48,26 @@ const keyCaps = () => {
   })
 }
 
-describe('le champ d’un raccourci', () => {
-  it('dessine les touches de la combinaison en cours, sur Windows', async () => {
+describe('the field of a shortcut', () => {
+  it('draws the keys of the current combination, on Windows', async () => {
     await field({ accelerator: 'Control+Shift+Right' })
 
     expect(keyCaps()).toStrictEqual(['Ctrl', 'Maj', '→'])
   })
 
-  it('dessine les mêmes touches dans le dialecte d’un clavier Apple', async () => {
+  it('draws the same keys in the dialect of an Apple keyboard', async () => {
     await field({ accelerator: 'Control+Shift+Right', agent: APPLE_AGENT })
 
     expect(keyCaps()).toStrictEqual(['⌃', '⇧', '→'])
   })
 
-  it('dessine les touches Commande et Option d’un clavier Apple', async () => {
+  it('draws the Command and Option keys of an Apple keyboard', async () => {
     await field({ accelerator: 'Super+Alt+KeyD', agent: APPLE_AGENT })
 
     expect(keyCaps()).toStrictEqual(['⌥', '⌘', 'D'])
   })
 
-  it('refuse la combinaison de collage d’un Mac sur un Mac', async () => {
+  it('refuses the paste combination of a Mac on a Mac', async () => {
     const { editing, button } = await field({
       isActive: true,
       agent: APPLE_AGENT
@@ -81,7 +81,7 @@ describe('le champ d’un raccourci', () => {
     )
   })
 
-  it('laisse passer la combinaison de collage de Windows sur un Mac', async () => {
+  it('lets through the paste combination of Windows on a Mac', async () => {
     const { editing, button } = await field({
       isActive: true,
       agent: APPLE_AGENT
@@ -92,13 +92,13 @@ describe('le champ d’un raccourci', () => {
     expect(editing.handleCapture).toHaveBeenCalledWith('Control+KeyV')
   })
 
-  it('dit qu’il n’y a rien quand aucune touche n’est posée', async () => {
+  it('says there is nothing when no key is set', async () => {
     await field()
 
     expect(screen.getByText('Aucune')).not.toBeNull()
   })
 
-  it('ouvre la saisie au clic', async () => {
+  it('opens the capture on click', async () => {
     const { editing, button } = await field()
 
     fireEvent.click(button)
@@ -106,7 +106,7 @@ describe('le champ d’un raccourci', () => {
     expect(editing.handleOpen).toHaveBeenCalledWith(expect.anything())
   })
 
-  it('invite à frapper une combinaison une fois ouvert', async () => {
+  it('invites to hit a combination once open', async () => {
     await field({ isActive: true })
 
     expect(screen.getByText('Appuyez sur vos touches')).not.toBeNull()
@@ -115,7 +115,7 @@ describe('le champ d’un raccourci', () => {
     ).not.toBeNull()
   })
 
-  it('prend la combinaison frappée', async () => {
+  it('takes the hit combination', async () => {
     const { editing, button } = await field({ isActive: true })
 
     fireEvent.keyDown(button, {
@@ -128,7 +128,7 @@ describe('le champ d’un raccourci', () => {
     expect(editing.handleCapture).toHaveBeenCalledWith('Control+Shift+KeyN')
   })
 
-  it('attend la suite tant que seuls des modificateurs sont tenus', async () => {
+  it('waits for the rest while only modifiers are held', async () => {
     const { editing, button } = await field({ isActive: true })
 
     fireEvent.keyDown(button, {
@@ -141,7 +141,7 @@ describe('le champ d’un raccourci', () => {
     expect(keyCaps()).toStrictEqual(['Ctrl'])
   })
 
-  it('refuse une touche frappée sans modificateur, et dit pourquoi', async () => {
+  it('refuses a key hit without a modifier, and says why', async () => {
     const { editing, button } = await field({ isActive: true })
 
     fireEvent.keyDown(button, { key: 'n', code: 'KeyN' })
@@ -152,7 +152,7 @@ describe('le champ d’un raccourci', () => {
     )
   })
 
-  it('prend une touche de fonction frappée seule, sur Windows', async () => {
+  it('takes a function key hit alone, on Windows', async () => {
     const { editing, button } = await field({ isActive: true })
 
     fireEvent.keyDown(button, { key: 'F5', code: 'F5' })
@@ -161,7 +161,7 @@ describe('le champ d’un raccourci', () => {
     expect(screen.queryByRole('alert')).toBeNull()
   })
 
-  it('refuse la même touche de fonction sur un Mac, où le système la tient', async () => {
+  it('refuses the same function key on a Mac, where the system holds it', async () => {
     const { editing, button } = await field({
       isActive: true,
       agent: APPLE_AGENT
@@ -175,7 +175,7 @@ describe('le champ d’un raccourci', () => {
     )
   })
 
-  it('refuse la combinaison de collage de Windows sur Windows', async () => {
+  it('refuses the paste combination of Windows on Windows', async () => {
     const { editing, button } = await field({ isActive: true })
 
     fireEvent.keyDown(button, { key: 'v', code: 'KeyV', ctrlKey: true })
@@ -186,7 +186,7 @@ describe('le champ d’un raccourci', () => {
     )
   })
 
-  it('refuse une touche que le greffon ne connaît pas', async () => {
+  it('refuses a key the plugin does not know', async () => {
     const { editing, button } = await field({ isActive: true })
 
     fireEvent.keyDown(button, {
@@ -201,7 +201,7 @@ describe('le champ d’un raccourci', () => {
     )
   })
 
-  it('efface la combinaison sur Retour arrière', async () => {
+  it('clears the combination on Backspace', async () => {
     const { editing, button } = await field({
       accelerator: 'Control+Shift+Right',
       isActive: true
@@ -212,7 +212,7 @@ describe('le champ d’un raccourci', () => {
     expect(editing.handleCapture).toHaveBeenCalledWith(null)
   })
 
-  it('referme la saisie sur Échap, sans rien changer', async () => {
+  it('closes the capture on Escape, without changing anything', async () => {
     const { editing, button } = await field({ isActive: true })
 
     fireEvent.keyDown(button, { key: 'Escape', code: 'Escape' })
@@ -221,7 +221,7 @@ describe('le champ d’un raccourci', () => {
     expect(editing.handleCapture).not.toHaveBeenCalled()
   })
 
-  it('referme la saisie quand la ligne perd le focus', async () => {
+  it('closes the capture when the row loses the focus', async () => {
     const { editing, button } = await field({ isActive: true })
 
     fireEvent.blur(button)
@@ -230,7 +230,7 @@ describe('le champ d’un raccourci', () => {
     expect(editing.handleCapture).not.toHaveBeenCalled()
   })
 
-  it('ne lit plus le clavier une fois la saisie refermée', async () => {
+  it('stops reading the keyboard once the capture is closed', async () => {
     const { editing, button } = await field()
 
     fireEvent.keyDown(button, {
@@ -243,7 +243,7 @@ describe('le champ d’un raccourci', () => {
     expect(editing.handleCapture).not.toHaveBeenCalled()
   })
 
-  it('oublie le refus dès que la combinaison suivante est bonne', async () => {
+  it('forgets the refusal as soon as the next combination is good', async () => {
     const { editing, button } = await field({ isActive: true })
 
     fireEvent.keyDown(button, { key: 'n', code: 'KeyN' })

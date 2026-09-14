@@ -57,23 +57,23 @@ const namesOf = (container: HTMLElement) => {
   })
 }
 
-describe('la roue dessinée', () => {
-  it('découpe le disque en autant de camemberts que de personnages', () => {
+describe('the drawn wheel', () => {
+  it('cuts the disc into as many slices as there are characters', () => {
     expect(slicesOf(draw())).toHaveLength(3)
   })
 
-  it('donne le disque entier au seul personnage connecté', () => {
+  it('gives the whole disc to the only online character', () => {
     const container = draw({ slices: [TEAM[0]] })
 
     expect(slicesOf(container)).toHaveLength(1)
     expect(slicesOf(container)[0].getAttribute('fill-rule')).toBe('evenodd')
   })
 
-  it('écrit le pseudo sous chaque tête', () => {
+  it('writes the nickname under each head', () => {
     expect(namesOf(draw())).toStrictEqual(['Alpha', 'Bravo', 'Charlie'])
   })
 
-  it('peint plus foncé la part de la fenêtre où l’on est', () => {
+  it('paints darker the slice of the window you are on', () => {
     const marked = slicesOf(draw()).map((slice) => {
       return slice.hasAttribute('data-here')
     })
@@ -81,7 +81,7 @@ describe('la roue dessinée', () => {
     expect(marked).toStrictEqual([true, false, false])
   })
 
-  it('teinte la part du personnage de sa couleur, et laisse l’ambre aux autres', () => {
+  it('tints the character slice with its color, and leaves the amber to the others', () => {
     const container = draw({
       slices: [
         wheelSliceOf({ nickname: 'Alpha', color: 'sky', here: true }),
@@ -100,7 +100,7 @@ describe('la roue dessinée', () => {
     ).toBe(false)
   })
 
-  it('teinte chaque part dès le repos, sans rien attendre du survol', () => {
+  it('tints each slice at rest already, without waiting for the hover', () => {
     const slices = slicesOf(
       draw({
         slices: [
@@ -120,13 +120,13 @@ describe('la roue dessinée', () => {
     expect(slices[1].classList.contains('tint-pine')).toBe(true)
   })
 
-  it('pose la tête de la fenêtre du dessus au centre', () => {
+  it('puts the head of the front window at the center', () => {
     const faces = draw().querySelectorAll('.wheel-face img')
 
     expect(faces).toHaveLength(1)
   })
 
-  it('laisse le centre vide quand on n’est sur personne', () => {
+  it('leaves the center empty when you are on nobody', () => {
     const container = draw({
       slices: [wheelSliceOf({ nickname: 'Alpha' })]
     })
@@ -134,7 +134,7 @@ describe('la roue dessinée', () => {
     expect(container.querySelectorAll('.wheel-face img')).toHaveLength(0)
   })
 
-  it('allume la part visée, et elle seule', () => {
+  it('lights the aimed slice, and only it', () => {
     const lit = slicesOf(draw({ hovered: 2 })).map((slice) => {
       return slice.hasAttribute('data-hovered')
     })
@@ -142,11 +142,11 @@ describe('la roue dessinée', () => {
     expect(lit).toStrictEqual([false, false, true])
   })
 
-  it('ne dit rien au centre tant qu’il reste un personnage', () => {
+  it('says nothing at the center while one character is left', () => {
     expect(draw({ nobody: 'Personne' }).querySelector('p')).toBeNull()
   })
 
-  it('dit au centre qu’il n’y a personne quand la roue est vide', () => {
+  it('says at the center that there is nobody when the wheel is empty', () => {
     const container = draw({ slices: [], nobody: 'Personne de connecté' })
 
     expect(container.querySelector('p')?.textContent).toBe(
@@ -154,7 +154,7 @@ describe('la roue dessinée', () => {
     )
   })
 
-  it('vise la part que la souris touche, et lâche en sortant', () => {
+  it('aims at the slice the mouse touches, and lets go when it leaves', () => {
     const aimed = vi.fn()
     const container = draw({ onAim: aimed })
 
@@ -169,7 +169,7 @@ describe('la roue dessinée', () => {
     expect(aimed).toHaveBeenCalledWith(null)
   })
 
-  it('éclaire le pseudo de la part visée, et lui seul', () => {
+  it('lights the nickname of the aimed slice, and only it', () => {
     const container = draw({ hovered: 1 })
     const names = [...container.querySelectorAll('.wheel-name')]
 
@@ -177,7 +177,7 @@ describe('la roue dessinée', () => {
     expect(names[0].hasAttribute('data-hovered')).toBe(false)
   })
 
-  it('fait grandir tout le disque avec la jauge', () => {
+  it('grows the whole disc with the gauge', () => {
     const small = headWidthOf(draw({ diameter: 280 }))
     const wide = headWidthOf(draw({ diameter: 720 }))
 
@@ -185,7 +185,7 @@ describe('la roue dessinée', () => {
     expect(wide / small).toBeCloseTo(720 / 280, 1)
   })
 
-  it('resserre les têtes quand toute l’équipe est là', () => {
+  it('tightens the heads when the whole team is there', () => {
     const three = headWidthOf(draw())
     const eight = headWidthOf(
       draw({

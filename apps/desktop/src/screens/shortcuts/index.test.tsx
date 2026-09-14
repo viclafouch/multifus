@@ -105,12 +105,12 @@ const fieldOfCharacter = (nickname: string) => {
   })
 }
 
-describe('l’écran des raccourcis, les huit actions', () => {
+describe('the shortcuts screen, the eight actions', () => {
   const all = ALL_ACTIONS.map((action) => {
     return shortcut(action)
   })
 
-  it('porte une ligne par action, avec ce qu’elle fait', () => {
+  it('carries one row per action, with what it does', () => {
     show({ shortcuts: all })
 
     for (const action of ALL_ACTIONS) {
@@ -122,13 +122,13 @@ describe('l’écran des raccourcis, les huit actions', () => {
     }
   })
 
-  it('marque la seule action qui répond à une touche maintenue', () => {
+  it('marks the only action that answers to a held key', () => {
     show({ shortcuts: all })
 
     expect(screen.getAllByText('au maintien')).toHaveLength(1)
   })
 
-  it('n’ouvre la saisie que sur la ligne cliquée', () => {
+  it('opens the capture only on the clicked row', () => {
     show({ shortcuts: all })
 
     fireEvent.click(fieldOf('next'))
@@ -139,7 +139,7 @@ describe('l’écran des raccourcis, les huit actions', () => {
     ).not.toBeNull()
   })
 
-  it('referme la ligne d’avant quand on en ouvre une autre', () => {
+  it('closes the previous row when another one is opened', () => {
     show({ shortcuts: all })
 
     fireEvent.click(fieldOf('next'))
@@ -151,7 +151,7 @@ describe('l’écran des raccourcis, les huit actions', () => {
     ).not.toBeNull()
   })
 
-  it('pose la combinaison frappée et referme la saisie', () => {
+  it('sets the hit combination and closes the capture', () => {
     show({ shortcuts: all })
 
     fireEvent.click(fieldOf('next'))
@@ -164,7 +164,7 @@ describe('l’écran des raccourcis, les huit actions', () => {
     expect(screen.queryByText('Appuyez sur vos touches')).toBeNull()
   })
 
-  it('efface la combinaison sur Retour arrière', () => {
+  it('clears the combination on Backspace', () => {
     show({ shortcuts: [shortcut('walk', { accelerator: 'Alt+KeyW' })] })
 
     fireEvent.click(fieldOf('walk'))
@@ -173,7 +173,7 @@ describe('l’écran des raccourcis, les huit actions', () => {
     expect(bridge.setShortcut).toHaveBeenCalledWith('walk', null)
   })
 
-  it('dessine les touches de chaque action', () => {
+  it('draws the keys of each action', () => {
     show({
       shortcuts: [
         shortcut('next', { accelerator: 'Control+Right' }),
@@ -186,8 +186,8 @@ describe('l’écran des raccourcis, les huit actions', () => {
   })
 })
 
-describe('l’écran des raccourcis, le personnage principal', () => {
-  it('dit ce que la frappe fera, sans nommer personne', () => {
+describe('the shortcuts screen, the main character', () => {
+  it('says what the press will do, without naming anybody', () => {
     show({
       shortcuts: [shortcut('main', { accelerator: 'Control+Shift+Space' })]
     })
@@ -200,7 +200,7 @@ describe('l’écran des raccourcis, le personnage principal', () => {
   })
 })
 
-describe('l’écran des raccourcis, le retour en arrière', () => {
+describe('the shortcuts screen, the undo', () => {
   const before = [shortcut('walk', { accelerator: 'Alt+KeyW' })]
   const after = [
     shortcut('walk', {
@@ -209,7 +209,7 @@ describe('l’écran des raccourcis, le retour en arrière', () => {
     })
   ]
 
-  it('offre de remettre les touches d’avant, une fois la nouvelle posée', () => {
+  it('offers to put the previous keys back, once the new one is set', () => {
     const answered = show({ shortcuts: before })
 
     fireEvent.click(fieldOf('walk'))
@@ -223,7 +223,7 @@ describe('l’écran des raccourcis, le retour en arrière', () => {
     expect(keyCapsOf(undo)).toStrictEqual(['Alt', 'W'])
   })
 
-  it('repose les touches d’avant, et n’offre plus rien', () => {
+  it('puts the previous keys back, and offers nothing more', () => {
     const answered = show({ shortcuts: before })
 
     fireEvent.click(fieldOf('walk'))
@@ -247,7 +247,7 @@ describe('l’écran des raccourcis, le retour en arrière', () => {
     ).toBeNull()
   })
 
-  it('n’offre rien tant que rien n’a été changé', () => {
+  it('offers nothing while nothing has been changed', () => {
     show({ shortcuts: after })
 
     expect(
@@ -257,7 +257,7 @@ describe('l’écran des raccourcis, le retour en arrière', () => {
     ).toBeNull()
   })
 
-  it('offre de remettre aucune touche quand il n’y en avait pas', () => {
+  it('offers to put no key back when there was none', () => {
     const answered = show({ shortcuts: [shortcut('walk')] })
 
     fireEvent.click(fieldOf('walk'))
@@ -272,8 +272,8 @@ describe('l’écran des raccourcis, le retour en arrière', () => {
   })
 })
 
-describe('l’écran des raccourcis, les touches d’origine', () => {
-  it('n’offre rien tant que rien n’a bougé', () => {
+describe('the shortcuts screen, the original keys', () => {
+  it('offers nothing while nothing has moved', () => {
     show({ shortcuts: [shortcut('walk'), shortcut('next')] })
 
     expect(
@@ -281,7 +281,7 @@ describe('l’écran des raccourcis, les touches d’origine', () => {
     ).toBeNull()
   })
 
-  it('offre de tout remettre dès qu’une touche a bougé', () => {
+  it('offers to put everything back as soon as a key has moved', () => {
     show({
       shortcuts: [shortcut('walk'), shortcut('next', { isDefault: false })]
     })
@@ -293,7 +293,7 @@ describe('l’écran des raccourcis, les touches d’origine', () => {
     expect(bridge.resetShortcuts).toHaveBeenCalledWith()
   })
 
-  it('oublie les retours en arrière quand on remet tout d’origine', () => {
+  it('forgets the undos when everything is put back to the original', () => {
     const answered = show({
       shortcuts: [shortcut('walk', { accelerator: 'Alt+KeyW' })]
     })
@@ -321,8 +321,8 @@ describe('l’écran des raccourcis, les touches d’origine', () => {
   })
 })
 
-describe('l’écran des raccourcis, ce que Rust répond d’une combinaison', () => {
-  it('dit que rien ne se passera sans touches', () => {
+describe('the shortcuts screen, what Rust answers about a combination', () => {
+  it('says nothing will happen without keys', () => {
     show({ shortcuts: [shortcut('walk')] })
 
     expect(
@@ -330,7 +330,7 @@ describe('l’écran des raccourcis, ce que Rust répond d’une combinaison', (
     ).not.toBeNull()
   })
 
-  it('dit qu’un autre logiciel a déjà pris ces touches', () => {
+  it('says another program has already taken those keys', () => {
     show({
       shortcuts: [
         shortcut('walk', {
@@ -345,7 +345,7 @@ describe('l’écran des raccourcis, ce que Rust répond d’une combinaison', (
     )
   })
 
-  it('nomme l’action qui tient déjà les mêmes touches', () => {
+  it('names the action that already holds the same keys', () => {
     show({
       shortcuts: [
         shortcut('next', { accelerator: 'Control+KeyN' }),
@@ -364,7 +364,7 @@ describe('l’écran des raccourcis, ce que Rust répond d’une combinaison', (
     )
   })
 
-  it('nomme la réponse rapide qui tient déjà les mêmes touches', () => {
+  it('names the quick reply that already holds the same keys', () => {
     show({
       shortcuts: [
         shortcut('walk', {
@@ -383,7 +383,7 @@ describe('l’écran des raccourcis, ce que Rust répond d’une combinaison', (
     )
   })
 
-  it('ne dit rien quand la combinaison est bien enregistrée', () => {
+  it('says nothing when the combination is properly registered', () => {
     show({
       shortcuts: [shortcut('walk', { accelerator: 'Control+KeyW' })]
     })
@@ -395,11 +395,11 @@ describe('l’écran des raccourcis, ce que Rust répond d’une combinaison', (
   })
 })
 
-describe('l’écran des raccourcis, un personnage une touche', () => {
+describe('the shortcuts screen, one character one key', () => {
   const ALPHA = characterOf({ nickname: 'Alpha' })
   const BRAVO = characterOf({ nickname: 'Bravo', online: false })
 
-  it('porte une ligne par personnage du roster, connecté ou non', () => {
+  it('carries one row per character of the roster, online or not', () => {
     show({ characters: [ALPHA, BRAVO] })
 
     expect(screen.getByText('Un personnage, une touche')).not.toBeNull()
@@ -407,7 +407,7 @@ describe('l’écran des raccourcis, un personnage une touche', () => {
     expect(fieldOfCharacter('Bravo')).not.toBeNull()
   })
 
-  it('montre la couleur de chaque personnage au bord de sa ligne', () => {
+  it('shows the color of each character at the edge of its row', () => {
     show({
       characters: [
         characterOf({ nickname: 'Alpha', color: 'earth' }),
@@ -421,7 +421,7 @@ describe('l’écran des raccourcis, un personnage une touche', () => {
     expect(stripes[0].classList).toContain('tint-earth')
   })
 
-  it('dit où les personnages arrivent quand le roster est vide', () => {
+  it('says where the characters come from when the roster is empty', () => {
     show({ characters: [] })
 
     expect(
@@ -431,7 +431,7 @@ describe('l’écran des raccourcis, un personnage une touche', () => {
     ).not.toBeNull()
   })
 
-  it('ne donne aucune touche à un personnage, et ne l’en avertit pas', () => {
+  it('gives no key to a character, and does not warn about it', () => {
     show({ characters: [ALPHA] })
 
     expect(keyCapsOf(fieldOfCharacter('Alpha'))).toStrictEqual([])
@@ -440,7 +440,7 @@ describe('l’écran des raccourcis, un personnage une touche', () => {
     ).toBeNull()
   })
 
-  it('pose la touche frappée sur le personnage, et referme la saisie', () => {
+  it('sets the hit key on the character, and closes the capture', () => {
     show({ characters: [ALPHA] })
 
     fireEvent.click(fieldOfCharacter('Alpha'))
@@ -457,7 +457,7 @@ describe('l’écran des raccourcis, un personnage une touche', () => {
     expect(screen.queryByText('Appuyez sur vos touches')).toBeNull()
   })
 
-  it('efface la touche d’un personnage sur Retour arrière', () => {
+  it('clears the key of a character on Backspace', () => {
     show({ characters: [characterOf({ shortcut: 'F1' })] })
 
     fireEvent.click(fieldOfCharacter('Alpha'))
@@ -469,7 +469,7 @@ describe('l’écran des raccourcis, un personnage une touche', () => {
     expect(bridge.setCharacterShortcut).toHaveBeenCalledWith('Alpha', null)
   })
 
-  it('n’ouvre la saisie que sur la ligne cliquée, actions comprises', () => {
+  it('opens the capture only on the clicked row, actions included', () => {
     show({ shortcuts: [shortcut('next')], characters: [ALPHA] })
 
     fireEvent.click(fieldOf('next'))
@@ -481,7 +481,7 @@ describe('l’écran des raccourcis, un personnage une touche', () => {
     ).not.toBeNull()
   })
 
-  it('marque d’une étoile le personnage principal, et lui seul', () => {
+  it('marks the main character with a star, and only it', () => {
     show({
       characters: [
         characterOf({ nickname: 'Alpha', main: true }),
@@ -492,7 +492,7 @@ describe('l’écran des raccourcis, un personnage une touche', () => {
     expect(screen.getAllByText('Personnage principal')).toHaveLength(1)
   })
 
-  it('nomme le personnage qui tient déjà les mêmes touches', () => {
+  it('names the character who already holds the same keys', () => {
     show({
       shortcuts: [
         shortcut('walk', {

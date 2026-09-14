@@ -55,8 +55,8 @@ const show = () => {
   return { onMove, onSettle, unmount }
 }
 
-describe('le tirage d’une fenêtre posée', () => {
-  it('déplace de ce que la souris a parcouru', async () => {
+describe('the drag of a laid window', () => {
+  it('moves by what the mouse travelled', async () => {
     const { onMove } = show()
 
     press(100, 100)
@@ -67,7 +67,7 @@ describe('le tirage d’une fenêtre posée', () => {
     })
   })
 
-  it('rattrape les quatre premiers points, pour ne pas traîner derrière la souris', async () => {
+  it('catches up the first four points, so as not to lag behind the mouse', async () => {
     const { onMove } = show()
 
     press(100, 100)
@@ -78,7 +78,7 @@ describe('le tirage d’une fenêtre posée', () => {
     })
   })
 
-  it('ne compte que l’écart au point de départ, jamais le chemin parcouru', () => {
+  it('counts only the gap to the starting point, never the path travelled', () => {
     const { onMove, onSettle } = show()
 
     press(100, 100)
@@ -92,7 +92,7 @@ describe('le tirage d’une fenêtre posée', () => {
     expect(onSettle).not.toHaveBeenCalled()
   })
 
-  it('ne lâche plus la souris une fois le seuil passé, même revenue au départ', async () => {
+  it('stops letting go of the mouse once the threshold is passed, even back at the start', async () => {
     const { onMove, onSettle } = show()
 
     press(100, 100)
@@ -111,7 +111,7 @@ describe('le tirage d’une fenêtre posée', () => {
     expect(travelled).toBe(0)
   })
 
-  it('lâche le tableau d’une page qui s’en va au milieu du geste', () => {
+  it('lets go of the table of a page that leaves in the middle of the move', () => {
     const { onSettle, unmount } = show()
 
     press(100, 100)
@@ -121,7 +121,7 @@ describe('le tirage d’une fenêtre posée', () => {
     expect(onSettle).toHaveBeenCalledExactlyOnceWith()
   })
 
-  it('n’enregistre rien d’une page qui s’en va sans que rien ait bougé', () => {
+  it('records nothing of a page that leaves without anything having moved', () => {
     const { onSettle, unmount } = show()
 
     press(100, 100)
@@ -130,7 +130,7 @@ describe('le tirage d’une fenêtre posée', () => {
     expect(onSettle).not.toHaveBeenCalled()
   })
 
-  it('ne bouge rien sous le seuil, et ne l’enregistre pas', () => {
+  it('moves nothing under the threshold, and does not record it', () => {
     const { onMove, onSettle } = show()
 
     press(100, 100)
@@ -141,7 +141,7 @@ describe('le tirage d’une fenêtre posée', () => {
     expect(onSettle).not.toHaveBeenCalled()
   })
 
-  it('enregistre la place une fois la souris lâchée', async () => {
+  it('records the place once the mouse is released', async () => {
     const { onMove, onSettle } = show()
 
     press(100, 100)
@@ -154,7 +154,7 @@ describe('le tirage d’une fenêtre posée', () => {
     expect(onSettle).toHaveBeenCalledExactlyOnceWith()
   })
 
-  it('n’appelle Rust qu’une fois par image, quoi qu’il arrive à la souris', async () => {
+  it('calls Rust only once per frame, whatever happens to the mouse', async () => {
     const { onMove } = show()
 
     press(100, 100)
@@ -167,7 +167,7 @@ describe('le tirage d’une fenêtre posée', () => {
     })
   })
 
-  it('prend le pointeur, et le rend une fois lâché', () => {
+  it('takes the pointer, and gives it back once released', () => {
     show()
 
     press(100, 100)
@@ -180,7 +180,7 @@ describe('le tirage d’une fenêtre posée', () => {
     expect(table().hasPointerCapture(POINTER)).toBe(false)
   })
 
-  it('laisse le clic à ce qui arrête la propagation', () => {
+  it('leaves the click to whatever stops the propagation', () => {
     const { onMove } = show()
 
     fireEvent.pointerDown(screen.getByRole('button'), {
@@ -195,7 +195,7 @@ describe('le tirage d’une fenêtre posée', () => {
     expect(table().hasPointerCapture(POINTER)).toBe(false)
   })
 
-  it('ne répond qu’au bouton gauche', () => {
+  it('answers only to the left button', () => {
     const { onMove } = show()
 
     fireEvent.pointerDown(table(), {
@@ -209,13 +209,13 @@ describe('le tirage d’une fenêtre posée', () => {
     expect(onMove).not.toHaveBeenCalled()
   })
 
-  it('coupe au navigateur ce qu’il ferait du clic, la sélection du texte comprise', () => {
+  it('cuts from the browser what it would do with the click, the text selection included', () => {
     show()
 
     expect(press(100, 100)).toBe(false)
   })
 
-  it('laisse le navigateur faire du clic ce qu’il veut, hors du bouton gauche', () => {
+  it('lets the browser do what it wants with the click, outside the left button', () => {
     show()
 
     const answered = fireEvent.pointerDown(table(), {
@@ -228,7 +228,7 @@ describe('le tirage d’une fenêtre posée', () => {
     expect(answered).toBe(true)
   })
 
-  it('oublie le tirage quand le système reprend le pointeur', async () => {
+  it('forgets the drag when the system takes the pointer back', async () => {
     const { onMove, onSettle } = show()
 
     press(100, 100)

@@ -46,14 +46,14 @@ const resize = (observer: ResizeObserver) => {
   })
 }
 
-describe('la forme que le tableau dit de lui-même', () => {
+describe('the shape the table says of itself', () => {
   afterEach(() => {
     watchers.length = 0
 
     vi.unstubAllGlobals()
   })
 
-  it('rend la hauteur sur la largeur, et non la hauteur seule', () => {
+  it('returns the height over the width, and not the height alone', () => {
     const report = vi.fn()
     const measured = standing(WIDTH, 640)
 
@@ -63,7 +63,7 @@ describe('la forme que le tableau dit de lui-même', () => {
     expect(report).toHaveBeenCalledExactlyOnceWith(2)
   })
 
-  it('se tait sur un tableau que personne n’a encore posé', () => {
+  it('keeps quiet about a table nobody has laid yet', () => {
     const report = vi.fn()
     const measured = standing(0, 0)
 
@@ -73,7 +73,7 @@ describe('la forme que le tableau dit de lui-même', () => {
     expect(report).not.toHaveBeenCalled()
   })
 
-  it('remesure le tableau que la jauge vient de grossir', () => {
+  it('measures again the table the gauge has just grown', () => {
     vi.stubGlobal('ResizeObserver', WatchingResizeObserver)
 
     const report = vi.fn()
@@ -90,7 +90,7 @@ describe('la forme que le tableau dit de lui-même', () => {
     expect(report).toHaveBeenLastCalledWith(1400 / (WIDTH * 2))
   })
 
-  it('lâche l’observateur en partant', () => {
+  it('lets go of the observer on leaving', () => {
     vi.stubGlobal('ResizeObserver', WatchingResizeObserver)
 
     const measured = standing(WIDTH, 640)

@@ -27,13 +27,13 @@ const root = () => {
   return element
 }
 
-describe('le démarrage d’un point d’entrée', () => {
+describe('the boot of an entry point', () => {
   afterEach(() => {
     speak(SOURCE_LANGUAGE)
     document.querySelector('#root')?.remove()
   })
 
-  it('parle la langue que le Rust donne avant de rendre quoi que ce soit', async () => {
+  it('speaks the language Rust gives before rendering anything', async () => {
     bridge.language.mockResolvedValueOnce('en')
     root()
 
@@ -45,8 +45,8 @@ describe('le démarrage d’un point d’entrée', () => {
     expect(document.documentElement.lang).toBe('en')
   })
 
-  it('retombe sur le français quand le Rust ne répond pas', async () => {
-    bridge.language.mockRejectedValueOnce(new Error('aucune réponse'))
+  it('falls back to French when Rust does not answer', async () => {
+    bridge.language.mockRejectedValueOnce(new Error('no answer'))
     root()
 
     mount('index.html', <Screen />)
@@ -57,7 +57,7 @@ describe('le démarrage d’un point d’entrée', () => {
     expect(document.documentElement.lang).toBe(SOURCE_LANGUAGE)
   })
 
-  it('refuse de démarrer sur une page sans racine', () => {
+  it('refuses to boot on a page without a root', () => {
     expect(() => {
       mount('banner.html', <Screen />)
     }).toThrow('banner.html')

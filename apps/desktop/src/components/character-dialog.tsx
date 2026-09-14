@@ -5,7 +5,7 @@ import { t } from '@lingui/core/macro'
 import { Button } from '@multifus/retro'
 import type { Character, Class, Color, Gender, Portrait } from '@/@types/roster'
 import { CharacterMedallion } from '@/components/character-medallion'
-import { ClassVignette } from '@/components/class-vignette'
+import { ClassThumbnail } from '@/components/class-thumbnail'
 import { ColorGrid } from '@/components/color-grid'
 import { ColorStripe } from '@/components/color-stripe'
 import { GenderSigil } from '@/components/gender-sigil'
@@ -197,7 +197,7 @@ const MarksStep = ({
 
             return (
               <li key={candidate}>
-                <ClassVignette
+                <ClassThumbnail
                   label={label}
                   isCurrent={character.class === candidate}
                   ariaLabel={t`Marquer ${nickname} comme ${label}`}
@@ -210,24 +210,24 @@ const MarksStep = ({
                     src={
                       CLASS_PORTRAITS[candidate][gender ?? UNANSWERED_GENDER]
                     }
-                    className="size-vignette rounded-md object-cover"
+                    className="size-thumbnail rounded-md object-cover"
                   />
-                </ClassVignette>
+                </ClassThumbnail>
               </li>
             )
           })}
           <li>
-            <ClassVignette
+            <ClassThumbnail
               label={t`Aucune`}
               ariaLabel={t`Retirer la classe de ${nickname}`}
               onPick={() => {
                 onPickClass(null)
               }}
             >
-              <span className="flex size-vignette items-center justify-center rounded-md border border-dashed border-border text-muted-foreground/60">
+              <span className="flex size-thumbnail items-center justify-center rounded-md border border-dashed border-border text-muted-foreground/60">
                 <Ban aria-hidden className="size-4" strokeWidth={1.75} />
               </span>
-            </ClassVignette>
+            </ClassThumbnail>
           </li>
         </ul>
       </div>

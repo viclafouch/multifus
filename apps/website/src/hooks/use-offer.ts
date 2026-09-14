@@ -25,7 +25,7 @@ export const useOffer = (current: Language) => {
       return
     }
 
-    // oxlint-disable-next-line react/set-state-in-effect -- la page est prérendue : la proposition ne peut naître qu'après l'hydratation, sinon le HTML livré porterait la langue d'un autre visiteur
+    // oxlint-disable-next-line react/set-state-in-effect -- the page is prerendered: the offer can only be born after hydration, otherwise the delivered HTML would carry the language of another visitor
     setOffered(wanted)
   }, [current])
 

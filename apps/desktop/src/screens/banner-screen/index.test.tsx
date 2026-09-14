@@ -58,12 +58,12 @@ const portrait = () => {
   return document.querySelector('img')?.getAttribute('src') ?? null
 }
 
-describe('la bannière', () => {
+describe('the banner', () => {
   beforeEach(() => {
     rust.stepped = null
   })
 
-  it('ne se montre pas tant que Rust n’a rien posé', async () => {
+  it('does not show itself while Rust has laid nothing', async () => {
     bridge.onBannerStep.mockImplementation(pending)
     bridge.bannerStep.mockImplementation(pending)
 
@@ -72,20 +72,20 @@ describe('la bannière', () => {
     expect(screen.queryByText('Déplacement rapide')).toBeNull()
   })
 
-  it('dit seulement Déplacement rapide tant qu’on n’est arrivé sur personne', async () => {
+  it('says only the Quick move name while nobody has been reached', async () => {
     await posted(stepOf())
 
     expect(screen.getByText('Déplacement rapide')).not.toBeNull()
   })
 
-  it('dit Aperçu le temps de montrer le coin choisi', async () => {
+  it('says it is a preview while showing the chosen corner', async () => {
     await posted(stepOf({ previewing: true }))
 
     expect(screen.getByText('Aperçu')).not.toBeNull()
     expect(screen.queryByText('Déplacement rapide')).toBeNull()
   })
 
-  it('porte le pseudo du personnage sur lequel on vient d’arriver', async () => {
+  it('carries the nickname of the character just reached', async () => {
     await posted(
       stepOf({
         character: {
@@ -101,7 +101,7 @@ describe('la bannière', () => {
     expect(screen.queryByText('Déplacement rapide')).toBeNull()
   })
 
-  it('porte le liseré de la couleur du personnage', async () => {
+  it('carries the rim of the character color', async () => {
     await posted(
       stepOf({
         character: {
@@ -116,7 +116,7 @@ describe('la bannière', () => {
     expect(document.querySelector('.stripe')?.classList).toContain('tint-sky')
   })
 
-  it('ne porte pas de liseré pour un personnage sans couleur', async () => {
+  it('carries no rim for a character without a color', async () => {
     await posted(
       stepOf({
         character: {
@@ -131,7 +131,7 @@ describe('la bannière', () => {
     expect(document.querySelector('.stripe')).toBeNull()
   })
 
-  it('porte la tête de classe du personnage', async () => {
+  it('carries the class head of the character', async () => {
     await posted(
       stepOf({
         character: {
@@ -146,7 +146,7 @@ describe('la bannière', () => {
     expect(portrait()).toBe(CLASS_PORTRAITS.cra.female)
   })
 
-  it('porte le pseudo même sans classe ni sexe', async () => {
+  it('carries the nickname even without a class nor a gender', async () => {
     await posted(
       stepOf({
         character: {
@@ -162,7 +162,7 @@ describe('la bannière', () => {
     expect(portrait()).toBeNull()
   })
 
-  it('suit le pas suivant', async () => {
+  it('follows the next step', async () => {
     await posted(
       stepOf({
         character: {
@@ -189,7 +189,7 @@ describe('la bannière', () => {
     expect(screen.queryByText('Alpha')).toBeNull()
   })
 
-  it('revient à Déplacement rapide quand on quitte le jeu', async () => {
+  it('goes back to the Quick move name when the game is left', async () => {
     await posted(
       stepOf({
         character: {

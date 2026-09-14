@@ -4,34 +4,34 @@ import { screenShape } from '@/helpers/display'
 import { displayOf } from '@/test-doubles'
 
 describe('screenShape', () => {
-  it('prend le 16/9 quand aucun écran n’est encore connu', () => {
+  it('takes the 16/9 when no screen is known yet', () => {
     const shape = screenShape(null)
 
     expect(shape.width).toBe(WIDESCREEN.width)
     expect(shape.ratio).toBe(WIDESCREEN.width / WIDESCREEN.height)
   })
 
-  it('rend la forme de l’écran qu’on lui donne', () => {
+  it('returns the shape of the given screen', () => {
     const shape = screenShape(displayOf({ width: 2560, height: 1440 }))
 
     expect(shape.width).toBe(2560)
     expect(shape.ratio).toBe(2560 / 1440)
   })
 
-  it('dessine un écran plus large que haut à la largeur du cadre', () => {
+  it('draws a screen wider than tall at the width of the frame', () => {
     const shape = screenShape(displayOf({ width: 3840, height: 1080 }))
 
     expect(shape.drawnWidth).toBe(DRAWN_SCREEN.width)
   })
 
-  it('rétrécit le dessin d’un écran presque carré, pour qu’il tienne en hauteur', () => {
+  it('shrinks the drawing of an almost square screen, so that it fits in height', () => {
     const shape = screenShape(displayOf({ width: 1280, height: 1024 }))
 
     expect(shape.drawnWidth).toBeLessThan(DRAWN_SCREEN.width)
     expect(shape.drawnWidth).toBe(DRAWN_SCREEN.height * (1280 / 1024))
   })
 
-  it('garde le dessin dans le cadre, quel que soit l’écran', () => {
+  it('keeps the drawing in the frame, whatever the screen', () => {
     const screens = [
       displayOf({ width: 1512, height: 982 }),
       displayOf({ width: 1920, height: 1080 }),

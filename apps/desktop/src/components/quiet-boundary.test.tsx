@@ -14,7 +14,7 @@ vi.mock(import('@/lib/multifus'), () => {
 const { QuietBoundary } = await import('@/components/quiet-boundary')
 
 const Broken = () => {
-  throw new Error('le tableau des runes a lâché')
+  throw new Error('the rune table gave up')
 }
 
 const drawBroken = () => {
@@ -27,8 +27,8 @@ const drawBroken = () => {
   )
 }
 
-describe('la barrière des fenêtres sans bord', () => {
-  it('laisse passer ce qu’on lui confie tant que rien ne lève', () => {
+describe('the boundary of the borderless windows', () => {
+  it('lets through what it is given while nothing throws', () => {
     render(
       <QuietBoundary>
         <p>Les poids des runes</p>
@@ -38,18 +38,16 @@ describe('la barrière des fenêtres sans bord', () => {
     expect(screen.getByText('Les poids des runes')).not.toBeNull()
   })
 
-  it('ne montre rien du tout quand un rendu lève', () => {
+  it('shows nothing at all when a render throws', () => {
     const { container } = drawBroken()
 
     expect(container.textContent).toBe('')
     expect(screen.queryByRole('alert')).toBeNull()
   })
 
-  it('écrit au journal ce que l’erreur disait', () => {
+  it('writes to the journal what the error said', () => {
     drawBroken()
 
-    expect(bridge.screenStopped).toHaveBeenCalledWith(
-      'le tableau des runes a lâché'
-    )
+    expect(bridge.screenStopped).toHaveBeenCalledWith('the rune table gave up')
   })
 })

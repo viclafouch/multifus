@@ -53,8 +53,8 @@ const loopShown = (caption = WHEEL_CAPTION) => {
   return screen.queryByLabelText(caption)
 }
 
-describe('le bouton de la vidéo', () => {
-  it('porte le même mot sur chaque écran qui a une vidéo', () => {
+describe('the video button', () => {
+  it('carries the same word on every screen that has a video', () => {
     const named = Object.values(MAP_LOOPS).filter((loop) => {
       return loop !== null
     })
@@ -72,7 +72,7 @@ describe('le bouton de la vidéo', () => {
     }
   })
 
-  it('ouvre la vidéo de son écran, et pas une autre', async () => {
+  it('opens the video of its screen, and not another one', async () => {
     show({ loop: MAP_LOOPS.runeTable })
 
     fireEvent.click(screen.getByRole('button', { name: 'Voir la vidéo' }))
@@ -84,8 +84,8 @@ describe('le bouton de la vidéo', () => {
   })
 })
 
-describe('la vidéo d’un écran', () => {
-  it('vient d’elle-même à la première arrivée, et ne revient plus', async () => {
+describe('the video of a screen', () => {
+  it('comes by itself on the first arrival, and never comes back', async () => {
     show({ isSeen: false })
 
     expect(loopShown()).toBeNull()
@@ -99,7 +99,7 @@ describe('la vidéo d’un écran', () => {
     expect(bridge.setLoopSeen).toHaveBeenCalledExactlyOnceWith('wheel')
   })
 
-  it('ne s’ouvre jamais toute seule une fois vue', async () => {
+  it('never opens on its own once seen', async () => {
     show()
 
     await new Promise((resolve) => {
@@ -109,7 +109,7 @@ describe('la vidéo d’un écran', () => {
     expect(screen.queryByRole('dialog')).toBeNull()
   })
 
-  it('se rouvre au bouton, sans plus rien enregistrer', async () => {
+  it('opens again on the button, without recording anything more', async () => {
     show()
 
     fireEvent.click(screen.getByRole('button', { name: 'Voir la vidéo' }))
@@ -123,7 +123,7 @@ describe('la vidéo d’un écran', () => {
     expect(bridge.setLoopSeen).not.toHaveBeenCalled()
   })
 
-  it('n’enregistre qu’une fois, même rouverte avant que Rust ait répondu', async () => {
+  it('records only once, even reopened before Rust has answered', async () => {
     show({ isSeen: false })
     await findLateDialog()
 
@@ -136,7 +136,7 @@ describe('la vidéo d’un écran', () => {
     expect(bridge.setLoopSeen).toHaveBeenCalledTimes(1)
   })
 
-  it('ne revient pas toute seule quand on l’a déjà ouverte à la main', async () => {
+  it('does not come back on its own when it was already opened by hand', async () => {
     show({ isSeen: false })
 
     fireEvent.click(screen.getByRole('button', { name: 'Voir la vidéo' }))
@@ -150,7 +150,7 @@ describe('la vidéo d’un écran', () => {
     expect(screen.queryByRole('dialog')).toBeNull()
   })
 
-  it('arrive sans attendre pour qui a demandé moins de mouvement', () => {
+  it('comes without waiting for whoever asked for less motion', () => {
     show({ isSeen: false, isStill: true })
 
     expect(loopShown()).not.toBeNull()

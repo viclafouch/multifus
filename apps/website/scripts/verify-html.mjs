@@ -39,15 +39,15 @@ const checkRendered = (pathname, html) => {
   const body = html.slice(html.indexOf('<body>'))
 
   if (body.includes(SUSPENSE_ERROR)) {
-    complain(pathname, 'le rendu serveur a échoué, le corps est vide')
+    complain(pathname, 'the server render failed, the body is empty')
   }
 
   if (!body.includes('<h1')) {
-    complain(pathname, 'aucun titre dans le HTML livré')
+    complain(pathname, 'no title in the delivered HTML')
   }
 
   if (!html.includes('name="description"')) {
-    complain(pathname, 'aucune description')
+    complain(pathname, 'no description')
   }
 
   return body
@@ -59,59 +59,59 @@ for (const pathname of addresses) {
   const marked = SCHEMA.exec(html)
 
   if (marked === null) {
-    complain(pathname, 'aucun balisage schema.org')
+    complain(pathname, 'no schema.org markup')
   } else {
     const nodes = JSON.parse(marked[1])
 
     if (nodes.length === 0) {
-      complain(pathname, 'un balisage vide')
+      complain(pathname, 'an empty markup')
     }
 
     for (const node of nodes) {
       if (node['@context'] !== 'https://schema.org') {
-        complain(pathname, `une fiche ${node['@type']} hors de schema.org`)
+        complain(pathname, `a ${node['@type']} record outside of schema.org`)
       }
     }
   }
 
   if (!html.includes('rel="expect"')) {
-    complain(pathname, 'aucune attente de rendu pour la transition')
+    complain(pathname, 'no render expectation for the transition')
   }
 
   if (!body.includes(`id="${FOLD_ANCHOR}"`)) {
-    complain(pathname, `aucune bande ${FOLD_ANCHOR} à attendre`)
+    complain(pathname, `no ${FOLD_ANCHOR} band to wait for`)
   }
 
   if (!body.includes('Ankama')) {
-    complain(pathname, 'ni indépendance ni crédit d’Ankama')
+    complain(pathname, 'neither independence nor credit of Ankama')
   }
 
   if (!html.includes('hrefLang="x-default"')) {
-    complain(pathname, 'aucun x-default')
+    complain(pathname, 'no x-default')
   }
 
   if (!html.includes('rel="canonical"')) {
-    complain(pathname, 'aucune adresse canonique')
+    complain(pathname, 'no canonical address')
   }
 
   const drawn = OG_IMAGE.exec(html)
 
   if (drawn === null) {
-    complain(pathname, 'aucune image Open Graph')
+    complain(pathname, 'no Open Graph image')
   } else if (!existsSync(join(CLIENT, new URL(drawn[1]).pathname))) {
-    complain(pathname, `l’image ${drawn[1]} n’est pas livrée`)
+    complain(pathname, `the image ${drawn[1]} is not delivered`)
   }
 
   if (!html.includes('content="summary_large_image"')) {
-    complain(pathname, 'la carte Twitter n’est pas en grand format')
+    complain(pathname, 'the Twitter card is not in large format')
   }
 
   if (!/<html lang="(?:fr|en|es)">/u.test(html)) {
-    complain(pathname, 'aucune langue sur la balise html')
+    complain(pathname, 'no language on the html tag')
   }
 
   if (body.includes('data-offer')) {
-    complain(pathname, 'la proposition de langue est dans le HTML prérendu')
+    complain(pathname, 'the language offer is in the prerendered HTML')
   }
 
   const flags = [...body.matchAll(/<a\b[^>]*>/gu)]
@@ -123,7 +123,10 @@ for (const pathname of addresses) {
     })
 
   if (flags.length !== 3) {
-    complain(pathname, `${flags.length} drapeaux au cartouche au lieu de trois`)
+    complain(
+      pathname,
+      `${flags.length} flags in the language bar instead of three`
+    )
   }
 
   const lit = flags.filter((tag) => {
@@ -131,12 +134,12 @@ for (const pathname of addresses) {
   })
 
   if (lit.length !== 1) {
-    complain(pathname, `${lit.length} drapeaux allumés au lieu d’un`)
+    complain(pathname, `${lit.length} flags lit instead of one`)
   }
 }
 
 if (addresses.length === 0) {
-  complain('sitemap.xml', 'aucune adresse')
+  complain('sitemap.xml', 'no address')
 }
 
 const SERVED = [
@@ -154,14 +157,14 @@ const missing = SERVED.filter((name) => {
 })
 
 for (const name of missing) {
-  complain(name, 'absent du paquet livré')
+  complain(name, 'missing from the delivered bundle')
 }
 
 if (!missing.includes(ROBOTS_PATH)) {
   const robots = readFileSync(join(CLIENT, ROBOTS_PATH), 'utf8')
 
   if (!robots.includes(`Sitemap: ${host}/sitemap.xml`)) {
-    complain(ROBOTS_PATH, 'aucun renvoi vers le sitemap')
+    complain(ROBOTS_PATH, 'no reference to the sitemap')
   }
 }
 
@@ -170,8 +173,8 @@ if (!missing.includes(LOST_FILE)) {
 }
 
 if (complaints.length > 0) {
-  console.error(`Le HTML livré ne tient pas :\n${complaints.join('\n')}`)
+  console.error(`The delivered HTML does not hold:\n${complaints.join('\n')}`)
   process.exit(1)
 }
 
-console.log(`${addresses.length} pages livrées, toutes complètes.`)
+console.log(`${addresses.length} pages delivered, all complete.`)

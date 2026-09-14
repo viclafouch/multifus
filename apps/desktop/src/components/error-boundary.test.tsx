@@ -20,7 +20,7 @@ vi.mock(import('@/lib/reload'), () => {
 const { ErrorBoundary } = await import('@/components/error-boundary')
 
 const Broken = () => {
-  throw new Error('le rendu a lâché')
+  throw new Error('the render gave up')
 }
 
 const drawBroken = () => {
@@ -33,8 +33,8 @@ const drawBroken = () => {
   )
 }
 
-describe('l’écran qui remplace la fenêtre blanche', () => {
-  it('laisse passer ce qu’on lui confie tant que rien ne lève', () => {
+describe('the screen that replaces the white window', () => {
+  it('lets through what it is given while nothing throws', () => {
     render(
       <ErrorBoundary>
         <p>La roue tourne</p>
@@ -44,7 +44,7 @@ describe('l’écran qui remplace la fenêtre blanche', () => {
     expect(screen.getByText('La roue tourne')).not.toBeNull()
   })
 
-  it('dit que Multifus tourne toujours quand un rendu lève', () => {
+  it('says Multifus is still running when a render throws', () => {
     drawBroken()
 
     expect(screen.getByRole('alert')).not.toBeNull()
@@ -52,19 +52,19 @@ describe('l’écran qui remplace la fenêtre blanche', () => {
     expect(screen.getByText(/Multifus, lui, tourne toujours/u)).not.toBeNull()
   })
 
-  it('montre le message de l’erreur, celui qu’on recopie dans un rapport', () => {
+  it('shows the error message, the one copied into a report', () => {
     drawBroken()
 
-    expect(screen.getByText('le rendu a lâché')).not.toBeNull()
+    expect(screen.getByText('the render gave up')).not.toBeNull()
   })
 
-  it('écrit dans le journal, que le bouton propose ensuite d’ouvrir', () => {
+  it('writes to the journal, which the button then offers to open', () => {
     drawBroken()
 
-    expect(bridge.screenStopped).toHaveBeenCalledWith('le rendu a lâché')
+    expect(bridge.screenStopped).toHaveBeenCalledWith('the render gave up')
   })
 
-  it('offre de recharger l’écran et d’ouvrir le journal', () => {
+  it('offers to reload the screen and to open the journal', () => {
     drawBroken()
 
     expect(
@@ -76,7 +76,7 @@ describe('l’écran qui remplace la fenêtre blanche', () => {
     ).not.toBeNull()
   })
 
-  it('recharge l’écran quand on le lui demande', () => {
+  it('reloads the screen when asked', () => {
     drawBroken()
 
     fireEvent.click(screen.getByRole('button', { name: 'Recharger l’écran' }))

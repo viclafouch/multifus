@@ -47,27 +47,27 @@ const toggle = () => {
   return screen.getByRole('button', { expanded: false })
 }
 
-describe('le journal', () => {
-  it('reste replié à l’ouverture de la fenêtre', () => {
+describe('the journal', () => {
+  it('stays folded when the window opens', () => {
     show(ENTRIES)
 
     expect(toggle()).not.toBeNull()
     expect(screen.queryByText(LINES[0])).toBeNull()
   })
 
-  it('compte ce qu’il a à dire, replié', () => {
+  it('counts what it has to say, folded', () => {
     show(ENTRIES)
 
     expect(screen.getByText('2 entrées')).not.toBeNull()
   })
 
-  it('compte une entrée au singulier', () => {
+  it('counts one entry in the singular', () => {
     show([ENTRIES[0]])
 
     expect(screen.getByText('1 entrée')).not.toBeNull()
   })
 
-  it('déroule les lignes et leur heure quand on l’ouvre', () => {
+  it('unfolds the lines and their time when it is opened', () => {
     show(ENTRIES)
 
     fireEvent.click(toggle())
@@ -78,7 +78,7 @@ describe('le journal', () => {
     }
   })
 
-  it('se replie quand on le reclique', () => {
+  it('folds back when it is clicked again', () => {
     show(ENTRIES)
 
     fireEvent.click(toggle())
@@ -87,7 +87,7 @@ describe('le journal', () => {
     expect(screen.queryByText(LINES[0])).toBeNull()
   })
 
-  it('dit qu’il n’a rien à signaler quand il est vide', () => {
+  it('says it has nothing to report when it is empty', () => {
     show([])
 
     fireEvent.click(toggle())
@@ -95,7 +95,7 @@ describe('le journal', () => {
     expect(screen.getByText('Rien à signaler pour l’instant.')).not.toBeNull()
   })
 
-  it('n’offre de copier que lorsqu’il a quelque chose à dire', () => {
+  it('offers to copy only when it has something to say', () => {
     show([])
 
     expect(
@@ -103,7 +103,7 @@ describe('le journal', () => {
     ).toBeNull()
   })
 
-  it('offre de copier dès la première ligne, même replié', () => {
+  it('offers to copy from the first line, even folded', () => {
     show(ENTRIES)
 
     expect(
@@ -111,7 +111,7 @@ describe('le journal', () => {
     ).not.toBeNull()
   })
 
-  it('mène au fichier du journal', () => {
+  it('leads to the journal file', () => {
     show([])
 
     fireEvent.click(

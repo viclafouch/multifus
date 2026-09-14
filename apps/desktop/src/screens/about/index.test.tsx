@@ -59,8 +59,8 @@ const LEGAL = [
   }
 ]
 
-describe('l’écran À propos', () => {
-  it('dit ce qu’est Multifus et tout ce qu’il sait faire', () => {
+describe('the About screen', () => {
+  it('says what Multifus is and everything it can do', () => {
     show()
 
     expect(
@@ -73,7 +73,7 @@ describe('l’écran À propos', () => {
     ).not.toBeNull()
   })
 
-  it('dit la version, le système et où sont rangés les réglages', () => {
+  it('says the version, the system and where the settings are kept', () => {
     show({ version: '1.4.2', system: 'Windows 10.0.26100 (x64)' })
 
     expect(screen.getByText('1.4.2')).not.toBeNull()
@@ -81,7 +81,7 @@ describe('l’écran À propos', () => {
     expect(screen.getByText(CONFIG_PATH)).not.toBeNull()
   })
 
-  it('ouvre le dossier des réglages', () => {
+  it('opens the settings folder', () => {
     bridge.revealConfig.mockResolvedValue(null)
     show()
 
@@ -90,7 +90,7 @@ describe('l’écran À propos', () => {
     expect(bridge.revealConfig).toHaveBeenCalledWith()
   })
 
-  it('mène chaque mention légale par la phrase qui compte', () => {
+  it('leads to each legal notice through the sentence that matters', () => {
     show()
 
     for (const { lead } of LEGAL) {
@@ -98,7 +98,7 @@ describe('l’écran À propos', () => {
     }
   })
 
-  it('dit Ankama, les paquets auxquels on ne touche pas, et internet', () => {
+  it('says Ankama, the packages nobody touches, and the internet', () => {
     show()
 
     const said = LEGAL.map(({ lead, body }) => {
@@ -110,7 +110,7 @@ describe('l’écran À propos', () => {
     }
   })
 
-  it('dit que Telegram ne part qu’à la demande', () => {
+  it('says Telegram only leaves on request', () => {
     show()
 
     const telegram = LEGAL.find(({ body }) => {
@@ -120,8 +120,8 @@ describe('l’écran À propos', () => {
     expect(telegram?.body).toContain('seulement si vous')
   })
 
-  describe('ce qu’Ankama autorise', () => {
-    it('dit la tolérance, la limite et qui répond de Multifus', () => {
+  describe('what Ankama allows', () => {
+    it('says the tolerance, the limit and who answers for Multifus', () => {
       show()
 
       expect(
@@ -135,7 +135,7 @@ describe('l’écran À propos', () => {
       ).not.toBeNull()
     })
 
-    it('montre les deux messages d’Ankama, datés et situés', () => {
+    it('shows the two messages of Ankama, dated and placed', () => {
       show()
 
       expect(
@@ -146,7 +146,7 @@ describe('l’écran À propos', () => {
       ).not.toBeNull()
     })
 
-    it('ouvre un message en grand, sa source par-dessus', async () => {
+    it('opens a message at full size, its source on top of it', async () => {
       show()
 
       fireEvent.click(
@@ -163,7 +163,7 @@ describe('l’écran À propos', () => {
       expect(buttonNamed('Fermer')).not.toBeNull()
     })
 
-    it('mène à la page d’Ankama où le message a été écrit', async () => {
+    it('leads to the Ankama page where the message was written', async () => {
       bridge.openAboutLink.mockResolvedValue(null)
       show()
 
@@ -180,8 +180,8 @@ describe('l’écran À propos', () => {
     })
   })
 
-  describe('le projet', () => {
-    it('mène au code source et à l’endroit où raconter un bug', () => {
+  describe('the project', () => {
+    it('leads to the source code and to the place where a bug is told', () => {
       bridge.openAboutLink.mockResolvedValue(null)
       show()
 
@@ -193,8 +193,8 @@ describe('l’écran À propos', () => {
     })
   })
 
-  describe('la mise à jour', () => {
-    it('va voir s’il y en a une, à la demande', () => {
+  describe('the update', () => {
+    it('goes and sees if there is one, on request', () => {
       show({ update: { kind: 'upToDate' } })
 
       fireEvent.click(buttonNamed('Vérifier'))
@@ -203,20 +203,20 @@ describe('l’écran À propos', () => {
       expect(bridge.installUpdate).not.toHaveBeenCalled()
     })
 
-    it('dit que la version est la dernière', () => {
+    it('says the version is the latest', () => {
       show({ update: { kind: 'upToDate' } })
 
       expect(screen.getByText('Vous êtes à jour.')).not.toBeNull()
     })
 
-    it('dit que la vérification est en cours', () => {
+    it('says the check is going on', () => {
       show({ update: { kind: 'checking' } })
 
       expect(screen.getByText('Vérification en cours…')).not.toBeNull()
       expect(buttonNamed('Vérifier').getAttribute('aria-busy')).toBe('true')
     })
 
-    it('propose d’installer la version trouvée', () => {
+    it('offers to install the version it found', () => {
       show({ update: { kind: 'available', version: '1.5.0' } })
 
       expect(
@@ -231,14 +231,14 @@ describe('l’écran À propos', () => {
       expect(bridge.checkUpdate).not.toHaveBeenCalled()
     })
 
-    it('dit que le téléchargement est en cours', () => {
+    it('says the download is going on', () => {
       show({ update: { kind: 'installing' } })
 
       expect(screen.getByText('Téléchargement en cours…')).not.toBeNull()
       expect(buttonNamed('Installer').getAttribute('aria-busy')).toBe('true')
     })
 
-    it('dit pourquoi la mise à jour n’a pas abouti, et laisse réessayer', () => {
+    it('says why the update did not go through, and lets it be tried again', () => {
       show({ update: { kind: 'failed', detail: 'signature invalide' } })
 
       expect(
@@ -251,8 +251,8 @@ describe('l’écran À propos', () => {
     })
   })
 
-  describe('tout remettre à neuf', () => {
-    it('demande confirmation avant de rien toucher', () => {
+  describe('resetting everything', () => {
+    it('asks for a confirmation before touching anything', () => {
       show()
 
       fireEvent.click(buttonNamed('Tout réinitialiser'))
@@ -266,7 +266,7 @@ describe('l’écran À propos', () => {
       expect(bridge.reset).not.toHaveBeenCalled()
     })
 
-    it('prévient que les personnages Dofus ne risquent rien', () => {
+    it('warns the Dofus characters risk nothing', () => {
       show()
 
       expect(
@@ -279,7 +279,7 @@ describe('l’écran À propos', () => {
       ).toContain('Dofus Retro')
     })
 
-    it('n’efface rien quand on annule', async () => {
+    it('clears nothing when it is cancelled', async () => {
       show()
 
       fireEvent.click(buttonNamed('Tout réinitialiser'))
@@ -291,7 +291,7 @@ describe('l’écran À propos', () => {
       expect(bridge.reset).not.toHaveBeenCalled()
     })
 
-    it('demande à Rust de tout effacer quand on confirme', async () => {
+    it('asks Rust to clear everything when it is confirmed', async () => {
       show()
 
       fireEvent.click(buttonNamed('Tout réinitialiser'))

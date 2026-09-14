@@ -14,7 +14,7 @@ const threeFrames = async () => {
 }
 
 describe('afterPaint', () => {
-  it('ne travaille pas sur l’image que la page dessine déjà', async () => {
+  it('does not work on the frame the page is already drawing', async () => {
     const work = vi.fn()
 
     afterPaint(work)
@@ -24,7 +24,7 @@ describe('afterPaint', () => {
     expect(work).not.toHaveBeenCalled()
   })
 
-  it('travaille une fois la page redessinée', async () => {
+  it('works once the page is drawn again', async () => {
     const work = vi.fn()
 
     afterPaint(work)
@@ -34,7 +34,7 @@ describe('afterPaint', () => {
     expect(work).toHaveBeenCalledWith()
   })
 
-  it('renonce si on l’annule avant l’image', async () => {
+  it('gives up if it is cancelled before the frame', async () => {
     const work = vi.fn()
 
     afterPaint(work)()

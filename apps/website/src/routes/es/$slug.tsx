@@ -16,7 +16,7 @@ export const Route = createFileRoute('/es/$slug')({
     const page = pageOf({ slug: params.slug, language: LANGUAGE })
 
     if (page === null) {
-      // oxlint-disable-next-line only-throw-error -- notFound() de TanStack n'est pas une Error, c'est le signal d'un 404
+      // oxlint-disable-next-line only-throw-error -- notFound() from TanStack is not an Error, it is the signal of a 404
       throw notFound()
     }
 

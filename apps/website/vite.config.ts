@@ -43,12 +43,12 @@ const originOf = (mode: string) => {
     return new URL(VITE_SITE_URL).origin
   } catch {
     throw new Error(
-      `VITE_SITE_URL absente ou invalide pour le mode ${mode} : ajoutez-la au .env du site`
+      `VITE_SITE_URL missing or invalid for mode ${mode}: add it to the .env of the site`
     )
   }
 }
 
-// oxlint-disable-next-line prefer-readonly-parameter-types -- la signature du rappel appartient à ConfigEnv de Vite
+// oxlint-disable-next-line prefer-readonly-parameter-types -- the signature of the callback belongs to the ConfigEnv of Vite
 export default defineConfig(({ mode }) => {
   return {
     plugins: [

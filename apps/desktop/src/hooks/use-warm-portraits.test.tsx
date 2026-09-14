@@ -34,7 +34,7 @@ const askedInOrder = (asked: readonly string[]) => {
 }
 
 describe('useWarmPortraits', () => {
-  it('demande les vingt-quatre portraits, hommes et femmes', () => {
+  it('asks for the twenty four portraits, males and females', () => {
     const asked = warmed()
 
     renderHook(() => {
@@ -44,7 +44,7 @@ describe('useWarmPortraits', () => {
     expect(askedInOrder(asked)).toStrictEqual(EVERY_PORTRAIT)
   })
 
-  it('ne les redemande pas à chaque rendu', () => {
+  it('does not ask for them again on every render', () => {
     const asked = warmed()
 
     const { rerender } = renderHook(() => {

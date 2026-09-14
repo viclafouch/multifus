@@ -55,8 +55,8 @@ const TEAM = [
   wheelSliceOf({ nickname: 'Charlie', class: null, gender: null, main: true })
 ]
 
-describe('la roue', () => {
-  it('ne dessine rien tant que Rust n’a pas parlé', () => {
+describe('the wheel', () => {
+  it('draws nothing while Rust has not spoken', () => {
     bridge.wheelStep.mockImplementation(pending)
     bridge.onWheelStep.mockImplementation(pending)
     bridge.onWheelAim.mockImplementation(pending)
@@ -67,13 +67,13 @@ describe('la roue', () => {
     expect(container.textContent).toBe('')
   })
 
-  it('porte une part par personnage connecté, pseudo compris', async () => {
+  it('carries one slice per online character, nickname included', async () => {
     await show(stepOf({ slices: TEAM }))
 
     expect(namesOf()).toStrictEqual(['Alpha', 'Bravo', 'Charlie'])
   })
 
-  it('allume la part visée', async () => {
+  it('lights the aimed slice', async () => {
     await show(stepOf({ slices: TEAM, hovered: 1 }))
 
     const lit = [...document.querySelectorAll('.wheel-slice')].map((slice) => {
@@ -83,19 +83,19 @@ describe('la roue', () => {
     expect(lit).toStrictEqual([false, true, false])
   })
 
-  it('n’écrit rien au centre tant qu’il reste un personnage', async () => {
+  it('writes nothing at the center while one character is left', async () => {
     await show(stepOf({ slices: TEAM }))
 
     expect(document.querySelector('p')).toBeNull()
   })
 
-  it('s’ouvre en le disant quand personne n’est connecté', async () => {
+  it('opens saying so when nobody is online', async () => {
     await show(stepOf({ slices: [] }))
 
     expect(screen.getByText('Personne de connecté')).not.toBeNull()
   })
 
-  it('pose ce que la roue lui donne, aperçu comme vraie roue', async () => {
+  it('lays what the wheel gives it, preview as well as real wheel', async () => {
     await show(stepOf({ slices: TEAM, previewing: true }))
 
     expect(namesOf()).toStrictEqual(
@@ -105,7 +105,7 @@ describe('la roue', () => {
     )
   })
 
-  it('rend l’étoile au principal, et à lui seul', async () => {
+  it('gives the star back to the main one, and to it alone', async () => {
     await show(stepOf({ slices: TEAM }))
 
     expect(screen.getAllByText('Personnage principal')).toHaveLength(1)

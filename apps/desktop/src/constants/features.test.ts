@@ -36,12 +36,12 @@ const missingFromRoll = () => {
   return missing
 }
 
-describe('les fonctionnalités du générique', () => {
-  it('nomment toutes les maps du monde, les réglages mis à part', () => {
+describe('the features of the credits', () => {
+  it('name every map of the world, the settings aside', () => {
     expect(missingFromRoll()).toStrictEqual([])
   })
 
-  it('ne mène deux fois qu’à la map qui porte deux fonctionnalités', () => {
+  it('leads twice only to the map that carries two features', () => {
     expect(TWICE_NAMED).toStrictEqual(['characters'])
   })
 })

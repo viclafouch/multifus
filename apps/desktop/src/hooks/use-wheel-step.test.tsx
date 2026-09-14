@@ -96,13 +96,13 @@ describe('useWheelStep', () => {
     bridge.first = null
   })
 
-  it('n’a rien à dessiner avant que Rust ouvre la roue', () => {
+  it('has nothing to draw before Rust opens the wheel', () => {
     const { result } = show()
 
     expect(result.current).toBeNull()
   })
 
-  it('prend la roue que Rust lui donne au départ', async () => {
+  it('takes the wheel Rust gives it at the start', async () => {
     const { result } = show()
 
     await listening()
@@ -111,7 +111,7 @@ describe('useWheelStep', () => {
     expect(result.current).toStrictEqual(stepOf(null))
   })
 
-  it('laisse la roue ouverte passer devant celle du départ', async () => {
+  it('lets the opened wheel go before the one of the start', async () => {
     const { result } = show()
 
     await listening()
@@ -124,7 +124,7 @@ describe('useWheelStep', () => {
     expect(result.current?.hovered).toBe(1)
   })
 
-  it('suit la part visée sans redemander toute la roue', async () => {
+  it('follows the aimed slice without asking for the whole wheel again', async () => {
     const { result } = show()
 
     await listening()
@@ -140,7 +140,7 @@ describe('useWheelStep', () => {
     expect(result.current?.slices).toBe(opened?.slices)
   })
 
-  it('rend le centre à personne quand la souris quitte le disque', async () => {
+  it('gives the center back to nobody when the mouse leaves the disc', async () => {
     const { result } = show()
 
     await listening()
@@ -153,7 +153,7 @@ describe('useWheelStep', () => {
     expect(result.current?.hovered).toBeNull()
   })
 
-  it('ne vise rien tant que Rust n’a pas ouvert la roue', async () => {
+  it('aims at nothing while Rust has not opened the wheel', async () => {
     const { result } = show()
 
     await waitFor(() => {
@@ -167,7 +167,7 @@ describe('useWheelStep', () => {
     expect(result.current).toBeNull()
   })
 
-  it('efface la roue dès que Rust la referme, et le lui dit', async () => {
+  it('clears the wheel as soon as Rust closes it, and tells it so', async () => {
     const { result } = show()
 
     await listening()
@@ -184,7 +184,7 @@ describe('useWheelStep', () => {
     })
   })
 
-  it('ne dit rien à Rust tant que la roue est à l’écran', async () => {
+  it('says nothing to Rust while the wheel is on the screen', async () => {
     show()
 
     await listening()
@@ -193,7 +193,7 @@ describe('useWheelStep', () => {
     expect(bridge.answered).not.toHaveBeenCalled()
   })
 
-  it('laisse effacée la roue que Rust a refermée avant sa réponse', async () => {
+  it('leaves cleared the wheel Rust closed before its answer', async () => {
     const { result } = show()
 
     await listening()
@@ -206,7 +206,7 @@ describe('useWheelStep', () => {
     expect(result.current).toBeNull()
   })
 
-  it('cesse d’écouter les trois canaux quand la fenêtre s’en va', async () => {
+  it('stops listening to the three channels when the window leaves', async () => {
     const { unmount } = show()
 
     await listening()

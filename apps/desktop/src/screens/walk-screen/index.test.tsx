@@ -112,8 +112,8 @@ const chipNamed = (rank: number) => {
   })
 }
 
-describe('l’écran du Déplacement rapide', () => {
-  it('l’allume quand on bouge l’interrupteur', async () => {
+describe('the Quick move screen', () => {
+  it('turns it on when the switch is moved', async () => {
     await show({ enabled: false })
 
     fireEvent.click(screen.getByRole('switch', { name: 'Déplacement rapide' }))
@@ -121,7 +121,7 @@ describe('l’écran du Déplacement rapide', () => {
     expect(bridge.setWalkEnabled).toHaveBeenCalledWith(true)
   })
 
-  it('l’éteint quand on rebouge l’interrupteur', async () => {
+  it('turns it off when the switch is moved again', async () => {
     await show({ enabled: true })
 
     fireEvent.click(screen.getByRole('switch', { name: 'Déplacement rapide' }))
@@ -129,7 +129,7 @@ describe('l’écran du Déplacement rapide', () => {
     expect(bridge.setWalkEnabled).toHaveBeenCalledWith(false)
   })
 
-  it('dit qu’il est allumé, et ce que valent les clics', async () => {
+  it('says it is on, and what the clicks are worth', async () => {
     await show({ enabled: true })
 
     expect(screen.getByText('Allumé')).not.toBeNull()
@@ -139,7 +139,7 @@ describe('l’écran du Déplacement rapide', () => {
     expect(screen.queryByText('Éteint')).toBeNull()
   })
 
-  it('dit qu’il est éteint, et ce que valent les clics', async () => {
+  it('says it is off, and what the clicks are worth', async () => {
     await show({ enabled: false })
 
     expect(screen.getByText('Éteint')).not.toBeNull()
@@ -149,21 +149,21 @@ describe('l’écran du Déplacement rapide', () => {
     expect(screen.queryByText('Allumé')).toBeNull()
   })
 
-  describe('le rappel du raccourci', () => {
-    it('dessine les touches du raccourci', async () => {
+  describe('the recall of the shortcut', () => {
+    it('draws the keys of the shortcut', async () => {
       await show({ shortcuts: [walkShortcut('Control+Shift+KeyW')] })
 
       expect(keyCaps()).toStrictEqual(['Ctrl', 'Maj', 'W'])
     })
 
-    it('dit qu’il n’y en a aucune tant que rien n’est posé', async () => {
+    it('says there is none while nothing is set', async () => {
       await show({ shortcuts: [walkShortcut(null)] })
 
       expect(screen.getByText('Aucune')).not.toBeNull()
       expect(keyCaps()).toStrictEqual([])
     })
 
-    it('dit qu’il n’y en a aucune quand il n’est pas dans la liste', async () => {
+    it('says there is none when it is not in the list', async () => {
       await show({
         shortcuts: [
           {
@@ -179,8 +179,8 @@ describe('l’écran du Déplacement rapide', () => {
     })
   })
 
-  describe('le conseil sur le plein écran', () => {
-    it('dit de garder les clients en fenêtre agrandie, sur un Mac', async () => {
+  describe('the advice about full screen', () => {
+    it('says to keep the clients in an enlarged window, on a Mac', async () => {
       await show({ agent: APPLE_AGENT })
 
       expect(
@@ -190,7 +190,7 @@ describe('l’écran du Déplacement rapide', () => {
       ).not.toBeNull()
     })
 
-    it('ne dit rien sur Windows', async () => {
+    it('says nothing on Windows', async () => {
       await show({ agent: WINDOWS_AGENT })
 
       expect(
@@ -201,8 +201,8 @@ describe('l’écran du Déplacement rapide', () => {
     })
   })
 
-  describe('le coin de la bannière', () => {
-    it('dessine l’écran au format de celui qui porte la bannière', async () => {
+  describe('the corner of the banner', () => {
+    it('draws the screen at the format of the one that carries the banner', async () => {
       await show({
         screens: [ULTRAWIDE],
         banner: { corner: 'topLeft', screen: ULTRAWIDE.name }
@@ -215,7 +215,7 @@ describe('l’écran du Déplacement rapide', () => {
       expect(monitor.style.aspectRatio).toBe(`${3440 / 1440} / 1`)
     })
 
-    it('offre les quatre coins', async () => {
+    it('offers the four corners', async () => {
       await show()
 
       for (const label of CORNER_LABELS) {
@@ -223,7 +223,7 @@ describe('l’écran du Déplacement rapide', () => {
       }
     })
 
-    it('montre le coin en cours comme choisi, et lui seul', async () => {
+    it('shows the current corner as chosen, and only it', async () => {
       await show({ banner: { corner: 'topLeft', screen: null } })
 
       expect(cornerNamed('En haut à gauche').getAttribute('aria-pressed')).toBe(
@@ -234,7 +234,7 @@ describe('l’écran du Déplacement rapide', () => {
       )
     })
 
-    it('pose la bannière dans le coin désigné', async () => {
+    it('lays the banner in the named corner', async () => {
       await show({ banner: { corner: 'bottomRight', screen: null } })
 
       fireEvent.click(cornerNamed('En haut à droite'))
@@ -243,14 +243,14 @@ describe('l’écran du Déplacement rapide', () => {
     })
   })
 
-  describe('le choix de l’écran', () => {
-    it('ne demande rien tant qu’il n’y a qu’un écran', async () => {
+  describe('the choice of the screen', () => {
+    it('asks nothing while there is only one screen', async () => {
       await show({ screens: [LAPTOP] })
 
       expect(screen.queryByText('L’écran')).toBeNull()
     })
 
-    it('ne demande rien tant que le système n’a pas répondu', async () => {
+    it('asks nothing while the system has not answered', async () => {
       bridge.bannerScreens.mockImplementation(pending)
 
       await renderScreen({ banner: { corner: 'topLeft', screen: null } })
@@ -259,13 +259,13 @@ describe('l’écran du Déplacement rapide', () => {
       expect(cornerNamed('En haut à gauche')).not.toBeNull()
     })
 
-    it('ne demande rien quand le système ne rend aucun écran', async () => {
+    it('asks nothing when the system returns no screen', async () => {
       await show({ screens: [] })
 
       expect(screen.queryByText('L’écran')).toBeNull()
     })
 
-    it('offre une pastille par écran dès qu’il y en a deux', async () => {
+    it('offers one dot per screen as soon as there are two', async () => {
       await show({ screens: [LAPTOP, TELEVISION] })
 
       expect(screen.getByText('L’écran')).not.toBeNull()
@@ -273,14 +273,14 @@ describe('l’écran du Déplacement rapide', () => {
       expect(chipNamed(2)).not.toBeNull()
     })
 
-    it('dit la taille de chaque écran, et lequel est le principal', async () => {
+    it('says the size of each screen, and which one is the main one', async () => {
       await show({ screens: [LAPTOP, TELEVISION] })
 
       expect(screen.getByText('3840 × 2160')).not.toBeNull()
       expect(screen.getAllByText('principal')).toHaveLength(1)
     })
 
-    it('pose la bannière sur l’écran désigné', async () => {
+    it('lays the banner on the named screen', async () => {
       await show({ screens: [LAPTOP, TELEVISION] })
 
       fireEvent.click(chipNamed(2))
@@ -288,7 +288,7 @@ describe('l’écran du Déplacement rapide', () => {
       expect(bridge.setBannerScreen).toHaveBeenCalledWith(TELEVISION.name)
     })
 
-    it('montre l’écran choisi comme choisi', async () => {
+    it('shows the chosen screen as chosen', async () => {
       await show({
         screens: [LAPTOP, TELEVISION],
         banner: { corner: 'bottomRight', screen: TELEVISION.name }
@@ -298,7 +298,7 @@ describe('l’écran du Déplacement rapide', () => {
       expect(chipNamed(2).getAttribute('aria-pressed')).toBe('true')
     })
 
-    it('retombe sur l’écran principal quand celui d’avant a été débranché', async () => {
+    it('falls back on the main screen when the previous one was unplugged', async () => {
       await show({
         screens: [LAPTOP, TELEVISION],
         banner: { corner: 'bottomRight', screen: 'un écran parti' }

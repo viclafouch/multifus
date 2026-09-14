@@ -24,14 +24,14 @@ const numbersOf = (path: string) => {
 const RING = 100
 
 describe('headPlace', () => {
-  it('pose la première tête à midi', () => {
+  it('puts the first head at noon', () => {
     expect(headPlace({ index: 0, count: 4, ring: RING })).toStrictEqual({
       x: 0,
       y: -100
     })
   })
 
-  it('pose la deuxième à trois heures, et suit les aiguilles', () => {
+  it('puts the second one at three o’clock, and follows the hands', () => {
     const right = headPlace({ index: 1, count: 4, ring: RING })
     const bottom = headPlace({ index: 2, count: 4, ring: RING })
 
@@ -40,7 +40,7 @@ describe('headPlace', () => {
     expect(bottom.y).toBeCloseTo(100)
   })
 
-  it('boucle le tour par la gauche', () => {
+  it('loops the turn through the left', () => {
     const left = headPlace({ index: 3, count: 4, ring: RING })
 
     expect(left.x).toBeCloseTo(-100)
@@ -49,7 +49,7 @@ describe('headPlace', () => {
 })
 
 describe('slicePath', () => {
-  it('dessine un anneau entier pour un seul personnage', () => {
+  it('draws a whole ring for a single character', () => {
     const path = slicePath({ index: 0, count: 1, inner: 16 })
 
     expect(path.split('M')).toHaveLength(3)
@@ -57,7 +57,7 @@ describe('slicePath', () => {
     expect(numbersOf(path)).toContain(16)
   })
 
-  it('dessine un camembert fermé pour chacun des autres', () => {
+  it('draws a closed pie slice for each of the others', () => {
     const path = slicePath({ index: 2, count: 8, inner: 16 })
 
     expect(path.startsWith('M ')).toBe(true)
@@ -65,7 +65,7 @@ describe('slicePath', () => {
     expect(path.split('A')).toHaveLength(3)
   })
 
-  it('laisse une fente entre deux parts voisines', () => {
+  it('leaves a slit between two neighboring slices', () => {
     const first = slicePath({ index: 0, count: 4, inner: 16 })
     const second = slicePath({ index: 1, count: 4, inner: 16 })
 
@@ -75,7 +75,7 @@ describe('slicePath', () => {
     expect(startX).not.toBe(endX)
   })
 
-  it('écrit des nombres courts, sans traîne de virgule flottante', () => {
+  it('writes short numbers, without a trail of floating point', () => {
     for (const number of numbersOf(
       slicePath({ index: 1, count: 3, inner: 16 })
     )) {
@@ -85,7 +85,7 @@ describe('slicePath', () => {
 })
 
 describe('dialShape', () => {
-  it('fait grandir la tête et son pseudo avec le diamètre', () => {
+  it('grows the head and its nickname with the diameter', () => {
     const small = dialShape({ diameter: 280, deadZone: DEAD_ZONE, count: 6 })
     const wide = dialShape({ diameter: 720, deadZone: DEAD_ZONE, count: 6 })
 
@@ -94,14 +94,14 @@ describe('dialShape', () => {
     expect(wide.hub).toBeGreaterThan(small.hub)
   })
 
-  it('resserre la tête quand les parts se pressent', () => {
+  it('tightens the head when the slices press together', () => {
     const few = dialShape({ diameter: 400, deadZone: DEAD_ZONE, count: 4 })
     const many = dialShape({ diameter: 400, deadZone: DEAD_ZONE, count: 12 })
 
     expect(many.head).toBeLessThan(few.head)
   })
 
-  it('garde la tête et son pseudo dans leur part', () => {
+  it('keeps the head and its nickname inside their slice', () => {
     for (const count of [1, 2, 6, 8, 12]) {
       for (const diameter of [120, 200, 280, 400, 720]) {
         const shape = dialShape({ diameter, deadZone: DEAD_ZONE, count })
@@ -113,13 +113,13 @@ describe('dialShape', () => {
     }
   })
 
-  it('creuse le rond mort à la mesure que Rust a donnée', () => {
+  it('hollows the dead zone at the measure Rust gave', () => {
     const shape = dialShape({ diameter: 400, deadZone: DEAD_ZONE, count: 6 })
 
     expect(shape.inner).toBeCloseTo(DIAL_RADIUS * DEAD_ZONE)
   })
 
-  it('garde une tête lisible sur une roue vide', () => {
+  it('keeps a head readable on an empty wheel', () => {
     const shape = dialShape({ diameter: 400, deadZone: DEAD_ZONE, count: 0 })
 
     expect(shape.head).toBeGreaterThanOrEqual(HEAD_SMALLEST)
@@ -145,13 +145,13 @@ describe('drawnWheel', () => {
 
   const BOX = 640
 
-  it('prend la forme de l’écran qui porte Multifus', () => {
+  it('takes the shape of the screen that carries Multifus', () => {
     const drawn = drawnWheel({ screen: LAPTOP, size: GAUGE, boxWidth: BOX })
 
     expect(drawn.ratio).toBeCloseTo(LAPTOP.width / LAPTOP.height)
   })
 
-  it('grandit avec la jauge, et tient dans la boîte', () => {
+  it('grows with the gauge, and fits in the box', () => {
     const narrow = drawnWheel({ screen: LAPTOP, size: GAUGE, boxWidth: BOX })
     const wide = drawnWheel({
       screen: LAPTOP,
@@ -163,7 +163,7 @@ describe('drawnWheel', () => {
     expect(wide.drawnDiameter).toBeLessThanOrEqual(BOX / wide.ratio)
   })
 
-  it('garde l’exemple lisible sur tous les écrans, seul comme à huit', () => {
+  it('keeps the example readable on every screen, alone as with eight', () => {
     for (const width of [1280, 1512, 1920, 3840]) {
       for (const count of [DEMO_FEWEST, DEMO_USUAL, WIDEST_TEAM]) {
         const drawn = drawnWheel({
@@ -183,7 +183,7 @@ describe('drawnWheel', () => {
     }
   })
 
-  it('laisse de l’air entre la roue dessinée et son cadre', () => {
+  it('leaves some air between the drawn wheel and its frame', () => {
     const wide = drawnWheel({
       screen: LAPTOP,
       size: { ...GAUGE, diameter: 720 },
@@ -193,14 +193,14 @@ describe('drawnWheel', () => {
     expect(wide.drawnDiameter).toBeLessThan((BOX / wide.ratio) * 0.9)
   })
 
-  it('suit la boîte que la plaque lui donne, une fois mesurée', () => {
+  it('follows the box the plate gives it, once measured', () => {
     const wide = drawnWheel({ screen: LAPTOP, size: GAUGE, boxWidth: BOX })
     const half = drawnWheel({ screen: LAPTOP, size: GAUGE, boxWidth: BOX / 2 })
 
     expect(wide.drawnDiameter).toBeCloseTo(half.drawnDiameter * 2)
   })
 
-  it('retombe sur l’écran dessiné tant que rien n’est mesuré', () => {
+  it('falls back on the drawn screen while nothing is measured', () => {
     const unmeasured = drawnWheel({ screen: LAPTOP, size: GAUGE, boxWidth: 0 })
     const measured = drawnWheel({
       screen: LAPTOP,
@@ -211,7 +211,7 @@ describe('drawnWheel', () => {
     expect(unmeasured.drawnDiameter).toBeCloseTo(measured.drawnDiameter)
   })
 
-  it('prend un seize-neuvièmes tant que le système n’a nommé aucun écran', () => {
+  it('takes a sixteen ninths while the system has named no screen', () => {
     const drawn = drawnWheel({ screen: null, size: GAUGE, boxWidth: BOX })
 
     expect(drawn.ratio).toBeCloseTo(16 / 9)

@@ -21,12 +21,12 @@ const show = (offered: Language, onHide = () => {}) => {
   })
 }
 
-describe('la proposition de langue', () => {
+describe('the language offer', () => {
   afterEach(() => {
     cleanup()
   })
 
-  it('écrit en français quand c’est le français qu’elle propose', () => {
+  it('writes in French when it is French that it offers', () => {
     show('fr')
 
     const offer = screen.getByRole('link', { name: OFFER_IN_FRENCH })
@@ -35,7 +35,7 @@ describe('la proposition de langue', () => {
     expect(screen.getByRole('button', { name: CLOSE_IN_FRENCH })).toBeDefined()
   })
 
-  it.each(OTHERS)('n’écrit pas le français à qui parle %s', (offered) => {
+  it.each(OTHERS)('does not write French to whoever speaks %s', (offered) => {
     show(offered)
 
     expect(screen.queryByText(OFFER_IN_FRENCH)).toBeNull()
@@ -43,7 +43,7 @@ describe('la proposition de langue', () => {
     expect(screen.getByRole('link').getAttribute('hreflang')).toBe(offered)
   })
 
-  it.each(LANGUAGES)('mène à la même page, en %s', (offered) => {
+  it.each(LANGUAGES)('leads to the same page, in %s', (offered) => {
     show(offered)
 
     expect(screen.getByRole('link').getAttribute('href')).toBe(
@@ -51,19 +51,19 @@ describe('la proposition de langue', () => {
     )
   })
 
-  it.each(LANGUAGES)('donne le %s au lecteur d’écran', (offered) => {
+  it.each(LANGUAGES)('gives the %s to the screen reader', (offered) => {
     const { container } = show(offered)
 
     expect(container.querySelector('aside')?.getAttribute('lang')).toBe(offered)
   })
 
-  it('se laisse retrouver dans le HTML livré', () => {
+  it('lets itself be found in the delivered HTML', () => {
     const { container } = show('en')
 
     expect(container.querySelector('[data-offer]')).not.toBeNull()
   })
 
-  it('se masque à la demande', () => {
+  it('hides itself on request', () => {
     const onHide = vi.fn()
 
     show('fr', onHide)

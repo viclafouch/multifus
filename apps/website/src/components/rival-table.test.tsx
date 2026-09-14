@@ -20,18 +20,18 @@ const show = () => {
   )
 }
 
-describe('le tableau du comparatif', () => {
+describe('the table of the comparison', () => {
   afterEach(() => {
     cleanup()
   })
 
-  it('donne sa colonne à Multifus', () => {
+  it('gives its column to Multifus', () => {
     show()
 
     expect(screen.getByRole('columnheader', { name: 'Multifus' })).toBeDefined()
   })
 
-  it.each(RIVAL_IDS)('mène au code de %s', (rival) => {
+  it.each(RIVAL_IDS)('leads to the code of %s', (rival) => {
     show()
 
     const { name, code } = RIVALS[rival]
@@ -40,7 +40,7 @@ describe('le tableau du comparatif', () => {
     expect(link.getAttribute('href')).toBe(code)
   })
 
-  it.each(TRAIT_IDS)('pose la ligne %s', (trait) => {
+  it.each(TRAIT_IDS)('lays the %s row', (trait) => {
     show()
 
     expect(
@@ -50,7 +50,7 @@ describe('le tableau du comparatif', () => {
     ).toBeDefined()
   })
 
-  it('dit non sous Multifus là où Multifus ne fait rien', () => {
+  it('says no under Multifus where Multifus does nothing', () => {
     show()
 
     const row = screen.getByRole('row', {
@@ -61,7 +61,7 @@ describe('le tableau du comparatif', () => {
     expect(mine.getAttribute('aria-label')).toBe('non')
   })
 
-  it('dit chaque case en toutes lettres', () => {
+  it('says each cell in full words', () => {
     show()
 
     expect(screen.getAllByRole('img', { name: 'oui' }).length).toBeGreaterThan(
@@ -75,13 +75,13 @@ describe('le tableau du comparatif', () => {
     ).toBeGreaterThan(0)
   })
 
-  it('livre la raison d’une case à moitié sans qu’on la survole', () => {
+  it('delivers the reason of a half cell without it being hovered', () => {
     show()
 
     expect(screen.getByText('Code publié, sans licence libre.')).toBeDefined()
   })
 
-  it('lève la bulle quand le curseur se pose sur une case à moitié', () => {
+  it('raises the bubble when the cursor lands on a half cell', () => {
     show()
 
     const asked = screen.getAllByRole('button')[0]
@@ -104,7 +104,7 @@ describe('le tableau du comparatif', () => {
     expect(screen.queryByRole('tooltip')).toBeNull()
   })
 
-  it('date son relevé en français', () => {
+  it('dates its record in French', () => {
     show()
 
     expect(screen.getByText(/14 septembre 2026/u)).toBeDefined()

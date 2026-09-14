@@ -28,13 +28,13 @@ const GAMMA = { ...ALPHA, nickname: 'Gamma' }
 const ROSTER = [ALPHA, BETA, GAMMA]
 
 describe('arrange', () => {
-  it('rend le roster tel quel quand aucun ordre n’est en cours', () => {
+  it('returns the roster as it is when no order is going on', () => {
     const arranged = arrange({ characters: ROSTER, order: null })
 
     expect(arranged).toBe(ROSTER)
   })
 
-  it('suit l’ordre donné', () => {
+  it('follows the given order', () => {
     const arranged = arrange({
       characters: ROSTER,
       order: ['Gamma', 'Alpha', 'Beta']
@@ -43,7 +43,7 @@ describe('arrange', () => {
     expect(arranged).toStrictEqual([GAMMA, ALPHA, BETA])
   })
 
-  it('saute un pseudo que l’ordre nomme et que le roster n’a plus', () => {
+  it('skips a nickname the order names and the roster no longer has', () => {
     const order = ['Gamma', 'Delta', 'Alpha', 'Beta']
 
     const arranged = arrange({ characters: ROSTER, order })
@@ -51,7 +51,7 @@ describe('arrange', () => {
     expect(arranged).toStrictEqual([GAMMA, ALPHA, BETA])
   })
 
-  it('range à la fin un personnage que l’ordre a oublié', () => {
+  it('puts at the end a character the order forgot', () => {
     const order = ['Gamma', 'Alpha']
 
     const arranged = arrange({ characters: ROSTER, order })
@@ -59,7 +59,7 @@ describe('arrange', () => {
     expect(arranged).toStrictEqual([GAMMA, ALPHA, BETA])
   })
 
-  it('rend tout le roster quand l’ordre est vide', () => {
+  it('returns the whole roster when the order is empty', () => {
     const arranged = arrange({ characters: ROSTER, order: [] })
 
     expect(arranged).toStrictEqual([ALPHA, BETA, GAMMA])
@@ -67,27 +67,27 @@ describe('arrange', () => {
 })
 
 describe('nicknamesOf', () => {
-  it('rend les pseudos dans l’ordre du roster', () => {
+  it('returns the nicknames in the order of the roster', () => {
     expect(nicknamesOf(ROSTER)).toStrictEqual(['Alpha', 'Beta', 'Gamma'])
   })
 })
 
 describe('matchIsInCycle', () => {
-  it('prend un personnage connecté et pas exclu', () => {
+  it('takes a character who is online and not excluded', () => {
     expect(matchIsInCycle(ALPHA)).toBe(true)
   })
 
-  it('laisse un personnage exclu', () => {
+  it('leaves out an excluded character', () => {
     expect(matchIsInCycle({ ...ALPHA, excluded: true })).toBe(false)
   })
 
-  it('laisse un personnage déconnecté', () => {
+  it('leaves out an offline character', () => {
     expect(matchIsInCycle({ ...ALPHA, online: false })).toBe(false)
   })
 })
 
 describe('genderGroupOf', () => {
-  it('allume un sexe dont au moins un connecté défile', () => {
+  it('lights a gender when at least one of its online characters cycles', () => {
     const characters = [{ ...ALPHA, excluded: true }, BETA]
 
     expect(genderGroupOf({ characters, gender: 'male' })).toStrictEqual({
@@ -96,7 +96,7 @@ describe('genderGroupOf', () => {
     })
   })
 
-  it('éteint un sexe dont tous les connectés sont exclus', () => {
+  it('turns off a gender when all its online characters are excluded', () => {
     const characters = [{ ...ALPHA, excluded: true }]
 
     expect(genderGroupOf({ characters, gender: 'male' })).toStrictEqual({
@@ -105,7 +105,7 @@ describe('genderGroupOf', () => {
     })
   })
 
-  it('dit vide un sexe dont personne n’est connecté', () => {
+  it('says a gender is empty when none of its characters is online', () => {
     const characters = [
       ALPHA,
       { ...BETA, gender: 'female', online: false }
@@ -119,7 +119,7 @@ describe('genderGroupOf', () => {
 })
 
 describe('genderlessNicknames', () => {
-  it('nomme les connectés qui n’ont pas de sexe', () => {
+  it('names the online ones who have no gender', () => {
     const characters = [
       ALPHA,
       { ...BETA, gender: null },
@@ -131,29 +131,29 @@ describe('genderlessNicknames', () => {
 })
 
 describe('matchIsArranged', () => {
-  it('dit oui quand aucun ordre n’est en cours', () => {
+  it('says yes when no order is going on', () => {
     expect(matchIsArranged({ characters: ROSTER, order: null })).toBe(true)
   })
 
-  it('dit oui quand le roster suit déjà l’ordre', () => {
+  it('says yes when the roster already follows the order', () => {
     const order = ['Alpha', 'Beta', 'Gamma']
 
     expect(matchIsArranged({ characters: ROSTER, order })).toBe(true)
   })
 
-  it('dit non quand le roster arrive dans un autre ordre', () => {
+  it('says no when the roster comes in another order', () => {
     const order = ['Gamma', 'Alpha', 'Beta']
 
     expect(matchIsArranged({ characters: ROSTER, order })).toBe(false)
   })
 
-  it('ignore un pseudo que l’ordre nomme et que le roster n’a plus', () => {
+  it('ignores a nickname the order names and the roster no longer has', () => {
     const order = ['Alpha', 'Delta', 'Beta', 'Gamma']
 
     expect(matchIsArranged({ characters: ROSTER, order })).toBe(true)
   })
 
-  it('ignore un personnage arrivé depuis', () => {
+  it('ignores a character who arrived since then', () => {
     const order = ['Alpha', 'Gamma']
 
     expect(matchIsArranged({ characters: [ALPHA, GAMMA, BETA], order })).toBe(

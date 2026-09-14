@@ -20,12 +20,12 @@ const roomOf = (width: number) => {
   )
 }
 
-describe('la page taillée pour la fenêtre qui la porte', () => {
+describe('the page cut for the window that carries it', () => {
   afterEach(() => {
     document.body.removeAttribute('style')
   })
 
-  it('grossit d’un bloc, écriture comprise, plutôt que de s’étirer', () => {
+  it('grows as one block, writing included, rather than stretching', () => {
     roomOf(DRAWN * 2)
 
     render(<RuneTable drawn={DRAWN} />)
@@ -35,7 +35,7 @@ describe('la page taillée pour la fenêtre qui la porte', () => {
     expect(document.body.style.width).toBe(`${DRAWN}px`)
   })
 
-  it('garde la taille où elle a été dessinée quand la fenêtre y est déjà', () => {
+  it('keeps the size where it was drawn when the window is already there', () => {
     roomOf(DRAWN)
 
     render(<RuneTable drawn={DRAWN} />)
@@ -43,7 +43,7 @@ describe('la page taillée pour la fenêtre qui la porte', () => {
     expect(document.body.style.transform).toBe('scale(1)')
   })
 
-  it('rapetisse d’un bloc, sans que le moteur relève l’écriture', () => {
+  it('shrinks as one block, without the engine raising the writing', () => {
     roomOf(DRAWN / 2)
 
     render(<RuneTable drawn={DRAWN} />)
@@ -52,7 +52,7 @@ describe('la page taillée pour la fenêtre qui la porte', () => {
     expect(document.body.style.zoom).toBe('')
   })
 
-  it('ne touche à rien tant que personne n’a mesuré la fenêtre', () => {
+  it('touches nothing while nobody has measured the window', () => {
     roomOf(0)
 
     render(<RuneTable drawn={DRAWN} />)

@@ -51,8 +51,8 @@ const SEEN: LoopsSeen = {
   quickReplies: true
 }
 
-describe('le cadre d’une map', () => {
-  it('pose le bouton de la vidéo au même endroit, sur les seules maps qui en ont une', () => {
+describe('the frame of a map', () => {
+  it('puts the video button in the same place, on the only maps that have one', () => {
     motion.matchIsStill.mockReturnValue(false)
 
     for (const map of MAPS) {
@@ -68,7 +68,7 @@ describe('le cadre d’une map', () => {
     }
   })
 
-  it('rend sa vidéo neuve à la map suivante, qui s’ouvre et s’enregistre à son tour', async () => {
+  it('gives its fresh video to the next map, which opens and records in its turn', async () => {
     motion.matchIsStill.mockReturnValue(true)
 
     const view = render(frameOf('characters', { ...SEEN, walk: false }))

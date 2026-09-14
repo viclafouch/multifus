@@ -15,18 +15,18 @@ const WITHOUT_HOME = PAGE_IDS.filter((page) => {
 
 const FILMED = ['home', ...MENU_FEATURES] as const satisfies readonly PageId[]
 
-describe('la table des pages', () => {
-  it('donne treize pages', () => {
+describe('the table of the pages', () => {
+  it('gives thirteen pages', () => {
     expect(PAGE_IDS).toHaveLength(13)
   })
 
-  it('énumère exactement ce que la table porte', () => {
+  it('lists exactly what the table carries', () => {
     expect(Object.keys(PAGES).toSorted(alphabetical)).toStrictEqual(
       [...PAGE_IDS].toSorted(alphabetical)
     )
   })
 
-  it('laisse la racine à l’accueil, dans les trois langues', () => {
+  it('leaves the root to the home page, in the three languages', () => {
     const rooted = LANGUAGES.map((language) => {
       return PAGES.home.slugs[language]
     })
@@ -34,7 +34,7 @@ describe('la table des pages', () => {
     expect(rooted).toStrictEqual(['', '', ''])
   })
 
-  it.each(WITHOUT_HOME)('donne une adresse à %s dans chaque langue', (page) => {
+  it.each(WITHOUT_HOME)('gives an address to %s in each language', (page) => {
     const slugs = LANGUAGES.map((language) => {
       return PAGES[page].slugs[language]
     })
@@ -43,7 +43,7 @@ describe('la table des pages', () => {
   })
 
   it.each(WITHOUT_HOME)(
-    'écrit l’adresse de %s sans majuscule ni accent',
+    'writes the address of %s without a capital nor an accent',
     (page) => {
       for (const language of LANGUAGES) {
         expect(PAGES[page].slugs[language]).toMatch(SLUG_SHAPE)
@@ -52,7 +52,7 @@ describe('la table des pages', () => {
   )
 
   it.each(LANGUAGES)(
-    'ne donne pas deux fois la même adresse en %s',
+    'does not give the same address twice in %s',
     (language) => {
       const slugs = PAGE_IDS.map((page) => {
         return PAGES[page].slugs[language]
@@ -62,54 +62,51 @@ describe('la table des pages', () => {
     }
   )
 
-  it.each(PAGE_IDS)('nomme et promet %s', (page) => {
+  it.each(PAGE_IDS)('names and promises %s', (page) => {
     expect(PAGE_NAMES[page]).toBeDefined()
     expect(PAGE_PROMISES[page]).toBeDefined()
   })
 
-  it.each(MENU_FEATURES)(
-    'ne met au menu que des fonctionnalités, %s',
-    (page) => {
-      expect(PAGES[page].kind).toBe('feature')
-    }
-  )
+  it.each(MENU_FEATURES)('puts only features on the menu, %s', (page) => {
+    expect(PAGES[page].kind).toBe('feature')
+  })
 
   it.each(MENU_FEATURES)(
-    'tient la phrase du menu de %s en une ligne',
+    'holds the menu sentence of %s on one line',
     (page) => {
       expect(MENU_HINTS[page].message).toBeDefined()
       expect(MENU_HINTS[page].message?.length).toBeLessThanOrEqual(HINT_LENGTH)
     }
   )
 
-  it.each(PAGE_IDS)('ne donne à %s que des voisines connues', (page) => {
+  it.each(PAGE_IDS)('gives %s only known neighbours', (page) => {
     for (const neighbour of PAGES[page].kin) {
       expect(PAGE_IDS).toContain(neighbour)
     }
   })
 
-  it.each(PAGE_IDS)('ne donne à %s que des voisines à affiche', (page) => {
+  it.each(PAGE_IDS)('gives %s only neighbours with a poster', (page) => {
     for (const neighbour of PAGES[page].kin) {
       expect(MENU_FEATURES).toContain(neighbour)
       expect(PAGES[neighbour].loop).not.toBeNull()
     }
   })
 
-  it.each(PAGE_IDS)('ne rend pas %s voisine d’elle-même', (page) => {
+  it.each(PAGE_IDS)('does not make %s a neighbour of itself', (page) => {
     expect(PAGES[page].kin).not.toContain(page)
   })
 
-  it.each(PAGE_IDS)('ne nomme pas deux fois la même voisine de %s', (page) => {
+  it.each(PAGE_IDS)('does not name the same neighbour of %s twice', (page) => {
     const { kin } = PAGES[page]
 
     expect(new Set(kin).size).toBe(kin.length)
   })
 
-  it.each(FILMED)('donne sa propre boucle à %s', (page) => {
+  it.each(FILMED)('gives its own loop to %s', (page) => {
     expect(PAGES[page].loop).toBe(page)
   })
 
-  it('ne filme que l’accueil et les fonctionnalités du menu', () => {
+  it('films only the home page and the features of the menu', () => {
     const filmed = PAGE_IDS.filter((page) => {
       return PAGES[page].loop !== null
     })

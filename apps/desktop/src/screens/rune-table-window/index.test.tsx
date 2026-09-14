@@ -61,8 +61,8 @@ const letGo = (screenX: number, screenY: number) => {
   fireEvent.pointerUp(table(), { pointerId: POINTER, screenX, screenY })
 }
 
-describe('le tableau des runes posé sur le jeu', () => {
-  it('porte son titre et les cinq familles', () => {
+describe('the rune table laid on the game', () => {
+  it('carries its title and the five families', () => {
     show()
 
     expect(screen.getByText('Tableau des runes')).not.toBeNull()
@@ -76,7 +76,7 @@ describe('le tableau des runes posé sur le jeu', () => {
     }
   })
 
-  it('écrit chaque stat de la source, et son poids', () => {
+  it('writes each stat of the source, and its weight', () => {
     show()
 
     expect(screen.getByRole('rowheader', { name: 'Vitalité' })).not.toBeNull()
@@ -87,7 +87,7 @@ describe('le tableau des runes posé sur le jeu', () => {
     expect(screen.getAllByText('100')).not.toHaveLength(0)
   })
 
-  it('dit sa forme à Rust, qui en tire la hauteur de la fenêtre', () => {
+  it('tells its shape to Rust, which draws the height of the window from it', () => {
     const measured = standing(TABLE_HEIGHT)
 
     show()
@@ -98,7 +98,7 @@ describe('le tableau des runes posé sur le jeu', () => {
     )
   })
 
-  it('se prend par un chiffre du tableau comme par un bord', async () => {
+  it('is grabbed by a number of the table as by an edge', async () => {
     show()
 
     const weight = screen.getAllByText('100')[0]
@@ -111,7 +111,7 @@ describe('le tableau des runes posé sur le jeu', () => {
     })
   })
 
-  it('n’écrit rien sur un clic net, sans un pixel de dérive', () => {
+  it('writes nothing on a clean click, without a pixel of drift', () => {
     show()
 
     takenAt(table(), 200, 200)
@@ -122,7 +122,7 @@ describe('le tableau des runes posé sur le jeu', () => {
     expect(bridge.runeTableSettled).not.toHaveBeenCalled()
   })
 
-  it('enregistre la place une fois le tableau lâché', async () => {
+  it('records the place once the table is released', async () => {
     show()
 
     takenAt(table(), 200, 200)
@@ -134,7 +134,7 @@ describe('le tableau des runes posé sur le jeu', () => {
     })
   })
 
-  it('se ferme à la croix, et la croix ne déplace jamais', () => {
+  it('closes on the cross, and the cross never moves it', () => {
     show()
 
     const cross = screen.getByRole('button', {
@@ -149,7 +149,7 @@ describe('le tableau des runes posé sur le jeu', () => {
     expect(bridge.closeRuneTable).toHaveBeenCalledExactlyOnceWith()
   })
 
-  it('porte le voile que Rust lui donne, sans rien changer d’autre', async () => {
+  it('carries the veil Rust gives it, without changing anything else', async () => {
     show()
 
     await waitFor(() => {
@@ -157,7 +157,7 @@ describe('le tableau des runes posé sur le jeu', () => {
     })
   })
 
-  it('dit qu’une case vide est une rune qui n’existe pas', () => {
+  it('says an empty cell is a rune that does not exist', () => {
     show()
 
     expect(screen.getAllByText('La rune n’existe pas')).not.toHaveLength(0)

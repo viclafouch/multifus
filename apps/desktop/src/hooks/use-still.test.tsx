@@ -34,7 +34,7 @@ const system = () => {
 }
 
 describe('useStill', () => {
-  it('lit le réglage du système à l’ouverture', () => {
+  it('reads the setting of the system on opening', () => {
     const reduced = system()
 
     reduced.ask(true)
@@ -46,7 +46,7 @@ describe('useStill', () => {
     expect(result.current).toBe(true)
   })
 
-  it('suit le réglage sans qu’on recharge la fenêtre', () => {
+  it('follows the setting without the window being reloaded', () => {
     const reduced = system()
 
     const { result } = renderHook(() => {

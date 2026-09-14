@@ -45,14 +45,14 @@ const frenchOf = (body: Body) => {
   })
 }
 
-describe('le corps des pages', () => {
-  it('ne pose un corps que sur une fonctionnalité', () => {
+describe('the body of the pages', () => {
+  it('lays a body only on a feature', () => {
     for (const page of PAGE_IDS) {
       expect(PAGE_BODIES[page] === null).toBe(PAGES[page].kind !== 'feature')
     }
   })
 
-  it('écrit un corps pour chaque fonctionnalité', () => {
+  it('writes a body for each feature', () => {
     const features = PAGE_IDS.filter((page) => {
       return PAGES[page].kind === 'feature'
     })
@@ -60,28 +60,28 @@ describe('le corps des pages', () => {
     expect(WITH_BODY).toHaveLength(features.length)
   })
 
-  it.each(WITH_BODY)('donne au moins deux passages à $page', ({ body }) => {
+  it.each(WITH_BODY)('gives at least two passages to $page', ({ body }) => {
     expect(body.passages.length).toBeGreaterThanOrEqual(PASSAGE_FLOOR)
   })
 
-  it.each(WITH_BODY)('ne laisse aucun passage vide sur $page', ({ body }) => {
+  it.each(WITH_BODY)('leaves no passage empty on $page', ({ body }) => {
     for (const passage of passagesOf(body)) {
       expect(passage.points.length).toBeGreaterThan(0)
     }
   })
 
-  it.each(WITH_BODY)('dit ce que $page ne fait pas', ({ body }) => {
+  it.each(WITH_BODY)('says what $page does not do', ({ body }) => {
     expect(SPEAKERS.fr._(body.limit.title)).toMatch(DENIAL)
   })
 
   it.each(WITH_BODY)(
-    'écrit assez pour se ranger quelque part, $page',
+    'writes enough to be filed somewhere, $page',
     ({ body }) => {
       expect(frenchOf(body).join(' ').length).toBeGreaterThanOrEqual(BODY_FLOOR)
     }
   )
 
-  it('ne redit pas deux fois la même phrase', () => {
+  it('does not say the same sentence twice', () => {
     const french = WITH_BODY.flatMap(({ body }) => {
       return frenchOf(body)
     })
@@ -89,7 +89,7 @@ describe('le corps des pages', () => {
     expect(new Set(french).size).toBe(french.length)
   })
 
-  it.each(LANGUAGES)('ne laisse aucune phrase muette en %s', (language) => {
+  it.each(LANGUAGES)('leaves no sentence silent in %s', (language) => {
     for (const { body } of WITH_BODY) {
       for (const phrase of phrasesOf(body)) {
         expect(SPEAKERS[language]._(phrase)).not.toBe('')
@@ -97,7 +97,7 @@ describe('le corps des pages', () => {
     }
   })
 
-  it.each(TRANSLATED)('ne laisse pas le français passer en %s', (language) => {
+  it.each(TRANSLATED)('does not let French go through in %s', (language) => {
     for (const { body } of WITH_BODY) {
       for (const phrase of phrasesOf(body)) {
         expect(SPEAKERS[language]._(phrase)).not.toBe(SPEAKERS.fr._(phrase))

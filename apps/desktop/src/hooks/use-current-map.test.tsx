@@ -9,13 +9,13 @@ const openMultifus = () => {
 }
 
 describe('useCurrentMap', () => {
-  it('ouvre sur la clairière tant que rien n’a été visité', () => {
+  it('opens on the clearing while nothing has been visited', () => {
     const { result } = openMultifus()
 
     expect(result.current[0]).toBe('clearing')
   })
 
-  it('garde la map visitée quand la fenêtre se recharge', () => {
+  it('keeps the visited map when the window reloads', () => {
     const first = openMultifus()
 
     act(() => {

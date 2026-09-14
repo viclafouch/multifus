@@ -17,17 +17,17 @@ const LINUX =
   'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0 Safari/537.36'
 
 describe('systemOf', () => {
-  it('reconnaît les deux systèmes que Multifus sert', () => {
+  it('recognizes the two systems Multifus serves', () => {
     expect(systemOf(MAC)).toBe('macos')
     expect(systemOf(WINDOWS)).toBe('windows')
   })
 
-  it('ne met rien en avant sur un téléphone, que l’iPhone se dise Mac ou non', () => {
+  it('puts nothing forward on a phone, whether the iPhone calls itself a Mac or not', () => {
     expect(systemOf(IPHONE)).toBeNull()
     expect(systemOf(ANDROID)).toBeNull()
   })
 
-  it('ne met rien en avant sur un système que Multifus ne sert pas', () => {
+  it('puts nothing forward on a system Multifus does not serve', () => {
     expect(systemOf(LINUX)).toBeNull()
     expect(systemOf('')).toBeNull()
   })

@@ -16,25 +16,25 @@ const DAY_SHAPE = /^\d{4}-\d{2}-\d{2}$/u
 
 const LOST_BY_MULTIFUS = 2
 
-describe('la table du comparatif', () => {
-  it('ne tient pas plus de cinq concurrents', () => {
+describe('the table of the comparison', () => {
+  it('holds no more than five rivals', () => {
     expect(RIVAL_IDS.length).toBeLessThanOrEqual(5)
   })
 
-  it('énumère exactement les concurrents que la table porte', () => {
+  it('lists exactly the rivals the table carries', () => {
     expect(Object.keys(RIVALS).toSorted(alphabetical)).toStrictEqual(
       [...RIVAL_IDS].toSorted(alphabetical)
     )
   })
 
-  it.each(RIVAL_IDS)('nomme %s et mène à son code', (rival) => {
+  it.each(RIVAL_IDS)('names %s and leads to its code', (rival) => {
     const { name, code } = RIVALS[rival]
 
     expect(name).not.toBe('')
     expect(code.startsWith('https://github.com/')).toBe(true)
   })
 
-  it('ne nomme pas deux fois le même concurrent', () => {
+  it('does not name the same rival twice', () => {
     const names = RIVAL_IDS.map((rival) => {
       return RIVALS[rival].name
     })
@@ -42,24 +42,24 @@ describe('la table du comparatif', () => {
     expect(new Set(names).size).toBe(names.length)
   })
 
-  it('tient entre dix et douze lignes', () => {
+  it('holds between ten and twelve rows', () => {
     expect(TRAIT_IDS.length).toBeGreaterThanOrEqual(10)
     expect(TRAIT_IDS.length).toBeLessThanOrEqual(12)
   })
 
-  it('énumère exactement les lignes que la table porte', () => {
+  it('lists exactly the rows the table carries', () => {
     expect(Object.keys(TRAITS).toSorted(alphabetical)).toStrictEqual(
       [...TRAIT_IDS].toSorted(alphabetical)
     )
   })
 
-  it.each(TRAIT_IDS)('donne une case à chaque concurrent sur %s', (trait) => {
+  it.each(TRAIT_IDS)('gives a cell to each rival on %s', (trait) => {
     for (const rival of RIVAL_IDS) {
       expect(TRAITS[trait].theirs[rival]).toBeDefined()
     }
   })
 
-  it('laisse les deux lignes que la page annonce perdues', () => {
+  it('leaves lost the two rows the page announces', () => {
     const lost = TRAIT_IDS.filter((trait) => {
       return TRAITS[trait].mine === 'no'
     })
@@ -67,7 +67,7 @@ describe('la table du comparatif', () => {
     expect(lost).toHaveLength(LOST_BY_MULTIFUS)
   })
 
-  it.each(RIVAL_IDS)('laisse au moins une ligne à %s', (rival) => {
+  it.each(RIVAL_IDS)('leaves at least one row to %s', (rival) => {
     const won = TRAIT_IDS.filter((trait) => {
       return TRAITS[trait].theirs[rival] === 'yes'
     })
@@ -75,7 +75,7 @@ describe('la table du comparatif', () => {
     expect(won.length).toBeGreaterThan(0)
   })
 
-  it('donne une note à chaque case à moitié, et rien qu’à elles', () => {
+  it('gives a note to each half cell, and to them alone', () => {
     const halves = TRAIT_IDS.flatMap((trait) => {
       return RIVAL_IDS.filter((rival) => {
         return TRAITS[trait].theirs[rival] === 'half'
@@ -92,23 +92,23 @@ describe('la table du comparatif', () => {
     )
   })
 
-  it.each(LANGUAGES)('écrit chaque note à moitié en %s', (language) => {
+  it.each(LANGUAGES)('writes each half note in %s', (language) => {
     for (const note of HALF_NOTES) {
       expect(SPEAKERS[language]._(note.line)).not.toBe('')
     }
   })
 
-  it('date son relevé', () => {
+  it('dates its record', () => {
     expect(SURVEYED_ON).toMatch(DAY_SHAPE)
   })
 
-  it('dit chaque case en français', () => {
+  it('says each cell in French', () => {
     expect(SPEAKERS.fr._(MARK_NAMES.yes)).toBe('oui')
     expect(SPEAKERS.fr._(MARK_NAMES.half)).toBe('à moitié')
     expect(SPEAKERS.fr._(MARK_NAMES.no)).toBe('non')
   })
 
-  it.each(LANGUAGES)('ne laisse aucune case muette en %s', (language) => {
+  it.each(LANGUAGES)('leaves no cell silent in %s', (language) => {
     for (const name of Object.values(MARK_NAMES)) {
       expect(SPEAKERS[language]._(name)).not.toBe('')
     }

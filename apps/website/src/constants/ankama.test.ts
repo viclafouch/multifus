@@ -25,23 +25,23 @@ const PHRASES = [
   })
 ]
 
-describe('les deux messages d’Ankama', () => {
-  it('en garde exactement deux', () => {
+describe('the two messages of Ankama', () => {
+  it('keeps exactly two of them', () => {
     expect(ANKAMA_WORD_IDS).toStrictEqual(['post', 'forum'])
   })
 
-  it.each(ANKAMA_WORD_IDS)('donne à %s sa capture et sa source', (word) => {
+  it.each(ANKAMA_WORD_IDS)('gives %s its screenshot and its source', (word) => {
     const { shot, href } = ANKAMA_WORDS[word]
 
     expect(shot).not.toBe('')
     expect(href.startsWith('https://')).toBe(true)
   })
 
-  it.each(ANKAMA_WORD_IDS)('cite %s assez pour qu’on juge', (word) => {
+  it.each(ANKAMA_WORD_IDS)('quotes %s enough for a judgement', (word) => {
     expect(ANKAMA_WORDS[word].quote.length).toBeGreaterThanOrEqual(QUOTE_FLOOR)
   })
 
-  it('ne recopie pas deux fois la même citation', () => {
+  it('does not copy the same quotation twice', () => {
     const quotes = ANKAMA_WORD_IDS.map((word) => {
       return ANKAMA_WORDS[word].quote
     })
@@ -50,8 +50,8 @@ describe('les deux messages d’Ankama', () => {
   })
 })
 
-describe('ce que la page dit', () => {
-  it('ne dit pas deux fois la même phrase', () => {
+describe('what the page says', () => {
+  it('does not say the same sentence twice', () => {
     const french = PHRASES.map((phrase) => {
       return SPEAKERS.fr._(phrase)
     })
@@ -59,7 +59,7 @@ describe('ce que la page dit', () => {
     expect(new Set(french).size).toBe(french.length)
   })
 
-  it('dit sur une plaque ce que la page ne promet pas', () => {
+  it('says on a plate what the page does not promise', () => {
     const french = ANKAMA_LIMIT.map((point) => {
       return SPEAKERS.fr._(point.lead)
     })
@@ -67,13 +67,13 @@ describe('ce que la page dit', () => {
     expect(french).toContain('Une tolérance n’est pas une autorisation.')
   })
 
-  it.each(LANGUAGES)('ne laisse aucune phrase muette en %s', (language) => {
+  it.each(LANGUAGES)('leaves no sentence silent in %s', (language) => {
     for (const phrase of PHRASES) {
       expect(SPEAKERS[language]._(phrase)).not.toBe('')
     }
   })
 
-  it.each(TRANSLATED)('ne laisse pas le français passer en %s', (language) => {
+  it.each(TRANSLATED)('does not let French go through in %s', (language) => {
     for (const phrase of PHRASES) {
       expect(SPEAKERS[language]._(phrase)).not.toBe(SPEAKERS.fr._(phrase))
     }

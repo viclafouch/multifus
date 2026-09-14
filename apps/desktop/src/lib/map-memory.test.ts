@@ -3,41 +3,41 @@ import { forgetMap, lastSeenMap, rememberMap } from '@/lib/map-memory'
 
 const refuseMemory = () => {
   vi.spyOn(window, 'sessionStorage', 'get').mockImplementation(() => {
-    throw new Error('stockage refusé')
+    throw new Error('storage refused')
   })
 }
 
-describe('la mémoire de la map', () => {
-  it('ouvre sur la clairière tant que rien n’a été retenu', () => {
+describe('the memory of the map', () => {
+  it('opens on the clearing while nothing has been kept', () => {
     expect(lastSeenMap()).toBe('clearing')
   })
 
-  it('rend la map retenue', () => {
+  it('returns the kept map', () => {
     rememberMap('relay')
 
     expect(lastSeenMap()).toBe('relay')
   })
 
-  it('revient à la clairière une fois la map oubliée', () => {
+  it('goes back to the clearing once the map is forgotten', () => {
     rememberMap('settings')
     forgetMap()
 
     expect(lastSeenMap()).toBe('clearing')
   })
 
-  it('revient à la clairière quand la mémoire nomme une map inconnue', () => {
+  it('goes back to the clearing when the memory names an unknown map', () => {
     vi.spyOn(window.sessionStorage, 'getItem').mockReturnValue('donjon')
 
     expect(lastSeenMap()).toBe('clearing')
   })
 
-  it('ouvre sur la clairière quand le système refuse la mémoire', () => {
+  it('opens on the clearing when the system refuses the memory', () => {
     refuseMemory()
 
     expect(lastSeenMap()).toBe('clearing')
   })
 
-  it('ne casse pas quand le système refuse de retenir ou d’oublier', () => {
+  it('does not break when the system refuses to keep or to forget', () => {
     refuseMemory()
 
     expect(() => {

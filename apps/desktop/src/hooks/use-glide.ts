@@ -186,6 +186,6 @@ export const useGlide = (
     }
 
     boxes.current = kept
-    // oxlint-disable-next-line react/exhaustive-effect-dependencies -- l’effet lit le DOM, et « roll » n’est là que pour dire qu’il a changé
+    // oxlint-disable-next-line react/exhaustive-effect-dependencies -- the effect reads the DOM, and roll is only there to say that it changed
   }, [holder, roll, isStill])
 }

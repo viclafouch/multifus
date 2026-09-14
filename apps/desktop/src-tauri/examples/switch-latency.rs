@@ -1,6 +1,6 @@
 #[cfg(not(target_os = "macos"))]
 fn main() {
-    println!("Le banc de la bascule ne tourne que sur le Mac.");
+    println!("The switch bench only runs on the Mac.");
 }
 
 #[cfg(target_os = "macos")]
@@ -37,7 +37,7 @@ mod bench {
         let rounds = rounds();
 
         println!(
-            "{} clients, {rounds} bascules par client, {} ms de repos entre deux",
+            "{} clients, {rounds} switches per client, {} ms of rest between two",
             clients.len(),
             SETTLE.as_millis()
         );
@@ -54,7 +54,7 @@ mod bench {
 
                 match told {
                     Ok(()) => spent.push(took),
-                    Err(error) => println!("  tour {round}, {} : {error}", client.nickname()),
+                    Err(error) => println!("  round {round}, {} : {error}", client.nickname()),
                 }
             }
         }
@@ -67,14 +67,14 @@ mod bench {
             Ok(granted) if granted.is_granted() => true,
             Ok(_) => {
                 println!(
-                    "L'Accessibilité est refusée à ce banc. Ajoutez-le dans Réglages Système, \
-                     Confidentialité et sécurité, Accessibilité."
+                    "Accessibility is refused to this bench. Add it in System Settings, \
+                     Privacy and Security, Accessibility."
                 );
 
                 false
             }
             Err(error) => {
-                println!("L'Accessibilité n'a pas répondu : {error}");
+                println!("Accessibility did not answer: {error}");
 
                 false
             }
@@ -85,14 +85,14 @@ mod bench {
         let found = match windows.game_windows() {
             Ok(found) => found,
             Err(error) => {
-                println!("Les fenêtres du jeu n'ont pas pu être lues : {error}");
+                println!("The windows of the game could not be read: {error}");
 
                 return None;
             }
         };
 
         if found.is_empty() {
-            println!("Aucun client de Dofus Retro n'est ouvert.");
+            println!("No Dofus Retro client is open.");
 
             return None;
         }
@@ -110,7 +110,7 @@ mod bench {
 
     fn report(spent: &mut [Duration]) {
         if spent.is_empty() {
-            println!("Aucune bascule n'a abouti.");
+            println!("No switch went through.");
 
             return;
         }
@@ -122,7 +122,7 @@ mod bench {
         let ninth = spent[spent.len() * 9 / 10];
 
         println!(
-            "{} bascules : médiane {:.1} ms, neuvième décile {:.1} ms, pire {:.1} ms, moyenne {:.1} ms",
+            "{} switches: median {:.1} ms, ninth decile {:.1} ms, worst {:.1} ms, mean {:.1} ms",
             spent.len(),
             middle.as_secs_f64() * 1000.0,
             ninth.as_secs_f64() * 1000.0,

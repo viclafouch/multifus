@@ -11,14 +11,14 @@ import {
 } from '@/helpers/page'
 
 describe('pathOf', () => {
-  it('laisse le français à la racine', () => {
+  it('leaves French at the root', () => {
     expect(pathOf({ page: 'home', language: 'fr' })).toBe('/')
     expect(pathOf({ page: 'wheel', language: 'fr' })).toBe(
       '/roue-des-personnages'
     )
   })
 
-  it('préfixe l’anglais et l’espagnol', () => {
+  it('prefixes English and Spanish', () => {
     expect(pathOf({ page: 'home', language: 'en' })).toBe('/en')
     expect(pathOf({ page: 'wheel', language: 'en' })).toBe(
       '/en/character-wheel'
@@ -28,7 +28,7 @@ describe('pathOf', () => {
     )
   })
 
-  it('traduit l’adresse, et pas seulement la page', () => {
+  it('translates the address, and not only the page', () => {
     const french = pathOf({ page: 'download', language: 'fr' })
     const spanish = pathOf({ page: 'download', language: 'es' })
 
@@ -38,22 +38,22 @@ describe('pathOf', () => {
 })
 
 describe('pageOf', () => {
-  it('retrouve la page depuis son adresse', () => {
+  it('finds the page again from its address', () => {
     expect(pageOf({ slug: 'roue-des-personnages', language: 'fr' })).toBe(
       'wheel'
     )
     expect(pageOf({ slug: 'character-wheel', language: 'en' })).toBe('wheel')
   })
 
-  it('refuse l’adresse d’une autre langue', () => {
+  it('refuses the address of another language', () => {
     expect(pageOf({ slug: 'character-wheel', language: 'fr' })).toBeNull()
   })
 
-  it('refuse ce qui n’est pas une page', () => {
+  it('refuses what is not a page', () => {
     expect(pageOf({ slug: 'n-importe-quoi', language: 'fr' })).toBeNull()
   })
 
-  it('fait le tour depuis pathOf, dans les trois langues', () => {
+  it('goes round from pathOf, in the three languages', () => {
     for (const language of LANGUAGES) {
       for (const page of PAGE_IDS) {
         const slug = PAGES[page].slugs[language]
@@ -67,7 +67,7 @@ describe('pageOf', () => {
 describe('ogPathOf', () => {
   const drawn = OG_IMAGE.extension
 
-  it('range l’image sous sa langue', () => {
+  it('files the image under its language', () => {
     expect(ogPathOf({ page: 'wheel', language: 'fr' })).toBe(
       `/og/fr/roue-des-personnages.${drawn}`
     )
@@ -76,7 +76,7 @@ describe('ogPathOf', () => {
     )
   })
 
-  it('nomme les trois accueils', () => {
+  it('names the three home pages', () => {
     expect(ogPathOf({ page: 'home', language: 'fr' })).toBe(
       `/og/fr/index.${drawn}`
     )
@@ -85,7 +85,7 @@ describe('ogPathOf', () => {
     )
   })
 
-  it('donne un fichier par page et par langue', () => {
+  it('gives one file per page and per language', () => {
     const files = LANGUAGES.flatMap((language) => {
       return PAGE_IDS.map((page) => {
         return ogPathOf({ page, language })
@@ -106,7 +106,7 @@ const FEATURE_LOOP_PATHS = [
 ]
 
 describe('matchHasLoop', () => {
-  it('compte les six pages de fonctionnalité qui portent une boucle', () => {
+  it('counts the six feature pages that carry a loop', () => {
     const carried = FEATURE_LOOP_PATHS.filter((path) => {
       return matchHasLoop(path)
     })
@@ -114,18 +114,18 @@ describe('matchHasLoop', () => {
     expect(carried).toStrictEqual(FEATURE_LOOP_PATHS)
   })
 
-  it('compte les trois accueils, qui portent la boucle d’ambiance', () => {
+  it('counts the three home pages, which carry the ambient loop', () => {
     expect(matchHasLoop('/')).toBe(true)
     expect(matchHasLoop('/en')).toBe(true)
     expect(matchHasLoop('/es')).toBe(true)
   })
 
-  it('écarte mac, qui est une fonctionnalité sans boucle', () => {
+  it('sets aside mac, which is a feature without a loop', () => {
     expect(matchHasLoop('/mac')).toBe(false)
     expect(matchHasLoop('/en/mac')).toBe(false)
   })
 
-  it('écarte les pages qui ne montrent aucune boucle', () => {
+  it('sets aside the pages that show no loop', () => {
     expect(matchHasLoop('/comparatif')).toBe(false)
     expect(matchHasLoop('/telecharger')).toBe(false)
     expect(matchHasLoop('/journal')).toBe(false)
@@ -133,27 +133,27 @@ describe('matchHasLoop', () => {
     expect(matchHasLoop('/mentions-legales')).toBe(false)
   })
 
-  it('répond pareil dans les trois langues', () => {
+  it('answers the same in the three languages', () => {
     expect(matchHasLoop('/en/character-wheel')).toBe(true)
     expect(matchHasLoop('/es/rueda-de-personajes')).toBe(true)
     expect(matchHasLoop('/en/comparison')).toBe(false)
     expect(matchHasLoop('/es/aviso-legal')).toBe(false)
   })
 
-  it('refuse une adresse qui n’est pas une page', () => {
+  it('refuses an address that is not a page', () => {
     expect(matchHasLoop('/n-importe-quoi')).toBe(false)
   })
 })
 
 describe('everyPath', () => {
-  it('donne une adresse par page et par langue', () => {
+  it('gives one address per page and per language', () => {
     const paths = everyPath()
 
     expect(paths).toHaveLength(PAGE_IDS.length * LANGUAGES.length)
     expect(new Set(paths).size).toBe(paths.length)
   })
 
-  it('ouvre les trois accueils', () => {
+  it('opens the three home pages', () => {
     expect(everyPath()).toStrictEqual(
       expect.arrayContaining(['/', '/en', '/es'])
     )

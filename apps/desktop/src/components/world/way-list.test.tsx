@@ -4,8 +4,8 @@ import { fireEvent, render, screen, within } from '@testing-library/react'
 import { WayList } from '@/components/world/way-list'
 import { MAP_NAMES, MAPS } from '@/constants/world'
 
-describe('les chemins de la clairière', () => {
-  it('nomme chaque map, et le nom reste le nom du bouton', () => {
+describe('the ways of the clearing', () => {
+  it('names each map, and the name stays the name of the button', () => {
     render(<WayList asking={null} onGo={() => {}} />)
 
     for (const map of MAPS) {
@@ -15,7 +15,7 @@ describe('les chemins de la clairière', () => {
     }
   })
 
-  it('dit quelle map on a prise', () => {
+  it('says which map was taken', () => {
     const onGo = vi.fn()
     render(<WayList asking={null} onGo={onGo} />)
 
@@ -24,7 +24,7 @@ describe('les chemins de la clairière', () => {
     expect(onGo).toHaveBeenCalledWith('walk')
   })
 
-  it('ne marque « À régler » que sur la map qui le demande', () => {
+  it('marks only the map that asks to be set', () => {
     render(<WayList asking="settings" onGo={() => {}} />)
 
     const settings = screen.getByRole('button', { name: /^Paramètres/u })

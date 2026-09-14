@@ -7,12 +7,12 @@ import { LANGUAGE_NAMES, LANGUAGES } from '@/constants/languages'
 
 const TONGUES = msg`La langue du site`
 
-type CartoucheProps = Readonly<{
+type LanguageBarProps = Readonly<{
   page: PageId
   className?: string
 }>
 
-export const Cartouche = ({ page, className }: CartoucheProps) => {
+export const LanguageBar = ({ page, className }: LanguageBarProps) => {
   const { i18n } = useLingui()
 
   return (

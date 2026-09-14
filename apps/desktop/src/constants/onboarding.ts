@@ -11,7 +11,7 @@ import type { Phrase } from '@/lib/i18n'
 
 export const WELCOME_PAGE = 'welcome' satisfies Page
 
-export const ONBOARDING_ANCHOR = 'prise-en-main'
+export const ONBOARDING_ANCHOR = 'onboarding'
 
 export const SETTING_STEPS = [
   'authorization',

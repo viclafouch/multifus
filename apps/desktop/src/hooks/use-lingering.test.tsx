@@ -53,7 +53,7 @@ describe('useLingering', () => {
     motion.isStill = false
   })
 
-  it('rend la liste telle quelle tant que personne ne s’en va', () => {
+  it('returns the list as it is while nobody leaves', () => {
     const { result } = watch([ALPHA, BRAVO])
 
     expect(namesOf(result.current)).toStrictEqual(['Alpha', 'Bravo'])
@@ -64,7 +64,7 @@ describe('useLingering', () => {
     ).toBe(true)
   })
 
-  it('garde à sa place celui qui s’en va, et le dit partant', () => {
+  it('keeps in place the one who leaves, and says it is leaving', () => {
     const { result, rerender } = watch([ALPHA, BRAVO, CHARLIE])
 
     rerender([ALPHA, CHARLIE])
@@ -77,7 +77,7 @@ describe('useLingering', () => {
     ).toStrictEqual([false, true, false])
   })
 
-  it('le lâche une fois le temps passé', () => {
+  it('lets it go once the time has passed', () => {
     const { result, rerender } = watch([ALPHA, BRAVO])
 
     rerender([ALPHA])
@@ -88,7 +88,7 @@ describe('useLingering', () => {
     expect(namesOf(result.current)).toStrictEqual(['Alpha'])
   })
 
-  it('le garde tant que le temps n’est pas passé', () => {
+  it('keeps it while the time has not passed', () => {
     const { result, rerender } = watch([ALPHA, BRAVO])
 
     rerender([ALPHA])
@@ -99,7 +99,7 @@ describe('useLingering', () => {
     expect(namesOf(result.current)).toStrictEqual(['Alpha', 'Bravo'])
   })
 
-  it('rend sa place à celui qui revient avant la fin', () => {
+  it('gives its place back to the one who comes back before the end', () => {
     const { result, rerender } = watch([ALPHA, BRAVO])
 
     rerender([ALPHA])
@@ -113,7 +113,7 @@ describe('useLingering', () => {
     ).toBe(true)
   })
 
-  it('pose le nouveau venu à la suite', () => {
+  it('puts the newcomer at the end', () => {
     const { result, rerender } = watch([ALPHA])
 
     rerender([ALPHA, BRAVO])
@@ -121,7 +121,7 @@ describe('useLingering', () => {
     expect(namesOf(result.current)).toStrictEqual(['Alpha', 'Bravo'])
   })
 
-  it('ne retient personne quand le mouvement est refusé', () => {
+  it('keeps nobody when the motion is refused', () => {
     motion.isStill = true
 
     const { result, rerender } = watch([ALPHA, BRAVO])

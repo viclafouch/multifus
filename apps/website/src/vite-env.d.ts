@@ -1,11 +1,11 @@
 /// <reference types="vite/client" />
 
-// oxlint-disable-next-line consistent-type-definitions -- vite/client déclare ImportMetaEnv en interface, seule une interface fusionne avec elle
+// oxlint-disable-next-line consistent-type-definitions -- vite/client declares ImportMetaEnv as an interface, only an interface merges with it
 interface ImportMetaEnv {
   readonly VITE_SITE_URL: string
 }
 
-// oxlint-disable-next-line consistent-type-definitions -- même fusion de déclaration, imposée par vite/client
+// oxlint-disable-next-line consistent-type-definitions -- same declaration merging, imposed by vite/client
 interface ImportMeta {
   readonly env: ImportMetaEnv
 }

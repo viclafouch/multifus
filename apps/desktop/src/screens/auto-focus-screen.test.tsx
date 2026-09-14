@@ -71,8 +71,8 @@ const switchNamed = (label: string) => {
   return screen.getByRole('switch', { name: label })
 }
 
-describe('l’écran de l’AutoFocus', () => {
-  it('porte une ligne par événement que le jeu sait annoncer', async () => {
+describe('the AutoFocus screen', () => {
+  it('carries one row per event the game can announce', async () => {
     const kinds = await show()
 
     for (const kind of ALL_KINDS) {
@@ -83,7 +83,7 @@ describe('l’écran de l’AutoFocus', () => {
     }
   })
 
-  it('ne montre que les événements que Rust lui donne', async () => {
+  it('shows only the events Rust gives it', async () => {
     const kinds = await show({ switches: [{ kind: 'combat', enabled: true }] })
 
     expect(switchNamed(i18n._(kinds.combat.label))).not.toBeNull()
@@ -92,7 +92,7 @@ describe('l’écran de l’AutoFocus', () => {
     ).toBeNull()
   })
 
-  it('allume l’AutoFocus quand on bouge l’interrupteur maître', async () => {
+  it('turns AutoFocus on when the master switch is moved', async () => {
     await show({ isEnabled: false })
 
     fireEvent.click(switchNamed('Activer l’AutoFocus'))
@@ -100,7 +100,7 @@ describe('l’écran de l’AutoFocus', () => {
     expect(bridge.setAutoFocusEnabled).toHaveBeenCalledWith(true)
   })
 
-  it('éteint l’AutoFocus quand on rebouge l’interrupteur maître', async () => {
+  it('turns AutoFocus off when the master switch is moved again', async () => {
     await show({ isEnabled: true })
 
     fireEvent.click(switchNamed('Activer l’AutoFocus'))
@@ -108,7 +108,7 @@ describe('l’écran de l’AutoFocus', () => {
     expect(bridge.setAutoFocusEnabled).toHaveBeenCalledWith(false)
   })
 
-  it('coupe un événement quand on décoche sa ligne', async () => {
+  it('cuts an event when its row is unchecked', async () => {
     const kinds = await show()
 
     fireEvent.click(switchNamed(i18n._(kinds.combat.label)))
@@ -116,7 +116,7 @@ describe('l’écran de l’AutoFocus', () => {
     expect(bridge.setAutoFocus).toHaveBeenCalledWith('combat', false)
   })
 
-  it('rallume un événement quand on recoche sa ligne', async () => {
+  it('turns an event back on when its row is checked again', async () => {
     const kinds = await show({
       switches: [{ kind: 'perceptor', enabled: false }]
     })
@@ -126,7 +126,7 @@ describe('l’écran de l’AutoFocus', () => {
     expect(bridge.setAutoFocus).toHaveBeenCalledWith('perceptor', true)
   })
 
-  it('garde en mémoire les événements cochés, l’AutoFocus éteint', async () => {
+  it('keeps the checked events in memory, with AutoFocus off', async () => {
     const kinds = await show({
       isEnabled: false,
       switches: [
@@ -143,7 +143,7 @@ describe('l’écran de l’AutoFocus', () => {
     ).toBe('false')
   })
 
-  it('laisse régler les événements même l’AutoFocus éteint', async () => {
+  it('lets the events be set even with AutoFocus off', async () => {
     const kinds = await show({ isEnabled: false })
 
     fireEvent.click(switchNamed(i18n._(kinds.trade.label)))
@@ -151,7 +151,7 @@ describe('l’écran de l’AutoFocus', () => {
     expect(bridge.setAutoFocus).toHaveBeenCalledWith('trade', false)
   })
 
-  it('va chercher les fenêtres réduites quand on le lui demande', async () => {
+  it('goes and gets the minimized windows when it is asked to', async () => {
     await show({ wakesMinimized: false })
 
     fireEvent.click(switchNamed('Aller chercher les fenêtres réduites'))
@@ -159,7 +159,7 @@ describe('l’écran de l’AutoFocus', () => {
     expect(bridge.setWakesMinimized).toHaveBeenCalledWith(true)
   })
 
-  it('parle de la barre des tâches sur Windows', async () => {
+  it('speaks of the taskbar on Windows', async () => {
     await show({ agent: WINDOWS_AGENT })
 
     expect(
@@ -169,7 +169,7 @@ describe('l’écran de l’AutoFocus', () => {
     ).not.toBeNull()
   })
 
-  it('parle du Dock sur un Mac', async () => {
+  it('speaks of the Dock on a Mac', async () => {
     await show({ agent: APPLE_AGENT })
 
     expect(

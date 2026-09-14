@@ -11,19 +11,19 @@ const RUST_SCREENS = (TRAY_SOURCE.match(SCREEN_ID) ?? []).map((line) => {
   return QUOTED.exec(line)?.[1] ?? ''
 })
 
-describe('le monde', () => {
-  it('porte les maps que la barre système nomme, dans le même ordre', () => {
+describe('the world', () => {
+  it('carries the maps the tray names, in the same order', () => {
     expect([...MAPS]).toStrictEqual(RUST_SCREENS)
   })
 
-  it('nomme et décore l’accueil comme les autres maps', () => {
+  it('names and decorates the home like the other maps', () => {
     const named = [CLEARING, ...MAPS]
 
     expect(Object.keys(MAP_NAMES)).toStrictEqual(named)
     expect(Object.keys(MAP_SCENES)).toStrictEqual(named)
   })
 
-  it('donne un nom français à chaque map', () => {
+  it('gives a French name to each map', () => {
     const named: string[] = []
 
     for (const label of Object.values(MAP_NAMES)) {

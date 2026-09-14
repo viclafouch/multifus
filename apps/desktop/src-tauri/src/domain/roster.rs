@@ -410,7 +410,7 @@ mod tests {
     }
 
     #[test]
-    fn a_group_action_pushes_the_veille_on_one_gender_only() {
+    fn a_group_action_pushes_the_exclusion_on_one_gender_only() {
         let mut roster = roster(vec![
             Character::new("Alpha").with_gender(Gender::Male),
             Character::new("Bravo").with_gender(Gender::Female),

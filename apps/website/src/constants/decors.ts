@@ -1,10 +1,10 @@
 import arena from '@multifus/ankama/images/arena.webp'
 import battle from '@multifus/ankama/images/battle.webp'
 import camp from '@multifus/ankama/images/camp.webp'
-import dolmen from '@multifus/ankama/images/dolmen.webp'
 import forest from '@multifus/ankama/images/forest.webp'
 import harbour from '@multifus/ankama/images/harbour.webp'
 import pen from '@multifus/ankama/images/pen.webp'
+import standingStone from '@multifus/ankama/images/standing-stone.webp'
 import village from '@multifus/ankama/images/village.webp'
 import workshop from '@multifus/ankama/images/workshop.webp'
 import type { PageId } from '@/@types/page'
@@ -21,7 +21,7 @@ export const PAGE_DECORS = {
   quickReplies: harbour,
   mac: village,
   comparison: arena,
-  download: dolmen,
+  download: standingStone,
   journal: null,
   ankama: null,
   legal: null
@@ -37,8 +37,8 @@ export const OG_DECOR_FILES = {
   quickReplies: `${DECOR_DIR}/harbour.webp`,
   mac: `${DECOR_DIR}/village.webp`,
   comparison: `${DECOR_DIR}/arena.webp`,
-  download: `${DECOR_DIR}/dolmen.webp`,
-  journal: `${DECOR_DIR}/dolmen.webp`,
+  download: `${DECOR_DIR}/standing-stone.webp`,
+  journal: `${DECOR_DIR}/standing-stone.webp`,
   ankama: `${DECOR_DIR}/village.webp`,
-  legal: `${DECOR_DIR}/dolmen.webp`
+  legal: `${DECOR_DIR}/standing-stone.webp`
 } as const satisfies Record<PageId, string>

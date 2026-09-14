@@ -81,8 +81,8 @@ const goTo = (label: string) => {
   fireEvent.click(buttonNamed(new RegExp(`^${label}$`, 'u')))
 }
 
-describe('la mise en route', () => {
-  it('laisse changer de langue avant d’avoir fini', async () => {
+describe('the setup', () => {
+  it('lets the language be changed before it is over', async () => {
     await show()
 
     expect(
@@ -92,7 +92,7 @@ describe('la mise en route', () => {
     expect(buttonNamed('English').getAttribute('aria-pressed')).toBe('false')
   })
 
-  it('ouvre sur ce que Multifus fait, première des six pages', async () => {
+  it('opens on what Multifus does, the first of the six pages', async () => {
     await show()
 
     expect(
@@ -101,7 +101,7 @@ describe('la mise en route', () => {
     expect(screen.getByText('Étape 1 sur 6')).not.toBeNull()
   })
 
-  it('dit la peine du multicompte avant de dire le remède', async () => {
+  it('says the pain of multi accounting before saying the cure', async () => {
     await show()
 
     expect(
@@ -111,7 +111,7 @@ describe('la mise en route', () => {
     ).not.toBeNull()
   })
 
-  it('annonce tout ce que Multifus sait faire, et pas seulement l’AutoFocus', async () => {
+  it('announces everything Multifus can do, and not only AutoFocus', async () => {
     await show()
 
     const named = FEATURE_NAMES.filter((name) => {
@@ -121,7 +121,7 @@ describe('la mise en route', () => {
     expect(named).toStrictEqual(FEATURE_NAMES)
   })
 
-  it('dit à qui appartient le décor', async () => {
+  it('says who the scenery belongs to', async () => {
     await show()
 
     expect(
@@ -129,7 +129,7 @@ describe('la mise en route', () => {
     ).not.toBeNull()
   })
 
-  it('mène à l’autorisation, et dit où la donner', async () => {
+  it('leads to the authorization, and says where to give it', async () => {
     await show()
 
     fireEvent.click(buttonNamed(/C’est parti/u))
@@ -141,7 +141,7 @@ describe('la mise en route', () => {
     expect(screen.getByText('Accessibilité')).not.toBeNull()
   })
 
-  it('pose le lecteur sur le titre de l’étape où l’on arrive', async () => {
+  it('puts the reader on the title of the step you reach', async () => {
     await show()
 
     fireEvent.click(buttonNamed(/C’est parti/u))
@@ -151,7 +151,7 @@ describe('la mise en route', () => {
     )
   })
 
-  it('dit en rouge que Multifus ne peut rien faire sans l’autorisation', async () => {
+  it('says in red that Multifus can do nothing without the authorization', async () => {
     await show()
 
     goTo('L’autorisation')
@@ -163,7 +163,7 @@ describe('la mise en route', () => {
     expect(badge.getAttribute('data-check')).toBe('blocked')
   })
 
-  it('dit que Multifus voit une fois l’autorisation donnée', async () => {
+  it('says Multifus sees once the authorization is given', async () => {
     await show({
       onboarding: onboardingOf({
         done: false,
@@ -176,7 +176,7 @@ describe('la mise en route', () => {
     expect(screen.getByText('Multifus voit vos fenêtres.')).not.toBeNull()
   })
 
-  it('demande l’autorisation au système, et attend l’instantané', async () => {
+  it('asks the system for the authorization, and waits for the snapshot', async () => {
     const run = await show()
 
     goTo('L’autorisation')
@@ -186,7 +186,7 @@ describe('la mise en route', () => {
     expect(run).toHaveBeenCalledWith(expect.any(Promise))
   })
 
-  it('ne redemande pas une autorisation déjà donnée', async () => {
+  it('does not ask again for an authorization already given', async () => {
     await show({
       onboarding: onboardingOf({
         done: false,
@@ -201,7 +201,7 @@ describe('la mise en route', () => {
     ).toBeNull()
   })
 
-  it('ouvre la page du système sans attendre d’instantané', async () => {
+  it('opens the system page without waiting for a snapshot', async () => {
     const run = await show()
 
     goTo('Les notifications')
@@ -211,7 +211,7 @@ describe('la mise en route', () => {
     expect(run).not.toHaveBeenCalled()
   })
 
-  it('nomme le jeu comme le système le nomme', async () => {
+  it('names the game the way the system names it', async () => {
     await show()
 
     goTo('Les notifications')
@@ -219,7 +219,7 @@ describe('la mise en route', () => {
     expect(screen.getByText('Dofus Retro')).not.toBeNull()
   })
 
-  it('ne dit rien de ce que Multifus ne peut pas lire', async () => {
+  it('says nothing about what Multifus cannot read', async () => {
     await show()
 
     goTo('La concentration')
@@ -228,7 +228,7 @@ describe('la mise en route', () => {
     expect(screen.queryByText(/Ce n’est pas en place/u)).toBeNull()
   })
 
-  it('tient les étapes illisibles pour bonnes quand le jeu s’est fait entendre', async () => {
+  it('holds the unreadable steps as good when the game has made itself heard', async () => {
     await show({
       onboarding: onboardingOf({
         done: false,
@@ -252,7 +252,7 @@ describe('la mise en route', () => {
     ).not.toBeNull()
   })
 
-  it('dit qu’il a lu le réglage quand rien ne s’est encore fait entendre', async () => {
+  it('says it has read the setting when nothing has made itself heard yet', async () => {
     await show({
       agent: WINDOWS_AGENT,
       onboarding: onboardingOf({
@@ -268,7 +268,7 @@ describe('la mise en route', () => {
     ).not.toBeNull()
   })
 
-  it('montre la case à cocher du jeu, et son chemin', async () => {
+  it('shows the checkbox of the game, and its path', async () => {
     await show()
 
     goTo('Dans le jeu')
@@ -281,7 +281,7 @@ describe('la mise en route', () => {
     expect(screen.getByText('Divers')).not.toBeNull()
   })
 
-  it('garde la capture du jeu pour qui la demande', async () => {
+  it('keeps the screenshot of the game for whoever asks for it', async () => {
     await show()
 
     goTo('Dans le jeu')
@@ -294,7 +294,7 @@ describe('la mise en route', () => {
     expect(screen.getByRole('button', { name: 'Fermer' })).not.toBeNull()
   })
 
-  it('attend qu’un personnage se connecte', async () => {
+  it('waits for a character to come online', async () => {
     await show()
 
     goTo('L’essai')
@@ -302,7 +302,7 @@ describe('la mise en route', () => {
     expect(screen.getByText('Aucun personnage connecté')).not.toBeNull()
   })
 
-  it('montre les personnages que Multifus voit', async () => {
+  it('shows the characters Multifus sees', async () => {
     await show({
       characters: [
         characterOf({ nickname: 'Alpha', online: true }),
@@ -317,7 +317,7 @@ describe('la mise en route', () => {
     expect(screen.queryByText('Bravo')).toBeNull()
   })
 
-  it('dit ce qu’il reste à faire une fois le personnage vu', async () => {
+  it('says what is left to do once the character is seen', async () => {
     await show({
       characters: [characterOf({ nickname: 'Alpha', online: true })]
     })
@@ -333,7 +333,7 @@ describe('la mise en route', () => {
     ).not.toBeNull()
   })
 
-  it('laisse partir sans avoir entendu le jeu', async () => {
+  it('lets you leave without having heard the game', async () => {
     const run = await show()
 
     goTo('L’essai')
@@ -343,7 +343,7 @@ describe('la mise en route', () => {
     expect(run).toHaveBeenCalledWith(expect.any(Promise))
   })
 
-  it('se termine sur une réussite quand le jeu s’est fait entendre', async () => {
+  it('ends on a success when the game has made itself heard', async () => {
     await show({
       characters: [characterOf({ nickname: 'Alpha', online: true })],
       onboarding: onboardingOf({
@@ -365,7 +365,7 @@ describe('la mise en route', () => {
     expect(bridge.finishOnboarding).toHaveBeenCalledWith()
   })
 
-  it('fait affirmer ce que Multifus ne peut pas lire', async () => {
+  it('makes you state what Multifus cannot read', async () => {
     await show()
 
     goTo('Les notifications')
@@ -374,7 +374,7 @@ describe('la mise en route', () => {
     expect(screen.queryByRole('button', { name: /^Continuer$/u })).toBeNull()
   })
 
-  it('n’affirme rien là où Multifus lit lui-même', async () => {
+  it('states nothing where Multifus reads by itself', async () => {
     await show()
 
     goTo('L’autorisation')
@@ -383,7 +383,7 @@ describe('la mise en route', () => {
     expect(screen.queryByRole('button', { name: /^C’est fait$/u })).toBeNull()
   })
 
-  it('se passe d’un bout à l’autre', async () => {
+  it('goes through from one end to the other', async () => {
     await show()
 
     fireEvent.click(buttonNamed('Passer'))
@@ -391,7 +391,7 @@ describe('la mise en route', () => {
     expect(bridge.finishOnboarding).toHaveBeenCalledWith()
   })
 
-  it('parle des notifications, et non des fenêtres, sur Windows', async () => {
+  it('speaks of the notifications, and not of the windows, on Windows', async () => {
     await show({ agent: WINDOWS_AGENT })
 
     goTo('L’autorisation')

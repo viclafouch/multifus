@@ -77,14 +77,14 @@ const ask = (asked: string) => {
   fireEvent.click(screen.getByRole('button', { name: asked }))
 }
 
-describe('les questions fréquentes', () => {
-  it('ne montre rien tant qu’on n’a pas ouvert', async () => {
+describe('the frequent questions', () => {
+  it('shows nothing until it is opened', async () => {
     await show()
 
     expect(screen.queryByText(ASKED[3])).toBeNull()
   })
 
-  it('pose chaque question de la table, et aucune de plus', async () => {
+  it('asks every question of the table, and none more', async () => {
     await openQuestions()
 
     expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(
@@ -97,7 +97,7 @@ describe('les questions fréquentes', () => {
     }
   })
 
-  it('garde la réponse pliée tant qu’on n’a pas posé la question', async () => {
+  it('keeps the answer folded until the question is asked', async () => {
     await openQuestions()
 
     expect(
@@ -111,7 +111,7 @@ describe('les questions fréquentes', () => {
     ).not.toBeNull()
   })
 
-  it('ne garde qu’une réponse ouverte à la fois', async () => {
+  it('keeps only one answer open at a time', async () => {
     await openQuestions()
 
     ask(ASKED[1])
@@ -125,7 +125,7 @@ describe('les questions fréquentes', () => {
     ).not.toBeNull()
   })
 
-  it('mène aux réglages du système quand la réponse y est', async () => {
+  it('leads to the system settings when the answer is there', async () => {
     await openQuestions()
 
     ask(ASKED[0])
@@ -137,7 +137,7 @@ describe('les questions fréquentes', () => {
     expect(bridge.openSystemPage).toHaveBeenCalledWith('notifications')
   })
 
-  it('ne tend aucun panneau sur Mac, où la bannière est à garder', async () => {
+  it('hands over no panel on Mac, where the banner is to be kept', async () => {
     await openQuestions({ agent: APPLE_AGENT })
 
     ask(ASKED[0])
@@ -148,7 +148,7 @@ describe('les questions fréquentes', () => {
     ).toBeNull()
   })
 
-  it('emmène à la map Raccourcis et ferme derrière elle', async () => {
+  it('takes you to the Shortcuts map and closes behind it', async () => {
     const { goToMap } = await openQuestions()
 
     ask(ASKED[3])
@@ -161,7 +161,7 @@ describe('les questions fréquentes', () => {
     expect(screen.queryByText(ASKED[3])).toBeNull()
   })
 
-  it('relance la mise en route depuis la réponse', async () => {
+  it('starts the setup again from the answer', async () => {
     const { run } = await openQuestions()
 
     ask(ASKED[1])
@@ -175,7 +175,7 @@ describe('les questions fréquentes', () => {
     expect(screen.queryByText(ASKED[1])).toBeNull()
   })
 
-  it('ferme le dialogue pour montrer le réglage qui agrandit', async () => {
+  it('closes the dialog to show the setting that enlarges', async () => {
     await openQuestions()
 
     ask(ASKED[2])
@@ -185,7 +185,7 @@ describe('les questions fréquentes', () => {
     expect(screen.queryByText(ASKED[2])).toBeNull()
   })
 
-  it('se ferme sur la croix', async () => {
+  it('closes on the cross', async () => {
     await openQuestions()
 
     fireEvent.click(screen.getByRole('button', { name: 'Fermer' }))

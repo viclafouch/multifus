@@ -27,8 +27,8 @@ const openSettingsButton = () => {
   return screen.getByRole('button', { name: /Ouvrir/u })
 }
 
-describe('l’écran de l’autorisation', () => {
-  it('dit ce que Multifus ne peut pas faire sans elle', () => {
+describe('the authorization screen', () => {
+  it('says what Multifus cannot do without it', () => {
     show()
 
     expect(
@@ -37,13 +37,13 @@ describe('l’écran de l’autorisation', () => {
     expect(screen.getByText(/Multifus ne peut pas/u)).not.toBeNull()
   })
 
-  it('prévient que l’écran s’en ira tout seul', () => {
+  it('warns the screen will leave on its own', () => {
     show()
 
     expect(screen.getByText(/cet écran disparaîtra tout seul/u)).not.toBeNull()
   })
 
-  it('demande l’autorisation au système, et attend l’instantané', () => {
+  it('asks the system for the authorization, and waits for the snapshot', () => {
     const run = show()
 
     fireEvent.click(buttonNamed('Demander l’autorisation'))
@@ -52,7 +52,7 @@ describe('l’écran de l’autorisation', () => {
     expect(run).toHaveBeenCalledWith(expect.any(Promise))
   })
 
-  it('ouvre les réglages du système sans attendre d’instantané', () => {
+  it('opens the system settings without waiting for a snapshot', () => {
     const run = show()
 
     fireEvent.click(openSettingsButton())
@@ -61,10 +61,8 @@ describe('l’écran de l’autorisation', () => {
     expect(run).not.toHaveBeenCalled()
   })
 
-  it('ne casse pas quand les réglages refusent de s’ouvrir', () => {
-    bridge.openSystemPage.mockRejectedValueOnce(
-      new Error('aucun panneau à ouvrir')
-    )
+  it('does not break when the settings refuse to open', () => {
+    bridge.openSystemPage.mockRejectedValueOnce(new Error('no panel to open'))
 
     show()
 

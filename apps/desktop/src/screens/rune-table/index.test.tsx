@@ -59,7 +59,7 @@ const gaugeNamed = (label: string) => {
     })
 
   if (found === undefined) {
-    throw new Error(`Aucune jauge nommée ${label}`)
+    throw new Error(`No gauge named ${label}`)
   }
 
   return found
@@ -73,8 +73,8 @@ const veil = () => {
   return gaugeNamed('Transparence')
 }
 
-describe('l’écran du tableau des runes', () => {
-  it('rappelle la combinaison, sans rien dire de plus qu’elle', () => {
+describe('the rune table screen', () => {
+  it('recalls the combination, without saying anything more than it', () => {
     show()
 
     expect(screen.getByText('Ctrl')).not.toBeNull()
@@ -86,7 +86,7 @@ describe('l’écran du tableau des runes', () => {
     ).toBeNull()
   })
 
-  it('dit en tête que le tableau ne s’affiche plus sans combinaison', () => {
+  it('says at the top that the table no longer shows without a combination', () => {
     show({ shortcuts: [runeTableShortcut(null)] })
 
     expect(
@@ -96,7 +96,7 @@ describe('l’écran du tableau des runes', () => {
     ).not.toBeNull()
   })
 
-  it('porte la jauge de largeur, ses bornes et la valeur du moment', () => {
+  it('carries the width gauge, its bounds and the current value', () => {
     show()
 
     expect(gauge().getAttribute('min')).toBe('320')
@@ -106,7 +106,7 @@ describe('l’écran du tableau des runes', () => {
     expect(screen.getByText('420 px')).not.toBeNull()
   })
 
-  it('pousse la taille à l’aperçu à la touche, et l’enregistre une fois lâchée', async () => {
+  it('pushes the size to the preview while it is touched, and records it once released', async () => {
     show()
 
     gauge().focus()
@@ -118,7 +118,7 @@ describe('l’écran du tableau des runes', () => {
     expect(bridge.setRuneTableWidth).toHaveBeenCalledWith(440)
   })
 
-  it('porte la jauge de transparence, du tableau plein au tableau fantôme', () => {
+  it('carries the transparency gauge, from the full table to the ghost table', () => {
     show()
 
     expect(veil().getAttribute('min')).toBe('0')
@@ -127,7 +127,7 @@ describe('l’écran du tableau des runes', () => {
     expect(veil().getAttribute('aria-valuenow')).toBe('0')
   })
 
-  it('éclaircit le tableau à la touche, et ne l’enregistre qu’une fois lâché', async () => {
+  it('lightens the table while it is touched, and records it only once released', async () => {
     show()
 
     veil().focus()
@@ -139,7 +139,7 @@ describe('l’écran du tableau des runes', () => {
     expect(bridge.setRuneTableTransparency).toHaveBeenCalledWith(5)
   })
 
-  it('porte l’interrupteur des autres personnages, éteint au départ', () => {
+  it('carries the switch of the other characters, off at the start', () => {
     show()
 
     const everywhere = screen.getByRole('switch', {
@@ -153,7 +153,7 @@ describe('l’écran du tableau des runes', () => {
     expect(bridge.setRuneTableEverywhere).toHaveBeenCalledWith(true)
   })
 
-  it('éteint l’interrupteur allumé', () => {
+  it('turns off the switch that is on', () => {
     show({ runeTable: { ...RUNE_TABLE, everywhere: true } })
 
     fireEvent.click(
@@ -165,7 +165,7 @@ describe('l’écran du tableau des runes', () => {
     expect(bridge.setRuneTableEverywhere).toHaveBeenCalledWith(false)
   })
 
-  it('pose le vrai tableau au bouton, et n’en offre pas un second', () => {
+  it('lays the real table on the button, and does not offer a second one', () => {
     show()
 
     const posers = screen.getAllByRole('button', { name: 'Voir en vrai' })
@@ -176,7 +176,7 @@ describe('l’écran du tableau des runes', () => {
     expect(posers).toHaveLength(1)
   })
 
-  it('rappelle le tableau poussé hors de l’écran au coin du client', () => {
+  it('brings back the table pushed off the screen to the corner of the client', () => {
     show()
 
     fireEvent.click(screen.getByRole('button', { name: 'Remettre' }))

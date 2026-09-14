@@ -6,8 +6,8 @@ const strike = (key: string) => {
   fireEvent.keyDown(window, { key })
 }
 
-describe('la touche Échap', () => {
-  it('répond tant qu’on l’écoute', () => {
+describe('the Escape key', () => {
+  it('answers while it is listened to', () => {
     const close = vi.fn()
 
     renderHook(() => {
@@ -19,7 +19,7 @@ describe('la touche Échap', () => {
     expect(close).toHaveBeenCalledExactlyOnceWith()
   })
 
-  it('ne répond pas aux autres touches', () => {
+  it('does not answer to the other keys', () => {
     const close = vi.fn()
 
     renderHook(() => {
@@ -32,7 +32,7 @@ describe('la touche Échap', () => {
     expect(close).not.toHaveBeenCalled()
   })
 
-  it('se tait quand personne n’écoute', () => {
+  it('keeps quiet when nobody listens', () => {
     const close = vi.fn()
 
     renderHook(() => {
@@ -44,7 +44,7 @@ describe('la touche Échap', () => {
     expect(close).not.toHaveBeenCalled()
   })
 
-  it('appelle la dernière fonction reçue, sans se rebrancher', () => {
+  it('calls the last function it got, without wiring itself again', () => {
     const first = vi.fn()
     const second = vi.fn()
     const { rerender } = renderHook(
@@ -61,7 +61,7 @@ describe('la touche Échap', () => {
     expect(second).toHaveBeenCalledExactlyOnceWith()
   })
 
-  it('lâche la touche en partant', () => {
+  it('lets go of the key on leaving', () => {
     const close = vi.fn()
     const { unmount } = renderHook(() => {
       useEscape(true, close)

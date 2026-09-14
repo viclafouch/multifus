@@ -1,7 +1,7 @@
 import React from 'react'
 import { Button } from '@multifus/retro'
 
-type ClassVignetteProps = Readonly<{
+type ClassThumbnailProps = Readonly<{
   label: string
   ariaLabel: string
   onPick: () => void
@@ -9,13 +9,13 @@ type ClassVignetteProps = Readonly<{
   isCurrent?: boolean
 }>
 
-export const ClassVignette = ({
+export const ClassThumbnail = ({
   label,
   ariaLabel,
   onPick,
   children,
   isCurrent
-}: ClassVignetteProps) => {
+}: ClassThumbnailProps) => {
   return (
     <Button
       variant="bare"

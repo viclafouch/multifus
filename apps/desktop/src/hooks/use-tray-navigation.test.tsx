@@ -45,7 +45,7 @@ describe('useTrayNavigation', () => {
     rust.open = null
   })
 
-  it('montre l’écran que la barre système demande', async () => {
+  it('shows the screen the tray asks for', async () => {
     const show = vi.fn<(screen: ScreenName) => void>()
 
     renderHook(() => {
@@ -60,7 +60,7 @@ describe('useTrayNavigation', () => {
     expect(show).toHaveBeenCalledWith('relay')
   })
 
-  it('cesse d’écouter quand la fenêtre s’en va', async () => {
+  it('stops listening when the window leaves', async () => {
     const { unmount } = renderHook(() => {
       useTrayNavigation(() => {})
     })
@@ -73,7 +73,7 @@ describe('useTrayNavigation', () => {
     })
   })
 
-  it('cesse d’écouter même quand la fenêtre part avant la réponse', async () => {
+  it('stops listening even when the window leaves before the answer', async () => {
     const { unmount } = renderHook(() => {
       useTrayNavigation(() => {})
     })

@@ -121,8 +121,8 @@ const readout = () => {
   return legend.nextElementSibling?.textContent ?? null
 }
 
-describe('la couleur, dans la modale', () => {
-  it('offre les douze couleurs et le retrait de la couleur', async () => {
+describe('the color, in the dialog', () => {
+  it('offers the twelve colors and the removal of the color', async () => {
     await open()
 
     for (const label of Object.values(COLOR_LABELS).map((colour) => {
@@ -142,7 +142,7 @@ describe('la couleur, dans la modale', () => {
     ).not.toBeNull()
   })
 
-  it('pose la couleur choisie', async () => {
+  it('sets the chosen color', async () => {
     const handlers = await open()
 
     pickColor('Turquoise')
@@ -150,7 +150,7 @@ describe('la couleur, dans la modale', () => {
     expect(handlers.handleSetColor).toHaveBeenCalledWith('turquoise')
   })
 
-  it('retire la couleur posée', async () => {
+  it('removes the color already set', async () => {
     const handlers = await open({
       character: characterOf({ color: 'turquoise' })
     })
@@ -164,7 +164,7 @@ describe('la couleur, dans la modale', () => {
     expect(handlers.handleSetColor).toHaveBeenCalledWith(null)
   })
 
-  it('reste ouverte, pour qu’on voie la couleur se poser', async () => {
+  it('stays open, so the color is seen being set', async () => {
     await open()
 
     pickColor('Rose')
@@ -172,7 +172,7 @@ describe('la couleur, dans la modale', () => {
     expect(screen.queryByRole('dialog')).not.toBeNull()
   })
 
-  it('marque la couleur du personnage, et elle seule', async () => {
+  it('marks the character color, and only it', async () => {
     await open({ character: characterOf({ color: 'pink' }) })
 
     expect(
@@ -191,7 +191,7 @@ describe('la couleur, dans la modale', () => {
     ).toBe('false')
   })
 
-  it('marque « Aucune » quand le personnage n’a pas de couleur', async () => {
+  it('marks the no color entry when the character has no color', async () => {
     await open()
 
     expect(
@@ -203,7 +203,7 @@ describe('la couleur, dans la modale', () => {
     ).toBe('true')
   })
 
-  it('dit qui porte déjà une couleur, sans la refuser', async () => {
+  it('says who already wears a color, without refusing it', async () => {
     const handlers = await open({
       roster: [characterOf({ nickname: 'Bravo', color: 'sky' })]
     })
@@ -216,7 +216,7 @@ describe('la couleur, dans la modale', () => {
     expect(handlers.handleSetColor).toHaveBeenCalledWith('sky')
   })
 
-  it('ne se compte pas lui-même comme voleur de sa couleur', async () => {
+  it('does not count itself as the thief of its own color', async () => {
     await open({
       character: characterOf({ nickname: 'Alpha', color: 'sky' }),
       roster: [characterOf({ nickname: 'Alpha', color: 'sky' })]
@@ -231,20 +231,20 @@ describe('la couleur, dans la modale', () => {
   })
 })
 
-describe('la couleur, ce que la modale en dit', () => {
-  it('nomme la couleur du personnage tant qu’on ne survole rien', async () => {
+describe('the color, what the dialog says about it', () => {
+  it('names the character color while nothing is hovered', async () => {
     await open({ character: characterOf({ color: 'turquoise' }) })
 
     expect(readout()).toBe('Turquoise')
   })
 
-  it('dit qu’il n’y a aucune couleur quand il n’y en a pas', async () => {
+  it('says there is no color when there is none', async () => {
     await open()
 
     expect(readout()).toBe('Aucune couleur')
   })
 
-  it('nomme la couleur survolée, puis rend la parole à celle du personnage', async () => {
+  it('names the hovered color, then gives the floor back to the character one', async () => {
     await open({ character: characterOf({ color: 'turquoise' }) })
     const sky = colorButton('Ciel')
 
@@ -257,7 +257,7 @@ describe('la couleur, ce que la modale en dit', () => {
     expect(readout()).toBe('Turquoise')
   })
 
-  it('nomme la couleur atteinte au clavier, sans souris', async () => {
+  it('names the color reached with the keyboard, without a mouse', async () => {
     await open({ character: characterOf({ color: 'turquoise' }) })
     const sky = colorButton('Ciel')
 
@@ -270,7 +270,7 @@ describe('la couleur, ce que la modale en dit', () => {
     expect(readout()).toBe('Turquoise')
   })
 
-  it('dit qui porte déjà la couleur survolée', async () => {
+  it('says who already wears the hovered color', async () => {
     await open({ roster: [characterOf({ nickname: 'Bravo', color: 'sky' })] })
 
     fireEvent.pointerEnter(
@@ -282,7 +282,7 @@ describe('la couleur, ce que la modale en dit', () => {
     expect(readout()).toBe(`Ciel · déjà pris par Bravo`)
   })
 
-  it('allume la pastille du personnage, et elle seule', async () => {
+  it('lights the character swatch, and only it', async () => {
     await open({ character: characterOf({ color: 'turquoise' }) })
 
     expect(swatchOf(colorButton('Turquoise'))?.hasAttribute('data-worn')).toBe(
@@ -291,7 +291,7 @@ describe('la couleur, ce que la modale en dit', () => {
     expect(swatchOf(colorButton('Ciel'))?.hasAttribute('data-worn')).toBe(false)
   })
 
-  it('allume le retrait quand le personnage n’a pas de couleur', async () => {
+  it('lights the removal when the character has no color', async () => {
     await open()
     const none = screen.getByRole('button', {
       name: 'Retirer la couleur de Alpha'
@@ -300,7 +300,7 @@ describe('la couleur, ce que la modale en dit', () => {
     expect(swatchOf(none)?.hasAttribute('data-worn')).toBe(true)
   })
 
-  it('marque la pastille survolée, et la rend en partant', async () => {
+  it('marks the hovered swatch, and gives it back on leaving', async () => {
     await open()
     const sky = colorButton('Ciel')
 
@@ -318,7 +318,7 @@ describe('la couleur, ce que la modale en dit', () => {
     expect(swatchOf(sky)?.hasAttribute('data-hovered')).toBe(false)
   })
 
-  it('creuse la pastille qu’un autre porte déjà', async () => {
+  it('hollows the swatch another one already wears', async () => {
     await open({ roster: [characterOf({ nickname: 'Bravo', color: 'sky' })] })
     const taken = screen.getByRole('button', {
       name: 'Marquer Alpha en Ciel, déjà pris par Bravo'
@@ -330,7 +330,7 @@ describe('la couleur, ce que la modale en dit', () => {
     )
   })
 
-  it('porte le liseré du personnage en tête de la modale', async () => {
+  it('carries the character rim at the top of the dialog', async () => {
     await open({ character: characterOf({ color: 'violet' }) })
 
     expect(document.querySelector('.stripe')?.classList).toContain(
@@ -338,13 +338,13 @@ describe('la couleur, ce que la modale en dit', () => {
     )
   })
 
-  it('ne porte aucun liseré pour un personnage sans couleur', async () => {
+  it('carries no rim for a character without a color', async () => {
     await open()
 
     expect(document.querySelector('.stripe')).toBeNull()
   })
 
-  it('dit Aucune couleur en survolant le retrait', async () => {
+  it('says there is no color when hovering the removal', async () => {
     await open({ character: characterOf({ color: 'turquoise' }) })
 
     fireEvent.pointerEnter(
@@ -357,8 +357,8 @@ describe('la couleur, ce que la modale en dit', () => {
   })
 })
 
-describe('la modale de classe, à l’ouverture', () => {
-  it('offre le sexe, les douze classes et le retrait de la classe', async () => {
+describe('the class dialog, on opening', () => {
+  it('offers the gender, the twelve classes and the removal of the class', async () => {
     await open()
 
     for (const label of Object.values(CLASS_LABELS).map((each) => {
@@ -380,16 +380,16 @@ describe('la modale de classe, à l’ouverture', () => {
     ).not.toBeNull()
   })
 
-  it('porte le pseudo du personnage', async () => {
+  it('carries the character nickname', async () => {
     await open()
     expect(within(screen.getByRole('dialog')).getByText('Alpha')).not.toBeNull()
   })
 })
 
-describe('la modale de classe, quand le sexe est déjà connu', () => {
+describe('the class dialog, when the gender is already known', () => {
   const known = characterOf({ gender: 'female', class: 'iop' })
 
-  it('pose la classe et s’en va, sans rien demander de plus', async () => {
+  it('sets the class and leaves, without asking anything more', async () => {
     const handlers = await open({ character: known })
 
     pickClass('Crâ')
@@ -399,7 +399,7 @@ describe('la modale de classe, quand le sexe est déjà connu', () => {
     await closed()
   })
 
-  it('montre le sexe en cours comme choisi', async () => {
+  it('shows the current gender as chosen', async () => {
     await open({ character: known })
 
     expect(
@@ -410,7 +410,7 @@ describe('la modale de classe, quand le sexe est déjà connu', () => {
     ).toBe('false')
   })
 
-  it('montre la classe en cours comme choisie', async () => {
+  it('shows the current class as chosen', async () => {
     await open({ character: known })
 
     expect(
@@ -422,7 +422,7 @@ describe('la modale de classe, quand le sexe est déjà connu', () => {
     ).toBe('true')
   })
 
-  it('dessine les vignettes au sexe du personnage', async () => {
+  it('draws the thumbnails in the character gender', async () => {
     await open({ character: known })
 
     expect(portraitOf(`Marquer Alpha comme Crâ`)).toBe(
@@ -430,7 +430,7 @@ describe('la modale de classe, quand le sexe est déjà connu', () => {
     )
   })
 
-  it('change le sexe sans refermer, la classe reste à choisir', async () => {
+  it('changes the gender without closing, the class is still to be chosen', async () => {
     const handlers = await open({ character: known })
 
     fireEvent.click(screen.getByRole('button', { name: 'Homme' }))
@@ -439,7 +439,7 @@ describe('la modale de classe, quand le sexe est déjà connu', () => {
     expect(screen.getByRole('dialog')).not.toBeNull()
   })
 
-  it('retire le sexe quand on reclique sur celui du personnage', async () => {
+  it('removes the gender when the character one is clicked again', async () => {
     const handlers = await open({ character: known })
 
     fireEvent.click(screen.getByRole('button', { name: 'Femme' }))
@@ -448,8 +448,8 @@ describe('la modale de classe, quand le sexe est déjà connu', () => {
   })
 })
 
-describe('la modale de classe, quand le sexe manque encore', () => {
-  it('demande homme ou femme avant de poser la classe', async () => {
+describe('the class dialog, when the gender is still missing', () => {
+  it('asks male or female before setting the class', async () => {
     const handlers = await open()
 
     pickClass('Iop')
@@ -459,7 +459,7 @@ describe('la modale de classe, quand le sexe manque encore', () => {
     expect(screen.getByText('Iop : homme ou femme ?')).not.toBeNull()
   })
 
-  it('montre les deux portraits de la classe demandée', async () => {
+  it('shows both portraits of the asked class', async () => {
     await open()
 
     pickClass('Iop')
@@ -468,7 +468,7 @@ describe('la modale de classe, quand le sexe manque encore', () => {
     expect(portraitOf('Iop femme')).toBe(CLASS_PORTRAITS.iop.female)
   })
 
-  it('pose la classe et le sexe d’un seul geste, et s’en va', async () => {
+  it('sets the class and the gender in one move, and leaves', async () => {
     const handlers = await open()
 
     pickClass('Iop')
@@ -486,7 +486,7 @@ describe('la modale de classe, quand le sexe manque encore', () => {
     await closed()
   })
 
-  it('range les douze classes hors de vue le temps de la question', async () => {
+  it('puts the twelve classes out of sight while the question is asked', async () => {
     await open()
 
     pickClass('Iop')
@@ -498,7 +498,7 @@ describe('la modale de classe, quand le sexe manque encore', () => {
     ).toBeNull()
   })
 
-  it('revient aux classes sans rien avoir posé', async () => {
+  it('goes back to the classes without having set anything', async () => {
     const handlers = await open()
 
     pickClass('Iop')
@@ -513,13 +513,13 @@ describe('la modale de classe, quand le sexe manque encore', () => {
     ).not.toBeNull()
   })
 
-  it('dessine les vignettes en homme, faute de réponse', async () => {
+  it('draws the thumbnails as male, for lack of an answer', async () => {
     await open()
 
     expect(portraitOf(`Marquer Alpha comme Crâ`)).toBe(CLASS_PORTRAITS.cra.male)
   })
 
-  it('retire la classe sans demander le sexe', async () => {
+  it('removes the class without asking the gender', async () => {
     const handlers = await open()
 
     fireEvent.click(
@@ -532,7 +532,7 @@ describe('la modale de classe, quand le sexe manque encore', () => {
     await closed()
   })
 
-  it('pose le sexe seul, et laisse la modale ouverte pour la classe', async () => {
+  it('sets the gender alone, and leaves the dialog open for the class', async () => {
     const handlers = await open()
 
     fireEvent.click(screen.getByRole('button', { name: 'Homme' }))
@@ -542,8 +542,8 @@ describe('la modale de classe, quand le sexe manque encore', () => {
   })
 })
 
-describe('la modale de classe, quand on referme sans répondre', () => {
-  it('s’en va sans rien poser', async () => {
+describe('the class dialog, when it is closed without an answer', () => {
+  it('leaves without setting anything', async () => {
     const handlers = await open()
 
     fireEvent.click(
@@ -558,7 +558,7 @@ describe('la modale de classe, quand on referme sans répondre', () => {
     expect(handlers.handleSetGender).not.toHaveBeenCalled()
   })
 
-  it('oublie la question posée, et rouvre sur les classes', async () => {
+  it('forgets the asked question, and reopens on the classes', async () => {
     await open()
 
     pickClass('Iop')
@@ -580,8 +580,8 @@ describe('la modale de classe, quand on referme sans répondre', () => {
   })
 })
 
-describe('la modale de classe, ce qu’elle prévient', () => {
-  it('dit qu’un Mac garde le logo Dofus sur le client', async () => {
+describe('the class dialog, what it warns about', () => {
+  it('says a Mac keeps the Dofus logo on the client', async () => {
     await open({ agent: APPLE_AGENT })
 
     expect(
@@ -591,7 +591,7 @@ describe('la modale de classe, ce qu’elle prévient', () => {
     ).not.toBeNull()
   })
 
-  it('dit sur Windows que la tête de classe est coupée, quand elle l’est', async () => {
+  it('says on Windows that the class head is cut, when it is', async () => {
     await open({ agent: WINDOWS_AGENT, paintPortraits: false })
 
     expect(
@@ -601,7 +601,7 @@ describe('la modale de classe, ce qu’elle prévient', () => {
     ).not.toBeNull()
   })
 
-  it('ne prévient de rien quand la tête va bien se poser', async () => {
+  it('warns about nothing when the head will land fine', async () => {
     await open({ agent: WINDOWS_AGENT, paintPortraits: true })
 
     expect(

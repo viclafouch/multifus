@@ -16,7 +16,7 @@ const NOTHING_HELD = {
 }
 
 describe('capture', () => {
-  it('rend la combinaison quand une touche est frappée avec un modificateur', () => {
+  it('returns the combination when a key is hit with a modifier', () => {
     const press = {
       ...NOTHING_HELD,
       code: 'ArrowRight',
@@ -32,7 +32,7 @@ describe('capture', () => {
     })
   })
 
-  it('écrit les modificateurs dans l’ordre de la table et non de l’appui', () => {
+  it('writes the modifiers in the order of the table and not of the press', () => {
     const press = {
       code: 'KeyA',
       ctrlKey: true,
@@ -49,7 +49,7 @@ describe('capture', () => {
     })
   })
 
-  it('attend la suite quand l’appui n’est que des modificateurs', () => {
+  it('waits for the rest when the press is only modifiers', () => {
     const press = { ...NOTHING_HELD, code: 'ShiftLeft', shiftKey: true }
 
     const result = capture(press)
@@ -57,25 +57,25 @@ describe('capture', () => {
     expect(result).toStrictEqual({ status: 'waiting' })
   })
 
-  it('refuse une touche frappée sans modificateur', () => {
+  it('refuses a key hit without a modifier', () => {
     const result = capture({ ...NOTHING_HELD, code: 'KeyA' })
 
     expect(result).toStrictEqual({ status: 'rejected', reason: 'noModifier' })
   })
 
-  it('prend une touche de fonction seule, ailleurs que sur un Mac', () => {
+  it('takes a function key alone, anywhere but on a Mac', () => {
     const result = capture({ ...NOTHING_HELD, code: 'F5' })
 
     expect(result).toStrictEqual({ status: 'captured', accelerator: 'F5' })
   })
 
-  it('prend une touche de fonction sous un modificateur comme une autre', () => {
+  it('takes a function key under a modifier like any other', () => {
     const result = capture({ ...NOTHING_HELD, code: 'F5', altKey: true })
 
     expect(result).toStrictEqual({ status: 'captured', accelerator: 'Alt+F5' })
   })
 
-  it('refuse la combinaison de collage, qu’une quickReply déclencherait elle-même', () => {
+  it('refuses the paste combination, which a quickReply would trigger by itself', () => {
     const press = { ...NOTHING_HELD, code: 'KeyV', ctrlKey: true }
 
     const result = capture(press)
@@ -86,7 +86,7 @@ describe('capture', () => {
     })
   })
 
-  it('laisse passer la touche du collage sous un autre modificateur', () => {
+  it('lets through the paste key under another modifier', () => {
     const press = { ...NOTHING_HELD, code: 'KeyV', ctrlKey: true, altKey: true }
 
     const result = capture(press)
@@ -97,7 +97,7 @@ describe('capture', () => {
     })
   })
 
-  it('refuse une touche que le parseur du greffon ne connaît pas', () => {
+  it('refuses a key the parser of the plugin does not know', () => {
     const press = { ...NOTHING_HELD, code: 'ContextMenu', ctrlKey: true }
 
     const result = capture(press)
@@ -110,7 +110,7 @@ describe('capture', () => {
 })
 
 describe('heldModifiers', () => {
-  it('rend les modificateurs tenus dans l’ordre où ils s’écrivent', () => {
+  it('returns the held modifiers in the order they are written', () => {
     const press = {
       ctrlKey: true,
       altKey: false,
@@ -123,7 +123,7 @@ describe('heldModifiers', () => {
     expect(held).toStrictEqual(['Control', 'Shift', 'Super'])
   })
 
-  it('ne rend rien quand aucun modificateur n’est tenu', () => {
+  it('returns nothing when no modifier is held', () => {
     const held = heldModifiers(NOTHING_HELD)
 
     expect(held).toStrictEqual([])
@@ -131,25 +131,25 @@ describe('heldModifiers', () => {
 })
 
 describe('acceleratorParts', () => {
-  it('résout les alias des modificateurs et des flèches', () => {
+  it('resolves the aliases of the modifiers and of the arrows', () => {
     const parts = acceleratorParts('Ctrl+Shift+Right')
 
     expect(parts).toStrictEqual(['Control', 'Shift', 'ArrowRight'])
   })
 
-  it('remet les modificateurs devant la touche', () => {
+  it('puts the modifiers back in front of the key', () => {
     const parts = acceleratorParts('KeyA+Shift+Control')
 
     expect(parts).toStrictEqual(['Control', 'Shift', 'KeyA'])
   })
 
-  it('laisse tomber les espaces autour des parties', () => {
+  it('drops the spaces around the parts', () => {
     const parts = acceleratorParts(' Cmd + KeyA ')
 
     expect(parts).toStrictEqual(['Super', 'KeyA'])
   })
 
-  it('rend la seule touche d’une combinaison sans modificateur', () => {
+  it('returns the only key of a combination without a modifier', () => {
     const parts = acceleratorParts('KeyA')
 
     expect(parts).toStrictEqual(['KeyA'])
@@ -165,58 +165,58 @@ const AZERTY: KeyLabels = {
 }
 
 describe('keyLabel', () => {
-  it('lit un clavier qui n’est pas un clavier Apple, sous jsdom', () => {
+  it('reads a keyboard that is not an Apple keyboard, under jsdom', () => {
     expect(IS_APPLE).toBe(false)
   })
 
-  it('dessine une flèche à la place de son nom', () => {
+  it('draws an arrow instead of its name', () => {
     expect(keyLabel('ArrowRight')).toBe('→')
   })
 
-  it('dessine Control dans le dialecte de ce clavier', () => {
+  it('draws Control in the dialect of that keyboard', () => {
     expect(keyLabel('Control')).toBe('Ctrl')
   })
 
-  it('dessine Shift dans le dialecte de ce clavier', () => {
+  it('draws Shift in the dialect of that keyboard', () => {
     expect(keyLabel('Shift')).toBe('Maj')
   })
 
-  it('dessine Super dans le dialecte de ce clavier', () => {
+  it('draws Super in the dialect of that keyboard', () => {
     expect(keyLabel('Super')).toBe('Win')
   })
 
-  it('rend la lettre d’une touche alphabétique', () => {
+  it('returns the letter of an alphabetic key', () => {
     expect(keyLabel('KeyA')).toBe('A')
   })
 
-  it('rend le chiffre d’une touche numérique', () => {
+  it('returns the digit of a numeric key', () => {
     expect(keyLabel('Digit5')).toBe('5')
   })
 
-  it('nomme le pavé numérique devant son chiffre', () => {
+  it('names the numeric keypad in front of its digit', () => {
     expect(keyLabel('Numpad7')).toBe('Pavé 7')
   })
 
-  it('lit la table avant de lire le préfixe', () => {
+  it('reads the table before reading the prefix', () => {
     expect(keyLabel('NumpadAdd')).toBe('Pavé +')
   })
 
-  it('rend un token inconnu tel quel', () => {
+  it('returns an unknown token as it is', () => {
     expect(keyLabel('F13')).toBe('F13')
   })
 
-  it('écrit la lettre du clavier de l’utilisateur avant la sienne', () => {
+  it('writes the letter of the user keyboard before its own', () => {
     expect(keyLabel('KeyW', AZERTY)).toBe('Z')
     expect(keyLabel('KeyA', AZERTY)).toBe('Q')
     expect(keyLabel('Semicolon', AZERTY)).toBe('M')
   })
 
-  it('garde ses lettres pour une touche que le clavier ne nomme pas', () => {
+  it('keeps its letters for a key the keyboard does not name', () => {
     expect(keyLabel('KeyB', AZERTY)).toBe('B')
     expect(keyLabel('ArrowRight', AZERTY)).toBe('→')
   })
 
-  it('garde ses lettres quand le système n’a rien su dire', () => {
+  it('keeps its letters when the system could say nothing', () => {
     expect(keyLabel('KeyW', {})).toBe('W')
   })
 })

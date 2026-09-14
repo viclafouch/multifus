@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it } from 'vitest'
 import { I18nProvider } from '@lingui/react'
 import { cleanup, screen } from '@testing-library/react'
 import type { Language } from '@/@types/language'
-import { Cartouche } from '@/components/cartouche'
+import { LanguageBar } from '@/components/language-bar'
 import { LANGUAGE_NAMES, LANGUAGES } from '@/constants/languages'
 import { pathOf } from '@/helpers/page'
 import { SPEAKERS } from '@/lib/i18n'
@@ -13,18 +13,18 @@ const show = (current: Language) => {
     at: pathOf({ page: 'wheel', language: current }),
     children: (
       <I18nProvider i18n={SPEAKERS[current]}>
-        <Cartouche page="wheel" />
+        <LanguageBar page="wheel" />
       </I18nProvider>
     )
   })
 }
 
-describe('le cartouche', () => {
+describe('the language bar', () => {
   afterEach(() => {
     cleanup()
   })
 
-  it('pose les trois drapeaux, chaque langue se nommant elle-même', () => {
+  it('lays the three flags, each language naming itself', () => {
     show('fr')
 
     expect(
@@ -38,7 +38,7 @@ describe('le cartouche', () => {
     }
   })
 
-  it.each(LANGUAGES)('reste sur la page en passant en %s', (language) => {
+  it.each(LANGUAGES)('stays on the page when switching to %s', (language) => {
     show('fr')
 
     const flag = screen.getByRole('link', { name: LANGUAGE_NAMES[language] })
@@ -46,18 +46,15 @@ describe('le cartouche', () => {
     expect(flag.getAttribute('href')).toBe(pathOf({ page: 'wheel', language }))
   })
 
-  it.each(LANGUAGES)(
-    'allume le drapeau de %s sur sa propre page',
-    (current) => {
-      show(current)
+  it.each(LANGUAGES)('lights the %s flag on its own page', (current) => {
+    show(current)
 
-      const flag = screen.getByRole('link', { name: LANGUAGE_NAMES[current] })
+    const flag = screen.getByRole('link', { name: LANGUAGE_NAMES[current] })
 
-      expect(flag.getAttribute('aria-current')).toBe('page')
-    }
-  )
+    expect(flag.getAttribute('aria-current')).toBe('page')
+  })
 
-  it.each(LANGUAGES)('laisse les autres drapeaux éteints en %s', (current) => {
+  it.each(LANGUAGES)('leaves the other flags off in %s', (current) => {
     show(current)
 
     const others = LANGUAGES.filter((language) => {
@@ -71,7 +68,7 @@ describe('le cartouche', () => {
     }
   })
 
-  it('annonce à chaque drapeau la langue où il mène', () => {
+  it('announces to each flag the language it leads to', () => {
     show('fr')
 
     for (const language of LANGUAGES) {

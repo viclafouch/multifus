@@ -140,7 +140,7 @@ const ONLINE_CHARACTER = {
 
 describe('updateLine', () => {
   it.each(Object.values(UPDATE_CASES))(
-    'met en mots la mise à jour $update.kind',
+    'puts into words the update $update.kind',
     ({ update, line }) => {
       const written = updateLine(update)
 
@@ -151,7 +151,7 @@ describe('updateLine', () => {
 
 describe('pairingProblemLine', () => {
   it.each(Object.values(PAIRING_CASES))(
-    'met en mots l’échec d’appariement $problem.kind',
+    'puts into words the pairing failure $problem.kind',
     ({ problem, line }) => {
       const written = pairingProblemLine(problem)
 
@@ -162,7 +162,7 @@ describe('pairingProblemLine', () => {
 
 describe('shortcutStatusLine', () => {
   it.each(Object.values(STATUS_CASES))(
-    'met en mots le statut $status.kind, avec le ton qui va avec',
+    'puts into words the status $status.kind, with the tone that goes with it',
     ({ status, answer }) => {
       const written = shortcutStatusLine(status, QUICK_REPLIES)
 
@@ -170,7 +170,7 @@ describe('shortcutStatusLine', () => {
     }
   )
 
-  it('nomme l’action qui tient déjà la combinaison', () => {
+  it('names the action that already holds the combination', () => {
     const status = {
       kind: 'duplicate',
       binding: { kind: 'action', action: 'walk' }
@@ -181,7 +181,7 @@ describe('shortcutStatusLine', () => {
     expect(written?.text).toContain('Déplacement rapide')
   })
 
-  it('nomme par son texte la quickReply qui tient déjà la combinaison', () => {
+  it('names by its text the quickReply that already holds the combination', () => {
     const status = {
       kind: 'duplicate',
       binding: { kind: 'quickReply', id: 1 }
@@ -192,7 +192,7 @@ describe('shortcutStatusLine', () => {
     expect(written?.text).toContain('la réponse « prix libre »')
   })
 
-  it('nomme une quickReply sans texte sans prétendre la citer', () => {
+  it('names a quickReply without text without pretending to quote it', () => {
     const status = {
       kind: 'duplicate',
       binding: { kind: 'quickReply', id: 2 }
@@ -205,7 +205,7 @@ describe('shortcutStatusLine', () => {
 })
 
 describe('bindingLabel', () => {
-  it('coupe un texte trop long sur un caractère et non au milieu d’un', () => {
+  it('cuts a text that is too long on a character and not in the middle of one', () => {
     const quickReplies = [
       { ...QUICK_REPLIES[0], text: 'é'.repeat(60) }
     ] as const satisfies readonly QuickReply[]
@@ -215,7 +215,7 @@ describe('bindingLabel', () => {
     expect(label).toBe(`la réponse « ${'é'.repeat(30)}… »`)
   })
 
-  it('nomme une quickReply que le tableau ne porte plus', () => {
+  it('names a quickReply the table no longer carries', () => {
     const label = bindingLabel({ kind: 'quickReply', id: 404 }, QUICK_REPLIES)
 
     expect(label).toBe('une réponse sans texte')
@@ -223,7 +223,7 @@ describe('bindingLabel', () => {
 })
 
 describe('authorizationLine', () => {
-  it('dit l’écoute active quand le système entend', () => {
+  it('says the listening is on when the system hears', () => {
     const line = authorizationLine({
       granted: true,
       listening: true
@@ -232,7 +232,7 @@ describe('authorizationLine', () => {
     expect(line).toBe('À l’écoute du jeu')
   })
 
-  it('dit l’écoute arrêtée quand elle ne tourne pas', () => {
+  it('says the listening is stopped when it is not running', () => {
     const line = authorizationLine({
       granted: true,
       listening: false
@@ -241,7 +241,7 @@ describe('authorizationLine', () => {
     expect(line).toBe('Écoute interrompue')
   })
 
-  it('dit l’autorisation manquante avant tout le reste', () => {
+  it('says the authorization is missing before everything else', () => {
     const line = authorizationLine({
       granted: false,
       listening: true
@@ -252,13 +252,13 @@ describe('authorizationLine', () => {
 })
 
 describe('characterSubLine', () => {
-  it('réclame la classe tant qu’aucune n’est choisie', () => {
+  it('asks for the class while none is chosen', () => {
     const line = characterSubLine(ONLINE_CHARACTER)
 
     expect(line).toBe(`Classe à choisir · Connecté`)
   })
 
-  it('réclame le sexe d’une classe choisie sans lui', () => {
+  it('asks for the gender of a class chosen without it', () => {
     const character = {
       ...ONLINE_CHARACTER,
       class: 'iop',
@@ -270,7 +270,7 @@ describe('characterSubLine', () => {
     expect(line).toBe(`Sexe à choisir · Connecté`)
   })
 
-  it('dit la classe avant l’état une fois le portrait complet', () => {
+  it('says the class before the state once the portrait is complete', () => {
     const character = { ...ONLINE_CHARACTER, class: 'iop' } as const
 
     const line = characterSubLine(character)
@@ -278,7 +278,7 @@ describe('characterSubLine', () => {
     expect(line).toBe(`Iop · Connecté`)
   })
 
-  it('ne nomme jamais la couleur : elle se voit, elle ne se lit pas', () => {
+  it('never names the color: it is seen, it is not read', () => {
     const character = {
       ...ONLINE_CHARACTER,
       class: 'iop',
@@ -291,13 +291,13 @@ describe('characterSubLine', () => {
 })
 
 describe('characterMarksLabel', () => {
-  it('invite à choisir la classe tant qu’elle manque', () => {
+  it('invites to choose the class while it is missing', () => {
     const label = characterMarksLabel(ONLINE_CHARACTER)
 
     expect(label).toBe('Choisir la classe de Alpha')
   })
 
-  it('invite à choisir le sexe quand seule la classe est là', () => {
+  it('invites to choose the gender when only the class is there', () => {
     const character = {
       ...ONLINE_CHARACTER,
       class: 'iop',
@@ -309,7 +309,7 @@ describe('characterMarksLabel', () => {
     expect(label).toBe('Choisir le sexe de Alpha')
   })
 
-  it('propose de changer le portrait une fois complet', () => {
+  it('offers to change the portrait once it is complete', () => {
     const character = { ...ONLINE_CHARACTER, class: 'iop' } as const
 
     const label = characterMarksLabel(character)
@@ -319,13 +319,13 @@ describe('characterMarksLabel', () => {
 })
 
 describe('characterMarksTooltip', () => {
-  it('invite à choisir la classe tant qu’elle manque', () => {
+  it('invites to choose the class while it is missing', () => {
     const tooltip = characterMarksTooltip(ONLINE_CHARACTER)
 
     expect(tooltip).toBe('Choisir la classe de Alpha')
   })
 
-  it('dit seulement Modifier une fois le portrait complet', () => {
+  it('says only change once the portrait is complete', () => {
     const character = { ...ONLINE_CHARACTER, class: 'iop' } as const
 
     const tooltip = characterMarksTooltip(character)
@@ -335,7 +335,7 @@ describe('characterMarksTooltip', () => {
 })
 
 describe('cycleToggleTooltip', () => {
-  it('propose d’exclure un personnage qui défile', () => {
+  it('offers to exclude a character who cycles', () => {
     const tooltip = cycleToggleTooltip(ONLINE_CHARACTER)
 
     expect(tooltip).toBe(
@@ -343,7 +343,7 @@ describe('cycleToggleTooltip', () => {
     )
   })
 
-  it('propose de réintégrer un personnage exclu', () => {
+  it('offers to bring back an excluded character', () => {
     const character = { ...ONLINE_CHARACTER, excluded: true }
 
     const tooltip = cycleToggleTooltip(character)
@@ -353,7 +353,7 @@ describe('cycleToggleTooltip', () => {
     )
   })
 
-  it('dit pourquoi l’interrupteur d’un déconnecté ne bouge pas', () => {
+  it('says why the switch of an offline one does not move', () => {
     const character = { ...ONLINE_CHARACTER, online: false }
 
     const tooltip = cycleToggleTooltip(character)
@@ -363,7 +363,7 @@ describe('cycleToggleTooltip', () => {
 })
 
 describe('characterPresenceSubLine', () => {
-  it('dit la classe avant l’état', () => {
+  it('says the class before the state', () => {
     const character = { ...ONLINE_CHARACTER, class: 'iop' } as const
 
     const line = characterPresenceSubLine(character)
@@ -371,7 +371,7 @@ describe('characterPresenceSubLine', () => {
     expect(line).toBe(`Iop · Connecté`)
   })
 
-  it('tait l’exclusion d’un personnage connecté et exclu', () => {
+  it('keeps quiet about the exclusion of a character who is online and excluded', () => {
     const character = { ...ONLINE_CHARACTER, excluded: true }
 
     const line = characterPresenceSubLine(character)
@@ -379,7 +379,7 @@ describe('characterPresenceSubLine', () => {
     expect(line).toBe('Connecté')
   })
 
-  it('dit la déconnexion d’un personnage déconnecté', () => {
+  it('says the disconnection of an offline character', () => {
     const character = { ...ONLINE_CHARACTER, excluded: true, online: false }
 
     const line = characterPresenceSubLine(character)
@@ -389,17 +389,17 @@ describe('characterPresenceSubLine', () => {
 })
 
 describe('missingGenderLine', () => {
-  it('ne dit rien quand personne ne manque', () => {
+  it('says nothing when nobody is missing', () => {
     expect(missingGenderLine([])).toBeNull()
   })
 
-  it('nomme un seul manquant au singulier', () => {
+  it('names a single missing one in the singular', () => {
     const line = missingGenderLine(['Chafoin'])
 
     expect(line).toBe('Chafoin n’a pas de sexe : il ne bougera pas.')
   })
 
-  it('nomme deux manquants sans les compter', () => {
+  it('names two missing ones without counting them', () => {
     const line = missingGenderLine(['Chafoin', 'Bilou'])
 
     expect(line).toBe(
@@ -407,7 +407,7 @@ describe('missingGenderLine', () => {
     )
   })
 
-  it('nomme les deux premiers et compte le reste', () => {
+  it('names the first two and counts the rest', () => {
     const line = missingGenderLine(['Chafoin', 'Bilou', 'Nabur', 'Elyandra'])
 
     expect(line).toBe(
@@ -415,7 +415,7 @@ describe('missingGenderLine', () => {
     )
   })
 
-  it('accorde le reste au singulier', () => {
+  it('agrees the rest in the singular', () => {
     const line = missingGenderLine(['Chafoin', 'Bilou', 'Nabur'])
 
     expect(line).toBe(
@@ -425,7 +425,7 @@ describe('missingGenderLine', () => {
 })
 
 describe('genderGroupHint', () => {
-  it('propose d’exclure un sexe encore dans le défilement', () => {
+  it('offers to exclude a gender still in the cycle', () => {
     const hint = genderGroupHint({
       gender: 'male',
       isEmpty: false,
@@ -435,7 +435,7 @@ describe('genderGroupHint', () => {
     expect(hint).toBe('Exclure tous les hommes')
   })
 
-  it('propose de réintégrer un sexe entièrement exclu', () => {
+  it('offers to bring back a gender that is entirely excluded', () => {
     const hint = genderGroupHint({
       gender: 'female',
       isEmpty: false,
@@ -445,7 +445,7 @@ describe('genderGroupHint', () => {
     expect(hint).toBe('Réintégrer toutes les femmes')
   })
 
-  it('dit qu’un sexe n’a personne de connecté', () => {
+  it('says a gender has nobody online', () => {
     const hint = genderGroupHint({
       gender: 'female',
       isEmpty: true,
@@ -457,13 +457,13 @@ describe('genderGroupHint', () => {
 })
 
 describe('characterStateLine', () => {
-  it('dit le défilement pour un personnage connecté et dedans', () => {
+  it('says the cycle for a character who is online and in it', () => {
     const line = characterStateLine(ONLINE_CHARACTER)
 
     expect(line).toBe('Connecté')
   })
 
-  it('dit l’exclusion pour un personnage connecté et exclu', () => {
+  it('says the exclusion for a character who is online and excluded', () => {
     const character = { ...ONLINE_CHARACTER, excluded: true }
 
     const line = characterStateLine(character)
@@ -471,7 +471,7 @@ describe('characterStateLine', () => {
     expect(line).toBe('Exclu')
   })
 
-  it('dit la déconnexion avant l’exclusion pour un personnage déconnecté', () => {
+  it('says the disconnection before the exclusion for an offline character', () => {
     const character = { ...ONLINE_CHARACTER, excluded: true, online: false }
 
     const line = characterStateLine(character)

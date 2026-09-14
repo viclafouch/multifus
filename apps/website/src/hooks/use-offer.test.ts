@@ -6,13 +6,13 @@ const speaks = (spoken: readonly string[]) => {
   vi.spyOn(window.navigator, 'languages', 'get').mockReturnValue([...spoken])
 }
 
-describe('la proposition faite une fois', () => {
+describe('the offer made once', () => {
   afterEach(() => {
     cleanup()
     window.localStorage.clear()
   })
 
-  it('propose la langue du navigateur et garde le souvenir', () => {
+  it('offers the language of the browser and keeps the memory', () => {
     speaks(['es-MX', 'es'])
 
     const { result } = renderHook(() => {
@@ -23,7 +23,7 @@ describe('la proposition faite une fois', () => {
     expect(window.localStorage.getItem(OFFER_MADE)).toBe('es')
   })
 
-  it('ne propose plus rien une fois le souvenir posé', () => {
+  it('offers nothing more once the memory is set', () => {
     speaks(['es'])
     window.localStorage.setItem(OFFER_MADE, 'es')
 
@@ -34,7 +34,7 @@ describe('la proposition faite une fois', () => {
     expect(result.current.offered).toBeNull()
   })
 
-  it('se tait devant un navigateur qui parle la langue de la page', () => {
+  it('keeps quiet in front of a browser that speaks the language of the page', () => {
     speaks(['fr-FR'])
 
     const { result } = renderHook(() => {
@@ -45,7 +45,7 @@ describe('la proposition faite une fois', () => {
     expect(window.localStorage.getItem(OFFER_MADE)).toBeNull()
   })
 
-  it('se tait devant une langue que le site ne parle pas', () => {
+  it('keeps quiet in front of a language the site does not speak', () => {
     speaks(['de-DE'])
 
     const { result } = renderHook(() => {
@@ -55,7 +55,7 @@ describe('la proposition faite une fois', () => {
     expect(result.current.offered).toBeNull()
   })
 
-  it('se retire quand on la masque', () => {
+  it('withdraws when it is hidden', () => {
     speaks(['en'])
 
     const { result } = renderHook(() => {

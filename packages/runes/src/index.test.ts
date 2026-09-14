@@ -29,26 +29,26 @@ const WITH_RA = RUNE_STAT_IDS.filter((stat) => {
   return RUNE_WEIGHTS[stat].ra !== null
 })
 
-describe('les poids de runes', () => {
-  it('porte les vingt stats de la source, dans cinq familles', () => {
+describe('the rune weights', () => {
+  it('carries the twenty stats of the source, in five families', () => {
     expect(RUNE_FAMILY_IDS).toHaveLength(5)
     expect(RUNE_STAT_IDS).toHaveLength(20)
   })
 
-  it('range chaque stat dans une famille, et dans une seule', () => {
+  it('files each stat in one family, and in only one', () => {
     expect(new Set(RUNE_STAT_IDS).size).toBe(RUNE_STAT_IDS.length)
     expect([...RUNE_STAT_IDS].toSorted(alphabetical)).toStrictEqual(
       Object.keys(RUNE_WEIGHTS).toSorted(alphabetical)
     )
   })
 
-  it('ne laisse aucune famille vide', () => {
+  it('leaves no family empty', () => {
     for (const family of RUNE_FAMILY_IDS) {
       expect(RUNE_FAMILY_STATS[family].length).toBeGreaterThan(0)
     }
   })
 
-  it('pèse la Pa trois fois la simple, sauf là où le jeu arrondit', () => {
+  it('weighs the Pa three times the plain one, except where the game rounds', () => {
     const off = WITH_PA.filter((stat) => {
       const { simple, pa } = RUNE_WEIGHTS[stat]
 
@@ -58,7 +58,7 @@ describe('les poids de runes', () => {
     expect(off).toStrictEqual(['pods'])
   })
 
-  it('pèse la Ra dix fois la simple, sauf là où le jeu arrondit', () => {
+  it('weighs the Ra ten times the plain one, except where the game rounds', () => {
     const off = WITH_RA.filter((stat) => {
       const { simple, ra } = RUNE_WEIGHTS[stat]
 
@@ -68,13 +68,13 @@ describe('les poids de runes', () => {
     expect(off).toStrictEqual(['vitality', 'pods'])
   })
 
-  it('n’arrondit que des stats dont le point porte une virgule', () => {
+  it('rounds only the stats whose point carries a decimal', () => {
     for (const stat of ROUNDED_UP_STATS) {
       expect(Number.isInteger(RUNE_WEIGHTS[stat].unit)).toBe(false)
     }
   })
 
-  it('garde les poids arrondis vers le haut de la vitalité et des pods', () => {
+  it('keeps the weights of vitality and pods rounded up', () => {
     expect(RUNE_WEIGHTS.vitality).toStrictEqual({
       simple: 1,
       pa: 3,
@@ -89,7 +89,7 @@ describe('les poids de runes', () => {
     })
   })
 
-  it('ne fait jamais peser une rune moins qu’un point de sa stat', () => {
+  it('never makes a rune weigh less than one point of its stat', () => {
     for (const stat of RUNE_STAT_IDS) {
       const { simple, unit } = RUNE_WEIGHTS[stat]
 
@@ -97,7 +97,7 @@ describe('les poids de runes', () => {
     }
   })
 
-  it('fait monter le poids de la simple à la Pa, puis de la Pa à la Ra', () => {
+  it('raises the weight from the plain one to the Pa, then from the Pa to the Ra', () => {
     for (const stat of RUNE_STAT_IDS) {
       const { simple, pa, ra } = RUNE_WEIGHTS[stat]
       const steps = [simple, pa, ra].filter((weight) => {
@@ -112,13 +112,13 @@ describe('les poids de runes', () => {
     }
   })
 
-  it('ne donne une Ra qu’à une stat qui a déjà une Pa', () => {
+  it('gives a Ra only to a stat that already has a Pa', () => {
     for (const stat of WITH_RA) {
       expect(RUNE_WEIGHTS[stat].pa).not.toBeNull()
     }
   })
 
-  it('laisse vide la rune qui n’existe pas, plutôt que de la dire chère', () => {
+  it('leaves empty the rune that does not exist, rather than calling it expensive', () => {
     expect(WITH_PA).toStrictEqual([
       'trapDamage',
       'trapPercent',
@@ -141,17 +141,17 @@ describe('les poids de runes', () => {
   })
 })
 
-describe('le poids écrit', () => {
-  it('prend la virgule de la langue qu’on lui donne', () => {
+describe('the written weight', () => {
+  it('takes the decimal mark of the language it is given', () => {
     expect(formatWeight({ weight: 0.25, locale: 'fr' })).toBe('0,25')
     expect(formatWeight({ weight: 0.25, locale: 'en' })).toBe('0.25')
   })
 
-  it('garde les entiers entiers', () => {
+  it('keeps the whole numbers whole', () => {
     expect(formatWeight({ weight: 100, locale: 'fr' })).toBe('100')
   })
 
-  it('coupe au centième, une rune ne pesant jamais plus fin', () => {
+  it('cuts at the hundredth, a rune never weighing finer', () => {
     expect(formatWeight({ weight: 0.256, locale: 'fr' })).toBe('0,26')
   })
 })

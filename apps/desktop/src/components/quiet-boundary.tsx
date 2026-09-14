@@ -20,7 +20,7 @@ export class QuietBoundary extends React.Component<
     return { hasStopped: true }
   }
 
-  // oxlint-disable-next-line class-methods-use-this -- React n’appelle componentDidCatch que sur l’instance
+  // oxlint-disable-next-line class-methods-use-this -- React only calls componentDidCatch on the instance
   componentDidCatch(error: unknown) {
     screenStopped(errorMessage(error)).catch(ignore)
   }

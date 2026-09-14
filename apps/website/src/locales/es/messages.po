@@ -572,7 +572,7 @@ msgstr "La ventana que juega pasa delante."
 msgid "La forgemagie sans le deuxième écran"
 msgstr "La forjamagia sin la segunda pantalla"
 
-#: src/components/cartouche.tsx
+#: src/components/language-bar.tsx
 msgid "La langue du site"
 msgstr "El idioma del sitio"
 

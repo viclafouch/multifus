@@ -6,12 +6,12 @@ import { PAGES } from '@/constants/pages'
 import { PAGE_NAMES, PAGE_PROMISES } from '@/constants/wording'
 import { usePeek } from '@/hooks/use-peek'
 
-type VignetteProps = Readonly<{
+type FeatureCardProps = Readonly<{
   page: FeatureId
   hasPeek?: boolean
 }>
 
-export const Vignette = ({ page, hasPeek = false }: VignetteProps) => {
+export const FeatureCard = ({ page, hasPeek = false }: FeatureCardProps) => {
   const { i18n } = useLingui()
   const { isPeeking, isReady, handleLoad, handlers } = usePeek({ hasPeek })
   const { loop } = PAGES[page]
@@ -23,7 +23,7 @@ export const Vignette = ({ page, hasPeek = false }: VignetteProps) => {
       isBare
       className="card sighted flex h-full flex-col"
     >
-      <span className="vignette">
+      <span className="thumbnail">
         <img
           src={LOOPS[loop].poster}
           alt=""

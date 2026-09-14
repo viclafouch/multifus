@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { matchIsSameBinding } from '@/helpers/binding'
 
 describe('matchIsSameBinding', () => {
-  it('reconnaît deux fois la même action', () => {
+  it('recognizes twice the same action', () => {
     const isSame = matchIsSameBinding(
       { kind: 'action', action: 'next' },
       { kind: 'action', action: 'next' }
@@ -11,7 +11,7 @@ describe('matchIsSameBinding', () => {
     expect(isSame).toBe(true)
   })
 
-  it('sépare deux actions différentes', () => {
+  it('separates two different actions', () => {
     const isSame = matchIsSameBinding(
       { kind: 'action', action: 'next' },
       { kind: 'action', action: 'previous' }
@@ -20,7 +20,7 @@ describe('matchIsSameBinding', () => {
     expect(isSame).toBe(false)
   })
 
-  it('reconnaît deux fois la même réponse rapide', () => {
+  it('recognizes twice the same quick reply', () => {
     const isSame = matchIsSameBinding(
       { kind: 'quickReply', id: 3 },
       { kind: 'quickReply', id: 3 }
@@ -29,7 +29,7 @@ describe('matchIsSameBinding', () => {
     expect(isSame).toBe(true)
   })
 
-  it('sépare deux réponses rapides différentes', () => {
+  it('separates two different quick replies', () => {
     const isSame = matchIsSameBinding(
       { kind: 'quickReply', id: 3 },
       { kind: 'quickReply', id: 4 }
@@ -38,7 +38,7 @@ describe('matchIsSameBinding', () => {
     expect(isSame).toBe(false)
   })
 
-  it('ne confond jamais les deux familles', () => {
+  it('never mixes up the two families', () => {
     const quickReply = { kind: 'quickReply', id: 0 } as const
 
     const isSame = matchIsSameBinding(
@@ -49,7 +49,7 @@ describe('matchIsSameBinding', () => {
     expect(isSame).toBe(false)
   })
 
-  it('ne reconnaît rien quand rien n’est en cours', () => {
+  it('recognizes nothing when nothing is going on', () => {
     const isSame = matchIsSameBinding(null, { kind: 'action', action: 'walk' })
 
     expect(isSame).toBe(false)

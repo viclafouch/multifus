@@ -47,7 +47,7 @@ const placeOf = (container: HTMLElement, name: string) => {
   const place = container.querySelector<HTMLElement>(`[data-place="${name}"]`)
 
   if (place === null) {
-    throw new Error(`${name} n’est pas sur le terrain`)
+    throw new Error(`${name} is not on the field`)
   }
 
   return place
@@ -58,7 +58,7 @@ describe('useGlide', () => {
     motion.isStill = false
   })
 
-  it('sort du flux celui qui s’en va, à la place qu’il occupait', () => {
+  it('takes out of the flow the one who leaves, at the place it held', () => {
     const { container, rerender } = render(<Field going={[]} />)
 
     rerender(<Field going={['Bravo']} />)
@@ -66,7 +66,7 @@ describe('useGlide', () => {
     expect(placeOf(container, 'Bravo').style.position).toBe('absolute')
   })
 
-  it('laisse dans le flux ceux qui restent', () => {
+  it('leaves in the flow those who stay', () => {
     const { container, rerender } = render(<Field going={[]} />)
 
     rerender(<Field going={['Bravo']} />)
@@ -75,7 +75,7 @@ describe('useGlide', () => {
     expect(placeOf(container, 'Charlie').style.position).toBe('')
   })
 
-  it('remet dans le flux celui qui revient', () => {
+  it('puts back in the flow the one who comes back', () => {
     const { container, rerender } = render(<Field going={[]} />)
 
     rerender(<Field going={['Bravo']} />)
@@ -84,7 +84,7 @@ describe('useGlide', () => {
     expect(placeOf(container, 'Bravo').style.position).toBe('')
   })
 
-  it('ne touche à rien quand le mouvement est refusé', () => {
+  it('touches nothing when the motion is refused', () => {
     motion.isStill = true
 
     const { container, rerender } = render(<Field going={[]} />)

@@ -49,8 +49,8 @@ const toggleOf = (gender: Gender) => {
   })
 }
 
-describe('le roster des personnages', () => {
-  it('montre une ligne par personnage, dans l’ordre du défilement', () => {
+describe('the roster of the characters', () => {
+  it('shows one row per character, in the order of the cycle', () => {
     show([
       characterOf({ nickname: 'Alpha' }),
       characterOf({ nickname: 'Bravo' }),
@@ -64,7 +64,7 @@ describe('le roster des personnages', () => {
     expect(nicknames).toStrictEqual(['Alpha', 'Bravo', 'Charlie'])
   })
 
-  it('numérote les personnages du défilement, et eux seuls', () => {
+  it('numbers the characters of the cycle, and only them', () => {
     show([
       characterOf({ nickname: 'Alpha' }),
       characterOf({ nickname: 'Bravo', excluded: true }),
@@ -79,7 +79,7 @@ describe('le roster des personnages', () => {
     expect(ranks).toStrictEqual(['01', '·', '02', '·'])
   })
 
-  it('exclut le personnage dont on bouge l’interrupteur', () => {
+  it('excludes the character whose switch is moved', () => {
     show([characterOf({ nickname: 'Alpha' })])
 
     fireEvent.click(
@@ -91,7 +91,7 @@ describe('le roster des personnages', () => {
     expect(bridge.toggleExcluded).toHaveBeenCalledWith('Alpha')
   })
 
-  it('laisse l’interrupteur d’un personnage déconnecté hors d’atteinte', () => {
+  it('leaves the switch of an offline character out of reach', () => {
     show([characterOf({ nickname: 'Alpha', online: false })])
 
     const toggle = screen.getByRole('switch', {
@@ -104,7 +104,7 @@ describe('le roster des personnages', () => {
     expect(bridge.toggleExcluded).not.toHaveBeenCalled()
   })
 
-  it('n’offre de retirer du roster que les personnages déconnectés', () => {
+  it('offers to remove from the roster only the offline characters', () => {
     show([
       characterOf({ nickname: 'Alpha' }),
       characterOf({ nickname: 'Bravo', online: false })
@@ -118,7 +118,7 @@ describe('le roster des personnages', () => {
     ).not.toBeNull()
   })
 
-  it('retire du roster sans rien demander', () => {
+  it('removes from the roster without asking anything', () => {
     show([characterOf({ nickname: 'Bravo', online: false })])
 
     fireEvent.click(
@@ -128,7 +128,7 @@ describe('le roster des personnages', () => {
     expect(bridge.removeCharacter).toHaveBeenCalledWith('Bravo')
   })
 
-  it('montre les deux sexes allumés quand tout le monde défile', () => {
+  it('shows the two genders lit when everybody cycles', () => {
     show([
       characterOf({ nickname: 'Alpha' }),
       characterOf({ nickname: 'Bravo', gender: 'female' })
@@ -138,7 +138,7 @@ describe('le roster des personnages', () => {
     expect(toggleOf('female').getAttribute('aria-pressed')).toBe('true')
   })
 
-  it('éteint le sexe dont tous les connectés sont exclus', () => {
+  it('turns off the gender every online one of which is excluded', () => {
     show([
       characterOf({ nickname: 'Alpha', excluded: true }),
       characterOf({ nickname: 'Bravo', gender: 'female' })
@@ -148,7 +148,7 @@ describe('le roster des personnages', () => {
     expect(toggleOf('female').getAttribute('aria-pressed')).toBe('true')
   })
 
-  it('exclut tout un sexe encore dans le défilement', () => {
+  it('excludes a whole gender still in the cycle', () => {
     show([
       characterOf({ nickname: 'Alpha' }),
       characterOf({ nickname: 'Bravo', gender: 'female' })
@@ -159,7 +159,7 @@ describe('le roster des personnages', () => {
     expect(bridge.setGenderExcluded).toHaveBeenCalledWith('male', true)
   })
 
-  it('réintègre un sexe entièrement exclu', () => {
+  it('brings back a gender that is entirely excluded', () => {
     show([characterOf({ nickname: 'Alpha', gender: 'female', excluded: true })])
 
     fireEvent.click(toggleOf('female'))
@@ -167,7 +167,7 @@ describe('le roster des personnages', () => {
     expect(bridge.setGenderExcluded).toHaveBeenCalledWith('female', false)
   })
 
-  it('laisse les deux sexes sous la main quand un connecté n’a pas de sexe', () => {
+  it('leaves the two genders at hand when an online one has no gender', () => {
     show([characterOf({ nickname: 'Alpha', gender: null })])
 
     fireEvent.click(toggleOf('male'))
@@ -175,7 +175,7 @@ describe('le roster des personnages', () => {
     expect(bridge.setGenderExcluded).toHaveBeenCalledWith('male', false)
   })
 
-  it('ne compte pas un déconnecté sans sexe comme un manque', () => {
+  it('does not count an offline one without a gender as a missing one', () => {
     show([
       characterOf({ nickname: 'Alpha' }),
       characterOf({ nickname: 'Bravo', gender: null, online: false })
@@ -186,7 +186,7 @@ describe('le roster des personnages', () => {
     expect(bridge.setGenderExcluded).toHaveBeenCalledWith('male', true)
   })
 
-  it('éteint l’interrupteur d’un personnage exclu, et lui seul', () => {
+  it('turns off the switch of an excluded character, and only it', () => {
     show([
       characterOf({ nickname: 'Alpha', excluded: true }),
       characterOf({ nickname: 'Bravo' })
@@ -203,7 +203,7 @@ describe('le roster des personnages', () => {
     expect(states).toStrictEqual(['false', 'true'])
   })
 
-  it('dit sous chaque pseudo ce qui manque à son portrait', () => {
+  it('says under each nickname what is missing from its portrait', () => {
     show([
       characterOf({ nickname: 'Alpha', class: null }),
       characterOf({ nickname: 'Bravo', gender: null }),
@@ -221,7 +221,7 @@ describe('le roster des personnages', () => {
     ])
   })
 
-  it('mène du portrait vers ce qu’il reste à choisir', () => {
+  it('leads from the portrait to what is left to choose', () => {
     show([
       characterOf({ nickname: 'Alpha', class: null }),
       characterOf({ nickname: 'Bravo' })
@@ -239,7 +239,7 @@ describe('le roster des personnages', () => {
     ).not.toBeNull()
   })
 
-  it('fait de ce personnage le principal', () => {
+  it('makes that character the main one', () => {
     show([characterOf({ nickname: 'Alpha' })])
 
     fireEvent.click(mainToggleOf('Alpha'))
@@ -248,8 +248,8 @@ describe('le roster des personnages', () => {
   })
 })
 
-describe('la couleur, dans l’écran des personnages', () => {
-  it('montre la couleur du personnage, sans jamais la nommer', () => {
+describe('the color, in the characters screen', () => {
+  it('shows the character color, without ever naming it', () => {
     show([
       characterOf({ nickname: 'Alpha', class: 'iop', color: 'turquoise' }),
       characterOf({ nickname: 'Bravo', class: 'iop', color: null })
@@ -263,7 +263,7 @@ describe('la couleur, dans l’écran des personnages', () => {
     expect(within(rows()[0]).queryByText(/Turquoise/u)).toBeNull()
   })
 
-  it('pose la couleur choisie dans la modale', () => {
+  it('sets the color chosen in the dialog', () => {
     show([characterOf({ nickname: 'Alpha' })])
 
     fireEvent.click(
@@ -280,7 +280,7 @@ describe('la couleur, dans l’écran des personnages', () => {
     expect(bridge.setColor).toHaveBeenCalledWith('Alpha', 'sky')
   })
 
-  it('montre à chacun les couleurs que les autres portent déjà', () => {
+  it('shows to each one the colors the others already wear', () => {
     show([
       characterOf({ nickname: 'Alpha', color: null }),
       characterOf({ nickname: 'Bravo', color: 'sky' })
@@ -300,8 +300,8 @@ describe('la couleur, dans l’écran des personnages', () => {
   })
 })
 
-describe('le personnage principal', () => {
-  it('reprend le principal à celui qui l’est', () => {
+describe('the main character', () => {
+  it('takes the main back from the one who is main', () => {
     show([characterOf({ nickname: 'Alpha', main: true })])
 
     fireEvent.click(mainToggleOf('Alpha'))
@@ -309,7 +309,7 @@ describe('le personnage principal', () => {
     expect(bridge.setMain).toHaveBeenCalledWith('Alpha', false)
   })
 
-  it('n’allume le bouton que sur le personnage principal', () => {
+  it('lights the button only on the main character', () => {
     show([
       characterOf({ nickname: 'Alpha' }),
       characterOf({ nickname: 'Bravo', main: true })
@@ -322,7 +322,7 @@ describe('le personnage principal', () => {
     expect(lit).toStrictEqual(['false', 'true'])
   })
 
-  it('offre le principal à un déconnecté et à un exclu comme aux autres', () => {
+  it('offers the main to an offline one and to an excluded one like to the others', () => {
     show([
       characterOf({ nickname: 'Alpha', online: false }),
       characterOf({ nickname: 'Bravo', excluded: true, main: true })
@@ -334,7 +334,7 @@ describe('le personnage principal', () => {
     expect(mainToggleOf('Bravo').getAttribute('aria-pressed')).toBe('true')
   })
 
-  it('dit d’un personnage exclu qu’il est exclu', () => {
+  it('says of an excluded character that it is excluded', () => {
     show([
       characterOf({ nickname: 'Alpha', excluded: true }),
       characterOf({ nickname: 'Bravo', online: false })

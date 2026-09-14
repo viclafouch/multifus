@@ -47,7 +47,7 @@ const listenedEvent = () => {
   const last = invoked.at(-1)
 
   if (last?.command !== LISTEN_COMMAND) {
-    throw new Error('la dernière commande n’ouvre aucune écoute')
+    throw new Error('the last command opens no listening')
   }
 
   return last.payload.event
@@ -57,7 +57,7 @@ const listenedHandler = () => {
   const handler = invoked.at(-1)?.payload.handler
 
   if (typeof handler !== 'number') {
-    throw new TypeError('le greffon n’a rendu aucun identifiant d’écoute')
+    throw new TypeError('the plugin returned no listening id')
   }
 
   return handler
@@ -617,7 +617,7 @@ const lastCall = async (call: Call) => {
   return last
 }
 
-describe('le pont vers Rust', () => {
+describe('the bridge to Rust', () => {
   beforeEach(() => {
     invoked.length = 0
     listenIPC()
@@ -627,7 +627,7 @@ describe('le pont vers Rust', () => {
     clearMocks()
   })
 
-  it('couvre toutes les fonctions du module', () => {
+  it('covers every function of the module', () => {
     const covered = CALLS.map((call) => {
       return call.name
     })
@@ -638,7 +638,7 @@ describe('le pont vers Rust', () => {
   })
 
   it.each(CALLS)(
-    '$name appelle une commande que Rust expose, avec ses arguments',
+    '$name calls a command Rust exposes, with its arguments',
     async (call) => {
       const { command, payload } = await lastCall(call)
 
@@ -648,16 +648,13 @@ describe('le pont vers Rust', () => {
     }
   )
 
-  it.each(CALLS)(
-    '$name appelle une commande que lib.rs enregistre',
-    async (call) => {
-      const { command } = await lastCall(call)
+  it.each(CALLS)('$name calls a command lib.rs registers', async (call) => {
+    const { command } = await lastCall(call)
 
-      expect(REGISTERED_COMMANDS).toContain(command)
-    }
-  )
+    expect(REGISTERED_COMMANDS).toContain(command)
+  })
 
-  it('n’oublie aucune commande enregistrée', async () => {
+  it('forgets no registered command', async () => {
     await Promise.all(
       CALLS.map((call) => {
         return call.run()
@@ -671,55 +668,55 @@ describe('le pont vers Rust', () => {
     expect(sorted(REGISTERED_COMMANDS)).toStrictEqual(sorted(called))
   })
 
-  it('écoute les instantanés sur le canal que runtime.rs émet', async () => {
+  it('listens to the snapshots on the channel runtime.rs emits', async () => {
     await multifus.onSnapshot(() => {})
 
     expect(listenedEvent()).toBe(rustConstant(RUNTIME_SOURCE, 'SNAPSHOT_EVENT'))
   })
 
-  it('écoute la navigation sur le canal que la barre des tâches émet', async () => {
+  it('listens to the navigation on the channel the taskbar emits', async () => {
     await multifus.onNavigate(() => {})
 
     expect(listenedEvent()).toBe(rustConstant(RUNTIME_SOURCE, 'NAVIGATE_EVENT'))
   })
 
-  it('écoute la bannière sur le canal que banner.rs émet', async () => {
+  it('listens to the banner on the channel banner.rs emits', async () => {
     await multifus.onBannerStep(() => {})
 
     expect(listenedEvent()).toBe(rustConstant(BANNER_SOURCE, 'STEP_EVENT'))
   })
 
-  it('écoute la roue sur le canal que wheel.rs émet', async () => {
+  it('listens to the wheel on the channel wheel.rs emits', async () => {
     await multifus.onWheelStep(() => {})
 
     expect(listenedEvent()).toBe(rustConstant(WHEEL_SOURCE, 'STEP_EVENT'))
   })
 
-  it('écoute la part visée sur le canal que le fil de la roue émet', async () => {
+  it('listens to the aimed slice on the channel the wheel thread emits', async () => {
     await multifus.onWheelAim(() => {})
 
     expect(listenedEvent()).toBe(rustConstant(WHEEL_SOURCE, 'AIM_EVENT'))
   })
 
-  it('écoute l’effacement de la roue sur le canal que wheel.rs émet', async () => {
+  it('listens to the wiping of the wheel on the channel wheel.rs emits', async () => {
     await multifus.onWheelWipe(() => {})
 
     expect(listenedEvent()).toBe(rustConstant(WHEEL_SOURCE, 'WIPE_EVENT'))
   })
 
-  it('écoute le voile du tableau sur le canal que rune_table.rs émet', async () => {
+  it('listens to the veil of the table on the channel rune_table.rs emits', async () => {
     await multifus.onRuneTableLook(() => {})
 
     expect(listenedEvent()).toBe(rustConstant(RUNE_TABLE_SOURCE, 'LOOK_EVENT'))
   })
 
-  it('écoute la taille des clients sur le canal que le tour émet', async () => {
+  it('listens to the count of the clients on the channel the loop emits', async () => {
     await multifus.onClients(() => {})
 
     expect(listenedEvent()).toBe(rustConstant(RUNTIME_SOURCE, 'CLIENTS_EVENT'))
   })
 
-  it('rend à la fenêtre ce que le canal porte, et rien d’autre', async () => {
+  it('gives the window what the channel carries, and nothing else', async () => {
     const heard: unknown[] = []
 
     await multifus.onSnapshot((snapshot) => {

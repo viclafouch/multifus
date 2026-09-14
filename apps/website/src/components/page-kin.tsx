@@ -3,7 +3,7 @@ import { useLingui } from '@lingui/react'
 import type { FeatureId } from '@/@types/page'
 import { Band } from '@/components/band'
 import { BandTitle } from '@/components/band-title'
-import { Vignette } from '@/components/vignette'
+import { FeatureCard } from '@/components/feature-card'
 
 const ALSO_SEE = msg`À voir aussi`
 
@@ -21,7 +21,7 @@ export const PageKin = ({ pages }: PageKinProps) => {
         {pages.map((page) => {
           return (
             <li key={page}>
-              <Vignette page={page} />
+              <FeatureCard page={page} />
             </li>
           )
         })}

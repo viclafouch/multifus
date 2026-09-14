@@ -7,8 +7,8 @@ const catchJsdomRefusal = () => {
   return vi.spyOn(process.stderr, 'write').mockReturnValue(true)
 }
 
-describe('le rechargement de l’écran', () => {
-  it('oublie la map qui vient de casser, puis recharge la fenêtre', () => {
+describe('the reload of the screen', () => {
+  it('forgets the map that has just broken, then reloads the window', () => {
     const refusal = catchJsdomRefusal()
 
     rememberMap('settings')

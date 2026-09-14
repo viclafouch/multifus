@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, render, screen } from '@testing-library/react'
 import type { Character } from '@/@types/roster'
-import { Dolmen, LEAVE_MS } from '@/components/world/dolmen'
+import { StandingStone, LEAVE_MS } from '@/components/world/standing-stone'
 import { characterOf } from '@/test-doubles'
 
 const ALPHA = characterOf({ nickname: 'Alpha' })
@@ -9,7 +9,7 @@ const BRAVO = characterOf({ nickname: 'Bravo', online: false })
 
 const seat = (characters: readonly Character[]) => {
   return (
-    <Dolmen
+    <StandingStone
       characters={characters}
       onOpenCharacter={() => {}}
       onRemoveCharacter={() => {}}
@@ -23,7 +23,7 @@ const headOf = (nickname: string) => {
   })
 }
 
-describe('le dolmen', () => {
+describe('the standing stone', () => {
   beforeEach(() => {
     vi.useFakeTimers()
   })
@@ -32,7 +32,7 @@ describe('le dolmen', () => {
     vi.useRealTimers()
   })
 
-  it('garde la tête retirée le temps qu’elle s’efface', () => {
+  it('keeps the removed head while it fades away', () => {
     const { rerender } = render(seat([ALPHA, BRAVO]))
 
     rerender(seat([ALPHA]))
@@ -40,7 +40,7 @@ describe('le dolmen', () => {
     expect(headOf('Bravo')).not.toBeNull()
   })
 
-  it('la retire une fois qu’elle s’est effacée', () => {
+  it('removes it once it has faded away', () => {
     const { rerender } = render(seat([ALPHA, BRAVO]))
 
     rerender(seat([ALPHA]))
@@ -51,7 +51,7 @@ describe('le dolmen', () => {
     expect(headOf('Bravo')).toBeNull()
   })
 
-  it('ne compte plus la tête qui s’en va', () => {
+  it('stops counting the head that leaves', () => {
     const { rerender } = render(
       seat([ALPHA, characterOf({ nickname: 'Charlie' })])
     )
@@ -61,7 +61,7 @@ describe('le dolmen', () => {
     expect(screen.getByText('1 connecté')).not.toBeNull()
   })
 
-  it('attend que la dernière tête soit partie pour inviter à ouvrir un client', () => {
+  it('waits for the last head to leave before inviting to open a client', () => {
     const { rerender } = render(seat([BRAVO]))
 
     rerender(seat([]))

@@ -34,6 +34,7 @@ Avoid over-simplification that could:
 
 ### Naming Conventions
 
+- Anything the player never reads is written in English: identifiers, test titles, assertion messages, comments, console output. Only the strings shown on screen stay in French.
 - Variables: descriptive, meaningful names
 - Booleans: `is*`, `has*`, `should*`, `can*`
 - Boolean functions: `matchIs*`, `matchAs*`

@@ -60,7 +60,7 @@ describe('useMultifus', () => {
     bridge.first = null
   })
 
-  it('n’a rien à montrer avant le premier instantané', () => {
+  it('has nothing to show before the first snapshot', () => {
     const { result } = renderHook(() => {
       return useMultifus()
     })
@@ -68,7 +68,7 @@ describe('useMultifus', () => {
     expect(result.current.snapshot).toBeNull()
   })
 
-  it('prend le premier instantané que Rust lui donne', async () => {
+  it('takes the first snapshot Rust gives it', async () => {
     const { result } = renderHook(() => {
       return useMultifus()
     })
@@ -81,7 +81,7 @@ describe('useMultifus', () => {
     )
   })
 
-  it('écoute avant de demander, pour ne rien perdre', async () => {
+  it('listens before asking, so as to lose nothing', async () => {
     const { result } = renderHook(() => {
       return useMultifus()
     })
@@ -97,7 +97,7 @@ describe('useMultifus', () => {
     )
   })
 
-  it('laisse le canal parler plus fort que la demande de départ', async () => {
+  it('lets the channel speak louder than the starting request', async () => {
     const { result } = renderHook(() => {
       return useMultifus()
     })
@@ -114,7 +114,7 @@ describe('useMultifus', () => {
     )
   })
 
-  it('remplace l’instantané par ce qu’une commande rend', async () => {
+  it('replaces the snapshot with what a command returns', async () => {
     const { result } = renderHook(() => {
       return useMultifus()
     })
@@ -132,7 +132,7 @@ describe('useMultifus', () => {
     )
   })
 
-  it('garde l’instantané quand une commande échoue', async () => {
+  it('keeps the snapshot when a command fails', async () => {
     const { result } = renderHook(() => {
       return useMultifus()
     })
@@ -141,7 +141,7 @@ describe('useMultifus', () => {
     await answered('0.1.0')
 
     await act(async () => {
-      result.current.run(Promise.reject(new Error('la commande a refusé')))
+      result.current.run(Promise.reject(new Error('the command refused')))
       await Promise.resolve()
     })
 
@@ -150,7 +150,7 @@ describe('useMultifus', () => {
     )
   })
 
-  it('cesse d’écouter quand la fenêtre s’en va', async () => {
+  it('stops listening when the window leaves', async () => {
     const { unmount } = renderHook(() => {
       return useMultifus()
     })
@@ -163,7 +163,7 @@ describe('useMultifus', () => {
     expect(bridge.unlisten).toHaveBeenCalledWith()
   })
 
-  it('cesse d’écouter même quand la fenêtre part avant la réponse', async () => {
+  it('stops listening even when the window leaves before the answer', async () => {
     const { unmount } = renderHook(() => {
       return useMultifus()
     })

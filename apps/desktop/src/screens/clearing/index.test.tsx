@@ -32,8 +32,8 @@ const show = (characters: readonly Character[]) => {
   )
 }
 
-describe('l’accueil', () => {
-  it('dit sous le titre que Multifus vient de la communauté', () => {
+describe('the home screen', () => {
+  it('says under the title that Multifus comes from the community', () => {
     show([])
 
     expect(
@@ -41,7 +41,7 @@ describe('l’accueil', () => {
     ).not.toBeNull()
   })
 
-  it('pose sur le dolmen une tête par personnage', () => {
+  it('lays on the standing stone one head per character', () => {
     show([
       characterOf({ nickname: 'Alpha' }),
       characterOf({ nickname: 'Bravo', online: false })
@@ -51,7 +51,7 @@ describe('l’accueil', () => {
     expect(screen.getByRole('button', { name: /^Bravo ·/u })).not.toBeNull()
   })
 
-  it('n’offre de retirer que les têtes déconnectées', () => {
+  it('offers to remove only the offline heads', () => {
     show([
       characterOf({ nickname: 'Alpha' }),
       characterOf({ nickname: 'Bravo', online: false })
@@ -65,7 +65,7 @@ describe('l’accueil', () => {
     ).not.toBeNull()
   })
 
-  it('ne compte, sous le dolmen, que les personnages connectés', () => {
+  it('counts, under the standing stone, only the online characters', () => {
     show([
       characterOf({ nickname: 'Alpha' }),
       characterOf({ nickname: 'Bravo', online: false }),
@@ -75,7 +75,7 @@ describe('l’accueil', () => {
     expect(screen.getByText('2 connectés')).not.toBeNull()
   })
 
-  it('retire du roster sans rien demander, et sans ouvrir la fiche', () => {
+  it('removes from the roster without asking anything, and without opening the card', () => {
     show([characterOf({ nickname: 'Bravo', online: false })])
 
     fireEvent.click(

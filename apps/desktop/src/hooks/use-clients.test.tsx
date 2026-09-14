@@ -41,12 +41,12 @@ const stillWatching = () => {
   }, 0)
 }
 
-describe('le compte des clients', () => {
+describe('the count of the clients', () => {
   beforeEach(() => {
     counter.told = null
   })
 
-  it('ne compte rien avant que Rust ait répondu', () => {
+  it('counts nothing before Rust has answered', () => {
     bridge.clients.mockReturnValue(new Promise(ignore))
     bridge.watchClients.mockResolvedValue(null)
     bridge.onClients.mockReturnValue(new Promise(ignore))
@@ -58,7 +58,7 @@ describe('le compte des clients', () => {
     expect(result.current).toBeNull()
   })
 
-  it('s’abonne, puis lit le compte une première fois', async () => {
+  it('subscribes, then reads the count a first time', async () => {
     const { result } = watching()
 
     await waitFor(() => {
@@ -68,7 +68,7 @@ describe('le compte des clients', () => {
     expect(bridge.watchClients).toHaveBeenCalledWith(true)
   })
 
-  it('suit ce que le tour lui dit ensuite', async () => {
+  it('follows what the channel says next', async () => {
     const { result } = watching()
 
     await waitFor(() => {
@@ -84,7 +84,7 @@ describe('le compte des clients', () => {
     expect(result.current).toStrictEqual(filled)
   })
 
-  it('se désabonne en partant, et cesse de faire lire Rust', async () => {
+  it('unsubscribes on leaving, and stops making Rust read', async () => {
     const { result, unmount } = watching()
 
     await waitFor(() => {
@@ -100,7 +100,7 @@ describe('le compte des clients', () => {
     expect(stop).toHaveBeenCalledWith()
   })
 
-  it('ouvre une fois par écran, et ferme une fois par départ', async () => {
+  it('opens once per screen, and closes once per departure', async () => {
     const first = watching()
 
     await waitFor(() => {
@@ -124,7 +124,7 @@ describe('le compte des clients', () => {
     second.unmount()
   })
 
-  it('cesse de faire lire Rust même si l’écran part avant la réponse', async () => {
+  it('stops making Rust read even if the screen leaves before the answer', async () => {
     const { unmount } = watching()
 
     unmount()

@@ -48,8 +48,8 @@ const tell = async (look: number) => {
   })
 }
 
-describe('le voile que Rust donne au tableau', () => {
-  it('porte le tableau plein tant que Rust n’a rien dit', () => {
+describe('the veil Rust gives to the table', () => {
+  it('carries the full table while Rust has said nothing', () => {
     const { result } = renderHook(() => {
       return useRuneTableLook()
     })
@@ -57,7 +57,7 @@ describe('le voile que Rust donne au tableau', () => {
     expect(result.current).toBe(1)
   })
 
-  it('prend la première valeur que la commande rend', async () => {
+  it('takes the first value the command returns', async () => {
     const { result } = renderHook(() => {
       return useRuneTableLook()
     })
@@ -67,7 +67,7 @@ describe('le voile que Rust donne au tableau', () => {
     expect(result.current).toBe(0.4)
   })
 
-  it('suit la jauge à chaque cran', async () => {
+  it('follows the gauge at every notch', async () => {
     const { result } = renderHook(() => {
       return useRuneTableLook()
     })
@@ -78,7 +78,7 @@ describe('le voile que Rust donne au tableau', () => {
     expect(result.current).toBe(0.3)
   })
 
-  it('ne laisse pas la commande écraser un cran plus récent', async () => {
+  it('does not let the command crush a more recent notch', async () => {
     const { result } = renderHook(() => {
       return useRuneTableLook()
     })
@@ -89,7 +89,7 @@ describe('le voile que Rust donne au tableau', () => {
     expect(result.current).toBe(0.3)
   })
 
-  it('lâche l’écoute en partant', async () => {
+  it('lets go of the listening on leaving', async () => {
     const { unmount } = renderHook(() => {
       return useRuneTableLook()
     })

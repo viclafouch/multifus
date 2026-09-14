@@ -25,8 +25,8 @@ const show = (current: Language) => {
   return user
 }
 
-describe('le choix de la langue', () => {
-  it('montre les trois langues, chacune nommée dans sa propre langue', () => {
+describe('the language choice', () => {
+  it('shows the three languages, each named in its own language', () => {
     show('fr')
 
     expect(
@@ -37,7 +37,7 @@ describe('le choix de la langue', () => {
     expect(flag('Español')).not.toBeNull()
   })
 
-  it('marque la langue en cours, et elle seule', () => {
+  it('marks the current language, and only it', () => {
     show('es')
 
     expect(flag('Español').getAttribute('aria-pressed')).toBe('true')
@@ -45,7 +45,7 @@ describe('le choix de la langue', () => {
     expect(flag('English').getAttribute('aria-pressed')).toBe('false')
   })
 
-  it('ne demande rien quand on reprend la langue en cours', async () => {
+  it('asks nothing when the current language is picked again', async () => {
     const user = show('fr')
 
     await user.click(flag('Français'))
@@ -54,7 +54,7 @@ describe('le choix de la langue', () => {
     expect(bridge.setLanguage).not.toHaveBeenCalled()
   })
 
-  it('prévient que Multifus va se recharger avant de rien changer', async () => {
+  it('warns Multifus will reload before changing anything', async () => {
     const user = show('fr')
 
     await user.click(flag('English'))
@@ -63,7 +63,7 @@ describe('le choix de la langue', () => {
     expect(bridge.setLanguage).not.toHaveBeenCalled()
   })
 
-  it('demande au Rust la langue choisie une fois l’avertissement accepté', async () => {
+  it('asks Rust for the chosen language once the warning is accepted', async () => {
     bridge.setLanguage.mockResolvedValueOnce(null)
 
     const user = show('fr')
@@ -74,7 +74,7 @@ describe('le choix de la langue', () => {
     expect(bridge.setLanguage).toHaveBeenCalledWith('en')
   })
 
-  it('ne change rien quand on renonce', async () => {
+  it('changes nothing when it is given up', async () => {
     const user = show('fr')
 
     await user.click(flag('English'))
@@ -84,8 +84,8 @@ describe('le choix de la langue', () => {
     expect(screen.queryByText('Passer Multifus en English ?')).toBeNull()
   })
 
-  it('ne casse pas quand le Rust refuse de recharger', async () => {
-    bridge.setLanguage.mockRejectedValueOnce(new Error('rien à recharger'))
+  it('does not break when Rust refuses to reload', async () => {
+    bridge.setLanguage.mockRejectedValueOnce(new Error('nothing to reload'))
 
     const user = show('fr')
 

@@ -27,14 +27,14 @@ const exampleOn = async (agent: string) => {
   return screen.getByText(/il passe devant/u)
 }
 
-describe('l’exemple donné aux raccourcis de personnage', () => {
-  it('propose une touche de fonction seule sur Windows, où elle se pose', async () => {
+describe('the example given to the character shortcuts', () => {
+  it('offers a function key alone on Windows, where it lands', async () => {
     const example = await exampleOn(WINDOWS_AGENT)
 
     expect(example.textContent).toContain('F1')
   })
 
-  it('n’en promet pas sur le Mac, qui les refuse sans modificateur', async () => {
+  it('promises none on the Mac, which refuses them without a modifier', async () => {
     const example = await exampleOn(APPLE_AGENT)
 
     expect(example.textContent).not.toContain('F1')

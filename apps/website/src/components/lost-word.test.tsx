@@ -15,19 +15,19 @@ const show = (language: Language, level: LostLevel = 1) => {
   })
 }
 
-describe('le mot de la page perdue', () => {
+describe('the word of the lost page', () => {
   afterEach(() => {
     cleanup()
   })
 
-  it.each(LANGUAGES)('dit en %s que la page n’existe pas', (language) => {
+  it.each(LANGUAGES)('says in %s that the page does not exist', (language) => {
     show(language)
 
     expect(screen.getByText(SPEAKERS[language]._(LOST_TITLE))).toBeDefined()
     expect(screen.getByText(SPEAKERS[language]._(LOST_PROMISE))).toBeDefined()
   })
 
-  it.each(LANGUAGES)('ramène à l’accueil en %s', (language) => {
+  it.each(LANGUAGES)('leads back home in %s', (language) => {
     show(language)
 
     const back = screen.getByRole('link')
@@ -36,7 +36,7 @@ describe('le mot de la page perdue', () => {
     expect(back.getAttribute('hreflang')).toBe(language)
   })
 
-  it.each(LANGUAGES)('donne le %s au lecteur d’écran', (language) => {
+  it.each(LANGUAGES)('gives the %s to the screen reader', (language) => {
     const { container } = show(language)
 
     expect(container.querySelector('[lang]')?.getAttribute('lang')).toBe(
@@ -44,14 +44,17 @@ describe('le mot de la page perdue', () => {
     )
   })
 
-  it.each(LANGUAGES)('titre le %s selon le rang demandé', (language) => {
-    show(language, 2)
+  it.each(LANGUAGES)(
+    'titles the %s according to the asked rank',
+    (language) => {
+      show(language, 2)
 
-    expect(screen.queryByRole('heading', { level: 1 })).toBeNull()
-    expect(screen.getByRole('heading', { level: 2 })).toBeDefined()
-  })
+      expect(screen.queryByRole('heading', { level: 1 })).toBeNull()
+      expect(screen.getByRole('heading', { level: 2 })).toBeDefined()
+    }
+  )
 
-  it('ne traduit pas deux langues pareil', () => {
+  it('does not translate two languages the same', () => {
     const titles = LANGUAGES.map((language) => {
       return SPEAKERS[language]._(LOST_TITLE)
     })

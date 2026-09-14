@@ -1,6 +1,6 @@
 #[cfg(not(target_os = "windows"))]
 fn main() {
-    println!("Le banc de mesure des notifications ne tourne que sur Windows.");
+    println!("The notification bench only runs on Windows.");
 }
 
 #[cfg(target_os = "windows")]
@@ -56,9 +56,9 @@ mod bench {
 
     const SETTLE: Duration = Duration::from_secs(2);
 
-    const TITLE_PREFIX: &str = "Multifus banc";
+    const TITLE_PREFIX: &str = "Multifus bench";
 
-    const TOAST_GROUP: &str = "multifus-banc";
+    const TOAST_GROUP: &str = "multifus-bench";
 
     const DEFAULT_ROUNDS: usize = 24;
 
@@ -93,10 +93,10 @@ mod bench {
         announce_cost();
         println!();
         println!(
-            "{rounds} notifications par intervalle, une toutes les {} ms.",
+            "{rounds} notifications per interval, one every {} ms.",
             BETWEEN_TOASTS.as_millis()
         );
-        println!("Laissez la machine tranquille, le Mode Concentration éteint.\n");
+        println!("Leave the machine alone, with Focus Mode off.\n");
 
         let readings: Vec<Reading> = CANDIDATES
             .into_iter()
@@ -117,21 +117,21 @@ mod bench {
 
     fn ask_access() -> Result<(), String> {
         let listener = UserNotificationListener::Current()
-            .map_err(|error| format!("Listener introuvable : {error}"))?;
+            .map_err(|error| format!("Listener not found: {error}"))?;
         let status = listener
             .RequestAccessAsync()
             .and_then(|request| request.join())
-            .map_err(|error| format!("Demande d’accès refusée : {error}"))?;
+            .map_err(|error| format!("Access request refused: {error}"))?;
 
         if status == UserNotificationListenerAccessStatus::Allowed {
             return Ok(());
         }
 
-        Err("L’accès aux notifications est refusé. Autorisez-le dans les réglages.".to_owned())
+        Err("Access to the notifications is refused. Allow it in the settings.".to_owned())
     }
 
     fn announce_subscription() {
-        let listener = UserNotificationListener::Current().expect("le listener");
+        let listener = UserNotificationListener::Current().expect("the listener");
         let handler =
             TypedEventHandler::<UserNotificationListener, UserNotificationChangedEventArgs>::new(
                 |_, _| Ok(()),
@@ -141,28 +141,28 @@ mod bench {
             Ok(token) => {
                 drop(listener.RemoveNotificationChanged(token));
 
-                println!("Abonnement NotificationChanged : accepté.");
+                println!("NotificationChanged subscription: accepted.");
             }
             Err(error) => {
-                println!("Abonnement NotificationChanged : refusé, {error}");
+                println!("NotificationChanged subscription: refused, {error}");
             }
         }
     }
 
     fn announce_cost() {
-        let listener = UserNotificationListener::Current().expect("le listener");
+        let listener = UserNotificationListener::Current().expect("the listener");
         let notifier = notifier();
 
         clear_history();
         thread::sleep(SETTLE);
 
-        println!("Un appel GetNotificationsAsync, selon la file en attente :");
+        println!("One GetNotificationsAsync call, by the depth of the queue:");
 
         let mut shown = 0;
 
         for depth in QUEUE_DEPTHS {
             while shown < depth {
-                notifier.Show(&build_toast(shown)).expect("l’envoi");
+                notifier.Show(&build_toast(shown)).expect("the sending");
 
                 shown += 1;
             }
@@ -170,7 +170,7 @@ mod bench {
             thread::sleep(SETTLE);
 
             println!(
-                "  {depth:>3} en attente   {:>6} µs",
+                "  {depth:>3} waiting   {:>6} µs",
                 cost_of_one_call(&listener).as_micros()
             );
         }
@@ -193,10 +193,7 @@ mod bench {
     }
 
     fn measure(interval: Duration, rounds: usize) -> Vec<Duration> {
-        println!(
-            "---- scrutation toutes les {} ms ----",
-            interval.as_millis()
-        );
+        println!("---- polling every {} ms ----", interval.as_millis());
 
         let running = Arc::new(AtomicBool::new(true));
         let (sender, receiver) = mpsc::channel();
@@ -217,7 +214,9 @@ mod bench {
             let toast = build_toast(round);
 
             sent.insert(round, Instant::now());
-            notifier.Show(&toast).expect("l’envoi de la notification");
+            notifier
+                .Show(&toast)
+                .expect("the sending of the notification");
 
             thread::sleep(BETWEEN_TOASTS);
         }
@@ -237,14 +236,14 @@ mod bench {
 
         latencies.sort_unstable();
 
-        println!("{} entendues sur {rounds}.\n", latencies.len());
+        println!("{} heard out of {rounds}.\n", latencies.len());
 
         latencies
     }
 
     fn notifier() -> ToastNotifier {
         ToastNotificationManager::CreateToastNotifierWithId(&HSTRING::from(POWERSHELL_APP_ID))
-            .expect("le notificateur de PowerShell")
+            .expect("the PowerShell notifier")
     }
 
     fn clear_history() {
@@ -258,19 +257,20 @@ mod bench {
 
     fn build_toast(round: usize) -> ToastNotification {
         let payload = format!(
-            "<toast><visual><binding template=\"ToastGeneric\"><text>{TITLE_PREFIX} {round}</text><text>latence</text></binding></visual></toast>"
+            "<toast><visual><binding template=\"ToastGeneric\"><text>{TITLE_PREFIX} {round}</text><text>latency</text></binding></visual></toast>"
         );
-        let document = XmlDocument::new().expect("le document");
+        let document = XmlDocument::new().expect("the document");
 
         document
             .LoadXml(&HSTRING::from(payload))
-            .expect("le contenu de la notification");
+            .expect("the content of the notification");
 
-        let toast = ToastNotification::CreateToastNotification(&document).expect("la notification");
+        let toast =
+            ToastNotification::CreateToastNotification(&document).expect("the notification");
 
         toast
             .SetGroup(&HSTRING::from(TOAST_GROUP))
-            .expect("le groupe de la notification");
+            .expect("the group of the notification");
 
         toast
     }
@@ -278,7 +278,7 @@ mod bench {
     fn watch(interval: Duration, running: &AtomicBool, sender: &mpsc::Sender<Heard>) {
         let _ = unsafe { CoInitializeEx(None, COINIT_APARTMENTTHREADED) };
 
-        let listener = UserNotificationListener::Current().expect("le listener");
+        let listener = UserNotificationListener::Current().expect("the listener");
         let mut reported = HashSet::new();
 
         while running.load(Ordering::Relaxed) {
@@ -350,11 +350,11 @@ mod bench {
     }
 
     fn report(readings: &[Reading]) {
-        println!("intervalle   entendues   minimum   médiane   p95   maximum   moyenne");
+        println!("interval   heard   minimum   median   p95   maximum   mean");
 
         for reading in readings {
             if reading.latencies.is_empty() {
-                println!("{:>7} ms   rien entendu", reading.interval.as_millis());
+                println!("{:>7} ms   nothing heard", reading.interval.as_millis());
 
                 continue;
             }

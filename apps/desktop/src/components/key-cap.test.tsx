@@ -14,20 +14,20 @@ const draw = (token: string, labels: KeyLabels) => {
   )
 }
 
-describe('la touche dessinée', () => {
-  it('porte la lettre écrite sur le clavier de l’utilisateur', () => {
+describe('the drawn key', () => {
+  it('carries the letter written on the user keyboard', () => {
     draw('KeyW', AZERTY)
 
     expect(screen.getByText('Z')).not.toBeNull()
   })
 
-  it('suit aussi les signes qu’un AZERTY déplace', () => {
+  it('also follows the signs an AZERTY moves', () => {
     draw('Semicolon', AZERTY)
 
     expect(screen.getByText('M')).not.toBeNull()
   })
 
-  it('garde ses lettres sur un clavier que le système n’a pas su lire', () => {
+  it('keeps its letters on a keyboard the system could not read', () => {
     draw('KeyW', {})
 
     expect(screen.getByText('W')).not.toBeNull()

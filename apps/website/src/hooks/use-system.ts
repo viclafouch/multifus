@@ -13,7 +13,7 @@ export const useSystem = () => {
       return
     }
 
-    // oxlint-disable-next-line react/set-state-in-effect -- la page est prérendue : les deux systèmes sont dans le HTML livré, et celui du visiteur ne peut se reconnaître qu'après l'hydratation, sinon les trente-six fichiers porteraient le système d'un seul visiteur
+    // oxlint-disable-next-line react/set-state-in-effect -- the page is prerendered: both systems are in the delivered HTML, and the one of the visitor can only be recognized after hydration, otherwise the thirty six files would carry the system of a single visitor
     setSystem(found)
   }, [])
 

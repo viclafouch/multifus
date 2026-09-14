@@ -105,12 +105,12 @@ const silentSnapshot = () => {
   return snapshotOf({ onboarding: onboardingOf({ hasSilence: true }) })
 }
 
-describe('la fenêtre de Multifus', () => {
+describe('the Multifus window', () => {
   beforeEach(() => {
     tray.asked = null
   })
 
-  it('n’ouvre rien tant que Rust n’a pas parlé', () => {
+  it('opens nothing until Rust has spoken', () => {
     bridge.onSnapshot.mockImplementation(pending)
     bridge.onNavigate.mockImplementation(pending)
     bridge.snapshot.mockImplementation(pending)
@@ -120,14 +120,14 @@ describe('la fenêtre de Multifus', () => {
     expect(screen.queryByRole('heading', { level: 1 })).toBeNull()
   })
 
-  it('s’ouvre sur l’accueil', async () => {
+  it('opens on the home screen', async () => {
     await open(snapshotOf())
 
     expect(currentMap()).toBe('Multifus')
     expect(screen.getByText('0 connecté')).not.toBeNull()
   })
 
-  it('marque les paramètres quand un contrôle s’est fermé', async () => {
+  it('marks the settings when a check is closed', async () => {
     await open(
       snapshotOf({
         onboarding: onboardingOf({
@@ -141,7 +141,7 @@ describe('la fenêtre de Multifus', () => {
     ).toContain('À régler')
   })
 
-  it('ne marque rien quand tous les contrôles tiennent', async () => {
+  it('marks nothing when every check holds', async () => {
     await open(snapshotOf())
 
     expect(
@@ -149,7 +149,7 @@ describe('la fenêtre de Multifus', () => {
     ).not.toContain('À régler')
   })
 
-  it('n’ouvre que la prise en main tant qu’elle n’est pas faite', async () => {
+  it('opens only the onboarding while it is not done', async () => {
     bridge.onSnapshot.mockResolvedValue(ignore)
     bridge.onNavigate.mockResolvedValue(ignore)
     bridge.snapshot.mockResolvedValue(
@@ -164,7 +164,7 @@ describe('la fenêtre de Multifus', () => {
     expect(screen.queryByRole('heading', { name: 'Multifus' })).toBeNull()
   })
 
-  it('mène à toutes les maps depuis l’accueil, et dit la version', async () => {
+  it('leads to every map from home, and states the version', async () => {
     await open(snapshotOf({ version: '1.4.2' }))
 
     for (const name of MAPS) {
@@ -174,7 +174,7 @@ describe('la fenêtre de Multifus', () => {
     expect(screen.getByText('v1.4.2')).not.toBeNull()
   })
 
-  it('mène à chaque map, et son titre dit où l’on est', async () => {
+  it('leads to each map, and its title says where you are', async () => {
     await open(snapshotOf())
 
     for (const { name, mark } of ARRIVALS) {
@@ -185,7 +185,7 @@ describe('la fenêtre de Multifus', () => {
     }
   })
 
-  it('pose le lecteur sur le titre de la map où l’on arrive', async () => {
+  it('puts the reader on the title of the map you reach', async () => {
     await open(snapshotOf())
 
     navigateTo('settings')
@@ -201,7 +201,7 @@ describe('la fenêtre de Multifus', () => {
     )
   })
 
-  it('ferme l’aperçu du tableau des runes à Échap, quel que soit l’écran ouvert', async () => {
+  it('closes the rune table preview on Escape, whatever screen is open', async () => {
     await open(
       snapshotOf({
         runeTable: { ...snapshotOf().runeTable, previewing: true }
@@ -214,7 +214,7 @@ describe('la fenêtre de Multifus', () => {
     expect(bridge.closeRuneTable).toHaveBeenCalledExactlyOnceWith()
   })
 
-  it('laisse Échap tranquille tant qu’aucun aperçu n’est ouvert', async () => {
+  it('leaves Escape alone while no preview is open', async () => {
     await open(snapshotOf())
 
     fireEvent.keyDown(window, { key: 'Escape' })
@@ -222,7 +222,7 @@ describe('la fenêtre de Multifus', () => {
     expect(bridge.closeRuneTable).not.toHaveBeenCalled()
   })
 
-  it('rouvre sur l’écran quitté quand Multifus se recharge', async () => {
+  it('reopens on the screen left behind when Multifus reloads', async () => {
     await open(snapshotOf())
 
     navigateTo('settings')
@@ -232,7 +232,7 @@ describe('la fenêtre de Multifus', () => {
     expect(currentMap()).toBe(mapName('settings'))
   })
 
-  it('revient à l’accueil à Échap', async () => {
+  it('goes back home on Escape', async () => {
     await open(snapshotOf())
 
     navigateTo('settings')
@@ -241,8 +241,8 @@ describe('la fenêtre de Multifus', () => {
     expect(currentMap()).toBe('Multifus')
   })
 
-  describe('l’accueil', () => {
-    it('compte les personnages connectés', async () => {
+  describe('the home screen', () => {
+    it('counts the online characters', async () => {
       await open(
         snapshotOf({
           characters: [
@@ -256,7 +256,7 @@ describe('la fenêtre de Multifus', () => {
       expect(screen.getByText('2 connectés')).not.toBeNull()
     })
 
-    it('dit qu’il est à l’écoute du jeu', async () => {
+    it('says it is listening to the game', async () => {
       await open(
         snapshotOf({
           authorization: { granted: true, listening: true }
@@ -266,7 +266,7 @@ describe('la fenêtre de Multifus', () => {
       expect(screen.getByText('À l’écoute du jeu')).not.toBeNull()
     })
 
-    it('dit quand l’écoute s’est interrompue', async () => {
+    it('says when the listening has stopped', async () => {
       await open(
         snapshotOf({
           authorization: { granted: true, listening: false }
@@ -276,7 +276,7 @@ describe('la fenêtre de Multifus', () => {
       expect(screen.getByText('Écoute interrompue')).not.toBeNull()
     })
 
-    it('dit quand l’autorisation manque', async () => {
+    it('says when the authorization is missing', async () => {
       await open(
         snapshotOf({
           authorization: { granted: false, listening: false }
@@ -287,12 +287,12 @@ describe('la fenêtre de Multifus', () => {
     })
   })
 
-  describe('sans l’autorisation du système', () => {
+  describe('without the system authorization', () => {
     const denied = snapshotOf({
       authorization: { granted: false, listening: false }
     })
 
-    it('demande l’autorisation à la place des personnages', async () => {
+    it('asks for the authorization instead of the characters', async () => {
       await open(denied)
 
       navigateTo('characters')
@@ -303,7 +303,7 @@ describe('la fenêtre de Multifus', () => {
       expect(screen.queryByText('Votre roster est vide')).toBeNull()
     })
 
-    it('laisse quand même atteindre les autres écrans', async () => {
+    it('still lets the other screens be reached', async () => {
       await open(denied)
 
       navigateTo('settings')
@@ -316,7 +316,7 @@ describe('la fenêtre de Multifus', () => {
     })
   })
 
-  it('suit la barre système sans qu’on ait touché à un panneau', async () => {
+  it('follows the tray without any panel being touched', async () => {
     await open(snapshotOf())
 
     act(() => {
@@ -329,14 +329,14 @@ describe('la fenêtre de Multifus', () => {
     expect(currentMap()).toBe('Messages privés')
   })
 
-  describe('l’avis sur les réglages', () => {
-    it('ne dit rien quand le fichier va bien', async () => {
+  describe('the notice about the settings', () => {
+    it('says nothing when the file is fine', async () => {
       await open(snapshotOf())
 
       expect(screen.queryByText('J’ai compris')).toBeNull()
     })
 
-    it('dit que les réglages n’ont pas pu être lus', async () => {
+    it('says the settings could not be read', async () => {
       const problem: ConfigProblem = {
         kind: 'unreadable',
         detail: 'permission denied'
@@ -352,7 +352,7 @@ describe('la fenêtre de Multifus', () => {
       ).toBeNull()
     })
 
-    it('montre où le fichier mis de côté a été rangé', async () => {
+    it('shows where the set aside file was put', async () => {
       const problem: ConfigProblem = {
         kind: 'malformed',
         detail: 'expected value',
@@ -373,7 +373,7 @@ describe('la fenêtre de Multifus', () => {
       expect(bridge.revealQuarantinedConfig).toHaveBeenCalledWith()
     })
 
-    it('s’efface quand on dit avoir compris', async () => {
+    it('goes away when you say you understood', async () => {
       const problem: ConfigProblem = { kind: 'notSaved', detail: 'disk full' }
 
       await open(snapshotOf({ config: { path: '/tmp/c.json', problem } }))
@@ -383,7 +383,7 @@ describe('la fenêtre de Multifus', () => {
       expect(bridge.dismissConfigProblem).toHaveBeenCalledWith()
     })
 
-    it('reste au-dessus de l’écran où l’on va', async () => {
+    it('stays above the screen you go to', async () => {
       const problem: ConfigProblem = { kind: 'notSaved', detail: 'disk full' }
 
       await open(snapshotOf({ config: { path: '/tmp/c.json', problem } }))
@@ -396,7 +396,7 @@ describe('la fenêtre de Multifus', () => {
     })
   })
 
-  it('porte le journal en bas, quel que soit l’écran', async () => {
+  it('carries the journal at the bottom, whatever the screen', async () => {
     await open(snapshotOf())
 
     navigateTo('settings')
@@ -406,20 +406,20 @@ describe('la fenêtre de Multifus', () => {
   })
 })
 
-describe('l’avis sur un contrôle fermé', () => {
-  it('ne dit rien quand aucun réglage lu n’est fermé', async () => {
+describe('the notice about a closed check', () => {
+  it('says nothing when no read setting is closed', async () => {
     await open(snapshotOf())
 
     expect(screen.queryByText('L’AutoFocus ne peut pas marcher')).toBeNull()
   })
 
-  it('dit que l’AutoFocus ne peut pas marcher', async () => {
+  it('says AutoFocus cannot work', async () => {
     await open(snapshotOf({ onboarding: onboardingOf({ hasNotice: true }) }))
 
     expect(screen.getByText('L’AutoFocus ne peut pas marcher')).not.toBeNull()
   })
 
-  it('mène aux paramètres, et reste tant que rien n’est réglé', async () => {
+  it('leads to the settings, and stays while nothing is fixed', async () => {
     const scrolled = vi.spyOn(Element.prototype, 'scrollIntoView')
 
     await open(snapshotOf({ onboarding: onboardingOf({ hasNotice: true }) }))
@@ -434,7 +434,7 @@ describe('l’avis sur un contrôle fermé', () => {
     ])
   })
 
-  it('s’efface quand on dit avoir compris', async () => {
+  it('goes away when you say you understood', async () => {
     await open(snapshotOf({ onboarding: onboardingOf({ hasNotice: true }) }))
 
     fireEvent.click(screen.getByRole('button', { name: 'J’ai compris' }))
@@ -443,8 +443,8 @@ describe('l’avis sur un contrôle fermé', () => {
   })
 })
 
-describe('l’avis sur une oreille restée sourde', () => {
-  it('ne dit rien tant que Multifus entend le jeu', async () => {
+describe('the notice about an ear that stayed deaf', () => {
+  it('says nothing while Multifus hears the game', async () => {
     await open(snapshotOf())
 
     expect(
@@ -452,7 +452,7 @@ describe('l’avis sur une oreille restée sourde', () => {
     ).toBeNull()
   })
 
-  it('dit que rien ne lui est parvenu depuis longtemps', async () => {
+  it('says nothing has reached it for a long time', async () => {
     await open(silentSnapshot())
 
     expect(
@@ -460,7 +460,7 @@ describe('l’avis sur une oreille restée sourde', () => {
     ).not.toBeNull()
   })
 
-  it('mène aux paramètres', async () => {
+  it('leads to the settings', async () => {
     const scrolled = vi.spyOn(Element.prototype, 'scrollIntoView')
 
     await open(silentSnapshot())
@@ -474,7 +474,7 @@ describe('l’avis sur une oreille restée sourde', () => {
     ])
   })
 
-  it('s’efface quand on dit avoir compris', async () => {
+  it('goes away when you say you understood', async () => {
     await open(silentSnapshot())
 
     fireEvent.click(screen.getByRole('button', { name: 'J’ai compris' }))

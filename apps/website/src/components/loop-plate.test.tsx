@@ -28,7 +28,7 @@ const show = (isAmbient: boolean) => {
   )
 }
 
-describe('la plaque de boucle', () => {
+describe('the loop plate', () => {
   beforeEach(() => {
     vi.stubGlobal('matchMedia', watchMotion)
   })
@@ -39,7 +39,7 @@ describe('la plaque de boucle', () => {
     vi.restoreAllMocks()
   })
 
-  it('laisse la boucle à l’arrêt tant que personne ne la lance', () => {
+  it('leaves the loop stopped while nobody starts it', () => {
     const play = spyOnPlayback()
 
     show(false)
@@ -47,7 +47,7 @@ describe('la plaque de boucle', () => {
     expect(play).not.toHaveBeenCalled()
   })
 
-  it('reste dans la page sur iOS plutôt que de passer en plein écran', () => {
+  it('stays in the page on iOS rather than going full screen', () => {
     spyOnPlayback()
 
     const { container } = show(false)
@@ -57,7 +57,7 @@ describe('la plaque de boucle', () => {
     expect(loop?.muted).toBe(true)
   })
 
-  it('offre toute la surface de la boucle au clic, badge à l’appui', () => {
+  it('offers the whole surface of the loop to the click, badge included', () => {
     const play = spyOnPlayback()
 
     show(false)
@@ -71,7 +71,7 @@ describe('la plaque de boucle', () => {
     expect(play).toHaveBeenCalledWith()
   })
 
-  it('lance la boucle d’ambiance d’entrée, sous sa seule pastille', () => {
+  it('starts the ambient loop of the entrance, under its only dot', () => {
     const play = spyOnPlayback()
 
     show(true)

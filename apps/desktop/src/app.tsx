@@ -9,7 +9,7 @@ import { MapNavigationProvider } from '@/components/map-navigation-provider'
 import { SceneCredit } from '@/components/retro/scene-credit'
 import { SilenceNotice } from '@/components/silence-notice'
 import { TooltipProvider } from '@/components/ui/tooltip'
-import { Cartouche } from '@/components/world/cartouche'
+import { LanguageBar } from '@/components/world/language-bar'
 import { MapFrame } from '@/components/world/map-frame'
 import { WorldScene } from '@/components/world/world-scene'
 import { ONBOARDING_ANCHOR } from '@/constants/onboarding'
@@ -113,7 +113,7 @@ export const App = () => {
                 />
               ) : null}
               <div className="relative flex min-h-0 flex-1 flex-col">
-                <Cartouche
+                <LanguageBar
                   version={snapshot.version}
                   language={snapshot.language}
                 />

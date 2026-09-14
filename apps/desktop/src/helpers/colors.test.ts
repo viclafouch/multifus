@@ -10,7 +10,7 @@ const ROSTER = [
 ]
 
 describe('colorHolders', () => {
-  it('range les personnages sous la couleur qu’ils portent', () => {
+  it('sorts the characters under the color they wear', () => {
     const holders = colorHolders(ROSTER)
 
     expect(holders.sky).toStrictEqual(['Alpha', 'Charlie'])
@@ -18,7 +18,7 @@ describe('colorHolders', () => {
     expect(holders.red).toBeUndefined()
   })
 
-  it('ne retient personne d’un roster sans couleur', () => {
+  it('keeps nobody from a roster without a color', () => {
     const colourless = colorHolders([characterOf({ color: null })])
 
     expect(Object.keys(colourless)).toHaveLength(0)
@@ -27,14 +27,14 @@ describe('colorHolders', () => {
 })
 
 describe('holderOf', () => {
-  it('nomme le premier autre qui porte déjà la couleur', () => {
+  it('names the first other one who already wears the color', () => {
     const holders = colorHolders(ROSTER)
 
     expect(holderOf(holders, { color: 'sky', besides: 'Bravo' })).toBe('Alpha')
     expect(holderOf(holders, { color: 'pine', besides: 'Bravo' })).toBe('Delta')
   })
 
-  it('ne se compte pas lui-même', () => {
+  it('does not count itself', () => {
     const holders = colorHolders(ROSTER)
 
     expect(holderOf(holders, { color: 'sky', besides: 'Alpha' })).toBe(
@@ -43,7 +43,7 @@ describe('holderOf', () => {
     expect(holderOf(holders, { color: 'pine', besides: 'Delta' })).toBeNull()
   })
 
-  it('ne nomme personne pour une couleur libre', () => {
+  it('names nobody for a free color', () => {
     expect(
       holderOf(colorHolders(ROSTER), { color: 'red', besides: 'Alpha' })
     ).toBeNull()

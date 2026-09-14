@@ -68,10 +68,10 @@ const relayedRows = () => {
   })
 }
 
-describe('l’écran des messages privés, tant que le téléphone n’est pas relié', () => {
+describe('the private messages screen, while the phone is not linked', () => {
   const notPaired = { paired: false, ready: false }
 
-  it('déroule les cinq étapes et demande le code du robot', () => {
+  it('unfolds the five steps and asks for the code of the bot', () => {
     show({ relay: notPaired })
 
     expect(screen.getByText('Relier votre téléphone')).not.toBeNull()
@@ -82,7 +82,7 @@ describe('l’écran des messages privés, tant que le téléphone n’est pas r
     }
   })
 
-  it('cache tout ce qui n’a de sens qu’une fois relié', () => {
+  it('hides everything that only makes sense once linked', () => {
     show({ relay: notPaired })
 
     expect(
@@ -92,7 +92,7 @@ describe('l’écran des messages privés, tant que le téléphone n’est pas r
     expect(screen.queryByText('Message d’essai')).toBeNull()
   })
 
-  it('garde le code du robot hors de vue pendant la frappe', () => {
+  it('keeps the code of the bot out of sight while it is typed', () => {
     show({ relay: notPaired })
 
     expect(screen.getByLabelText('Code du robot').getAttribute('type')).toBe(
@@ -100,7 +100,7 @@ describe('l’écran des messages privés, tant que le téléphone n’est pas r
     )
   })
 
-  it('envoie à Rust le code collé, une fois Connecter cliqué', () => {
+  it('sends Rust the pasted code, once the connect button is clicked', () => {
     show({ relay: notPaired })
 
     fireEvent.change(screen.getByLabelText('Code du robot'), {
@@ -111,7 +111,7 @@ describe('l’écran des messages privés, tant que le téléphone n’est pas r
     expect(bridge.pairRelay).toHaveBeenCalledWith('  1234:abcd  ')
   })
 
-  it('laisse partir un code vide, et c’est Rust qui refuse', () => {
+  it('lets an empty code leave, and it is Rust that refuses', () => {
     show({ relay: notPaired })
 
     fireEvent.click(screen.getByRole('button', { name: 'Connecter' }))
@@ -119,7 +119,7 @@ describe('l’écran des messages privés, tant que le téléphone n’est pas r
     expect(bridge.pairRelay).toHaveBeenCalledWith('')
   })
 
-  it('dit que la connexion est en cours, et n’offre plus Connecter', () => {
+  it('says the connection is going on, and no longer offers to connect', () => {
     show({ relay: { ...notPaired, pairing: { kind: 'working' } } })
 
     expect(
@@ -130,7 +130,7 @@ describe('l’écran des messages privés, tant que le téléphone n’est pas r
     expect(screen.queryByRole('button', { name: 'Connecter' })).toBeNull()
   })
 
-  it('rappelle l’étape 4 quand le joueur n’a pas dit salut à son robot', () => {
+  it('recalls step 4 when the player has not said hello to their bot', () => {
     const pairing: PairingStatus = {
       kind: 'failed',
       problem: { kind: 'noChat' }
@@ -143,7 +143,7 @@ describe('l’écran des messages privés, tant que le téléphone n’est pas r
     )
   })
 
-  it('marque le champ en faute et le relie à la raison du refus', () => {
+  it('marks the field at fault and links it to the reason of the refusal', () => {
     const pairing: PairingStatus = {
       kind: 'failed',
       problem: { kind: 'tokenRefused', detail: '401' }
@@ -161,7 +161,7 @@ describe('l’écran des messages privés, tant que le téléphone n’est pas r
     )
   })
 
-  it('ouvre Telegram et BotFather sans quitter l’écran', () => {
+  it('opens Telegram and BotFather without leaving the screen', () => {
     show({ relay: notPaired })
 
     fireEvent.click(screen.getByRole('button', { name: 'Ouvrir Telegram Web' }))
@@ -172,8 +172,8 @@ describe('l’écran des messages privés, tant que le téléphone n’est pas r
   })
 })
 
-describe('l’écran des messages privés, une fois le téléphone relié', () => {
-  it('remplace le guide par l’interrupteur, le robot et l’essai', () => {
+describe('the private messages screen, once the phone is linked', () => {
+  it('replaces the guide with the switch, the bot and the test', () => {
     show({ relay: { paired: true } })
 
     expect(screen.queryByText('Relier votre téléphone')).toBeNull()
@@ -184,7 +184,7 @@ describe('l’écran des messages privés, une fois le téléphone relié', () =
     expect(screen.getByText('Message d’essai')).not.toBeNull()
   })
 
-  it('dit que tout est prêt, l’envoi à l’arrêt', () => {
+  it('says everything is ready, with the sending stopped', () => {
     show({ relay: { active: false, ready: true } })
 
     expect(screen.getByText('À l’arrêt')).not.toBeNull()
@@ -195,7 +195,7 @@ describe('l’écran des messages privés, une fois le téléphone relié', () =
     ).toBe('false')
   })
 
-  it('dit que l’envoi est en marche', () => {
+  it('says the sending is running', () => {
     show({ relay: { active: true, ready: true } })
 
     expect(screen.getByText('En marche')).not.toBeNull()
@@ -206,13 +206,13 @@ describe('l’écran des messages privés, une fois le téléphone relié', () =
     ).toBe('true')
   })
 
-  it('dit qu’il n’a personne à écouter quand aucun personnage n’est relayé', () => {
+  it('says it has nobody to listen to when no character is relayed', () => {
     show({ relay: { active: false, ready: false } })
 
     expect(screen.getByText('Aucun personnage connecté')).not.toBeNull()
   })
 
-  it('met l’envoi en marche quand on bouge l’interrupteur', () => {
+  it('starts the sending when the switch is moved', () => {
     show({ relay: { active: false } })
 
     fireEvent.click(
@@ -222,7 +222,7 @@ describe('l’écran des messages privés, une fois le téléphone relié', () =
     expect(bridge.setRelayActive).toHaveBeenCalledWith(true)
   })
 
-  it('coupe l’envoi quand on rebouge l’interrupteur', () => {
+  it('cuts the sending when the switch is moved again', () => {
     show({ relay: { active: true } })
 
     fireEvent.click(
@@ -232,7 +232,7 @@ describe('l’écran des messages privés, une fois le téléphone relié', () =
     expect(bridge.setRelayActive).toHaveBeenCalledWith(false)
   })
 
-  it('dit pourquoi la mise en marche a échoué, et relie l’interrupteur à la raison', () => {
+  it('says why the start failed, and links the switch to the reason', () => {
     show({
       relay: {
         switch: {
@@ -254,7 +254,7 @@ describe('l’écran des messages privés, une fois le téléphone relié', () =
     ).toBe(alert.id)
   })
 
-  it('ne relie l’interrupteur à rien tant que rien n’a échoué', () => {
+  it('links the switch to nothing while nothing has failed', () => {
     show({ relay: { switch: { kind: 'idle' } } })
 
     expect(
@@ -264,7 +264,7 @@ describe('l’écran des messages privés, une fois le téléphone relié', () =
     ).toBeNull()
   })
 
-  it('dit que la mise en marche est en cours', () => {
+  it('says the start is going on', () => {
     show({ relay: { switch: { kind: 'starting' } } })
 
     expect(
@@ -274,7 +274,7 @@ describe('l’écran des messages privés, une fois le téléphone relié', () =
     ).toBe('true')
   })
 
-  it('retire le robot à la demande', () => {
+  it('removes the bot on request', () => {
     show()
 
     fireEvent.click(screen.getByRole('button', { name: 'Retirer ce robot' }))
@@ -282,7 +282,7 @@ describe('l’écran des messages privés, une fois le téléphone relié', () =
     expect(bridge.unpairRelay).toHaveBeenCalledWith()
   })
 
-  it('dit que le retrait du robot est en cours', () => {
+  it('says the removal of the bot is going on', () => {
     show({ relay: { pairing: { kind: 'working' } } })
 
     expect(
@@ -291,8 +291,8 @@ describe('l’écran des messages privés, une fois le téléphone relié', () =
   })
 })
 
-describe('l’écran des messages privés, le message d’essai', () => {
-  it('part à la demande', () => {
+describe('the private messages screen, the test message', () => {
+  it('leaves on request', () => {
     show()
 
     fireEvent.click(screen.getByRole('button', { name: 'Envoyer un essai' }))
@@ -300,7 +300,7 @@ describe('l’écran des messages privés, le message d’essai', () => {
     expect(bridge.testRelay).toHaveBeenCalledWith()
   })
 
-  it('ne dit rien tant qu’aucun essai n’est parti', () => {
+  it('says nothing while no test has left', () => {
     show({ relay: { test: { kind: 'idle' } } })
 
     expect(
@@ -310,7 +310,7 @@ describe('l’écran des messages privés, le message d’essai', () => {
     ).toBeNull()
   })
 
-  it('invite à regarder le téléphone une fois l’essai parti', () => {
+  it('invites to look at the phone once the test has left', () => {
     show({ relay: { test: { kind: 'sent' } } })
 
     expect(screen.getByRole('status').textContent).toBe(
@@ -319,7 +319,7 @@ describe('l’écran des messages privés, le message d’essai', () => {
     expect(screen.queryByRole('alert')).toBeNull()
   })
 
-  it('demande d’attendre quand deux essais se suivent de trop près', () => {
+  it('asks to wait when two tests follow each other too closely', () => {
     show({ relay: { test: { kind: 'tooSoon' } } })
 
     expect(screen.getByRole('status').textContent).toBe(
@@ -327,7 +327,7 @@ describe('l’écran des messages privés, le message d’essai', () => {
     )
   })
 
-  it('crie quand Telegram a refusé l’essai', () => {
+  it('shouts when Telegram refused the test', () => {
     const test: TestStatus = {
       kind: 'failed',
       reason: { reason: 'telegram', detail: '403' }
@@ -341,7 +341,7 @@ describe('l’écran des messages privés, le message d’essai', () => {
     expect(screen.queryByRole('status')).toBeNull()
   })
 
-  it('dit que l’essai est en cours', () => {
+  it('says the test is going on', () => {
     show({ relay: { test: { kind: 'working' } } })
 
     expect(
@@ -350,8 +350,8 @@ describe('l’écran des messages privés, le message d’essai', () => {
   })
 })
 
-describe('l’écran des messages privés, les personnages relayés', () => {
-  it('invite à connecter un personnage quand le roster est vide', () => {
+describe('the private messages screen, the relayed characters', () => {
+  it('invites to connect a character when the roster is empty', () => {
     show({ characters: [] })
 
     expect(
@@ -362,7 +362,7 @@ describe('l’écran des messages privés, les personnages relayés', () => {
     expect(relayedRows()).toHaveLength(0)
   })
 
-  it('porte une ligne par personnage du roster', () => {
+  it('carries one row per character of the roster', () => {
     show({
       characters: [
         characterOf({ nickname: 'Alpha' }),
@@ -378,7 +378,7 @@ describe('l’écran des messages privés, les personnages relayés', () => {
     ).toBeNull()
   })
 
-  it('montre la couleur de chaque personnage au bord de sa ligne', () => {
+  it('shows the color of each character at the edge of its row', () => {
     show({
       characters: [
         characterOf({ nickname: 'Alpha', color: 'violet' }),
@@ -392,7 +392,7 @@ describe('l’écran des messages privés, les personnages relayés', () => {
     expect(bravo.querySelector('.stripe')).toBeNull()
   })
 
-  it('relaie un personnage quand on coche sa ligne', () => {
+  it('relays a character when its row is checked', () => {
     show({ characters: [characterOf({ nickname: 'Alpha', relayed: false })] })
 
     fireEvent.click(switchNamed('Relayer Alpha'))
@@ -400,7 +400,7 @@ describe('l’écran des messages privés, les personnages relayés', () => {
     expect(bridge.setRelayed).toHaveBeenCalledWith('Alpha', true)
   })
 
-  it('cesse de relayer un personnage quand on décoche sa ligne', () => {
+  it('stops relaying a character when its row is unchecked', () => {
     show({ characters: [characterOf({ nickname: 'Alpha' })] })
 
     fireEvent.click(switchNamed('Relayer Alpha'))
@@ -408,7 +408,7 @@ describe('l’écran des messages privés, les personnages relayés', () => {
     expect(bridge.setRelayed).toHaveBeenCalledWith('Alpha', false)
   })
 
-  it('garde coché un personnage que le jeu vient de déconnecter', () => {
+  it('keeps checked a character the game has just disconnected', () => {
     show({ characters: [characterOf({ nickname: 'Alpha', online: false })] })
 
     const toggle = switchNamed('Relayer Alpha')
@@ -417,7 +417,7 @@ describe('l’écran des messages privés, les personnages relayés', () => {
     expect(toggle.getAttribute('aria-disabled')).toBeNull()
   })
 
-  it('dit la classe et la présence de chaque personnage', () => {
+  it('says the class and the presence of each character', () => {
     show({
       characters: [
         characterOf({ nickname: 'Alpha' }),
@@ -432,7 +432,7 @@ describe('l’écran des messages privés, les personnages relayés', () => {
     expect(subLines).toStrictEqual(['Iop · Connecté', 'Iop · Déconnecté'])
   })
 
-  it('ne dit jamais qu’un personnage est exclu, l’exclusion ne compte pas ici', () => {
+  it('never says a character is excluded, the exclusion does not count here', () => {
     show({ characters: [characterOf({ nickname: 'Alpha', excluded: true })] })
 
     expect(screen.getByText('Iop · Connecté')).not.toBeNull()
@@ -440,8 +440,8 @@ describe('l’écran des messages privés, les personnages relayés', () => {
   })
 })
 
-describe('l’écran des messages privés, le reste de l’écran', () => {
-  it('cesse d’envoyer le texte du message quand on décoche', () => {
+describe('the private messages screen, the rest of the screen', () => {
+  it('stops sending the text of the message when it is unchecked', () => {
     show({ relay: { sendBody: true } })
 
     fireEvent.click(switchNamed('Recevoir ce que le joueur a écrit'))
@@ -449,7 +449,7 @@ describe('l’écran des messages privés, le reste de l’écran', () => {
     expect(bridge.setSendBody).toHaveBeenCalledWith(false)
   })
 
-  it('ne dit rien de l’écran de veille quand il ne démarre jamais', () => {
+  it('says nothing about the screen saver when it never starts', () => {
     show({ relay: { screenSaver: { kind: 'never' } } })
 
     expect(
@@ -457,7 +457,7 @@ describe('l’écran des messages privés, le reste de l’écran', () => {
     ).toBeNull()
   })
 
-  it('ne dit rien de l’écran de veille quand Multifus ne sait pas', () => {
+  it('says nothing about the screen saver when Multifus does not know', () => {
     show({ relay: { screenSaver: { kind: 'unknown' } } })
 
     expect(
@@ -465,7 +465,7 @@ describe('l’écran des messages privés, le reste de l’écran', () => {
     ).toBeNull()
   })
 
-  it('avertit quand l’écran de veille peut tout arrêter', () => {
+  it('warns when the screen saver can stop everything', () => {
     show({ relay: { screenSaver: { kind: 'after', seconds: 600 } } })
 
     const delay = screenSaverDelay(600)
@@ -477,7 +477,7 @@ describe('l’écran des messages privés, le reste de l’écran', () => {
     expect(screen.getByText(warning)).not.toBeNull()
   })
 
-  it('mène vers l’explication du robot Telegram', () => {
+  it('leads to the explanation of the Telegram bot', () => {
     show()
 
     fireEvent.click(

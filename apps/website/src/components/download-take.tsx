@@ -24,7 +24,7 @@ export const DownloadTake = () => {
           nativeButton={false}
           className="h-auto max-w-full py-3 text-center whitespace-normal"
           render={
-            /* oxlint-disable-next-line control-has-associated-label -- Base UI pose les enfants du Button dans ce lien, que la règle lit vide */
+            /* oxlint-disable-next-line control-has-associated-label -- Base UI puts the children of the Button in this link, which the rule reads as empty */
             <a className="sighted" href={RELEASES} />
           }
         >

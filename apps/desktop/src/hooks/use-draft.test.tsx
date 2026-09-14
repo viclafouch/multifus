@@ -12,13 +12,13 @@ const draftOf = (stored: string) => {
 }
 
 describe('useDraft', () => {
-  it('part du texte rangé dans la configuration', () => {
+  it('starts from the text kept in the configuration', () => {
     const { result } = draftOf('Bon jeu à toi !')
 
     expect(result.current.draft).toBe('Bon jeu à toi !')
   })
 
-  it('garde ce que l’utilisateur écrit', () => {
+  it('keeps what the user writes', () => {
     const { result } = draftOf('Bon jeu à toi !')
 
     act(() => {
@@ -28,7 +28,7 @@ describe('useDraft', () => {
     expect(result.current.draft).toBe('Prix libre')
   })
 
-  it('ne rend pas la main à un instantané qui dit la même chose', () => {
+  it('does not hand back to a snapshot that says the same thing', () => {
     const { result, rerender } = draftOf('Bon jeu à toi !')
 
     act(() => {
@@ -39,7 +39,7 @@ describe('useDraft', () => {
     expect(result.current.draft).toBe('Prix')
   })
 
-  it('reprend le texte quand la configuration change ailleurs', () => {
+  it('takes the text back when the configuration changes elsewhere', () => {
     const { result, rerender } = draftOf('Bon jeu à toi !')
 
     act(() => {
@@ -50,7 +50,7 @@ describe('useDraft', () => {
     expect(result.current.draft).toBe('De rien')
   })
 
-  it('accepte un texte vide comme un texte comme un autre', () => {
+  it('takes an empty text as a text like any other', () => {
     const { result, rerender } = draftOf('Bon jeu à toi !')
 
     rerender({ text: '' })

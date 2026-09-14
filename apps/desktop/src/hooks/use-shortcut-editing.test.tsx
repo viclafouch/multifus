@@ -13,8 +13,8 @@ vi.mock(import('@/lib/multifus'), () => {
 
 const { useShortcutEditing } = await import('@/hooks/use-shortcut-editing')
 
-describe('la saisie d’une combinaison', () => {
-  it('rend les touches au système tant qu’un champ est ouvert', () => {
+describe('the capture of a combination', () => {
+  it('hands the keys back to the system while a field is open', () => {
     const { result } = renderHook(() => {
       return useShortcutEditing()
     })
@@ -30,7 +30,7 @@ describe('la saisie d’une combinaison', () => {
     })
   })
 
-  it('les reprend même si l’écran disparaît le champ ouvert', () => {
+  it('takes them back even if the screen disappears with the field open', () => {
     const { result, unmount } = renderHook(() => {
       return useShortcutEditing()
     })
@@ -43,7 +43,7 @@ describe('la saisie d’une combinaison', () => {
     expect(bridge.resumeShortcuts).toHaveBeenCalledWith()
   })
 
-  it('les reprend dès que le champ se referme sans rien poser', () => {
+  it('takes them back as soon as the field closes without setting anything', () => {
     const { result } = renderHook(() => {
       return useShortcutEditing()
     })

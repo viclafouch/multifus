@@ -9,7 +9,7 @@ import type { Authorization } from '@/@types/system'
 import { CharacterDialog } from '@/components/character-dialog'
 import { Lamp } from '@/components/lamp'
 import { MapTitle } from '@/components/layout/map-title'
-import { Dolmen } from '@/components/world/dolmen'
+import { StandingStone } from '@/components/world/standing-stone'
 import { WayList } from '@/components/world/way-list'
 import { CLEARING, MAP_NAMES } from '@/constants/world'
 import { colorHolders } from '@/helpers/colors'
@@ -69,7 +69,7 @@ export const ClearingScreen = ({
           <WayList asking={asking} onGo={onGo} />
         </div>
       </div>
-      <Dolmen
+      <StandingStone
         characters={characters}
         onOpenCharacter={setOpened}
         onRemoveCharacter={marks.handleRemove}

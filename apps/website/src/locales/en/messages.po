@@ -572,7 +572,7 @@ msgstr "The window in play comes forward."
 msgid "La forgemagie sans le deuxième écran"
 msgstr "Smithmagic without the second screen"
 
-#: src/components/cartouche.tsx
+#: src/components/language-bar.tsx
 msgid "La langue du site"
 msgstr "The language of the site"
 

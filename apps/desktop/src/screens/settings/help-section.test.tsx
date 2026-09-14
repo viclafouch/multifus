@@ -21,8 +21,8 @@ const show = async () => {
   return { run }
 }
 
-describe('le panneau du doute, sous les réglages', () => {
-  it('offre les trois gestes, et ne rejoue pas le tableau des étapes', async () => {
+describe('the panel of the doubt, under the settings', () => {
+  it('offers the three moves, and does not play the table of the steps again', async () => {
     await show()
 
     expect(screen.getByText('Est-ce que tout marche ?')).not.toBeNull()
@@ -31,7 +31,7 @@ describe('le panneau du doute, sous les réglages', () => {
     expect(screen.queryByText('Laissez Multifus voir vos fenêtres')).toBeNull()
   })
 
-  it('relance la mise en route, et attend l’instantané', async () => {
+  it('starts the setup again, and waits for the snapshot', async () => {
     const { run } = await show()
 
     fireEvent.click(screen.getByRole('button', { name: 'Revoir' }))

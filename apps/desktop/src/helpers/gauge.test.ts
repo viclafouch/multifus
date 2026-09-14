@@ -2,15 +2,15 @@ import { describe, expect, it } from 'vitest'
 import { gaugeValue } from '@/helpers/gauge'
 
 describe('gaugeValue', () => {
-  it('prend le nombre tel quel', () => {
+  it('takes the number as it is', () => {
     expect(gaugeValue(400, 280)).toBe(400)
   })
 
-  it('prend le premier curseur quand la jauge en donne une liste', () => {
+  it('takes the first cursor when the gauge gives a list of them', () => {
     expect(gaugeValue([420], 280)).toBe(420)
   })
 
-  it('garde la valeur du moment quand la liste arrive vide', () => {
+  it('keeps the current value when the list comes empty', () => {
     expect(gaugeValue([], 280)).toBe(280)
   })
 })

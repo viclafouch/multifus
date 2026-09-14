@@ -24,7 +24,7 @@ const rebound = (
 }
 
 describe('useShortcutUndo', () => {
-  it('n’offre rien tant qu’aucune combinaison n’a bougé', () => {
+  it('offers nothing while no combination has moved', () => {
     const { result } = renderHook(() => {
       return useShortcutUndo(vi.fn())
     })
@@ -32,7 +32,7 @@ describe('useShortcutUndo', () => {
     expect(result.current.undoFor(NEXT)).toBeNull()
   })
 
-  it('offre de reprendre la combinaison d’avant', () => {
+  it('offers to take back the combination from before', () => {
     const { result } = renderHook(() => {
       return useShortcutUndo(vi.fn())
     })
@@ -49,7 +49,7 @@ describe('useShortcutUndo', () => {
     )
   })
 
-  it('repose la combinaison d’avant et retire l’offre', () => {
+  it('sets the combination from before back and removes the offer', () => {
     const apply = vi.fn()
     const { result } = renderHook(() => {
       return useShortcutUndo(apply)
@@ -66,7 +66,7 @@ describe('useShortcutUndo', () => {
     expect(result.current.undoFor(rebound(NEXT, 'Alt+KeyN'))).toBeNull()
   })
 
-  it('n’offre rien quand la combinaison est revenue toute seule', () => {
+  it('offers nothing when the combination came back on its own', () => {
     const { result } = renderHook(() => {
       return useShortcutUndo(vi.fn())
     })
@@ -78,7 +78,7 @@ describe('useShortcutUndo', () => {
     expect(result.current.undoFor(NEXT)).toBeNull()
   })
 
-  it('offre de reprendre une combinaison qui vient d’être effacée', () => {
+  it('offers to take back a combination that has just been cleared', () => {
     const { result } = renderHook(() => {
       return useShortcutUndo(vi.fn())
     })
@@ -92,7 +92,7 @@ describe('useShortcutUndo', () => {
     )
   })
 
-  it('offre de reprendre une absence, quand il n’y avait rien avant', () => {
+  it('offers to take back an absence, when there was nothing before', () => {
     const { result } = renderHook(() => {
       return useShortcutUndo(vi.fn())
     })
@@ -106,7 +106,7 @@ describe('useShortcutUndo', () => {
     ).toBeNull()
   })
 
-  it('tient une mémoire par action', () => {
+  it('holds one memory per action', () => {
     const { result } = renderHook(() => {
       return useShortcutUndo(vi.fn())
     })
@@ -119,7 +119,7 @@ describe('useShortcutUndo', () => {
     expect(result.current.undoFor(rebound(NEXT, 'Alt+KeyN'))).not.toBeNull()
   })
 
-  it('oublie tout quand les cinq touches du premier jour reviennent', () => {
+  it('forgets everything when the five keys of the first day come back', () => {
     const { result } = renderHook(() => {
       return useShortcutUndo(vi.fn())
     })
@@ -135,7 +135,7 @@ describe('useShortcutUndo', () => {
     expect(result.current.undoFor(rebound(PREVIOUS, 'Alt+KeyP'))).toBeNull()
   })
 
-  it('ne remonte que d’un cran après deux changements de suite', () => {
+  it('goes back only one notch after two changes in a row', () => {
     const { result } = renderHook(() => {
       return useShortcutUndo(vi.fn())
     })

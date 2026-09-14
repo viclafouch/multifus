@@ -60,7 +60,7 @@ describe('useBannerStep', () => {
     bridge.unlisten.mockClear()
   })
 
-  it('n’a rien à dessiner avant le premier pas', () => {
+  it('has nothing to draw before the first step', () => {
     const { result } = renderHook(() => {
       return useBannerStep()
     })
@@ -68,7 +68,7 @@ describe('useBannerStep', () => {
     expect(result.current).toBeNull()
   })
 
-  it('prend le pas que Rust lui donne au départ', async () => {
+  it('takes the step Rust gives it at the start', async () => {
     const { result } = renderHook(() => {
       return useBannerStep()
     })
@@ -79,7 +79,7 @@ describe('useBannerStep', () => {
     expect(result.current).toStrictEqual(stepOf(null))
   })
 
-  it('suit le personnage sur lequel le Déplacement rapide arrive', async () => {
+  it('follows the character the Quick move lands on', async () => {
     const { result } = renderHook(() => {
       return useBannerStep()
     })
@@ -93,7 +93,7 @@ describe('useBannerStep', () => {
     expect(result.current).toStrictEqual(stepOf('Alpha'))
   })
 
-  it('laisse le pas arrivé passer devant celui du départ', async () => {
+  it('lets the step that arrived go before the one of the start', async () => {
     const { result } = renderHook(() => {
       return useBannerStep()
     })
@@ -108,7 +108,7 @@ describe('useBannerStep', () => {
     expect(result.current).toStrictEqual(stepOf('Alpha'))
   })
 
-  it('cesse d’écouter quand la bannière se ferme', async () => {
+  it('stops listening when the banner closes', async () => {
     const { unmount } = renderHook(() => {
       return useBannerStep()
     })

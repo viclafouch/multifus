@@ -1487,7 +1487,7 @@ const SNAPSHOT = {
 
 describe('journalLine', () => {
   it.each(Object.values(JOURNAL_CASES).flat())(
-    '$event.kind se lit « $line »',
+    '$event.kind reads as « $line »',
     ({ event, line }) => {
       const written = journalLine(event, QUICK_REPLIES)
 
@@ -1497,19 +1497,19 @@ describe('journalLine', () => {
 })
 
 describe('journalTone', () => {
-  it('salue une autorisation accordée', () => {
+  it('greets a granted authorization', () => {
     const tone = journalTone({ kind: 'authorization', granted: true })
 
     expect(tone).toBe('good')
   })
 
-  it('avertit sur une autorisation refusée', () => {
+  it('warns on a refused authorization', () => {
     const tone = journalTone({ kind: 'authorization', granted: false })
 
     expect(tone).toBe('warning')
   })
 
-  it('salue une demande d’autorisation qui a abouti', () => {
+  it('greets an authorization request that went through', () => {
     const event = {
       kind: 'authorizationRequested',
       granted: true,
@@ -1521,7 +1521,7 @@ describe('journalTone', () => {
     expect(tone).toBe('good')
   })
 
-  it('ne compte pas comme une faute un refus dans la seconde qui suit', () => {
+  it('does not count as a fault a refusal in the second that follows', () => {
     const event = {
       kind: 'authorizationRequested',
       granted: false,
@@ -1533,7 +1533,7 @@ describe('journalTone', () => {
     expect(tone).toBe('neutral')
   })
 
-  it('avertit quand le système n’a pas pu répondre à la demande', () => {
+  it('warns when the system could not answer the request', () => {
     const event = {
       kind: 'authorizationRequested',
       granted: false,
@@ -1545,7 +1545,7 @@ describe('journalTone', () => {
     expect(tone).toBe('warning')
   })
 
-  it('salue une notification qui a ramené une fenêtre', () => {
+  it('greets a notification that brought a window back', () => {
     const event = {
       ...NOTIFIED,
       outcome: { outcome: 'focused', focusMicros: 12_400 }
@@ -1556,7 +1556,7 @@ describe('journalTone', () => {
     expect(tone).toBe('good')
   })
 
-  it('reste neutre sur une notification qui n’a rien fait', () => {
+  it('stays neutral on a notification that did nothing', () => {
     const event = {
       ...NOTIFIED,
       outcome: { outcome: 'kindDisabled' }
@@ -1567,7 +1567,7 @@ describe('journalTone', () => {
     expect(tone).toBe('neutral')
   })
 
-  it('salue un raccourci qui a ramené une fenêtre', () => {
+  it('greets a shortcut that brought a window back', () => {
     const event = {
       ...FIRED,
       outcome: { outcome: 'focused', nickname: NICKNAME }
@@ -1578,7 +1578,7 @@ describe('journalTone', () => {
     expect(tone).toBe('good')
   })
 
-  it('reste neutre sur un raccourci frappé hors du jeu', () => {
+  it('stays neutral on a shortcut hit outside the game', () => {
     const event = { ...FIRED, outcome: { outcome: 'outsideGame' } } as const
 
     const tone = journalTone(event)
@@ -1586,7 +1586,7 @@ describe('journalTone', () => {
     expect(tone).toBe('neutral')
   })
 
-  it('avertit sur un raccourci dont le focus a été refusé', () => {
+  it('warns on a shortcut whose focus was refused', () => {
     const event = {
       ...FIRED,
       outcome: { outcome: 'focusFailed', nickname: NICKNAME, detail: DETAIL }
@@ -1597,7 +1597,7 @@ describe('journalTone', () => {
     expect(tone).toBe('warning')
   })
 
-  it('salue un clic de la barre système qui a abouti', () => {
+  it('greets a tray click that went through', () => {
     const event = { ...CLICKED, outcome: { outcome: 'focused' } } as const
 
     const tone = journalTone(event)
@@ -1605,7 +1605,7 @@ describe('journalTone', () => {
     expect(tone).toBe('good')
   })
 
-  it('avertit sur un clic de la barre système que le système a refusé', () => {
+  it('warns on a tray click the system refused', () => {
     const event = {
       ...CLICKED,
       outcome: { outcome: 'focusFailed', detail: DETAIL }
@@ -1616,13 +1616,13 @@ describe('journalTone', () => {
     expect(tone).toBe('warning')
   })
 
-  it('avertit dès qu’une seule combinaison n’est pas sur le système', () => {
+  it('warns as soon as a single combination is not on the system', () => {
     const tone = journalTone({ kind: 'shortcutsBound', bindings: BINDINGS })
 
     expect(tone).toBe('warning')
   })
 
-  it('reste neutre quand chaque combinaison est posée ou vide', () => {
+  it('stays neutral when every combination is set or empty', () => {
     const bindings = BINDINGS.filter((binding) => {
       return QUIET_STATUSES.has(binding.status.kind)
     })
@@ -1632,13 +1632,13 @@ describe('journalTone', () => {
     expect(tone).toBe('neutral')
   })
 
-  it('lit dans la table le ton d’une écoute qui a démarré', () => {
+  it('reads in the table the tone of a listening that started', () => {
     const tone = journalTone({ kind: 'listening' })
 
     expect(tone).toBe('good')
   })
 
-  it('lit dans la table le ton d’une lecture des fenêtres impossible', () => {
+  it('reads in the table the tone of an impossible read of the windows', () => {
     const tone = journalTone({ kind: 'scanFailed', detail: DETAIL })
 
     expect(tone).toBe('warning')
@@ -1646,13 +1646,13 @@ describe('journalTone', () => {
 })
 
 describe('journalTime', () => {
-  it('écrit l’heure, les minutes et les secondes sur deux chiffres', () => {
+  it('writes the hour, the minutes and the seconds on two digits', () => {
     const time = journalTime(MORNING)
 
     expect(time).toBe('09:05:03')
   })
 
-  it('écrit minuit comme une heure ordinaire', () => {
+  it('writes midnight like an ordinary hour', () => {
     const time = journalTime(Date.UTC(2026, 0, 15))
 
     expect(time).toBe('00:00:00')
@@ -1660,7 +1660,7 @@ describe('journalTime', () => {
 })
 
 describe('journalTranscript', () => {
-  it('porte un en-tête qui se lit seul, puis une entrée par ligne', () => {
+  it('carries a header that reads on its own, then one entry per line', () => {
     const transcript = journalTranscript(SNAPSHOT)
 
     expect(transcript).toBe(
@@ -1681,7 +1681,7 @@ describe('journalTranscript', () => {
     )
   })
 
-  it('dit l’autorisation refusée et l’écoute arrêtée', () => {
+  it('says the authorization refused and the listening stopped', () => {
     const authorization = { granted: false, listening: false }
 
     const transcript = journalTranscript({ ...SNAPSHOT, authorization })
@@ -1689,7 +1689,7 @@ describe('journalTranscript', () => {
     expect(transcript).toContain('Autorisation : refusée, écoute arrêtée')
   })
 
-  it('dit l’AutoFocus suspendu et le réveil des réduites inactif', () => {
+  it('says AutoFocus suspended and the wake of the minimized ones off', () => {
     const transcript = journalTranscript({
       ...SNAPSHOT,
       autoFocusEnabled: false,
@@ -1701,7 +1701,7 @@ describe('journalTranscript', () => {
     )
   })
 
-  it('dit le Déplacement rapide allumé', () => {
+  it('says the Quick move is on', () => {
     const walk = { ...SNAPSHOT.walk, enabled: true }
 
     const transcript = journalTranscript({ ...SNAPSHOT, walk })
@@ -1709,7 +1709,7 @@ describe('journalTranscript', () => {
     expect(transcript).toContain('Déplacement rapide : allumé')
   })
 
-  it('ne promet aucune période quand rien n’est en mémoire', () => {
+  it('promises no period when nothing is in memory', () => {
     const transcript = journalTranscript({ ...SNAPSHOT, journal: [] })
 
     expect(transcript).toContain('Entrées en mémoire : 0, aucune entrée')

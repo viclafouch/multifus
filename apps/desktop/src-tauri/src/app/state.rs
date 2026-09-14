@@ -2532,7 +2532,7 @@ mod tests {
     }
 
     #[test]
-    fn the_veille_shortcut_acts_on_the_character_in_front() {
+    fn the_exclusion_shortcut_acts_on_the_character_in_front() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
         state.apply_windows(&[window(1, "Alpha"), window(2, "Bravo")]);
@@ -2835,7 +2835,7 @@ mod tests {
     }
 
     #[test]
-    fn a_veille_moved_from_a_row_is_written_down() {
+    fn an_exclusion_moved_from_a_row_is_written_down() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
         state.apply_windows(&[window(1, "Alpha")]);
@@ -2864,7 +2864,7 @@ mod tests {
     }
 
     #[test]
-    fn a_veille_on_a_character_nobody_knows_writes_nothing() {
+    fn an_exclusion_on_a_character_nobody_knows_writes_nothing() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
 
@@ -3076,7 +3076,10 @@ mod tests {
 
         state.enable_relay(Surface::Tray);
 
-        assert!(state.relays("Alpha"), "the veille does not silence anybody");
+        assert!(
+            state.relays("Alpha"),
+            "the exclusion does not silence anybody"
+        );
         assert!(!state.relays("Bravo"));
         assert!(!state.relays("Nobody"));
     }
@@ -4198,7 +4201,7 @@ mod tests {
     }
 
     #[test]
-    fn a_system_that_reads_its_reglages_opens_the_two_steps_it_can_read() {
+    fn a_system_that_reads_its_settings_opens_the_two_steps_it_can_read() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
 
@@ -4213,12 +4216,12 @@ mod tests {
         assert_eq!(
             check_of_step(&state, Step::GameSetting),
             Check::Unknown,
-            "no system reads the case a joueur ticks inside Dofus"
+            "no system reads the box a player ticks inside Dofus"
         );
     }
 
     #[test]
-    fn a_reglage_read_and_closed_shows_the_step_closed() {
+    fn a_setting_read_and_closed_shows_the_step_closed() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
 
@@ -4233,7 +4236,7 @@ mod tests {
     }
 
     #[test]
-    fn a_reglage_half_read_says_nothing_rather_than_guessing() {
+    fn a_setting_half_read_says_nothing_rather_than_guessing() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
 
@@ -4248,7 +4251,7 @@ mod tests {
     }
 
     #[test]
-    fn a_reglage_read_and_closed_wins_over_a_notification_heard_before_it() {
+    fn a_setting_read_and_closed_wins_over_a_notification_heard_before_it() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
 
@@ -4402,7 +4405,7 @@ mod tests {
     }
 
     #[test]
-    fn a_reglage_read_open_at_the_first_turn_is_not_a_line_of_journal() {
+    fn a_setting_read_open_at_the_first_turn_is_not_a_line_of_journal() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
 
@@ -4415,7 +4418,7 @@ mod tests {
     }
 
     #[test]
-    fn a_reglage_that_closes_and_opens_again_is_written_down_once_each_way() {
+    fn a_setting_that_closes_and_opens_again_is_written_down_once_each_way() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
 
@@ -4445,7 +4448,7 @@ mod tests {
     }
 
     #[test]
-    fn a_closed_reglage_warns_only_while_the_autofocus_is_on_and_nobody_said_they_knew() {
+    fn a_closed_setting_warns_only_while_the_autofocus_is_on_and_nobody_said_they_knew() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
 
@@ -4459,7 +4462,7 @@ mod tests {
     }
 
     #[test]
-    fn a_reglage_put_right_then_closed_again_warns_a_second_time() {
+    fn a_setting_put_right_then_closed_again_warns_a_second_time() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
 
@@ -4470,12 +4473,12 @@ mod tests {
 
         assert!(
             state.snapshot().onboarding.has_notice,
-            "the joueur said they knew about a reglage they have put right since"
+            "the player said they knew about a setting they have put right since"
         );
     }
 
     #[test]
-    fn a_closed_reglage_says_nothing_when_the_autofocus_is_off() {
+    fn a_closed_setting_says_nothing_when_the_autofocus_is_off() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
 
@@ -4486,7 +4489,7 @@ mod tests {
     }
 
     #[test]
-    fn a_reglage_nobody_reads_never_warns() {
+    fn a_setting_nobody_reads_never_warns() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
 
@@ -4549,7 +4552,7 @@ mod tests {
     }
 
     #[test]
-    fn an_ecoute_that_dies_is_written_down_and_puts_multifus_back_in_line_to_listen() {
+    fn a_listening_that_dies_is_written_down_and_puts_multifus_back_in_line_to_listen() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
 
@@ -4560,7 +4563,7 @@ mod tests {
 
         assert!(
             !state.is_listening(),
-            "the scan reads this to know it has an ecoute to start again"
+            "the scan reads this to know it has a listening to start again"
         );
         assert!(!state.snapshot().authorization.listening);
         assert!(journalled(&state).contains(&JournalEvent::ListeningLost {
@@ -4569,7 +4572,7 @@ mod tests {
     }
 
     #[test]
-    fn an_ecoute_that_dies_again_and_again_writes_one_line_and_holds_its_tongue() {
+    fn a_listening_that_dies_again_and_again_writes_one_line_and_holds_its_tongue() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
 
@@ -4599,7 +4602,7 @@ mod tests {
     }
 
     #[test]
-    fn the_ecoute_says_it_is_back_the_moment_a_notification_is_heard_again() {
+    fn the_listening_says_it_is_back_the_moment_a_notification_is_heard_again() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
 
@@ -4612,7 +4615,7 @@ mod tests {
         assert_eq!(
             counted(&state, &JournalEvent::Listening),
             2,
-            "the ecoute that comes back says so, as the first did"
+            "the listening that comes back says so, as the first did"
         );
         assert!(
             !state.note_listening_back(),
@@ -4621,7 +4624,7 @@ mod tests {
     }
 
     #[test]
-    fn an_ecoute_that_holds_a_few_turns_says_it_is_back_without_waiting_for_a_notification() {
+    fn a_listening_that_holds_a_few_turns_says_it_is_back_without_waiting_for_a_notification() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
 
@@ -4639,11 +4642,11 @@ mod tests {
         assert_eq!(counted(&state, &JournalEvent::Listening), 2);
         assert!(
             !state.note_listening_holds(),
-            "an ecoute nobody lost has nothing to hold"
+            "a listening nobody lost has nothing to hold"
         );
         assert!(
             state.take_listening_retry(),
-            "the ecoute that held starts its rest over"
+            "the listening that held starts its rest over"
         );
     }
 
@@ -4662,13 +4665,13 @@ mod tests {
     }
 
     #[test]
-    fn a_lost_ecoute_is_tried_again_less_and_less_often_up_to_a_ceiling() {
+    fn a_lost_listening_is_tried_again_less_and_less_often_up_to_a_ceiling() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
 
         assert!(
             state.take_listening_retry(),
-            "an ecoute that never died waits for nothing"
+            "a listening that never died waits for nothing"
         );
 
         state.note_listening_lost("the notification platform is not available".to_owned());
@@ -4689,7 +4692,7 @@ mod tests {
 
         assert!(
             state.take_listening_retry(),
-            "an ecoute that came back starts its rest over"
+            "a listening that came back starts its rest over"
         );
     }
 

@@ -16,8 +16,8 @@ const RUST_STEPS = (STEP_BLOCK.exec(VIEW_SOURCE)?.groups?.variants ?? '')
     return `${variant.slice(0, 1).toLowerCase()}${variant.slice(1)}`
   })
 
-describe('les étapes de la prise en main', () => {
-  it('sont celles que le Rust nomme, dans le même ordre, la page d’accueil en tête', () => {
+describe('the steps of the onboarding', () => {
+  it('are the ones Rust names, in the same order, the welcome page first', () => {
     expect(RUST_STEPS).toHaveLength(5)
     expect(Object.keys(SYSTEM_PAGES)).toStrictEqual(['welcome', ...RUST_STEPS])
   })

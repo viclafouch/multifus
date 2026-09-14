@@ -60,8 +60,8 @@ const WITHOUT_SOFTWARE = PAGE_IDS.filter((page) => {
   return page !== 'home' && page !== 'download'
 })
 
-describe('la fiche du logiciel', () => {
-  it('se pose sur l’accueil et sur le téléchargement', () => {
+describe('the software record', () => {
+  it('lands on the home page and on the download page', () => {
     expect(typesOf({ page: 'home', language: 'fr' })).toContain(
       'SoftwareApplication'
     )
@@ -70,13 +70,13 @@ describe('la fiche du logiciel', () => {
     )
   })
 
-  it.each(WITHOUT_SOFTWARE)('ne se pose pas sur %s', (page) => {
+  it.each(WITHOUT_SOFTWARE)('does not land on %s', (page) => {
     expect(typesOf({ page, language: 'fr' })).not.toContain(
       'SoftwareApplication'
     )
   })
 
-  it('dit le logiciel gratuit, et où le prendre', () => {
+  it('says the software is free, and where to get it', () => {
     expect(
       nodeOf({ page: 'home', language: 'fr', type: 'SoftwareApplication' })
     ).toMatchObject({
@@ -86,7 +86,7 @@ describe('la fiche du logiciel', () => {
     })
   })
 
-  it('nomme les deux systèmes', () => {
+  it('names the two systems', () => {
     const software = nodeOf({
       page: 'home',
       language: 'fr',
@@ -96,7 +96,7 @@ describe('la fiche du logiciel', () => {
     expect(software?.operatingSystem).toContain('Windows')
   })
 
-  it('ne décrit qu’un seul logiciel sur les deux pages', () => {
+  it('describes only one software on both pages', () => {
     const home = nodeOf({
       page: 'home',
       language: 'fr',
@@ -112,16 +112,16 @@ describe('la fiche du logiciel', () => {
   })
 })
 
-describe('la fiche de la vidéo', () => {
-  it.each(FILMED)('se pose sur %s', (page) => {
+describe('the video record', () => {
+  it.each(FILMED)('lands on %s', (page) => {
     expect(typesOf({ page, language: 'fr' })).toContain('VideoObject')
   })
 
-  it.each(UNFILMED)('ne se pose pas sur %s', (page) => {
+  it.each(UNFILMED)('does not land on %s', (page) => {
     expect(typesOf({ page, language: 'fr' })).not.toContain('VideoObject')
   })
 
-  it('donne à la vidéo son adresse, sa vignette, sa durée et sa date', () => {
+  it('gives the video its address, its thumbnail, its duration and its date', () => {
     expect(
       nodeOf({ page: 'wheel', language: 'fr', type: 'VideoObject' })
     ).toMatchObject({
@@ -135,7 +135,7 @@ describe('la fiche de la vidéo', () => {
     })
   })
 
-  it('compte la durée de chaque boucle en secondes entières', () => {
+  it('counts the duration of each loop in whole seconds', () => {
     expect(
       nodeOf({ page: 'runeTable', language: 'fr', type: 'VideoObject' })
     ).toMatchObject({
@@ -148,7 +148,7 @@ describe('la fiche de la vidéo', () => {
     })
   })
 
-  it('ne raconte pas la vidéo en français aux autres langues', () => {
+  it('does not tell the video in French to the other languages', () => {
     const french = nodeOf({
       page: 'wheel',
       language: 'fr',
@@ -165,18 +165,18 @@ describe('la fiche de la vidéo', () => {
   })
 })
 
-describe('le fil d’Ariane', () => {
-  it.each(WITHOUT_HOME)('se pose sur %s', (page) => {
+describe('the breadcrumb', () => {
+  it.each(WITHOUT_HOME)('lands on %s', (page) => {
     expect(typesOf({ page, language: 'fr' })).toContain('BreadcrumbList')
   })
 
-  it('ne se pose pas sur l’accueil, qui est la première marche', () => {
+  it('does not land on the home page, which is the first step', () => {
     expect(typesOf({ page: 'home', language: 'fr' })).not.toContain(
       'BreadcrumbList'
     )
   })
 
-  it('part de l’accueil et s’arrête sur la page', () => {
+  it('starts from the home page and stops on the page', () => {
     expect(
       nodeOf({ page: 'wheel', language: 'fr', type: 'BreadcrumbList' })
     ).toMatchObject({
@@ -197,7 +197,7 @@ describe('le fil d’Ariane', () => {
     })
   })
 
-  it('suit la langue de la page', () => {
+  it('follows the language of the page', () => {
     expect(
       nodeOf({ page: 'wheel', language: 'es', type: 'BreadcrumbList' })
     ).toMatchObject({
@@ -209,18 +209,18 @@ describe('le fil d’Ariane', () => {
   })
 })
 
-describe('tout le balisage', () => {
-  it.each(PAGE_IDS)('donne au moins une fiche à %s', (page) => {
+describe('the whole markup', () => {
+  it.each(PAGE_IDS)('gives at least one record to %s', (page) => {
     expect(schemaOf({ page, language: 'fr' }).length).toBeGreaterThan(0)
   })
 
-  it.each(PAGE_IDS)('met chaque fiche de %s sous schema.org', (page) => {
+  it.each(PAGE_IDS)('puts each record of %s under schema.org', (page) => {
     for (const node of schemaOf({ page, language: 'fr' })) {
       expect(node['@context']).toBe('https://schema.org')
     }
   })
 
-  it.each(PAGE_IDS)('n’écrit que des adresses absolues sur %s', (page) => {
+  it.each(PAGE_IDS)('writes only absolute addresses on %s', (page) => {
     const written = JSON.stringify(schemaOf({ page, language: 'fr' }))
     const addresses = [...written.matchAll(/"([^"]+)":"([^"]*)"/gu)].filter(
       (found) => {
@@ -235,19 +235,19 @@ describe('tout le balisage', () => {
     }
   })
 
-  it.each(PAGE_IDS)('garde chez nous les adresses de %s', (page) => {
+  it.each(PAGE_IDS)('keeps the addresses of %s at home', (page) => {
     for (const node of schemaOf({ page, language: 'fr' })) {
       expect(node['@id'].startsWith(HOST)).toBe(true)
     }
   })
 })
 
-describe('le balisage posé dans la page', () => {
-  it.each(PAGE_IDS)('ne laisse aucun chevron sortir de %s', (page) => {
+describe('the markup laid in the page', () => {
+  it.each(PAGE_IDS)('lets no angle bracket out of %s', (page) => {
     expect(scriptOf({ page, language: 'fr' })).not.toContain('<')
   })
 
-  it('reste lisible comme du JSON', () => {
+  it('stays readable as JSON', () => {
     const written = scriptOf({ page: 'wheel', language: 'fr' })
 
     expect(JSON.parse(written)).toStrictEqual(

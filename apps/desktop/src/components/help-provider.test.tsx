@@ -65,7 +65,7 @@ const show = async ({
   bridge.openSystemPage.mockResolvedValue(null)
 
   if (refuses) {
-    bridge.checkHealth.mockRejectedValue(new Error('le pont n’a pas répondu'))
+    bridge.checkHealth.mockRejectedValue(new Error('the bridge did not answer'))
   } else {
     bridge.checkHealth.mockResolvedValue(snapshotOf())
   }
@@ -114,8 +114,8 @@ const verdictOf = async (line: string | RegExp) => {
   return screen.findByText(line, {}, { timeout: VERDICT_WAIT_MS })
 }
 
-describe('la vérification', () => {
-  it('ne demande rien au système tant qu’on n’a pas cliqué', async () => {
+describe('the check', () => {
+  it('asks the system nothing until it is clicked', async () => {
     await show({ checks: ALL_READY })
 
     expect(bridge.checkHealth).not.toHaveBeenCalled()
@@ -125,7 +125,7 @@ describe('la vérification', () => {
     expect(bridge.checkHealth).toHaveBeenCalledWith()
   })
 
-  it('dit qu’elle lit, et ne rend son verdict qu’une fois la réponse là', async () => {
+  it('says it is reading, and gives its verdict only once the answer is there', async () => {
     await show({ checks: ALL_READY })
 
     check()
@@ -137,7 +137,7 @@ describe('la vérification', () => {
     expect(screen.queryByText('Multifus relit les réglages')).toBeNull()
   })
 
-  it('relit encore à chaque ouverture, et jamais en fond', async () => {
+  it('reads again on every opening, and never in the background', async () => {
     await show({ checks: ALL_READY })
 
     check()
@@ -151,7 +151,7 @@ describe('la vérification', () => {
     expect(bridge.checkHealth).toHaveBeenCalledTimes(2)
   })
 
-  it('avoue la lecture ratée, et la refait quand on redemande', async () => {
+  it('admits the failed read, and does it again when asked again', async () => {
     await show({ refuses: true })
 
     check()
@@ -159,7 +159,7 @@ describe('la vérification', () => {
     expect(
       await verdictOf('Multifus n’a pas pu relire les réglages')
     ).not.toBeNull()
-    expect(screen.getByText('le pont n’a pas répondu')).not.toBeNull()
+    expect(screen.getByText('the bridge did not answer')).not.toBeNull()
 
     bridge.checkHealth.mockResolvedValue(snapshotOf())
 
@@ -168,7 +168,7 @@ describe('la vérification', () => {
     expect(await verdictOf('Multifus ne peut pas tout lire ici')).not.toBeNull()
   })
 
-  it('rassure quand tout est ouvert', async () => {
+  it('reassures when everything is open', async () => {
     await show({ checks: ALL_READY })
 
     check()
@@ -179,7 +179,7 @@ describe('la vérification', () => {
     ).toBeNull()
   })
 
-  it('mène à la mise en route quand un réglage est fermé', async () => {
+  it('leads to the setup when a setting is closed', async () => {
     const { run } = await show({ checks: ['blocked'] })
 
     check()
@@ -194,7 +194,7 @@ describe('la vérification', () => {
     expect(run).toHaveBeenCalledWith(expect.any(Promise))
   })
 
-  it('ne compte pas l’essai parmi les réglages fermés', async () => {
+  it('does not count the test among the closed settings', async () => {
     await show({ checks: ['blocked', 'ready', 'ready', 'ready', 'blocked'] })
 
     check()
@@ -202,7 +202,7 @@ describe('la vérification', () => {
     expect(await verdictOf('1 réglage n’est pas en place')).not.toBeNull()
   })
 
-  it('mène à la map AutoFocus quand il est éteint', async () => {
+  it('leads to the AutoFocus map when it is off', async () => {
     const { goToMap } = await show({ isAutoFocusEnabled: false })
 
     check()
@@ -214,7 +214,7 @@ describe('la vérification', () => {
     expect(screen.queryByText('L’AutoFocus est éteint')).toBeNull()
   })
 
-  it('tend les questions fréquentes quand elle ne tranche pas', async () => {
+  it('hands over the frequent questions when it does not decide', async () => {
     await show()
 
     check()
@@ -229,7 +229,7 @@ describe('la vérification', () => {
     expect(screen.getByText(ASKED[3])).not.toBeNull()
   })
 
-  it('s’ouvre sur la map des réglages quand la barre système l’appelle', async () => {
+  it('opens on the settings map when the tray calls it', async () => {
     const { goToMap } = await show()
 
     expect(screen.queryByText('Multifus ne peut pas tout lire ici')).toBeNull()

@@ -10,7 +10,7 @@ const TWO_ROWS = 8
 
 export const LEAVE_MS = 300
 
-type DolmenProps = Readonly<{
+type StandingStoneProps = Readonly<{
   characters: readonly Character[]
   onOpenCharacter: (nickname: string) => void
   onRemoveCharacter: (nickname: string) => void
@@ -32,11 +32,11 @@ const crowdOf = (count: number) => {
   return 'many'
 }
 
-export const Dolmen = ({
+export const StandingStone = ({
   characters,
   onOpenCharacter,
   onRemoveCharacter
-}: DolmenProps) => {
+}: StandingStoneProps) => {
   const seat = React.useRef<HTMLDivElement>(null)
   const places = useLingering({
     items: characters,
@@ -57,11 +57,11 @@ export const Dolmen = ({
   }).length
 
   return (
-    <div className="dolmen-field pointer-events-none">
+    <div className="standing-stone-field pointer-events-none">
       <div
         ref={seat}
         data-crowd={crowdOf(characters.length)}
-        className="dolmen-seat pointer-events-auto flex w-dolmen flex-col items-center"
+        className="standing-stone-seat pointer-events-auto flex w-standing-stone flex-col items-center"
       >
         <span
           aria-hidden

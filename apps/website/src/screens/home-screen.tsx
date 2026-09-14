@@ -5,12 +5,12 @@ import type { PageScreenProps } from '@/@types/screen'
 import { Band } from '@/components/band'
 import { BandTitle } from '@/components/band-title'
 import { DownloadCall } from '@/components/download-call'
+import { FeatureCard } from '@/components/feature-card'
 import { LoopPlate } from '@/components/loop-plate'
 import { OutLink } from '@/components/out-link'
 import { PageLink } from '@/components/page-link'
 import { PlateBlock } from '@/components/plate-block'
 import { Prose } from '@/components/prose'
-import { Vignette } from '@/components/vignette'
 import { WayLink } from '@/components/way-link'
 import { MENU_FEATURES } from '@/constants/pages'
 import { FOLD_ANCHOR, REPOSITORY } from '@/constants/site'
@@ -77,7 +77,7 @@ export const HomeScreen = (_props: PageScreenProps) => {
           {MENU_FEATURES.map((feature) => {
             return (
               <li key={feature}>
-                <Vignette page={feature} hasPeek />
+                <FeatureCard page={feature} hasPeek />
               </li>
             )
           })}

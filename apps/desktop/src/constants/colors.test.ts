@@ -224,7 +224,7 @@ const declaredValue = (name: string) => {
   const declaration = new RegExp(`--${name}:\\s*([^;]+);`, 'u').exec(THEME)
 
   if (declaration === null) {
-    throw new Error(`aucune feuille ne déclare --${name}`)
+    throw new Error(`no sheet declares --${name}`)
   }
 
   return declaration[1].trim()
@@ -235,7 +235,7 @@ const declaredColor = (name: string): Triplet => {
   const oklch = /^oklch\(([\d.]+) ([\d.]+) ([\d.]+)\)$/u.exec(value)
 
   if (oklch === null) {
-    throw new Error(`--${name} n’est pas écrit en oklch`)
+    throw new Error(`--${name} is not written in oklch`)
   }
 
   return [Number(oklch[1]), Number(oklch[2]), Number(oklch[3])]
@@ -270,7 +270,7 @@ const share = (declaration: string) => {
   const found = new RegExp(declaration, 'u').exec(THEME)
 
   if (found === null) {
-    throw new Error(`aucune feuille ne mélange ${declaration}`)
+    throw new Error(`no sheet mixes ${declaration}`)
   }
 
   return Number(found[1]) / 100
@@ -369,7 +369,7 @@ const declared = (color: Color): Triplet => {
   const found = DECLARED.get(color)
 
   if (found === undefined) {
-    throw new Error(`aucune feuille ne déclare --${color}`)
+    throw new Error(`no sheet declares --${color}`)
   }
 
   return found
@@ -385,8 +385,8 @@ const PAIRS = COLORS.flatMap((one, index) => {
   })
 })
 
-describe('la palette des personnages', () => {
-  it('porte les douze couleurs du thème, et pas une de plus', () => {
+describe('the palette of the characters', () => {
+  it('carries the twelve colors of the theme, and not one more', () => {
     expect(COLORS).toHaveLength(12)
     expect(new Set(COLORS).size).toBe(12)
     expect(Object.keys(COLOR_TINTS).toSorted(alphabetical)).toStrictEqual(
@@ -397,37 +397,40 @@ describe('la palette des personnages', () => {
     )
   })
 
-  it.each(PAIRS)('sépare %s de %s à l’œil ordinaire', (one, other) => {
+  it.each(PAIRS)('separates %s from %s to the ordinary eye', (one, other) => {
     expect(apart(declared(one), declared(other))).toBeGreaterThanOrEqual(
       NORMAL_FLOOR
     )
   })
 
-  it.each(PAIRS)('sépare %s de %s sans le rouge ni le vert', (one, other) => {
-    const distances = BLINDNESSES.map((blindness) => {
-      return apart(
-        simulated(declared(one), blindness),
-        simulated(declared(other), blindness)
-      )
-    })
+  it.each(PAIRS)(
+    'separates %s from %s without the red nor the green',
+    (one, other) => {
+      const distances = BLINDNESSES.map((blindness) => {
+        return apart(
+          simulated(declared(one), blindness),
+          simulated(declared(other), blindness)
+        )
+      })
 
-    expect(Math.min(...distances)).toBeGreaterThanOrEqual(BLIND_FLOOR)
-  })
+      expect(Math.min(...distances)).toBeGreaterThanOrEqual(BLIND_FLOOR)
+    }
+  )
 
-  it.each(SLICES)('sépare %s de %s dans une roue au repos', (one, other) => {
+  it.each(SLICES)('separates %s from %s in a wheel at rest', (one, other) => {
     expect(apart(sliceFill(one), sliceFill(other))).toBeGreaterThanOrEqual(
       SLICE_FLOOR
     )
   })
 
-  it.each(WHEEL_TINTS)('laisse lire un pseudo sur la part %s', (tint) => {
+  it.each(WHEEL_TINTS)('lets a nickname be read on the %s slice', (tint) => {
     const name = declaredLinear('foreground')
 
     expect(contrast(sliceFill(tint), name)).toBeGreaterThanOrEqual(NAME_FLOOR)
   })
 
   it.each(WHEEL_TINTS)(
-    'laisse lire un pseudo sur la part %s au survol',
+    'lets a nickname be read on the %s slice when hovered',
     (tint) => {
       const name = declaredLinear('foreground')
 
@@ -437,25 +440,30 @@ describe('la palette des personnages', () => {
     }
   )
 
-  it.each(COLORS)('éloigne %s du vert du connecté', (color) => {
+  it.each(COLORS)('keeps %s far from the green of the online one', (color) => {
     const live = declaredLinear('live')
 
     expect(apart(declared(color), live)).toBeGreaterThanOrEqual(LIVE_FLOOR)
   })
 
-  it.each(COLORS)('éloigne %s de l’ambre d’une part sans couleur', (color) => {
-    const amber = declaredLinear(AMBER)
+  it.each(COLORS)(
+    'keeps %s far from the amber of a slice without a color',
+    (color) => {
+      const amber = declaredLinear(AMBER)
 
-    expect(apart(declared(color), amber)).toBeGreaterThanOrEqual(PRIMARY_FLOOR)
-  })
+      expect(apart(declared(color), amber)).toBeGreaterThanOrEqual(
+        PRIMARY_FLOOR
+      )
+    }
+  )
 
-  it.each(COLORS)('affiche %s telle qu’elle est déclarée', (color) => {
+  it.each(COLORS)('shows %s as it is declared', (color) => {
     const shown = shownOf(declared(color))
 
     expect(apart(declared(color), shown)).toBeLessThanOrEqual(RENDERED_DRIFT)
   })
 
-  it.each(SATELLITES)('sert les douze teintes à %s', (satellite) => {
+  it.each(SATELLITES)('serves the twelve tints to %s', (satellite) => {
     const loaded = loadedBy(satellite)
 
     for (const color of COLORS) {
@@ -466,11 +474,14 @@ describe('la palette des personnages', () => {
     expect(loaded).toContain('@utility stripe')
   })
 
-  it('donne au Rust les douze couleurs, et pas une de plus', () => {
+  it('gives Rust the twelve colors, and not one more', () => {
     expect(PAINTED.size).toBe(COLORS.length)
   })
 
-  it.each(COLORS)('donne %s au Rust qui peint l’icône Windows', (color) => {
-    expect(rgbOf(declared(color))).toStrictEqual(painted(color))
-  })
+  it.each(COLORS)(
+    'gives %s to the Rust that paints the Windows icon',
+    (color) => {
+      expect(rgbOf(declared(color))).toStrictEqual(painted(color))
+    }
+  )
 })

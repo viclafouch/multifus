@@ -71,7 +71,7 @@ msgstr "{combination} ilegible ({detail})"
 msgid "{combination} refusé ({detail})"
 msgstr "{combination} rechazado ({detail})"
 
-#: src/components/world/dolmen.tsx
+#: src/components/world/standing-stone.tsx
 msgid "{connected, plural, one {# connecté} other {# connectés}}"
 msgstr "{connected, plural, one {# conectado} other {# conectados}}"
 
@@ -2630,7 +2630,7 @@ msgstr "Abra las {options} de Dofus y marque la casilla. Sin ella, el cliente se
 msgid "Ouvrez Telegram sur cet ordinateur"
 msgstr "Abre Telegram en este ordenador"
 
-#: src/components/world/dolmen.tsx
+#: src/components/world/standing-stone.tsx
 msgid "Ouvrez un client Dofus : votre personnage viendra se poser ici."
 msgstr "Abre un cliente de Dofus: tu personaje vendrá a colocarse aquí."
 

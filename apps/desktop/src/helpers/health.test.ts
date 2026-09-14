@@ -23,12 +23,12 @@ const ALL_READY: readonly Check[] = [
   'ready'
 ]
 
-describe('le verdict de la vérification', () => {
+describe('the verdict of the check', () => {
   beforeEach(async () => {
     await speakFrench()
   })
 
-  it('dit la lecture en cours avant de dire quoi que ce soit d’autre', async () => {
+  it('says the read is going on before saying anything else', async () => {
     const { healthReport } = await import('@/helpers/health')
 
     const report = healthReport({
@@ -42,7 +42,7 @@ describe('le verdict de la vérification', () => {
     expect(report.move).toBeNull()
   })
 
-  it('avoue la lecture ratée, et n’offre alors aucun geste qui emmène', async () => {
+  it('admits the failed read, and then offers no move that leads away', async () => {
     const { healthReport } = await import('@/helpers/health')
 
     const report = healthReport({
@@ -56,7 +56,7 @@ describe('le verdict de la vérification', () => {
     expect(report.move).toBeNull()
   })
 
-  it('dit l’AutoFocus éteint avant tout le reste', async () => {
+  it('says AutoFocus is off before everything else', async () => {
     const { healthReport } = await import('@/helpers/health')
 
     const report = healthReport({
@@ -70,7 +70,7 @@ describe('le verdict de la vérification', () => {
     expect(report.check).toBeNull()
   })
 
-  it('compte les réglages fermés, au singulier comme au pluriel', async () => {
+  it('counts the closed settings, in the singular as in the plural', async () => {
     const { healthReport } = await import('@/helpers/health')
 
     const alone = healthReport({
@@ -90,7 +90,7 @@ describe('le verdict de la vérification', () => {
     expect(several.move).toBe('onboarding')
   })
 
-  it('avoue ce qu’il ne sait pas lire, et tend les questions', async () => {
+  it('admits what it cannot read, and hands over the questions', async () => {
     const { healthReport } = await import('@/helpers/health')
 
     const report = healthReport({
@@ -104,7 +104,7 @@ describe('le verdict de la vérification', () => {
     expect(report.check).toBeNull()
   })
 
-  it('rassure quand tout est ouvert', async () => {
+  it('reassures when everything is open', async () => {
     const { healthReport } = await import('@/helpers/health')
 
     const report = healthReport({
