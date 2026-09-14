@@ -35,13 +35,17 @@ msgstr "à moitié"
 msgid "À quatre connectés, la question se pose à chaque fois."
 msgstr "À quatre connectés, la question se pose à chaque fois."
 
+#: src/constants/legal.ts
+#~ msgid "À titre personnel, hors de toute société, et sans rien vendre. Son identité est connue de l’hébergeur, comme la loi le demande."
+#~ msgstr "À titre personnel, hors de toute société, et sans rien vendre. Son identité est connue de l’hébergeur, comme la loi le demande."
+
 #: src/components/page-kin.tsx
 msgid "À voir aussi"
 msgstr "À voir aussi"
 
 #: src/constants/rivals.ts
-msgid "Aligne les fenêtres, sans la grille à quatre."
-msgstr "Aligne les fenêtres, sans la grille à quatre."
+#~ msgid "Aligne les fenêtres, sans la grille à quatre."
+#~ msgstr "Aligne les fenêtres, sans la grille à quatre."
 
 #: src/components/skip-link.tsx
 msgid "Aller au contenu"
@@ -79,6 +83,14 @@ msgstr "Aucun avertissement ne vous dira que l’auteur n’a pas pu être véri
 msgid "Aucun clic, aucun sort, aucune réponse : il vous emmène, et le reste est à vous."
 msgstr "Aucun clic, aucun sort, aucune réponse : il vous emmène, et le reste est à vous."
 
+#: src/screens/legal-screen.tsx
+msgid "Aucun cookie n’est posé, ni par le site, ni par la mesure d’audience. Il n’y a donc rien à accepter."
+msgstr "Aucun cookie n’est posé, ni par le site, ni par la mesure d’audience. Il n’y a donc rien à accepter."
+
+#: src/constants/legal.ts
+#~ msgid "Aucun cookie n’est posé."
+#~ msgstr "Aucun cookie n’est posé."
+
 #: src/constants/ankama.ts
 msgid "Aucun fichier de Dofus n’est lu ni modifié, et sa mémoire n’est jamais regardée. C’est la seule condition qu’Ankama a posée."
 msgstr "Aucun fichier de Dofus n’est lu ni modifié, et sa mémoire n’est jamais regardée. C’est la seule condition qu’Ankama a posée."
@@ -99,6 +111,10 @@ msgstr "Avant d’installer"
 #: src/constants/bodies.ts
 msgid "C’est à votre tour de jouer."
 msgstr "C’est à votre tour de jouer."
+
+#: src/constants/legal.ts
+#~ msgid "C’est la même que pour signaler une erreur du comparatif ou une faute de traduction."
+#~ msgstr "C’est la même que pour signaler une erreur du comparatif ou une faute de traduction."
 
 #: src/screens/comparison-screen.tsx
 msgid "C’est là que ses cases ont été lues, et vous pouvez lire le même code que nous."
@@ -164,6 +180,10 @@ msgstr "Ce que la roue ne fait pas"
 msgid "Ce que le Déplacement rapide ne fait pas"
 msgstr "Ce que le Déplacement rapide ne fait pas"
 
+#: src/screens/legal-screen.tsx
+msgid "Ce que le site garde de vous"
+msgstr "Ce que le site garde de vous"
+
 #: src/constants/bodies.ts
 msgid "Ce que le tableau des runes ne fait pas"
 msgstr "Ce que le tableau des runes ne fait pas"
@@ -204,7 +224,7 @@ msgstr "Ce qui disparaît, c’est la recherche de fenêtre entre chaque clic."
 msgid "Celle qu’un premier lancement vous offre est en français, même si vous lisez Multifus en anglais."
 msgstr "Celle qu’un premier lancement vous offre est en français, même si vous lisez Multifus en anglais."
 
-#: src/screens/lost-screen.tsx
+#: src/components/lost-word.tsx
 msgid "Cette page n’existe pas"
 msgstr "Cette page n’existe pas"
 
@@ -272,6 +292,10 @@ msgstr "Dans sa fenêtre à lui, pas par-dessus le jeu."
 msgid "Déplacement rapide"
 msgstr "Déplacement rapide"
 
+#: src/constants/rivals.ts
+msgid "Deux équipes fixes, T1 et T2, qu’on ne nomme pas."
+msgstr "Deux équipes fixes, T1 et T2, qu’on ne nomme pas."
+
 #: src/screens/comparison-screen.tsx
 msgid "Deux outils du tableau le font, et pas lui."
 msgstr "Deux outils du tableau le font, et pas lui."
@@ -283,6 +307,18 @@ msgstr "Deux Sadidas femmes se séparent."
 #: src/constants/bodies.ts
 msgid "Dofus Retro déconnecte un personnage qui ne fait rien, et le relais l’annonce plutôt que de vous laisser croire que personne n’écrit."
 msgstr "Dofus Retro déconnecte un personnage qui ne fait rien, et le relais l’annonce plutôt que de vous laisser croire que personne n’écrit."
+
+#: src/screens/legal-screen.tsx
+msgid "Dofus, Dofus Retro et Ankama appartiennent à <0>Ankama Games</0>. Les images et les vidéos du site viennent du <1>jeu</1> et restent à eux."
+msgstr "Dofus, Dofus Retro et Ankama appartiennent à <0>Ankama Games</0>. Les images et les vidéos du site viennent du <1>jeu</1> et restent à eux."
+
+#: src/constants/legal.ts
+#~ msgid "Dofus, Dofus Retro et Ankama appartiennent à Ankama Games."
+#~ msgstr "Dofus, Dofus Retro et Ankama appartiennent à Ankama Games."
+
+#: src/constants/legal.ts
+#~ msgid "Dofus, Dofus Retro et Ankama appartiennent à Ankama Games. Les images et les vidéos du site viennent du jeu et restent à eux."
+#~ msgstr "Dofus, Dofus Retro et Ankama appartiennent à Ankama Games. Les images et les vidéos du site viennent du jeu et restent à eux."
 
 #: src/constants/bodies.ts
 msgid "Échange, groupe, guilde, message privé, défi, craft, percepteur attaqué : sept appels, et pas un de plus."
@@ -488,9 +524,21 @@ msgstr "Jouez en multicompte sur Dofus Retro sans jamais chercher une fenêtre."
 msgid "Journal des versions"
 msgstr "Journal des versions"
 
-#: src/screens/lost-screen.tsx
+#: src/components/lost-word.tsx
 msgid "L’adresse est peut-être mal recopiée, ou la page a changé de nom. L’accueil vous remet sur le chemin."
 msgstr "L’adresse est peut-être mal recopiée, ou la page a changé de nom. L’accueil vous remet sur le chemin."
+
+#: src/constants/legal.ts
+#~ msgid "L’audience est comptée sans vous nommer."
+#~ msgstr "L’audience est comptée sans vous nommer."
+
+#: src/screens/legal-screen.tsx
+msgid "L’audience est comptée sans vous nommer. <0>Vercel Analytics</0> compte les pages vues et les téléchargements, sans identifiant, sans profil, et sans vous suivre d’un site à l’autre."
+msgstr "L’audience est comptée sans vous nommer. <0>Vercel Analytics</0> compte les pages vues et les téléchargements, sans identifiant, sans profil, et sans vous suivre d’un site à l’autre."
+
+#: src/constants/legal.ts
+#~ msgid "L’audience est comptée sans vous nommer. Vercel Analytics compte les pages vues et les téléchargements, sans identifiant, sans profil, et sans vous suivre d’un site à l’autre."
+#~ msgstr "L’audience est comptée sans vous nommer. Vercel Analytics compte les pages vues et les téléchargements, sans identifiant, sans profil, et sans vous suivre d’un site à l’autre."
 
 #: src/constants/bodies.ts
 msgid "L’AutoFocus, la roue, le Déplacement rapide, le tableau des runes, les réponses rapides et les messages privés, et la touche s’écrit comme sur votre clavier."
@@ -556,6 +604,10 @@ msgstr "Lancez l’installeur .exe que vous venez de prendre."
 msgid "Lancez Multifus, et jouez."
 msgstr "Lancez Multifus, et jouez."
 
+#: src/screens/legal-screen.tsx
+msgid "Le <0>code du site</0> est public."
+msgstr "Le <0>code du site</0> est public."
+
 #: src/screens/download-screen.tsx
 #~ msgid "Le code est ouvert"
 #~ msgstr "Le code est ouvert"
@@ -571,6 +623,14 @@ msgstr "Le commerce ne s’arrête pas quand vous partez"
 #: src/constants/ankama.ts
 msgid "le compte Dofus Retro sur X, le 10 mars 2026"
 msgstr "le compte Dofus Retro sur X, le 10 mars 2026"
+
+#: src/constants/legal.ts
+#~ msgid "Le compte X du pied de page est la voie de contact, la même que pour signaler une erreur du comparatif ou une faute de traduction."
+#~ msgstr "Le compte X du pied de page est la voie de contact, la même que pour signaler une erreur du comparatif ou une faute de traduction."
+
+#: src/constants/legal.ts
+#~ msgid "Le compte X du pied de page est la voie de contact."
+#~ msgstr "Le compte X du pied de page est la voie de contact."
 
 #: src/screens/comparison-screen.tsx
 msgid "Le dépôt de Multifus sur GitHub"
@@ -640,6 +700,22 @@ msgstr "Le relais va dans un sens, du jeu vers vous."
 msgid "Le site dans votre langue"
 msgstr "Le site dans votre langue"
 
+#: src/constants/legal.ts
+#~ msgid "Le site est hébergé aux États-Unis."
+#~ msgstr "Le site est hébergé aux États-Unis."
+
+#: src/constants/legal.ts
+#~ msgid "Le site est hébergé par {HOSTER}, aux États-Unis."
+#~ msgstr "Le site est hébergé par {HOSTER}, aux États-Unis."
+
+#: src/screens/legal-screen.tsx
+#~ msgid "Le site est hébergé par <0>{HOSTER_ADDRESS}</0>, aux États-Unis."
+#~ msgstr "Le site est hébergé par <0>{HOSTER_ADDRESS}</0>, aux États-Unis."
+
+#: src/screens/legal-screen.tsx
+msgid "Le site est hébergé par <0>{VERCEL_NAME}</0>, {VERCEL_ADDRESS}, aux États-Unis."
+msgstr "Le site est hébergé par <0>{VERCEL_NAME}</0>, {VERCEL_ADDRESS}, aux États-Unis."
+
 #: src/constants/bodies.ts
 msgid "Le tableau des poids de runes se pose par-dessus la fenêtre du jeu, à la touche que vous avez choisie. Vous brisez, vous lisez, vous continuez."
 msgstr "Le tableau des poids de runes se pose par-dessus la fenêtre du jeu, à la touche que vous avez choisie. Vous brisez, vous lisez, vous continuez."
@@ -664,6 +740,14 @@ msgstr "Les deux messages"
 msgid "Les deux systèmes sont construits à partir du même code."
 msgstr "Les deux systèmes sont construits à partir du même code."
 
+#: src/constants/legal.ts
+#~ msgid "Les images et les vidéos du site viennent du jeu et restent à eux."
+#~ msgstr "Les images et les vidéos du site viennent du jeu et restent à eux."
+
+#: src/screens/legal-screen.tsx
+msgid "Les marques qui ne sont pas les nôtres"
+msgstr "Les marques qui ne sont pas les nôtres"
+
 #: src/constants/wording.ts
 msgid "Les messages privés vous suivent sur le téléphone."
 msgstr "Les messages privés vous suivent sur le téléphone."
@@ -671,6 +755,10 @@ msgstr "Les messages privés vous suivent sur le téléphone."
 #: src/components/site-header.tsx
 msgid "Les pages de Multifus"
 msgstr "Les pages de Multifus"
+
+#: src/screens/legal-screen.tsx
+msgid "Les pages sont construites à l’avance et servies telles quelles, sans base de données et sans compte."
+msgstr "Les pages sont construites à l’avance et servies telles quelles, sans base de données et sans compte."
 
 #: src/constants/bodies.ts
 msgid "Les phrases qu’on retape vingt fois par jour"
@@ -701,6 +789,10 @@ msgid "Masquer cette proposition"
 msgstr "Masquer cette proposition"
 
 #: src/constants/wording.ts
+msgid "Mentions légales"
+msgstr "Mentions légales"
+
+#: src/constants/wording.ts
 msgid "Messages privés"
 msgstr "Messages privés"
 
@@ -716,9 +808,37 @@ msgstr "Multifus amène devant vous la fenêtre du personnage qui joue sur Dofus
 msgid "Multifus démarre toujours avec lui éteint."
 msgstr "Multifus démarre toujours avec lui éteint."
 
+#: src/constants/legal.ts
+#~ msgid "Multifus est publié par {PUBLISHER}, un particulier, à titre personnel, hors de toute société, et sans rien vendre. Son identité est connue de l’hébergeur, comme la loi le demande."
+#~ msgstr "Multifus est publié par {PUBLISHER}, un particulier, à titre personnel, hors de toute société, et sans rien vendre. Son identité est connue de l’hébergeur, comme la loi le demande."
+
+#: src/screens/legal-screen.tsx
+msgid "Multifus est publié par <0>viclafouch</0>, un particulier, à titre personnel, hors de toute société, et sans rien vendre. Son identité est connue de l’hébergeur, comme la loi le demande."
+msgstr "Multifus est publié par <0>viclafouch</0>, un particulier, à titre personnel, hors de toute société, et sans rien vendre. Son identité est connue de l’hébergeur, comme la loi le demande."
+
+#: src/constants/legal.ts
+#~ msgid "Multifus est publié par un particulier."
+#~ msgstr "Multifus est publié par un particulier."
+
+#: src/screens/legal-screen.tsx
+#~ msgid "Multifus est un projet personnel, gratuit, sans société derrière et sans compte à créer. Cette page dit qui le publie, qui l’héberge, et le peu qu’il garde de votre passage."
+#~ msgstr "Multifus est un projet personnel, gratuit, sans société derrière et sans compte à créer. Cette page dit qui le publie, qui l’héberge, et le peu qu’il garde de votre passage."
+
+#: src/screens/legal-screen.tsx
+#~ msgid "Multifus est un projet personnel, gratuit, sans société derrière et sans compte à créer. Tout ce que la loi demande de dire tient sur cette page."
+#~ msgstr "Multifus est un projet personnel, gratuit, sans société derrière et sans compte à créer. Tout ce que la loi demande de dire tient sur cette page."
+
 #: src/constants/wording.ts
 msgid "Multifus et les autres gestionnaires, ligne par ligne."
 msgstr "Multifus et les autres gestionnaires, ligne par ligne."
+
+#: src/screens/legal-screen.tsx
+msgid "Multifus n’a aucun lien avec Ankama : ni partenariat, ni approbation, ni soutien d’aucune sorte."
+msgstr "Multifus n’a aucun lien avec Ankama : ni partenariat, ni approbation, ni soutien d’aucune sorte."
+
+#: src/constants/legal.ts
+#~ msgid "Multifus n’a aucun lien avec Ankama."
+#~ msgstr "Multifus n’a aucun lien avec Ankama."
 
 #: src/constants/bodies.ts
 msgid "Multifus ne lit pas ce qu’on vous a écrit."
@@ -752,9 +872,21 @@ msgstr "Multifus tourne sur macOS avec les mêmes mécanismes que sur Windows. L
 msgid "Multifus, logiciel multicompte gratuit pour Dofus Retro"
 msgstr "Multifus, logiciel multicompte gratuit pour Dofus Retro"
 
+#: src/constants/legal.ts
+#~ msgid "Ni par le site, ni par la mesure d’audience, et il n’y a donc rien à accepter."
+#~ msgstr "Ni par le site, ni par la mesure d’audience, et il n’y a donc rien à accepter."
+
+#: src/constants/legal.ts
+#~ msgid "Ni partenariat, ni approbation, ni soutien d’aucune sorte."
+#~ msgstr "Ni partenariat, ni approbation, ni soutien d’aucune sorte."
+
 #: src/constants/rivals.ts
 msgid "non"
 msgstr "non"
+
+#: src/screens/legal-screen.tsx
+msgid "On l’écrit à <0>{AUTHOR_MAIL}</0>, ou sur son <1>compte X</1>. C’est par là que passent une erreur du comparatif et une faute de traduction."
+msgstr "On l’écrit à <0>{AUTHOR_MAIL}</0>, ou sur son <1>compte X</1>. C’est par là que passent une erreur du comparatif et une faute de traduction."
 
 #: src/constants/bodies.ts
 msgid "On vous écrit, on vous invite, on vous défie."
@@ -816,6 +948,22 @@ msgstr "Poussé à fond, il reste toujours assez visible pour se lire."
 msgid "Projet indépendant, sans lien avec Ankama."
 msgstr "Projet indépendant, sans lien avec Ankama."
 
+#: src/constants/legal.ts
+#~ msgid "Que la proposition de lire le site dans votre langue vous a déjà été montrée. Elle ne quitte pas votre machine, et vider les données du site l’efface."
+#~ msgstr "Que la proposition de lire le site dans votre langue vous a déjà été montrée. Elle ne quitte pas votre machine, et vider les données du site l’efface."
+
+#: src/screens/legal-screen.tsx
+msgid "Qui l’héberge"
+msgstr "Qui l’héberge"
+
+#: src/constants/wording.ts
+msgid "Qui publie ce site, qui l’héberge, et le peu qu’il garde de vous."
+msgstr "Qui publie ce site, qui l’héberge, et le peu qu’il garde de vous."
+
+#: src/screens/legal-screen.tsx
+msgid "Qui publie le site"
+msgstr "Qui publie le site"
+
 #: src/components/rival-table.tsx
 msgid "Relevé le {surveyed}, dans le code de chaque outil."
 msgstr "Relevé le {surveyed}, dans le code de chaque outil."
@@ -825,10 +973,10 @@ msgid "Réponses rapides"
 msgstr "Réponses rapides"
 
 #: src/constants/rivals.ts
-msgid "Retient la dernière équipe, pas des compositions nommées."
-msgstr "Retient la dernière équipe, pas des compositions nommées."
+#~ msgid "Retient la dernière équipe, pas des compositions nommées."
+#~ msgstr "Retient la dernière équipe, pas des compositions nommées."
 
-#: src/screens/lost-screen.tsx
+#: src/components/lost-word.tsx
 msgid "Retour à l’accueil"
 msgstr "Retour à l’accueil"
 
@@ -895,6 +1043,10 @@ msgstr "Six gestionnaires de fenêtres, ligne par ligne. Chaque case est relevé
 #: src/screens/home-screen.tsx
 msgid "Six mécanismes, un seul but : ne plus chercher le personnage qui vous attend."
 msgstr "Six mécanismes, un seul but : ne plus chercher le personnage qui vous attend."
+
+#: src/screens/legal-screen.tsx
+#~ msgid "Son <0>compte X</0> est la voie de contact, la même que pour signaler une erreur du comparatif ou une faute de traduction. Le <1>code du site</1> est public."
+#~ msgstr "Son <0>compte X</0> est la voie de contact, la même que pour signaler une erreur du comparatif ou une faute de traduction. Le <1>code du site</1> est public."
 
 #: src/constants/rivals.ts
 #~ msgid "Son code ne porte rien sur cette ligne."
@@ -1048,6 +1200,10 @@ msgstr "Une tolérance n’est pas une autorisation."
 msgid "Une touche par personnage tient jusqu’à quatre."
 msgstr "Une touche par personnage tient jusqu’à quatre."
 
+#: src/constants/legal.ts
+#~ msgid "Vercel Analytics compte les pages vues et les téléchargements, sans identifiant, sans profil, et sans vous suivre d’un site à l’autre."
+#~ msgstr "Vercel Analytics compte les pages vues et les téléchargements, sans identifiant, sans profil, et sans vous suivre d’un site à l’autre."
+
 #: src/screens/comparison-screen.tsx
 msgid "Vérifiez ce tableau vous-même"
 msgstr "Vérifiez ce tableau vous-même"
@@ -1060,6 +1216,14 @@ msgstr "Viser vaut mieux que se souvenir"
 #: src/screens/home-screen.tsx
 msgid "Voir le code"
 msgstr "Voir le code"
+
+#: src/screens/legal-screen.tsx
+msgid "Votre navigateur ne garde qu’une chose : que la proposition de lire le site dans votre langue vous a déjà été montrée. Elle ne quitte pas votre machine, et vider les données du site l’efface."
+msgstr "Votre navigateur ne garde qu’une chose : que la proposition de lire le site dans votre langue vous a déjà été montrée. Elle ne quitte pas votre machine, et vider les données du site l’efface."
+
+#: src/constants/legal.ts
+#~ msgid "Votre navigateur ne garde qu’une chose."
+#~ msgstr "Votre navigateur ne garde qu’une chose."
 
 #: src/constants/bodies.ts
 msgid "Votre principal oui, vos mules non."
