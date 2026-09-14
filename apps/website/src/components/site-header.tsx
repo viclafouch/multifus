@@ -2,6 +2,7 @@ import { msg } from '@lingui/core/macro'
 import { useLingui } from '@lingui/react'
 import { Button } from '@multifus/retro'
 import logo from '@multifus/retro/assets/logo.png'
+import { DownloadSimpleIcon } from '@phosphor-icons/react/dist/ssr/DownloadSimple'
 import type { PageId } from '@/@types/page'
 import { Cartouche } from '@/components/cartouche'
 import { FeaturesMenu } from '@/components/features-menu'
@@ -51,6 +52,7 @@ export const SiteHeader = ({ page }: SiteHeaderProps) => {
             nativeButton={false}
             render={<PageLink page="download" isBare className="sighted" />}
           >
+            <DownloadSimpleIcon weight="bold" aria-hidden />
             {i18n._(PAGE_NAMES.download)}
           </Button>
         </nav>
