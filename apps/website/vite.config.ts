@@ -31,9 +31,9 @@ export const SOURCE_ALIAS = {
 }
 
 export const SOURCE_PLUGINS = [
+  babel({ presets: [linguiTransformerBabelPreset()] }),
   react({ compiler: true }),
-  lingui({ failOnMissing: true, failOnCompileError: true }),
-  babel({ presets: [linguiTransformerBabelPreset()] })
+  lingui({ failOnMissing: true, failOnCompileError: true })
 ]
 
 const originOf = (mode: string) => {
