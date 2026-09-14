@@ -1,12 +1,12 @@
 import { useLingui } from '@lingui/react'
 import type { PageScreenProps } from '@/@types/screen'
 import { Band } from '@/components/band'
+import { BoonCard } from '@/components/boon-card'
+import { CaveatList } from '@/components/caveat-list'
 import { FeatureStage } from '@/components/feature-stage'
-import { LimitPlate } from '@/components/limit-plate'
 import { Opening } from '@/components/opening'
 import { PageHead } from '@/components/page-head'
 import { PageKin } from '@/components/page-kin'
-import { Passage } from '@/components/passage'
 import { PAGE_BODIES } from '@/constants/bodies'
 import { PAGES } from '@/constants/pages'
 import { FOLD_ANCHOR } from '@/constants/site'
@@ -29,17 +29,21 @@ export const FeatureScreen = ({ page }: PageScreenProps) => {
       )}
       {body === null ? null : (
         <>
-          <Band className="max-w-theatre pt-14 pb-10">
+          <Band className="max-w-theatre pt-14 pb-8">
             <Opening>{i18n._(body.lead)}</Opening>
           </Band>
-          <Band className="reveal grid gap-12 py-10 lg:grid-cols-2 lg:gap-16">
-            {body.passages.map((passage) => {
-              return <Passage key={i18n._(passage.title)} passage={passage} />
-            })}
+          <Band className="reveal max-w-theatre py-8">
+            <ul className="grid gap-drop sm:grid-cols-2">
+              {body.boons.map((boon) => {
+                return <BoonCard key={i18n._(boon.title)} boon={boon} />
+              })}
+            </ul>
           </Band>
-          <Band className="reveal py-14">
-            <LimitPlate limit={body.limit} />
-          </Band>
+          {body.caveats.length === 0 ? null : (
+            <Band className="reveal max-w-theatre pt-8 pb-16">
+              <CaveatList caveats={body.caveats} />
+            </Band>
+          )}
         </>
       )}
       {kin.length === 0 ? null : <PageKin pages={kin} />}

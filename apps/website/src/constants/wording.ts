@@ -23,7 +23,7 @@ export const PAGE_PROMISES = {
   home: msg`Jouez en multicompte sur Dofus Retro sans jamais chercher une fenêtre.`,
   autoFocus: msg`La fenêtre du personnage qui joue passe devant toute seule.`,
   wheel: msg`Un disque de têtes sous le pouce, et la bonne fenêtre arrive.`,
-  walk: msg`Un clic gauche, et toute la team marche au même endroit.`,
+  walk: msg`Un clic par personnage, et toute la team marche au même endroit.`,
   runeTable: msg`Le poids des runes posé par-dessus le jeu, sans quitter l’atelier.`,
   relay: msg`Les messages privés vous suivent sur le téléphone.`,
   quickReplies: msg`Un texte tout prêt part sous une combinaison de touches.`,
@@ -53,6 +53,8 @@ export const SITE_TITLE = msg`Multifus, logiciel multicompte gratuit pour Dofus 
 export const INDEPENDENCE = msg`Projet indépendant, sans lien avec Ankama.`
 
 export const LIMITS_TITLE = msg`Ce que Multifus ne fait pas`
+
+export const CAVEATS_TITLE = msg`À savoir`
 
 export const NO_HARM = msg`Multifus ne lit pas la mémoire du jeu, ne touche à aucun de ses fichiers, et ne joue à votre place sur aucun personnage.`
 

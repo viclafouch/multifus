@@ -175,6 +175,9 @@
 
   --lozenge-side: 7px;
   --lozenge-turn: 0.3s;
+
+  --stage-edge: 2px;
+  --stage-nook: 8px;
 }
 
 @utility tint-red {
@@ -1135,8 +1138,9 @@
 
 @utility stage {
   overflow: clip;
-  border-radius: 10px;
-  border: 2px solid color-mix(in srgb, var(--band), transparent 45%);
+  border-radius: calc(var(--stage-edge) + var(--stage-nook));
+  border: var(--stage-edge) solid
+    color-mix(in srgb, var(--band), transparent 45%);
   text-shadow: var(--engrave);
   background-color: color-mix(in srgb, var(--iron), transparent 14%);
   box-shadow:

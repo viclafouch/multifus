@@ -1,8 +1,10 @@
 import { useLingui } from '@lingui/react'
+import { cn } from '@multifus/retro'
 import type { FeatureId } from '@/@types/page'
 import { PageLink } from '@/components/page-link'
 import { LOOPS, PEEKS } from '@/constants/loops'
 import { PAGES } from '@/constants/pages'
+import { PAGE_TINTS } from '@/constants/tints'
 import { PAGE_NAMES, PAGE_PROMISES } from '@/constants/wording'
 import { usePeek } from '@/hooks/use-peek'
 
@@ -21,7 +23,10 @@ export const FeatureCard = ({ page, hasPeek = false }: FeatureCardProps) => {
       {...handlers}
       page={page}
       isBare
-      className="card sighted flex h-full flex-col"
+      className={cn(
+        'card torch sighted flex h-full flex-col',
+        PAGE_TINTS[page]
+      )}
     >
       <span className="thumbnail">
         <img

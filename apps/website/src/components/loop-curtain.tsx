@@ -21,7 +21,7 @@ export const LoopCurtain = ({ isPlaying, onToggle }: LoopToggleProps) => {
           <PlayIcon weight="fill" aria-hidden />
         )}
       </span>
-      <span className="engraved font-carve text-legend tracking-widest text-cream uppercase">
+      <span className="engraved rubric text-cream">
         {i18n._(isPlaying ? LOOP_HOLD : LOOP_PLAY)}
       </span>
     </button>

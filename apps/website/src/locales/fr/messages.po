@@ -32,8 +32,12 @@ msgid "à moitié"
 msgstr "à moitié"
 
 #: src/constants/bodies.ts
-msgid "À quatre connectés, la question se pose à chaque fois."
-msgstr "À quatre connectés, la question se pose à chaque fois."
+#~ msgid "À quatre connectés, la question se pose à chaque fois."
+#~ msgstr "À quatre connectés, la question se pose à chaque fois."
+
+#: src/constants/wording.ts
+msgid "À savoir"
+msgstr "À savoir"
 
 #: src/constants/legal.ts
 #~ msgid "À titre personnel, hors de toute société, et sans rien vendre. Son identité est connue de l’hébergeur, comme la loi le demande."
@@ -72,16 +76,16 @@ msgid "Ankama tolère les gestionnaires de fenêtres. Voici ses deux messages."
 msgstr "Ankama tolère les gestionnaires de fenêtres. Voici ses deux messages."
 
 #: src/constants/bodies.ts
-msgid "Annuler est aussi simple qu’aller"
-msgstr "Annuler est aussi simple qu’aller"
+#~ msgid "Annuler est aussi simple qu’aller"
+#~ msgstr "Annuler est aussi simple qu’aller"
 
 #: src/constants/bodies.ts
-msgid "Aucun avertissement ne vous dira que l’auteur n’a pas pu être vérifié."
-msgstr "Aucun avertissement ne vous dira que l’auteur n’a pas pu être vérifié."
+#~ msgid "Aucun avertissement ne vous dira que l’auteur n’a pas pu être vérifié."
+#~ msgstr "Aucun avertissement ne vous dira que l’auteur n’a pas pu être vérifié."
 
 #: src/constants/bodies.ts
-msgid "Aucun clic, aucun sort, aucune réponse : il vous emmène, et le reste est à vous."
-msgstr "Aucun clic, aucun sort, aucune réponse : il vous emmène, et le reste est à vous."
+#~ msgid "Aucun clic, aucun sort, aucune réponse : il vous emmène, et le reste est à vous."
+#~ msgstr "Aucun clic, aucun sort, aucune réponse : il vous emmène, et le reste est à vous."
 
 #: src/screens/legal-screen.tsx
 msgid "Aucun cookie n’est posé, ni par le site, ni par la mesure d’audience. Il n’y a donc rien à accepter."
@@ -109,8 +113,8 @@ msgid "Avant d’installer"
 msgstr "Avant d’installer"
 
 #: src/constants/bodies.ts
-msgid "C’est à votre tour de jouer."
-msgstr "C’est à votre tour de jouer."
+#~ msgid "C’est à votre tour de jouer."
+#~ msgstr "C’est à votre tour de jouer."
 
 #: src/constants/legal.ts
 #~ msgid "C’est la même que pour signaler une erreur du comparatif ou une faute de traduction."
@@ -129,24 +133,36 @@ msgid "C’est un choix, et il ne changera pas : Multifus amène devant vous cel
 msgstr "C’est un choix, et il ne changera pas : Multifus amène devant vous celle du personnage qui joue, il ne redessine pas votre bureau."
 
 #: src/constants/bodies.ts
-msgid "C’est un interrupteur, et vous le tenez."
-msgstr "C’est un interrupteur, et vous le tenez."
+#~ msgid "C’est un interrupteur, et vous le tenez."
+#~ msgstr "C’est un interrupteur, et vous le tenez."
 
 #: src/constants/bodies.ts
-msgid "C’est votre main qui vient sur le disque, jamais l’inverse."
-msgstr "C’est votre main qui vient sur le disque, jamais l’inverse."
+#~ msgid "C’est votre main qui vient sur le disque, jamais l’inverse."
+#~ msgstr "C’est votre main qui vient sur le disque, jamais l’inverse."
 
 #: src/constants/bodies.ts
-msgid "C’est vous qui appuyez sur Entrée."
-msgstr "C’est vous qui appuyez sur Entrée."
+msgid "C’est vous qui appuyez sur Entrée"
+msgstr "C’est vous qui appuyez sur Entrée"
 
 #: src/constants/bodies.ts
-msgid "C’est vous qui cliquez sur la case où la team doit aller."
-msgstr "C’est vous qui cliquez sur la case où la team doit aller."
+#~ msgid "C’est vous qui appuyez sur Entrée."
+#~ msgstr "C’est vous qui appuyez sur Entrée."
+
+#: src/constants/bodies.ts
+#~ msgid "C’est vous qui cliquez sur la case où la team doit aller, jamais Multifus."
+#~ msgstr "C’est vous qui cliquez sur la case où la team doit aller, jamais Multifus."
+
+#: src/constants/bodies.ts
+#~ msgid "C’est vous qui cliquez sur la case où la team doit aller."
+#~ msgstr "C’est vous qui cliquez sur la case où la team doit aller."
 
 #: src/screens/download-screen.tsx
 msgid "Ce marché est plein de clones, et vous avez raison de vous méfier. Voici quatre choses que vous pouvez vérifier vous-même."
 msgstr "Ce marché est plein de clones, et vous avez raison de vous méfier. Voici quatre choses que vous pouvez vérifier vous-même."
+
+#: src/constants/bodies.ts
+msgid "Ce n’est pas un portage"
+msgstr "Ce n’est pas un portage"
 
 #: src/constants/wording.ts
 msgid "Ce qu’Ankama en dit"
@@ -169,32 +185,32 @@ msgstr "Ce que chaque version a changé."
 #~ msgstr "Ce que dit chaque case"
 
 #: src/constants/bodies.ts
-msgid "Ce que l’AutoFocus ne fait pas"
-msgstr "Ce que l’AutoFocus ne fait pas"
+#~ msgid "Ce que l’AutoFocus ne fait pas"
+#~ msgstr "Ce que l’AutoFocus ne fait pas"
 
 #: src/constants/bodies.ts
-msgid "Ce que la roue ne fait pas"
-msgstr "Ce que la roue ne fait pas"
+#~ msgid "Ce que la roue ne fait pas"
+#~ msgstr "Ce que la roue ne fait pas"
 
 #: src/constants/bodies.ts
-msgid "Ce que le Déplacement rapide ne fait pas"
-msgstr "Ce que le Déplacement rapide ne fait pas"
+#~ msgid "Ce que le Déplacement rapide ne fait pas"
+#~ msgstr "Ce que le Déplacement rapide ne fait pas"
 
 #: src/screens/legal-screen.tsx
 msgid "Ce que le site garde de vous"
 msgstr "Ce que le site garde de vous"
 
 #: src/constants/bodies.ts
-msgid "Ce que le tableau des runes ne fait pas"
-msgstr "Ce que le tableau des runes ne fait pas"
+#~ msgid "Ce que le tableau des runes ne fait pas"
+#~ msgstr "Ce que le tableau des runes ne fait pas"
 
 #: src/constants/bodies.ts
-msgid "Ce que les messages privés ne font pas"
-msgstr "Ce que les messages privés ne font pas"
+#~ msgid "Ce que les messages privés ne font pas"
+#~ msgstr "Ce que les messages privés ne font pas"
 
 #: src/constants/bodies.ts
-msgid "Ce que les réponses rapides ne font pas"
-msgstr "Ce que les réponses rapides ne font pas"
+#~ msgid "Ce que les réponses rapides ne font pas"
+#~ msgstr "Ce que les réponses rapides ne font pas"
 
 #: src/screens/ankama-screen.tsx
 msgid "Ce que Multifus en retient"
@@ -213,12 +229,12 @@ msgid "Ce que Multifus ne fait pas"
 msgstr "Ce que Multifus ne fait pas"
 
 #: src/constants/bodies.ts
-msgid "Ce que Multifus ne fait pas sur Mac"
-msgstr "Ce que Multifus ne fait pas sur Mac"
+#~ msgid "Ce que Multifus ne fait pas sur Mac"
+#~ msgstr "Ce que Multifus ne fait pas sur Mac"
 
 #: src/constants/bodies.ts
-msgid "Ce qui disparaît, c’est la recherche de fenêtre entre chaque clic."
-msgstr "Ce qui disparaît, c’est la recherche de fenêtre entre chaque clic."
+#~ msgid "Ce qui disparaît, c’est la recherche de fenêtre entre chaque clic."
+#~ msgstr "Ce qui disparaît, c’est la recherche de fenêtre entre chaque clic."
 
 #: src/constants/bodies.ts
 msgid "Celle qu’un premier lancement vous offre est en français, même si vous lisez Multifus en anglais."
@@ -229,8 +245,8 @@ msgid "Cette page n’existe pas"
 msgstr "Cette page n’existe pas"
 
 #: src/constants/bodies.ts
-msgid "Chaque appel a son interrupteur."
-msgstr "Chaque appel a son interrupteur."
+#~ msgid "Chaque appel a son interrupteur."
+#~ msgstr "Chaque appel a son interrupteur."
 
 #: src/screens/comparison-screen.tsx
 #~ msgid "Chaque case de ce tableau est lue dans le code de l’outil, jamais sur sa page d’accueil. Un outil qui garde son code fermé n’a pas de colonne ici : rien de ce qu’il promet ne se vérifie. Et vous trouverez deux lignes que Multifus ne coche pas, parce qu’un comparatif où l’on gagne partout ne vaut rien."
@@ -241,16 +257,20 @@ msgid "Chaque case est lue dans le code de l’outil, jamais sur sa page d’acc
 msgstr "Chaque case est lue dans le code de l’outil, jamais sur sa page d’accueil. Un outil qui garde son code fermé n’a pas de colonne ici. Et Multifus perd deux lignes, parce qu’un comparatif qu’on gagne partout ne vaut rien."
 
 #: src/constants/bodies.ts
-msgid "Chaque clic vaut pour le personnage qui est devant vous, et pour lui seul."
-msgstr "Chaque clic vaut pour le personnage qui est devant vous, et pour lui seul."
+#~ msgid "Chaque clic vaut pour le personnage qui est devant vous, et pour lui seul."
+#~ msgstr "Chaque clic vaut pour le personnage qui est devant vous, et pour lui seul."
 
 #: src/screens/comparison-screen.tsx
 msgid "Chaque colonne mène à son dépôt."
 msgstr "Chaque colonne mène à son dépôt."
 
 #: src/constants/bodies.ts
-msgid "Chaque message nomme le personnage appelé."
-msgstr "Chaque message nomme le personnage appelé."
+#~ msgid "Chaque message nomme le personnage appelé."
+#~ msgstr "Chaque message nomme le personnage appelé."
+
+#: src/constants/bodies.ts
+msgid "Chaque message nomme le personnage qu’on vient d’appeler."
+msgstr "Chaque message nomme le personnage qu’on vient d’appeler."
 
 #: src/screens/comparison-screen.tsx
 #~ msgid "Chaque nom de colonne mène au dépôt de l’outil, là où nous avons lu ses cases. Une case qui vous paraît fausse se vérifie dans le même code que nous, et elle se corrige ici :"
@@ -301,12 +321,20 @@ msgid "Deux outils du tableau le font, et pas lui."
 msgstr "Deux outils du tableau le font, et pas lui."
 
 #: src/constants/bodies.ts
-msgid "Deux Sadidas femmes se séparent."
-msgstr "Deux Sadidas femmes se séparent."
+msgid "Deux Sadidas femmes se séparent"
+msgstr "Deux Sadidas femmes se séparent"
 
 #: src/constants/bodies.ts
-msgid "Dofus Retro déconnecte un personnage qui ne fait rien, et le relais l’annonce plutôt que de vous laisser croire que personne n’écrit."
-msgstr "Dofus Retro déconnecte un personnage qui ne fait rien, et le relais l’annonce plutôt que de vous laisser croire que personne n’écrit."
+#~ msgid "Deux Sadidas femmes se séparent."
+#~ msgstr "Deux Sadidas femmes se séparent."
+
+#: src/constants/bodies.ts
+#~ msgid "Dofus Retro déconnecte un personnage qui ne fait rien, et le relais l’annonce plutôt que de vous laisser croire que personne n’écrit."
+#~ msgstr "Dofus Retro déconnecte un personnage qui ne fait rien, et le relais l’annonce plutôt que de vous laisser croire que personne n’écrit."
+
+#: src/constants/bodies.ts
+msgid "Dofus Retro déconnecte un personnage qui ne fait rien, et le relais l’annonce."
+msgstr "Dofus Retro déconnecte un personnage qui ne fait rien, et le relais l’annonce."
 
 #: src/screens/legal-screen.tsx
 msgid "Dofus, Dofus Retro et Ankama appartiennent à <0>Ankama Games</0>. Les images et les vidéos du site viennent du <1>jeu</1> et restent à eux."
@@ -321,56 +349,84 @@ msgstr "Dofus, Dofus Retro et Ankama appartiennent à <0>Ankama Games</0>. Les i
 #~ msgstr "Dofus, Dofus Retro et Ankama appartiennent à Ankama Games. Les images et les vidéos du site viennent du jeu et restent à eux."
 
 #: src/constants/bodies.ts
-msgid "Échange, groupe, guilde, message privé, défi, craft, percepteur attaqué : sept appels, et pas un de plus."
-msgstr "Échange, groupe, guilde, message privé, défi, craft, percepteur attaqué : sept appels, et pas un de plus."
+#~ msgid "Échange, groupe, guilde, message privé, défi, craft, percepteur attaqué : sept appels, et pas un de plus."
+#~ msgstr "Échange, groupe, guilde, message privé, défi, craft, percepteur attaqué : sept appels, et pas un de plus."
+
+#: src/constants/bodies.ts
+msgid "Échange, groupe, guilde, message privé, défi, craft, percepteur attaqué."
+msgstr "Échange, groupe, guilde, message privé, défi, craft, percepteur attaqué."
 
 #: src/components/site-footer.tsx
 msgid "Écrire à l’auteur"
 msgstr "Écrire à l’auteur"
 
 #: src/constants/bodies.ts
-msgid "Elle ignore vos personnages déconnectés."
-msgstr "Elle ignore vos personnages déconnectés."
+#~ msgid "Elle ignore vos personnages déconnectés."
+#~ msgstr "Elle ignore vos personnages déconnectés."
 
 #: src/constants/bodies.ts
-msgid "Elle montre les connectés, et elle ne reconnecte personne."
-msgstr "Elle montre les connectés, et elle ne reconnecte personne."
+#~ msgid "Elle montre les connectés, et elle ne reconnecte personne."
+#~ msgstr "Elle montre les connectés, et elle ne reconnecte personne."
 
 #: src/constants/bodies.ts
-msgid "Elle ne bouge jamais votre curseur."
-msgstr "Elle ne bouge jamais votre curseur."
+msgid "Elle montre les personnages connectés, et n’en reconnecte aucun."
+msgstr "Elle montre les personnages connectés, et n’en reconnecte aucun."
 
 #: src/constants/bodies.ts
-msgid "Elle se colle, elle ne s’envoie pas"
-msgstr "Elle se colle, elle ne s’envoie pas"
+#~ msgid "Elle ne bouge jamais votre curseur."
+#~ msgstr "Elle ne bouge jamais votre curseur."
+
+#: src/constants/bodies.ts
+#~ msgid "Elle se colle, elle ne s’envoie pas"
+#~ msgstr "Elle se colle, elle ne s’envoie pas"
 
 #: src/constants/bodies.ts
 msgid "Elle se pose au coin que vous avez choisi et nomme le personnage qui vient d’arriver."
 msgstr "Elle se pose au coin que vous avez choisi et nomme le personnage qui vient d’arriver."
 
 #: src/constants/bodies.ts
-msgid "Elles ne répondent à personne à votre place."
-msgstr "Elles ne répondent à personne à votre place."
+#~ msgid "Elles ne répondent à personne à votre place."
+#~ msgstr "Elles ne répondent à personne à votre place."
 
 #: src/constants/bodies.ts
-msgid "Elles posent du texte, et rien d’autre."
-msgstr "Elles posent du texte, et rien d’autre."
+msgid "Elles posent du texte sur une ligne, et rien d’autre."
+msgstr "Elles posent du texte sur une ligne, et rien d’autre."
 
 #: src/constants/bodies.ts
-msgid "Elles s’écrivent dans la langue du jeu."
-msgstr "Elles s’écrivent dans la langue du jeu."
+#~ msgid "Elles posent du texte, et rien d’autre."
+#~ msgstr "Elles posent du texte, et rien d’autre."
 
 #: src/constants/bodies.ts
-msgid "Elles tiennent sur une ligne."
-msgstr "Elles tiennent sur une ligne."
+msgid "Elles s’écrivent dans la langue du jeu"
+msgstr "Elles s’écrivent dans la langue du jeu"
 
 #: src/constants/bodies.ts
-msgid "Elles vous suivent partout."
-msgstr "Elles vous suivent partout."
+#~ msgid "Elles s’écrivent dans la langue du jeu."
+#~ msgstr "Elles s’écrivent dans la langue du jeu."
 
 #: src/constants/bodies.ts
-msgid "En marche avant de vous lever, coupé en revenant."
-msgstr "En marche avant de vous lever, coupé en revenant."
+msgid "Elles suivent tous vos personnages"
+msgstr "Elles suivent tous vos personnages"
+
+#: src/constants/bodies.ts
+#~ msgid "Elles tiennent sur une ligne."
+#~ msgstr "Elles tiennent sur une ligne."
+
+#: src/constants/bodies.ts
+#~ msgid "Elles vous suivent partout."
+#~ msgstr "Elles vous suivent partout."
+
+#: src/constants/bodies.ts
+#~ msgid "En marche avant de vous lever, coupé en revenant."
+#~ msgstr "En marche avant de vous lever, coupé en revenant."
+
+#: src/constants/bodies.ts
+msgid "Et la touche s’écrit comme sur votre clavier."
+msgstr "Et la touche s’écrit comme sur votre clavier."
+
+#: src/constants/bodies.ts
+msgid "Et un bouton le repose au coin de la fenêtre du jeu quand vous l’avez perdu de vue."
+msgstr "Et un bouton le repose au coin de la fenêtre du jeu quand vous l’avez perdu de vue."
 
 #: src/constants/rivals.ts
 msgid "Fenêtres rangées côte à côte"
@@ -404,97 +460,121 @@ msgstr "Gratuit, code publié, paquet signé et notarisé."
 msgid "Gratuit, code publié, paquet signé. Pour macOS et pour Windows."
 msgstr "Gratuit, code publié, paquet signé. Pour macOS et pour Windows."
 
+#: src/constants/bodies.ts
+msgid "Il démarre toujours éteint"
+msgstr "Il démarre toujours éteint"
+
 #: src/constants/rivals.ts
 #~ msgid "Il en fait une partie, et la case dit laquelle."
 #~ msgstr "Il en fait une partie, et la case dit laquelle."
 
 #: src/constants/bodies.ts
-msgid "Il entend ce que le jeu annonce lui-même, et rien d’autre."
-msgstr "Il entend ce que le jeu annonce lui-même, et rien d’autre."
+msgid "Il entend ce que le jeu annonce lui-même, et ne lit rien dans sa mémoire."
+msgstr "Il entend ce que le jeu annonce lui-même, et ne lit rien dans sa mémoire."
 
 #: src/constants/bodies.ts
-msgid "Il garde sa place."
-msgstr "Il garde sa place."
+#~ msgid "Il entend ce que le jeu annonce lui-même, et rien d’autre."
+#~ msgstr "Il entend ce que le jeu annonce lui-même, et rien d’autre."
 
 #: src/constants/bodies.ts
-msgid "Il ne déplace pas la team d’un seul clic."
-msgstr "Il ne déplace pas la team d’un seul clic."
+msgid "Il garde sa place"
+msgstr "Il garde sa place"
+
+#: src/constants/bodies.ts
+#~ msgid "Il garde sa place."
+#~ msgstr "Il garde sa place."
+
+#: src/constants/bodies.ts
+#~ msgid "Il ne déplace pas la team d’un seul clic."
+#~ msgstr "Il ne déplace pas la team d’un seul clic."
 
 #: src/screens/comparison-screen.tsx
 msgid "Il ne garde pas de compositions d’équipe."
 msgstr "Il ne garde pas de compositions d’équipe."
 
 #: src/constants/bodies.ts
-msgid "Il ne joue pas à votre place."
-msgstr "Il ne joue pas à votre place."
+#~ msgid "Il ne joue pas à votre place."
+#~ msgstr "Il ne joue pas à votre place."
 
 #: src/screens/download-screen.tsx
 msgid "Il ne lit pas sa mémoire, ne modifie aucun de ses fichiers, et il ne déplace jamais toute une team d’un coup."
 msgstr "Il ne lit pas sa mémoire, ne modifie aucun de ses fichiers, et il ne déplace jamais toute une team d’un coup."
 
 #: src/constants/bodies.ts
-msgid "Il ne lit rien dans le jeu."
-msgstr "Il ne lit rien dans le jeu."
+#~ msgid "Il ne lit rien dans le jeu."
+#~ msgstr "Il ne lit rien dans le jeu."
 
 #: src/screens/comparison-screen.tsx
 msgid "Il ne range pas les fenêtres côte à côte."
 msgstr "Il ne range pas les fenêtres côte à côte."
 
 #: src/constants/bodies.ts
-msgid "Il ne range pas votre Dock."
-msgstr "Il ne range pas votre Dock."
+#~ msgid "Il ne range pas votre Dock."
+#~ msgstr "Il ne range pas votre Dock."
 
 #: src/constants/bodies.ts
-msgid "Il ne regarde pas dans le jeu."
-msgstr "Il ne regarde pas dans le jeu."
+#~ msgid "Il ne regarde pas dans le jeu."
+#~ msgstr "Il ne regarde pas dans le jeu."
 
 #: src/constants/bodies.ts
-msgid "Il ne relaie que le privé."
-msgstr "Il ne relaie que le privé."
+#~ msgid "Il ne relaie que le privé."
+#~ msgstr "Il ne relaie que le privé."
 
 #: src/constants/bodies.ts
-msgid "Il ne s’allume jamais tout seul"
-msgstr "Il ne s’allume jamais tout seul"
+#~ msgid "Il ne s’allume jamais tout seul"
+#~ msgstr "Il ne s’allume jamais tout seul"
 
 #: src/constants/bodies.ts
-msgid "Il ne sait pas ce que vous brisez et ne calcule aucune probabilité."
-msgstr "Il ne sait pas ce que vous brisez et ne calcule aucune probabilité."
+#~ msgid "Il ne sait pas ce que vous brisez et ne calcule aucune probabilité."
+#~ msgstr "Il ne sait pas ce que vous brisez et ne calcule aucune probabilité."
 
 #: src/constants/bodies.ts
-msgid "Il ne se pose pas sur un client en plein écran."
-msgstr "Il ne se pose pas sur un client en plein écran."
+msgid "Il ne se pose pas sur un client en plein écran, où une fenêtre agrandie fait mieux le travail."
+msgstr "Il ne se pose pas sur un client en plein écran, où une fenêtre agrandie fait mieux le travail."
+
+#: src/constants/bodies.ts
+#~ msgid "Il ne se pose pas sur un client en plein écran."
+#~ msgstr "Il ne se pose pas sur un client en plein écran."
 
 #: src/constants/ankama.ts
 msgid "Il ne touche pas au jeu."
 msgstr "Il ne touche pas au jeu."
 
 #: src/constants/bodies.ts
-msgid "Il ne vise pas à votre place."
-msgstr "Il ne vise pas à votre place."
+#~ msgid "Il ne vise pas à votre place."
+#~ msgstr "Il ne vise pas à votre place."
 
 #: src/constants/bodies.ts
-msgid "Il ne vise pas les Mac Intel."
-msgstr "Il ne vise pas les Mac Intel."
+#~ msgid "Il ne vise pas les Mac Intel."
+#~ msgstr "Il ne vise pas les Mac Intel."
 
 #: src/constants/bodies.ts
-msgid "Il ne vous conseille pas le plein écran."
-msgstr "Il ne vous conseille pas le plein écran."
+#~ msgid "Il ne vous conseille pas le plein écran."
+#~ msgstr "Il ne vous conseille pas le plein écran."
 
 #: src/constants/bodies.ts
-msgid "Il s’éteint d’un interrupteur."
-msgstr "Il s’éteint d’un interrupteur."
+msgid "Il porte le privé, et rien du canal commerce, de la guilde ou du recrutement."
+msgstr "Il porte le privé, et rien du canal commerce, de la guilde ou du recrutement."
 
 #: src/constants/bodies.ts
-msgid "Il s’éteint dès qu’il n’a plus où aller."
-msgstr "Il s’éteint dès qu’il n’a plus où aller."
+#~ msgid "Il s’éteint d’un interrupteur."
+#~ msgstr "Il s’éteint d’un interrupteur."
 
 #: src/constants/bodies.ts
-msgid "Il se règle pour ne pas gêner"
-msgstr "Il se règle pour ne pas gêner"
+#~ msgid "Il s’éteint dès qu’il n’a plus où aller."
+#~ msgstr "Il s’éteint dès qu’il n’a plus où aller."
 
 #: src/constants/bodies.ts
-msgid "Il vous dit aussi quand il se tait."
-msgstr "Il vous dit aussi quand il se tait."
+#~ msgid "Il se règle pour ne pas gêner"
+#~ msgstr "Il se règle pour ne pas gêner"
+
+#: src/constants/bodies.ts
+msgid "Il vous dit aussi quand il se tait"
+msgstr "Il vous dit aussi quand il se tait"
+
+#: src/constants/bodies.ts
+#~ msgid "Il vous dit aussi quand il se tait."
+#~ msgstr "Il vous dit aussi quand il se tait."
 
 #: src/constants/wording.ts
 msgid "Ils vous suivent sur le téléphone."
@@ -541,24 +621,36 @@ msgstr "L’audience est comptée sans vous nommer. <0>Vercel Analytics</0> comp
 #~ msgstr "L’audience est comptée sans vous nommer. Vercel Analytics compte les pages vues et les téléchargements, sans identifiant, sans profil, et sans vous suivre d’un site à l’autre."
 
 #: src/constants/bodies.ts
-msgid "L’AutoFocus, la roue, le Déplacement rapide, le tableau des runes, les réponses rapides et les messages privés, et la touche s’écrit comme sur votre clavier."
-msgstr "L’AutoFocus, la roue, le Déplacement rapide, le tableau des runes, les réponses rapides et les messages privés, et la touche s’écrit comme sur votre clavier."
+#~ msgid "L’AutoFocus, la roue, le Déplacement rapide, le tableau des runes, les réponses rapides et les messages privés, et la touche s’écrit comme sur votre clavier."
+#~ msgstr "L’AutoFocus, la roue, le Déplacement rapide, le tableau des runes, les réponses rapides et les messages privés, et la touche s’écrit comme sur votre clavier."
 
 #: src/constants/bodies.ts
-msgid "L’ordre du défilement est le vôtre."
-msgstr "L’ordre du défilement est le vôtre."
+msgid "L’ordre du défilement est le vôtre"
+msgstr "L’ordre du défilement est le vôtre"
+
+#: src/constants/bodies.ts
+#~ msgid "L’ordre du défilement est le vôtre."
+#~ msgstr "L’ordre du défilement est le vôtre."
 
 #: src/constants/rivals.ts
 #~ msgid "L’outil fait cette ligne en entier."
 #~ msgstr "L’outil fait cette ligne en entier."
 
 #: src/constants/bodies.ts
-msgid "La couleur que vous leur avez donnée les distingue là où le portrait ne le fait plus."
-msgstr "La couleur que vous leur avez donnée les distingue là où le portrait ne le fait plus."
+msgid "La bonne fenêtre est devant vous avant que le chrono ne descende."
+msgstr "La bonne fenêtre est devant vous avant que le chrono ne descende."
 
 #: src/constants/bodies.ts
-msgid "La fenêtre du personnage qui doit jouer arrive devant vous avant que le chrono ne descende."
-msgstr "La fenêtre du personnage qui doit jouer arrive devant vous avant que le chrono ne descende."
+#~ msgid "La couleur que vous leur avez donnée les distingue là où le portrait ne le fait plus."
+#~ msgstr "La couleur que vous leur avez donnée les distingue là où le portrait ne le fait plus."
+
+#: src/constants/bodies.ts
+msgid "La couleur que vous leur donnez les distingue là où le portrait ne suffit plus."
+msgstr "La couleur que vous leur donnez les distingue là où le portrait ne suffit plus."
+
+#: src/constants/bodies.ts
+#~ msgid "La fenêtre du personnage qui doit jouer arrive devant vous avant que le chrono ne descende."
+#~ msgstr "La fenêtre du personnage qui doit jouer arrive devant vous avant que le chrono ne descende."
 
 #: src/constants/wording.ts
 msgid "La fenêtre du personnage qui joue passe devant toute seule."
@@ -569,32 +661,48 @@ msgid "La fenêtre qui joue passe devant."
 msgstr "La fenêtre qui joue passe devant."
 
 #: src/constants/bodies.ts
-msgid "La forgemagie sans le deuxième écran"
-msgstr "La forgemagie sans le deuxième écran"
+#~ msgid "La forgemagie sans le deuxième écran"
+#~ msgstr "La forgemagie sans le deuxième écran"
 
 #: src/components/language-bar.tsx
 msgid "La langue du site"
 msgstr "La langue du site"
 
 #: src/constants/bodies.ts
-msgid "La même touche le cache et le rappelle, et un bouton le repose au coin de la fenêtre du jeu."
-msgstr "La même touche le cache et le rappelle, et un bouton le repose au coin de la fenêtre du jeu."
+msgid "La même combinaison marche sur n’importe lequel d’entre eux."
+msgstr "La même combinaison marche sur n’importe lequel d’entre eux."
 
 #: src/constants/bodies.ts
-msgid "La roue ne demande rien à votre mémoire."
-msgstr "La roue ne demande rien à votre mémoire."
+msgid "La même touche le cache et le rappelle"
+msgstr "La même touche le cache et le rappelle"
 
 #: src/constants/bodies.ts
-msgid "La taille et la transparence se règlent."
-msgstr "La taille et la transparence se règlent."
+#~ msgid "La même touche le cache et le rappelle, et un bouton le repose au coin de la fenêtre du jeu."
+#~ msgstr "La même touche le cache et le rappelle, et un bouton le repose au coin de la fenêtre du jeu."
 
 #: src/constants/bodies.ts
-msgid "La version Mac n’est pas un portage."
-msgstr "La version Mac n’est pas un portage."
+msgid "La mule que vous laissez en banque ne prend aucun de vos clics."
+msgstr "La mule que vous laissez en banque ne prend aucun de vos clics."
 
 #: src/constants/bodies.ts
-msgid "Lâchez au centre, il ne se passe rien."
-msgstr "Lâchez au centre, il ne se passe rien."
+#~ msgid "La roue ne demande rien à votre mémoire."
+#~ msgstr "La roue ne demande rien à votre mémoire."
+
+#: src/constants/bodies.ts
+#~ msgid "La taille et la transparence se règlent."
+#~ msgstr "La taille et la transparence se règlent."
+
+#: src/constants/bodies.ts
+#~ msgid "La version Mac n’est pas un portage."
+#~ msgstr "La version Mac n’est pas un portage."
+
+#: src/constants/bodies.ts
+#~ msgid "Lâchez au centre, il ne se passe rien."
+#~ msgstr "Lâchez au centre, il ne se passe rien."
+
+#: src/constants/bodies.ts
+msgid "Lâchez au centre, rien ne se passe"
+msgstr "Lâchez au centre, rien ne se passe"
 
 #: src/constants/systems.ts
 msgid "Lancez l’installeur .exe que vous venez de prendre."
@@ -617,8 +725,12 @@ msgid "Le code est ouvert."
 msgstr "Le code est ouvert."
 
 #: src/constants/bodies.ts
-msgid "Le commerce ne s’arrête pas quand vous partez"
-msgstr "Le commerce ne s’arrête pas quand vous partez"
+msgid "Le commerce continue sans vous"
+msgstr "Le commerce continue sans vous"
+
+#: src/constants/bodies.ts
+#~ msgid "Le commerce ne s’arrête pas quand vous partez"
+#~ msgstr "Le commerce ne s’arrête pas quand vous partez"
 
 #: src/constants/ankama.ts
 msgid "le compte Dofus Retro sur X, le 10 mars 2026"
@@ -649,28 +761,44 @@ msgid "le forum de Dofus Retro, le 1ᵉʳ avril 2026"
 msgstr "le forum de Dofus Retro, le 1ᵉʳ avril 2026"
 
 #: src/constants/bodies.ts
-msgid "Le jeu garde le premier plan."
-msgstr "Le jeu garde le premier plan."
+msgid "Le jeu garde le premier plan : un clic sur le tableau ne fait pas sauter Multifus devant."
+msgstr "Le jeu garde le premier plan : un clic sur le tableau ne fait pas sauter Multifus devant."
 
 #: src/constants/bodies.ts
-msgid "Le jeu ne voit plus votre souris."
-msgstr "Le jeu ne voit plus votre souris."
+#~ msgid "Le jeu garde le premier plan."
+#~ msgstr "Le jeu garde le premier plan."
 
 #: src/constants/bodies.ts
-msgid "Le multicompte sur Mac n’avait presque personne"
-msgstr "Le multicompte sur Mac n’avait presque personne"
+#~ msgid "Le jeu ne voit plus votre souris."
+#~ msgstr "Le jeu ne voit plus votre souris."
 
 #: src/constants/bodies.ts
-msgid "Le navigateur reste fermé."
-msgstr "Le navigateur reste fermé."
+#~ msgid "Le multicompte sur Mac n’avait presque personne"
+#~ msgstr "Le multicompte sur Mac n’avait presque personne"
 
 #: src/constants/bodies.ts
-msgid "Le nombre de clics ne change pas."
-msgstr "Le nombre de clics ne change pas."
+msgid "Le navigateur reste fermé"
+msgstr "Le navigateur reste fermé"
 
 #: src/constants/bodies.ts
-msgid "Le paquet est construit pour Apple Silicon."
-msgstr "Le paquet est construit pour Apple Silicon."
+#~ msgid "Le navigateur reste fermé."
+#~ msgstr "Le navigateur reste fermé."
+
+#: src/constants/bodies.ts
+msgid "Le nombre de clics ne change pas : c’est la recherche de fenêtre entre deux clics qui disparaît."
+msgstr "Le nombre de clics ne change pas : c’est la recherche de fenêtre entre deux clics qui disparaît."
+
+#: src/constants/bodies.ts
+#~ msgid "Le nombre de clics ne change pas."
+#~ msgstr "Le nombre de clics ne change pas."
+
+#: src/constants/bodies.ts
+msgid "Le paquet est construit pour Apple Silicon, et ne vise pas les Mac Intel."
+msgstr "Le paquet est construit pour Apple Silicon, et ne vise pas les Mac Intel."
+
+#: src/constants/bodies.ts
+#~ msgid "Le paquet est construit pour Apple Silicon."
+#~ msgstr "Le paquet est construit pour Apple Silicon."
 
 #: src/screens/home-screen.tsx
 msgid "Le paquet est signé par Apple, le code est ouvert, et Ankama tolère ce genre d’outil tant qu’il ne touche pas au jeu. Les trois se vérifient."
@@ -693,8 +821,12 @@ msgid "Le pseudo, la tête de classe et le bouton par personnage n’existent qu
 msgstr "Le pseudo, la tête de classe et le bouton par personnage n’existent que sur la barre des tâches de Windows."
 
 #: src/constants/bodies.ts
-msgid "Le relais va dans un sens, du jeu vers vous."
-msgstr "Le relais va dans un sens, du jeu vers vous."
+msgid "Le relais va dans un sens : vous ne répondez pas depuis le téléphone."
+msgstr "Le relais va dans un sens : vous ne répondez pas depuis le téléphone."
+
+#: src/constants/bodies.ts
+#~ msgid "Le relais va dans un sens, du jeu vers vous."
+#~ msgstr "Le relais va dans un sens, du jeu vers vous."
 
 #: src/components/language-offer.tsx
 msgid "Le site dans votre langue"
@@ -717,20 +849,28 @@ msgid "Le site est hébergé par <0>{VERCEL_NAME}</0>, {VERCEL_ADDRESS}, aux Ét
 msgstr "Le site est hébergé par <0>{VERCEL_NAME}</0>, {VERCEL_ADDRESS}, aux États-Unis."
 
 #: src/constants/bodies.ts
-msgid "Le tableau des poids de runes se pose par-dessus la fenêtre du jeu, à la touche que vous avez choisie. Vous brisez, vous lisez, vous continuez."
-msgstr "Le tableau des poids de runes se pose par-dessus la fenêtre du jeu, à la touche que vous avez choisie. Vous brisez, vous lisez, vous continuez."
+msgid "Le tableau des poids de runes se pose par-dessus la fenêtre du jeu, à la touche que vous avez choisie."
+msgstr "Le tableau des poids de runes se pose par-dessus la fenêtre du jeu, à la touche que vous avez choisie."
 
 #: src/constants/bodies.ts
-msgid "Le trajet à quatre personnages"
-msgstr "Le trajet à quatre personnages"
+#~ msgid "Le tableau des poids de runes se pose par-dessus la fenêtre du jeu, à la touche que vous avez choisie. Vous brisez, vous lisez, vous continuez."
+#~ msgstr "Le tableau des poids de runes se pose par-dessus la fenêtre du jeu, à la touche que vous avez choisie. Vous brisez, vous lisez, vous continuez."
 
 #: src/constants/bodies.ts
-msgid "Les autres outils sont des logiciels Windows."
-msgstr "Les autres outils sont des logiciels Windows."
+#~ msgid "Le trajet à quatre personnages"
+#~ msgstr "Le trajet à quatre personnages"
 
 #: src/constants/bodies.ts
-msgid "Les crafts des autres ne vous intéressent pas ? Vous coupez celui-là et vous gardez les six autres."
-msgstr "Les crafts des autres ne vous intéressent pas ? Vous coupez celui-là et vous gardez les six autres."
+#~ msgid "Les autres outils sont des logiciels Windows."
+#~ msgstr "Les autres outils sont des logiciels Windows."
+
+#: src/constants/bodies.ts
+msgid "Les crafts des autres ne vous intéressent pas ? Coupez celui-là, gardez les six autres."
+msgstr "Les crafts des autres ne vous intéressent pas ? Coupez celui-là, gardez les six autres."
+
+#: src/constants/bodies.ts
+#~ msgid "Les crafts des autres ne vous intéressent pas ? Vous coupez celui-là et vous gardez les six autres."
+#~ msgstr "Les crafts des autres ne vous intéressent pas ? Vous coupez celui-là et vous gardez les six autres."
 
 #: src/screens/ankama-screen.tsx
 msgid "Les deux messages"
@@ -769,8 +909,12 @@ msgid "Les six mécanismes à l’œuvre dans le jeu"
 msgstr "Les six mécanismes à l’œuvre dans le jeu"
 
 #: src/constants/bodies.ts
-msgid "Les six mécanismes sont là."
-msgstr "Les six mécanismes sont là."
+msgid "Les six mécanismes sont là"
+msgstr "Les six mécanismes sont là"
+
+#: src/constants/bodies.ts
+#~ msgid "Les six mécanismes sont là."
+#~ msgstr "Les six mécanismes sont là."
 
 #: src/constants/wording.ts
 msgid "Lire"
@@ -805,8 +949,8 @@ msgid "Multifus amène devant vous la fenêtre du personnage qui joue sur Dofus 
 msgstr "Multifus amène devant vous la fenêtre du personnage qui joue sur Dofus Retro. Vous gardez les mains sur le jeu, et la team suit."
 
 #: src/constants/bodies.ts
-msgid "Multifus démarre toujours avec lui éteint."
-msgstr "Multifus démarre toujours avec lui éteint."
+#~ msgid "Multifus démarre toujours avec lui éteint."
+#~ msgstr "Multifus démarre toujours avec lui éteint."
 
 #: src/constants/legal.ts
 #~ msgid "Multifus est publié par {PUBLISHER}, un particulier, à titre personnel, hors de toute société, et sans rien vendre. Son identité est connue de l’hébergeur, comme la loi le demande."
@@ -841,8 +985,8 @@ msgstr "Multifus n’a aucun lien avec Ankama : ni partenariat, ni approbation, 
 #~ msgstr "Multifus n’a aucun lien avec Ankama."
 
 #: src/constants/bodies.ts
-msgid "Multifus ne lit pas ce qu’on vous a écrit."
-msgstr "Multifus ne lit pas ce qu’on vous a écrit."
+#~ msgid "Multifus ne lit pas ce qu’on vous a écrit."
+#~ msgstr "Multifus ne lit pas ce qu’on vous a écrit."
 
 #: src/constants/wording.ts
 msgid "Multifus ne lit pas la mémoire du jeu, ne touche à aucun de ses fichiers, et ne joue à votre place sur aucun personnage."
@@ -865,8 +1009,12 @@ msgid "Multifus tourne sur Mac, signé et notarisé par Apple."
 msgstr "Multifus tourne sur Mac, signé et notarisé par Apple."
 
 #: src/constants/bodies.ts
-msgid "Multifus tourne sur macOS avec les mêmes mécanismes que sur Windows. Le paquet est signé et notarisé par Apple, donc il s’ouvre normalement."
-msgstr "Multifus tourne sur macOS avec les mêmes mécanismes que sur Windows. Le paquet est signé et notarisé par Apple, donc il s’ouvre normalement."
+msgid "Multifus tourne sur macOS avec les mêmes mécanismes que sur Windows, dans un paquet signé et notarisé par Apple."
+msgstr "Multifus tourne sur macOS avec les mêmes mécanismes que sur Windows, dans un paquet signé et notarisé par Apple."
+
+#: src/constants/bodies.ts
+#~ msgid "Multifus tourne sur macOS avec les mêmes mécanismes que sur Windows. Le paquet est signé et notarisé par Apple, donc il s’ouvre normalement."
+#~ msgstr "Multifus tourne sur macOS avec les mêmes mécanismes que sur Windows. Le paquet est signé et notarisé par Apple, donc il s’ouvre normalement."
 
 #: src/constants/wording.ts
 msgid "Multifus, logiciel multicompte gratuit pour Dofus Retro"
@@ -889,8 +1037,8 @@ msgid "On l’écrit à <0>{AUTHOR_MAIL}</0>, ou sur son <1>compte X</1>. C’es
 msgstr "On l’écrit à <0>{AUTHOR_MAIL}</0>, ou sur son <1>compte X</1>. C’est par là que passent une erreur du comparatif et une faute de traduction."
 
 #: src/constants/bodies.ts
-msgid "On vous écrit, on vous invite, on vous défie."
-msgstr "On vous écrit, on vous invite, on vous défie."
+#~ msgid "On vous écrit, on vous invite, on vous défie."
+#~ msgstr "On vous écrit, on vous invite, on vous défie."
 
 #: src/constants/rivals.ts
 msgid "oui"
@@ -909,12 +1057,20 @@ msgid "Paquet signé"
 msgstr "Paquet signé"
 
 #: src/constants/bodies.ts
-msgid "Par Telegram, personnage par personnage"
-msgstr "Par Telegram, personnage par personnage"
+#~ msgid "Par Telegram, personnage par personnage"
+#~ msgstr "Par Telegram, personnage par personnage"
 
 #: src/constants/bodies.ts
-msgid "Pas de clic droit pour forcer l’ouverture."
-msgstr "Pas de clic droit pour forcer l’ouverture."
+msgid "Par Telegram, sur votre téléphone"
+msgstr "Par Telegram, sur votre téléphone"
+
+#: src/constants/bodies.ts
+msgid "Pas de clic droit pour forcer l’ouverture, aucun avertissement sur un auteur non vérifié."
+msgstr "Pas de clic droit pour forcer l’ouverture, aucun avertissement sur un auteur non vérifié."
+
+#: src/constants/bodies.ts
+#~ msgid "Pas de clic droit pour forcer l’ouverture."
+#~ msgstr "Pas de clic droit pour forcer l’ouverture."
 
 #: src/constants/rivals.ts
 msgid "Pas signé, mais l’attestation GitHub y est."
@@ -925,16 +1081,16 @@ msgid "Pause"
 msgstr "Pause"
 
 #: src/constants/bodies.ts
-msgid "Perdu de vue, il revient."
-msgstr "Perdu de vue, il revient."
+#~ msgid "Perdu de vue, il revient."
+#~ msgstr "Perdu de vue, il revient."
 
 #: src/constants/bodies.ts
 msgid "Plus d’aller-retour vers un onglet à chaque objet brisé."
 msgstr "Plus d’aller-retour vers un onglet à chaque objet brisé."
 
 #: src/constants/bodies.ts
-msgid "Plus une fenêtre à parcourir, plus un clic à prendre."
-msgstr "Plus une fenêtre à parcourir, plus un clic à prendre."
+#~ msgid "Plus une fenêtre à parcourir, plus un clic à prendre."
+#~ msgstr "Plus une fenêtre à parcourir, plus un clic à prendre."
 
 #: src/constants/bodies.ts
 msgid "Posé où vous voulez, il y revient au lancement suivant et suit la fenêtre quand elle bouge."
@@ -947,6 +1103,10 @@ msgstr "Poussé à fond, il reste toujours assez visible pour se lire."
 #: src/constants/wording.ts
 msgid "Projet indépendant, sans lien avec Ankama."
 msgstr "Projet indépendant, sans lien avec Ankama."
+
+#: src/constants/bodies.ts
+msgid "Quatre clics, quatre personnages"
+msgstr "Quatre clics, quatre personnages"
 
 #: src/constants/legal.ts
 #~ msgid "Que la proposition de lire le site dans votre langue vous a déjà été montrée. Elle ne quitte pas votre machine, et vider les données du site l’efface."
@@ -993,16 +1153,20 @@ msgid "Rien d’officiel."
 msgstr "Rien d’officiel."
 
 #: src/constants/bodies.ts
-msgid "Rien du canal commerce, rien de la guilde, rien du recrutement."
-msgstr "Rien du canal commerce, rien de la guilde, rien du recrutement."
+#~ msgid "Rien du canal commerce, rien de la guilde, rien du recrutement."
+#~ msgstr "Rien du canal commerce, rien de la guilde, rien du recrutement."
 
 #: src/constants/wording.ts
 msgid "Roue des personnages"
 msgstr "Roue des personnages"
 
 #: src/constants/bodies.ts
-msgid "Sa fenêtre ne passe plus devant tant que vous ne l’avez pas remise dans le rang."
-msgstr "Sa fenêtre ne passe plus devant tant que vous ne l’avez pas remise dans le rang."
+#~ msgid "Sa fenêtre ne passe plus devant tant que vous ne l’avez pas remise dans le rang."
+#~ msgstr "Sa fenêtre ne passe plus devant tant que vous ne l’avez pas remise dans le rang."
+
+#: src/constants/bodies.ts
+msgid "Sa fenêtre ne passe plus devant tant que vous ne la rappelez pas."
+msgstr "Sa fenêtre ne passe plus devant tant que vous ne la rappelez pas."
 
 #: src/screens/home-screen.tsx
 msgid "sans chercher une fenêtre"
@@ -1013,16 +1177,20 @@ msgid "Sans compte, sans publicité, sans limite d’essai."
 msgstr "Sans compte, sans publicité, sans limite d’essai."
 
 #: src/constants/bodies.ts
-msgid "Sans fermer Multifus, et tout le reste continue de marcher."
-msgstr "Sans fermer Multifus, et tout le reste continue de marcher."
+#~ msgid "Sans fermer Multifus, et tout le reste continue de marcher."
+#~ msgstr "Sans fermer Multifus, et tout le reste continue de marcher."
 
 #: src/constants/bodies.ts
-msgid "Sans relais, vous les découvrez une heure plus tard, et l’acheteur est reparti."
-msgstr "Sans relais, vous les découvrez une heure plus tard, et l’acheteur est reparti."
+#~ msgid "Sans relais, vous les découvrez une heure plus tard, et l’acheteur est reparti."
+#~ msgstr "Sans relais, vous les découvrez une heure plus tard, et l’acheteur est reparti."
 
 #: src/constants/bodies.ts
-msgid "Sept appels, sept fois la bonne fenêtre"
-msgstr "Sept appels, sept fois la bonne fenêtre"
+msgid "Sept appels surveillés"
+msgstr "Sept appels surveillés"
+
+#: src/constants/bodies.ts
+#~ msgid "Sept appels, sept fois la bonne fenêtre"
+#~ msgstr "Sept appels, sept fois la bonne fenêtre"
 
 #: src/screens/download-screen.tsx
 #~ msgid "Signé par Apple"
@@ -1033,8 +1201,12 @@ msgid "Signé par Apple."
 msgstr "Signé par Apple."
 
 #: src/constants/bodies.ts
-msgid "Signer coûte de l’argent chaque année."
-msgstr "Signer coûte de l’argent chaque année."
+msgid "Signer coûte de l’argent chaque année"
+msgstr "Signer coûte de l’argent chaque année"
+
+#: src/constants/bodies.ts
+#~ msgid "Signer coûte de l’argent chaque année."
+#~ msgstr "Signer coûte de l’argent chaque année."
 
 #: src/screens/home-screen.tsx
 msgid "Six gestionnaires de fenêtres, ligne par ligne. Chaque case est relevée dans le code, pas sur la page d’accueil de son auteur."
@@ -1081,8 +1253,16 @@ msgid "Tableau des runes"
 msgstr "Tableau des runes"
 
 #: src/constants/bodies.ts
-msgid "Tant que le disque est ouvert, rien ne s’allume derrière et aucun sort ne part."
-msgstr "Tant que le disque est ouvert, rien ne s’allume derrière et aucun sort ne part."
+msgid "Taille et transparence se règlent"
+msgstr "Taille et transparence se règlent"
+
+#: src/constants/bodies.ts
+msgid "Tant que le disque est ouvert, le jeu ne voit plus votre souris : aucun sort ne part."
+msgstr "Tant que le disque est ouvert, le jeu ne voit plus votre souris : aucun sort ne part."
+
+#: src/constants/bodies.ts
+#~ msgid "Tant que le disque est ouvert, rien ne s’allume derrière et aucun sort ne part."
+#~ msgstr "Tant que le disque est ouvert, rien ne s’allume derrière et aucun sort ne part."
 
 #: src/constants/wording.ts
 msgid "Télécharger"
@@ -1097,8 +1277,8 @@ msgid "Télécharger le .exe"
 msgstr "Télécharger le .exe"
 
 #: src/constants/bodies.ts
-msgid "Toujours les mêmes, toujours au pire moment."
-msgstr "Toujours les mêmes, toujours au pire moment."
+#~ msgid "Toujours les mêmes, toujours au pire moment."
+#~ msgstr "Toujours les mêmes, toujours au pire moment."
 
 #: src/screens/download-screen.tsx
 msgid "Tout ce que Multifus fait se lit sur GitHub, et vous pouvez le compiler vous-même."
@@ -1109,12 +1289,16 @@ msgid "Un clic gauche, et la team suit."
 msgstr "Un clic gauche, et la team suit."
 
 #: src/constants/wording.ts
-msgid "Un clic gauche, et toute la team marche au même endroit."
-msgstr "Un clic gauche, et toute la team marche au même endroit."
+#~ msgid "Un clic gauche, et toute la team marche au même endroit."
+#~ msgstr "Un clic gauche, et toute la team marche au même endroit."
+
+#: src/constants/wording.ts
+msgid "Un clic par personnage, et toute la team marche au même endroit."
+msgstr "Un clic par personnage, et toute la team marche au même endroit."
 
 #: src/constants/bodies.ts
-msgid "Un clic sur le tableau ne fait pas sauter Multifus devant."
-msgstr "Un clic sur le tableau ne fait pas sauter Multifus devant."
+#~ msgid "Un clic sur le tableau ne fait pas sauter Multifus devant."
+#~ msgstr "Un clic sur le tableau ne fait pas sauter Multifus devant."
 
 #: src/constants/ankama.ts
 msgid "Un clic, un personnage."
@@ -1137,16 +1321,20 @@ msgstr "Un geste commencé par erreur ne coûte pas une fenêtre."
 #~ msgstr "Un geste ne vaut que pour le personnage qui est devant vous. Les macros qui déplacent toute une team d’un coup sont bannissables, et elles restent hors de ce projet."
 
 #: src/constants/bodies.ts
-msgid "Un interrupteur ou une touche l’allume, et rien d’autre."
-msgstr "Un interrupteur ou une touche l’allume, et rien d’autre."
+#~ msgid "Un interrupteur ou une touche l’allume, et rien d’autre."
+#~ msgstr "Un interrupteur ou une touche l’allume, et rien d’autre."
 
 #: src/constants/bodies.ts
-msgid "Un joueur sur Mac finit par monter une machine virtuelle, ou par s’en passer."
-msgstr "Un joueur sur Mac finit par monter une machine virtuelle, ou par s’en passer."
+msgid "Un interrupteur par appel"
+msgstr "Un interrupteur par appel"
 
 #: src/constants/bodies.ts
-msgid "Un jour, dans le mauvais canal, devant tout le monde."
-msgstr "Un jour, dans le mauvais canal, devant tout le monde."
+#~ msgid "Un joueur sur Mac finit par monter une machine virtuelle, ou par s’en passer."
+#~ msgstr "Un joueur sur Mac finit par monter une machine virtuelle, ou par s’en passer."
+
+#: src/constants/bodies.ts
+#~ msgid "Un jour, dans le mauvais canal, devant tout le monde."
+#~ msgstr "Un jour, dans le mauvais canal, devant tout le monde."
 
 #: src/constants/wording.ts
 msgid "Un texte prêt part au raccourci."
@@ -1157,12 +1345,20 @@ msgid "Un texte tout prêt part sous une combinaison de touches."
 msgstr "Un texte tout prêt part sous une combinaison de touches."
 
 #: src/constants/bodies.ts
-msgid "Une annonce en vente attend des réponses."
-msgstr "Une annonce en vente attend des réponses."
+msgid "Une annonce en vente attend des réponses, et l’acheteur ne repart plus faute de vous."
+msgstr "Une annonce en vente attend des réponses, et l’acheteur ne repart plus faute de vous."
 
 #: src/constants/bodies.ts
-msgid "Une bannière dit où vous êtes."
-msgstr "Une bannière dit où vous êtes."
+#~ msgid "Une annonce en vente attend des réponses."
+#~ msgstr "Une annonce en vente attend des réponses."
+
+#: src/constants/bodies.ts
+msgid "Une bannière dit où vous en êtes"
+msgstr "Une bannière dit où vous en êtes"
+
+#: src/constants/bodies.ts
+#~ msgid "Une bannière dit où vous êtes."
+#~ msgstr "Une bannière dit où vous êtes."
 
 #: src/screens/comparison-screen.tsx
 #~ msgid "Une case à moitié dit ce qui manque : posez le curseur dessus, ou touchez-la."
@@ -1173,20 +1369,24 @@ msgid "Une case qui vous paraît fausse se corrige ici :"
 msgstr "Une case qui vous paraît fausse se corrige ici :"
 
 #: src/constants/bodies.ts
-msgid "Une fenêtre agrandie fait mieux le travail."
-msgstr "Une fenêtre agrandie fait mieux le travail."
+#~ msgid "Une fenêtre agrandie fait mieux le travail."
+#~ msgstr "Une fenêtre agrandie fait mieux le travail."
 
 #: src/constants/bodies.ts
-msgid "Une mule se met de côté."
-msgstr "Une mule se met de côté."
+msgid "Une mule se met de côté"
+msgstr "Une mule se met de côté"
 
 #: src/constants/bodies.ts
-msgid "Une phrase qui partirait seule finirait mal."
-msgstr "Une phrase qui partirait seule finirait mal."
+#~ msgid "Une mule se met de côté."
+#~ msgstr "Une mule se met de côté."
 
 #: src/constants/bodies.ts
-msgid "Une réponse rapide marche sur n’importe lequel de vos personnages."
-msgstr "Une réponse rapide marche sur n’importe lequel de vos personnages."
+#~ msgid "Une phrase qui partirait seule finirait mal."
+#~ msgstr "Une phrase qui partirait seule finirait mal."
+
+#: src/constants/bodies.ts
+#~ msgid "Une réponse rapide marche sur n’importe lequel de vos personnages."
+#~ msgstr "Une réponse rapide marche sur n’importe lequel de vos personnages."
 
 #: src/constants/wording.ts
 msgid "Une roue de têtes sous le pouce."
@@ -1197,8 +1397,16 @@ msgid "Une tolérance n’est pas une autorisation."
 msgstr "Une tolérance n’est pas une autorisation."
 
 #: src/constants/bodies.ts
-msgid "Une touche par personnage tient jusqu’à quatre."
-msgstr "Une touche par personnage tient jusqu’à quatre."
+msgid "Une touche l’allume, et il s’éteint dès qu’il n’a plus de fenêtre où aller."
+msgstr "Une touche l’allume, et il s’éteint dès qu’il n’a plus de fenêtre où aller."
+
+#: src/constants/bodies.ts
+msgid "Une touche par personnage tient jusqu’à quatre"
+msgstr "Une touche par personnage tient jusqu’à quatre"
+
+#: src/constants/bodies.ts
+#~ msgid "Une touche par personnage tient jusqu’à quatre."
+#~ msgstr "Une touche par personnage tient jusqu’à quatre."
 
 #: src/constants/legal.ts
 #~ msgid "Vercel Analytics compte les pages vues et les téléchargements, sans identifiant, sans profil, et sans vous suivre d’un site à l’autre."
@@ -1209,8 +1417,12 @@ msgid "Vérifiez ce tableau vous-même"
 msgstr "Vérifiez ce tableau vous-même"
 
 #: src/constants/bodies.ts
-msgid "Viser vaut mieux que se souvenir"
-msgstr "Viser vaut mieux que se souvenir"
+msgid "Viser plutôt que se souvenir"
+msgstr "Viser plutôt que se souvenir"
+
+#: src/constants/bodies.ts
+#~ msgid "Viser vaut mieux que se souvenir"
+#~ msgstr "Viser vaut mieux que se souvenir"
 
 #: src/screens/download-screen.tsx
 #: src/screens/home-screen.tsx
@@ -1230,44 +1442,72 @@ msgid "Votre principal oui, vos mules non."
 msgstr "Votre principal oui, vos mules non."
 
 #: src/constants/bodies.ts
-msgid "Vous allumez le Déplacement rapide, vous cliquez là où vous voulez aller, et c’est le personnage suivant qui arrive devant vous. Quatre clics, quatre personnages sur la même map."
-msgstr "Vous allumez le Déplacement rapide, vous cliquez là où vous voulez aller, et c’est le personnage suivant qui arrive devant vous. Quatre clics, quatre personnages sur la même map."
+msgid "Votre tour de jouer"
+msgstr "Votre tour de jouer"
 
 #: src/constants/bodies.ts
-msgid "Vous choisissez qui est suivi."
-msgstr "Vous choisissez qui est suivi."
+msgid "Vous allumez le Déplacement rapide, vous cliquez là où vous voulez aller, et c’est le personnage suivant qui arrive devant vous."
+msgstr "Vous allumez le Déplacement rapide, vous cliquez là où vous voulez aller, et c’est le personnage suivant qui arrive devant vous."
 
 #: src/constants/bodies.ts
-msgid "Vous décidez qui a le droit de vous déranger"
-msgstr "Vous décidez qui a le droit de vous déranger"
+#~ msgid "Vous allumez le Déplacement rapide, vous cliquez là où vous voulez aller, et c’est le personnage suivant qui arrive devant vous. Quatre clics, quatre personnages sur la même map."
+#~ msgstr "Vous allumez le Déplacement rapide, vous cliquez là où vous voulez aller, et c’est le personnage suivant qui arrive devant vous. Quatre clics, quatre personnages sur la même map."
 
 #: src/constants/bodies.ts
-msgid "Vous êtes parti manger, vos personnages sont restés connectés, et quelqu’un vous écrit en privé. Votre téléphone vous dit lequel vient d’être appelé."
-msgstr "Vous êtes parti manger, vos personnages sont restés connectés, et quelqu’un vous écrit en privé. Votre téléphone vous dit lequel vient d’être appelé."
+msgid "Vous choisissez qui est suivi"
+msgstr "Vous choisissez qui est suivi"
+
+#: src/constants/bodies.ts
+#~ msgid "Vous choisissez qui est suivi."
+#~ msgstr "Vous choisissez qui est suivi."
+
+#: src/constants/bodies.ts
+#~ msgid "Vous décidez qui a le droit de vous déranger"
+#~ msgstr "Vous décidez qui a le droit de vous déranger"
+
+#: src/constants/bodies.ts
+msgid "Vous êtes parti manger, vos personnages sont restés connectés, et quelqu’un vous écrit en privé."
+msgstr "Vous êtes parti manger, vos personnages sont restés connectés, et quelqu’un vous écrit en privé."
+
+#: src/constants/bodies.ts
+#~ msgid "Vous êtes parti manger, vos personnages sont restés connectés, et quelqu’un vous écrit en privé. Votre téléphone vous dit lequel vient d’être appelé."
+#~ msgstr "Vous êtes parti manger, vos personnages sont restés connectés, et quelqu’un vous écrit en privé. Votre téléphone vous dit lequel vient d’être appelé."
 
 #: src/constants/ankama.ts
 msgid "Vous installez sous votre responsabilité."
 msgstr "Vous installez sous votre responsabilité."
 
 #: src/constants/bodies.ts
-msgid "Vous jouez sur votre Iop, et c’est votre Eniripsa qu’on invite en groupe. Sa fenêtre arrive devant vous toute seule."
-msgstr "Vous jouez sur votre Iop, et c’est votre Eniripsa qu’on invite en groupe. Sa fenêtre arrive devant vous toute seule."
+#~ msgid "Vous jouez sur votre Iop, et c’est votre Eniripsa qu’on invite en groupe. Sa fenêtre arrive devant vous toute seule."
+#~ msgstr "Vous jouez sur votre Iop, et c’est votre Eniripsa qu’on invite en groupe. Sa fenêtre arrive devant vous toute seule."
 
 #: src/constants/bodies.ts
-msgid "Vous le rangez à la main, et la mule que vous laissez en banque ne prend aucun de vos clics."
-msgstr "Vous le rangez à la main, et la mule que vous laissez en banque ne prend aucun de vos clics."
+msgid "Vous jouez sur votre Iop, et c’est votre Eniripsa qu’on invite. Sa fenêtre arrive devant vous toute seule."
+msgstr "Vous jouez sur votre Iop, et c’est votre Eniripsa qu’on invite. Sa fenêtre arrive devant vous toute seule."
 
 #: src/constants/bodies.ts
-msgid "Vous maintenez une combinaison, un disque de têtes s’ouvre au milieu de l’écran, vous visez, vous lâchez. La fenêtre est devant vous."
-msgstr "Vous maintenez une combinaison, un disque de têtes s’ouvre au milieu de l’écran, vous visez, vous lâchez. La fenêtre est devant vous."
+#~ msgid "Vous le rangez à la main, et la mule que vous laissez en banque ne prend aucun de vos clics."
+#~ msgstr "Vous le rangez à la main, et la mule que vous laissez en banque ne prend aucun de vos clics."
 
 #: src/constants/bodies.ts
-msgid "Vous ne répondez pas depuis le téléphone."
-msgstr "Vous ne répondez pas depuis le téléphone."
+msgid "Vous maintenez une combinaison, un disque de têtes s’ouvre au milieu de l’écran, vous visez, vous lâchez."
+msgstr "Vous maintenez une combinaison, un disque de têtes s’ouvre au milieu de l’écran, vous visez, vous lâchez."
 
 #: src/constants/bodies.ts
-msgid "Vous rangez une phrase sous une combinaison de touches. Dans le jeu, vous appuyez, et la phrase se pose là où vous êtes en train d’écrire."
-msgstr "Vous rangez une phrase sous une combinaison de touches. Dans le jeu, vous appuyez, et la phrase se pose là où vous êtes en train d’écrire."
+#~ msgid "Vous maintenez une combinaison, un disque de têtes s’ouvre au milieu de l’écran, vous visez, vous lâchez. La fenêtre est devant vous."
+#~ msgstr "Vous maintenez une combinaison, un disque de têtes s’ouvre au milieu de l’écran, vous visez, vous lâchez. La fenêtre est devant vous."
+
+#: src/constants/bodies.ts
+#~ msgid "Vous ne répondez pas depuis le téléphone."
+#~ msgstr "Vous ne répondez pas depuis le téléphone."
+
+#: src/constants/bodies.ts
+msgid "Vous rangez une phrase sous une combinaison de touches. Dans le jeu, vous appuyez, et elle se pose là où vous êtes en train d’écrire."
+msgstr "Vous rangez une phrase sous une combinaison de touches. Dans le jeu, vous appuyez, et elle se pose là où vous êtes en train d’écrire."
+
+#: src/constants/bodies.ts
+#~ msgid "Vous rangez une phrase sous une combinaison de touches. Dans le jeu, vous appuyez, et la phrase se pose là où vous êtes en train d’écrire."
+#~ msgstr "Vous rangez une phrase sous une combinaison de touches. Dans le jeu, vous appuyez, et la phrase se pose là où vous êtes en train d’écrire."
 
 #: src/constants/bodies.ts
 msgid "Vous reconnaissez la tête de classe et le pseudo, et vous partez dessus."

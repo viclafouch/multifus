@@ -1,17 +1,19 @@
 import type { MessageDescriptor } from '@lingui/core'
+import type { Icon } from '@phosphor-icons/react'
 
 export type Point = Readonly<{
   lead: MessageDescriptor
   line: MessageDescriptor
 }>
 
-export type Passage = Readonly<{
+export type Boon = Readonly<{
+  icon: Icon
   title: MessageDescriptor
-  points: readonly Point[]
+  line: MessageDescriptor
 }>
 
 export type Body = Readonly<{
   lead: MessageDescriptor
-  passages: readonly Passage[]
-  limit: Passage
+  boons: readonly Boon[]
+  caveats: readonly MessageDescriptor[]
 }>

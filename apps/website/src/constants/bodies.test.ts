@@ -5,11 +5,11 @@ import { LANGUAGES, SOURCE_LANGUAGE } from '@/constants/languages'
 import { PAGES, PAGE_IDS } from '@/constants/pages'
 import { SPEAKERS } from '@/lib/i18n'
 
-const PASSAGE_FLOOR = 2
+const BOON_FLOOR = 3
 
-const BODY_FLOOR = 800
+const BODY_FLOOR = 450
 
-const DENIAL = /ne fait pas|ne font pas/u
+const TITLE_CEILING = 48
 
 const WITH_BODY = PAGE_IDS.flatMap((page) => {
   const body = PAGE_BODIES[page]
@@ -21,21 +21,13 @@ const TRANSLATED = LANGUAGES.filter((language) => {
   return language !== SOURCE_LANGUAGE
 })
 
-const passagesOf = (body: Body) => {
-  return [...body.passages, body.limit]
-}
-
 const phrasesOf = (body: Body) => {
   return [
     body.lead,
-    ...passagesOf(body).flatMap((passage) => {
-      return [
-        passage.title,
-        ...passage.points.flatMap((point) => {
-          return [point.lead, point.line]
-        })
-      ]
-    })
+    ...body.boons.flatMap((boon) => {
+      return [boon.title, boon.line]
+    }),
+    ...body.caveats
   ]
 }
 
@@ -60,18 +52,18 @@ describe('the body of the pages', () => {
     expect(WITH_BODY).toHaveLength(features.length)
   })
 
-  it.each(WITH_BODY)('gives at least two passages to $page', ({ body }) => {
-    expect(body.passages.length).toBeGreaterThanOrEqual(PASSAGE_FLOOR)
+  it.each(WITH_BODY)('gives at least three boons to $page', ({ body }) => {
+    expect(body.boons.length).toBeGreaterThanOrEqual(BOON_FLOOR)
   })
 
-  it.each(WITH_BODY)('leaves no passage empty on $page', ({ body }) => {
-    for (const passage of passagesOf(body)) {
-      expect(passage.points.length).toBeGreaterThan(0)
+  it.each(WITH_BODY)('keeps the boon titles short on $page', ({ body }) => {
+    for (const language of LANGUAGES) {
+      for (const boon of body.boons) {
+        expect(SPEAKERS[language]._(boon.title).length).toBeLessThanOrEqual(
+          TITLE_CEILING
+        )
+      }
     }
-  })
-
-  it.each(WITH_BODY)('says what $page does not do', ({ body }) => {
-    expect(SPEAKERS.fr._(body.limit.title)).toMatch(DENIAL)
   })
 
   it.each(WITH_BODY)(
