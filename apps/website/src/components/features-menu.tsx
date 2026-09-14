@@ -20,6 +20,14 @@ export const FeaturesMenu = ({ page }: FeaturesMenuProps) => {
     return feature === page
   })
 
+  const handleLeave = () => {
+    const element = menu.current
+
+    if (element !== null) {
+      element.open = false
+    }
+  }
+
   useDismiss(menu)
 
   return (
@@ -37,6 +45,7 @@ export const FeaturesMenu = ({ page }: FeaturesMenuProps) => {
             <li key={feature}>
               <PageLink
                 page={feature}
+                onClick={handleLeave}
                 className="flex flex-col gap-0.5 rounded-lg px-3 py-2.5 hover:bg-slate/50"
               >
                 <span className="font-carve text-deed tracking-wide text-cream uppercase">
