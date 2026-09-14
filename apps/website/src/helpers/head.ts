@@ -1,3 +1,4 @@
+import type { MessageDescriptor } from '@lingui/core'
 import type { PageId } from '@/@types/page'
 import { LANGUAGES, SOURCE_LANGUAGE } from '@/constants/languages'
 import { LOOPS } from '@/constants/loops'
@@ -47,6 +48,14 @@ const posterOf = (page: PageId) => {
 
 export const titleOf = (name: string) => {
   return `${name} · Multifus`
+}
+
+const TONGUE_SEPARATOR = ' · '
+
+export const everyTongue = (word: MessageDescriptor) => {
+  return LANGUAGES.map((language) => {
+    return SPEAKERS[language]._(word)
+  }).join(TONGUE_SEPARATOR)
 }
 
 export const headOf = ({ page, language }: PathParams) => {

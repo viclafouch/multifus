@@ -1,13 +1,15 @@
 import React from 'react'
+import type { HeadingLevel } from '@/lib/heading'
+import { HEADING_TAGS } from '@/lib/heading'
 
 type ProseBlockProps = Readonly<{
-  level: 2 | 3
+  level: Exclude<HeadingLevel, 1>
   title: string
   children: React.ReactNode
 }>
 
 export const ProseBlock = ({ level, title, children }: ProseBlockProps) => {
-  const Heading = level === 2 ? 'h2' : 'h3'
+  const Heading = HEADING_TAGS[level]
 
   return (
     <section className="rule flex flex-col gap-3 border-t pt-6">

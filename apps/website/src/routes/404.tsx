@@ -1,20 +1,17 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { SOURCE_LANGUAGE } from '@/constants/languages'
-import { titleOf } from '@/helpers/head'
-import { SPEAKERS } from '@/lib/i18n'
-import { LOST_PROMISE, LOST_TITLE, LostScreen } from '@/screens/lost-screen'
+import { LOST_PROMISE, LOST_TITLE } from '@/components/lost-word'
+import { everyTongue, titleOf } from '@/helpers/head'
+import { LostTonguesScreen } from '@/screens/lost-tongues-screen'
 
 export const Route = createFileRoute('/404')({
   head: () => {
-    const speaker = SPEAKERS[SOURCE_LANGUAGE]
-
     return {
       meta: [
-        { title: titleOf(speaker._(LOST_TITLE)) },
-        { name: 'description', content: speaker._(LOST_PROMISE) },
+        { title: titleOf(everyTongue(LOST_TITLE)) },
+        { name: 'description', content: everyTongue(LOST_PROMISE) },
         { name: 'robots', content: 'noindex' }
       ]
     }
   },
-  component: LostScreen
+  component: LostTonguesScreen
 })
