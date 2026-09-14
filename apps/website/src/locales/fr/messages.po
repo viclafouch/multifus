@@ -420,6 +420,10 @@ msgstr "Elles suivent tous vos personnages"
 #~ msgid "En marche avant de vous lever, coupé en revenant."
 #~ msgstr "En marche avant de vous lever, coupé en revenant."
 
+#: src/screens/home-screen.tsx
+msgid "enfin jouable"
+msgstr "enfin jouable"
+
 #: src/constants/bodies.ts
 msgid "Et la touche s’écrit comme sur votre clavier."
 msgstr "Et la touche s’écrit comme sur votre clavier."
@@ -593,8 +597,8 @@ msgid "Je vends des runes, je reviens dans deux minutes, bienvenue dans la guild
 msgstr "Je vends des runes, je reviens dans deux minutes, bienvenue dans la guilde."
 
 #: src/screens/home-screen.tsx
-msgid "Jouez en multicompte"
-msgstr "Jouez en multicompte"
+#~ msgid "Jouez en multicompte"
+#~ msgstr "Jouez en multicompte"
 
 #: src/constants/wording.ts
 msgid "Jouez en multicompte sur Dofus Retro sans jamais chercher une fenêtre."
@@ -771,6 +775,10 @@ msgstr "Le jeu garde le premier plan : un clic sur le tableau ne fait pas sauter
 #: src/constants/bodies.ts
 #~ msgid "Le jeu ne voit plus votre souris."
 #~ msgstr "Le jeu ne voit plus votre souris."
+
+#: src/screens/home-screen.tsx
+msgid "Le multicompte sur Dofus Retro"
+msgstr "Le multicompte sur Dofus Retro"
 
 #: src/constants/bodies.ts
 #~ msgid "Le multicompte sur Mac n’avait presque personne"
@@ -1169,8 +1177,8 @@ msgid "Sa fenêtre ne passe plus devant tant que vous ne la rappelez pas."
 msgstr "Sa fenêtre ne passe plus devant tant que vous ne la rappelez pas."
 
 #: src/screens/home-screen.tsx
-msgid "sans chercher une fenêtre"
-msgstr "sans chercher une fenêtre"
+#~ msgid "sans chercher une fenêtre"
+#~ msgstr "sans chercher une fenêtre"
 
 #: src/screens/download-screen.tsx
 msgid "Sans compte, sans publicité, sans limite d’essai."

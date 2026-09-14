@@ -420,6 +420,10 @@ msgstr "They follow every character"
 #~ msgid "En marche avant de vous lever, coupé en revenant."
 #~ msgstr "On before you stand up, off when you come back."
 
+#: src/screens/home-screen.tsx
+msgid "enfin jouable"
+msgstr "finally easy"
+
 #: src/constants/bodies.ts
 msgid "Et la touche s’écrit comme sur votre clavier."
 msgstr "And the key is spelled the way your keyboard spells it."
@@ -593,8 +597,8 @@ msgid "Je vends des runes, je reviens dans deux minutes, bienvenue dans la guild
 msgstr "Selling runes, back in two minutes, welcome to the guild."
 
 #: src/screens/home-screen.tsx
-msgid "Jouez en multicompte"
-msgstr "Play multiple accounts"
+#~ msgid "Jouez en multicompte"
+#~ msgstr "Play multiple accounts"
 
 #: src/constants/wording.ts
 msgid "Jouez en multicompte sur Dofus Retro sans jamais chercher une fenêtre."
@@ -771,6 +775,10 @@ msgstr "The game keeps the foreground: a click on the table does not bring Multi
 #: src/constants/bodies.ts
 #~ msgid "Le jeu ne voit plus votre souris."
 #~ msgstr "The game no longer sees your mouse."
+
+#: src/screens/home-screen.tsx
+msgid "Le multicompte sur Dofus Retro"
+msgstr "Multiboxing on Dofus Retro"
 
 #: src/constants/bodies.ts
 #~ msgid "Le multicompte sur Mac n’avait presque personne"
@@ -1169,8 +1177,8 @@ msgid "Sa fenêtre ne passe plus devant tant que vous ne la rappelez pas."
 msgstr "Its window stops coming forward until you call it back."
 
 #: src/screens/home-screen.tsx
-msgid "sans chercher une fenêtre"
-msgstr "never hunting for a window"
+#~ msgid "sans chercher une fenêtre"
+#~ msgstr "never hunting for a window"
 
 #: src/screens/download-screen.tsx
 msgid "Sans compte, sans publicité, sans limite d’essai."
