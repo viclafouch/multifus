@@ -24,12 +24,7 @@
 - [ ] Ouvrir `/journal` depuis À propos, et trancher si le panneau de mise à jour y renvoie
 - [ ] Poser Vercel Analytics, un seul événement, le clic sur « Télécharger » avec le système dedans
 - [ ] Déclarer le site à la Search Console et y déposer le sitemap
-- [ ] Revérifier dans le code des concurrents les quatre notes à moitié du comparatif
 - [ ] Ouvrir le site dans Firefox, qui ne connaît pas `animation-timeline` : les replis n'ont jamais tourné
-- [ ] Relire l'anglais et l'espagnol une fois le français figé, le corps des sept fonctionnalités compris
-- [ ] Trancher la langue de la page perdue, Vercel ne servant qu'un `404.html` français
-- [ ] Trancher les mentions légales, une page ou rien, `localStorage` et Vercel Analytics compris
-- [ ] Trancher le bandeau de cookies, le site n'en posant aucun aujourd'hui
 - [ ] Repasser le site en ligne sur l'adresse réelle et sur un téléphone : icônes, `robots.txt`, 404
 
 La paire de clés de l'updater existe déjà, dans `~/.tauri/multifus.key` et son
