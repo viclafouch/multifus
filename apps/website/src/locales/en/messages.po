@@ -478,11 +478,11 @@ msgstr "Selling runes, back in two minutes, welcome to the guild."
 
 #: src/screens/home-screen.tsx
 msgid "Jouez en multicompte"
-msgstr "Play multi-account"
+msgstr "Play multiple accounts"
 
 #: src/constants/wording.ts
 msgid "Jouez en multicompte sur Dofus Retro sans jamais chercher une fenêtre."
-msgstr "Play several accounts on Dofus Retro without ever hunting for a window."
+msgstr "Play multiple accounts on Dofus Retro without ever hunting for a window."
 
 #: src/constants/wording.ts
 msgid "Journal des versions"
@@ -858,7 +858,7 @@ msgstr "Its window no longer comes to the front until you put it back in the lin
 
 #: src/screens/home-screen.tsx
 msgid "sans chercher une fenêtre"
-msgstr "without hunting for a window"
+msgstr "never hunting for a window"
 
 #: src/screens/download-screen.tsx
 msgid "Sans compte, sans publicité, sans limite d’essai."
