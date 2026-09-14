@@ -1,3 +1,4 @@
+import type { TintName } from '@multifus/retro'
 import type { ShortcutStatus } from '@/@types/shortcuts'
 
 export type Gender = 'female' | 'male'
@@ -16,19 +17,7 @@ export type Class =
   | 'sram'
   | 'xelor'
 
-export type Color =
-  | 'blue'
-  | 'earth'
-  | 'green'
-  | 'lavender'
-  | 'orange'
-  | 'pine'
-  | 'pink'
-  | 'red'
-  | 'sky'
-  | 'turquoise'
-  | 'violet'
-  | 'yellow'
+export type Color = TintName
 
 export type Portrait = {
   readonly class: Class
