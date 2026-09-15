@@ -3,7 +3,8 @@ import { LANGUAGES } from '@/constants/languages'
 import { OG_IMAGE } from '@/constants/og'
 import { PAGES, PAGE_IDS } from '@/constants/pages'
 import {
-  everyPath,
+  alternateRefsOf,
+  everyPage,
   matchHasLoop,
   ogPathOf,
   pageOf,
@@ -145,17 +146,60 @@ describe('matchHasLoop', () => {
   })
 })
 
-describe('everyPath', () => {
+describe('everyPage', () => {
   it('gives one address per page and per language', () => {
-    const paths = everyPath()
+    const paths = everyPage().map(({ path }) => {
+      return path
+    })
 
     expect(paths).toHaveLength(PAGE_IDS.length * LANGUAGES.length)
     expect(new Set(paths).size).toBe(paths.length)
   })
 
   it('opens the three home pages', () => {
-    expect(everyPath()).toStrictEqual(
-      expect.arrayContaining(['/', '/en', '/es'])
+    expect(
+      everyPage().map(({ path }) => {
+        return path
+      })
+    ).toStrictEqual(expect.arrayContaining(['/', '/en', '/es']))
+  })
+
+  it('carries the page each address belongs to', () => {
+    expect(everyPage()).toStrictEqual(
+      expect.arrayContaining([
+        { page: 'wheel', language: 'en', path: '/en/character-wheel' }
+      ])
     )
+  })
+})
+
+describe('alternateRefsOf', () => {
+  it('names the three languages and the default', () => {
+    expect(
+      alternateRefsOf({ page: 'wheel', origin: 'https://multifus.app' })
+    ).toStrictEqual([
+      { hreflang: 'fr', href: 'https://multifus.app/roue-des-personnages' },
+      { hreflang: 'en', href: 'https://multifus.app/en/character-wheel' },
+      { hreflang: 'es', href: 'https://multifus.app/es/rueda-de-personajes' },
+      {
+        hreflang: 'x-default',
+        href: 'https://multifus.app/roue-des-personnages'
+      }
+    ])
+  })
+
+  it('sends the default to the French page', () => {
+    const refs = alternateRefsOf({
+      page: 'mac',
+      origin: 'https://multifus.app'
+    })
+    const french = refs.find(({ hreflang }) => {
+      return hreflang === 'fr'
+    })
+    const fallback = refs.find(({ hreflang }) => {
+      return hreflang === 'x-default'
+    })
+
+    expect(fallback?.href).toBe(french?.href)
   })
 })

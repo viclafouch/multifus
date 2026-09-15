@@ -1,6 +1,8 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import process from 'node:process'
+import { INK } from '../src/constants/ink.ts'
+import { LANGUAGES } from '../src/constants/languages.ts'
 import { FOLD_ANCHOR, LOST_FILE, ROBOTS_PATH } from '../src/constants/site.ts'
 
 const CLIENT = join(import.meta.dirname, '..', 'dist', 'client')
@@ -9,8 +11,16 @@ const SITEMAP = readFileSync(join(CLIENT, 'sitemap.xml'), 'utf8')
 
 const SUSPENSE_ERROR = '<!--$!-->'
 
-const located = [...SITEMAP.matchAll(/<loc>([^<]+)<\/loc>/gu)].map((found) => {
-  return new URL(found[1])
+const TITLE_CEILING = 65
+
+const SITEMAP_NAMESPACE = 'http://www.sitemaps.org/schemas/sitemap/0.9'
+
+const entries = [...SITEMAP.matchAll(/<url>(.+?)<\/url>/gsu)].map((found) => {
+  return found[1]
+})
+
+const located = entries.map((entry) => {
+  return new URL(/<loc>([^<]+)<\/loc>/u.exec(entry)[1])
 })
 
 const addresses = located.map((url) => {
@@ -35,6 +45,27 @@ const SCHEMA = /<script type="application\/ld\+json">(.+?)<\/script>/su
 
 const OG_IMAGE = /<meta[^>]*property="og:image"[^>]*content="([^"]+)"/u
 
+const TITLE = /<title>([^<]*)<\/title>/u
+
+const metasOf = (html, { name, property }) => {
+  const key = name === undefined ? 'property' : 'name'
+  const value = name ?? property
+
+  return [
+    ...html.matchAll(
+      new RegExp(`<meta[^>]*${key}="${value}"[^>]*content="([^"]*)"`, 'gu')
+    )
+  ].map((found) => {
+    return found[1]
+  })
+}
+
+const namedOf = (html, name) => {
+  const [found] = metasOf(html, { name })
+
+  return found ?? null
+}
+
 const checkRendered = (pathname, html) => {
   const body = html.slice(html.indexOf('<body>'))
 
@@ -50,7 +81,27 @@ const checkRendered = (pathname, html) => {
     complain(pathname, 'no description')
   }
 
+  if (!html.includes('charSet="utf-8"')) {
+    complain(pathname, 'no utf-8 declared')
+  }
+
   return body
+}
+
+const titles = new Map()
+
+const descriptions = new Map()
+
+const rememberOnce = ({ kept, value, pathname, what }) => {
+  const taken = kept.get(value)
+
+  if (taken === undefined) {
+    kept.set(value, pathname)
+
+    return
+  }
+
+  complain(pathname, `the same ${what} as ${taken}`)
 }
 
 for (const pathname of addresses) {
@@ -61,17 +112,85 @@ for (const pathname of addresses) {
   if (marked === null) {
     complain(pathname, 'no schema.org markup')
   } else {
-    const nodes = JSON.parse(marked[1])
+    const graph = JSON.parse(marked[1])
 
-    if (nodes.length === 0) {
-      complain(pathname, 'an empty markup')
+    if (graph['@context'] !== 'https://schema.org') {
+      complain(pathname, 'a graph laid outside of schema.org')
     }
 
-    for (const node of nodes) {
-      if (node['@context'] !== 'https://schema.org') {
-        complain(pathname, `a ${node['@type']} record outside of schema.org`)
+    const types = (graph['@graph'] ?? []).map((node) => {
+      return node['@type']
+    })
+
+    for (const wanted of ['WebSite', 'Person', 'WebPage']) {
+      if (!types.includes(wanted)) {
+        complain(pathname, `no ${wanted} record`)
       }
     }
+  }
+
+  const named = TITLE.exec(html)
+
+  if (named === null) {
+    complain(pathname, 'no title')
+  } else {
+    if (named[1].length > TITLE_CEILING) {
+      complain(
+        pathname,
+        `a title of ${named[1].length} signs, more than ${TITLE_CEILING}`
+      )
+    }
+
+    rememberOnce({ kept: titles, value: named[1], pathname, what: 'title' })
+  }
+
+  const promise = namedOf(html, 'description')
+
+  if (promise !== null) {
+    rememberOnce({
+      kept: descriptions,
+      value: promise,
+      pathname,
+      what: 'description'
+    })
+  }
+
+  const crawl = namedOf(html, 'robots')
+
+  if (crawl === null || !crawl.includes('max-image-preview:large')) {
+    complain(pathname, 'no large preview allowed to the crawler')
+  }
+
+  for (const wanted of ['theme-color', 'color-scheme', 'author']) {
+    if (namedOf(html, wanted) === null) {
+      complain(pathname, `no ${wanted}`)
+    }
+  }
+
+  for (const wanted of [
+    'twitter:title',
+    'twitter:description',
+    'twitter:image',
+    'twitter:site'
+  ]) {
+    if (namedOf(html, wanted) === null) {
+      complain(pathname, `no ${wanted}`)
+    }
+  }
+
+  const [spoken] = metasOf(html, { property: 'og:locale' })
+
+  if (spoken === undefined || !/^[a-z]{2}_[A-Z]{2}$/u.test(spoken)) {
+    complain(pathname, `og:locale reads ${spoken}, not a language and a land`)
+  }
+
+  const others = metasOf(html, { property: 'og:locale:alternate' })
+
+  if (others.length !== LANGUAGES.length - 1) {
+    complain(
+      pathname,
+      `${others.length} other locales named instead of ${LANGUAGES.length - 1}`
+    )
   }
 
   if (!html.includes('rel="expect"')) {
@@ -92,6 +211,10 @@ for (const pathname of addresses) {
 
   if (!html.includes('rel="canonical"')) {
     complain(pathname, 'no canonical address')
+  }
+
+  if (!/<link[^>]*rel="preload"[^>]*as="font"/u.test(html)) {
+    complain(pathname, 'the carved font is not preloaded')
   }
 
   const drawn = OG_IMAGE.exec(html)
@@ -142,6 +265,26 @@ if (addresses.length === 0) {
   complain('sitemap.xml', 'no address')
 }
 
+if (!SITEMAP.includes(`xmlns="${SITEMAP_NAMESPACE}"`)) {
+  complain('sitemap.xml', `laid outside of ${SITEMAP_NAMESPACE}`)
+}
+
+for (const [index, entry] of entries.entries()) {
+  const pathname = addresses[index]
+  const alternates = [...entry.matchAll(/<xhtml:link\b[^>]*>/gu)]
+
+  if (alternates.length !== LANGUAGES.length + 1) {
+    complain(
+      'sitemap.xml',
+      `${alternates.length} alternates on ${pathname} instead of ${LANGUAGES.length + 1}`
+    )
+  }
+
+  if (!/<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/u.test(entry)) {
+    complain('sitemap.xml', `no day of last change on ${pathname}`)
+  }
+}
+
 const SERVED = [
   ROBOTS_PATH,
   LOST_FILE,
@@ -160,6 +303,10 @@ for (const name of missing) {
   complain(name, 'missing from the delivered bundle')
 }
 
+if (existsSync(join(CLIENT, 'pages.json'))) {
+  complain('/pages.json', 'delivered, and nobody asked for it')
+}
+
 if (!missing.includes(ROBOTS_PATH)) {
   const robots = readFileSync(join(CLIENT, ROBOTS_PATH), 'utf8')
 
@@ -168,8 +315,32 @@ if (!missing.includes(ROBOTS_PATH)) {
   }
 }
 
+if (!missing.includes('/site.webmanifest')) {
+  const manifest = JSON.parse(
+    readFileSync(join(CLIENT, 'site.webmanifest'), 'utf8')
+  )
+
+  for (const key of ['id', 'name', 'description', 'lang', 'scope', 'icons']) {
+    if (manifest[key] === undefined) {
+      complain('/site.webmanifest', `no ${key}`)
+    }
+  }
+
+  for (const key of ['theme_color', 'background_color']) {
+    if (manifest[key] !== INK.iron) {
+      complain('/site.webmanifest', `${key} drifted away from INK.iron`)
+    }
+  }
+}
+
 if (!missing.includes(LOST_FILE)) {
-  checkRendered(LOST_FILE, readFileSync(join(CLIENT, LOST_FILE), 'utf8'))
+  const lost = readFileSync(join(CLIENT, LOST_FILE), 'utf8')
+
+  checkRendered(LOST_FILE, lost)
+
+  if (namedOf(lost, 'robots') !== 'noindex') {
+    complain(LOST_FILE, 'left open to the crawler')
+  }
 }
 
 if (complaints.length > 0) {

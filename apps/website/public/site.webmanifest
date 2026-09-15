@@ -1,8 +1,16 @@
 {
+  "id": "/",
   "name": "Multifus",
   "short_name": "Multifus",
+  "description": "Jouez en multicompte sur Dofus Retro sans jamais chercher une fenêtre.",
+  "lang": "fr",
+  "dir": "ltr",
   "start_url": "/",
+  "scope": "/",
   "display": "browser",
+  "theme_color": "#241f19",
+  "background_color": "#241f19",
+  "categories": ["utilities", "games"],
   "icons": [
     { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }

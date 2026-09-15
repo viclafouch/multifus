@@ -7,7 +7,7 @@ import { PAGES, PAGE_IDS } from '@/constants/pages'
 import { RELEASES } from '@/constants/site'
 import type { PathParams } from '@/helpers/page'
 import type { SchemaNode } from '@/helpers/schema'
-import { schemaOf, scriptOf } from '@/helpers/schema'
+import { graphOf, schemaOf, scriptOf } from '@/helpers/schema'
 
 const ADDRESS_KEYS = new Set([
   '@id',
@@ -15,7 +15,11 @@ const ADDRESS_KEYS = new Set([
   'item',
   'contentUrl',
   'thumbnailUrl',
-  'downloadUrl'
+  'downloadUrl',
+  'installUrl',
+  'screenshot',
+  'image',
+  'license'
 ])
 
 type SchemaType = SchemaNode['@type']
@@ -209,15 +213,105 @@ describe('the breadcrumb', () => {
   })
 })
 
+describe('the site and its author', () => {
+  it.each(PAGE_IDS)('names both on %s', (page) => {
+    expect(typesOf({ page, language: 'fr' })).toContain('WebSite')
+    expect(typesOf({ page, language: 'fr' })).toContain('Person')
+  })
+
+  it('gives the site one address for the three languages', () => {
+    const french = nodeOf({ page: 'home', language: 'fr', type: 'WebSite' })
+    const spanish = nodeOf({ page: 'wheel', language: 'es', type: 'WebSite' })
+
+    expect(french?.['@id']).toBe(spanish?.['@id'])
+    expect(french?.url).not.toBe(spanish?.url)
+  })
+
+  it('makes the author the publisher of the site', () => {
+    const site = nodeOf({ page: 'home', language: 'fr', type: 'WebSite' })
+    const author = nodeOf({ page: 'home', language: 'fr', type: 'Person' })
+
+    expect(site?.publisher).toStrictEqual({ '@id': author?.['@id'] })
+  })
+})
+
+describe('the page record', () => {
+  it.each(PAGE_IDS)('lands on %s', (page) => {
+    expect(typesOf({ page, language: 'fr' })).toContain('WebPage')
+  })
+
+  it('hangs the page under the site', () => {
+    const site = nodeOf({ page: 'wheel', language: 'fr', type: 'WebSite' })
+
+    expect(
+      nodeOf({ page: 'wheel', language: 'fr', type: 'WebPage' })
+    ).toMatchObject({
+      url: `${HOST}/roue-des-personnages`,
+      name: 'Roue des personnages',
+      inLanguage: 'fr',
+      isPartOf: { '@id': site?.['@id'] }
+    })
+  })
+
+  it('points at the breadcrumb of the page, and at nothing on the home page', () => {
+    const crumbs = nodeOf({
+      page: 'wheel',
+      language: 'fr',
+      type: 'BreadcrumbList'
+    })
+
+    expect(
+      nodeOf({ page: 'wheel', language: 'fr', type: 'WebPage' })?.breadcrumb
+    ).toStrictEqual({ '@id': crumbs?.['@id'] })
+    expect(
+      nodeOf({ page: 'home', language: 'fr', type: 'WebPage' })?.breadcrumb
+    ).toBeUndefined()
+  })
+
+  it('makes the software the subject of the two pages that carry it', () => {
+    const software = nodeOf({
+      page: 'home',
+      language: 'fr',
+      type: 'SoftwareApplication'
+    })
+
+    expect(
+      nodeOf({ page: 'download', language: 'fr', type: 'WebPage' })?.mainEntity
+    ).toStrictEqual({ '@id': software?.['@id'] })
+    expect(
+      nodeOf({ page: 'wheel', language: 'fr', type: 'WebPage' })?.mainEntity
+    ).toBeUndefined()
+  })
+
+  it('shows the Open Graph image of the page', () => {
+    expect(
+      nodeOf({ page: 'mac', language: 'en', type: 'WebPage' })
+        ?.primaryImageOfPage
+    ).toMatchObject({
+      '@type': 'ImageObject',
+      contentUrl: `${HOST}/og/en/mac.webp`
+    })
+  })
+})
+
 describe('the whole markup', () => {
   it.each(PAGE_IDS)('gives at least one record to %s', (page) => {
     expect(schemaOf({ page, language: 'fr' }).length).toBeGreaterThan(0)
   })
 
-  it.each(PAGE_IDS)('puts each record of %s under schema.org', (page) => {
-    for (const node of schemaOf({ page, language: 'fr' })) {
-      expect(node['@context']).toBe('https://schema.org')
-    }
+  it.each(PAGE_IDS)('holds every record of %s in one graph', (page) => {
+    const graph = graphOf({ page, language: 'fr' })
+
+    expect(graph['@context']).toBe('https://schema.org')
+    expect(graph['@graph']).toStrictEqual(schemaOf({ page, language: 'fr' }))
+  })
+
+  it.each(PAGE_IDS)('gives each record of %s its own address', (page) => {
+    const written = schemaOf({ page, language: 'fr' }).map((node) => {
+      return node['@id']
+    })
+
+    expect(new Set(written).size).toBe(written.length)
   })
 
   it.each(PAGE_IDS)('writes only absolute addresses on %s', (page) => {
@@ -249,9 +343,9 @@ describe('the markup laid in the page', () => {
 
   it('stays readable as JSON', () => {
     const written = scriptOf({ page: 'wheel', language: 'fr' })
+    const graph = graphOf({ page: 'wheel', language: 'fr' })
+    const laid = JSON.stringify(graph)
 
-    expect(JSON.parse(written)).toStrictEqual(
-      schemaOf({ page: 'wheel', language: 'fr' })
-    )
+    expect(JSON.parse(written)).toStrictEqual(JSON.parse(laid))
   })
 })

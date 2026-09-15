@@ -55,6 +55,10 @@ msgstr "See also"
 msgid "Aller au contenu"
 msgstr "Skip to content"
 
+#: src/constants/wording.ts
+msgid "Ankama et les logiciels multicompte Dofus Retro"
+msgstr "Ankama and Dofus Retro multi-account software"
+
 #: src/constants/ankama.ts
 msgid "Ankama l’écrit lui-même dans les deux messages ci-dessus."
 msgstr "Ankama says so itself, in both messages above."
@@ -107,6 +111,10 @@ msgstr "No move sends two characters at once. That is exactly the macro Ankama c
 #: src/constants/wording.ts
 msgid "AutoFocus"
 msgstr "AutoFocus"
+
+#: src/constants/wording.ts
+msgid "AutoFocus multicompte pour Dofus Retro"
+msgstr "Multi-account AutoFocus for Dofus Retro"
 
 #: src/constants/wording.ts
 msgid "Avant d’installer"
@@ -292,6 +300,10 @@ msgstr "Code published, with no free licence."
 msgid "Comparatif"
 msgstr "Comparison"
 
+#: src/constants/wording.ts
+msgid "Comparatif des logiciels multicompte Dofus Retro"
+msgstr "Dofus Retro multi-account software compared"
+
 #: src/constants/rivals.ts
 msgid "Compositions d’équipe enregistrées"
 msgstr "Saved team line-ups"
@@ -311,6 +323,10 @@ msgstr "In a window of its own, not over the game."
 #: src/constants/wording.ts
 msgid "Déplacement rapide"
 msgstr "Quick move"
+
+#: src/constants/wording.ts
+msgid "Déplacement rapide multicompte sur Dofus Retro"
+msgstr "Multi-account quick move on Dofus Retro"
 
 #: src/constants/rivals.ts
 msgid "Deux équipes fixes, T1 et T2, qu’on ne nomme pas."
@@ -607,6 +623,10 @@ msgstr "Play multiple accounts on Dofus Retro without ever hunting for a window.
 #: src/constants/wording.ts
 msgid "Journal des versions"
 msgstr "Changelog"
+
+#: src/constants/wording.ts
+msgid "Journal des versions de Multifus"
+msgstr "Multifus changelog"
 
 #: src/components/lost-word.tsx
 msgid "L’adresse est peut-être mal recopiée, ou la page a changé de nom. L’accueil vous remet sur le chemin."
@@ -936,6 +956,10 @@ msgstr "Read this page in English"
 msgid "Lire le message chez Ankama"
 msgstr "Read the message at Ankama"
 
+#: src/constants/wording.ts
+msgid "Logiciel multicompte Dofus Retro sur Mac"
+msgstr "Dofus Retro multi-account software on Mac"
+
 #: src/components/language-offer.tsx
 msgid "Masquer cette proposition"
 msgstr "Hide this suggestion"
@@ -947,6 +971,10 @@ msgstr "Legal notice"
 #: src/constants/wording.ts
 msgid "Messages privés"
 msgstr "Private messages"
+
+#: src/constants/wording.ts
+msgid "Messages privés de Dofus Retro sur Telegram"
+msgstr "Dofus Retro private messages on Telegram"
 
 #: src/constants/wording.ts
 msgid "Multifus"
@@ -1140,6 +1168,10 @@ msgstr "Surveyed on {surveyed}, in each tool’s own code."
 msgid "Réponses rapides"
 msgstr "Quick replies"
 
+#: src/constants/wording.ts
+msgid "Réponses rapides au clavier sur Dofus Retro"
+msgstr "Quick replies from the keyboard on Dofus Retro"
+
 #: src/constants/rivals.ts
 #~ msgid "Retient la dernière équipe, pas des compositions nommées."
 #~ msgstr "Remembers the last team, not named line-ups."
@@ -1167,6 +1199,10 @@ msgstr "Nothing official."
 #: src/constants/wording.ts
 msgid "Roue des personnages"
 msgstr "Character wheel"
+
+#: src/constants/wording.ts
+msgid "Roue des personnages pour le multicompte Dofus Retro"
+msgstr "Character wheel for Dofus Retro multiboxing"
 
 #: src/constants/bodies.ts
 #~ msgid "Sa fenêtre ne passe plus devant tant que vous ne l’avez pas remise dans le rang."
@@ -1260,6 +1296,10 @@ msgstr "On Windows? Take the .exe"
 msgid "Tableau des runes"
 msgstr "Rune table"
 
+#: src/constants/wording.ts
+msgid "Tableau du poids des runes de Dofus Retro"
+msgstr "Dofus Retro rune weight table"
+
 #: src/constants/bodies.ts
 msgid "Taille et transparence se règlent"
 msgstr "Size and transparency adjust"
@@ -1283,6 +1323,10 @@ msgstr "Download the .dmg"
 #: src/constants/systems.ts
 msgid "Télécharger le .exe"
 msgstr "Download the .exe"
+
+#: src/constants/wording.ts
+msgid "Télécharger le multicompte Dofus Retro gratuit"
+msgstr "Download free Dofus Retro multi-account software"
 
 #: src/constants/bodies.ts
 #~ msgid "Toujours les mêmes, toujours au pire moment."

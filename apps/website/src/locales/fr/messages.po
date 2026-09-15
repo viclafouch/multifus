@@ -55,6 +55,10 @@ msgstr "À voir aussi"
 msgid "Aller au contenu"
 msgstr "Aller au contenu"
 
+#: src/constants/wording.ts
+msgid "Ankama et les logiciels multicompte Dofus Retro"
+msgstr "Ankama et les logiciels multicompte Dofus Retro"
+
 #: src/constants/ankama.ts
 msgid "Ankama l’écrit lui-même dans les deux messages ci-dessus."
 msgstr "Ankama l’écrit lui-même dans les deux messages ci-dessus."
@@ -107,6 +111,10 @@ msgstr "Aucun geste ne déplace deux personnages à la fois. C’est exactement 
 #: src/constants/wording.ts
 msgid "AutoFocus"
 msgstr "AutoFocus"
+
+#: src/constants/wording.ts
+msgid "AutoFocus multicompte pour Dofus Retro"
+msgstr "AutoFocus multicompte pour Dofus Retro"
 
 #: src/constants/wording.ts
 msgid "Avant d’installer"
@@ -292,6 +300,10 @@ msgstr "Code publié, sans licence libre."
 msgid "Comparatif"
 msgstr "Comparatif"
 
+#: src/constants/wording.ts
+msgid "Comparatif des logiciels multicompte Dofus Retro"
+msgstr "Comparatif des logiciels multicompte Dofus Retro"
+
 #: src/constants/rivals.ts
 msgid "Compositions d’équipe enregistrées"
 msgstr "Compositions d’équipe enregistrées"
@@ -311,6 +323,10 @@ msgstr "Dans sa fenêtre à lui, pas par-dessus le jeu."
 #: src/constants/wording.ts
 msgid "Déplacement rapide"
 msgstr "Déplacement rapide"
+
+#: src/constants/wording.ts
+msgid "Déplacement rapide multicompte sur Dofus Retro"
+msgstr "Déplacement rapide multicompte sur Dofus Retro"
 
 #: src/constants/rivals.ts
 msgid "Deux équipes fixes, T1 et T2, qu’on ne nomme pas."
@@ -607,6 +623,10 @@ msgstr "Jouez en multicompte sur Dofus Retro sans jamais chercher une fenêtre."
 #: src/constants/wording.ts
 msgid "Journal des versions"
 msgstr "Journal des versions"
+
+#: src/constants/wording.ts
+msgid "Journal des versions de Multifus"
+msgstr "Journal des versions de Multifus"
 
 #: src/components/lost-word.tsx
 msgid "L’adresse est peut-être mal recopiée, ou la page a changé de nom. L’accueil vous remet sur le chemin."
@@ -936,6 +956,10 @@ msgstr "Lire cette page en français"
 msgid "Lire le message chez Ankama"
 msgstr "Lire le message chez Ankama"
 
+#: src/constants/wording.ts
+msgid "Logiciel multicompte Dofus Retro sur Mac"
+msgstr "Logiciel multicompte Dofus Retro sur Mac"
+
 #: src/components/language-offer.tsx
 msgid "Masquer cette proposition"
 msgstr "Masquer cette proposition"
@@ -947,6 +971,10 @@ msgstr "Mentions légales"
 #: src/constants/wording.ts
 msgid "Messages privés"
 msgstr "Messages privés"
+
+#: src/constants/wording.ts
+msgid "Messages privés de Dofus Retro sur Telegram"
+msgstr "Messages privés de Dofus Retro sur Telegram"
 
 #: src/constants/wording.ts
 msgid "Multifus"
@@ -1140,6 +1168,10 @@ msgstr "Relevé le {surveyed}, dans le code de chaque outil."
 msgid "Réponses rapides"
 msgstr "Réponses rapides"
 
+#: src/constants/wording.ts
+msgid "Réponses rapides au clavier sur Dofus Retro"
+msgstr "Réponses rapides au clavier sur Dofus Retro"
+
 #: src/constants/rivals.ts
 #~ msgid "Retient la dernière équipe, pas des compositions nommées."
 #~ msgstr "Retient la dernière équipe, pas des compositions nommées."
@@ -1167,6 +1199,10 @@ msgstr "Rien d’officiel."
 #: src/constants/wording.ts
 msgid "Roue des personnages"
 msgstr "Roue des personnages"
+
+#: src/constants/wording.ts
+msgid "Roue des personnages pour le multicompte Dofus Retro"
+msgstr "Roue des personnages pour le multicompte Dofus Retro"
 
 #: src/constants/bodies.ts
 #~ msgid "Sa fenêtre ne passe plus devant tant que vous ne l’avez pas remise dans le rang."
@@ -1260,6 +1296,10 @@ msgstr "Sur Windows ? Prendre le .exe"
 msgid "Tableau des runes"
 msgstr "Tableau des runes"
 
+#: src/constants/wording.ts
+msgid "Tableau du poids des runes de Dofus Retro"
+msgstr "Tableau du poids des runes de Dofus Retro"
+
 #: src/constants/bodies.ts
 msgid "Taille et transparence se règlent"
 msgstr "Taille et transparence se règlent"
@@ -1283,6 +1323,10 @@ msgstr "Télécharger le .dmg"
 #: src/constants/systems.ts
 msgid "Télécharger le .exe"
 msgstr "Télécharger le .exe"
+
+#: src/constants/wording.ts
+msgid "Télécharger le multicompte Dofus Retro gratuit"
+msgstr "Télécharger le multicompte Dofus Retro gratuit"
 
 #: src/constants/bodies.ts
 #~ msgid "Toujours les mêmes, toujours au pire moment."

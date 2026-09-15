@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { LANGUAGES, SOURCE_LANGUAGE } from '@/constants/languages'
-import { PAGE_NAMES, SITE_TITLE } from '@/constants/wording'
+import { PAGE_NAMES, PAGE_TITLES } from '@/constants/wording'
 import { SPEAKERS } from '@/lib/i18n'
 
 const TRANSLATED = LANGUAGES.filter((language) => {
@@ -15,7 +15,7 @@ describe('the three voices', () => {
   })
 
   it('return the French sentence as it is', () => {
-    expect(SPEAKERS.fr._(SITE_TITLE)).toBe(
+    expect(SPEAKERS.fr._(PAGE_TITLES.home)).toBe(
       'Multifus, logiciel multicompte gratuit pour Dofus Retro'
     )
     expect(SPEAKERS.fr._(PAGE_NAMES.wheel)).toBe('Roue des personnages')

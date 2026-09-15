@@ -4,6 +4,10 @@ export const REPOSITORY = 'https://github.com/viclafouch/multifus'
 
 export const AUTHOR = 'https://x.com/TrustedSheriff'
 
+export const AUTHOR_HANDLE = '@TrustedSheriff'
+
+export const AUTHOR_NAME = 'Victor de la Fouchardière'
+
 export const AUTHOR_CODE = 'https://github.com/viclafouch'
 
 export const AUTHOR_MAIL = 'victor.delafouchardiere@gmail.com'

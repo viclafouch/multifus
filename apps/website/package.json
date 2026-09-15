@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "pnpm run draw:og && vite dev",
-    "build": "pnpm run draw:og && vite build",
+    "build": "pnpm run draw:og && vite build && node scripts/tidy-build.mjs",
     "draw:og": "node scripts/draw-og.mjs",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",

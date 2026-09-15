@@ -1,33 +1,22 @@
 import type { MessageDescriptor } from '@lingui/core'
 import type { PageId } from '@/@types/page'
-import { LANGUAGES, SOURCE_LANGUAGE } from '@/constants/languages'
+import { HOST } from '@/constants/host'
+import { LANGUAGES, OPEN_GRAPH_LOCALES } from '@/constants/languages'
 import { LOOPS } from '@/constants/loops'
 import { OG_HEIGHT, OG_IMAGE, OG_WIDTH } from '@/constants/og'
 import { PAGES } from '@/constants/pages'
-import { FOLD_ANCHOR } from '@/constants/site'
-import { PAGE_NAMES, PAGE_PROMISES, SITE_TITLE } from '@/constants/wording'
+import { AUTHOR_HANDLE, FOLD_ANCHOR } from '@/constants/site'
+import { PAGE_NAMES, PAGE_PROMISES, PAGE_TITLES } from '@/constants/wording'
 import { addressOf, ogAddressOf } from '@/helpers/address'
 import type { PathParams } from '@/helpers/page'
+import { alternateRefsOf } from '@/helpers/page'
 import { scriptOf } from '@/helpers/schema'
 import { SPEAKERS } from '@/lib/i18n'
 
-export const alternatesOf = (page: PageId) => {
-  const translated = LANGUAGES.map((language) => {
-    return {
-      rel: 'alternate',
-      hrefLang: language,
-      href: addressOf({ page, language })
-    }
+const alternatesOf = (page: PageId) => {
+  return alternateRefsOf({ page, origin: HOST }).map(({ hreflang, href }) => {
+    return { rel: 'alternate', hrefLang: hreflang, href }
   })
-
-  return [
-    ...translated,
-    {
-      rel: 'alternate',
-      hrefLang: 'x-default',
-      href: addressOf({ page, language: SOURCE_LANGUAGE })
-    }
-  ]
 }
 
 const POSTER_PRELOAD = {
@@ -63,7 +52,10 @@ export const headOf = ({ page, language }: PathParams) => {
   const address = addressOf({ page, language })
   const name = speaker._(PAGE_NAMES[page])
   const description = speaker._(PAGE_PROMISES[page])
-  const title = page === 'home' ? speaker._(SITE_TITLE) : titleOf(name)
+  const written = speaker._(PAGE_TITLES[page])
+  const title = page === 'home' ? written : titleOf(written)
+  const image = ogAddressOf({ page, language })
+  const legend = `${name}. ${description}`
 
   return {
     meta: [
@@ -74,13 +66,19 @@ export const headOf = ({ page, language }: PathParams) => {
       { property: 'og:description', content: description },
       { property: 'og:type', content: 'website' },
       { property: 'og:url', content: address },
-      { property: 'og:locale', content: language },
-      { property: 'og:image', content: ogAddressOf({ page, language }) },
+      { property: 'og:locale', content: OPEN_GRAPH_LOCALES[language] },
+      { property: 'og:image', content: image },
       { property: 'og:image:type', content: OG_IMAGE.type },
       { property: 'og:image:width', content: String(OG_WIDTH) },
       { property: 'og:image:height', content: String(OG_HEIGHT) },
-      { property: 'og:image:alt', content: `${name}. ${description}` },
-      { name: 'twitter:card', content: 'summary_large_image' }
+      { property: 'og:image:alt', content: legend },
+      { name: 'twitter:card', content: 'summary_large_image' },
+      { name: 'twitter:site', content: AUTHOR_HANDLE },
+      { name: 'twitter:creator', content: AUTHOR_HANDLE },
+      { name: 'twitter:title', content: title },
+      { name: 'twitter:description', content: description },
+      { name: 'twitter:image', content: image },
+      { name: 'twitter:image:alt', content: legend }
     ],
     links: [
       { rel: 'canonical', href: address },

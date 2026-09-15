@@ -1,13 +1,14 @@
+import { INK } from '@/constants/ink'
 import { SITE_DOMAIN } from '@/constants/site'
 import { INDEPENDENCE, PAGE_NAMES, PAGE_PROMISES } from '@/constants/wording'
 import type { PathParams } from '@/helpers/page'
 import { SPEAKERS } from '@/lib/i18n'
 import { OG_FONTS } from '@/og/fonts'
-import { inkedWith, OG_INK } from '@/og/ink'
 import {
   ENGRAVE,
   FLOOR,
   GRAIN,
+  inkedWith,
   LIMELIGHT,
   SCRIM,
   SHEET,
@@ -54,7 +55,7 @@ export const OgCard = ({ page, language, decor, logo }: OgCardProps) => {
         height: '100%',
         padding: '54px 62px',
         fontFamily: PLAIN,
-        backgroundColor: OG_INK.iron
+        backgroundColor: INK.iron
       }}
     >
       <img
@@ -86,7 +87,7 @@ export const OgCard = ({ page, language, decor, logo }: OgCardProps) => {
           bottom: 22,
           left: 22,
           borderRadius: 16,
-          border: `1px solid ${inkedWith(OG_INK.band, 0.22)}`
+          border: `1px solid ${inkedWith(INK.band, 0.22)}`
         }}
       />
       <div
@@ -104,10 +105,10 @@ export const OgCard = ({ page, language, decor, logo }: OgCardProps) => {
               height: 12,
               borderRadius: 2,
               transform: 'rotate(45deg)',
-              backgroundColor: OG_INK.leafLit
+              backgroundColor: INK.leafLit
             }}
           />
-          <div style={legendOf(OG_INK.khaki)}>{GAME}</div>
+          <div style={legendOf(INK.khaki)}>{GAME}</div>
         </div>
       </div>
       <div
@@ -126,7 +127,7 @@ export const OgCard = ({ page, language, decor, logo }: OgCardProps) => {
             fontSize: 112,
             lineHeight: 0.88,
             letterSpacing: '-0.02em',
-            color: OG_INK.cream,
+            color: INK.cream,
             textShadow: LIMELIGHT
           }}
         >
@@ -148,7 +149,7 @@ export const OgCard = ({ page, language, decor, logo }: OgCardProps) => {
             maxWidth: 780,
             fontSize: 34,
             lineHeight: 1.4,
-            color: OG_INK.khaki,
+            color: INK.khaki,
             textShadow: ENGRAVE
           }}
         >
@@ -164,14 +165,12 @@ export const OgCard = ({ page, language, decor, logo }: OgCardProps) => {
         }}
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <div style={{ ...legendOf(OG_INK.khaki), fontSize: 21 }}>
-            {SYSTEMS}
-          </div>
+          <div style={{ ...legendOf(INK.khaki), fontSize: 21 }}>{SYSTEMS}</div>
           <div
             style={{
               display: 'flex',
               fontSize: 19,
-              color: inkedWith(OG_INK.khaki, 0.82),
+              color: inkedWith(INK.khaki, 0.82),
               textShadow: LIMELIGHT
             }}
           >
@@ -186,7 +185,7 @@ export const OgCard = ({ page, language, decor, logo }: OgCardProps) => {
               fontFamily: CARVE,
               fontSize: 30,
               letterSpacing: '0.05em',
-              color: OG_INK.cream,
+              color: INK.cream,
               textShadow: LIMELIGHT
             }}
           >

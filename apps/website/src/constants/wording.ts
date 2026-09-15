@@ -19,6 +19,22 @@ export const PAGE_NAMES = {
   legal: msg`Mentions légales`
 } as const satisfies Record<PageId, MessageDescriptor>
 
+export const PAGE_TITLES = {
+  home: msg`Multifus, logiciel multicompte gratuit pour Dofus Retro`,
+  autoFocus: msg`AutoFocus multicompte pour Dofus Retro`,
+  wheel: msg`Roue des personnages pour le multicompte Dofus Retro`,
+  walk: msg`Déplacement rapide multicompte sur Dofus Retro`,
+  runeTable: msg`Tableau du poids des runes de Dofus Retro`,
+  relay: msg`Messages privés de Dofus Retro sur Telegram`,
+  quickReplies: msg`Réponses rapides au clavier sur Dofus Retro`,
+  mac: msg`Logiciel multicompte Dofus Retro sur Mac`,
+  comparison: msg`Comparatif des logiciels multicompte Dofus Retro`,
+  download: msg`Télécharger le multicompte Dofus Retro gratuit`,
+  journal: msg`Journal des versions de Multifus`,
+  ankama: msg`Ankama et les logiciels multicompte Dofus Retro`,
+  legal: msg`Mentions légales`
+} as const satisfies Record<PageId, MessageDescriptor>
+
 export const PAGE_PROMISES = {
   home: msg`Jouez en multicompte sur Dofus Retro sans jamais chercher une fenêtre.`,
   autoFocus: msg`La fenêtre du personnage qui joue passe devant toute seule.`,
@@ -47,8 +63,6 @@ export const MENU_HINTS = {
 export const LOOP_PLAY = msg`Lire`
 
 export const LOOP_HOLD = msg`Pause`
-
-export const SITE_TITLE = msg`Multifus, logiciel multicompte gratuit pour Dofus Retro`
 
 export const INDEPENDENCE = msg`Projet indépendant, sans lien avec Ankama.`
 

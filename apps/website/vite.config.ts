@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process'
 import path from 'node:path'
 import { loadEnv } from 'vite'
 import { defineConfig } from 'vitest/config'
@@ -6,8 +7,9 @@ import babel from '@rolldown/plugin-babel'
 import tailwindcss from '@tailwindcss/vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import react from '@vitejs/plugin-react'
+import type { PageId } from './src/@types/page.ts'
 import { LOST_FILE, LOST_PATH, ROBOTS_PATH } from './src/constants/site.ts'
-import { everyPath } from './src/helpers/page.ts'
+import { alternateRefsOf, everyPage } from './src/helpers/page.ts'
 
 type StartPage = NonNullable<
   NonNullable<Parameters<typeof tanstackStart>[0]>['pages']
@@ -36,6 +38,32 @@ export const SOURCE_PLUGINS = [
   lingui({ failOnMissing: true, failOnCompileError: true })
 ]
 
+const siteWrittenOn = () => {
+  try {
+    const day = execFileSync(
+      'git',
+      ['log', '-1', '--format=%cs', '--', 'src'],
+      { cwd: import.meta.dirname, encoding: 'utf8' }
+    ).trim()
+
+    return day === '' ? null : day
+  } catch {
+    return null
+  }
+}
+
+type SitemapOfParams = Readonly<{
+  page: PageId
+  origin: string
+  day: string | null
+}>
+
+const sitemapOf = ({ page, origin, day }: SitemapOfParams) => {
+  const alternateRefs = alternateRefsOf({ page, origin })
+
+  return day === null ? { alternateRefs } : { alternateRefs, lastmod: day }
+}
+
 const originOf = (mode: string) => {
   const { VITE_SITE_URL } = loadEnv(mode, import.meta.dirname, 'VITE_')
 
@@ -50,6 +78,9 @@ const originOf = (mode: string) => {
 
 // oxlint-disable-next-line prefer-readonly-parameter-types -- the signature of the callback belongs to the ConfigEnv of Vite
 export default defineConfig(({ mode }) => {
+  const origin = originOf(mode)
+  const day = siteWrittenOn()
+
   return {
     plugins: [
       tanstackStart({
@@ -60,14 +91,18 @@ export default defineConfig(({ mode }) => {
           failOnError: true
         },
         pages: [
-          ...everyPath().map((route) => {
-            return { path: route, prerender: { enabled: true } }
+          ...everyPage().map(({ page, path: route }) => {
+            return {
+              path: route,
+              prerender: { enabled: true },
+              sitemap: sitemapOf({ page, origin, day })
+            }
           }),
           ...ASIDE_PAGES
         ],
         sitemap: {
           enabled: true,
-          host: originOf(mode)
+          host: origin
         }
       }),
       tailwindcss(),

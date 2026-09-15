@@ -40,24 +40,46 @@ export const pageOf = ({ slug, language }: PageOfParams) => {
   return found ?? null
 }
 
-const pathsOf = (pages: readonly PageId[]) => {
+type AlternateRefsOfParams = Readonly<{
+  page: PageId
+  origin: string
+}>
+
+export const alternateRefsOf = ({ page, origin }: AlternateRefsOfParams) => {
+  const translated = LANGUAGES.map((language) => {
+    return {
+      hreflang: language,
+      href: `${origin}${pathOf({ page, language })}`
+    }
+  })
+
+  return [
+    ...translated,
+    {
+      hreflang: 'x-default',
+      href: `${origin}${pathOf({ page, language: SOURCE_LANGUAGE })}`
+    }
+  ]
+}
+
+type PageAddress = PathParams & Readonly<{ path: string }>
+
+export const everyPage = (): readonly PageAddress[] => {
   return LANGUAGES.flatMap((language) => {
-    return pages.map((page) => {
-      return pathOf({ page, language })
+    return PAGE_IDS.map((page) => {
+      return { page, language, path: pathOf({ page, language }) }
     })
   })
 }
 
-export const everyPath = () => {
-  return pathsOf(PAGE_IDS)
-}
-
 const LOOP_PATHS = new Set(
-  pathsOf(
-    PAGE_IDS.filter((page) => {
+  everyPage()
+    .filter(({ page }) => {
       return PAGES[page].loop !== null
     })
-  )
+    .map(({ path }) => {
+      return path
+    })
 )
 
 export const matchHasLoop = (pathname: string) => {
