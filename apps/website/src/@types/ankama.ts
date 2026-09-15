@@ -1,9 +1,15 @@
+import type { MessageDescriptor } from '@lingui/core'
+import type { Icon } from '@phosphor-icons/react'
 import type { Picture } from './media'
 
-export type AnkamaWordId = 'forum' | 'post'
+export type AnkamaSourceId = 'forum' | 'post'
 
-export type AnkamaWord = Readonly<{
-  shot: Picture
+export type AnkamaSource = Readonly<{
+  icon: Icon
+  name: MessageDescriptor
+  date: MessageDescriptor
+  alt: MessageDescriptor
   quote: string
+  shot: Picture
   href: string
 }>

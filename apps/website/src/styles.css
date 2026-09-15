@@ -190,6 +190,27 @@
   }
 }
 
+@utility proof {
+  display: block;
+  position: relative;
+
+  & img {
+    display: block;
+    width: 100%;
+    height: auto;
+    filter: saturate(0.88) brightness(0.88);
+    transition-property: filter, transform;
+    transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+    transition-duration: 0.45s;
+  }
+
+  &:hover img,
+  &:focus-visible img {
+    filter: none;
+    transform: scale(1.015);
+  }
+}
+
 @keyframes sweep {
   to {
     --sweep: 360deg;
@@ -1092,6 +1113,7 @@
   .card,
   .card::after,
   .plane,
+  .proof img,
   .hinted,
   .picked,
   .pick::before,

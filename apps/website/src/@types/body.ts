@@ -12,6 +12,16 @@ export type Boon = Readonly<{
   line: MessageDescriptor
 }>
 
+export type RuleTone = 'banned' | 'kept'
+
+export type Rule = Readonly<{
+  tone: RuleTone
+  icon: Icon
+  title: MessageDescriptor
+  lines: readonly MessageDescriptor[]
+  verdict: MessageDescriptor
+}>
+
 export type Body = Readonly<{
   lead: MessageDescriptor
   boons: readonly Boon[]

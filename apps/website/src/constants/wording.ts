@@ -15,7 +15,7 @@ export const PAGE_NAMES = {
   comparison: msg`Comparatif`,
   download: msg`Télécharger`,
   journal: msg`Journal des versions`,
-  ankama: msg`Ce qu’Ankama en dit`,
+  ankama: msg`Multifus est-il autorisé ?`,
   legal: msg`Mentions légales`
 } as const satisfies Record<PageId, MessageDescriptor>
 
@@ -31,7 +31,7 @@ export const PAGE_TITLES = {
   comparison: msg`Comparatif des logiciels multicompte Dofus Retro`,
   download: msg`Télécharger le multicompte Dofus Retro gratuit`,
   journal: msg`Journal des versions de Multifus`,
-  ankama: msg`Ankama et les logiciels multicompte Dofus Retro`,
+  ankama: msg`Multifus est-il autorisé sur Dofus Retro ?`,
   legal: msg`Mentions légales`
 } as const satisfies Record<PageId, MessageDescriptor>
 
@@ -47,7 +47,7 @@ export const PAGE_PROMISES = {
   comparison: msg`Multifus et les autres gestionnaires, ligne par ligne.`,
   download: msg`Multifus est gratuit, pour Mac et pour Windows. Trois gestes, et vous jouez en multicompte sur Dofus Retro.`,
   journal: msg`Ce que chaque version a changé.`,
-  ankama: msg`Ankama tolère les gestionnaires de fenêtres. Voici ses deux messages.`,
+  ankama: msg`Oui. Ankama tolère les logiciels qui rangent les fenêtres du jeu, tant qu’ils n’y touchent à rien. Multifus reste dans ce cadre.`,
   legal: msg`Qui publie ce site, qui l’héberge, et le peu qu’il garde de vous.`
 } as const satisfies Record<PageId, MessageDescriptor>
 

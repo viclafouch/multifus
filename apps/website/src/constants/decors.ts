@@ -47,7 +47,7 @@ export const PAGE_DECORS = {
   comparison: DECORS.arena,
   download: DECORS.standingStone,
   journal: null,
-  ankama: null,
+  ankama: DECORS.village,
   legal: null
 } as const satisfies Record<PageId, Picture | null>
 

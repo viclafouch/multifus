@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises'
 import { describe, expect, it } from 'vitest'
 import type { Size } from '@/@types/media'
-import { ANKAMA_WORD_IDS, ANKAMA_WORDS } from '@/constants/ankama'
+import { ANKAMA_SOURCE_IDS, ANKAMA_SOURCES } from '@/constants/ankama'
 import { PAGE_DECORS } from '@/constants/decors'
 import { LOOPS, PEEK_SIZE, PEEKS, POSTER_SIZE } from '@/constants/loops'
 import { PAGE_IDS } from '@/constants/pages'
@@ -67,8 +67,8 @@ const everySizeDeclared = () => {
     }
   }
 
-  for (const word of ANKAMA_WORD_IDS) {
-    const { src, width, height } = ANKAMA_WORDS[word].shot
+  for (const source of ANKAMA_SOURCE_IDS) {
+    const { src, width, height } = ANKAMA_SOURCES[source].shot
 
     declared.set(src, { width, height })
   }
