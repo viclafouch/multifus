@@ -26,10 +26,12 @@ export const AnkamaWord = ({ word }: AnkamaWordProps) => {
         « {quote} »
       </blockquote>
       <img
-        src={shot}
+        src={shot.src}
         alt={i18n._(ANKAMA_WORD_ALTS[word])}
+        width={shot.width}
+        height={shot.height}
         loading="lazy"
-        className="rule w-full rounded-md border"
+        className="rule h-auto w-full rounded-md border"
       />
       <p className="text-aside">
         <OutLink href={href}>{i18n._(SEE_SOURCE)}</OutLink>

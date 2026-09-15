@@ -1,6 +1,8 @@
 export const SITE_DOMAIN = 'multifus.app'
 
-export const REPOSITORY = 'https://github.com/viclafouch/multifus'
+export const REPOSITORY_PATH = 'viclafouch/multifus'
+
+export const REPOSITORY = `https://github.com/${REPOSITORY_PATH}`
 
 export const AUTHOR = 'https://x.com/TrustedSheriff'
 

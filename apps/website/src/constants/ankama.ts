@@ -13,13 +13,13 @@ export const ANKAMA_WORD_IDS = [
 
 export const ANKAMA_WORDS = {
   post: {
-    shot: postShot,
+    shot: { src: postShot, width: 1176, height: 816 },
     quote:
       'L’utilisation d’un logiciel tiers est tolérée UNIQUEMENT s’il ne modifie/n’interagit pas avec les fichiers du jeu ou le jeu en lui-même.',
     href: ANKAMA_POST
   },
   forum: {
-    shot: forumShot,
+    shot: { src: forumShot, width: 1400, height: 982 },
     quote:
       'Nous avons une certaine tolérance pour ce qui est des logiciels de « gestion de fenêtres », mais il est important de rappeler qu’il ne s’agit pas d’outils officiellement pris en charge par Ankama.',
     href: ANKAMA_FORUM

@@ -1,4 +1,5 @@
 import { INK } from '@/constants/ink'
+import { OG_HEIGHT, OG_WIDTH } from '@/constants/og'
 import { SITE_DOMAIN } from '@/constants/site'
 import { INDEPENDENCE, PAGE_NAMES, PAGE_PROMISES } from '@/constants/wording'
 import type { PathParams } from '@/helpers/page'
@@ -61,6 +62,8 @@ export const OgCard = ({ page, language, decor, logo }: OgCardProps) => {
       <img
         src={decor}
         alt=""
+        width={OG_WIDTH}
+        height={OG_HEIGHT}
         style={{
           ...SHEET,
           width: '100%',

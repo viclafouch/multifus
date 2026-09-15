@@ -18,49 +18,61 @@ import walkLoop from '@multifus/ankama/loops/walk-loop.mp4'
 import wheelPeek from '@multifus/ankama/loops/wheel-loop-peek.webp'
 import wheelPoster from '@multifus/ankama/loops/wheel-loop-poster.webp'
 import wheelLoop from '@multifus/ankama/loops/wheel-loop.mp4'
+import type { Size } from '@/@types/media'
 import type { FeatureId, Loop, LoopId } from '@/@types/page'
 
 const FILMED_ON = '2026-09-08'
 
+export const POSTER_SIZE = { width: 1280, height: 720 } as const satisfies Size
+
+export const PEEK_SIZE = { width: 720, height: 406 } as const satisfies Size
+
 export const LOOPS = {
   home: {
     source: homeLoop,
+    size: { width: 1386, height: 780 },
     poster: homePoster,
     seconds: 12,
     filmed: FILMED_ON
   },
   autoFocus: {
     source: autoFocusLoop,
+    size: { width: 1384, height: 778 },
     poster: autoFocusPoster,
     seconds: 13,
     filmed: FILMED_ON
   },
   wheel: {
     source: wheelLoop,
+    size: { width: 1386, height: 780 },
     poster: wheelPoster,
     seconds: 12,
     filmed: FILMED_ON
   },
   walk: {
     source: walkLoop,
+    size: { width: 1386, height: 780 },
     poster: walkPoster,
     seconds: 14,
     filmed: FILMED_ON
   },
   runeTable: {
     source: runeTableLoop,
+    size: { width: 1384, height: 778 },
     poster: runeTablePoster,
     seconds: 14,
     filmed: FILMED_ON
   },
   relay: {
     source: relayLoop,
+    size: { width: 1384, height: 778 },
     poster: relayPoster,
     seconds: 13,
     filmed: FILMED_ON
   },
   quickReplies: {
     source: quickRepliesLoop,
+    size: { width: 1386, height: 780 },
     poster: quickRepliesPoster,
     seconds: 14,
     filmed: FILMED_ON

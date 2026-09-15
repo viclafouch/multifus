@@ -10,6 +10,8 @@ interface ImportMeta {
   readonly env: ImportMetaEnv
 }
 
+declare const __RELEASE_LINKS__: import('@/helpers/release').ReleaseLinks | null
+
 declare module '*.po' {
   import type { Messages } from '@lingui/core'
 

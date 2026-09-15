@@ -14,6 +14,7 @@ export const DownloadTake = () => {
   const { i18n } = useLingui()
   const shown = useSystem()
   const other = SYSTEM_OTHERS[shown]
+  const takes = __RELEASE_LINKS__ ?? { macos: RELEASES, windows: RELEASES }
 
   return (
     <div className="flex flex-col items-start gap-5">
@@ -25,7 +26,7 @@ export const DownloadTake = () => {
           className="h-auto max-w-full py-3 text-center whitespace-normal"
           render={
             /* oxlint-disable-next-line control-has-associated-label -- Base UI puts the children of the Button in this link, which the rule reads as empty */
-            <a className="sighted" href={RELEASES} />
+            <a className="sighted" href={takes[shown]} />
           }
         >
           {i18n._(SYSTEM_PACKAGES[shown])}
@@ -35,7 +36,7 @@ export const DownloadTake = () => {
         </p>
       </div>
       <p className="text-tale">
-        <OutLink href={RELEASES}>{i18n._(SYSTEM_ELSEWHERE[other])}</OutLink>
+        <OutLink href={takes[other]}>{i18n._(SYSTEM_ELSEWHERE[other])}</OutLink>
       </p>
     </div>
   )

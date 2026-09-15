@@ -15,6 +15,8 @@ import { useOffer } from '@/hooks/use-offer'
 
 const SITE_NAV = msg`Les pages de Multifus`
 
+const LOGO_SIDE = 256
+
 type SiteHeaderProps = Readonly<{
   page: PageId
 }>
@@ -41,7 +43,13 @@ export const SiteHeader = ({ page }: SiteHeaderProps) => {
             page="home"
             className="flex items-center gap-2.5 font-carve text-action tracking-chapter text-cream"
           >
-            <img src={logo} alt="" className="size-8" />
+            <img
+              src={logo}
+              alt=""
+              width={LOGO_SIDE}
+              height={LOGO_SIDE}
+              className="size-8"
+            />
             Multifus
           </PageLink>
           <FeaturesMenu page={page} />

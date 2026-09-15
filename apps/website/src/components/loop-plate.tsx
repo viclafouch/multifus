@@ -19,7 +19,7 @@ export const LoopPlate = ({
 }: LoopPlateProps) => {
   const isStill = useMedia(STILL)
   const { video, isPlaying, toggle } = usePlayer({ isStill, isAuto: isAmbient })
-  const { source, poster } = LOOPS[loop]
+  const { source, size, poster } = LOOPS[loop]
   const Toggle = isAmbient ? LoopChip : LoopCurtain
 
   return (
@@ -28,6 +28,8 @@ export const LoopPlate = ({
         ref={video}
         src={source}
         poster={poster}
+        width={size.width}
+        height={size.height}
         aria-label={caption}
         className="absolute inset-0 size-full object-cover"
         controls={isStill}

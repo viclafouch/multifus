@@ -8,8 +8,14 @@ import tailwindcss from '@tailwindcss/vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import react from '@vitejs/plugin-react'
 import type { PageId } from './src/@types/page.ts'
-import { LOST_FILE, LOST_PATH, ROBOTS_PATH } from './src/constants/site.ts'
+import {
+  LOST_FILE,
+  LOST_PATH,
+  RELEASES,
+  ROBOTS_PATH
+} from './src/constants/site.ts'
 import { alternateRefsOf, everyPage } from './src/helpers/page.ts'
+import { latestReleaseLinks } from './src/helpers/release.ts'
 
 type StartPage = NonNullable<
   NonNullable<Parameters<typeof tanstackStart>[0]>['pages']
@@ -76,12 +82,33 @@ const originOf = (mode: string) => {
   }
 }
 
+const releaseLinksFor = async (mode: string) => {
+  if (mode === 'test') {
+    return null
+  }
+
+  const links = await latestReleaseLinks()
+  const said =
+    links === null
+      ? `no published release yet, both packages point at ${RELEASES}`
+      : `packages taken from ${links.macos} and ${links.windows}`
+
+  // oxlint-disable-next-line no-console -- the build says out loud which addresses it froze into the pages
+  console.log(said)
+
+  return links
+}
+
 // oxlint-disable-next-line prefer-readonly-parameter-types -- the signature of the callback belongs to the ConfigEnv of Vite
-export default defineConfig(({ mode }) => {
+export default defineConfig(async ({ mode }) => {
   const origin = originOf(mode)
   const day = siteWrittenOn()
+  const releaseLinks = await releaseLinksFor(mode)
 
   return {
+    define: {
+      __RELEASE_LINKS__: JSON.stringify(releaseLinks)
+    },
     plugins: [
       tanstackStart({
         prerender: {

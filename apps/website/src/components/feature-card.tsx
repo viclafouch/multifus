@@ -2,7 +2,7 @@ import { useLingui } from '@lingui/react'
 import { cn } from '@multifus/retro'
 import type { FeatureId } from '@/@types/page'
 import { PageLink } from '@/components/page-link'
-import { LOOPS, PEEKS } from '@/constants/loops'
+import { LOOPS, PEEK_SIZE, PEEKS, POSTER_SIZE } from '@/constants/loops'
 import { PAGES } from '@/constants/pages'
 import { PAGE_TINTS } from '@/constants/tints'
 import { PAGE_NAMES, PAGE_PROMISES } from '@/constants/wording'
@@ -32,6 +32,7 @@ export const FeatureCard = ({ page, hasPeek = false }: FeatureCardProps) => {
         <img
           src={LOOPS[loop].poster}
           alt=""
+          {...POSTER_SIZE}
           loading="lazy"
           decoding="async"
           className="plane poster"
@@ -40,6 +41,7 @@ export const FeatureCard = ({ page, hasPeek = false }: FeatureCardProps) => {
           <img
             src={PEEKS[page]}
             alt=""
+            {...PEEK_SIZE}
             decoding="async"
             fetchPriority="high"
             data-ready={isReady ? '' : undefined}

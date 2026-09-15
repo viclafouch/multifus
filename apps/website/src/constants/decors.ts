@@ -7,25 +7,49 @@ import pen from '@multifus/ankama/images/pen.webp'
 import standingStone from '@multifus/ankama/images/standing-stone.webp'
 import village from '@multifus/ankama/images/village.webp'
 import workshop from '@multifus/ankama/images/workshop.webp'
+import type { Picture } from '@/@types/media'
 import type { PageId } from '@/@types/page'
 
 const DECOR_DIR = '@multifus/ankama/images'
 
+type DecorId =
+  | 'arena'
+  | 'battle'
+  | 'camp'
+  | 'forest'
+  | 'harbour'
+  | 'pen'
+  | 'standingStone'
+  | 'village'
+  | 'workshop'
+
+const DECORS = {
+  arena: { src: arena, width: 1100, height: 825 },
+  battle: { src: battle, width: 1484, height: 864 },
+  camp: { src: camp, width: 1100, height: 825 },
+  forest: { src: forest, width: 1100, height: 825 },
+  harbour: { src: harbour, width: 1100, height: 825 },
+  pen: { src: pen, width: 1100, height: 825 },
+  standingStone: { src: standingStone, width: 1484, height: 864 },
+  village: { src: village, width: 1100, height: 825 },
+  workshop: { src: workshop, width: 1030, height: 630 }
+} as const satisfies Record<DecorId, Picture>
+
 export const PAGE_DECORS = {
-  home: village,
-  autoFocus: battle,
-  wheel: camp,
-  walk: forest,
-  runeTable: workshop,
-  relay: pen,
-  quickReplies: harbour,
-  mac: village,
-  comparison: arena,
-  download: standingStone,
+  home: DECORS.village,
+  autoFocus: DECORS.battle,
+  wheel: DECORS.camp,
+  walk: DECORS.forest,
+  runeTable: DECORS.workshop,
+  relay: DECORS.pen,
+  quickReplies: DECORS.harbour,
+  mac: DECORS.village,
+  comparison: DECORS.arena,
+  download: DECORS.standingStone,
   journal: null,
   ankama: null,
   legal: null
-} as const satisfies Record<PageId, string | null>
+} as const satisfies Record<PageId, Picture | null>
 
 export const OG_DECOR_FILES = {
   home: `${DECOR_DIR}/village.webp`,

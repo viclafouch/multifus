@@ -33,7 +33,9 @@ describe('the two messages of Ankama', () => {
   it.each(ANKAMA_WORD_IDS)('gives %s its screenshot and its source', (word) => {
     const { shot, href } = ANKAMA_WORDS[word]
 
-    expect(shot).not.toBe('')
+    expect(shot.src).not.toBe('')
+    expect(shot.width).toBeGreaterThan(0)
+    expect(shot.height).toBeGreaterThan(0)
     expect(href.startsWith('https://')).toBe(true)
   })
 
