@@ -88,6 +88,7 @@
   --spacing-paving: clamp(6.5rem, 18vw, 11rem);
   --spacing-board: clamp(8.25rem, 16vw, 11.5rem);
   --spacing-emblem: 52px;
+  --spacing-banner: 66px;
   --spacing-way: 15.5rem;
   --spacing-rung: clamp(30px, 6.1vh, 40px);
   --spacing-crown: 28px;
