@@ -35,6 +35,8 @@ export const ROBOTS_PATH = '/robots.txt'
 
 export const RELEASES = `${REPOSITORY}/releases/latest`
 
+export const PAST_RELEASES = `${REPOSITORY}/releases`
+
 export const ANKAMA_POST =
   'https://x.com/DOFUSRetro_FR/status/2031323028072681799'
 

@@ -1,16 +1,14 @@
+import { msg } from '@lingui/core/macro'
 import { useLingui } from '@lingui/react'
 import { Button } from '@multifus/retro'
 import { DownloadSimpleIcon } from '@phosphor-icons/react/dist/ssr/DownloadSimple'
 import type { SystemId } from '@/@types/system'
 import { OutLink } from '@/components/out-link'
 import { SystemPick } from '@/components/system-pick'
-import { RELEASES } from '@/constants/site'
-import {
-  SYSTEM_ELSEWHERE,
-  SYSTEM_FLOORS,
-  SYSTEM_OTHERS,
-  SYSTEM_PACKAGES
-} from '@/constants/systems'
+import { PAST_RELEASES, RELEASES } from '@/constants/site'
+import { SYSTEM_FLOORS, SYSTEM_PACKAGES } from '@/constants/systems'
+
+const PAST_TAKE = msg`Télécharger une version antérieure`
 
 type DownloadTakeProps = Readonly<{
   shown: SystemId
@@ -19,7 +17,6 @@ type DownloadTakeProps = Readonly<{
 
 export const DownloadTake = ({ shown, onPick }: DownloadTakeProps) => {
   const { i18n } = useLingui()
-  const other = SYSTEM_OTHERS[shown]
   const takes = __RELEASE_LINKS__ ?? { macos: RELEASES, windows: RELEASES }
 
   return (
@@ -44,7 +41,7 @@ export const DownloadTake = ({ shown, onPick }: DownloadTakeProps) => {
         </p>
       </div>
       <p className="text-aside">
-        <OutLink href={takes[other]}>{i18n._(SYSTEM_ELSEWHERE[other])}</OutLink>
+        <OutLink href={PAST_RELEASES}>{i18n._(PAST_TAKE)}</OutLink>
       </p>
     </div>
   )

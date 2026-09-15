@@ -1423,12 +1423,12 @@ msgid "Télécharger le multicompte Dofus Retro gratuit"
 msgstr "Descargar el multicuenta gratis de Dofus Retro"
 
 #: src/constants/systems.ts
-msgid "Télécharger plutôt pour Mac"
-msgstr "Descargar para Mac en su lugar"
+#~ msgid "Télécharger plutôt pour Mac"
+#~ msgstr "Descargar para Mac en su lugar"
 
 #: src/constants/systems.ts
-msgid "Télécharger plutôt pour Windows"
-msgstr "Descargar para Windows en su lugar"
+#~ msgid "Télécharger plutôt pour Windows"
+#~ msgstr "Descargar para Windows en su lugar"
 
 #: src/constants/systems.ts
 msgid "Télécharger pour Mac"
@@ -1437,6 +1437,10 @@ msgstr "Descargar para Mac"
 #: src/constants/systems.ts
 msgid "Télécharger pour Windows"
 msgstr "Descargar para Windows"
+
+#: src/components/download-take.tsx
+msgid "Télécharger une version antérieure"
+msgstr "Descargar una versión anterior"
 
 #: src/constants/bodies.ts
 #~ msgid "Toujours les mêmes, toujours au pire moment."

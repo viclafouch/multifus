@@ -9,11 +9,6 @@ export const SYSTEM_IDS = [
 
 export const SOURCE_SYSTEM = 'macos' satisfies SystemId
 
-export const SYSTEM_OTHERS = {
-  macos: 'windows',
-  windows: 'macos'
-} as const satisfies Record<SystemId, SystemId>
-
 export const SYSTEM_NAMES = {
   macos: 'Mac',
   windows: 'Windows'
@@ -27,11 +22,6 @@ export const SYSTEM_VERSIONS = {
 export const SYSTEM_PACKAGES = {
   macos: msg`Télécharger pour Mac`,
   windows: msg`Télécharger pour Windows`
-} as const satisfies Record<SystemId, MessageDescriptor>
-
-export const SYSTEM_ELSEWHERE = {
-  macos: msg`Télécharger plutôt pour Mac`,
-  windows: msg`Télécharger plutôt pour Windows`
 } as const satisfies Record<SystemId, MessageDescriptor>
 
 export const SYSTEM_FLOORS = {
