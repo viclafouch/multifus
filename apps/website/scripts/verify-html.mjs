@@ -4,6 +4,7 @@ import process from 'node:process'
 import { INK } from '../src/constants/ink.ts'
 import { LANGUAGES } from '../src/constants/languages.ts'
 import { FOLD_ANCHOR, LOST_FILE, ROBOTS_PATH } from '../src/constants/site.ts'
+import { everyPage } from '../src/helpers/page.ts'
 
 const CLIENT = join(import.meta.dirname, '..', 'dist', 'client')
 
@@ -14,6 +15,28 @@ const SUSPENSE_ERROR = '<!--$!-->'
 const TITLE_CEILING = 65
 
 const SITEMAP_NAMESPACE = 'http://www.sitemaps.org/schemas/sitemap/0.9'
+
+const TAKES_WANTED = 2
+
+const TAKE_PATHS = new Set(
+  everyPage()
+    .filter(({ page }) => {
+      return page === 'download'
+    })
+    .map(({ path }) => {
+      return path
+    })
+)
+
+const takesOf = (body) => {
+  return [...body.matchAll(/<a\b[^>]*href="([^"]*)"/gu)]
+    .map((found) => {
+      return found[1]
+    })
+    .filter((href) => {
+      return href.includes('/releases')
+    })
+}
 
 const entries = [...SITEMAP.matchAll(/<url>(.+?)<\/url>/gsu)].map((found) => {
   return found[1]
@@ -203,6 +226,17 @@ for (const pathname of addresses) {
 
   if (!body.includes('Ankama')) {
     complain(pathname, 'neither independence nor credit of Ankama')
+  }
+
+  if (TAKE_PATHS.has(pathname)) {
+    const takes = takesOf(body)
+
+    if (takes.length < TAKES_WANTED) {
+      complain(
+        pathname,
+        `${takes.length} packages reachable without JavaScript instead of ${TAKES_WANTED}, one per system`
+      )
+    }
   }
 
   if (!html.includes('hrefLang="x-default"')) {

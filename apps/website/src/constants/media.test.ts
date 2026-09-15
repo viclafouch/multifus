@@ -5,6 +5,7 @@ import { ANKAMA_WORD_IDS, ANKAMA_WORDS } from '@/constants/ankama'
 import { PAGE_DECORS } from '@/constants/decors'
 import { LOOPS, PEEK_SIZE, PEEKS, POSTER_SIZE } from '@/constants/loops'
 import { PAGE_IDS } from '@/constants/pages'
+import { HOME_SHOT } from '@/constants/shots'
 
 const SERVED_FROM = '/@fs'
 
@@ -52,7 +53,9 @@ const sizeOnDisk = async (served: string) => {
 }
 
 const everySizeDeclared = () => {
-  const declared = new Map<string, Size>()
+  const declared = new Map<string, Size>([
+    [HOME_SHOT.src, { width: HOME_SHOT.width, height: HOME_SHOT.height }]
+  ])
 
   for (const page of PAGE_IDS) {
     const decor = PAGE_DECORS[page]
@@ -86,7 +89,7 @@ const DECLARED = everySizeDeclared()
 
 describe('the sizes the pages reserve', () => {
   it('finds every decor, screenshot, poster, peek and loop', () => {
-    expect(DECLARED).toHaveLength(31)
+    expect(DECLARED).toHaveLength(32)
   })
 
   it.each(DECLARED)('matches the file behind %s', async (served, size) => {

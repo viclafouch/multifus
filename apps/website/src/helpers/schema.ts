@@ -14,6 +14,7 @@ import { HOST } from '@/constants/host'
 import { LOOPS } from '@/constants/loops'
 import { OG_HEIGHT, OG_IMAGE, OG_WIDTH } from '@/constants/og'
 import { MENU_FEATURES, PAGES } from '@/constants/pages'
+import { HOME_SHOT } from '@/constants/shots'
 import {
   AUTHOR,
   AUTHOR_CODE,
@@ -94,7 +95,7 @@ const softwareOf = (language: Language) => {
     operatingSystem: SYSTEMS,
     downloadUrl: RELEASES,
     installUrl: RELEASES,
-    screenshot: `${HOST}${LOOPS.home.poster}`,
+    screenshot: `${HOST}${HOME_SHOT.src}`,
     image: ogAddressOf({ page: 'home', language }),
     featureList: MENU_FEATURES.map((feature) => {
       return speaker._(PAGE_NAMES[feature])

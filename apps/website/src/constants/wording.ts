@@ -45,7 +45,7 @@ export const PAGE_PROMISES = {
   quickReplies: msg`Un texte tout prêt part sous une combinaison de touches.`,
   mac: msg`Multifus tourne sur Mac, signé et notarisé par Apple.`,
   comparison: msg`Multifus et les autres gestionnaires, ligne par ligne.`,
-  download: msg`Gratuit, code publié, paquet signé. Pour macOS et pour Windows.`,
+  download: msg`Multifus est gratuit, pour Mac et pour Windows. Trois gestes, et vous jouez en multicompte sur Dofus Retro.`,
   journal: msg`Ce que chaque version a changé.`,
   ankama: msg`Ankama tolère les gestionnaires de fenêtres. Voici ses deux messages.`,
   legal: msg`Qui publie ce site, qui l’héberge, et le peu qu’il garde de vous.`
@@ -74,4 +74,8 @@ export const NO_HARM = msg`Multifus ne lit pas la mémoire du jeu, ne touche à 
 
 export const BEFORE_INSTALL = msg`Avant d’installer`
 
-export const FREE_AND_SIGNED = msg`Gratuit, code publié, paquet signé et notarisé.`
+export const PERKS = [
+  msg`Gratuit`,
+  msg`Sans compte`,
+  msg`Sans publicité`
+] as const satisfies readonly MessageDescriptor[]

@@ -15,13 +15,23 @@ msgstr ""
 
 #. placeholder {0}: SYSTEM_VERSIONS.macos
 #: src/constants/systems.ts
-msgid "{0} Monterey ou plus récent, sur un Mac Apple Silicon"
-msgstr "{0} Monterey or newer, on an Apple Silicon Mac"
+#~ msgid "{0} Monterey ou plus récent, sur un Mac Apple Silicon"
+#~ msgstr "{0} Monterey or newer, on an Apple Silicon Mac"
 
 #. placeholder {0}: SYSTEM_VERSIONS.windows
 #: src/constants/systems.ts
-msgid "{0}, mise à jour 1709 d’octobre 2017"
-msgstr "{0}, October 2017 update 1709"
+msgid "{0} ou plus récent"
+msgstr "{0} or newer"
+
+#. placeholder {0}: SYSTEM_VERSIONS.macos
+#: src/constants/systems.ts
+msgid "{0} ou plus récent, sur un Mac Apple Silicon"
+msgstr "{0} or newer, on an Apple Silicon Mac"
+
+#. placeholder {0}: SYSTEM_VERSIONS.windows
+#: src/constants/systems.ts
+#~ msgid "{0}, mise à jour 1709 d’octobre 2017"
+#~ msgstr "{0}, October 2017 update 1709"
 
 #: src/constants/bodies.ts
 msgid "À huit, vous cherchez si votre Crâ est sur F5 ou sur F6 plus longtemps que vous ne jouez."
@@ -124,6 +134,10 @@ msgstr "Before you install"
 #~ msgid "C’est à votre tour de jouer."
 #~ msgstr "It is your turn to play."
 
+#: src/screens/download-screen.tsx
+msgid "C’est gratuit ?"
+msgstr "Is it free?"
+
 #: src/constants/legal.ts
 #~ msgid "C’est la même que pour signaler une erreur du comparatif ou une faute de traduction."
 #~ msgstr "It is the same one for reporting a wrong mark in the comparison or a bad translation."
@@ -165,8 +179,12 @@ msgstr "You press Enter yourself"
 #~ msgstr "You are the one who clicks the cell the team walks to."
 
 #: src/screens/download-screen.tsx
-msgid "Ce marché est plein de clones, et vous avez raison de vous méfier. Voici quatre choses que vous pouvez vérifier vous-même."
-msgstr "This market is full of copycats, and you are right to be wary. Here are four things you can check yourself."
+msgid "Ça marche sur mon ordinateur ?"
+msgstr "Will it work on my computer?"
+
+#: src/screens/download-screen.tsx
+#~ msgid "Ce marché est plein de clones, et vous avez raison de vous méfier. Voici quatre choses que vous pouvez vérifier vous-même."
+#~ msgstr "This market is full of copycats, and you are right to be wary. Here are four things you can check yourself."
 
 #: src/constants/bodies.ts
 msgid "Ce n’est pas un portage"
@@ -287,6 +305,10 @@ msgstr "Every message names the character who has just been called."
 #: src/screens/comparison-screen.tsx
 #~ msgid "Chaque nom de colonne mène au dépôt où ses cases ont été lues. Une case qui vous paraît fausse se corrige ici :"
 #~ msgstr "Every column name leads to the repository where its marks were read. A mark that looks wrong to you gets fixed here:"
+
+#: src/constants/systems.ts
+msgid "Cliquez sur le bouton vert. Le fichier arrive dans vos téléchargements."
+msgstr "Click the green button. The file lands in your downloads."
 
 #: src/constants/rivals.ts
 msgid "Code publié"
@@ -440,6 +462,10 @@ msgstr "They follow every character"
 msgid "enfin jouable"
 msgstr "finally easy"
 
+#: src/screens/download-screen.tsx
+msgid "Et après ?"
+msgstr "And then?"
+
 #: src/constants/bodies.ts
 msgid "Et la touche s’écrit comme sur votre clavier."
 msgstr "And the key is spelled the way your keyboard spells it."
@@ -457,28 +483,32 @@ msgid "Fonctionnalités"
 msgstr "Features"
 
 #: src/screens/download-screen.tsx
-msgid "gh attestation verify <fichier> --repo viclafouch/multifus"
-msgstr "gh attestation verify <file> --repo viclafouch/multifus"
+#~ msgid "gh attestation verify <fichier> --repo viclafouch/multifus"
+#~ msgstr "gh attestation verify <file> --repo viclafouch/multifus"
 
 #: src/screens/download-screen.tsx
-msgid "GitHub pose un sceau sur chaque version publiée. Cette commande le vérifie :"
-msgstr "GitHub seals every published release. This command checks it:"
+#~ msgid "GitHub pose un sceau sur chaque version publiée. Cette commande le vérifie :"
+#~ msgstr "GitHub seals every published release. This command checks it:"
 
 #: src/screens/download-screen.tsx
 #~ msgid "GitHub pose un sceau sur chaque version publiée. Cette commande le vérifie, si vous voulez en avoir le cœur net :"
 #~ msgstr "GitHub seals every published release. This command checks the seal, if you want to be sure:"
 
 #: src/constants/systems.ts
-msgid "Glissez Multifus dans vos Applications."
-msgstr "Drag Multifus into your Applications."
+#~ msgid "Glissez Multifus dans vos Applications."
+#~ msgstr "Drag Multifus into your Applications."
 
 #: src/constants/wording.ts
-msgid "Gratuit, code publié, paquet signé et notarisé."
-msgstr "Free, published code, signed and notarised package."
+msgid "Gratuit"
+msgstr "Free"
 
 #: src/constants/wording.ts
-msgid "Gratuit, code publié, paquet signé. Pour macOS et pour Windows."
-msgstr "Free, published code, signed package. For macOS and for Windows."
+#~ msgid "Gratuit, code publié, paquet signé et notarisé."
+#~ msgstr "Free, published code, signed and notarised package."
+
+#: src/constants/wording.ts
+#~ msgid "Gratuit, code publié, paquet signé. Pour macOS et pour Windows."
+#~ msgstr "Free, published code, signed package. For macOS and for Windows."
 
 #: src/constants/bodies.ts
 msgid "Il démarre toujours éteint"
@@ -517,8 +547,8 @@ msgstr "It does not save team line-ups."
 #~ msgstr "It does not play for you."
 
 #: src/screens/download-screen.tsx
-msgid "Il ne lit pas sa mémoire, ne modifie aucun de ses fichiers, et il ne déplace jamais toute une team d’un coup."
-msgstr "It does not read its memory, does not change any of its files, and never moves a whole team at once."
+#~ msgid "Il ne lit pas sa mémoire, ne modifie aucun de ses fichiers, et il ne déplace jamais toute une team d’un coup."
+#~ msgstr "It does not read its memory, does not change any of its files, and never moves a whole team at once."
 
 #: src/constants/bodies.ts
 #~ msgid "Il ne lit rien dans le jeu."
@@ -608,6 +638,10 @@ msgstr "Images and videos © Ankama Games. Dofus Retro is a trademark of Ankama.
 msgid "Installer, c’est trois gestes"
 msgstr "Installing takes three moves"
 
+#: src/screens/download-screen.tsx
+msgid "Je risque quelque chose sur mon compte ?"
+msgstr "Am I risking anything on my account?"
+
 #: src/constants/bodies.ts
 msgid "Je vends des runes, je reviens dans deux minutes, bienvenue dans la guilde."
 msgstr "Selling runes, back in two minutes, welcome to the guild."
@@ -672,6 +706,10 @@ msgstr "The right window is in front of you before the timer starts falling."
 msgid "La couleur que vous leur donnez les distingue là où le portrait ne suffit plus."
 msgstr "The colour you give them tells them apart where the portrait no longer can."
 
+#: src/components/app-shot.tsx
+msgid "La fenêtre de Multifus, avec le menu des fonctionnalités à gauche et la place des personnages connectés au centre."
+msgstr "The Multifus window, with the menu of features on the left and the spot for connected characters in the middle."
+
 #: src/constants/bodies.ts
 #~ msgid "La fenêtre du personnage qui doit jouer arrive devant vous avant que le chrono ne descende."
 #~ msgstr "The window of the character whose turn it is comes to the front before the timer runs down."
@@ -729,12 +767,12 @@ msgid "Lâchez au centre, rien ne se passe"
 msgstr "Let go in the middle, nothing happens"
 
 #: src/constants/systems.ts
-msgid "Lancez l’installeur .exe que vous venez de prendre."
-msgstr "Run the .exe installer you have just taken."
+#~ msgid "Lancez l’installeur .exe que vous venez de prendre."
+#~ msgstr "Run the .exe installer you have just taken."
 
 #: src/constants/systems.ts
-msgid "Lancez Multifus, et jouez."
-msgstr "Launch Multifus, and play."
+#~ msgid "Lancez Multifus, et jouez."
+#~ msgstr "Launch Multifus, and play."
 
 #: src/screens/legal-screen.tsx
 msgid "Le <0>code du site</0> est public."
@@ -745,8 +783,8 @@ msgstr "The <0>site’s code</0> is public."
 #~ msgstr "The code is open"
 
 #: src/screens/download-screen.tsx
-msgid "Le code est ouvert."
-msgstr "The code is open."
+#~ msgid "Le code est ouvert."
+#~ msgstr "The code is open."
 
 #: src/constants/bodies.ts
 msgid "Le commerce continue sans vous"
@@ -773,12 +811,16 @@ msgid "Le dépôt de Multifus sur GitHub"
 msgstr "The Multifus repository on GitHub"
 
 #: src/screens/download-screen.tsx
+msgid "Le fichier est sûr ?"
+msgstr "Is the file safe?"
+
+#: src/screens/download-screen.tsx
 #~ msgid "Le fichier vient bien d’ici"
 #~ msgstr "The file really comes from here"
 
 #: src/screens/download-screen.tsx
-msgid "Le fichier vient bien d’ici."
-msgstr "The file really comes from here."
+#~ msgid "Le fichier vient bien d’ici."
+#~ msgstr "The file really comes from here."
 
 #: src/constants/ankama.ts
 msgid "le forum de Dofus Retro, le 1ᵉʳ avril 2026"
@@ -932,6 +974,10 @@ msgstr "The pages are built ahead of time and served as they are, with no databa
 msgid "Les phrases qu’on retape vingt fois par jour"
 msgstr "The sentences you retype twenty times a day"
 
+#: src/screens/download-screen.tsx
+msgid "Les questions qu’on se pose"
+msgstr "The questions people ask"
+
 #: src/screens/home-screen.tsx
 msgid "Les six mécanismes à l’œuvre dans le jeu"
 msgstr "The six mechanisms at work in the game"
@@ -988,6 +1034,10 @@ msgstr "Multifus brings the window of the character playing Dofus Retro right in
 #~ msgid "Multifus démarre toujours avec lui éteint."
 #~ msgstr "Multifus always starts with it switched off."
 
+#: src/constants/wording.ts
+msgid "Multifus est gratuit, pour Mac et pour Windows. Trois gestes, et vous jouez en multicompte sur Dofus Retro."
+msgstr "Multifus is free, for Mac and for Windows. Three moves, and you are playing multi-account on Dofus Retro."
+
 #: src/constants/legal.ts
 #~ msgid "Multifus est publié par {PUBLISHER}, un particulier, à titre personnel, hors de toute société, et sans rien vendre. Son identité est connue de l’hébergeur, comme la loi le demande."
 #~ msgstr "Multifus is published by {PUBLISHER}, a private individual, in a private capacity, outside any company, and selling nothing. The host knows who they are, as the law requires."
@@ -1033,8 +1083,20 @@ msgstr "Multifus does not read the game’s memory, does not touch any of its fi
 #~ msgstr "Multifus does not lay your windows side by side: that is a choice, and it will not change. It brings you the window of the character who is playing, it does not redraw your desktop. And it does not save team line-ups yet."
 
 #: src/screens/download-screen.tsx
-msgid "Multifus ne touche pas au jeu."
-msgstr "Multifus does not touch the game."
+#~ msgid "Multifus ne touche pas au jeu."
+#~ msgstr "Multifus does not touch the game."
+
+#: src/screens/download-screen.tsx
+msgid "Multifus ne touche pas au jeu. Il ne lit rien dedans, il ne change rien dedans, et il ne joue jamais à votre place. Ankama accepte ce genre de logiciel tant qu’il reste comme ça."
+msgstr "Multifus does not touch the game. It reads nothing inside it, changes nothing inside it, and never plays for you. Ankama accepts this kind of software as long as it stays that way."
+
+#: src/screens/download-screen.tsx
+msgid "Multifus s’ouvre et vous guide. Il vous montre les cases à cocher, dans votre ordinateur et dans Dofus. Deux minutes, une seule fois."
+msgstr "Multifus opens and guides you. It shows you the boxes to tick, in your computer and in Dofus. Two minutes, once."
+
+#: src/constants/systems.ts
+msgid "Multifus s’ouvre. Il vous montre la suite, pas à pas."
+msgstr "Multifus opens. It walks you through the rest, step by step."
 
 #: src/constants/wording.ts
 msgid "Multifus sur Mac"
@@ -1080,13 +1142,29 @@ msgstr "Write to <0>{AUTHOR_MAIL}</0>, or to the <1>X account</1>. That is the w
 msgid "oui"
 msgstr "yes"
 
-#: src/constants/systems.ts
-msgid "Ouvrez le .dmg que vous venez de prendre."
-msgstr "Open the .dmg you have just taken."
+#: src/screens/download-screen.tsx
+msgid "Oui, et pour toujours. Rien à payer, aucun compte à créer, aucune publicité. Il n’y a pas de version payante cachée derrière."
+msgstr "Yes, and forever. Nothing to pay, no account to create, no advertising. There is no paid version hiding behind it."
 
 #: src/constants/systems.ts
-msgid "Ouvrez Multifus, et jouez."
-msgstr "Open Multifus, and play."
+msgid "Ouvrez ce fichier, puis glissez Multifus dans le dossier Applications."
+msgstr "Open that file, then drag Multifus into the Applications folder."
+
+#: src/constants/systems.ts
+msgid "Ouvrez ce fichier, puis suivez l’installation jusqu’au bout."
+msgstr "Open that file, then follow the install to the end."
+
+#: src/constants/systems.ts
+#~ msgid "Ouvrez le .dmg que vous venez de prendre."
+#~ msgstr "Open the .dmg you have just taken."
+
+#: src/constants/systems.ts
+#~ msgid "Ouvrez Multifus, et jouez."
+#~ msgstr "Open Multifus, and play."
+
+#: src/constants/systems.ts
+msgid "Ouvrez Multifus. Il vous montre la suite, pas à pas."
+msgstr "Open Multifus. It walks you through the rest, step by step."
 
 #: src/constants/rivals.ts
 msgid "Paquet signé"
@@ -1185,8 +1263,8 @@ msgid "Rien à contourner pour l’installer"
 msgstr "Nothing to work around to install it"
 
 #: src/screens/download-screen.tsx
-msgid "Rien à régler avant de jouer : au premier lancement, Multifus vous prend par la main."
-msgstr "Nothing to set up before you play: on the first launch, Multifus takes you by the hand."
+#~ msgid "Rien à régler avant de jouer : au premier lancement, Multifus vous prend par la main."
+#~ msgstr "Nothing to set up before you play: on the first launch, Multifus takes you by the hand."
 
 #: src/constants/ankama.ts
 msgid "Rien d’officiel."
@@ -1216,13 +1294,21 @@ msgstr "Its window stops coming forward until you call it back."
 #~ msgid "sans chercher une fenêtre"
 #~ msgstr "never hunting for a window"
 
+#: src/constants/wording.ts
+msgid "Sans compte"
+msgstr "No account"
+
 #: src/screens/download-screen.tsx
-msgid "Sans compte, sans publicité, sans limite d’essai."
-msgstr "No account, no advertising, no trial limit."
+#~ msgid "Sans compte, sans publicité, sans limite d’essai."
+#~ msgstr "No account, no advertising, no trial limit."
 
 #: src/constants/bodies.ts
 #~ msgid "Sans fermer Multifus, et tout le reste continue de marcher."
 #~ msgstr "Without closing Multifus, and everything else keeps working."
+
+#: src/constants/wording.ts
+msgid "Sans publicité"
+msgstr "No advertising"
 
 #: src/constants/bodies.ts
 #~ msgid "Sans relais, vous les découvrez une heure plus tard, et l’acheteur est reparti."
@@ -1241,8 +1327,8 @@ msgstr "Seven calls watched"
 #~ msgstr "Signed by Apple"
 
 #: src/screens/download-screen.tsx
-msgid "Signé par Apple."
-msgstr "Signed by Apple."
+#~ msgid "Signé par Apple."
+#~ msgstr "Signed by Apple."
 
 #: src/constants/bodies.ts
 msgid "Signer coûte de l’argent chaque année"
@@ -1269,28 +1355,36 @@ msgstr "Six mechanisms, one goal: stop hunting for the character who is waiting 
 #~ msgstr "Its code holds nothing on this row."
 
 #: src/constants/systems.ts
-msgid "Suivez l’installation jusqu’au bout."
-msgstr "Follow the installation through to the end."
+#~ msgid "Suivez l’installation jusqu’au bout."
+#~ msgstr "Follow the installation through to the end."
+
+#: src/screens/download-screen.tsx
+msgid "Suivez les trois lignes de votre ordinateur. Il n’y a rien d’autre à faire."
+msgstr "Follow the three lines for your computer. There is nothing else to do."
 
 #: src/constants/rivals.ts
 msgid "Sur Mac"
 msgstr "On Mac"
 
 #: src/constants/systems.ts
-msgid "Sur Mac ? Prendre le .dmg"
-msgstr "On a Mac? Take the .dmg"
+#~ msgid "Sur Mac ? Prendre le .dmg"
+#~ msgstr "On a Mac? Take the .dmg"
 
 #: src/screens/download-screen.tsx
-msgid "Sur Mac, le fichier s’ouvre sans avertissement, et votre système vous dit qui l’a construit. Aucun autre outil de multicompte Dofus Retro ne le fait."
-msgstr "On a Mac the file opens with no warning, and your system tells you who built it. No other Dofus Retro multi-account tool does this."
+msgid "Sur Mac, Apple vérifie le fichier avant qu’il s’ouvre, et aucun avertissement ne s’affiche. Sur Windows, votre ordinateur peut demander confirmation : Multifus est encore jeune, et Windows ne le connaît pas encore. Dans les deux cas, il ne vous demande aucune information, et n’en envoie aucune."
+msgstr "On Mac, Apple checks the file before it opens, and no warning shows up. On Windows, your computer may ask you to confirm: Multifus is still young, and Windows does not know it yet. Either way, it asks you for no information, and sends none."
+
+#: src/screens/download-screen.tsx
+#~ msgid "Sur Mac, le fichier s’ouvre sans avertissement, et votre système vous dit qui l’a construit. Aucun autre outil de multicompte Dofus Retro ne le fait."
+#~ msgstr "On a Mac the file opens with no warning, and your system tells you who built it. No other Dofus Retro multi-account tool does this."
 
 #: src/constants/rivals.ts
 msgid "Sur Windows"
 msgstr "On Windows"
 
 #: src/constants/systems.ts
-msgid "Sur Windows ? Prendre le .exe"
-msgstr "On Windows? Take the .exe"
+#~ msgid "Sur Windows ? Prendre le .exe"
+#~ msgstr "On Windows? Take the .exe"
 
 #: src/constants/wording.ts
 msgid "Tableau des runes"
@@ -1317,24 +1411,40 @@ msgid "Télécharger"
 msgstr "Download"
 
 #: src/constants/systems.ts
-msgid "Télécharger le .dmg"
-msgstr "Download the .dmg"
+#~ msgid "Télécharger le .dmg"
+#~ msgstr "Download the .dmg"
 
 #: src/constants/systems.ts
-msgid "Télécharger le .exe"
-msgstr "Download the .exe"
+#~ msgid "Télécharger le .exe"
+#~ msgstr "Download the .exe"
 
 #: src/constants/wording.ts
 msgid "Télécharger le multicompte Dofus Retro gratuit"
 msgstr "Download free Dofus Retro multi-account software"
+
+#: src/constants/systems.ts
+msgid "Télécharger plutôt pour Mac"
+msgstr "Download for Mac instead"
+
+#: src/constants/systems.ts
+msgid "Télécharger plutôt pour Windows"
+msgstr "Download for Windows instead"
+
+#: src/constants/systems.ts
+msgid "Télécharger pour Mac"
+msgstr "Download for Mac"
+
+#: src/constants/systems.ts
+msgid "Télécharger pour Windows"
+msgstr "Download for Windows"
 
 #: src/constants/bodies.ts
 #~ msgid "Toujours les mêmes, toujours au pire moment."
 #~ msgstr "Always the same ones, always at the worst moment."
 
 #: src/screens/download-screen.tsx
-msgid "Tout ce que Multifus fait se lit sur GitHub, et vous pouvez le compiler vous-même."
-msgstr "Everything Multifus does can be read on GitHub, and you can build it yourself."
+#~ msgid "Tout ce que Multifus fait se lit sur GitHub, et vous pouvez le compiler vous-même."
+#~ msgstr "Everything Multifus does can be read on GitHub, and you can build it yourself."
 
 #: src/constants/wording.ts
 msgid "Un clic gauche, et la team suit."
@@ -1476,7 +1586,6 @@ msgstr "Aiming beats remembering"
 #~ msgid "Viser vaut mieux que se souvenir"
 #~ msgstr "Aiming beats remembering"
 
-#: src/screens/download-screen.tsx
 #: src/screens/home-screen.tsx
 msgid "Voir le code"
 msgstr "See the code"
@@ -1488,6 +1597,10 @@ msgstr "Your browser keeps one thing only: that the offer to read the site in yo
 #: src/constants/legal.ts
 #~ msgid "Votre navigateur ne garde qu’une chose."
 #~ msgstr "Your browser keeps one thing only."
+
+#: src/components/system-pick.tsx
+msgid "Votre ordinateur"
+msgstr "Your computer"
 
 #: src/constants/bodies.ts
 msgid "Votre principal oui, vos mules non."

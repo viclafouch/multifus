@@ -25,29 +25,29 @@ export const SYSTEM_VERSIONS = {
 } as const satisfies Record<SystemId, string>
 
 export const SYSTEM_PACKAGES = {
-  macos: msg`Télécharger le .dmg`,
-  windows: msg`Télécharger le .exe`
-} as const satisfies Record<SystemId, MessageDescriptor>
-
-export const SYSTEM_FLOORS = {
-  macos: msg`${SYSTEM_VERSIONS.macos} Monterey ou plus récent, sur un Mac Apple Silicon`,
-  windows: msg`${SYSTEM_VERSIONS.windows}, mise à jour 1709 d’octobre 2017`
+  macos: msg`Télécharger pour Mac`,
+  windows: msg`Télécharger pour Windows`
 } as const satisfies Record<SystemId, MessageDescriptor>
 
 export const SYSTEM_ELSEWHERE = {
-  macos: msg`Sur Mac ? Prendre le .dmg`,
-  windows: msg`Sur Windows ? Prendre le .exe`
+  macos: msg`Télécharger plutôt pour Mac`,
+  windows: msg`Télécharger plutôt pour Windows`
+} as const satisfies Record<SystemId, MessageDescriptor>
+
+export const SYSTEM_FLOORS = {
+  macos: msg`${SYSTEM_VERSIONS.macos} ou plus récent, sur un Mac Apple Silicon`,
+  windows: msg`${SYSTEM_VERSIONS.windows} ou plus récent`
 } as const satisfies Record<SystemId, MessageDescriptor>
 
 export const SYSTEM_MOVES = {
   macos: [
-    msg`Ouvrez le .dmg que vous venez de prendre.`,
-    msg`Glissez Multifus dans vos Applications.`,
-    msg`Lancez Multifus, et jouez.`
+    msg`Cliquez sur le bouton vert. Le fichier arrive dans vos téléchargements.`,
+    msg`Ouvrez ce fichier, puis glissez Multifus dans le dossier Applications.`,
+    msg`Ouvrez Multifus. Il vous montre la suite, pas à pas.`
   ],
   windows: [
-    msg`Lancez l’installeur .exe que vous venez de prendre.`,
-    msg`Suivez l’installation jusqu’au bout.`,
-    msg`Ouvrez Multifus, et jouez.`
+    msg`Cliquez sur le bouton vert. Le fichier arrive dans vos téléchargements.`,
+    msg`Ouvrez ce fichier, puis suivez l’installation jusqu’au bout.`,
+    msg`Multifus s’ouvre. Il vous montre la suite, pas à pas.`
   ]
 } as const satisfies Record<SystemId, readonly MessageDescriptor[]>

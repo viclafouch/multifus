@@ -60,15 +60,9 @@ export const HomeScreen = (_props: PageScreenProps) => {
           </p>
           <DownloadCall className="surface-3" />
         </div>
-        <figure
-          className="surface-4 flex flex-col items-stretch gap-3"
-          data-carried={isCarriedIn ? '' : undefined}
-        >
+        <div className="surface-4" data-carried={isCarriedIn ? '' : undefined}>
           <LoopPlate loop="home" caption={i18n._(LOOP_CAPTION)} isAmbient />
-          <figcaption className="engraved text-aside text-khaki">
-            {i18n._(LOOP_CAPTION)}
-          </figcaption>
-        </figure>
+        </div>
       </Band>
       <Band className="reveal py-16">
         <BandTitle>{i18n._(FEATURES_TITLE)}</BandTitle>

@@ -1,6 +1,9 @@
 import { useLingui } from '@lingui/react'
 import { Button } from '@multifus/retro'
+import { DownloadSimpleIcon } from '@phosphor-icons/react/dist/ssr/DownloadSimple'
+import type { SystemId } from '@/@types/system'
 import { OutLink } from '@/components/out-link'
+import { SystemPick } from '@/components/system-pick'
 import { RELEASES } from '@/constants/site'
 import {
   SYSTEM_ELSEWHERE,
@@ -8,16 +11,20 @@ import {
   SYSTEM_OTHERS,
   SYSTEM_PACKAGES
 } from '@/constants/systems'
-import { useSystem } from '@/hooks/use-system'
 
-export const DownloadTake = () => {
+type DownloadTakeProps = Readonly<{
+  shown: SystemId
+  onPick: (system: SystemId) => void
+}>
+
+export const DownloadTake = ({ shown, onPick }: DownloadTakeProps) => {
   const { i18n } = useLingui()
-  const shown = useSystem()
   const other = SYSTEM_OTHERS[shown]
   const takes = __RELEASE_LINKS__ ?? { macos: RELEASES, windows: RELEASES }
 
   return (
     <div className="flex flex-col items-start gap-5">
+      <SystemPick shown={shown} onPick={onPick} />
       <div className="flex flex-col items-start gap-3">
         <Button
           variant="leaf"
@@ -29,13 +36,14 @@ export const DownloadTake = () => {
             <a className="sighted" href={takes[shown]} />
           }
         >
+          <DownloadSimpleIcon weight="bold" aria-hidden />
           {i18n._(SYSTEM_PACKAGES[shown])}
         </Button>
         <p className="engraved text-aside text-khaki">
           {i18n._(SYSTEM_FLOORS[shown])}
         </p>
       </div>
-      <p className="text-tale">
+      <p className="text-aside">
         <OutLink href={takes[other]}>{i18n._(SYSTEM_ELSEWHERE[other])}</OutLink>
       </p>
     </div>
