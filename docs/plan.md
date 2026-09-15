@@ -15,6 +15,7 @@
 - [ ] Acheter `multifus.app`, sans « dofus » dedans, `HOST` le visant déjà
 - [ ] Écrire à `contact@ankama.com` le jour où le domaine est acheté
 - [ ] Créer le projet Vercel, racine `apps/website`, sur `dist/client`, sans réécriture attrape-tout
+- [ ] Désigner le domaine principal dans Vercel, pour que l'autre variante réponde en 308
 - [ ] Tourner les trois boucles doublures avec `make-loop` : messages privés, réponses rapides, accueil, et recouper les deux aperçus qui en descendent
 - [ ] Réduire les sept boucles, onze mégaoctets, `walk-loop.mp4` en pesant 2,2 à lui seul
 - [ ] Reprendre les quatre phrases des Messages privés et des Réponses rapides, les vraies boucles tournées
@@ -24,6 +25,12 @@
 - [ ] Ouvrir `/journal` depuis À propos, et trancher si le panneau de mise à jour y renvoie
 - [ ] Poser Vercel Analytics, un seul événement, le clic sur « Télécharger » avec le système dedans
 - [ ] Déclarer le site à la Search Console et y déposer le sitemap
+- [ ] Étoffer les treize pages, 250 à 370 mots chacune : c'est le seul écart qui reste avec Retro Toolbox
+- [ ] Porter `softwareVersion` et `releaseNotes` dans le `SoftwareApplication`, une fois `/journal` branché
+- [ ] Donner `width` et `height` aux images, la mise en page ne les tenant que par la CSS
+- [ ] Ouvrir une issue chez TanStack Start sur l'espace de noms du sitemap, écrit en `https` au lieu de `http`
+- [ ] Retirer `scripts/tidy-build.mjs` le jour où cet espace de noms est corrigé en amont
+- [ ] Passer les pages au Rich Results Test, à `validator.schema.org` et à un valideur de sitemap, une fois en ligne
 - [ ] Ouvrir le site dans Firefox, qui ne connaît pas `animation-timeline` : les replis n'ont jamais tourné
 - [ ] Repasser le site en ligne sur l'adresse réelle et sur un téléphone : icônes, `robots.txt`, 404
 
