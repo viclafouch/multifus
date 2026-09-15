@@ -7,6 +7,11 @@ license = "MIT"
 repository = "https://github.com/viclafouch/multifus"
 edition = "2024"
 
+[[bin]]
+# macOS shows this file name in the Dock while `tauri dev` runs, where there is no bundle to read a name from.
+name = "Multifus"
+path = "src/main.rs"
+
 [lib]
 # The `_lib` suffix keeps the library name off the binary's, which only Windows minds: https://github.com/rust-lang/cargo/issues/8519
 name = "multifus_lib"
