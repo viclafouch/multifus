@@ -289,6 +289,7 @@ const SERVED = [
   ROBOTS_PATH,
   LOST_FILE,
   '/favicon.ico',
+  '/favicon.svg',
   '/apple-touch-icon.png',
   '/icon-192.png',
   '/icon-512.png',
