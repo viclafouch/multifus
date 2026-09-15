@@ -1,6 +1,6 @@
 Le logiciel, en Tauri v2 : `https://v2.tauri.app/llms.txt`.
 
-On lance multifus et on l'oublie : une fonctionnalité qui oblige à ouvrir la
+On lance Multifus et on l'oublie : une fonctionnalité qui oblige à ouvrir la
 fenêtre a un raccourci clavier, ou elle n'existe pas.
 
 `tauri dev` est le seul endroit où le vrai logiciel se voit. Pour l'œil, un

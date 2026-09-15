@@ -4,7 +4,7 @@ Ce qu'ils font mieux que nous, et ce qu'il faut en faire. Les fonctionnalités
 sont dans [concurrents.md](./concurrents.md) ; ce fichier ne parle que de la
 technique : ce que le code appelle, ce qu'il coûte, et ce qu'il oublie.
 
-Relevé du 31 août 2026. `ROrganizer` reste sur le bureau, à côté de multifus.
+Relevé du 31 août 2026. `ROrganizer` reste sur le bureau, à côté de Multifus.
 Les autres ont été lus puis supprimés, `focusretro` compris : tout ce qui valait
 sa lecture est ici, et `gh repo clone alacroix/focusretro` le ramène en cinq
 secondes le jour où on veut revérifier une ligne. `concurrents.md` dit où

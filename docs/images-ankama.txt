@@ -1,11 +1,11 @@
-Images pour l'habillage de multifus
+Images pour l'habillage de Multifus
 Relevé du 5 septembre 2026. Toutes ces adresses ont répondu ce jour-là.
 La galerie qui les montre est dans plan-design-images-ankama.html, un onglet
 par source.
 
-Aucune de ces images n'appartient à multifus. Celles d'Ankama sont à Ankama,
+Aucune de ces images n'appartient à Multifus. Celles d'Ankama sont à Ankama,
 celles des deux sites communautaires sont à leurs auteurs. En garder une oblige
-à écrire, dans le logiciel et sur le site, que multifus n'est pas un logiciel
+à écrire, dans le logiciel et sur le site, que Multifus n'est pas un logiciel
 d'Ankama et n'a aucun droit sur ces images.
 
 Le site officiel de Dofus Retro n'a rien avant 2020 : le jeu a rouvert en 2019
