@@ -1,7 +1,5 @@
 # Plan
 
-- [ ] Dessiner le logo : `packages/retro/src/assets/logo.png` porte encore celui du scaffolder Tauri
-- [ ] Tirer les icônes de `apps/desktop/src-tauri/icons` du logo, Tauri les prenant à part
 - [ ] Créer un certificat Developer ID Application sur developer.apple.com, et l'exporter en `.p12`
 - [ ] Poser les huit secrets Apple et Tauri du workflow `release` dans les réglages du dépôt
 - [ ] Trancher les Mac Intel : ajouter la cible `x86_64-apple-darwin`, ou s'en tenir au README et à `/mac`

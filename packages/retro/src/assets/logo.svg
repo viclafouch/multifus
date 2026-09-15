@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <mask
+      id="multifus-front-cut"
+      maskUnits="userSpaceOnUse"
+      x="0"
+      y="0"
+      width="200"
+      height="200"
+    >
+      <rect x="0" y="0" width="200" height="200" fill="#fff" />
+      <path
+        d="M68 70H112A26 26 0 0 1 138 96V140A26 26 0 0 1 112 166H68A26 26 0 0 1 42 140V96A26 26 0 0 1 68 70Z"
+        fill="#000"
+        stroke="#000"
+        stroke-width="42"
+      />
+    </mask>
+  </defs>
+  <g fill="none" stroke-width="24" stroke-linecap="butt">
+    <path
+      d="M88 34H132A26 26 0 0 1 158 60V104A26 26 0 0 1 132 130H88A26 26 0 0 1 62 104V60A26 26 0 0 1 88 34Z"
+      mask="url(#multifus-front-cut)"
+      stroke="#34b944"
+    />
+    <path
+      pathLength="1000"
+      d="M68 70H112A26 26 0 0 1 138 96V140A26 26 0 0 1 112 166H68A26 26 0 0 1 42 140V96A26 26 0 0 1 68 70Z"
+      stroke-dasharray="880 120"
+      stroke-dashoffset="-750"
+      stroke="#f2b134"
+    />
+    <circle cx="50" cy="158" r="12" fill="#34b944" />
+  </g>
+</svg>

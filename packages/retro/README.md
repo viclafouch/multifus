@@ -15,6 +15,11 @@ import logo from '@multifus/retro/assets/logo.png'
 `retro.css` declares its own `@source`, so Tailwind scans the components of this
 package without the consumer declaring anything.
 
+`assets/logo.svg` is the logo. Everything else is drawn from it: `logo.png` here,
+the icons of `apps/desktop/src-tauri/icons`, and the favicons of
+`apps/website/public`. Change the logo in the SVG, then draw the rest again, or
+the three surfaces drift apart.
+
 A package importing `retro.css` must list `@fontsource/bebas-neue` in its own
 dependencies. Tailwind flattens the `@import` before Vite resolves the `url()`,
 so the font files resolve from the consumer, never from here. It is a peer
