@@ -14,6 +14,8 @@ export const AUTHOR_CODE = 'https://github.com/viclafouch'
 
 export const AUTHOR_MAIL = 'victor.delafouchardiere@gmail.com'
 
+export const MAIL_SCHEME = 'mailto:'
+
 export const VERCEL = 'https://vercel.com'
 
 export const VERCEL_NAME = 'Vercel Inc.'

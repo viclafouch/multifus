@@ -31,13 +31,14 @@ describe('the table of the comparison', () => {
     expect(screen.getByRole('columnheader', { name: 'Multifus' })).toBeDefined()
   })
 
-  it.each(RIVAL_IDS)('leads to the code of %s', (rival) => {
+  it.each(RIVAL_IDS)('leads to the code of %s, in another tab', (rival) => {
     show()
 
     const { name, code } = RIVALS[rival]
-    const link = screen.getByRole('link', { name })
+    const link = screen.getByRole('link', { name: new RegExp(`^${name}`, 'u') })
 
     expect(link.getAttribute('href')).toBe(code)
+    expect(link.getAttribute('target')).toBe('_blank')
   })
 
   it.each(TRAIT_IDS)('lays the %s row', (trait) => {

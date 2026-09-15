@@ -66,28 +66,40 @@ msgid "Aller au contenu"
 msgstr "Ir al contenido"
 
 #: src/constants/wording.ts
-msgid "Ankama et les logiciels multicompte Dofus Retro"
-msgstr "Ankama y los programas multicuenta de Dofus Retro"
+#~ msgid "Ankama et les logiciels multicompte Dofus Retro"
+#~ msgstr "Ankama y los programas multicuenta de Dofus Retro"
 
 #: src/constants/ankama.ts
-msgid "Ankama l’écrit lui-même dans les deux messages ci-dessus."
-msgstr "Ankama lo escribe él mismo en los dos mensajes de arriba."
+#~ msgid "Ankama l’écrit lui-même dans les deux messages ci-dessus."
+#~ msgstr "Ankama lo escribe él mismo en los dos mensajes de arriba."
 
 #: src/screens/ankama-screen.tsx
-msgid "Ankama n’a jamais publié de règle écrite sur les gestionnaires de fenêtres. Il a répondu deux fois en public, et c’est tout ce qui existe. Les voici, en entier."
-msgstr "Ankama nunca ha publicado una regla escrita sobre los gestores de ventanas. Ha respondido dos veces en público, y eso es todo lo que hay. Aquí están, enteros."
+msgid "Ankama n’a jamais publié de règle écrite sur ces logiciels, mais a répondu deux fois en public. Tout ce qui est écrit plus haut vient de ces deux messages."
+msgstr "Ankama nunca ha publicado una regla escrita sobre estos programas, pero ha respondido dos veces en público. Todo lo que está escrito arriba viene de esos dos mensajes."
+
+#: src/screens/ankama-screen.tsx
+#~ msgid "Ankama n’a jamais publié de règle écrite sur les gestionnaires de fenêtres. Il a répondu deux fois en public, et c’est tout ce qui existe. Les voici, en entier."
+#~ msgstr "Ankama nunca ha publicado una regla escrita sobre los gestores de ventanas. Ha respondido dos veces en público, y eso es todo lo que hay. Aquí están, enteros."
 
 #: src/constants/ankama.ts
-msgid "Ankama ne soutient pas Multifus et n’en répond pas. Personne ne peut vous promettre le contraire."
-msgstr "Ankama no respalda Multifus ni responde por él. Nadie puede prometerte lo contrario."
+msgid "Ankama ne répond pas de Multifus."
+msgstr "Ankama no responde por Multifus."
 
 #: src/constants/ankama.ts
-msgid "Ankama peut changer d’avis, et ce jour-là Multifus s’arrête."
-msgstr "Ankama puede cambiar de opinión, y ese día Multifus se para."
+#~ msgid "Ankama ne soutient pas Multifus et n’en répond pas. Personne ne peut vous promettre le contraire."
+#~ msgstr "Ankama no respalda Multifus ni responde por él. Nadie puede prometerte lo contrario."
+
+#: src/constants/ankama.ts
+#~ msgid "Ankama peut changer d’avis, et ce jour-là Multifus s’arrête."
+#~ msgstr "Ankama puede cambiar de opinión, y ese día Multifus se para."
+
+#: src/constants/ankama.ts
+msgid "Ankama peut changer d’avis. Ce jour-là, Multifus s’arrête."
+msgstr "Ankama puede cambiar de opinión. Ese día, Multifus se para."
 
 #: src/constants/wording.ts
-msgid "Ankama tolère les gestionnaires de fenêtres. Voici ses deux messages."
-msgstr "Ankama tolera los gestores de ventanas. Aquí están sus dos mensajes."
+#~ msgid "Ankama tolère les gestionnaires de fenêtres. Voici ses deux messages."
+#~ msgstr "Ankama tolera los gestores de ventanas. Aquí están sus dos mensajes."
 
 #: src/constants/bodies.ts
 #~ msgid "Annuler est aussi simple qu’aller"
@@ -110,12 +122,16 @@ msgstr "No se pone ninguna cookie, ni por el sitio, ni por la medición de audie
 #~ msgstr "No se pone ninguna cookie."
 
 #: src/constants/ankama.ts
-msgid "Aucun fichier de Dofus n’est lu ni modifié, et sa mémoire n’est jamais regardée. C’est la seule condition qu’Ankama a posée."
-msgstr "No se lee ni se modifica ningún archivo de Dofus, y nunca se mira su memoria. Es la única condición que puso Ankama."
+#~ msgid "Aucun fichier de Dofus n’est lu ni modifié, et sa mémoire n’est jamais regardée. C’est la seule condition qu’Ankama a posée."
+#~ msgstr "No se lee ni se modifica ningún archivo de Dofus, y nunca se mira su memoria. Es la única condición que puso Ankama."
 
 #: src/constants/ankama.ts
-msgid "Aucun geste ne déplace deux personnages à la fois. C’est exactement la macro qu’Ankama dit bannissable."
-msgstr "Ningún gesto mueve dos personajes a la vez. Es exactamente la macro que Ankama considera baneable."
+#~ msgid "Aucun geste ne déplace deux personnages à la fois. C’est exactement la macro qu’Ankama dit bannissable."
+#~ msgstr "Ningún gesto mueve dos personajes a la vez. Es exactamente la macro que Ankama considera baneable."
+
+#: src/constants/ankama.ts
+msgid "Aucun logiciel de la communauté n’est soutenu par le jeu. Vous l’installez sous votre responsabilité."
+msgstr "Ningún programa de la comunidad está respaldado por el juego. Lo instalas bajo tu responsabilidad."
 
 #: src/constants/rivals.ts
 #: src/constants/wording.ts
@@ -191,8 +207,12 @@ msgid "Ce n’est pas un portage"
 msgstr "No es un port"
 
 #: src/constants/wording.ts
-msgid "Ce qu’Ankama en dit"
-msgstr "Lo que dice Ankama"
+#~ msgid "Ce qu’Ankama en dit"
+#~ msgstr "Lo que dice Ankama"
+
+#: src/constants/ankama.ts
+msgid "Ce qu’Ankama tolère"
+msgstr "Lo que Ankama tolera"
 
 #: src/components/rival-table.tsx
 msgid "Ce qu’il fait"
@@ -239,8 +259,8 @@ msgstr "Lo que el sitio guarda de ti"
 #~ msgstr "Lo que las respuestas rápidas no hacen"
 
 #: src/screens/ankama-screen.tsx
-msgid "Ce que Multifus en retient"
-msgstr "Lo que Multifus se queda de ahí"
+#~ msgid "Ce que Multifus en retient"
+#~ msgstr "Lo que Multifus se queda de ahí"
 
 #: src/screens/home-screen.tsx
 msgid "Ce que Multifus fait"
@@ -261,6 +281,10 @@ msgstr "Lo que Multifus no hace"
 #: src/constants/bodies.ts
 #~ msgid "Ce qui disparaît, c’est la recherche de fenêtre entre chaque clic."
 #~ msgstr "Lo que desaparece es la búsqueda de la ventana entre cada clic."
+
+#: src/constants/ankama.ts
+msgid "Ce qui fait bannir"
+msgstr "Lo que hace que te baneen"
 
 #: src/constants/bodies.ts
 msgid "Celle qu’un premier lancement vous offre est en français, même si vous lisez Multifus en anglais."
@@ -349,6 +373,10 @@ msgstr "Movimiento rápido"
 #: src/constants/wording.ts
 msgid "Déplacement rapide multicompte sur Dofus Retro"
 msgstr "Movimiento rápido multicuenta en Dofus Retro"
+
+#: src/constants/ankama.ts
+msgid "Déplacer plusieurs personnages d’un coup"
+msgstr "Mover varios personajes de golpe"
 
 #: src/constants/rivals.ts
 msgid "Deux équipes fixes, T1 et T2, qu’on ne nomme pas."
@@ -587,8 +615,8 @@ msgstr "No se coloca sobre un cliente en pantalla completa, donde una ventana ma
 #~ msgstr "No se coloca sobre un cliente en pantalla completa."
 
 #: src/constants/ankama.ts
-msgid "Il ne touche pas au jeu."
-msgstr "No toca el juego."
+#~ msgid "Il ne touche pas au jeu."
+#~ msgstr "No toca el juego."
 
 #: src/constants/bodies.ts
 #~ msgid "Il ne vise pas à votre place."
@@ -746,6 +774,10 @@ msgstr "La misma tecla lo oculta y lo llama"
 msgid "La mule que vous laissez en banque ne prend aucun de vos clics."
 msgstr "La mula que dejas en el banco no se lleva ninguno de tus clics."
 
+#: src/screens/ankama-screen.tsx
+msgid "La règle d’Ankama"
+msgstr "La regla de Ankama"
+
 #: src/constants/bodies.ts
 #~ msgid "La roue ne demande rien à votre mémoire."
 #~ msgstr "La rueda no le pide nada a tu memoria."
@@ -778,6 +810,14 @@ msgstr "Suelta en el centro y no pasa nada"
 msgid "Le <0>code du site</0> est public."
 msgstr "El <0>código del sitio</0> es público."
 
+#: src/constants/ankama.ts
+msgid "Le 10 mars 2026"
+msgstr "El 10 de marzo de 2026"
+
+#: src/constants/ankama.ts
+msgid "Le 1ᵉʳ avril 2026"
+msgstr "El 1 de abril de 2026"
+
 #: src/screens/download-screen.tsx
 #~ msgid "Le code est ouvert"
 #~ msgstr "El código está abierto"
@@ -795,8 +835,12 @@ msgstr "El comercio sigue sin ti"
 #~ msgstr "El comercio no se para cuando te vas"
 
 #: src/constants/ankama.ts
-msgid "le compte Dofus Retro sur X, le 10 mars 2026"
-msgstr "la cuenta de Dofus Retro en X, el 10 de marzo de 2026"
+msgid "Le compte Dofus Retro sur X"
+msgstr "La cuenta de Dofus Retro en X"
+
+#: src/constants/ankama.ts
+#~ msgid "le compte Dofus Retro sur X, le 10 mars 2026"
+#~ msgstr "la cuenta de Dofus Retro en X, el 10 de marzo de 2026"
 
 #: src/constants/legal.ts
 #~ msgid "Le compte X du pied de page est la voie de contact, la même que pour signaler une erreur du comparatif ou une faute de traduction."
@@ -823,8 +867,12 @@ msgstr "¿El archivo es seguro?"
 #~ msgstr "El archivo viene de aquí de verdad."
 
 #: src/constants/ankama.ts
-msgid "le forum de Dofus Retro, le 1ᵉʳ avril 2026"
-msgstr "el foro de Dofus Retro, el 1 de abril de 2026"
+msgid "Le forum de Dofus Retro"
+msgstr "El foro de Dofus Retro"
+
+#: src/constants/ankama.ts
+#~ msgid "le forum de Dofus Retro, le 1ᵉʳ avril 2026"
+#~ msgstr "el foro de Dofus Retro, el 1 de abril de 2026"
 
 #: src/constants/bodies.ts
 msgid "Le jeu garde le premier plan : un clic sur le tableau ne fait pas sauter Multifus devant."
@@ -837,6 +885,10 @@ msgstr "El juego mantiene el primer plano: un clic en la tabla no trae Multifus 
 #: src/constants/bodies.ts
 #~ msgid "Le jeu ne voit plus votre souris."
 #~ msgstr "El juego ya no ve tu ratón."
+
+#: src/constants/wording.ts
+#~ msgid "Le multicompte est-il autorisé sur Dofus Retro ?"
+#~ msgstr "¿Está permitido el multicuenta en Dofus Retro?"
 
 #: src/screens/home-screen.tsx
 msgid "Le multicompte sur Dofus Retro"
@@ -943,8 +995,8 @@ msgstr "¿No te interesan las fabricaciones de los demás? Corta esa y quédate 
 #~ msgstr "¿No te interesan los oficios de los demás? Apagas ese y te quedas con los otros seis."
 
 #: src/screens/ankama-screen.tsx
-msgid "Les deux messages"
-msgstr "Los dos mensajes"
+#~ msgid "Les deux messages"
+#~ msgstr "Los dos mensajes"
 
 #: src/constants/bodies.ts
 msgid "Les deux systèmes sont construits à partir du même code."
@@ -953,6 +1005,14 @@ msgstr "Los dos sistemas se compilan a partir del mismo código."
 #: src/constants/legal.ts
 #~ msgid "Les images et les vidéos du site viennent du jeu et restent à eux."
 #~ msgstr "Las imágenes y los vídeos del sitio vienen del juego y siguen siendo suyos."
+
+#: src/constants/ankama.ts
+msgid "Les macros, quelles qu’elles soient"
+msgstr "Las macros, sean cuales sean"
+
+#: src/constants/ankama.ts
+#~ msgid "Les macros, sans aucune exception"
+#~ msgstr "Las macros, sin ninguna excepción"
 
 #: src/screens/legal-screen.tsx
 msgid "Les marques qui ne sont pas les nôtres"
@@ -990,6 +1050,10 @@ msgstr "Los seis mecanismos están ahí"
 #~ msgid "Les six mécanismes sont là."
 #~ msgstr "Están los seis mecanismos."
 
+#: src/screens/ankama-screen.tsx
+msgid "Les sources"
+msgstr "Las fuentes"
+
 #: src/constants/wording.ts
 msgid "Lire"
 msgstr "Reproducir"
@@ -999,8 +1063,8 @@ msgid "Lire cette page en français"
 msgstr "Leer esta página en español"
 
 #: src/components/ankama-word.tsx
-msgid "Lire le message chez Ankama"
-msgstr "Leer el mensaje en Ankama"
+#~ msgid "Lire le message chez Ankama"
+#~ msgstr "Leer el mensaje en Ankama"
 
 #: src/constants/wording.ts
 msgid "Logiciel multicompte Dofus Retro sur Mac"
@@ -1021,6 +1085,10 @@ msgstr "Mensajes privados"
 #: src/constants/wording.ts
 msgid "Messages privés de Dofus Retro sur Telegram"
 msgstr "Mensajes privados de Dofus Retro en Telegram"
+
+#: src/constants/wording.ts
+#~ msgid "Multicompte autorisé ?"
+#~ msgstr "¿Multicuenta permitido?"
 
 #: src/constants/wording.ts
 msgid "Multifus"
@@ -1059,6 +1127,14 @@ msgstr "Multifus lo publica <0>viclafouch</0>, un particular, a título personal
 #~ msgstr "Multifus es un proyecto personal, gratuito, sin ninguna empresa detrás y sin cuenta que crear. Todo lo que la ley pide decir cabe en esta página."
 
 #: src/constants/wording.ts
+msgid "Multifus est-il autorisé ?"
+msgstr "¿Está permitido Multifus?"
+
+#: src/constants/wording.ts
+msgid "Multifus est-il autorisé sur Dofus Retro ?"
+msgstr "¿Está permitido Multifus en Dofus Retro?"
+
+#: src/constants/wording.ts
 msgid "Multifus et les autres gestionnaires, ligne par ligne."
 msgstr "Multifus y los demás gestores, línea por línea."
 
@@ -1069,6 +1145,14 @@ msgstr "Multifus no tiene ningún vínculo con Ankama: ni acuerdo, ni aprobació
 #: src/constants/legal.ts
 #~ msgid "Multifus n’a aucun lien avec Ankama."
 #~ msgstr "Multifus no tiene ningún vínculo con Ankama."
+
+#: src/constants/ankama.ts
+msgid "Multifus n’en fait rien."
+msgstr "Multifus no hace nada de eso."
+
+#: src/constants/ankama.ts
+msgid "Multifus ne fait que ça."
+msgstr "Multifus solo hace eso."
 
 #: src/constants/bodies.ts
 #~ msgid "Multifus ne lit pas ce qu’on vous a écrit."
@@ -1118,6 +1202,10 @@ msgstr "Multifus funciona en macOS con los mismos mecanismos que en Windows, en 
 msgid "Multifus, logiciel multicompte gratuit pour Dofus Retro"
 msgstr "Multifus, programa multicuenta gratuito para Dofus Retro"
 
+#: src/constants/ankama.ts
+msgid "Ne rien lire et ne rien changer dans le jeu"
+msgstr "No leer ni cambiar nada en el juego"
+
 #: src/constants/legal.ts
 #~ msgid "Ni par le site, ni par la mesure d’audience, et il n’y a donc rien à accepter."
 #~ msgstr "Ni por el sitio, ni por la medición de audiencia, así que no hay nada que aceptar."
@@ -1129,6 +1217,10 @@ msgstr "Multifus, programa multicuenta gratuito para Dofus Retro"
 #: src/constants/rivals.ts
 msgid "non"
 msgstr "no"
+
+#: src/components/out-link.tsx
+msgid "nouvel onglet"
+msgstr "nueva pestaña"
 
 #: src/screens/legal-screen.tsx
 msgid "On l’écrit à <0>{AUTHOR_MAIL}</0>, ou sur son <1>compte X</1>. C’est par là que passent une erreur du comparatif et une faute de traduction."
@@ -1145,6 +1237,14 @@ msgstr "sí"
 #: src/screens/download-screen.tsx
 msgid "Oui, et pour toujours. Rien à payer, aucun compte à créer, aucune publicité. Il n’y a pas de version payante cachée derrière."
 msgstr "Sí, y para siempre. Nada que pagar, ninguna cuenta que crear, ninguna publicidad. No hay una versión de pago escondida detrás."
+
+#: src/constants/wording.ts
+#~ msgid "Oui, tant que le logiciel ne touche pas au jeu et ne joue pas à votre place. Ankama l’a écrit deux fois en public."
+#~ msgstr "Sí, mientras el programa no toque el juego y no juegue por ti. Ankama lo ha escrito dos veces en público."
+
+#: src/constants/wording.ts
+msgid "Oui. Ankama tolère les logiciels qui rangent les fenêtres du jeu, tant qu’ils n’y touchent à rien. Multifus reste dans ce cadre."
+msgstr "Sí. Ankama tolera los programas que ordenan las ventanas del juego, mientras no toquen nada dentro. Multifus se queda ahí."
 
 #: src/constants/systems.ts
 msgid "Ouvrez ce fichier, puis glissez Multifus dans le dossier Applications."
@@ -1165,6 +1265,14 @@ msgstr "Abre ese archivo y sigue la instalación hasta el final."
 #: src/constants/systems.ts
 msgid "Ouvrez Multifus. Il vous montre la suite, pas à pas."
 msgstr "Abre Multifus. Te enseña el resto, paso a paso."
+
+#: src/components/ankama-source.tsx
+msgid "Ouvrir la source"
+msgstr "Abrir la fuente"
+
+#: src/constants/ankama.ts
+msgid "Ouvrir ou modifier les fichiers du jeu"
+msgstr "Abrir o modificar los archivos del juego"
 
 #: src/constants/rivals.ts
 msgid "Paquet signé"
@@ -1238,6 +1346,10 @@ msgstr "Quién publica este sitio, quién lo aloja, y lo poco que guarda de ti."
 msgid "Qui publie le site"
 msgstr "Quién publica el sitio"
 
+#: src/constants/ankama.ts
+msgid "Ranger et changer les fenêtres du jeu"
+msgstr "Ordenar y cambiar las ventanas del juego"
+
 #: src/components/rival-table.tsx
 msgid "Relevé le {surveyed}, dans le code de chaque outil."
 msgstr "Consultado el {surveyed}, en el código de cada herramienta."
@@ -1267,8 +1379,8 @@ msgstr "Nada que esquivar para instalarlo"
 #~ msgstr "Nada que ajustar antes de jugar: en el primer arranque, Multifus te lleva de la mano."
 
 #: src/constants/ankama.ts
-msgid "Rien d’officiel."
-msgstr "Nada oficial."
+#~ msgid "Rien d’officiel."
+#~ msgstr "Nada oficial."
 
 #: src/constants/bodies.ts
 #~ msgid "Rien du canal commerce, rien de la guilde, rien du recrutement."
@@ -1467,8 +1579,8 @@ msgstr "Un clic por personaje, y todo el equipo camina al mismo sitio."
 #~ msgstr "Un clic en la tabla no trae Multifus al frente."
 
 #: src/constants/ankama.ts
-msgid "Un clic, un personnage."
-msgstr "Un clic, un personaje."
+#~ msgid "Un clic, un personnage."
+#~ msgstr "Un clic, un personaje."
 
 #: src/constants/bodies.ts
 msgid "Un client en plein écran prend un bureau à lui, et la bascule devient un glissement d’un bureau à l’autre."
@@ -1509,6 +1621,10 @@ msgstr "Un texto listo sale con un atajo."
 #: src/constants/wording.ts
 msgid "Un texte tout prêt part sous une combinaison de touches."
 msgstr "Un texto ya listo sale bajo una combinación de teclas."
+
+#: src/constants/ankama.ts
+msgid "Une action, un seul personnage"
+msgstr "Una acción, un solo personaje"
 
 #: src/constants/bodies.ts
 msgid "Une annonce en vente attend des réponses, et l’acheteur ne repart plus faute de vous."
@@ -1643,8 +1759,8 @@ msgstr "Te has ido a comer, tus personajes se han quedado conectados, y alguien 
 #~ msgstr "Te has ido a comer, tus personajes se han quedado conectados, y alguien te escribe en privado. Tu teléfono te dice a cuál acaban de llamar."
 
 #: src/constants/ankama.ts
-msgid "Vous installez sous votre responsabilité."
-msgstr "Instalas bajo tu responsabilidad."
+#~ msgid "Vous installez sous votre responsabilité."
+#~ msgstr "Instalas bajo tu responsabilidad."
 
 #: src/constants/bodies.ts
 #~ msgid "Vous jouez sur votre Iop, et c’est votre Eniripsa qu’on invite en groupe. Sa fenêtre arrive devant vous toute seule."

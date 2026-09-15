@@ -14,6 +14,7 @@ import {
   AUTHOR_MAIL,
   FOLD_ANCHOR,
   GAME,
+  MAIL_SCHEME,
   REPOSITORY,
   VERCEL,
   VERCEL_ADDRESS,
@@ -53,7 +54,7 @@ export const LegalScreen = ({ page }: PageScreenProps) => {
           <Prose isWide>
             <Trans>
               On l’écrit à{' '}
-              <OutLink isInline href={`mailto:${AUTHOR_MAIL}`}>
+              <OutLink isInline href={`${MAIL_SCHEME}${AUTHOR_MAIL}`}>
                 {AUTHOR_MAIL}
               </OutLink>
               , ou sur son{' '}

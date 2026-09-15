@@ -1,6 +1,7 @@
 import { msg } from '@lingui/core/macro'
 import { useLingui } from '@lingui/react'
 import type { PageId } from '@/@types/page'
+import { OutLink } from '@/components/out-link'
 import { PageLink } from '@/components/page-link'
 import { AUTHOR, REPOSITORY } from '@/constants/site'
 import { PAGE_NAMES } from '@/constants/wording'
@@ -43,20 +44,22 @@ export const SiteFooter = () => {
                 )
               })}
               <li>
-                <a
+                <OutLink
                   href={REPOSITORY}
+                  isBare
                   className="sighted transition-colors hover:text-cream"
                 >
                   GitHub
-                </a>
+                </OutLink>
               </li>
               <li>
-                <a
+                <OutLink
                   href={AUTHOR}
+                  isBare
                   className="sighted transition-colors hover:text-cream"
                 >
                   {i18n._(WRITE_TO_AUTHOR)}
-                </a>
+                </OutLink>
               </li>
             </ul>
           </nav>
