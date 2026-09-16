@@ -20,11 +20,14 @@ description: Fabrique la boucle sans son qu'une capture d'écran doit devenir, e
 ## Ce qu'il faut demander à qui filme
 
 Le script rétrécit, il n'agrandit pas : une capture plus étroite que la largeur
-d'arrivée donne une plaque molle, et rien ne la rattrape. Sur le Mac de la
-vitrine, une sélection de 704 × 396 points tombe pile sur les 1408 × 792 de la
-plaque, sans recadrage ni mise à l'échelle. Et la fenêtre de Dofus garde la même
-taille d'une vidéo à l'autre, sinon les trois plaques montrent le jeu à trois
-échelles et ne font pas famille.
+d'arrivée donne une plaque molle, et rien ne la rattrape.
+
+`node .claude/skills/make-loop/frame-dofus.mjs` règle chaque fenêtre de Dofus à
+702 × 560 points et dit la sélection à donner à l'enregistreur, 700 × 410 points
+sous la barre de titre. C'est la taille des boucles déjà posées, et elle tient
+d'une vidéo à l'autre : une fenêtre plus grande montre le jeu à une autre
+échelle, et les plaques ne font plus famille. La sélection rend 1400 pixels de
+large, huit de moins que la plaque de 1408 : cet écart-là ne se voit pas.
 
 ## Ce que le script ne dit pas
 
