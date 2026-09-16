@@ -27,7 +27,7 @@ export const InstallSteps = ({ system }: InstallStepsProps) => {
                   {rank + 1}
                 </span>
               </span>
-              <span className="max-w-tale text-tale text-band">{said}</span>
+              <span className="max-w-saga text-tale text-band">{said}</span>
             </li>
           )
         })}

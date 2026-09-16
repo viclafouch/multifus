@@ -60,18 +60,21 @@ const WITHOUT_HOME = PAGE_IDS.filter((page) => {
   return page !== 'home'
 })
 
+const WITH_SOFTWARE = [
+  'home',
+  'download',
+  'windows'
+] as const satisfies readonly PageId[]
+
 const WITHOUT_SOFTWARE = PAGE_IDS.filter((page) => {
-  return page !== 'home' && page !== 'download'
+  return !WITH_SOFTWARE.some((carrier) => {
+    return carrier === page
+  })
 })
 
 describe('the software record', () => {
-  it('lands on the home page and on the download page', () => {
-    expect(typesOf({ page: 'home', language: 'fr' })).toContain(
-      'SoftwareApplication'
-    )
-    expect(typesOf({ page: 'download', language: 'fr' })).toContain(
-      'SoftwareApplication'
-    )
+  it.each(WITH_SOFTWARE)('lands on %s', (page) => {
+    expect(typesOf({ page, language: 'fr' })).toContain('SoftwareApplication')
   })
 
   it.each(WITHOUT_SOFTWARE)('does not land on %s', (page) => {

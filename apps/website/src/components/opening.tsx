@@ -6,6 +6,6 @@ type OpeningProps = Readonly<{
 
 export const Opening = ({ children }: OpeningProps) => {
   return (
-    <p className="lede max-w-tale pl-6 text-herald text-cream">{children}</p>
+    <p className="lede max-w-saga pl-6 text-herald text-cream">{children}</p>
   )
 }

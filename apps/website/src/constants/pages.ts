@@ -65,6 +65,12 @@ export const PAGES = {
     kin: ['autoFocus', 'walk'],
     slugs: { fr: 'mac', en: 'mac', es: 'mac' }
   },
+  windows: {
+    kind: 'windows',
+    loop: null,
+    kin: [],
+    slugs: { fr: 'windows', en: 'windows', es: 'windows' }
+  },
   comparison: {
     kind: 'comparison',
     loop: null,
@@ -110,6 +116,7 @@ export const PAGE_IDS = [
   'relay',
   'quickTexts',
   'mac',
+  'windows',
   'comparison',
   'download',
   'journal',
@@ -128,6 +135,7 @@ export const MENU_FEATURES = [
 
 export const FOOTER_SOFTWARE = [
   'download',
+  'windows',
   'mac',
   'comparison'
 ] as const satisfies readonly PageId[]

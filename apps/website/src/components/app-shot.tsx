@@ -1,18 +1,21 @@
-import { msg } from '@lingui/core/macro'
+import type { MessageDescriptor } from '@lingui/core'
 import { useLingui } from '@lingui/react'
-import { HOME_SHOT } from '@/constants/shots'
+import type { Picture } from '@/@types/media'
 
-const SHOT_ALT = msg`La fenêtre de Multifus, avec le menu des fonctionnalités à gauche et la place des personnages connectés au centre.`
+type AppShotProps = Readonly<{
+  shot: Picture
+  alt: MessageDescriptor
+}>
 
-export const AppShot = () => {
+export const AppShot = ({ shot, alt }: AppShotProps) => {
   const { i18n } = useLingui()
 
   return (
     <img
-      src={HOME_SHOT.src}
-      alt={i18n._(SHOT_ALT)}
-      width={HOME_SHOT.width}
-      height={HOME_SHOT.height}
+      src={shot.src}
+      alt={i18n._(alt)}
+      width={shot.width}
+      height={shot.height}
       className="stage h-auto w-full"
     />
   )

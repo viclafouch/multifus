@@ -19,9 +19,10 @@ import { Plate } from '@/components/plate'
 import { Prose } from '@/components/prose'
 import { Question } from '@/components/question'
 import { PAGES } from '@/constants/pages'
+import { HOME_SHOT, HOME_SHOT_ALT } from '@/constants/shots'
 import { FOLD_ANCHOR } from '@/constants/site'
 import { SYSTEM_FLOORS, SYSTEM_IDS, SYSTEM_NAMES } from '@/constants/systems'
-import { PAGE_NAMES, PERKS } from '@/constants/wording'
+import { QUESTIONS_TITLE, PAGE_NAMES, PERKS } from '@/constants/wording'
 import { usePickedSystem } from '@/hooks/use-picked-system'
 
 const MOVES_TITLE = msg`Installer, c’est trois gestes`
@@ -31,8 +32,6 @@ const MOVES_LEAD = msg`Suivez les trois lignes de votre ordinateur. Il n’y a r
 const FIRST_TITLE = msg`Et après ?`
 
 const FIRST_LEAD = msg`Multifus s’ouvre et vous guide. Il vous montre les cases à cocher, dans votre ordinateur et dans Dofus. Deux minutes, une seule fois.`
-
-const QUESTIONS_TITLE = msg`Les questions qu’on se pose`
 
 const ASK_FREE = msg`C’est gratuit ?`
 
@@ -69,7 +68,7 @@ export const DownloadScreen = ({ page }: PageScreenProps) => {
           </div>
         </div>
         <div className="unveil">
-          <AppShot />
+          <AppShot shot={HOME_SHOT} alt={HOME_SHOT_ALT} />
         </div>
       </Band>
       <Band className="reveal py-14">

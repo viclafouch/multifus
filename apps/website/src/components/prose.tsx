@@ -8,7 +8,7 @@ type ProseProps = Readonly<{
 
 export const Prose = ({ children, isWide = false }: ProseProps) => {
   return (
-    <p className={cn('text-tale text-band', isWide ? null : 'max-w-tale')}>
+    <p className={cn('text-tale text-band', isWide ? null : 'max-w-saga')}>
       {children}
     </p>
   )

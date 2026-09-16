@@ -15,6 +15,7 @@ export type PageId =
   | 'runeTable'
   | 'walk'
   | 'wheel'
+  | 'windows'
 
 export type PageKind =
   | 'ankama'
@@ -24,6 +25,7 @@ export type PageKind =
   | 'home'
   | 'legal'
   | 'plain'
+  | 'windows'
 
 export type FeatureId =
   | 'autoFocus'

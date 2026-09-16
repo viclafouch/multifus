@@ -12,6 +12,7 @@ export const PAGE_NAMES = {
   relay: msg`Messages privés`,
   quickTexts: msg`Textes rapides`,
   mac: msg`Multifus sur Mac`,
+  windows: msg`Multifus sur Windows`,
   comparison: msg`Comparatif`,
   download: msg`Télécharger`,
   journal: msg`Journal des versions`,
@@ -28,6 +29,7 @@ export const PAGE_TITLES = {
   relay: msg`Messages privés de Dofus Retro sur Telegram`,
   quickTexts: msg`Textes rapides au clavier sur Dofus Retro`,
   mac: msg`Logiciel multicompte Dofus Retro sur Mac`,
+  windows: msg`Logiciel multicompte Dofus Retro sur Windows`,
   comparison: msg`Comparatif des logiciels multicompte Dofus Retro`,
   download: msg`Télécharger le multicompte Dofus Retro gratuit`,
   journal: msg`Journal des versions de Multifus`,
@@ -44,6 +46,7 @@ export const PAGE_PROMISES = {
   relay: msg`Les messages privés vous suivent au téléphone.`,
   quickTexts: msg`Un texte tout prêt part sous vos touches.`,
   mac: msg`Multifus tourne sur Mac, signé et notarisé par Apple.`,
+  windows: msg`Le multicompte Dofus Retro sur Windows 10 et 11, avec une barre des tâches personnalisable.`,
   comparison: msg`Multifus et les autres gestionnaires, ligne par ligne.`,
   download: msg`Multifus est gratuit, pour Mac et pour Windows. Trois gestes, et vous jouez en multicompte sur Dofus Retro.`,
   journal: msg`Ce que chaque version a changé.`,
@@ -75,6 +78,8 @@ export const PROJECT_TITLE = msg`Le projet`
 export const LIMITS_TITLE = msg`Ce que Multifus ne fait pas`
 
 export const CAVEATS_TITLE = msg`À savoir`
+
+export const QUESTIONS_TITLE = msg`Les questions qu’on se pose`
 
 export const NO_HARM = msg`Multifus ne lit pas la mémoire du jeu, ne touche à aucun de ses fichiers, et ne joue à votre place sur aucun personnage.`
 

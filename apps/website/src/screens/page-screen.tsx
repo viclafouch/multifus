@@ -10,10 +10,12 @@ import { FeatureScreen } from '@/screens/feature-screen'
 import { HomeScreen } from '@/screens/home-screen'
 import { LegalScreen } from '@/screens/legal-screen'
 import { PlainScreen } from '@/screens/plain-screen'
+import { WindowsScreen } from '@/screens/windows-screen'
 
 const PAGE_SCREENS = {
   home: HomeScreen,
   feature: FeatureScreen,
+  windows: WindowsScreen,
   download: DownloadScreen,
   comparison: ComparisonScreen,
   plain: PlainScreen,

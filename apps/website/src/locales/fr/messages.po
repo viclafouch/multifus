@@ -33,6 +33,10 @@ msgstr "{0} ou plus récent, sur un Mac Apple Silicon"
 #~ msgid "{0}, mise à jour 1709 d’octobre 2017"
 #~ msgstr "{0}, mise à jour 1709 d’octobre 2017"
 
+#: src/screens/windows-screen.tsx
+#~ msgid "8 clients Dofus Retro ouverts sur votre PC. Multifus range leurs fenêtres, et donne son bouton à chaque personnage."
+#~ msgstr "8 clients Dofus Retro ouverts sur votre PC. Multifus range leurs fenêtres, et donne son bouton à chaque personnage."
+
 #: src/constants/bodies.ts
 msgid "À huit, vous cherchez si votre Crâ est sur F5 ou sur F6 plus longtemps que vous ne jouez."
 msgstr "À huit, vous cherchez si votre Crâ est sur F5 ou sur F6 plus longtemps que vous ne jouez."
@@ -68,6 +72,10 @@ msgstr "Aller au contenu"
 #: src/constants/wording.ts
 #~ msgid "Ankama et les logiciels multicompte Dofus Retro"
 #~ msgstr "Ankama et les logiciels multicompte Dofus Retro"
+
+#: src/screens/windows-screen.tsx
+msgid "Ankama l’autorise ?"
+msgstr "Ankama l’autorise ?"
 
 #: src/constants/ankama.ts
 #~ msgid "Ankama l’écrit lui-même dans les deux messages ci-dessus."
@@ -133,6 +141,18 @@ msgstr "Aucun cookie n’est posé, ni par le site, ni par la mesure d’audienc
 msgid "Aucun logiciel de la communauté n’est soutenu par le jeu. Vous l’installez sous votre responsabilité."
 msgstr "Aucun logiciel de la communauté n’est soutenu par le jeu. Vous l’installez sous votre responsabilité."
 
+#: src/screens/windows-screen.tsx
+#~ msgid "Autant que votre ordinateur en ouvre. 4, 6, 8 clients Dofus Retro : Multifus les range tous de la même façon, mules comprises."
+#~ msgstr "Autant que votre ordinateur en ouvre. 4, 6, 8 clients Dofus Retro : Multifus les range tous de la même façon, mules comprises."
+
+#: src/screens/windows-screen.tsx
+#~ msgid "Autant que votre ordinateur en ouvre. Quatre, six, huit clients Dofus Retro : Multifus les range tous de la même façon, mules comprises."
+#~ msgstr "Autant que votre ordinateur en ouvre. Quatre, six, huit clients Dofus Retro : Multifus les range tous de la même façon, mules comprises."
+
+#: src/screens/windows-screen.tsx
+msgid "Autant que votre PC en ouvre. 4, 6, 8 clients Dofus Retro : Multifus les range tous pareil."
+msgstr "Autant que votre PC en ouvre. 4, 6, 8 clients Dofus Retro : Multifus les range tous pareil."
+
 #: src/constants/rivals.ts
 #: src/constants/wording.ts
 msgid "AutoFocus"
@@ -142,9 +162,17 @@ msgstr "AutoFocus"
 msgid "AutoFocus multicompte pour Dofus Retro"
 msgstr "AutoFocus multicompte pour Dofus Retro"
 
+#: src/constants/bodies.ts
+#~ msgid "AutoFocus, roue des personnages, déplacement rapide, tableau des runes, messages privés, textes rapides."
+#~ msgstr "AutoFocus, roue des personnages, déplacement rapide, tableau des runes, messages privés, textes rapides."
+
 #: src/constants/wording.ts
 msgid "Avant d’installer"
 msgstr "Avant d’installer"
+
+#: src/components/taskbar-proof.tsx
+msgid "Avec Multifus"
+msgstr "Avec Multifus"
 
 #: src/constants/bodies.ts
 #~ msgid "C’est à votre tour de jouer."
@@ -194,9 +222,17 @@ msgstr "C’est vous qui appuyez sur Entrée"
 #~ msgid "C’est vous qui cliquez sur la case où la team doit aller."
 #~ msgstr "C’est vous qui cliquez sur la case où la team doit aller."
 
+#: src/screens/windows-screen.tsx
+msgid "Ça marche sur Dofus 2 ou Dofus 3 ?"
+msgstr "Ça marche sur Dofus 2 ou Dofus 3 ?"
+
 #: src/screens/download-screen.tsx
 msgid "Ça marche sur mon ordinateur ?"
 msgstr "Ça marche sur mon ordinateur ?"
+
+#: src/screens/windows-screen.tsx
+msgid "Ça marche sur Windows 11 ?"
+msgstr "Ça marche sur Windows 11 ?"
 
 #: src/screens/download-screen.tsx
 #~ msgid "Ce marché est plein de clones, et vous avez raison de vous méfier. Voici quatre choses que vous pouvez vérifier vous-même."
@@ -278,6 +314,10 @@ msgstr "Ce que Multifus ne fait pas"
 #~ msgid "Ce que Multifus ne fait pas sur Mac"
 #~ msgstr "Ce que Multifus ne fait pas sur Mac"
 
+#: src/screens/windows-screen.tsx
+#~ msgid "Ce que Windows apporte en plus"
+#~ msgstr "Ce que Windows apporte en plus"
+
 #: src/constants/bodies.ts
 #~ msgid "Ce qui disparaît, c’est la recherche de fenêtre entre chaque clic."
 #~ msgstr "Ce qui disparaît, c’est la recherche de fenêtre entre chaque clic."
@@ -289,6 +329,10 @@ msgstr "Ce qui fait bannir"
 #: src/constants/bodies.ts
 msgid "Celle qu’un premier lancement vous offre est en français, même si vous lisez Multifus en anglais."
 msgstr "Celle qu’un premier lancement vous offre est en français, même si vous lisez Multifus en anglais."
+
+#: src/screens/windows-screen.tsx
+#~ msgid "Celle que vous lui donnez cercle sa tête, et sépare enfin vos deux Sadidas femmes."
+#~ msgstr "Celle que vous lui donnez cercle sa tête, et sépare enfin vos deux Sadidas femmes."
 
 #: src/components/lost-word.tsx
 msgid "Cette page n’existe pas"
@@ -330,6 +374,10 @@ msgstr "Chaque message nomme le personnage qu’on vient d’appeler."
 #~ msgid "Chaque nom de colonne mène au dépôt où ses cases ont été lues. Une case qui vous paraît fausse se corrige ici :"
 #~ msgstr "Chaque nom de colonne mène au dépôt où ses cases ont été lues. Une case qui vous paraît fausse se corrige ici :"
 
+#: src/components/taskbar-proof.tsx
+msgid "Chaque personnage a le sien."
+msgstr "Chaque personnage a le sien."
+
 #: src/constants/systems.ts
 msgid "Cliquez sur le bouton vert. Le fichier arrive dans vos téléchargements."
 msgstr "Cliquez sur le bouton vert. Le fichier arrive dans vos téléchargements."
@@ -361,6 +409,10 @@ msgstr "Copie de la réponse de l’équipe Ankama sur le forum de Dofus Retro."
 #: src/constants/ankama.ts
 msgid "Copie du message publié par le compte Dofus Retro sur X."
 msgstr "Copie du message publié par le compte Dofus Retro sur X."
+
+#: src/components/character-keys.tsx
+msgid "Crâ"
+msgstr "Crâ"
 
 #: src/constants/rivals.ts
 msgid "Dans sa fenêtre à lui, pas par-dessus le jeu."
@@ -394,6 +446,10 @@ msgstr "Deux Sadidas femmes se séparent"
 #~ msgid "Deux Sadidas femmes se séparent."
 #~ msgstr "Deux Sadidas femmes se séparent."
 
+#: src/screens/windows-screen.tsx
+msgid "Disponible sur Windows 10 et 11"
+msgstr "Disponible sur Windows 10 et 11"
+
 #: src/constants/bodies.ts
 #~ msgid "Dofus Retro déconnecte un personnage qui ne fait rien, et le relais l’annonce plutôt que de vous laisser croire que personne n’écrit."
 #~ msgstr "Dofus Retro déconnecte un personnage qui ne fait rien, et le relais l’annonce plutôt que de vous laisser croire que personne n’écrit."
@@ -413,6 +469,10 @@ msgstr "Dofus, Dofus Retro et Ankama appartiennent à <0>Ankama Games</0>. Les i
 #: src/constants/legal.ts
 #~ msgid "Dofus, Dofus Retro et Ankama appartiennent à Ankama Games. Les images et les vidéos du site viennent du jeu et restent à eux."
 #~ msgstr "Dofus, Dofus Retro et Ankama appartiennent à Ankama Games. Les images et les vidéos du site viennent du jeu et restent à eux."
+
+#: src/constants/bodies.ts
+#~ msgid "Échange, groupe, guilde, message privé, défi, craft, percepteur attaqué : sept appels surveillés."
+#~ msgstr "Échange, groupe, guilde, message privé, défi, craft, percepteur attaqué : sept appels surveillés."
 
 #: src/constants/bodies.ts
 #~ msgid "Échange, groupe, guilde, message privé, défi, craft, percepteur attaqué : sept appels, et pas un de plus."
@@ -490,6 +550,14 @@ msgstr "Elles suivent tous vos personnages"
 msgid "enfin jouable"
 msgstr "enfin jouable"
 
+#: src/components/character-keys.tsx
+#~ msgid "Eniripsa"
+#~ msgstr "Eniripsa"
+
+#: src/components/character-keys.tsx
+msgid "Enutrof"
+msgstr "Enutrof"
+
 #: src/screens/download-screen.tsx
 msgid "Et après ?"
 msgstr "Et après ?"
@@ -498,9 +566,25 @@ msgstr "Et après ?"
 msgid "Et la touche s’écrit comme sur votre clavier."
 msgstr "Et la touche s’écrit comme sur votre clavier."
 
+#: src/screens/windows-screen.tsx
+msgid "Et son exécution au démarrage de Windows, si vous cochez la case."
+msgstr "Et son exécution au démarrage de Windows, si vous cochez la case."
+
+#: src/screens/windows-screen.tsx
+#~ msgid "Et sur Dofus Unity ?"
+#~ msgstr "Et sur Dofus Unity ?"
+
 #: src/constants/bodies.ts
 msgid "Et un bouton le repose au coin de la fenêtre du jeu quand vous l’avez perdu de vue."
 msgstr "Et un bouton le repose au coin de la fenêtre du jeu quand vous l’avez perdu de vue."
+
+#: src/screens/windows-screen.tsx
+#~ msgid "F1 sur votre Iop, F2 sur votre premier Enutrof. Sur Windows, une touche de fonction se pose seule."
+#~ msgstr "F1 sur votre Iop, F2 sur votre premier Enutrof. Sur Windows, une touche de fonction se pose seule."
+
+#: src/screens/windows-screen.tsx
+msgid "F1 sur votre premier Enutrof, F2 sur le second. Sur Windows, une touche de fonction se pose seule."
+msgstr "F1 sur votre premier Enutrof, F2 sur le second. Sur Windows, une touche de fonction se pose seule."
 
 #: src/constants/rivals.ts
 msgid "Fenêtres rangées côte à côte"
@@ -537,6 +621,14 @@ msgstr "Gratuit"
 #: src/constants/wording.ts
 #~ msgid "Gratuit, code publié, paquet signé. Pour macOS et pour Windows."
 #~ msgstr "Gratuit, code publié, paquet signé. Pour macOS et pour Windows."
+
+#: src/constants/bodies.ts
+#~ msgid "Huit clients Dofus Retro ouverts, huit boutons collés sous le même nom. Multifus les décolle, écrit le pseudo sur chacun, et y pose la tête de classe."
+#~ msgstr "Huit clients Dofus Retro ouverts, huit boutons collés sous le même nom. Multifus les décolle, écrit le pseudo sur chacun, et y pose la tête de classe."
+
+#: src/constants/bodies.ts
+#~ msgid "Il démarre avec Windows"
+#~ msgstr "Il démarre avec Windows"
 
 #: src/constants/bodies.ts
 msgid "Il démarre toujours éteint"
@@ -666,6 +758,14 @@ msgstr "Images et vidéos © Ankama Games. Dofus Retro est une marque d’Ankama
 msgid "Installer, c’est trois gestes"
 msgstr "Installer, c’est trois gestes"
 
+#: src/components/character-keys.tsx
+#~ msgid "Iop"
+#~ msgstr "Iop"
+
+#: src/screens/windows-screen.tsx
+msgid "Je peux jouer combien de comptes ?"
+msgstr "Je peux jouer combien de comptes ?"
+
 #: src/screens/download-screen.tsx
 msgid "Je risque quelque chose sur mon compte ?"
 msgstr "Je risque quelque chose sur mon compte ?"
@@ -690,6 +790,14 @@ msgstr "Journal des versions"
 msgid "Journal des versions de Multifus"
 msgstr "Journal des versions de Multifus"
 
+#: src/screens/windows-screen.tsx
+msgid "L’accès aux notifications, et rien d’autre."
+msgstr "L’accès aux notifications, et rien d’autre."
+
+#: src/screens/windows-screen.tsx
+#~ msgid "L’accès aux notifications, et rien d’autre. C’est par là qu’il entend le jeu vous appeler."
+#~ msgstr "L’accès aux notifications, et rien d’autre. C’est par là qu’il entend le jeu vous appeler."
+
 #: src/components/lost-word.tsx
 msgid "L’adresse est peut-être mal recopiée, ou la page a changé de nom. L’accueil vous remet sur le chemin."
 msgstr "L’adresse est peut-être mal recopiée, ou la page a changé de nom. L’accueil vous remet sur le chemin."
@@ -710,6 +818,14 @@ msgstr "L’audience est comptée sans vous nommer. <0>Vercel Analytics</0> comp
 msgid "L’auteur sur X"
 msgstr "L’auteur sur X"
 
+#: src/screens/windows-screen.tsx
+#~ msgid "L’AutoFocus amène devant vous la fenêtre du personnage qu’on appelle. Les 5 autres mécanismes tournent pareil, que votre PC soit sous Windows 10 ou sous Windows 11."
+#~ msgstr "L’AutoFocus amène devant vous la fenêtre du personnage qu’on appelle. Les 5 autres mécanismes tournent pareil, que votre PC soit sous Windows 10 ou sous Windows 11."
+
+#: src/screens/windows-screen.tsx
+#~ msgid "L’AutoFocus amène devant vous la fenêtre du personnage qu’on appelle. Les 5 autres suivent."
+#~ msgstr "L’AutoFocus amène devant vous la fenêtre du personnage qu’on appelle. Les 5 autres suivent."
+
 #: src/constants/bodies.ts
 #~ msgid "L’AutoFocus, la roue, le Déplacement rapide, le tableau des runes, les réponses rapides et les messages privés, et la touche s’écrit comme sur votre clavier."
 #~ msgstr "L’AutoFocus, la roue, le Déplacement rapide, le tableau des runes, les réponses rapides et les messages privés, et la touche s’écrit comme sur votre clavier."
@@ -726,9 +842,17 @@ msgstr "L’ordre du défilement est le vôtre"
 #~ msgid "L’outil fait cette ligne en entier."
 #~ msgstr "L’outil fait cette ligne en entier."
 
+#: src/components/taskbar-proof.tsx
+msgid "La barre des tâches de Windows avec un seul bouton Dofus Retro, qui empile les fenêtres de tous les personnages."
+msgstr "La barre des tâches de Windows avec un seul bouton Dofus Retro, qui empile les fenêtres de tous les personnages."
+
 #: src/constants/bodies.ts
 msgid "La bonne fenêtre est devant vous avant que le chrono ne descende."
 msgstr "La bonne fenêtre est devant vous avant que le chrono ne descende."
+
+#: src/screens/windows-screen.tsx
+msgid "La couleur du personnage."
+msgstr "La couleur du personnage."
 
 #: src/constants/bodies.ts
 #~ msgid "La couleur que vous leur avez donnée les distingue là où le portrait ne le fait plus."
@@ -738,7 +862,11 @@ msgstr "La bonne fenêtre est devant vous avant que le chrono ne descende."
 msgid "La couleur que vous leur donnez les distingue là où le portrait ne suffit plus."
 msgstr "La couleur que vous leur donnez les distingue là où le portrait ne suffit plus."
 
-#: src/components/app-shot.tsx
+#: src/constants/shots.ts
+msgid "La fenêtre de Multifus sur Windows, par-dessus les clients Dofus Retro, et la barre des tâches avec un bouton par personnage."
+msgstr "La fenêtre de Multifus sur Windows, par-dessus les clients Dofus Retro, et la barre des tâches avec un bouton par personnage."
+
+#: src/constants/shots.ts
 msgid "La fenêtre de Multifus, avec le menu des fonctionnalités à gauche et la place des personnages connectés au centre."
 msgstr "La fenêtre de Multifus, avec le menu des fonctionnalités à gauche et la place des personnages connectés au centre."
 
@@ -765,6 +893,10 @@ msgstr "La fenêtre qui joue passe devant."
 #: src/components/language-bar.tsx
 msgid "La langue du site"
 msgstr "La langue du site"
+
+#: src/components/taskbar-proof.tsx
+msgid "La même barre des tâches avec un bouton par personnage, chacun portant son pseudo et sa tête de classe."
+msgstr "La même barre des tâches avec un bouton par personnage, chacun portant son pseudo et sa tête de classe."
 
 #: src/constants/bodies.ts
 msgid "La même combinaison marche sur n’importe lequel d’entre eux."
@@ -793,6 +925,10 @@ msgstr "La règle d’Ankama"
 #: src/constants/bodies.ts
 #~ msgid "La taille et la transparence se règlent."
 #~ msgstr "La taille et la transparence se règlent."
+
+#: src/screens/windows-screen.tsx
+msgid "La tête de classe."
+msgstr "La tête de classe."
 
 #: src/constants/bodies.ts
 #~ msgid "La version Mac n’est pas un portage."
@@ -906,9 +1042,25 @@ msgstr "Le jeu garde le premier plan : un clic sur le tableau ne fait pas sauter
 #~ msgid "Le jeu ne voit plus votre souris."
 #~ msgstr "Le jeu ne voit plus votre souris."
 
+#: src/constants/bodies.ts
+#~ msgid "Le jeu vous appelle, sa fenêtre arrive"
+#~ msgstr "Le jeu vous appelle, sa fenêtre arrive"
+
 #: src/constants/wording.ts
 msgid "Le logiciel"
 msgstr "Le logiciel"
+
+#: src/constants/wording.ts
+msgid "Le multicompte Dofus Retro sur Windows 10 et 11, avec une barre des tâches personnalisable."
+msgstr "Le multicompte Dofus Retro sur Windows 10 et 11, avec une barre des tâches personnalisable."
+
+#: src/constants/wording.ts
+#~ msgid "Le multicompte Dofus Retro sur Windows 10 et 11. Un bouton par personnage dans la barre des tâches."
+#~ msgstr "Le multicompte Dofus Retro sur Windows 10 et 11. Un bouton par personnage dans la barre des tâches."
+
+#: src/constants/wording.ts
+#~ msgid "Le multicompte Dofus Retro sur Windows 10 et Windows 11, avec ses 6 fonctionnalités et un bouton par personnage dans la barre des tâches."
+#~ msgstr "Le multicompte Dofus Retro sur Windows 10 et Windows 11, avec ses 6 fonctionnalités et un bouton par personnage dans la barre des tâches."
 
 #: src/constants/wording.ts
 #~ msgid "Le multicompte est-il autorisé sur Dofus Retro ?"
@@ -1014,6 +1166,22 @@ msgstr "Le tableau des poids de runes se pose par-dessus la fenêtre du jeu, à 
 #~ msgid "Le trajet à quatre personnages"
 #~ msgstr "Le trajet à quatre personnages"
 
+#: src/screens/windows-screen.tsx
+#~ msgid "Les 6 fonctionnalités de Multifus tournent sur Windows, l’AutoFocus en tête. Et la barre des tâches y fait ce qu’elle ne fait nulle part ailleurs."
+#~ msgstr "Les 6 fonctionnalités de Multifus tournent sur Windows, l’AutoFocus en tête. Et la barre des tâches y fait ce qu’elle ne fait nulle part ailleurs."
+
+#: src/screens/windows-screen.tsx
+#~ msgid "Les 6 fonctionnalités sur Windows 10 et 11"
+#~ msgstr "Les 6 fonctionnalités sur Windows 10 et 11"
+
+#: src/screens/windows-screen.tsx
+#~ msgid "Les 6 fonctionnalités, sur Windows 10 et Windows 11"
+#~ msgstr "Les 6 fonctionnalités, sur Windows 10 et Windows 11"
+
+#: src/screens/windows-screen.tsx
+#~ msgid "Les 6 fonctionnalités, toutes sur Windows"
+#~ msgstr "Les 6 fonctionnalités, toutes sur Windows"
+
 #: src/constants/bodies.ts
 #~ msgid "Les autres outils sont des logiciels Windows."
 #~ msgstr "Les autres outils sont des logiciels Windows."
@@ -1070,7 +1238,7 @@ msgstr "Les pages sont construites à l’avance et servies telles quelles, sans
 msgid "Les phrases qu’on retape vingt fois par jour"
 msgstr "Les phrases qu’on retape vingt fois par jour"
 
-#: src/screens/download-screen.tsx
+#: src/constants/wording.ts
 msgid "Les questions qu’on se pose"
 msgstr "Les questions qu’on se pose"
 
@@ -1106,6 +1274,10 @@ msgstr "Lire cette page en français"
 msgid "Logiciel multicompte Dofus Retro sur Mac"
 msgstr "Logiciel multicompte Dofus Retro sur Mac"
 
+#: src/constants/wording.ts
+msgid "Logiciel multicompte Dofus Retro sur Windows"
+msgstr "Logiciel multicompte Dofus Retro sur Windows"
+
 #: src/components/language-offer.tsx
 msgid "Masquer cette proposition"
 msgstr "Masquer cette proposition"
@@ -1121,6 +1293,10 @@ msgstr "Messages privés"
 #: src/constants/wording.ts
 msgid "Messages privés de Dofus Retro sur Telegram"
 msgstr "Messages privés de Dofus Retro sur Telegram"
+
+#: src/screens/windows-screen.tsx
+msgid "Mon PC est sous Windows 7, ça marche ?"
+msgstr "Mon PC est sous Windows 7, ça marche ?"
 
 #: src/constants/wording.ts
 #~ msgid "Multicompte autorisé ?"
@@ -1139,8 +1315,16 @@ msgid "Multifus amène devant vous la fenêtre du personnage qui joue sur Dofus 
 msgstr "Multifus amène devant vous la fenêtre du personnage qui joue sur Dofus Retro. Vous gardez les mains sur le jeu, et la team suit."
 
 #: src/constants/bodies.ts
+#~ msgid "Multifus demande l’accès aux notifications de Windows, et rien de plus."
+#~ msgstr "Multifus demande l’accès aux notifications de Windows, et rien de plus."
+
+#: src/constants/bodies.ts
 #~ msgid "Multifus démarre toujours avec lui éteint."
 #~ msgstr "Multifus démarre toujours avec lui éteint."
+
+#: src/constants/bodies.ts
+#~ msgid "Multifus est déjà là quand vous ouvrez vos clients, et il vit à côté de l’horloge."
+#~ msgstr "Multifus est déjà là quand vous ouvrez vos clients, et il vit à côté de l’horloge."
 
 #: src/constants/wording.ts
 msgid "Multifus est gratuit, pour Mac et pour Windows. Trois gestes, et vous jouez en multicompte sur Dofus Retro."
@@ -1177,6 +1361,10 @@ msgstr "Multifus est-il autorisé sur Dofus Retro ?"
 #: src/constants/wording.ts
 msgid "Multifus et les autres gestionnaires, ligne par ligne."
 msgstr "Multifus et les autres gestionnaires, ligne par ligne."
+
+#: src/screens/windows-screen.tsx
+msgid "Multifus fermé, le titre et l’icône d’origine reviennent."
+msgstr "Multifus fermé, le titre et l’icône d’origine reviennent."
 
 #: src/screens/legal-screen.tsx
 msgid "Multifus n’a aucun lien avec Ankama : ni partenariat, ni approbation, ni soutien d’aucune sorte."
@@ -1227,6 +1415,10 @@ msgid "Multifus sur Mac"
 msgstr "Multifus sur Mac"
 
 #: src/constants/wording.ts
+msgid "Multifus sur Windows"
+msgstr "Multifus sur Windows"
+
+#: src/constants/wording.ts
 msgid "Multifus tourne sur Mac, signé et notarisé par Apple."
 msgstr "Multifus tourne sur Mac, signé et notarisé par Apple."
 
@@ -1237,6 +1429,10 @@ msgstr "Multifus tourne sur macOS avec les mêmes mécanismes que sur Windows, d
 #: src/constants/bodies.ts
 #~ msgid "Multifus tourne sur macOS avec les mêmes mécanismes que sur Windows. Le paquet est signé et notarisé par Apple, donc il s’ouvre normalement."
 #~ msgstr "Multifus tourne sur macOS avec les mêmes mécanismes que sur Windows. Le paquet est signé et notarisé par Apple, donc il s’ouvre normalement."
+
+#: src/constants/wording.ts
+#~ msgid "Multifus tourne sur Windows avec ses 6 fonctionnalités, et donne son bouton à chaque personnage dans la barre des tâches."
+#~ msgstr "Multifus tourne sur Windows avec ses 6 fonctionnalités, et donne son bouton à chaque personnage dans la barre des tâches."
 
 #: src/constants/wording.ts
 msgid "Multifus, logiciel multicompte gratuit pour Dofus Retro"
@@ -1258,6 +1454,22 @@ msgstr "Ne rien lire et ne rien changer dans le jeu"
 msgid "non"
 msgstr "non"
 
+#: src/screens/windows-screen.tsx
+msgid "Non. Il faut Windows 10 ou Windows 11."
+msgstr "Non. Il faut Windows 10 ou Windows 11."
+
+#: src/screens/windows-screen.tsx
+#~ msgid "Non. Multifus a besoin de Windows 10 ou de Windows 11, et ne s’installe pas en dessous."
+#~ msgstr "Non. Multifus a besoin de Windows 10 ou de Windows 11, et ne s’installe pas en dessous."
+
+#: src/screens/windows-screen.tsx
+#~ msgid "Non. Multifus ne connaît que Dofus Retro, la 1.29, et ne regarde aucun autre jeu."
+#~ msgstr "Non. Multifus ne connaît que Dofus Retro, la 1.29, et ne regarde aucun autre jeu."
+
+#: src/screens/windows-screen.tsx
+msgid "Non. Multifus ne connaît que Dofus Retro, la 1.29."
+msgstr "Non. Multifus ne connaît que Dofus Retro, la 1.29."
+
 #: src/components/out-link.tsx
 msgid "nouvel onglet"
 msgstr "nouvel onglet"
@@ -1278,6 +1490,18 @@ msgstr "oui"
 msgid "Oui, et pour toujours. Rien à payer, aucun compte à créer, aucune publicité. Il n’y a pas de version payante cachée derrière."
 msgstr "Oui, et pour toujours. Rien à payer, aucun compte à créer, aucune publicité. Il n’y a pas de version payante cachée derrière."
 
+#: src/screens/windows-screen.tsx
+#~ msgid "Oui, et sur Windows 10 aussi. L’installation prend 3 gestes, puis Multifus vous montre la suite."
+#~ msgstr "Oui, et sur Windows 10 aussi. L’installation prend 3 gestes, puis Multifus vous montre la suite."
+
+#: src/screens/windows-screen.tsx
+msgid "Oui, et sur Windows 10 aussi. L’installation prend 3 gestes."
+msgstr "Oui, et sur Windows 10 aussi. L’installation prend 3 gestes."
+
+#: src/screens/windows-screen.tsx
+#~ msgid "Oui, et sur Windows 10 aussi. L’installation prend trois gestes, puis Multifus vous montre la suite."
+#~ msgstr "Oui, et sur Windows 10 aussi. L’installation prend trois gestes, puis Multifus vous montre la suite."
+
 #: src/constants/wording.ts
 #~ msgid "Oui, tant que le logiciel ne touche pas au jeu et ne joue pas à votre place. Ankama l’a écrit deux fois en public."
 #~ msgstr "Oui, tant que le logiciel ne touche pas au jeu et ne joue pas à votre place. Ankama l’a écrit deux fois en public."
@@ -1285,6 +1509,10 @@ msgstr "Oui, et pour toujours. Rien à payer, aucun compte à créer, aucune pub
 #: src/constants/wording.ts
 msgid "Oui. Ankama tolère les logiciels qui rangent les fenêtres du jeu, tant qu’ils n’y touchent à rien. Multifus reste dans ce cadre."
 msgstr "Oui. Ankama tolère les logiciels qui rangent les fenêtres du jeu, tant qu’ils n’y touchent à rien. Multifus reste dans ce cadre."
+
+#: src/screens/windows-screen.tsx
+#~ msgid "Oui. Et sur Windows 10 aussi : Multifus est fait pour les deux. L’installation prend 3 gestes, puis il vous montre la suite."
+#~ msgstr "Oui. Et sur Windows 10 aussi : Multifus est fait pour les deux. L’installation prend 3 gestes, puis il vous montre la suite."
 
 #: src/constants/systems.ts
 msgid "Ouvrez ce fichier, puis glissez Multifus dans le dossier Applications."
@@ -1358,6 +1586,14 @@ msgstr "Plus d’aller-retour vers un onglet à chaque objet brisé."
 msgid "Posé où vous voulez, il y revient au lancement suivant et suit la fenêtre quand elle bouge."
 msgstr "Posé où vous voulez, il y revient au lancement suivant et suit la fenêtre quand elle bouge."
 
+#: src/screens/windows-screen.tsx
+#~ msgid "Posez F1 sur votre Iop, F2 sur votre Eniripsa. Dans le jeu, vous appuyez, et la fenêtre est devant vous. Sur Windows, une touche de fonction se pose seule : aucune combinaison à retenir au milieu d’un combat."
+#~ msgstr "Posez F1 sur votre Iop, F2 sur votre Eniripsa. Dans le jeu, vous appuyez, et la fenêtre est devant vous. Sur Windows, une touche de fonction se pose seule : aucune combinaison à retenir au milieu d’un combat."
+
+#: src/screens/windows-screen.tsx
+#~ msgid "Posez F1 sur votre Iop, F2 sur votre premier Enutrof. Dans le jeu, vous appuyez, et la fenêtre est devant vous. Sur Windows, une touche de fonction se pose seule : aucune combinaison à retenir au milieu d’un combat."
+#~ msgstr "Posez F1 sur votre Iop, F2 sur votre premier Enutrof. Dans le jeu, vous appuyez, et la fenêtre est devant vous. Sur Windows, une touche de fonction se pose seule : aucune combinaison à retenir au milieu d’un combat."
+
 #: src/constants/bodies.ts
 msgid "Poussé à fond, il reste toujours assez visible pour se lire."
 msgstr "Poussé à fond, il reste toujours assez visible pour se lire."
@@ -1365,6 +1601,10 @@ msgstr "Poussé à fond, il reste toujours assez visible pour se lire."
 #: src/constants/wording.ts
 msgid "Projet indépendant, sans lien avec Ankama."
 msgstr "Projet indépendant, sans lien avec Ankama."
+
+#: src/screens/windows-screen.tsx
+msgid "Qu’est-ce que Multifus demande à Windows ?"
+msgstr "Qu’est-ce que Multifus demande à Windows ?"
 
 #: src/constants/bodies.ts
 msgid "Quatre clics, quatre personnages"
@@ -1430,6 +1670,14 @@ msgstr "Rien à contourner pour l’installer"
 #~ msgid "Rien du canal commerce, rien de la guilde, rien du recrutement."
 #~ msgstr "Rien du canal commerce, rien de la guilde, rien du recrutement."
 
+#: src/screens/windows-screen.tsx
+#~ msgid "Rien n’est réservé au Mac. L’AutoFocus amène devant vous la fenêtre du personnage qu’on appelle, et les 5 autres mécanismes suivent."
+#~ msgstr "Rien n’est réservé au Mac. L’AutoFocus amène devant vous la fenêtre du personnage qu’on appelle, et les 5 autres mécanismes suivent."
+
+#: src/constants/bodies.ts
+#~ msgid "Rien ne manque à l’appel"
+#~ msgstr "Rien ne manque à l’appel"
+
 #: src/constants/wording.ts
 msgid "Roue des personnages"
 msgstr "Roue des personnages"
@@ -1462,6 +1710,10 @@ msgstr "Sans compte"
 #~ msgid "Sans fermer Multifus, et tout le reste continue de marcher."
 #~ msgstr "Sans fermer Multifus, et tout le reste continue de marcher."
 
+#: src/components/taskbar-proof.tsx
+msgid "Sans Multifus"
+msgstr "Sans Multifus"
+
 #: src/constants/wording.ts
 msgid "Sans publicité"
 msgstr "Sans publicité"
@@ -1477,6 +1729,10 @@ msgstr "Sept appels surveillés"
 #: src/constants/bodies.ts
 #~ msgid "Sept appels, sept fois la bonne fenêtre"
 #~ msgstr "Sept appels, sept fois la bonne fenêtre"
+
+#: src/screens/windows-screen.tsx
+msgid "Seulement le pseudo."
+msgstr "Seulement le pseudo."
 
 #: src/screens/download-screen.tsx
 #~ msgid "Signé par Apple"
@@ -1614,6 +1870,18 @@ msgstr "Textes rapides au clavier sur Dofus Retro"
 #~ msgid "Tout ce que Multifus fait se lit sur GitHub, et vous pouvez le compiler vous-même."
 #~ msgstr "Tout ce que Multifus fait se lit sur GitHub, et vous pouvez le compiler vous-même."
 
+#: src/components/taskbar-proof.tsx
+#~ msgid "Un bouton par personnage, son pseudo écrit dessus, sa tête de classe posée devant."
+#~ msgstr "Un bouton par personnage, son pseudo écrit dessus, sa tête de classe posée devant."
+
+#: src/components/taskbar-proof.tsx
+#~ msgid "Un bouton par personnage, son pseudo et sa tête de classe."
+#~ msgstr "Un bouton par personnage, son pseudo et sa tête de classe."
+
+#: src/screens/windows-screen.tsx
+msgid "Un bouton par personnage."
+msgstr "Un bouton par personnage."
+
 #: src/constants/wording.ts
 msgid "Un clic gauche, et la team suit."
 msgstr "Un clic gauche, et la team suit."
@@ -1646,6 +1914,10 @@ msgstr "Un client en plein écran prend un bureau à lui, et la bascule devient 
 #~ msgid "Un disque de têtes sous le pouce, et la bonne fenêtre arrive."
 #~ msgstr "Un disque de têtes sous le pouce, et la bonne fenêtre arrive."
 
+#: src/constants/shots.ts
+#~ msgid "Un écran Windows avec la fenêtre de Multifus par-dessus les clients Dofus Retro, et la barre des tâches qui donne un bouton à chaque personnage."
+#~ msgstr "Un écran Windows avec la fenêtre de Multifus par-dessus les clients Dofus Retro, et la barre des tâches qui donne un bouton à chaque personnage."
+
 #: src/constants/bodies.ts
 msgid "Un geste commencé par erreur ne coûte pas une fenêtre."
 msgstr "Un geste commencé par erreur ne coûte pas une fenêtre."
@@ -1669,6 +1941,14 @@ msgstr "Un interrupteur par appel"
 #: src/constants/bodies.ts
 #~ msgid "Un jour, dans le mauvais canal, devant tout le monde."
 #~ msgstr "Un jour, dans le mauvais canal, devant tout le monde."
+
+#: src/components/taskbar-proof.tsx
+msgid "Un seul bouton, et le même nom pour tout le monde."
+msgstr "Un seul bouton, et le même nom pour tout le monde."
+
+#: src/components/taskbar-proof.tsx
+#~ msgid "Un seul bouton, toutes vos fenêtres dessous, et le même nom pour tout le monde."
+#~ msgstr "Un seul bouton, toutes vos fenêtres dessous, et le même nom pour tout le monde."
 
 #: src/constants/wording.ts
 msgid "Un texte prêt part au raccourci."
@@ -1701,6 +1981,10 @@ msgstr "Une bannière dit où vous en êtes"
 #: src/constants/bodies.ts
 #~ msgid "Une bannière dit où vous êtes."
 #~ msgstr "Une bannière dit où vous êtes."
+
+#: src/constants/bodies.ts
+#~ msgid "Une case à cocher, et c’est en route"
+#~ msgstr "Une case à cocher, et c’est en route"
 
 #: src/screens/comparison-screen.tsx
 #~ msgid "Une case à moitié dit ce qui manque : posez le curseur dessus, ou touchez-la."
@@ -1754,6 +2038,10 @@ msgstr "Une touche par personnage tient jusqu’à quatre"
 #~ msgid "Une touche par personnage tient jusqu’à quatre."
 #~ msgstr "Une touche par personnage tient jusqu’à quatre."
 
+#: src/screens/windows-screen.tsx
+msgid "Une touche, un personnage"
+msgstr "Une touche, un personnage"
+
 #: src/constants/legal.ts
 #~ msgid "Vercel Analytics compte les pages vues et les téléchargements, sans identifiant, sans profil, et sans vous suivre d’un site à l’autre."
 #~ msgstr "Vercel Analytics compte les pages vues et les téléchargements, sans identifiant, sans profil, et sans vous suivre d’un site à l’autre."
@@ -1773,6 +2061,42 @@ msgstr "Viser plutôt que se souvenir"
 #: src/screens/home-screen.tsx
 msgid "Voir le code"
 msgstr "Voir le code"
+
+#: src/screens/windows-screen.tsx
+msgid "Vos 6 Enutrofs ont la même tête. La couleur les sépare."
+msgstr "Vos 6 Enutrofs ont la même tête. La couleur les sépare."
+
+#: src/screens/windows-screen.tsx
+#~ msgid "Vos 6 Enutrofs portent la même tête. La couleur que vous leur donnez les sépare."
+#~ msgstr "Vos 6 Enutrofs portent la même tête. La couleur que vous leur donnez les sépare."
+
+#: src/screens/windows-screen.tsx
+#~ msgid "Vos clients Dofus Retro ne s’empilent plus : chacun garde sa place dans la barre."
+#~ msgstr "Vos clients Dofus Retro ne s’empilent plus : chacun garde sa place dans la barre."
+
+#: src/screens/windows-screen.tsx
+msgid "Vos clients ne s’empilent plus : chacun garde sa place."
+msgstr "Vos clients ne s’empilent plus : chacun garde sa place."
+
+#: src/screens/windows-screen.tsx
+#~ msgid "Vos fenêtres vous sont rendues. Multifus fermé, le titre et l’icône d’origine reviennent."
+#~ msgstr "Vos fenêtres vous sont rendues. Multifus fermé, le titre et l’icône d’origine reviennent."
+
+#: src/screens/windows-screen.tsx
+msgid "Votre barre des tâches devient votre team"
+msgstr "Votre barre des tâches devient votre team"
+
+#: src/constants/wording.ts
+#~ msgid "Votre barre des tâches devient votre team : un pseudo et une tête de classe par personnage."
+#~ msgstr "Votre barre des tâches devient votre team : un pseudo et une tête de classe par personnage."
+
+#: src/screens/windows-screen.tsx
+msgid "Votre Enutrof porte sa tête d’Enu, votre Crâ la sienne."
+msgstr "Votre Enutrof porte sa tête d’Enu, votre Crâ la sienne."
+
+#: src/screens/windows-screen.tsx
+#~ msgid "Votre Enutrof porte sa tête d’Enu, votre Crâ la sienne. Vous trouvez la bonne fenêtre sans lire un mot."
+#~ msgstr "Votre Enutrof porte sa tête d’Enu, votre Crâ la sienne. Vous trouvez la bonne fenêtre sans lire un mot."
 
 #: src/screens/legal-screen.tsx
 msgid "Votre navigateur ne garde qu’une chose : que la proposition de lire le site dans votre langue vous a déjà été montrée. Elle ne quitte pas votre machine, et vider les données du site l’efface."
@@ -1826,6 +2150,10 @@ msgstr "Vous êtes parti manger, vos personnages sont restés connectés, et que
 #~ msgid "Vous installez sous votre responsabilité."
 #~ msgstr "Vous installez sous votre responsabilité."
 
+#: src/screens/windows-screen.tsx
+#~ msgid "Vous jouez sur PC, 4 ou 8 clients Dofus Retro ouverts en même temps. Multifus range leurs fenêtres, et donne à chaque personnage son bouton dans la barre des tâches."
+#~ msgstr "Vous jouez sur PC, 4 ou 8 clients Dofus Retro ouverts en même temps. Multifus range leurs fenêtres, et donne à chaque personnage son bouton dans la barre des tâches."
+
 #: src/constants/bodies.ts
 #~ msgid "Vous jouez sur votre Iop, et c’est votre Eniripsa qu’on invite en groupe. Sa fenêtre arrive devant vous toute seule."
 #~ msgstr "Vous jouez sur votre Iop, et c’est votre Eniripsa qu’on invite en groupe. Sa fenêtre arrive devant vous toute seule."
@@ -1837,6 +2165,18 @@ msgstr "Vous jouez sur votre Iop, et c’est votre Eniripsa qu’on invite. Sa f
 #: src/constants/bodies.ts
 #~ msgid "Vous le rangez à la main, et la mule que vous laissez en banque ne prend aucun de vos clics."
 #~ msgstr "Vous le rangez à la main, et la mule que vous laissez en banque ne prend aucun de vos clics."
+
+#: src/screens/windows-screen.tsx
+#~ msgid "Vous lisez « Elyandra », et non « Elyandra - Dofus Retro ». 8 fenêtres, 8 noms lisibles."
+#~ msgstr "Vous lisez « Elyandra », et non « Elyandra - Dofus Retro ». 8 fenêtres, 8 noms lisibles."
+
+#: src/screens/windows-screen.tsx
+#~ msgid "Vous lisez « Elyandra », et non « Elyandra - Dofus Retro ». Huit fenêtres, huit noms lisibles."
+#~ msgstr "Vous lisez « Elyandra », et non « Elyandra - Dofus Retro ». Huit fenêtres, huit noms lisibles."
+
+#: src/screens/windows-screen.tsx
+msgid "Vous lisez « Elyandra », pas « Elyandra - Dofus Retro »."
+msgstr "Vous lisez « Elyandra », pas « Elyandra - Dofus Retro »."
 
 #: src/constants/bodies.ts
 msgid "Vous maintenez une combinaison, un disque de têtes s’ouvre au milieu de l’écran, vous visez, vous lâchez."
@@ -1865,3 +2205,19 @@ msgstr "Vous reconnaissez la tête de classe et le pseudo, et vous partez dessus
 #: src/constants/bodies.ts
 msgid "Vous voyez ce qui part avant que ça parte, et vous pouvez encore le corriger."
 msgstr "Vous voyez ce qui part avant que ça parte, et vous pouvez encore le corriger."
+
+#: src/screens/windows-screen.tsx
+#~ msgid "Windows colle sous un seul bouton toutes les fenêtres d’un même jeu. Avec 6 Enutrofs et 2 Crâs connectés, vous survolez, vous cherchez, et vous tombez sur la mauvaise. Multifus donne son bouton à chacun."
+#~ msgstr "Windows colle sous un seul bouton toutes les fenêtres d’un même jeu. Avec 6 Enutrofs et 2 Crâs connectés, vous survolez, vous cherchez, et vous tombez sur la mauvaise. Multifus donne son bouton à chacun."
+
+#: src/screens/windows-screen.tsx
+#~ msgid "Windows colle sous un seul bouton toutes les fenêtres d’un même jeu. Avec six personnages connectés, vous survolez, vous cherchez, et vous tombez sur la mauvaise. Multifus donne son bouton à chacun."
+#~ msgstr "Windows colle sous un seul bouton toutes les fenêtres d’un même jeu. Avec six personnages connectés, vous survolez, vous cherchez, et vous tombez sur la mauvaise. Multifus donne son bouton à chacun."
+
+#: src/screens/windows-screen.tsx
+msgid "Windows empile les fenêtres d’un même jeu sous un seul bouton. Avec 6 Enutrofs et 2 Crâs, vous cherchez. Multifus donne son bouton à chacun."
+msgstr "Windows empile les fenêtres d’un même jeu sous un seul bouton. Avec 6 Enutrofs et 2 Crâs, vous cherchez. Multifus donne son bouton à chacun."
+
+#: src/screens/windows-screen.tsx
+msgid "Windows peut demander confirmation la première fois : il ne connaît pas encore Multifus."
+msgstr "Windows peut demander confirmation la première fois : il ne connaît pas encore Multifus."

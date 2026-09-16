@@ -18,6 +18,7 @@
   --text-passage--line-height: 1.04;
 
   --container-world: var(--page);
+  --container-saga: 76ch;
 
   --grid-template-columns-brand: minmax(0, 1.3fr) repeat(3, minmax(0, 1fr));
 
@@ -230,6 +231,80 @@
       opacity: 1;
       animation: sweep 2.6s linear infinite;
     }
+  }
+}
+
+@utility keycap {
+  display: grid;
+  place-items: center;
+  min-width: 56px;
+  height: 44px;
+  padding-inline: 14px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--band), transparent 46%);
+  border-bottom-width: 3px;
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--deep), transparent 6%) 0%,
+    var(--night) 100%
+  );
+  font-family: var(--carve);
+  font-size: var(--text-action);
+  letter-spacing: 0.06em;
+  color: var(--cream);
+  box-shadow:
+    inset 0 1px 0 0 color-mix(in srgb, var(--band), transparent 72%),
+    0 6px 14px -8px rgb(0 0 0 / 0.9);
+}
+
+@utility ringed {
+  border-radius: 50%;
+  border: 3px solid var(--tint);
+  background-color: var(--deep);
+  box-shadow: 0 8px 20px -12px rgb(0 0 0 / 0.95);
+}
+
+@utility strip {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+  border: 1px solid color-mix(in srgb, var(--band), transparent 66%);
+  background-color: var(--night);
+}
+
+@utility hand {
+  --hand-ink: var(--band);
+
+  &[data-tone='lost'] {
+    --hand-ink: var(--flame);
+  }
+
+  &[data-tone='lost'] img {
+    filter: saturate(0.12) brightness(0.72);
+  }
+
+  &[data-tone='won'] {
+    --hand-ink: var(--leaf-lit);
+  }
+}
+
+@utility hand-name {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 11px;
+  color: var(--hand-ink, var(--band));
+
+  &::before {
+    content: '';
+    flex: none;
+    width: var(--lozenge-side);
+    height: var(--lozenge-side);
+    transform: rotate(45deg);
+    background-color: var(--hand-ink, var(--band));
+    box-shadow: 0 0 0 4px
+      color-mix(in srgb, var(--hand-ink, var(--band)), transparent 88%);
   }
 }
 

@@ -229,6 +229,7 @@ export const PAGE_BODIES = {
       msg`Un client en plein écran prend un bureau à lui, et la bascule devient un glissement d’un bureau à l’autre.`
     ]
   },
+  windows: null,
   comparison: null,
   download: null,
   journal: null,

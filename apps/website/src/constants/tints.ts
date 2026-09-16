@@ -10,6 +10,7 @@ export const PAGE_TINTS = {
   relay: 'tint-sky',
   quickTexts: 'tint-pink',
   mac: 'tint-turquoise',
+  windows: 'tint-blue',
   comparison: 'tint-green',
   download: 'tint-green',
   journal: 'tint-green',

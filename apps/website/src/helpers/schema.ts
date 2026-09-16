@@ -55,7 +55,7 @@ const SOFTWARE_AT = `${HOST}/#multifus`
 const matchHasSoftware = (page: PageId) => {
   const { kind } = PAGES[page]
 
-  return kind === 'home' || kind === 'download'
+  return kind === 'home' || kind === 'download' || kind === 'windows'
 }
 
 const personOf = () => {

@@ -60,7 +60,7 @@ export const ComparisonScreen = ({ page }: PageScreenProps) => {
         </ProseBlock>
         <ProseBlock level={2} title={i18n._(CHECK_TITLE)}>
           <PointList points={CHECK_POINTS} />
-          <p className="max-w-tale text-tale text-band">
+          <p className="max-w-saga text-tale text-band">
             {i18n._(CHECK_LEAD)}{' '}
             <OutLink href={REPOSITORY}>{i18n._(CHECK_NAME)}</OutLink>
           </p>
