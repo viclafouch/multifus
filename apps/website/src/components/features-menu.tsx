@@ -3,7 +3,7 @@ import { useLingui } from '@lingui/react'
 import type { PageId } from '@/@types/page'
 import { PageLink } from '@/components/page-link'
 import { MENU_FEATURES } from '@/constants/pages'
-import { FEATURES_TITLE, MENU_HINTS, PAGE_NAMES } from '@/constants/wording'
+import { FEATURES_TAB, MENU_HINTS, PAGE_NAMES } from '@/constants/wording'
 import { useDismiss } from '@/hooks/use-dismiss'
 
 type FeaturesMenuProps = Readonly<{
@@ -33,7 +33,7 @@ export const FeaturesMenu = ({ page }: FeaturesMenuProps) => {
         aria-current={isHere ? 'location' : undefined}
         className="tab sighted flex cursor-pointer list-none items-center gap-2 text-deed"
       >
-        {i18n._(FEATURES_TITLE)}
+        {i18n._(FEATURES_TAB)}
         <span aria-hidden className="askmark" />
       </summary>
       <ul className="canopy unfold shelf absolute top-full left-0 z-50 grid grid-cols-1 gap-1 rounded-xl p-2 sm:grid-cols-2">

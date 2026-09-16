@@ -53,7 +53,7 @@ describe('the site footer', () => {
   it('names the three columns of pages', () => {
     show('fr')
 
-    for (const title of ['Fonctionnalités', 'Le logiciel', 'Le projet']) {
+    for (const title of ['Les fonctionnalités', 'Le logiciel', 'Le projet']) {
       expect(screen.getByRole('navigation', { name: title })).toBeDefined()
     }
   })

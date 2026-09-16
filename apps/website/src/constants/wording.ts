@@ -69,7 +69,9 @@ export const LOOP_HOLD = msg`Pause`
 
 export const INDEPENDENCE = msg`Projet indépendant, sans lien avec Ankama.`
 
-export const FEATURES_TITLE = msg`Fonctionnalités`
+export const FEATURES_TAB = msg`Fonctionnalités`
+
+export const FEATURES_TITLE = msg`Les fonctionnalités`
 
 export const SOFTWARE_TITLE = msg`Le logiciel`
 

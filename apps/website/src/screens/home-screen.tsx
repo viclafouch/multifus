@@ -1,9 +1,11 @@
 import { msg } from '@lingui/core/macro'
 import { useLingui } from '@lingui/react'
+import { Trans } from '@lingui/react/macro'
 import { Button } from '@multifus/retro'
 import type { PageScreenProps } from '@/@types/screen'
 import { Band } from '@/components/band'
 import { BandTitle } from '@/components/band-title'
+import { BotBan } from '@/components/bot-ban'
 import { DownloadCall } from '@/components/download-call'
 import { FeatureCard } from '@/components/feature-card'
 import { LoopPlate } from '@/components/loop-plate'
@@ -25,8 +27,6 @@ import { useLoopCarriedIn } from '@/hooks/use-loop-carried-in'
 const HERO_LEAD = msg`Le multicompte sur Dofus Retro`
 
 const HERO_TURN = msg`enfin jouable`
-
-const HERO_UNDER = msg`Multifus amène devant vous la fenêtre du personnage qui joue sur Dofus Retro. Vous gardez les mains sur le jeu, et la team suit.`
 
 const FEATURES_TITLE = msg`Ce que Multifus fait`
 
@@ -56,7 +56,14 @@ export const HomeScreen = (_props: PageScreenProps) => {
             <span className="block text-leaf-lit">{i18n._(HERO_TURN)}</span>
           </h1>
           <p className="surface-2 engraved max-w-blurb text-herald text-khaki">
-            {i18n._(HERO_UNDER)}
+            <Trans>
+              Multifus amène devant vous la fenêtre du personnage qui joue sur
+              Dofus Retro,{' '}
+              <span className="underline decoration-leaf-lit decoration-2 underline-offset-4">
+                dans le respect des règles d’Ankama
+              </span>
+              .
+            </Trans>
           </p>
           <DownloadCall className="surface-3" />
         </div>
@@ -79,6 +86,7 @@ export const HomeScreen = (_props: PageScreenProps) => {
       </Band>
       <Band className="reveal py-16">
         <PlateBlock title={i18n._(LIMITS_TITLE)}>
+          <BotBan />
           <Prose>{i18n._(NO_HARM)}</Prose>
           <Prose>{i18n._(TRUST_PROOF)}</Prose>
           <div className="flex flex-wrap items-center gap-6">
