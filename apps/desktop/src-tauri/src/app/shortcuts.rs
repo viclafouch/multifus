@@ -294,7 +294,7 @@ trait Mechanisms {
 
     fn stop_relay(&self);
 
-    fn paste_quick_reply(&self, id: QuickReplyId);
+    fn paste_quick_reply(&self, id: QuickReplyId, here: WindowId);
 
     fn open_wheel(&self, here: WindowId);
 
@@ -320,8 +320,8 @@ impl Mechanisms for AppMechanisms<'_> {
         relay::run::stop(self.0, RelayStop::Shortcut);
     }
 
-    fn paste_quick_reply(&self, id: QuickReplyId) {
-        quick_replies::paste(self.0, id);
+    fn paste_quick_reply(&self, id: QuickReplyId, here: WindowId) {
+        quick_replies::paste(self.0, id, here);
     }
 
     fn open_wheel(&self, here: WindowId) {
@@ -429,7 +429,7 @@ fn act_on(press: &Press, binding: Binding, window: &GameWindow) {
             hold(press.state)
                 .log_unless_repeated(JournalEvent::CharacterShortcut { nickname, outcome });
         }
-        Binding::QuickReply { id } => press.mechanisms.paste_quick_reply(id),
+        Binding::QuickReply { id } => press.mechanisms.paste_quick_reply(id, window.id()),
     }
 }
 
@@ -531,7 +531,7 @@ mod tests {
         WalkToggled,
         AllMaximized,
         RelayStopped,
-        QuickReplyPasted(QuickReplyId),
+        QuickReplyPasted(QuickReplyId, WindowId),
         WheelOpened(WindowId),
         WheelReleased,
         RuneTableToggled(WindowId),
@@ -572,8 +572,8 @@ mod tests {
             self.write_down(Mechanism::RelayStopped);
         }
 
-        fn paste_quick_reply(&self, id: QuickReplyId) {
-            self.write_down(Mechanism::QuickReplyPasted(id));
+        fn paste_quick_reply(&self, id: QuickReplyId, here: WindowId) {
+            self.write_down(Mechanism::QuickReplyPasted(id, here));
         }
 
         fn open_wheel(&self, here: WindowId) {
@@ -918,7 +918,11 @@ mod tests {
 
         assert_eq!(
             mechanisms.set_going(),
-            vec![Mechanism::RelayStopped, Mechanism::QuickReplyPasted(id)]
+            vec![
+                Mechanism::RelayStopped,
+                Mechanism::QuickReplyPasted(id, WindowId::from_raw(1))
+            ],
+            "the paste aims at the game window the player is writing in"
         );
         assert_eq!(
             windows.asked(),

@@ -2061,10 +2061,12 @@ impl CoreGraphicsPasteSender {
 }
 
 impl PasteSender for CoreGraphicsPasteSender {
-    fn send_paste_combination(&self) -> Result<()> {
+    fn send_paste_combination(&self, here: WindowId) -> Result<()> {
         if !accessibility_authorization().is_granted() {
             return Err(PlatformError::AuthorizationDenied);
         }
+
+        let pid = pid_t::try_from(here.raw()).map_err(|_| PlatformError::WindowGone)?;
 
         let source = CGEventSource::new(CGEventSourceStateID::Private);
         let source = source.as_deref();
@@ -2075,9 +2077,9 @@ impl PasteSender for CoreGraphicsPasteSender {
         CGEvent::set_flags(Some(&press), CGEventFlags::MaskCommand);
         CGEvent::set_flags(Some(&release), CGEventFlags::MaskCommand);
 
-        CGEvent::post(CGEventTapLocation::HIDEventTap, Some(&press));
+        CGEvent::post_to_pid(pid, Some(&press));
         thread::sleep(PRESS_TO_RELEASE);
-        CGEvent::post(CGEventTapLocation::HIDEventTap, Some(&release));
+        CGEvent::post_to_pid(pid, Some(&release));
 
         Ok(())
     }

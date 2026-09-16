@@ -2092,7 +2092,7 @@ impl SendInputPasteSender {
 }
 
 impl PasteSender for SendInputPasteSender {
-    fn send_paste_combination(&self) -> Result<()> {
+    fn send_paste_combination(&self, _here: WindowId) -> Result<()> {
         let events: [INPUT; PASTE_EVENTS] = [
             key_event(VK_CONTROL, true),
             key_event(VK_V, true),

@@ -100,6 +100,7 @@ objc2-application-services = { version = "0.3", default-features = false, featur
 ] }
 objc2-core-graphics = { version = "0.3", default-features = false, features = [
   "std",
+  "libc",
   "CGEvent",
   "CGEventSource",
   "CGEventTypes",

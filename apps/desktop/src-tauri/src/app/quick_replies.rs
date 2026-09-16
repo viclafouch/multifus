@@ -15,6 +15,7 @@ use crate::platform::Clipboard;
 use crate::platform::PasteSender;
 use crate::platform::PlatformError;
 use crate::platform::Result;
+use crate::platform::WindowId;
 
 const GIVE_BACK_AFTER: Duration = Duration::from_millis(150);
 
@@ -39,14 +40,16 @@ struct Paste<'a> {
     clipboard: &'a dyn Clipboard,
     sender: &'a dyn PasteSender,
     state: &'a AppState,
+    here: WindowId,
 }
 
-pub fn paste(app: &AppHandle, id: QuickReplyId) {
+pub fn paste(app: &AppHandle, id: QuickReplyId, here: WindowId) {
     hand_over(
         &Paste {
             clipboard: &AppClipboard(app),
             sender: paste_sender(app),
             state: app.state::<AppState>().inner(),
+            here,
         },
         id,
     );
@@ -69,7 +72,7 @@ fn hand_over(paste: &Paste, id: QuickReplyId) {
         );
     }
 
-    match paste.sender.send_paste_combination() {
+    match paste.sender.send_paste_combination(paste.here) {
         Ok(()) => {
             thread::sleep(GIVE_BACK_AFTER);
 
@@ -160,21 +163,31 @@ mod tests {
         }
     }
 
+    fn where_the_player_writes() -> WindowId {
+        WindowId::from_raw(1)
+    }
+
     #[derive(Debug, Default)]
     struct FakePasteSender {
         refusal: Option<PlatformError>,
-        sent: Mutex<u32>,
+        aimed: Mutex<Vec<WindowId>>,
     }
 
     impl FakePasteSender {
-        fn sent(&self) -> u32 {
-            *self.sent.lock().unwrap_or_else(PoisonError::into_inner)
+        fn aimed(&self) -> Vec<WindowId> {
+            self.aimed
+                .lock()
+                .unwrap_or_else(PoisonError::into_inner)
+                .clone()
         }
     }
 
     impl PasteSender for FakePasteSender {
-        fn send_paste_combination(&self) -> Result<()> {
-            *self.sent.lock().unwrap_or_else(PoisonError::into_inner) += 1;
+        fn send_paste_combination(&self, here: WindowId) -> Result<()> {
+            self.aimed
+                .lock()
+                .unwrap_or_else(PoisonError::into_inner)
+                .push(here);
 
             match self.refusal.clone() {
                 Some(refusal) => Err(refusal),
@@ -213,11 +226,16 @@ mod tests {
                 clipboard: &clipboard,
                 sender: &sender,
                 state: &state,
+                here: where_the_player_writes(),
             },
             id,
         );
 
-        assert_eq!(sender.sent(), 1);
+        assert_eq!(
+            sender.aimed(),
+            vec![where_the_player_writes()],
+            "the combination goes to the window the reply was written for"
+        );
         assert_eq!(
             clipboard.read(),
             Some("une amulette du bouftou, 5000 kamas".to_owned())
@@ -242,6 +260,7 @@ mod tests {
                 clipboard: &clipboard,
                 sender: &sender,
                 state: &state,
+                here: where_the_player_writes(),
             },
             id,
         );
@@ -269,6 +288,7 @@ mod tests {
                 clipboard: &clipboard,
                 sender: &sender,
                 state: &state,
+                here: where_the_player_writes(),
             },
             id,
         );
@@ -298,11 +318,16 @@ mod tests {
                 clipboard: &clipboard,
                 sender: &sender,
                 state: &state,
+                here: where_the_player_writes(),
             },
             id,
         );
 
-        assert_eq!(sender.sent(), 0, "nothing is pasted that was never copied");
+        assert_eq!(
+            sender.aimed(),
+            Vec::new(),
+            "nothing is pasted that was never copied"
+        );
         assert_eq!(clipboard.read(), Some("prix libre".to_owned()));
     }
 
@@ -321,11 +346,12 @@ mod tests {
                 clipboard: &clipboard,
                 sender: &sender,
                 state: &state,
+                here: where_the_player_writes(),
             },
             id,
         );
 
-        assert_eq!(sender.sent(), 0);
+        assert_eq!(sender.aimed(), Vec::new());
         assert_eq!(clipboard.read(), Some("prix libre".to_owned()));
         assert!(journalled(&state).iter().any(|event| matches!(
             event,
