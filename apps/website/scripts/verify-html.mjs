@@ -28,6 +28,15 @@ const TAKE_PATHS = new Set(
     })
 )
 
+const KIN = new Map()
+
+const SPOKEN = new Map()
+
+for (const { language, path } of everyPage()) {
+  SPOKEN.set(path, language)
+  KIN.set(language, (KIN.get(language) ?? new Set()).add(path))
+}
+
 const takesOf = (body) => {
   return [...body.matchAll(/<a\b[^>]*href="([^"]*)"/gu)]
     .map((found) => {
@@ -292,6 +301,22 @@ for (const pathname of addresses) {
 
   if (lit.length !== 1) {
     complain(pathname, `${lit.length} flags lit instead of one`)
+  }
+
+  const footer = body.slice(body.lastIndexOf('<footer'))
+
+  const led = new Set(
+    [...footer.matchAll(/<a\b[^>]*href="([^"]*)"/gu)].map((found) => {
+      return found[1]
+    })
+  )
+
+  const unled = [...KIN.get(SPOKEN.get(pathname))].filter((kin) => {
+    return !led.has(kin)
+  })
+
+  if (unled.length > 0) {
+    complain(pathname, `the footer leads to no ${unled.join(', ')}`)
   }
 }
 

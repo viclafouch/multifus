@@ -176,6 +176,7 @@
 
   --lozenge-side: 7px;
   --lozenge-turn: 0.3s;
+  --lozenge-glow: 0 0 8px color-mix(in srgb, var(--leaf-glow), transparent 40%);
 
   --stage-edge: 2px;
   --stage-nook: 8px;
@@ -479,7 +480,7 @@
     opacity: 0;
     transform: translateX(calc(var(--waymark-step) / -2)) rotate(45deg);
     background-color: var(--leaf-lit);
-    box-shadow: 0 0 8px color-mix(in srgb, var(--leaf-glow), transparent 40%);
+    box-shadow: var(--lozenge-glow);
     transition-property: opacity, transform;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: var(--lozenge-turn);

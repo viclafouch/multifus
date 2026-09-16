@@ -66,6 +66,12 @@ export const LOOP_HOLD = msg`Pause`
 
 export const INDEPENDENCE = msg`Projet indépendant, sans lien avec Ankama.`
 
+export const FEATURES_TITLE = msg`Fonctionnalités`
+
+export const SOFTWARE_TITLE = msg`Le logiciel`
+
+export const PROJECT_TITLE = msg`Le projet`
+
 export const LIMITS_TITLE = msg`Ce que Multifus ne fait pas`
 
 export const CAVEATS_TITLE = msg`À savoir`

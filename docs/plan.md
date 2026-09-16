@@ -22,6 +22,7 @@
 - [ ] Poser Vercel Analytics, un seul événement, le clic sur « Télécharger » avec le système dedans
 - [ ] Déclarer le site à la Search Console et y déposer le sitemap
 - [ ] Étoffer les treize pages, 250 à 370 mots chacune : c'est le seul écart qui reste avec Retro Toolbox
+- [ ] Trancher une page Windows : la barre des tâches, pseudo, tête de classe et bouton par personnage, ou laisser `/mac` seul
 - [ ] Porter `softwareVersion` et `releaseNotes` dans le `SoftwareApplication`, une fois `/journal` branché
 - [ ] Ouvrir une issue chez TanStack Start sur l'espace de noms du sitemap, écrit en `https` au lieu de `http`
 - [ ] Retirer `scripts/tidy-build.mjs` le jour où cet espace de noms est corrigé en amont

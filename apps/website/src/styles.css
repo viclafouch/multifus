@@ -19,6 +19,8 @@
 
   --container-world: var(--page);
 
+  --grid-template-columns-brand: minmax(0, 1.3fr) repeat(3, minmax(0, 1fr));
+
   --spacing-mast: 60px;
   --spacing-brim: 34px;
   --spacing-drop: 26px;
@@ -519,6 +521,51 @@
 @utility ledge {
   border-bottom: 1px solid color-mix(in srgb, var(--border), transparent 55%);
   background-color: color-mix(in srgb, var(--deep), transparent 8%);
+}
+
+@utility plinth {
+  background-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    color-mix(in srgb, var(--deep), transparent 46%) 32%,
+    var(--deep) 100%
+  );
+}
+
+@utility stud {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  transition-property: color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 0.2s;
+
+  &::before {
+    content: '';
+    flex: none;
+    width: var(--lozenge-side);
+    height: var(--lozenge-side);
+    opacity: 0;
+    transform: rotate(45deg) scale(0.45);
+    background-color: var(--leaf-lit);
+    box-shadow: var(--lozenge-glow);
+    transition-property: opacity, transform;
+    transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+    transition-duration: var(--lozenge-turn);
+  }
+
+  &:hover,
+  &:focus-visible,
+  &[aria-current] {
+    color: var(--cream);
+  }
+
+  &:hover::before,
+  &:focus-visible::before,
+  &[aria-current]::before {
+    opacity: 1;
+    transform: rotate(45deg) scale(1);
+  }
 }
 
 @utility carried {
@@ -1097,6 +1144,8 @@
   .pick::before,
   .ask > summary,
   .torch::before,
+  .stud,
+  .stud::before,
   .ledger tbody tr {
     transition: none !important;
   }

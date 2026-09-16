@@ -423,8 +423,8 @@ msgid "Échange, groupe, guilde, message privé, défi, craft, percepteur attaqu
 msgstr "Échange, groupe, guilde, message privé, défi, craft, percepteur attaqué."
 
 #: src/components/site-footer.tsx
-msgid "Écrire à l’auteur"
-msgstr "Écrire à l’auteur"
+#~ msgid "Écrire à l’auteur"
+#~ msgstr "Écrire à l’auteur"
 
 #: src/constants/bodies.ts
 #~ msgid "Elle ignore vos personnages déconnectés."
@@ -506,7 +506,7 @@ msgstr "Et un bouton le repose au coin de la fenêtre du jeu quand vous l’avez
 msgid "Fenêtres rangées côte à côte"
 msgstr "Fenêtres rangées côte à côte"
 
-#: src/components/features-menu.tsx
+#: src/constants/wording.ts
 msgid "Fonctionnalités"
 msgstr "Fonctionnalités"
 
@@ -706,6 +706,10 @@ msgstr "L’audience est comptée sans vous nommer. <0>Vercel Analytics</0> comp
 #~ msgid "L’audience est comptée sans vous nommer. Vercel Analytics compte les pages vues et les téléchargements, sans identifiant, sans profil, et sans vous suivre d’un site à l’autre."
 #~ msgstr "L’audience est comptée sans vous nommer. Vercel Analytics compte les pages vues et les téléchargements, sans identifiant, sans profil, et sans vous suivre d’un site à l’autre."
 
+#: src/components/site-footer.tsx
+msgid "L’auteur sur X"
+msgstr "L’auteur sur X"
+
 #: src/constants/bodies.ts
 #~ msgid "L’AutoFocus, la roue, le Déplacement rapide, le tableau des runes, les réponses rapides et les messages privés, et la touche s’écrit comme sur votre clavier."
 #~ msgstr "L’AutoFocus, la roue, le Déplacement rapide, le tableau des runes, les réponses rapides et les messages privés, et la touche s’écrit comme sur votre clavier."
@@ -822,6 +826,10 @@ msgstr "Le 10 mars 2026"
 msgid "Le 1ᵉʳ avril 2026"
 msgstr "Le 1ᵉʳ avril 2026"
 
+#: src/components/site-footer.tsx
+msgid "Le code de Multifus sur GitHub"
+msgstr "Le code de Multifus sur GitHub"
+
 #: src/screens/download-screen.tsx
 #~ msgid "Le code est ouvert"
 #~ msgstr "Le code est ouvert"
@@ -878,6 +886,14 @@ msgstr "Le forum de Dofus Retro"
 #~ msgid "le forum de Dofus Retro, le 1ᵉʳ avril 2026"
 #~ msgstr "le forum de Dofus Retro, le 1ᵉʳ avril 2026"
 
+#: src/components/site-footer.tsx
+msgid "Le gestionnaire de fenêtres qui amène devant vous le personnage qui joue, sur Mac comme sur Windows."
+msgstr "Le gestionnaire de fenêtres qui amène devant vous le personnage qui joue, sur Mac comme sur Windows."
+
+#: src/components/site-footer.tsx
+#~ msgid "Le gestionnaire de fenêtres qui amène devant vous le personnage qui joue. Gratuit, pour Mac et pour Windows."
+#~ msgstr "Le gestionnaire de fenêtres qui amène devant vous le personnage qui joue. Gratuit, pour Mac et pour Windows."
+
 #: src/constants/bodies.ts
 msgid "Le jeu garde le premier plan : un clic sur le tableau ne fait pas sauter Multifus devant."
 msgstr "Le jeu garde le premier plan : un clic sur le tableau ne fait pas sauter Multifus devant."
@@ -889,6 +905,10 @@ msgstr "Le jeu garde le premier plan : un clic sur le tableau ne fait pas sauter
 #: src/constants/bodies.ts
 #~ msgid "Le jeu ne voit plus votre souris."
 #~ msgstr "Le jeu ne voit plus votre souris."
+
+#: src/constants/wording.ts
+msgid "Le logiciel"
+msgstr "Le logiciel"
 
 #: src/constants/wording.ts
 #~ msgid "Le multicompte est-il autorisé sur Dofus Retro ?"
@@ -931,8 +951,8 @@ msgid "Le paquet est signé par Apple, le code est ouvert, et Ankama tolère ce 
 msgstr "Le paquet est signé par Apple, le code est ouvert, et Ankama tolère ce genre d’outil tant qu’il ne touche pas au jeu. Les trois se vérifient."
 
 #: src/components/site-footer.tsx
-msgid "Le pied de page"
-msgstr "Le pied de page"
+#~ msgid "Le pied de page"
+#~ msgstr "Le pied de page"
 
 #: src/constants/wording.ts
 #~ msgid "Le poids des runes posé par-dessus le jeu, sans quitter l’atelier."
@@ -945,6 +965,10 @@ msgstr "Le poids des runes posé par-dessus le jeu."
 #: src/constants/wording.ts
 msgid "Le poids des runes posé sur le jeu."
 msgstr "Le poids des runes posé sur le jeu."
+
+#: src/constants/wording.ts
+msgid "Le projet"
+msgstr "Le projet"
 
 #: src/constants/bodies.ts
 msgid "Le pseudo, la tête de classe et le bouton par personnage n’existent que sur la barre des tâches de Windows."
@@ -1105,6 +1129,10 @@ msgstr "Messages privés de Dofus Retro sur Telegram"
 #: src/constants/wording.ts
 msgid "Multifus"
 msgstr "Multifus"
+
+#: src/components/site-footer.tsx
+msgid "Multifus ailleurs"
+msgstr "Multifus ailleurs"
 
 #: src/screens/home-screen.tsx
 msgid "Multifus amène devant vous la fenêtre du personnage qui joue sur Dofus Retro. Vous gardez les mains sur le jeu, et la team suit."
@@ -1381,6 +1409,10 @@ msgstr "Relevé le {surveyed}, dans le code de chaque outil."
 #: src/components/lost-word.tsx
 msgid "Retour à l’accueil"
 msgstr "Retour à l’accueil"
+
+#: src/components/site-footer.tsx
+#~ msgid "Revenir en haut"
+#~ msgstr "Revenir en haut"
 
 #: src/constants/bodies.ts
 msgid "Rien à contourner pour l’installer"

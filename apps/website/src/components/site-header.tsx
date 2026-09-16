@@ -1,9 +1,9 @@
 import { msg } from '@lingui/core/macro'
 import { useLingui } from '@lingui/react'
 import { Button } from '@multifus/retro'
-import logo from '@multifus/retro/assets/logo.png'
 import { DownloadSimpleIcon } from '@phosphor-icons/react/dist/ssr/DownloadSimple'
 import type { PageId } from '@/@types/page'
+import { BrandMark } from '@/components/brand-mark'
 import { FeaturesMenu } from '@/components/features-menu'
 import { LanguageBar } from '@/components/language-bar'
 import { LanguageOffer } from '@/components/language-offer'
@@ -14,8 +14,6 @@ import { useLanguage } from '@/hooks/use-language'
 import { useOffer } from '@/hooks/use-offer'
 
 const SITE_NAV = msg`Les pages de Multifus`
-
-const LOGO_SIDE = 256
 
 type SiteHeaderProps = Readonly<{
   page: PageId
@@ -39,19 +37,7 @@ export const SiteHeader = ({ page }: SiteHeaderProps) => {
           aria-label={i18n._(SITE_NAV)}
           className="relative mx-auto flex min-h-mast max-w-world flex-wrap items-center gap-x-7 gap-y-3 px-4 py-2.5"
         >
-          <PageLink
-            page="home"
-            className="flex items-center gap-2.5 font-carve text-action tracking-chapter text-cream"
-          >
-            <img
-              src={logo}
-              alt=""
-              width={LOGO_SIDE}
-              height={LOGO_SIDE}
-              className="size-8"
-            />
-            Multifus
-          </PageLink>
+          <BrandMark />
           <FeaturesMenu page={page} />
           <MastLink page="comparison" />
           <LanguageBar page={page} className="ml-auto" />

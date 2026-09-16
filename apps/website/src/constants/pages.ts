@@ -125,3 +125,15 @@ export const MENU_FEATURES = [
   'relay',
   'quickTexts'
 ] as const satisfies readonly FeatureId[]
+
+export const FOOTER_SOFTWARE = [
+  'download',
+  'mac',
+  'comparison'
+] as const satisfies readonly PageId[]
+
+export const FOOTER_PROJECT = [
+  'ankama',
+  'journal',
+  'legal'
+] as const satisfies readonly PageId[]
