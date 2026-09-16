@@ -130,8 +130,7 @@ describe('the video record', () => {
       nodeOf({ page: 'wheel', language: 'fr', type: 'VideoObject' })
     ).toMatchObject({
       name: 'Roue des personnages',
-      description:
-        'Un disque de têtes sous le pouce, et la bonne fenêtre arrive.',
+      description: 'Une roue de têtes, et la bonne fenêtre arrive.',
       contentUrl: `${HOST}${LOOPS.wheel.source}`,
       thumbnailUrl: `${HOST}${LOOPS.wheel.poster}`,
       duration: 'PT12S',

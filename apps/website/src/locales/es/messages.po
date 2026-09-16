@@ -743,8 +743,12 @@ msgstr "La ventana de Multifus, con el menú de funciones a la izquierda y el si
 #~ msgstr "La ventana del personaje al que le toca llega delante antes de que baje el cronómetro."
 
 #: src/constants/wording.ts
-msgid "La fenêtre du personnage qui joue passe devant toute seule."
-msgstr "La ventana del personaje que juega pasa al frente sola."
+#~ msgid "La fenêtre du personnage qui joue passe devant toute seule."
+#~ msgstr "La ventana del personaje que juega pasa al frente sola."
+
+#: src/constants/wording.ts
+msgid "La fenêtre du personnage qui joue passe devant."
+msgstr "La ventana del personaje que juega va delante."
 
 #: src/constants/wording.ts
 msgid "La fenêtre qui joue passe devant."
@@ -931,8 +935,12 @@ msgid "Le pied de page"
 msgstr "El pie de página"
 
 #: src/constants/wording.ts
-msgid "Le poids des runes posé par-dessus le jeu, sans quitter l’atelier."
-msgstr "El peso de las runas puesto sobre el juego, sin salir del taller."
+#~ msgid "Le poids des runes posé par-dessus le jeu, sans quitter l’atelier."
+#~ msgstr "El peso de las runas puesto sobre el juego, sin salir del taller."
+
+#: src/constants/wording.ts
+msgid "Le poids des runes posé par-dessus le jeu."
+msgstr "El peso de las runas puesto sobre el juego."
 
 #: src/constants/wording.ts
 msgid "Le poids des runes posé sur le jeu."
@@ -1019,8 +1027,12 @@ msgid "Les marques qui ne sont pas les nôtres"
 msgstr "Las marcas que no son nuestras"
 
 #: src/constants/wording.ts
-msgid "Les messages privés vous suivent sur le téléphone."
+msgid "Les messages privés vous suivent au téléphone."
 msgstr "Los mensajes privados te siguen al teléfono."
+
+#: src/constants/wording.ts
+#~ msgid "Les messages privés vous suivent sur le téléphone."
+#~ msgstr "Los mensajes privados te siguen al teléfono."
 
 #: src/components/site-header.tsx
 msgid "Les pages de Multifus"
@@ -1579,8 +1591,12 @@ msgstr "Un clic izquierdo, y el equipo sigue."
 #~ msgstr "Un clic izquierdo, y todo el equipo camina al mismo sitio."
 
 #: src/constants/wording.ts
-msgid "Un clic par personnage, et toute la team marche au même endroit."
-msgstr "Un clic por personaje, y todo el equipo camina al mismo sitio."
+msgid "Un clic par personnage, et la team suit."
+msgstr "Un clic por personaje, y el equipo te sigue."
+
+#: src/constants/wording.ts
+#~ msgid "Un clic par personnage, et toute la team marche au même endroit."
+#~ msgstr "Un clic por personaje, y todo el equipo camina al mismo sitio."
 
 #: src/constants/bodies.ts
 #~ msgid "Un clic sur le tableau ne fait pas sauter Multifus devant."
@@ -1595,8 +1611,8 @@ msgid "Un client en plein écran prend un bureau à lui, et la bascule devient u
 msgstr "Un cliente en pantalla completa se lleva un escritorio entero, y el cambio se convierte en un deslizamiento de un escritorio a otro."
 
 #: src/constants/wording.ts
-msgid "Un disque de têtes sous le pouce, et la bonne fenêtre arrive."
-msgstr "Un disco de cabezas bajo el pulgar, y llega la ventana correcta."
+#~ msgid "Un disque de têtes sous le pouce, et la bonne fenêtre arrive."
+#~ msgstr "Un disco de cabezas bajo el pulgar, y llega la ventana correcta."
 
 #: src/constants/bodies.ts
 msgid "Un geste commencé par erreur ne coûte pas une fenêtre."
@@ -1627,8 +1643,12 @@ msgid "Un texte prêt part au raccourci."
 msgstr "Un texto listo sale con un atajo."
 
 #: src/constants/wording.ts
-msgid "Un texte tout prêt part sous une combinaison de touches."
-msgstr "Un texto ya listo sale bajo una combinación de teclas."
+#~ msgid "Un texte tout prêt part sous une combinaison de touches."
+#~ msgstr "Un texto ya listo sale bajo una combinación de teclas."
+
+#: src/constants/wording.ts
+msgid "Un texte tout prêt part sous vos touches."
+msgstr "Un texto ya listo sale bajo tus teclas."
 
 #: src/constants/ankama.ts
 msgid "Une action, un seul personnage"
@@ -1681,6 +1701,10 @@ msgstr "Una mula se aparta"
 #: src/constants/wording.ts
 msgid "Une roue de têtes sous le pouce."
 msgstr "Una rueda de cabezas bajo el pulgar."
+
+#: src/constants/wording.ts
+msgid "Une roue de têtes, et la bonne fenêtre arrive."
+msgstr "Una rueda de cabezas, y llega la ventana buena."
 
 #: src/constants/ankama.ts
 msgid "Une tolérance n’est pas une autorisation."

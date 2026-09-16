@@ -37,12 +37,12 @@ export const PAGE_TITLES = {
 
 export const PAGE_PROMISES = {
   home: msg`Jouez en multicompte sur Dofus Retro sans jamais chercher une fenêtre.`,
-  autoFocus: msg`La fenêtre du personnage qui joue passe devant toute seule.`,
-  wheel: msg`Un disque de têtes sous le pouce, et la bonne fenêtre arrive.`,
-  walk: msg`Un clic par personnage, et toute la team marche au même endroit.`,
-  runeTable: msg`Le poids des runes posé par-dessus le jeu, sans quitter l’atelier.`,
-  relay: msg`Les messages privés vous suivent sur le téléphone.`,
-  quickTexts: msg`Un texte tout prêt part sous une combinaison de touches.`,
+  autoFocus: msg`La fenêtre du personnage qui joue passe devant.`,
+  wheel: msg`Une roue de têtes, et la bonne fenêtre arrive.`,
+  walk: msg`Un clic par personnage, et la team suit.`,
+  runeTable: msg`Le poids des runes posé par-dessus le jeu.`,
+  relay: msg`Les messages privés vous suivent au téléphone.`,
+  quickTexts: msg`Un texte tout prêt part sous vos touches.`,
   mac: msg`Multifus tourne sur Mac, signé et notarisé par Apple.`,
   comparison: msg`Multifus et les autres gestionnaires, ligne par ligne.`,
   download: msg`Multifus est gratuit, pour Mac et pour Windows. Trois gestes, et vous jouez en multicompte sur Dofus Retro.`,
