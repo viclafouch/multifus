@@ -53,19 +53,28 @@ if (windows === null) {
   process.exit(1)
 }
 
+const regionAt = (left, top) => {
+  return [left, top, CAPTURE_WIDTH, CAPTURE_HEIGHT].join(',')
+}
+
 for (const { title, originX, originY, width, height } of windows) {
   const isResized = width === WINDOW_WIDTH && height === WINDOW_HEIGHT
-  const region = [
+
+  if (!isResized) {
+    console.log(
+      `${title}\n  refusée à ${WINDOW_WIDTH} × ${WINDOW_HEIGHT}, reste à ${width} × ${height}`
+    )
+    continue
+  }
+
+  const topRegion = regionAt(originX, originY + TITLE_BAR_HEIGHT)
+  const bottomRegion = regionAt(
     originX,
-    originY + TITLE_BAR_HEIGHT,
-    CAPTURE_WIDTH,
-    CAPTURE_HEIGHT
-  ].join(',')
+    originY + WINDOW_HEIGHT - CAPTURE_HEIGHT
+  )
 
   console.log(
-    isResized
-      ? `${title}\n  fenêtre ${width} × ${height}, sélection ${region}`
-      : `${title}\n  refusée à ${WINDOW_WIDTH} × ${WINDOW_HEIGHT}, reste à ${width} × ${height}`
+    `${title}\n  fenêtre ${width} × ${height}\n  haut, la carte   ${topRegion}\n  bas, le chat     ${bottomRegion}`
   )
 }
 

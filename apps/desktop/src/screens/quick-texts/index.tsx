@@ -1,7 +1,7 @@
 import { i18n } from '@lingui/core'
 import { t } from '@lingui/core/macro'
 import { Button, Panel } from '@multifus/retro'
-import type { QuickReply } from '@/@types/shortcuts'
+import type { QuickText } from '@/@types/shortcuts'
 import type { Snapshot } from '@/@types/snapshot'
 import { Note } from '@/components/layout/note'
 import { Screen } from '@/components/layout/screen'
@@ -9,67 +9,64 @@ import { MAP_NAMES } from '@/constants/world'
 import { shortcutStatusLine } from '@/helpers/wording'
 import { useShortcutEditing } from '@/hooks/use-shortcut-editing'
 import {
-  addQuickReply,
-  removeQuickReply,
-  setQuickReplyShortcut,
-  setQuickReplyText
+  addQuickText,
+  removeQuickText,
+  setQuickTextShortcut,
+  setQuickTextText
 } from '@/lib/multifus'
-import { EmptyReplies } from '@/screens/quick-replies/empty-replies'
-import type { ReplyRowActions } from '@/screens/quick-replies/reply-row'
-import { ReplyRow } from '@/screens/quick-replies/reply-row'
+import { EmptyTexts } from '@/screens/quick-texts/empty-texts'
+import type { TextRowActions } from '@/screens/quick-texts/text-row'
+import { TextRow } from '@/screens/quick-texts/text-row'
 
-type QuickRepliesScreenProps = Readonly<{
-  quickReplies: readonly QuickReply[]
+type QuickTextsScreenProps = Readonly<{
+  quickTexts: readonly QuickText[]
   run: (action: Promise<Snapshot>) => void
 }>
 
-export const QuickRepliesScreen = ({
-  quickReplies,
+export const QuickTextsScreen = ({
+  quickTexts,
   run
-}: QuickRepliesScreenProps) => {
+}: QuickTextsScreenProps) => {
   const editing = useShortcutEditing()
 
   const handleAdd = () => {
-    run(addQuickReply())
+    run(addQuickText())
   }
 
-  const actions: ReplyRowActions = {
+  const actions: TextRowActions = {
     handleText: (id, text) => {
-      run(setQuickReplyText(id, text))
+      run(setQuickTextText(id, text))
     },
     handleShortcut: (id, accelerator) => {
       editing.close()
-      run(setQuickReplyShortcut(id, accelerator))
+      run(setQuickTextShortcut(id, accelerator))
     },
     handleRemove: (id) => {
-      run(removeQuickReply(id))
+      run(removeQuickText(id))
     },
     handleOpen: (id) => {
-      editing.open({ kind: 'quickReply', id })
+      editing.open({ kind: 'quickText', id })
     },
     handleClose: editing.close
   }
 
   return (
     <Screen
-      title={i18n._(MAP_NAMES.quickReplies)}
+      title={i18n._(MAP_NAMES.quickTexts)}
       subtitle={t`Les phrases que vous retapez tous les soirs, rangées sous une touche. Multifus les colle dans le jeu.`}
     >
-      {quickReplies.length === 0 ? (
-        <EmptyReplies handleAdd={handleAdd} />
+      {quickTexts.length === 0 ? (
+        <EmptyTexts handleAdd={handleAdd} />
       ) : (
         <Panel>
           <ul>
-            {quickReplies.map((quickReply, index) => {
+            {quickTexts.map((quickText, index) => {
               return (
-                <ReplyRow
-                  key={quickReply.id}
-                  quickReply={quickReply}
+                <TextRow
+                  key={quickText.id}
+                  quickText={quickText}
                   rank={index + 1}
-                  statusLine={shortcutStatusLine(
-                    quickReply.status,
-                    quickReplies
-                  )}
+                  statusLine={shortcutStatusLine(quickText.status, quickTexts)}
                   editing={editing.binding}
                   actions={actions}
                 />
@@ -78,7 +75,7 @@ export const QuickRepliesScreen = ({
           </ul>
           <div className="flex justify-center border-t border-band/25 px-4 py-3">
             <Button variant="slate" size="sm" onClick={handleAdd}>
-              {t`Ajouter une réponse`}
+              {t`Ajouter un texte`}
             </Button>
           </div>
         </Panel>

@@ -3,7 +3,7 @@ import { i18n } from '@lingui/core'
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import type { Character } from '@/@types/roster'
 import type {
-  QuickReply,
+  QuickText,
   ShortcutAction,
   ShortcutBinding,
   ShortcutStatus
@@ -13,7 +13,7 @@ import {
   characterOf,
   keyCapsOf,
   pending,
-  quickReplyOf,
+  quickTextOf,
   strike
 } from '@/test-doubles'
 
@@ -64,19 +64,19 @@ const shortcut = (
 type ShowParams = {
   readonly shortcuts?: readonly ShortcutBinding[]
   readonly characters?: readonly Character[]
-  readonly quickReplies?: readonly QuickReply[]
+  readonly quickTexts?: readonly QuickText[]
 }
 
 const show = ({
   shortcuts = [],
   characters = [],
-  quickReplies = []
+  quickTexts = []
 }: ShowParams = {}) => {
   const { rerender } = render(
     <ShortcutsScreen
       shortcuts={shortcuts}
       characters={characters}
-      quickReplies={quickReplies}
+      quickTexts={quickTexts}
       run={() => {}}
     />
   )
@@ -86,7 +86,7 @@ const show = ({
       <ShortcutsScreen
         shortcuts={next.shortcuts ?? shortcuts}
         characters={next.characters ?? characters}
-        quickReplies={next.quickReplies ?? quickReplies}
+        quickTexts={next.quickTexts ?? quickTexts}
         run={() => {}}
       />
     )
@@ -364,22 +364,22 @@ describe('the shortcuts screen, what Rust answers about a combination', () => {
     )
   })
 
-  it('names the quick reply that already holds the same keys', () => {
+  it('names the quick text that already holds the same keys', () => {
     show({
       shortcuts: [
         shortcut('walk', {
           accelerator: 'Control+KeyR',
           status: {
             kind: 'duplicate',
-            binding: { kind: 'quickReply', id: 7 }
+            binding: { kind: 'quickText', id: 7 }
           }
         })
       ],
-      quickReplies: [quickReplyOf({ id: 7, text: 'Bonjour' })]
+      quickTexts: [quickTextOf({ id: 7, text: 'Bonjour' })]
     })
 
     expect(screen.getByRole('alert').textContent).toBe(
-      'Déjà pris par la réponse « Bonjour ».'
+      'Déjà pris par le texte rapide « Bonjour ».'
     )
   })
 

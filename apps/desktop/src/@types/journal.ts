@@ -64,7 +64,7 @@ export type CharacterShortcutOutcome =
   | { readonly outcome: 'notInRoster' }
   | { readonly outcome: 'outsideGame' }
 
-export type QuickReplyFailure =
+export type QuickTextFailure =
   | { readonly reason: 'clipboardNotGivenBack'; readonly detail: string }
   | { readonly reason: 'clipboardRefused'; readonly detail: string }
   | { readonly reason: 'foregroundUnknown'; readonly detail: string }
@@ -149,8 +149,8 @@ export type JournalEvent =
   | { readonly kind: 'openFailed'; readonly detail: string }
   | { readonly kind: 'panicked'; readonly work: Work; readonly detail: string }
   | { readonly kind: 'panickedElsewhere'; readonly detail: string }
-  | { readonly kind: 'quickReplyFailed'; readonly reason: QuickReplyFailure }
-  | { readonly kind: 'quickReplyPasted'; readonly excerpt: string }
+  | { readonly kind: 'quickTextFailed'; readonly reason: QuickTextFailure }
+  | { readonly kind: 'quickTextPasted'; readonly excerpt: string }
   | { readonly kind: 'quit' }
   | { readonly kind: 'relayDisabled'; readonly reason: RelayStop }
   | { readonly kind: 'relayEnabled'; readonly surface: Surface }

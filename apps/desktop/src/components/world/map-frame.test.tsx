@@ -29,7 +29,7 @@ const MAPS_WITH_A_LOOP = [
   'walk',
   'runeTable',
   'relay',
-  'quickReplies'
+  'quickTexts'
 ]
 
 const BUTTON = 'Voir la vidéo'
@@ -48,7 +48,7 @@ const SEEN: LoopsSeen = {
   runeTable: true,
   autoFocus: true,
   relay: true,
-  quickReplies: true
+  quickTexts: true
 }
 
 describe('the frame of a map', () => {

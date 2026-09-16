@@ -6,11 +6,11 @@ use tauri::Manager;
 use tauri_plugin_clipboard_manager::ClipboardExt;
 
 use crate::app::journal::JournalEvent;
-use crate::app::journal::QuickReplyFailure;
+use crate::app::journal::QuickTextFailure;
 use crate::app::state::AppState;
 use crate::app::state::hold;
 use crate::app::state::paste_sender;
-use crate::config::QuickReplyId;
+use crate::config::QuickTextId;
 use crate::platform::Clipboard;
 use crate::platform::PasteSender;
 use crate::platform::PlatformError;
@@ -43,7 +43,7 @@ struct Paste<'a> {
     here: WindowId,
 }
 
-pub fn paste(app: &AppHandle, id: QuickReplyId, here: WindowId) {
+pub fn paste(app: &AppHandle, id: QuickTextId, here: WindowId) {
     hand_over(
         &Paste {
             clipboard: &AppClipboard(app),
@@ -55,9 +55,9 @@ pub fn paste(app: &AppHandle, id: QuickReplyId, here: WindowId) {
     );
 }
 
-fn hand_over(paste: &Paste, id: QuickReplyId) {
-    let Some(text) = hold(paste.state).quick_reply_text(id) else {
-        return failed(paste, QuickReplyFailure::Gone);
+fn hand_over(paste: &Paste, id: QuickTextId) {
+    let Some(text) = hold(paste.state).quick_text_text(id) else {
+        return failed(paste, QuickTextFailure::Gone);
     };
 
     let excerpt = excerpt_of(&text);
@@ -66,7 +66,7 @@ fn hand_over(paste: &Paste, id: QuickReplyId) {
     if let Err(error) = paste.clipboard.set_text(&text) {
         return failed(
             paste,
-            QuickReplyFailure::ClipboardRefused {
+            QuickTextFailure::ClipboardRefused {
                 detail: error.to_string(),
             },
         );
@@ -76,11 +76,11 @@ fn hand_over(paste: &Paste, id: QuickReplyId) {
         Ok(()) => {
             thread::sleep(GIVE_BACK_AFTER);
 
-            hold(paste.state).log(JournalEvent::QuickReplyPasted { excerpt });
+            hold(paste.state).log(JournalEvent::QuickTextPasted { excerpt });
         }
         Err(error) => failed(
             paste,
-            QuickReplyFailure::PasteRefused {
+            QuickTextFailure::PasteRefused {
                 detail: error.to_string(),
             },
         ),
@@ -97,15 +97,15 @@ fn give_back(paste: &Paste, borrowed: Option<String>) {
     if let Err(error) = paste.clipboard.set_text(&borrowed) {
         failed(
             paste,
-            QuickReplyFailure::ClipboardNotGivenBack {
+            QuickTextFailure::ClipboardNotGivenBack {
                 detail: error.to_string(),
             },
         );
     }
 }
 
-fn failed(paste: &Paste, reason: QuickReplyFailure) {
-    hold(paste.state).log_unless_repeated(JournalEvent::QuickReplyFailed { reason });
+fn failed(paste: &Paste, reason: QuickTextFailure) {
+    hold(paste.state).log_unless_repeated(JournalEvent::QuickTextFailed { reason });
 }
 
 fn excerpt_of(text: &str) -> String {
@@ -196,11 +196,11 @@ mod tests {
         }
     }
 
-    fn one_quick_reply() -> (QuickReplyId, String, Settings) {
+    fn one_quick_text() -> (QuickTextId, String, Settings) {
         let settings = Settings::default();
-        let reply = &settings.quick_replies[0];
-        let id = reply.id;
-        let text = reply.text.clone();
+        let quick_text = &settings.quick_texts[0];
+        let id = quick_text.id;
+        let text = quick_text.text.clone();
 
         (id, text, settings)
     }
@@ -216,7 +216,7 @@ mod tests {
     #[test]
     fn what_was_in_the_clipboard_before_the_paste_is_there_again_after() {
         let directory = directory();
-        let (id, _text, settings) = one_quick_reply();
+        let (id, _text, settings) = one_quick_text();
         let state = app_state(&directory, settings);
         let clipboard = FakeClipboard::holding("une amulette du bouftou, 5000 kamas");
         let sender = FakePasteSender::default();
@@ -234,7 +234,7 @@ mod tests {
         assert_eq!(
             sender.aimed(),
             vec![where_the_player_writes()],
-            "the combination goes to the window the reply was written for"
+            "the combination goes to the window the quick text was written for"
         );
         assert_eq!(
             clipboard.read(),
@@ -243,14 +243,14 @@ mod tests {
         assert!(
             journalled(&state)
                 .iter()
-                .any(|event| matches!(event, JournalEvent::QuickReplyPasted { .. }))
+                .any(|event| matches!(event, JournalEvent::QuickTextPasted { .. }))
         );
     }
 
     #[test]
-    fn an_empty_clipboard_is_left_empty_and_the_reply_is_not_given_back() {
+    fn an_empty_clipboard_is_left_empty_and_the_quick_text_is_not_given_back() {
         let directory = directory();
-        let (id, text, settings) = one_quick_reply();
+        let (id, text, settings) = one_quick_text();
         let state = app_state(&directory, settings);
         let clipboard = FakeClipboard::default();
         let sender = FakePasteSender::default();
@@ -275,7 +275,7 @@ mod tests {
     #[test]
     fn a_combination_the_system_refuses_still_gives_the_clipboard_back() {
         let directory = directory();
-        let (id, _text, settings) = one_quick_reply();
+        let (id, _text, settings) = one_quick_text();
         let state = app_state(&directory, settings);
         let clipboard = FakeClipboard::holding("prix libre");
         let sender = FakePasteSender {
@@ -296,8 +296,8 @@ mod tests {
         assert_eq!(clipboard.read(), Some("prix libre".to_owned()));
         assert!(journalled(&state).iter().any(|event| matches!(
             event,
-            JournalEvent::QuickReplyFailed {
-                reason: QuickReplyFailure::PasteRefused { .. }
+            JournalEvent::QuickTextFailed {
+                reason: QuickTextFailure::PasteRefused { .. }
             }
         )));
     }
@@ -305,7 +305,7 @@ mod tests {
     #[test]
     fn a_clipboard_that_will_not_be_written_to_leaves_the_game_alone() {
         let directory = directory();
-        let (id, _text, settings) = one_quick_reply();
+        let (id, _text, settings) = one_quick_text();
         let state = app_state(&directory, settings);
         let clipboard = FakeClipboard {
             text: Mutex::new(Some("prix libre".to_owned())),
@@ -332,14 +332,14 @@ mod tests {
     }
 
     #[test]
-    fn a_quick_reply_that_was_removed_pastes_nothing_at_all() {
+    fn a_quick_text_that_was_removed_pastes_nothing_at_all() {
         let directory = directory();
-        let (id, _text, settings) = one_quick_reply();
+        let (id, _text, settings) = one_quick_text();
         let state = app_state(&directory, settings);
         let clipboard = FakeClipboard::holding("prix libre");
         let sender = FakePasteSender::default();
 
-        hold(&state).remove_quick_reply(id);
+        hold(&state).remove_quick_text(id);
 
         hand_over(
             &Paste {
@@ -355,8 +355,8 @@ mod tests {
         assert_eq!(clipboard.read(), Some("prix libre".to_owned()));
         assert!(journalled(&state).iter().any(|event| matches!(
             event,
-            JournalEvent::QuickReplyFailed {
-                reason: QuickReplyFailure::Gone
+            JournalEvent::QuickTextFailed {
+                reason: QuickTextFailure::Gone
             }
         )));
     }

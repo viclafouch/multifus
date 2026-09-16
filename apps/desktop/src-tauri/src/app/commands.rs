@@ -29,7 +29,7 @@ use crate::app::wheel;
 use crate::config::BannerCorner;
 use crate::config::Language;
 use crate::config::Loop;
-use crate::config::QuickReplyId;
+use crate::config::QuickTextId;
 use crate::domain::Class;
 use crate::domain::Color;
 use crate::domain::Gender;
@@ -197,26 +197,26 @@ pub fn reset_shortcuts(app: AppHandle) -> Snapshot {
 }
 
 #[tauri::command]
-pub fn add_quick_reply(app: AppHandle) -> Snapshot {
-    lock(&app).add_quick_reply();
+pub fn add_quick_text(app: AppHandle) -> Snapshot {
+    lock(&app).add_quick_text();
 
     runtime::emit_snapshot(&app)
 }
 
 #[tauri::command]
-pub fn set_quick_reply_text(app: AppHandle, id: QuickReplyId, text: String) -> Snapshot {
-    lock(&app).set_quick_reply_text(id, &text);
+pub fn set_quick_text_text(app: AppHandle, id: QuickTextId, text: String) -> Snapshot {
+    lock(&app).set_quick_text_text(id, &text);
 
     runtime::emit_snapshot(&app)
 }
 
 #[tauri::command]
-pub fn set_quick_reply_shortcut(
+pub fn set_quick_text_shortcut(
     app: AppHandle,
-    id: QuickReplyId,
+    id: QuickTextId,
     accelerator: Option<String>,
 ) -> Snapshot {
-    lock(&app).set_quick_reply_shortcut(id, accelerator);
+    lock(&app).set_quick_text_shortcut(id, accelerator);
 
     shortcuts::apply(&app);
 
@@ -224,8 +224,8 @@ pub fn set_quick_reply_shortcut(
 }
 
 #[tauri::command]
-pub fn remove_quick_reply(app: AppHandle, id: QuickReplyId) -> Snapshot {
-    lock(&app).remove_quick_reply(id);
+pub fn remove_quick_text(app: AppHandle, id: QuickTextId) -> Snapshot {
+    lock(&app).remove_quick_text(id);
 
     shortcuts::apply(&app);
 

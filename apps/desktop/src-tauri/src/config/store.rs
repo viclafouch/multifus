@@ -239,8 +239,8 @@ mod tests {
     use crate::config::settings::Banner;
     use crate::config::settings::BannerCorner;
     use crate::config::settings::LoopsSeen;
-    use crate::config::settings::QuickReply;
-    use crate::config::settings::QuickReplyId;
+    use crate::config::settings::QuickText;
+    use crate::config::settings::QuickTextId;
     use crate::config::settings::RUNE_TABLE_CLEAREST;
     use crate::config::settings::Relay;
     use crate::config::settings::RuneOffset;
@@ -298,8 +298,8 @@ mod tests {
             paint_portraits: false,
             ungroup_taskbar: true,
             client_title_suffix: Some(" - Dofus Retro v1.48.21".to_owned()),
-            quick_replies: vec![QuickReply {
-                id: QuickReplyId::default().next(),
+            quick_texts: vec![QuickText {
+                id: QuickTextId::default().next(),
                 text: "prix libre".to_owned(),
                 shortcut: Shortcut::new("Alt+P"),
             }],
@@ -319,7 +319,7 @@ mod tests {
                 rune_table: false,
                 auto_focus: false,
                 relay: false,
-                quick_replies: false,
+                quick_texts: false,
             },
             rune_table: RuneTable {
                 width: 480,

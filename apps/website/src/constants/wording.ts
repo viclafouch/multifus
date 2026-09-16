@@ -10,7 +10,7 @@ export const PAGE_NAMES = {
   walk: msg`Déplacement rapide`,
   runeTable: msg`Tableau des runes`,
   relay: msg`Messages privés`,
-  quickReplies: msg`Réponses rapides`,
+  quickTexts: msg`Textes rapides`,
   mac: msg`Multifus sur Mac`,
   comparison: msg`Comparatif`,
   download: msg`Télécharger`,
@@ -26,7 +26,7 @@ export const PAGE_TITLES = {
   walk: msg`Déplacement rapide multicompte sur Dofus Retro`,
   runeTable: msg`Tableau du poids des runes de Dofus Retro`,
   relay: msg`Messages privés de Dofus Retro sur Telegram`,
-  quickReplies: msg`Réponses rapides au clavier sur Dofus Retro`,
+  quickTexts: msg`Textes rapides au clavier sur Dofus Retro`,
   mac: msg`Logiciel multicompte Dofus Retro sur Mac`,
   comparison: msg`Comparatif des logiciels multicompte Dofus Retro`,
   download: msg`Télécharger le multicompte Dofus Retro gratuit`,
@@ -42,7 +42,7 @@ export const PAGE_PROMISES = {
   walk: msg`Un clic par personnage, et toute la team marche au même endroit.`,
   runeTable: msg`Le poids des runes posé par-dessus le jeu, sans quitter l’atelier.`,
   relay: msg`Les messages privés vous suivent sur le téléphone.`,
-  quickReplies: msg`Un texte tout prêt part sous une combinaison de touches.`,
+  quickTexts: msg`Un texte tout prêt part sous une combinaison de touches.`,
   mac: msg`Multifus tourne sur Mac, signé et notarisé par Apple.`,
   comparison: msg`Multifus et les autres gestionnaires, ligne par ligne.`,
   download: msg`Multifus est gratuit, pour Mac et pour Windows. Trois gestes, et vous jouez en multicompte sur Dofus Retro.`,
@@ -57,7 +57,7 @@ export const MENU_HINTS = {
   walk: msg`Un clic gauche, et la team suit.`,
   runeTable: msg`Le poids des runes posé sur le jeu.`,
   relay: msg`Ils vous suivent sur le téléphone.`,
-  quickReplies: msg`Un texte prêt part au raccourci.`
+  quickTexts: msg`Un texte prêt part au raccourci.`
 } as const satisfies Record<(typeof MENU_FEATURES)[number], MessageDescriptor>
 
 export const LOOP_PLAY = msg`Lire`

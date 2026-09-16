@@ -23,11 +23,16 @@ Le script rétrécit, il n'agrandit pas : une capture plus étroite que la large
 d'arrivée donne une plaque molle, et rien ne la rattrape.
 
 `node .claude/skills/make-loop/frame-dofus.mjs` règle chaque fenêtre de Dofus à
-702 × 560 points et dit la sélection à donner à l'enregistreur, 700 × 410 points
-sous la barre de titre. C'est la taille des boucles déjà posées, et elle tient
-d'une vidéo à l'autre : une fenêtre plus grande montre le jeu à une autre
-échelle, et les plaques ne font plus famille. La sélection rend 1400 pixels de
-large, huit de moins que la plaque de 1408 : cet écart-là ne se voit pas.
+702 × 560 points et dit les deux sélections à donner à l'enregistreur, 700 × 410
+points chacune. C'est la taille des boucles déjà posées, et elle tient d'une
+vidéo à l'autre : une fenêtre plus grande montre le jeu à une autre échelle, et
+les plaques ne font plus famille. Chacune rend 1400 pixels de large, huit de
+moins que la plaque de 1408 : cet écart-là ne se voit pas.
+
+La sélection du haut commence sous la barre de titre et cadre la carte. Celle du
+bas se cale sur le bas de la fenêtre et cadre le chat, la ligne de saisie
+comprise. Une boucle qui montre un texte s'écrire prend celle du bas, sans quoi
+le recadrage 16:9 jette la ligne même qu'elle montre.
 
 ## Ce que le script ne dit pas
 

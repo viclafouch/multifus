@@ -62,7 +62,7 @@ GitHub n'est pas mesurable, et pèse souvent plus lourd qu'il n'y paraît.
 | Bannière du personnage              | o        | o                   | -             | -                       | -        | -              | -          | -    | -     |
 | Couleur par personnage              | o        | o                   | o             | -                       | -        | -              | -          | -    | -     |
 | Messages renvoyés sur téléphone     | o        | -                   | -             | -                       | -        | -              | -          | -    | -     |
-| Réponses toutes prêtes              | o        | -                   | -             | -                       | -        | -              | -          | -    | -     |
+| Textes tout prêts                   | o        | -                   | -             | -                       | -        | -              | -          | -    | -     |
 | Tableau des runes posé sur le jeu   | o        | -                   | -             | -                       | -        | ~              | -          | -    | -     |
 | Exclure tous les hommes ou femmes   | o        | -                   | -             | -                       | -        | -              | -          | -    | -     |
 | Code source publié                  | o        | o                   | o             | o                       | o        | ~              | o          | -    | -     |
@@ -99,7 +99,7 @@ Cent vingt-six chaînes d'interface en français, anglais et espagnol, dans un
 seul `i18n.json`. Cinq onglets : Personnages, Raccourcis, Outils, Paramètres,
 Infos.
 
-Il n'a ni roue, ni Telegram, ni réponses prêtes, ni tableau des runes, ni bouton
+Il n'a ni roue, ni Telegram, ni textes prêts, ni tableau des runes, ni bouton
 de souris, ni macOS. L'auteur écrit dans sa FAQ que tout est fait avec de l'IA.
 
 ## Ce qui nous manque
@@ -132,12 +132,12 @@ tour automatique.
 ## Ce qui nous reste en propre
 
 Les deux systèmes, le Déplacement rapide sur Mac, la roue couplée à sept
-événements, le renvoi des messages privés sur Telegram, les réponses toutes
-prêtes, le tableau des runes posé sur le jeu, les sigils qui excluent tous les
+événements, le renvoi des messages privés sur Telegram, les textes tout
+prêts, le tableau des runes posé sur le jeu, les sigils qui excluent tous les
 hommes ou toutes les femmes, et un binaire signé et notarisé.
 
 Dracoon connaît le sexe de chaque personnage et n'en fait rien. Personne n'a
-Telegram. Personne n'a les réponses prêtes.
+Telegram. Personne n'a les textes prêts.
 
 ## À ne pas installer
 

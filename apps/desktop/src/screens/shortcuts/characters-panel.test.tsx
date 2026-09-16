@@ -14,7 +14,7 @@ const exampleOn = async (agent: string) => {
   render(
     <CharactersPanel
       characters={[]}
-      quickReplies={[]}
+      quickTexts={[]}
       editing={null}
       actions={{
         handleShortcut: () => {},

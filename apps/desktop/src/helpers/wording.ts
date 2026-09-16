@@ -5,7 +5,7 @@ import type { PairingProblem, RelayFailure } from '@/@types/relay'
 import type { Character, Color, Gender } from '@/@types/roster'
 import type {
   Binding,
-  QuickReply,
+  QuickText,
   ShortcutAction,
   ShortcutStatus
 } from '@/@types/shortcuts'
@@ -171,11 +171,11 @@ export const relayFailureLine = ({ reason, detail }: RelayFailure) => {
   }
 }
 
-const QUICK_REPLY_LABEL_LENGTH = 30
+const QUICK_TEXT_LABEL_LENGTH = 30
 
 export const bindingLabel = (
   binding: Binding,
-  quickReplies: readonly QuickReply[]
+  quickTexts: readonly QuickText[]
 ): string => {
   if (binding.kind === 'action') {
     return quoted(i18n._(SHORTCUT_ACTIONS[binding.action].label))
@@ -185,37 +185,37 @@ export const bindingLabel = (
     return quoted(binding.nickname)
   }
 
-  const quickReply = quickReplies.find((candidate) => {
+  const quickText = quickTexts.find((candidate) => {
     return candidate.id === binding.id
   })
 
-  if (quickReply === undefined || quickReply.text.length === 0) {
-    return t`une réponse sans texte`
+  if (quickText === undefined || quickText.text.length === 0) {
+    return t`un texte rapide vide`
   }
 
-  const text = shorten(quickReply.text)
+  const text = shorten(quickText.text)
 
-  return t`la réponse « ${text} »`
+  return t`le texte rapide « ${text} »`
 }
 
-export const quickReplyEditLabel = (quickReply: QuickReply, rank: number) => {
-  if (quickReply.text.length === 0) {
-    return t`Modifier les touches de la réponse ${rank}`
+export const quickTextEditLabel = (quickText: QuickText, rank: number) => {
+  if (quickText.text.length === 0) {
+    return t`Modifier les touches du texte ${rank}`
   }
 
-  const text = shorten(quickReply.text)
+  const text = shorten(quickText.text)
 
-  return t`Modifier les touches de la réponse ${rank}, « ${text} »`
+  return t`Modifier les touches du texte ${rank}, « ${text} »`
 }
 
 const shorten = (text: string) => {
   const letters = Array.from(text)
 
-  if (letters.length <= QUICK_REPLY_LABEL_LENGTH) {
+  if (letters.length <= QUICK_TEXT_LABEL_LENGTH) {
     return text
   }
 
-  return `${letters.slice(0, QUICK_REPLY_LABEL_LENGTH).join('')}…`
+  return `${letters.slice(0, QUICK_TEXT_LABEL_LENGTH).join('')}…`
 }
 
 export const shortcutActionLabel = (action: ShortcutAction) => {
@@ -230,7 +230,7 @@ export const shortcutUndoLabel = (action: ShortcutAction) => {
 
 export const shortcutStatusLine = (
   status: ShortcutStatus,
-  quickReplies: readonly QuickReply[]
+  quickTexts: readonly QuickText[]
 ): TonedLine | null => {
   switch (status.kind) {
     case 'registered': {
@@ -252,7 +252,7 @@ export const shortcutStatusLine = (
       }
     }
     case 'duplicate': {
-      const label = bindingLabel(status.binding, quickReplies)
+      const label = bindingLabel(status.binding, quickTexts)
 
       return { tone: 'bad', text: t`Déjà pris par ${label}.` }
     }
@@ -264,11 +264,11 @@ export const shortcutStatusLine = (
 
 export const characterShortcutStatusLine = (
   status: ShortcutStatus,
-  quickReplies: readonly QuickReply[]
+  quickTexts: readonly QuickText[]
 ): TonedLine | null => {
   return status.kind === 'unbound'
     ? null
-    : shortcutStatusLine(status, quickReplies)
+    : shortcutStatusLine(status, quickTexts)
 }
 
 export const authorizationState = (authorization: Authorization): LampState => {

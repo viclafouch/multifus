@@ -173,7 +173,7 @@ export const PAGE_BODIES = {
       msg`Il porte le privé, et rien du canal commerce, de la guilde ou du recrutement.`
     ]
   },
-  quickReplies: {
+  quickTexts: {
     lead: msg`Vous rangez une phrase sous une combinaison de touches. Dans le jeu, vous appuyez, et elle se pose là où vous êtes en train d’écrire.`,
     boons: [
       {

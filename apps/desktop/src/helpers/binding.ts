@@ -13,7 +13,7 @@ export const matchIsSameBinding = (binding: Binding | null, other: Binding) => {
     return binding.nickname === other.nickname
   }
 
-  if (binding.kind === 'quickReply' && other.kind === 'quickReply') {
+  if (binding.kind === 'quickText' && other.kind === 'quickText') {
     return binding.id === other.id
   }
 

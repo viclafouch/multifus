@@ -37,7 +37,7 @@ use crate::app::view::ConfigProblem;
 use crate::app::view::ConfigView;
 use crate::app::view::OnboardingView;
 use crate::app::view::PairingView;
-use crate::app::view::QuickReplyView;
+use crate::app::view::QuickTextView;
 use crate::app::view::RelayView;
 use crate::app::view::RuneTableView;
 use crate::app::view::ScreenSaverView;
@@ -63,8 +63,8 @@ use crate::config::ConfigStore;
 use crate::config::Language;
 use crate::config::Loaded;
 use crate::config::Loop;
-use crate::config::QuickReply;
-use crate::config::QuickReplyId;
+use crate::config::QuickText;
+use crate::config::QuickTextId;
 use crate::config::RUNE_TABLE_CLEAREST;
 use crate::config::RUNE_TABLE_NARROWEST;
 use crate::config::RUNE_TABLE_STEP;
@@ -323,15 +323,15 @@ impl Multifus {
                     is_default: self.shortcut(action) == shortcut_in(&defaults, action),
                 })
                 .collect(),
-            quick_replies: self
+            quick_texts: self
                 .settings
-                .quick_replies
+                .quick_texts
                 .iter()
-                .map(|quick_reply| QuickReplyView {
-                    id: quick_reply.id,
-                    text: quick_reply.text.clone(),
-                    accelerator: accelerator_of(quick_reply.shortcut.as_ref()),
-                    status: self.status_of(&Binding::QuickReply { id: quick_reply.id }),
+                .map(|quick_text| QuickTextView {
+                    id: quick_text.id,
+                    text: quick_text.text.clone(),
+                    accelerator: accelerator_of(quick_text.shortcut.as_ref()),
+                    status: self.status_of(&Binding::QuickText { id: quick_text.id }),
                 })
                 .collect(),
             auto_focus: NotificationKind::ALL
@@ -615,14 +615,14 @@ impl Multifus {
             )
         });
 
-        let quick_replies = self.settings.quick_replies.iter().map(|quick_reply| {
+        let quick_texts = self.settings.quick_texts.iter().map(|quick_text| {
             (
-                Binding::QuickReply { id: quick_reply.id },
-                accelerator_of(quick_reply.shortcut.as_ref()),
+                Binding::QuickText { id: quick_text.id },
+                accelerator_of(quick_text.shortcut.as_ref()),
             )
         });
 
-        actions.chain(characters).chain(quick_replies).collect()
+        actions.chain(characters).chain(quick_texts).collect()
     }
 
     #[must_use]
@@ -699,62 +699,62 @@ impl Multifus {
     }
 
     #[must_use]
-    pub fn quick_reply_text(&self, id: QuickReplyId) -> Option<String> {
+    pub fn quick_text_text(&self, id: QuickTextId) -> Option<String> {
         self.settings
-            .quick_replies
+            .quick_texts
             .iter()
-            .find(|quick_reply| quick_reply.id == id)
-            .map(|quick_reply| quick_reply.text.clone())
+            .find(|quick_text| quick_text.id == id)
+            .map(|quick_text| quick_text.text.clone())
     }
 
-    pub fn add_quick_reply(&mut self) -> QuickReplyId {
+    pub fn add_quick_text(&mut self) -> QuickTextId {
         let id = self
             .settings
-            .quick_replies
+            .quick_texts
             .iter()
-            .map(|quick_reply| quick_reply.id)
+            .map(|quick_text| quick_text.id)
             .max()
-            .map_or_else(QuickReplyId::default, QuickReplyId::next);
+            .map_or_else(QuickTextId::default, QuickTextId::next);
 
-        self.settings.quick_replies.push(QuickReply::new(id));
+        self.settings.quick_texts.push(QuickText::new(id));
         self.save();
 
         id
     }
 
-    pub fn set_quick_reply_text(&mut self, id: QuickReplyId, text: &str) {
-        let Some(quick_reply) = self.quick_reply_mut(id) else {
+    pub fn set_quick_text_text(&mut self, id: QuickTextId, text: &str) {
+        let Some(quick_text) = self.quick_text_mut(id) else {
             return;
         };
 
-        quick_reply.set_text(text);
+        quick_text.set_text(text);
         self.save();
     }
 
-    pub fn set_quick_reply_shortcut(&mut self, id: QuickReplyId, accelerator: Option<String>) {
+    pub fn set_quick_text_shortcut(&mut self, id: QuickTextId, accelerator: Option<String>) {
         let shortcut = accelerator.and_then(Shortcut::new);
 
-        let Some(quick_reply) = self.quick_reply_mut(id) else {
+        let Some(quick_text) = self.quick_text_mut(id) else {
             return;
         };
 
-        quick_reply.shortcut = shortcut;
+        quick_text.shortcut = shortcut;
         self.save();
     }
 
-    pub fn remove_quick_reply(&mut self, id: QuickReplyId) {
+    pub fn remove_quick_text(&mut self, id: QuickTextId) {
         self.settings
-            .quick_replies
-            .retain(|quick_reply| quick_reply.id != id);
+            .quick_texts
+            .retain(|quick_text| quick_text.id != id);
         self.save();
     }
 
     #[must_use]
-    fn quick_reply_mut(&mut self, id: QuickReplyId) -> Option<&mut QuickReply> {
+    fn quick_text_mut(&mut self, id: QuickTextId) -> Option<&mut QuickText> {
         self.settings
-            .quick_replies
+            .quick_texts
             .iter_mut()
-            .find(|quick_reply| quick_reply.id == id)
+            .find(|quick_text| quick_text.id == id)
     }
 
     #[must_use]
@@ -3144,41 +3144,41 @@ mod tests {
     }
 
     #[test]
-    fn no_two_quick_replies_ever_share_an_identifier() {
+    fn no_two_quick_texts_ever_share_an_identifier() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
 
-        let first = state.add_quick_reply();
-        let second = state.add_quick_reply();
+        let first = state.add_quick_text();
+        let second = state.add_quick_text();
 
         assert_ne!(first, second);
 
-        state.set_quick_reply_text(first, "prix libre");
-        state.remove_quick_reply(second);
+        state.set_quick_text_text(first, "prix libre");
+        state.remove_quick_text(second);
 
-        let third = state.add_quick_reply();
+        let third = state.add_quick_text();
 
         assert_ne!(third, first);
-        assert_eq!(state.quick_reply_text(first).as_deref(), Some("prix libre"));
-        assert_eq!(state.quick_reply_text(third).as_deref(), Some(""));
+        assert_eq!(state.quick_text_text(first).as_deref(), Some("prix libre"));
+        assert_eq!(state.quick_text_text(third).as_deref(), Some(""));
     }
 
     #[test]
-    fn a_quick_reply_nobody_has_given_keys_to_reads_as_unbound() {
+    fn a_quick_text_nobody_has_given_keys_to_reads_as_unbound() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
 
-        let id = state.add_quick_reply();
+        let id = state.add_quick_text();
 
-        let quick_reply = state
+        let quick_text = state
             .snapshot()
-            .quick_replies
+            .quick_texts
             .into_iter()
-            .find(|quick_reply| quick_reply.id == id)
-            .expect("the quick reply that was just added");
+            .find(|quick_text| quick_text.id == id)
+            .expect("the quick text that was just added");
 
-        assert_eq!(quick_reply.accelerator, None);
-        assert_eq!(quick_reply.status, ShortcutStatus::Unbound);
+        assert_eq!(quick_text.accelerator, None);
+        assert_eq!(quick_text.status, ShortcutStatus::Unbound);
     }
 
     #[test]
@@ -3211,14 +3211,14 @@ mod tests {
     }
 
     #[test]
-    fn the_nine_actions_come_before_the_characters_and_the_quick_replies() {
+    fn the_nine_actions_come_before_the_characters_and_the_quick_texts() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
         state.apply_windows(&[window(1, "Alpha")]);
         state.set_character_shortcut("Alpha", Some("F1".to_owned()));
 
-        let id = state.add_quick_reply();
-        state.set_quick_reply_shortcut(id, Some("Alt+P".to_owned()));
+        let id = state.add_quick_text();
+        state.set_quick_text_shortcut(id, Some("Alt+P".to_owned()));
 
         let bindings = state.bindings();
 
@@ -3240,7 +3240,7 @@ mod tests {
         );
         assert_eq!(
             bindings.last().cloned(),
-            Some((Binding::QuickReply { id }, Some("Alt+P".to_owned())))
+            Some((Binding::QuickText { id }, Some("Alt+P".to_owned())))
         );
     }
 
@@ -3307,8 +3307,8 @@ mod tests {
     fn the_five_actions_take_back_their_first_day_keys_and_leave_the_rest_alone() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
-        let id = state.add_quick_reply();
-        state.set_quick_reply_shortcut(id, Some("Alt+P".to_owned()));
+        let id = state.add_quick_text();
+        state.set_quick_text_shortcut(id, Some("Alt+P".to_owned()));
         state.set_shortcut(ShortcutAction::Next, Some("Alt+N".to_owned()));
         state.set_shortcut(ShortcutAction::ToggleExcluded, None);
 
@@ -3318,38 +3318,38 @@ mod tests {
         assert!(state.accelerator(ShortcutAction::ToggleExcluded).is_some());
         assert_eq!(
             state.bindings().last().cloned(),
-            Some((Binding::QuickReply { id }, Some("Alt+P".to_owned())))
+            Some((Binding::QuickText { id }, Some("Alt+P".to_owned())))
         );
     }
 
     #[test]
-    fn a_quick_reply_that_is_gone_pastes_nothing_and_shows_nothing() {
+    fn a_quick_text_that_is_gone_pastes_nothing_and_shows_nothing() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
-        let id = state.add_quick_reply();
+        let id = state.add_quick_text();
 
-        state.remove_quick_reply(id);
+        state.remove_quick_text(id);
 
-        assert_eq!(state.quick_reply_text(id), None);
+        assert_eq!(state.quick_text_text(id), None);
         assert!(
             state
                 .snapshot()
-                .quick_replies
+                .quick_texts
                 .iter()
-                .all(|quick_reply| quick_reply.id != id)
+                .all(|quick_text| quick_text.id != id)
         );
     }
 
     #[test]
-    fn a_quick_reply_pastes_what_it_says_now_and_not_what_it_said_at_startup() {
+    fn a_quick_text_pastes_what_it_says_now_and_not_what_it_said_at_startup() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
-        let id = state.add_quick_reply();
+        let id = state.add_quick_text();
 
-        state.set_quick_reply_text(id, "prix libre");
-        state.set_quick_reply_text(id, "de rien");
+        state.set_quick_text_text(id, "prix libre");
+        state.set_quick_text_text(id, "de rien");
 
-        assert_eq!(state.quick_reply_text(id).as_deref(), Some("de rien"));
+        assert_eq!(state.quick_text_text(id).as_deref(), Some("de rien"));
     }
 
     fn open(raws: &[u64]) -> Vec<WindowId> {

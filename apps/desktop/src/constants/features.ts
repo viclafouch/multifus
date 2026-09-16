@@ -30,9 +30,9 @@ export const FEATURES = [
     screen: 'runeTable'
   },
   {
-    name: msg`Les réponses rapides`,
+    name: msg`Les textes rapides`,
     line: msg`Un texte tout prêt, collé dans le chat.`,
-    screen: 'quickReplies'
+    screen: 'quickTexts'
   },
   {
     name: msg`Les messages privés`,

@@ -34,7 +34,7 @@ describe('the world', () => {
       'Multifus',
       'Personnages',
       'Raccourcis',
-      'Réponses rapides',
+      'Textes rapides',
       'AutoFocus',
       'Déplacement rapide',
       'Tableau des runes',

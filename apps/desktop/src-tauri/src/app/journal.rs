@@ -132,12 +132,12 @@ pub enum JournalEvent {
         outcome: CharacterShortcutOutcome,
     },
 
-    QuickReplyPasted {
+    QuickTextPasted {
         excerpt: String,
     },
 
-    QuickReplyFailed {
-        reason: QuickReplyFailure,
+    QuickTextFailed {
+        reason: QuickTextFailure,
     },
 
     ClientMaximized,
@@ -431,7 +431,7 @@ pub enum RelayFailure {
     rename_all = "camelCase",
     rename_all_fields = "camelCase"
 )]
-pub enum QuickReplyFailure {
+pub enum QuickTextFailure {
     OutsideGame,
 
     ForegroundUnknown { detail: String },
@@ -848,14 +848,14 @@ mod tests {
 
     #[test]
     fn a_paste_carries_an_excerpt_of_the_user_s_own_line_and_nothing_more() {
-        let pasted = JournalEvent::QuickReplyPasted {
+        let pasted = JournalEvent::QuickTextPasted {
             excerpt: "prix libre".to_owned(),
         };
 
         assert_eq!(fields_of(&pasted), ["excerpt", "kind"]);
 
-        let failed = JournalEvent::QuickReplyFailed {
-            reason: QuickReplyFailure::PasteRefused {
+        let failed = JournalEvent::QuickTextFailed {
+            reason: QuickTextFailure::PasteRefused {
                 detail: "refusé".to_owned(),
             },
         };
@@ -863,25 +863,25 @@ mod tests {
         assert_eq!(fields_of(&failed), ["kind", "reason"]);
         assert_eq!(
             serde_json::to_string(&failed).expect("the event serialises"),
-            r#"{"kind":"quickReplyFailed","reason":{"reason":"pasteRefused","detail":"refusé"}}"#
+            r#"{"kind":"quickTextFailed","reason":{"reason":"pasteRefused","detail":"refusé"}}"#
         );
     }
 
     #[test]
-    fn a_quick_reply_that_failed_says_which_of_the_six_places_it_is_repaired_in() {
+    fn a_quick_text_that_failed_says_which_of_the_six_places_it_is_repaired_in() {
         let reasons = [
-            QuickReplyFailure::OutsideGame,
-            QuickReplyFailure::ForegroundUnknown {
+            QuickTextFailure::OutsideGame,
+            QuickTextFailure::ForegroundUnknown {
                 detail: "denied".to_owned(),
             },
-            QuickReplyFailure::Gone,
-            QuickReplyFailure::ClipboardRefused {
+            QuickTextFailure::Gone,
+            QuickTextFailure::ClipboardRefused {
                 detail: "denied".to_owned(),
             },
-            QuickReplyFailure::PasteRefused {
+            QuickTextFailure::PasteRefused {
                 detail: "denied".to_owned(),
             },
-            QuickReplyFailure::ClipboardNotGivenBack {
+            QuickTextFailure::ClipboardNotGivenBack {
                 detail: "denied".to_owned(),
             },
         ];

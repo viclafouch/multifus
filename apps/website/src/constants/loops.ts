@@ -3,9 +3,9 @@ import autoFocusPoster from '@multifus/ankama/loops/auto-focus-loop-poster.webp'
 import autoFocusLoop from '@multifus/ankama/loops/auto-focus-loop.mp4'
 import homePoster from '@multifus/ankama/loops/home-loop-poster.webp'
 import homeLoop from '@multifus/ankama/loops/home-loop.mp4'
-import quickRepliesPeek from '@multifus/ankama/loops/quick-replies-loop-peek.webp'
-import quickRepliesPoster from '@multifus/ankama/loops/quick-replies-loop-poster.webp'
-import quickRepliesLoop from '@multifus/ankama/loops/quick-replies-loop.mp4'
+import quickTextsPeek from '@multifus/ankama/loops/quick-texts-loop-peek.webp'
+import quickTextsPoster from '@multifus/ankama/loops/quick-texts-loop-poster.webp'
+import quickTextsLoop from '@multifus/ankama/loops/quick-texts-loop.mp4'
 import relayPeek from '@multifus/ankama/loops/relay-loop-peek.webp'
 import relayPoster from '@multifus/ankama/loops/relay-loop-poster.webp'
 import relayLoop from '@multifus/ankama/loops/relay-loop.mp4'
@@ -22,6 +22,8 @@ import type { Size } from '@/@types/media'
 import type { FeatureId, Loop, LoopId } from '@/@types/page'
 
 const FILMED_ON = '2026-09-08'
+
+const QUICK_TEXTS_FILMED_ON = '2026-09-16'
 
 export const POSTER_SIZE = { width: 1280, height: 720 } as const satisfies Size
 
@@ -70,12 +72,12 @@ export const LOOPS = {
     seconds: 13,
     filmed: FILMED_ON
   },
-  quickReplies: {
-    source: quickRepliesLoop,
-    size: { width: 1386, height: 780 },
-    poster: quickRepliesPoster,
-    seconds: 14,
-    filmed: FILMED_ON
+  quickTexts: {
+    source: quickTextsLoop,
+    size: { width: 800, height: 450 },
+    poster: quickTextsPoster,
+    seconds: 12,
+    filmed: QUICK_TEXTS_FILMED_ON
   }
 } as const satisfies Record<LoopId, Loop>
 
@@ -85,5 +87,5 @@ export const PEEKS = {
   walk: walkPeek,
   runeTable: runeTablePeek,
   relay: relayPeek,
-  quickReplies: quickRepliesPeek
+  quickTexts: quickTextsPeek
 } as const satisfies Record<FeatureId, string>

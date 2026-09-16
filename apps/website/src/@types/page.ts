@@ -10,7 +10,7 @@ export type PageId =
   | 'journal'
   | 'legal'
   | 'mac'
-  | 'quickReplies'
+  | 'quickTexts'
   | 'relay'
   | 'runeTable'
   | 'walk'
@@ -27,7 +27,7 @@ export type PageKind =
 
 export type FeatureId =
   | 'autoFocus'
-  | 'quickReplies'
+  | 'quickTexts'
   | 'relay'
   | 'runeTable'
   | 'walk'

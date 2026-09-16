@@ -3,7 +3,7 @@ import { t } from '@lingui/core/macro'
 import { Button, Panel } from '@multifus/retro'
 import type {
   Binding,
-  QuickReply,
+  QuickText,
   ShortcutAction,
   ShortcutBinding
 } from '@/@types/shortcuts'
@@ -23,7 +23,7 @@ type ActionsPanelActions = Readonly<{
 
 type ActionsPanelProps = Readonly<{
   shortcuts: readonly ShortcutBinding[]
-  quickReplies: readonly QuickReply[]
+  quickTexts: readonly QuickText[]
   editing: Binding | null
   undoFor: (shortcut: ShortcutBinding) => ShortcutUndo | null
   actions: ActionsPanelActions
@@ -31,7 +31,7 @@ type ActionsPanelProps = Readonly<{
 
 export const ActionsPanel = ({
   shortcuts,
-  quickReplies,
+  quickTexts,
   editing,
   undoFor,
   actions
@@ -58,7 +58,7 @@ export const ActionsPanel = ({
             >
               <ShortcutField
                 accelerator={shortcut.accelerator}
-                statusLine={shortcutStatusLine(shortcut.status, quickReplies)}
+                statusLine={shortcutStatusLine(shortcut.status, quickTexts)}
                 editLabel={t`Modifier le raccourci ${label}`}
                 undo={undoFor(shortcut)}
                 editing={{

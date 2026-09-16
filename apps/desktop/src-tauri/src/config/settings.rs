@@ -14,7 +14,7 @@ pub struct Settings {
     pub language: Option<Language>,
     pub roster: Roster,
     pub shortcuts: Shortcuts,
-    pub quick_replies: Vec<QuickReply>,
+    pub quick_texts: Vec<QuickText>,
     pub auto_focus: AutoFocus,
     pub relay: Relay,
     pub banner: Banner,
@@ -39,19 +39,19 @@ pub struct Traces {
     pub short_titles: bool,
 }
 
-const FIRST_QUICK_REPLY: &str = "Bon jeu à toi !";
+const FIRST_QUICK_TEXT: &str = "Bon jeu à toi !";
 
 impl Default for Settings {
     fn default() -> Self {
-        let mut quick_reply = QuickReply::new(QuickReplyId::default());
+        let mut quick_text = QuickText::new(QuickTextId::default());
 
-        quick_reply.set_text(FIRST_QUICK_REPLY);
+        quick_text.set_text(FIRST_QUICK_TEXT);
 
         Self {
             language: None,
             roster: Roster::default(),
             shortcuts: Shortcuts::default(),
-            quick_replies: vec![quick_reply],
+            quick_texts: vec![quick_text],
             auto_focus: AutoFocus::default(),
             relay: Relay::default(),
             banner: Banner::default(),
@@ -127,7 +127,7 @@ pub struct LoopsSeen {
     pub rune_table: bool,
     pub auto_focus: bool,
     pub relay: bool,
-    pub quick_replies: bool,
+    pub quick_texts: bool,
 }
 
 impl LoopsSeen {
@@ -138,7 +138,7 @@ impl LoopsSeen {
             Loop::RuneTable => self.rune_table = true,
             Loop::AutoFocus => self.auto_focus = true,
             Loop::Relay => self.relay = true,
-            Loop::QuickReplies => self.quick_replies = true,
+            Loop::QuickTexts => self.quick_texts = true,
         }
     }
 }
@@ -151,7 +151,7 @@ pub enum Loop {
     RuneTable,
     AutoFocus,
     Relay,
-    QuickReplies,
+    QuickTexts,
 }
 
 impl Wheel {
@@ -257,9 +257,9 @@ impl Default for Shortcuts {
     Debug, Clone, Copy, Default, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize,
 )]
 #[serde(transparent)]
-pub struct QuickReplyId(u32);
+pub struct QuickTextId(u32);
 
-impl QuickReplyId {
+impl QuickTextId {
     #[must_use]
     pub const fn next(self) -> Self {
         Self(self.0.saturating_add(1))
@@ -267,18 +267,18 @@ impl QuickReplyId {
 }
 
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
-pub struct QuickReply {
+pub struct QuickText {
     #[serde(default)]
-    pub id: QuickReplyId,
+    pub id: QuickTextId,
     #[serde(default)]
     pub text: String,
     #[serde(default)]
     pub shortcut: Option<Shortcut>,
 }
 
-impl QuickReply {
+impl QuickText {
     #[must_use]
-    pub fn new(id: QuickReplyId) -> Self {
+    pub fn new(id: QuickTextId) -> Self {
         Self {
             id,
             text: String::new(),
@@ -625,54 +625,54 @@ mod tests {
     }
 
     #[test]
-    fn a_first_launch_offers_one_quick_reply_to_start_from() {
-        let quick_replies = Settings::default().quick_replies;
+    fn a_first_launch_offers_one_quick_text_to_start_from() {
+        let quick_texts = Settings::default().quick_texts;
 
-        assert_eq!(quick_replies.len(), 1);
-        assert_eq!(quick_replies[0].text, FIRST_QUICK_REPLY);
-        assert!(quick_replies[0].shortcut.is_none());
+        assert_eq!(quick_texts.len(), 1);
+        assert_eq!(quick_texts[0].text, FIRST_QUICK_TEXT);
+        assert!(quick_texts[0].shortcut.is_none());
     }
 
     #[test]
-    fn a_quick_reply_holds_its_text_on_one_line() {
-        let mut quick_reply = QuickReply::new(QuickReplyId::default());
+    fn a_quick_text_holds_its_text_on_one_line() {
+        let mut quick_text = QuickText::new(QuickTextId::default());
 
-        quick_reply.set_text("  prix libre\nde rien  ");
+        quick_text.set_text("  prix libre\nde rien  ");
 
-        assert_eq!(quick_reply.text, "prix libre de rien");
+        assert_eq!(quick_text.text, "prix libre de rien");
 
-        quick_reply.set_text("prix libre\r\n\r\nde rien");
+        quick_text.set_text("prix libre\r\n\r\nde rien");
 
-        assert_eq!(quick_reply.text, "prix libre de rien");
+        assert_eq!(quick_text.text, "prix libre de rien");
     }
 
     #[test]
-    fn a_quick_reply_written_before_a_field_existed_still_loads() {
-        let quick_reply = serde_json::from_str::<QuickReply>(r#"{"text":"prix libre"}"#)
-            .expect("a partial quick_reply");
+    fn a_quick_text_written_before_a_field_existed_still_loads() {
+        let quick_text = serde_json::from_str::<QuickText>(r#"{"text":"prix libre"}"#)
+            .expect("a partial quick_text");
 
-        assert_eq!(quick_reply.text, "prix libre");
-        assert_eq!(quick_reply.id, QuickReplyId::default());
-        assert_eq!(quick_reply.shortcut, None);
+        assert_eq!(quick_text.text, "prix libre");
+        assert_eq!(quick_text.id, QuickTextId::default());
+        assert_eq!(quick_text.shortcut, None);
     }
 
     #[test]
-    fn a_quick_reply_keeps_its_identifier_across_the_file() {
-        let quick_reply = QuickReply {
-            id: QuickReplyId::default().next().next(),
+    fn a_quick_text_keeps_its_identifier_across_the_file() {
+        let quick_text = QuickText {
+            id: QuickTextId::default().next().next(),
             text: "de rien".to_owned(),
             shortcut: Shortcut::new("Control+Shift+K"),
         };
 
-        let json = serde_json::to_string(&quick_reply).expect("a quick_reply serialises");
+        let json = serde_json::to_string(&quick_text).expect("a quick_text serialises");
 
         assert_eq!(
             json,
             r#"{"id":2,"text":"de rien","shortcut":"Control+Shift+K"}"#
         );
         assert_eq!(
-            serde_json::from_str::<QuickReply>(&json).expect("a quick_reply reads back"),
-            quick_reply
+            serde_json::from_str::<QuickText>(&json).expect("a quick_text reads back"),
+            quick_text
         );
     }
 
@@ -711,6 +711,6 @@ mod tests {
         assert_eq!(settings.auto_focus, AutoFocus::default());
         assert_eq!(settings.relay, Relay::default());
         assert!(settings.roster.is_empty());
-        assert_eq!(settings.quick_replies, Settings::default().quick_replies);
+        assert_eq!(settings.quick_texts, Settings::default().quick_texts);
     }
 }

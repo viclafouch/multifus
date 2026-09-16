@@ -2,7 +2,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import type { Display } from '@/@types/display'
 import type { Onboarding } from '@/@types/onboarding'
 import type { Character } from '@/@types/roster'
-import type { QuickReply } from '@/@types/shortcuts'
+import type { QuickText } from '@/@types/shortcuts'
 import type { Snapshot } from '@/@types/snapshot'
 import type { WheelSize, WheelSlice } from '@/@types/wheel'
 import { OPENING_WAIT_MS } from '@/hooks/use-late-opening'
@@ -40,15 +40,15 @@ export const characterOf = (fields: Partial<Character> = {}) => {
   return { ...BLANK_CHARACTER, ...fields }
 }
 
-const BLANK_QUICK_REPLY: QuickReply = {
+const BLANK_QUICK_TEXT: QuickText = {
   id: 1,
   text: '',
   accelerator: null,
   status: { kind: 'unbound' }
 }
 
-export const quickReplyOf = (fields: Partial<QuickReply> = {}) => {
-  return { ...BLANK_QUICK_REPLY, ...fields }
+export const quickTextOf = (fields: Partial<QuickText> = {}) => {
+  return { ...BLANK_QUICK_TEXT, ...fields }
 }
 
 export type Combination = {
@@ -134,7 +134,7 @@ const BLANK_SNAPSHOT: Snapshot = {
   keyboard: {},
   characters: [],
   shortcuts: [],
-  quickReplies: [],
+  quickTexts: [],
   autoFocus: [],
   autoFocusEnabled: true,
   wakesMinimized: true,
@@ -177,7 +177,7 @@ const BLANK_SNAPSHOT: Snapshot = {
     runeTable: true,
     autoFocus: true,
     relay: true,
-    quickReplies: true
+    quickTexts: true
   },
   journal: []
 }

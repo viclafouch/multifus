@@ -17,7 +17,7 @@ export type Mark = 'half' | 'no' | 'yes'
 export type TraitId =
   | 'autoFocus'
   | 'macos'
-  | 'quickReplies'
+  | 'quickTexts'
   | 'relay'
   | 'runeTable'
   | 'signed'

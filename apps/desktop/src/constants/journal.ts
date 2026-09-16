@@ -2,7 +2,7 @@ import { msg } from '@lingui/core/macro'
 import type {
   JournalEvent,
   MaximizeAllOutcome,
-  QuickReplyFailure,
+  QuickTextFailure,
   ShortcutOutcome,
   TrayOutcome,
   WheelOutcome
@@ -24,7 +24,7 @@ type PlainEventKind = Exclude<
   | 'characterShortcut'
   | 'maximizeAll'
   | 'notification'
-  | 'quickReplyFailed'
+  | 'quickTextFailed'
   | 'shortcut'
   | 'shortcutsBound'
   | 'trayFocus'
@@ -85,19 +85,19 @@ export const TONES = {
   relayTestSent: 'good',
   displayAwake: 'neutral',
   displayAwakeFailed: 'warning',
-  quickReplyPasted: 'good',
+  quickTextPasted: 'good',
   reset: 'neutral',
   quit: 'neutral'
 } as const satisfies Record<PlainEventKind, JournalTone>
 
-export const QUICK_REPLY_FAILURE_TONES = {
+export const QUICK_TEXT_FAILURE_TONES = {
   outsideGame: 'neutral',
   gone: 'neutral',
   foregroundUnknown: 'warning',
   clipboardRefused: 'warning',
   pasteRefused: 'warning',
   clipboardNotGivenBack: 'warning'
-} as const satisfies Record<QuickReplyFailure['reason'], JournalTone>
+} as const satisfies Record<QuickTextFailure['reason'], JournalTone>
 
 export const WALK_IDLE_TONES = {
   nobodyInCycle: 'neutral',

@@ -75,7 +75,7 @@ describe('capture', () => {
     expect(result).toStrictEqual({ status: 'captured', accelerator: 'Alt+F5' })
   })
 
-  it('refuses the paste combination, which a quickReply would trigger by itself', () => {
+  it('refuses the paste combination, which a quickText would trigger by itself', () => {
     const press = { ...NOTHING_HELD, code: 'KeyV', ctrlKey: true }
 
     const result = capture(press)

@@ -9,7 +9,7 @@ pub mod main_window;
 pub mod overlay;
 pub mod panics;
 pub mod portraits;
-pub mod quick_replies;
+pub mod quick_texts;
 pub mod relay;
 pub mod rune_table;
 pub mod runtime;

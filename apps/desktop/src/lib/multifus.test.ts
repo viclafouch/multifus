@@ -256,27 +256,27 @@ const CALLS = [
     }
   },
   {
-    name: 'addQuickReply',
+    name: 'addQuickText',
     run: () => {
-      return multifus.addQuickReply()
+      return multifus.addQuickText()
     }
   },
   {
-    name: 'setQuickReplyText',
+    name: 'setQuickTextText',
     run: () => {
-      return multifus.setQuickReplyText(0, 'Bon jeu à toi !')
+      return multifus.setQuickTextText(0, 'Bon jeu à toi !')
     }
   },
   {
-    name: 'setQuickReplyShortcut',
+    name: 'setQuickTextShortcut',
     run: () => {
-      return multifus.setQuickReplyShortcut(0, 'Alt+KeyP')
+      return multifus.setQuickTextShortcut(0, 'Alt+KeyP')
     }
   },
   {
-    name: 'removeQuickReply',
+    name: 'removeQuickText',
     run: () => {
-      return multifus.removeQuickReply(0)
+      return multifus.removeQuickText(0)
     }
   },
   {

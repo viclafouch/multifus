@@ -4,7 +4,7 @@ import type {
   JournalEvent,
   MaximizeAllOutcome,
   NotificationOutcome,
-  QuickReplyFailure,
+  QuickTextFailure,
   RosterChange,
   SettingChange,
   ShortcutOutcome,
@@ -13,7 +13,7 @@ import type {
 import type { NoticeCase, RelayFailure } from '@/@types/relay'
 import type {
   BoundCombination,
-  QuickReply,
+  QuickText,
   ShortcutBinding,
   ShortcutStatus
 } from '@/@types/shortcuts'
@@ -71,14 +71,14 @@ const SHORTCUTS = [
   }
 ] as const satisfies readonly ShortcutBinding[]
 
-const QUICK_REPLIES = [
+const QUICK_TEXTS = [
   {
     id: 1,
     text: 'prix libre',
     accelerator: 'Control+Shift+KeyP',
     status: { kind: 'registered' }
   }
-] as const satisfies readonly QuickReply[]
+] as const satisfies readonly QuickText[]
 
 const BINDINGS = [
   {
@@ -102,7 +102,7 @@ const BINDINGS = [
     status: { kind: 'invalid', detail: 'touche inconnue' }
   },
   {
-    binding: { kind: 'quickReply', id: 1 },
+    binding: { kind: 'quickText', id: 1 },
     accelerator: 'Control+Shift+KeyP',
     status: { kind: 'registered' }
   }
@@ -114,7 +114,7 @@ const QUIET_STATUSES = new Set<ShortcutStatus['kind']>([
 ])
 
 const BINDINGS_LINE =
-  'Raccourcis : « Personnage suivant » Control+Shift+ArrowRight · « Personnage précédent » non attribué · « Exclure ou réintégrer » Control+Shift+KeyS refusé (déjà prise) · « Déplacement rapide » Control+Shift+KeyX illisible (touche inconnue) · la réponse « prix libre » Control+Shift+KeyP.'
+  'Raccourcis : « Personnage suivant » Control+Shift+ArrowRight · « Personnage précédent » non attribué · « Exclure ou réintégrer » Control+Shift+KeyS refusé (déjà prise) · « Déplacement rapide » Control+Shift+KeyX illisible (touche inconnue) · le texte rapide « prix libre » Control+Shift+KeyP.'
 
 const ROSTER_CASES = {
   excluded: [
@@ -649,58 +649,58 @@ const MAXIMIZE_ALL_CASES = {
   readonly Case<'maximizeAll'>[]
 >
 
-const QUICK_REPLY_CASES = {
+const QUICK_TEXT_CASES = {
   outsideGame: [
     {
-      event: { kind: 'quickReplyFailed', reason: { reason: 'outsideGame' } },
-      line: 'Réponse rapide ignorée : aucune fenêtre Dofus au premier plan.'
+      event: { kind: 'quickTextFailed', reason: { reason: 'outsideGame' } },
+      line: 'Texte rapide ignoré : aucune fenêtre Dofus au premier plan.'
     }
   ],
   foregroundUnknown: [
     {
       event: {
-        kind: 'quickReplyFailed',
+        kind: 'quickTextFailed',
         reason: { reason: 'foregroundUnknown', detail: DETAIL }
       },
-      line: `Réponse rapide ignorée : impossible de savoir quelle fenêtre est au premier plan (${DETAIL}).`
+      line: `Texte rapide ignoré : impossible de savoir quelle fenêtre est au premier plan (${DETAIL}).`
     }
   ],
   gone: [
     {
-      event: { kind: 'quickReplyFailed', reason: { reason: 'gone' } },
-      line: 'Réponse rapide introuvable : elle a été retirée entre l’appui et le collage.'
+      event: { kind: 'quickTextFailed', reason: { reason: 'gone' } },
+      line: 'Texte rapide introuvable : il a été retiré entre l’appui et le collage.'
     }
   ],
   clipboardRefused: [
     {
       event: {
-        kind: 'quickReplyFailed',
+        kind: 'quickTextFailed',
         reason: { reason: 'clipboardRefused', detail: DETAIL }
       },
-      line: `Réponse rapide non collée : le presse-papiers a refusé le texte (${DETAIL}).`
+      line: `Texte rapide non collé : le presse-papiers a refusé le texte (${DETAIL}).`
     }
   ],
   pasteRefused: [
     {
       event: {
-        kind: 'quickReplyFailed',
+        kind: 'quickTextFailed',
         reason: { reason: 'pasteRefused', detail: DETAIL }
       },
-      line: `Réponse rapide non collée : le système a refusé la combinaison de collage (${DETAIL}).`
+      line: `Texte rapide non collé : le système a refusé la combinaison de collage (${DETAIL}).`
     }
   ],
   clipboardNotGivenBack: [
     {
       event: {
-        kind: 'quickReplyFailed',
+        kind: 'quickTextFailed',
         reason: { reason: 'clipboardNotGivenBack', detail: DETAIL }
       },
-      line: `Réponse rapide collée, mais le presse-papiers d’avant n’a pas pu être rendu (${DETAIL}).`
+      line: `Texte rapide collé, mais le presse-papiers d’avant n’a pas pu être rendu (${DETAIL}).`
     }
   ]
 } as const satisfies Record<
-  QuickReplyFailure['reason'],
-  readonly Case<'quickReplyFailed'>[]
+  QuickTextFailure['reason'],
+  readonly Case<'quickTextFailed'>[]
 >
 
 const TRAY_CASES = {
@@ -1016,11 +1016,11 @@ const JOURNAL_CASES = {
   shortcut: Object.values(SHORTCUT_CASES).flat(),
   maximizeAll: Object.values(MAXIMIZE_ALL_CASES).flat(),
   characterShortcut: Object.values(CHARACTER_SHORTCUT_CASES).flat(),
-  quickReplyFailed: Object.values(QUICK_REPLY_CASES).flat(),
-  quickReplyPasted: [
+  quickTextFailed: Object.values(QUICK_TEXT_CASES).flat(),
+  quickTextPasted: [
     {
-      event: { kind: 'quickReplyPasted', excerpt: 'prix libre' },
-      line: 'Réponse rapide collée dans le jeu : « prix libre »'
+      event: { kind: 'quickTextPasted', excerpt: 'prix libre' },
+      line: 'Texte rapide collé dans le jeu : « prix libre »'
     }
   ],
   trayFocus: Object.values(TRAY_CASES).flat(),
@@ -1055,7 +1055,7 @@ const JOURNAL_CASES = {
         kind: 'shortcutsBound',
         bindings: [
           {
-            binding: { kind: 'quickReply', id: 2 },
+            binding: { kind: 'quickText', id: 2 },
             accelerator: 'Control+Shift+KeyP',
             status: {
               kind: 'duplicate',
@@ -1064,7 +1064,7 @@ const JOURNAL_CASES = {
           }
         ]
       },
-      line: 'Raccourcis : une réponse sans texte Control+Shift+KeyP en doublon avec « Personnage suivant », donc inerte.'
+      line: 'Raccourcis : un texte rapide vide Control+Shift+KeyP en doublon avec « Personnage suivant », donc inerte.'
     }
   ],
   shortcutsFailed: [
@@ -1424,7 +1424,7 @@ const SNAPSHOT = {
   keyboard: {},
   characters: [],
   shortcuts: SHORTCUTS,
-  quickReplies: QUICK_REPLIES,
+  quickTexts: QUICK_TEXTS,
   autoFocus: [],
   autoFocusEnabled: true,
   wakesMinimized: true,
@@ -1477,7 +1477,7 @@ const SNAPSHOT = {
     runeTable: true,
     autoFocus: true,
     relay: true,
-    quickReplies: true
+    quickTexts: true
   },
   journal: [
     { id: 1, at: MORNING, event: { kind: 'listening' } },
@@ -1489,7 +1489,7 @@ describe('journalLine', () => {
   it.each(Object.values(JOURNAL_CASES).flat())(
     '$event.kind reads as « $line »',
     ({ event, line }) => {
-      const written = journalLine(event, QUICK_REPLIES)
+      const written = journalLine(event, QUICK_TEXTS)
 
       expect(written).toBe(line)
     }

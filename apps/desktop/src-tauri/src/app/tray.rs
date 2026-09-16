@@ -41,7 +41,7 @@ use crate::platform::WindowId;
 struct MenuWords {
     characters: &'static str,
     shortcuts: &'static str,
-    quick_replies: &'static str,
+    quick_texts: &'static str,
     auto_focus_screen: &'static str,
     walk_screen: &'static str,
     rune_table_screen: &'static str,
@@ -73,7 +73,7 @@ struct MenuWords {
 const FRENCH_MENU: MenuWords = MenuWords {
     characters: "Personnages",
     shortcuts: "Raccourcis",
-    quick_replies: "Réponses rapides",
+    quick_texts: "Textes rapides",
     auto_focus_screen: "AutoFocus",
     walk_screen: "Déplacement rapide",
     rune_table_screen: "Tableau des runes",
@@ -109,7 +109,7 @@ const FRENCH_MENU: MenuWords = MenuWords {
 const ENGLISH_MENU: MenuWords = MenuWords {
     characters: "Characters",
     shortcuts: "Shortcuts",
-    quick_replies: "Quick replies",
+    quick_texts: "Quick texts",
     auto_focus_screen: "AutoFocus",
     walk_screen: "Quick move",
     rune_table_screen: "Rune table",
@@ -145,7 +145,7 @@ const ENGLISH_MENU: MenuWords = MenuWords {
 const SPANISH_MENU: MenuWords = MenuWords {
     characters: "Personajes",
     shortcuts: "Atajos",
-    quick_replies: "Respuestas rápidas",
+    quick_texts: "Textos rápidos",
     auto_focus_screen: "AutoFocus",
     walk_screen: "Movimiento rápido",
     rune_table_screen: "Tabla de runas",
@@ -685,7 +685,7 @@ fn screen_id(screen: Screen) -> &'static str {
     match screen {
         Screen::Characters => "characters",
         Screen::Shortcuts => "shortcuts",
-        Screen::QuickReplies => "quickReplies",
+        Screen::QuickTexts => "quickTexts",
         Screen::AutoFocus => "autoFocus",
         Screen::Walk => "walk",
         Screen::RuneTable => "runeTable",
@@ -707,7 +707,7 @@ fn screen_label(screen: Screen, language: Language) -> &'static str {
     match screen {
         Screen::Characters => words.characters,
         Screen::Shortcuts => words.shortcuts,
-        Screen::QuickReplies => words.quick_replies,
+        Screen::QuickTexts => words.quick_texts,
         Screen::AutoFocus => words.auto_focus_screen,
         Screen::Walk => words.walk_screen,
         Screen::RuneTable => words.rune_table_screen,

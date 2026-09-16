@@ -103,7 +103,7 @@ const FEATURE_LOOP_PATHS = [
   '/deplacement-rapide',
   '/tableau-des-runes',
   '/messages-prives',
-  '/reponses-rapides'
+  '/textes-rapides'
 ]
 
 describe('matchHasLoop', () => {

@@ -1,46 +1,46 @@
 import React from 'react'
 import { t } from '@lingui/core/macro'
-import type { Binding, QuickReply, QuickReplyId } from '@/@types/shortcuts'
+import type { Binding, QuickText, QuickTextId } from '@/@types/shortcuts'
 import { RemoveButton } from '@/components/remove-button'
 import { ShortcutField } from '@/components/shortcut-field'
 import { Input } from '@/components/ui/input'
 import { matchIsSameBinding } from '@/helpers/binding'
 import type { TonedLine } from '@/helpers/wording'
-import { quickReplyEditLabel } from '@/helpers/wording'
+import { quickTextEditLabel } from '@/helpers/wording'
 import { useDraft } from '@/hooks/use-draft'
 
-export type ReplyRowActions = Readonly<{
-  handleText: (id: QuickReplyId, text: string) => void
-  handleShortcut: (id: QuickReplyId, accelerator: string | null) => void
-  handleRemove: (id: QuickReplyId) => void
-  handleOpen: (id: QuickReplyId) => void
+export type TextRowActions = Readonly<{
+  handleText: (id: QuickTextId, text: string) => void
+  handleShortcut: (id: QuickTextId, accelerator: string | null) => void
+  handleRemove: (id: QuickTextId) => void
+  handleOpen: (id: QuickTextId) => void
   handleClose: () => void
 }>
 
-type ReplyRowProps = Readonly<{
-  quickReply: QuickReply
+type TextRowProps = Readonly<{
+  quickText: QuickText
   rank: number
   statusLine: TonedLine | null
   editing: Binding | null
-  actions: ReplyRowActions
+  actions: TextRowActions
 }>
 
-export const ReplyRow = ({
-  quickReply,
+export const TextRow = ({
+  quickText,
   rank,
   statusLine,
   editing,
   actions
-}: ReplyRowProps) => {
-  const { draft, setDraft } = useDraft(quickReply.text)
+}: TextRowProps) => {
+  const { draft, setDraft } = useDraft(quickText.text)
 
   const handleBlur = () => {
     const text = draft.trim()
 
     setDraft(text)
 
-    if (text !== quickReply.text) {
-      actions.handleText(quickReply.id, text)
+    if (text !== quickText.text) {
+      actions.handleText(quickText.id, text)
     }
   }
 
@@ -50,7 +50,7 @@ export const ReplyRow = ({
     }
 
     if (event.key === 'Escape') {
-      setDraft(quickReply.text)
+      setDraft(quickText.text)
     }
   }
 
@@ -60,7 +60,7 @@ export const ReplyRow = ({
         <Input
           value={draft}
           placeholder={t`Bon jeu à toi !`}
-          aria-label={t`Texte de la réponse`}
+          aria-label={t`Le texte à coller`}
           spellCheck={false}
           onChange={(event) => {
             setDraft(event.target.value)
@@ -76,28 +76,28 @@ export const ReplyRow = ({
         ) : null}
       </div>
       <RemoveButton
-        label={t`Retirer cette réponse`}
+        label={t`Retirer ce texte`}
         onRemove={() => {
-          actions.handleRemove(quickReply.id)
+          actions.handleRemove(quickText.id)
         }}
         className="mt-1"
       />
       <ShortcutField
-        accelerator={quickReply.accelerator}
+        accelerator={quickText.accelerator}
         statusLine={statusLine}
-        editLabel={quickReplyEditLabel(quickReply, rank)}
+        editLabel={quickTextEditLabel(quickText, rank)}
         undo={null}
         editing={{
           isActive: matchIsSameBinding(editing, {
-            kind: 'quickReply',
-            id: quickReply.id
+            kind: 'quickText',
+            id: quickText.id
           }),
           handleOpen: () => {
-            actions.handleOpen(quickReply.id)
+            actions.handleOpen(quickText.id)
           },
           handleClose: actions.handleClose,
           handleCapture: (accelerator) => {
-            actions.handleShortcut(quickReply.id, accelerator)
+            actions.handleShortcut(quickText.id, accelerator)
           }
         }}
       />

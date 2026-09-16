@@ -12,14 +12,14 @@ use tauri_plugin_global_shortcut::ShortcutState;
 use crate::app::Multifus;
 use crate::app::journal::CharacterShortcutOutcome;
 use crate::app::journal::JournalEvent;
-use crate::app::journal::QuickReplyFailure;
+use crate::app::journal::QuickTextFailure;
 use crate::app::journal::RelayStop;
 use crate::app::journal::ShortcutOutcome;
 use crate::app::journal::Surface;
 use crate::app::journal::WalkFrom;
 use crate::app::journal::Work;
 use crate::app::panics;
-use crate::app::quick_replies;
+use crate::app::quick_texts;
 use crate::app::relay;
 use crate::app::rune_table;
 use crate::app::runtime;
@@ -35,7 +35,7 @@ use crate::app::view::ShortcutAction;
 use crate::app::view::ShortcutStatus;
 use crate::app::walk;
 use crate::app::wheel;
-use crate::config::QuickReplyId;
+use crate::config::QuickTextId;
 use crate::platform::GameWindow;
 use crate::platform::PlatformError;
 use crate::platform::WindowId;
@@ -294,7 +294,7 @@ trait Mechanisms {
 
     fn stop_relay(&self);
 
-    fn paste_quick_reply(&self, id: QuickReplyId, here: WindowId);
+    fn paste_quick_text(&self, id: QuickTextId, here: WindowId);
 
     fn open_wheel(&self, here: WindowId);
 
@@ -320,8 +320,8 @@ impl Mechanisms for AppMechanisms<'_> {
         relay::run::stop(self.0, RelayStop::Shortcut);
     }
 
-    fn paste_quick_reply(&self, id: QuickReplyId, here: WindowId) {
-        quick_replies::paste(self.0, id, here);
+    fn paste_quick_text(&self, id: QuickTextId, here: WindowId) {
+        quick_texts::paste(self.0, id, here);
     }
 
     fn open_wheel(&self, here: WindowId) {
@@ -429,7 +429,7 @@ fn act_on(press: &Press, binding: Binding, window: &GameWindow) {
             hold(press.state)
                 .log_unless_repeated(JournalEvent::CharacterShortcut { nickname, outcome });
         }
-        Binding::QuickReply { id } => press.mechanisms.paste_quick_reply(id, window.id()),
+        Binding::QuickText { id } => press.mechanisms.paste_quick_text(id, window.id()),
     }
 }
 
@@ -457,11 +457,11 @@ fn refusal_said(binding: Binding, refusal: Refusal) -> JournalEvent {
                 }
             },
         },
-        Binding::QuickReply { .. } => JournalEvent::QuickReplyFailed {
+        Binding::QuickText { .. } => JournalEvent::QuickTextFailed {
             reason: match refusal {
-                Refusal::OutsideGame => QuickReplyFailure::OutsideGame,
+                Refusal::OutsideGame => QuickTextFailure::OutsideGame,
                 Refusal::ForegroundUnknown { detail } => {
-                    QuickReplyFailure::ForegroundUnknown { detail }
+                    QuickTextFailure::ForegroundUnknown { detail }
                 }
             },
         },
@@ -531,7 +531,7 @@ mod tests {
         WalkToggled,
         AllMaximized,
         RelayStopped,
-        QuickReplyPasted(QuickReplyId, WindowId),
+        QuickTextPasted(QuickTextId, WindowId),
         WheelOpened(WindowId),
         WheelReleased,
         RuneTableToggled(WindowId),
@@ -572,8 +572,8 @@ mod tests {
             self.write_down(Mechanism::RelayStopped);
         }
 
-        fn paste_quick_reply(&self, id: QuickReplyId, here: WindowId) {
-            self.write_down(Mechanism::QuickReplyPasted(id, here));
+        fn paste_quick_text(&self, id: QuickTextId, here: WindowId) {
+            self.write_down(Mechanism::QuickTextPasted(id, here));
         }
 
         fn open_wheel(&self, here: WindowId) {
@@ -702,8 +702,8 @@ mod tests {
         );
         answering(
             &press,
-            Binding::QuickReply {
-                id: QuickReplyId::default(),
+            Binding::QuickText {
+                id: QuickTextId::default(),
             },
         );
 
@@ -714,8 +714,8 @@ mod tests {
                     action: ShortcutAction::Next,
                     outcome: ShortcutOutcome::OutsideGame,
                 },
-                JournalEvent::QuickReplyFailed {
-                    reason: QuickReplyFailure::OutsideGame,
+                JournalEvent::QuickTextFailed {
+                    reason: QuickTextFailure::OutsideGame,
                 },
             ]
         );
@@ -754,8 +754,8 @@ mod tests {
         );
         answering(
             &press,
-            Binding::QuickReply {
-                id: QuickReplyId::default(),
+            Binding::QuickText {
+                id: QuickTextId::default(),
             },
         );
 
@@ -768,8 +768,8 @@ mod tests {
                         detail: detail.clone(),
                     },
                 },
-                JournalEvent::QuickReplyFailed {
-                    reason: QuickReplyFailure::ForegroundUnknown { detail },
+                JournalEvent::QuickTextFailed {
+                    reason: QuickTextFailure::ForegroundUnknown { detail },
                 },
             ]
         );
@@ -897,7 +897,7 @@ mod tests {
     }
 
     #[test]
-    fn a_quick_reply_is_pasted_where_the_player_is_writing_and_nowhere_else() {
+    fn a_quick_text_is_pasted_where_the_player_is_writing_and_nowhere_else() {
         let directory = directory();
         let state = three_in_the_cycle(&directory);
         let windows = FakeWindowManager::showing(Desktop {
@@ -905,7 +905,7 @@ mod tests {
             ..Desktop::default()
         });
         let mechanisms = FakeMechanisms::default();
-        let id = QuickReplyId::default();
+        let id = QuickTextId::default();
 
         answering(
             &Press {
@@ -913,21 +913,21 @@ mod tests {
                 state: &state,
                 mechanisms: &mechanisms,
             },
-            Binding::QuickReply { id },
+            Binding::QuickText { id },
         );
 
         assert_eq!(
             mechanisms.set_going(),
             vec![
                 Mechanism::RelayStopped,
-                Mechanism::QuickReplyPasted(id, WindowId::from_raw(1))
+                Mechanism::QuickTextPasted(id, WindowId::from_raw(1))
             ],
             "the paste aims at the game window the player is writing in"
         );
         assert_eq!(
             windows.asked(),
             Vec::new(),
-            "a quick reply writes, it does not switch"
+            "a quick text writes, it does not switch"
         );
     }
 

@@ -6,7 +6,7 @@ import type {
   JournalEvent,
   MaximizeAllOutcome,
   NotificationOutcome,
-  QuickReplyFailure,
+  QuickTextFailure,
   RosterChange,
   SettingChange,
   ShortcutOutcome,
@@ -17,7 +17,7 @@ import type { NotificationKind } from '@/@types/notification'
 import type { RelayFailure } from '@/@types/relay'
 import type {
   BoundCombination,
-  QuickReply,
+  QuickText,
   ShortcutAction
 } from '@/@types/shortcuts'
 import type { Snapshot } from '@/@types/snapshot'
@@ -29,7 +29,7 @@ import {
   GENDER_GROUP_LINES,
   MAXIMIZE_ALL_TONES,
   NOTICE_LINES,
-  QUICK_REPLY_FAILURE_TONES,
+  QUICK_TEXT_FAILURE_TONES,
   PLAIN_LINES,
   SURFACE_LABELS,
   WALK_FROM_LABELS,
@@ -97,8 +97,8 @@ export const journalTone = (event: JournalEvent): JournalTone => {
     return SHORTCUT_TONES[event.outcome.outcome]
   }
 
-  if (event.kind === 'quickReplyFailed') {
-    return QUICK_REPLY_FAILURE_TONES[event.reason.reason]
+  if (event.kind === 'quickTextFailed') {
+    return QUICK_TEXT_FAILURE_TONES[event.reason.reason]
   }
 
   if (event.kind === 'maximizeAll') {
@@ -194,33 +194,33 @@ const relayFailedLine = ({ reason, detail }: RelayFailure) => {
   }
 }
 
-const quickReplyFailedLine = (failure: QuickReplyFailure) => {
+const quickTextFailedLine = (failure: QuickTextFailure) => {
   switch (failure.reason) {
     case 'outsideGame': {
-      return t`Réponse rapide ignorée : aucune fenêtre Dofus au premier plan.`
+      return t`Texte rapide ignoré : aucune fenêtre Dofus au premier plan.`
     }
     case 'foregroundUnknown': {
       const { detail } = failure
 
-      return t`Réponse rapide ignorée : impossible de savoir quelle fenêtre est au premier plan (${detail}).`
+      return t`Texte rapide ignoré : impossible de savoir quelle fenêtre est au premier plan (${detail}).`
     }
     case 'gone': {
-      return t`Réponse rapide introuvable : elle a été retirée entre l’appui et le collage.`
+      return t`Texte rapide introuvable : il a été retiré entre l’appui et le collage.`
     }
     case 'clipboardRefused': {
       const { detail } = failure
 
-      return t`Réponse rapide non collée : le presse-papiers a refusé le texte (${detail}).`
+      return t`Texte rapide non collé : le presse-papiers a refusé le texte (${detail}).`
     }
     case 'pasteRefused': {
       const { detail } = failure
 
-      return t`Réponse rapide non collée : le système a refusé la combinaison de collage (${detail}).`
+      return t`Texte rapide non collé : le système a refusé la combinaison de collage (${detail}).`
     }
     case 'clipboardNotGivenBack': {
       const { detail } = failure
 
-      return t`Réponse rapide collée, mais le presse-papiers d’avant n’a pas pu être rendu (${detail}).`
+      return t`Texte rapide collé, mais le presse-papiers d’avant n’a pas pu être rendu (${detail}).`
     }
     default: {
       return failure satisfies never
@@ -408,11 +408,11 @@ const settingLine = (change: SettingChange) => {
 
 const shortcutsBoundLine = (
   bindings: readonly BoundCombination[],
-  quickReplies: readonly QuickReply[]
+  quickTexts: readonly QuickText[]
 ) => {
   const bound = bindings
     .map((binding) => {
-      return `${bindingLabel(binding.binding, quickReplies)} ${boundCombinationLabel(binding, quickReplies)}`
+      return `${bindingLabel(binding.binding, quickTexts)} ${boundCombinationLabel(binding, quickTexts)}`
     })
     .join(' · ')
 
@@ -421,7 +421,7 @@ const shortcutsBoundLine = (
 
 const boundCombinationLabel = (
   { accelerator, status }: BoundCombination,
-  quickReplies: readonly QuickReply[]
+  quickTexts: readonly QuickText[]
 ) => {
   const combination = accelerator ?? t`aucune combinaison`
 
@@ -438,7 +438,7 @@ const boundCombinationLabel = (
       return t`${combination} illisible (${detail})`
     }
     case 'duplicate': {
-      const label = bindingLabel(status.binding, quickReplies)
+      const label = bindingLabel(status.binding, quickTexts)
 
       return t`${combination} en doublon avec ${label}, donc inerte`
     }
@@ -470,17 +470,15 @@ const boundCombinations = (snapshot: Snapshot): readonly BoundCombination[] => {
       } as const
     })
 
-  const quickReplies = snapshot.quickReplies.map(
-    ({ id, accelerator, status }) => {
-      return {
-        binding: { kind: 'quickReply', id },
-        accelerator,
-        status
-      } as const
-    }
-  )
+  const quickTexts = snapshot.quickTexts.map(({ id, accelerator, status }) => {
+    return {
+      binding: { kind: 'quickText', id },
+      accelerator,
+      status
+    } as const
+  })
 
-  return [...actions, ...characters, ...quickReplies]
+  return [...actions, ...characters, ...quickTexts]
 }
 
 const journalPeriod = (entries: readonly JournalEntry[]) => {
@@ -497,7 +495,7 @@ export const journalTranscript = (snapshot: Snapshot) => {
   const { journal } = snapshot
 
   const lines = journal.map((entry) => {
-    return `${journalTime(entry.at)}  ${journalLine(entry.event, snapshot.quickReplies)}`
+    return `${journalTime(entry.at)}  ${journalLine(entry.event, snapshot.quickTexts)}`
   })
 
   const { version, system } = snapshot
@@ -517,7 +515,7 @@ export const journalTranscript = (snapshot: Snapshot) => {
     t`Autorisation : ${granted}, écoute ${listening}`,
     t`AutoFocus : ${autoFocus}, réveil des réduites ${minimized}`,
     t`Déplacement rapide : ${walk}`,
-    shortcutsBoundLine(boundCombinations(snapshot), snapshot.quickReplies),
+    shortcutsBoundLine(boundCombinations(snapshot), snapshot.quickTexts),
     t`Configuration : ${path}`,
     t`Mise à jour : ${update}`,
     t`Entrées en mémoire : ${kept}, ${period}`,
@@ -808,7 +806,7 @@ const checkEventLine = ({
 
 const runLine = (
   event: EventOf<RunEventKind>,
-  quickReplies: readonly QuickReply[]
+  quickTexts: readonly QuickText[]
 ) => {
   switch (event.kind) {
     case 'started': {
@@ -847,7 +845,7 @@ const runLine = (
       return notificationLine(event)
     }
     case 'shortcutsBound': {
-      return shortcutsBoundLine(event.bindings, quickReplies)
+      return shortcutsBoundLine(event.bindings, quickTexts)
     }
     case 'startAtLoginReconciled': {
       return event.enabled
@@ -911,13 +909,13 @@ const actionLine = (event: EventOf<ActionEventKind>) => {
     case 'maximizeAll': {
       return maximizeAllLine(event)
     }
-    case 'quickReplyPasted': {
+    case 'quickTextPasted': {
       const { excerpt } = event
 
-      return t`Réponse rapide collée dans le jeu : « ${excerpt} »`
+      return t`Texte rapide collé dans le jeu : « ${excerpt} »`
     }
-    case 'quickReplyFailed': {
-      return quickReplyFailedLine(event.reason)
+    case 'quickTextFailed': {
+      return quickTextFailedLine(event.reason)
     }
     case 'trayFocus': {
       return trayLine(event)
@@ -951,7 +949,7 @@ const actionLine = (event: EventOf<ActionEventKind>) => {
 
 export const journalLine = (
   event: JournalEvent,
-  quickReplies: readonly QuickReply[]
+  quickTexts: readonly QuickText[]
 ) => {
   if (isDetailed(event)) {
     const subject = i18n._(DETAILED_LINES[event.kind])
@@ -964,5 +962,5 @@ export const journalLine = (
     return i18n._(PLAIN_LINES[event.kind])
   }
 
-  return isRunEvent(event) ? runLine(event, quickReplies) : actionLine(event)
+  return isRunEvent(event) ? runLine(event, quickTexts) : actionLine(event)
 }

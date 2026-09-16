@@ -8,7 +8,7 @@ import type { NotificationKind } from '@/@types/notification'
 import type { SystemPage } from '@/@types/onboarding'
 import type { RelayLink } from '@/@types/relay'
 import type { Class, Color, Gender } from '@/@types/roster'
-import type { QuickReplyId, ShortcutAction } from '@/@types/shortcuts'
+import type { QuickTextId, ShortcutAction } from '@/@types/shortcuts'
 import type { Clients, ScreenName, Snapshot } from '@/@types/snapshot'
 import type { BannerCorner, BannerStep } from '@/@types/walk'
 import type { WheelStep } from '@/@types/wheel'
@@ -136,23 +136,23 @@ export const resetShortcuts = async () => {
   return invoke<Snapshot>('reset_shortcuts')
 }
 
-export const addQuickReply = async () => {
-  return invoke<Snapshot>('add_quick_reply')
+export const addQuickText = async () => {
+  return invoke<Snapshot>('add_quick_text')
 }
 
-export const setQuickReplyText = async (id: QuickReplyId, text: string) => {
-  return invoke<Snapshot>('set_quick_reply_text', { id, text })
+export const setQuickTextText = async (id: QuickTextId, text: string) => {
+  return invoke<Snapshot>('set_quick_text_text', { id, text })
 }
 
-export const setQuickReplyShortcut = async (
-  id: QuickReplyId,
+export const setQuickTextShortcut = async (
+  id: QuickTextId,
   accelerator: string | null
 ) => {
-  return invoke<Snapshot>('set_quick_reply_shortcut', { id, accelerator })
+  return invoke<Snapshot>('set_quick_text_shortcut', { id, accelerator })
 }
 
-export const removeQuickReply = async (id: QuickReplyId) => {
-  return invoke<Snapshot>('remove_quick_reply', { id })
+export const removeQuickText = async (id: QuickTextId) => {
+  return invoke<Snapshot>('remove_quick_text', { id })
 }
 
 export const setAutoFocus = async (

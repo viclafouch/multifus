@@ -1355,12 +1355,12 @@ msgid "Relevé le {surveyed}, dans le code de chaque outil."
 msgstr "Consultado el {surveyed}, en el código de cada herramienta."
 
 #: src/constants/wording.ts
-msgid "Réponses rapides"
-msgstr "Respuestas rápidas"
+#~ msgid "Réponses rapides"
+#~ msgstr "Respuestas rápidas"
 
 #: src/constants/wording.ts
-msgid "Réponses rapides au clavier sur Dofus Retro"
-msgstr "Respuestas rápidas con el teclado en Dofus Retro"
+#~ msgid "Réponses rapides au clavier sur Dofus Retro"
+#~ msgstr "Respuestas rápidas con el teclado en Dofus Retro"
 
 #: src/constants/rivals.ts
 #~ msgid "Retient la dernière équipe, pas des compositions nommées."
@@ -1553,6 +1553,14 @@ msgstr "Descargar para Windows"
 #: src/components/download-take.tsx
 msgid "Télécharger une version antérieure"
 msgstr "Descargar una versión anterior"
+
+#: src/constants/wording.ts
+msgid "Textes rapides"
+msgstr "Textos rápidos"
+
+#: src/constants/wording.ts
+msgid "Textes rapides au clavier sur Dofus Retro"
+msgstr "Textos rápidos con el teclado en Dofus Retro"
 
 #: src/constants/bodies.ts
 #~ msgid "Toujours les mêmes, toujours au pire moment."

@@ -51,7 +51,7 @@ export const TRAIT_IDS = [
   'autoFocus',
   'runeTable',
   'relay',
-  'quickReplies',
+  'quickTexts',
   'split',
   'teams',
   'signed',
@@ -129,7 +129,7 @@ export const TRAITS = {
       rorganizer: 'no'
     }
   },
-  quickReplies: {
+  quickTexts: {
     mine: 'yes',
     theirs: {
       dracoon: 'no',
@@ -189,7 +189,7 @@ export const TRAIT_NAMES = {
   autoFocus: msg`AutoFocus`,
   runeTable: PAGE_NAMES.runeTable,
   relay: PAGE_NAMES.relay,
-  quickReplies: PAGE_NAMES.quickReplies,
+  quickTexts: PAGE_NAMES.quickTexts,
   split: msg`Fenêtres rangées côte à côte`,
   teams: msg`Compositions d’équipe enregistrées`,
   signed: msg`Paquet signé`,

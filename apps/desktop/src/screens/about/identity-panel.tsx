@@ -52,7 +52,7 @@ export const IdentityPanel = ({
           </div>
         </div>
         <p className="max-w-tale text-tale text-khaki">
-          {t`Le multicompte sur Dofus Retro, sans quitter le jeu des yeux. Vos fenêtres passent devant au clavier, à la roue des personnages ou au clic, et celle qui vous appelle arrive toute seule. Un raccourci colle une réponse rapide, un autre pose le tableau des runes, et vos messages privés vous rejoignent sur votre téléphone si vous reliez Telegram.`}
+          {t`Le multicompte sur Dofus Retro, sans quitter le jeu des yeux. Vos fenêtres passent devant au clavier, à la roue des personnages ou au clic, et celle qui vous appelle arrive toute seule. Un raccourci colle un texte rapide, un autre pose le tableau des runes, et vos messages privés vous rejoignent sur votre téléphone si vous reliez Telegram.`}
         </p>
       </div>
       <dl className="flex flex-col gap-2 border-t border-band/25 px-4 py-3.5 text-tale">

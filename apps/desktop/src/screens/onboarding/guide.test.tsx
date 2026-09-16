@@ -16,7 +16,7 @@ const FEATURE_NAMES = [
   'La roue des personnages',
   'Le Déplacement rapide',
   'Le tableau des runes',
-  'Les réponses rapides',
+  'Les textes rapides',
   'Les messages privés',
   'Les raccourcis',
   'Vos personnages',

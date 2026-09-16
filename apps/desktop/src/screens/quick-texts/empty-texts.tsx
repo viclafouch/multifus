@@ -6,25 +6,25 @@ import { acceleratorParts } from '@/helpers/accelerator'
 
 const EXAMPLE_ACCELERATOR = 'Control+Alt+KeyB'
 
-type EmptyRepliesProps = Readonly<{
+type EmptyTextsProps = Readonly<{
   handleAdd: () => void
 }>
 
-export const EmptyReplies = ({ handleAdd }: EmptyRepliesProps) => {
+export const EmptyTexts = ({ handleAdd }: EmptyTextsProps) => {
   return (
     <EmptyState
-      title={t`Aucune réponse rangée`}
-      body={t`Une réponse, des touches, et vous ne la retapez plus de la soirée.`}
-      mark={<ReplyMark />}
+      title={t`Aucun texte rangé`}
+      body={t`Un texte, des touches, et vous ne le retapez plus de la soirée.`}
+      mark={<TextMark />}
     >
       <Button variant="slate" size="sm" onClick={handleAdd}>
-        {t`Ajouter une réponse`}
+        {t`Ajouter un texte`}
       </Button>
     </EmptyState>
   )
 }
 
-const ReplyMark = () => {
+const TextMark = () => {
   return (
     <span aria-hidden className="dimmed mb-2 flex items-center gap-4">
       <span className="flex items-center gap-1">

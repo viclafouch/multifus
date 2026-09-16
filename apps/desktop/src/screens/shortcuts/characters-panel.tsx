@@ -1,7 +1,7 @@
 import { t } from '@lingui/core/macro'
 import { Panel } from '@multifus/retro'
 import type { Character } from '@/@types/roster'
-import type { Binding, QuickReply } from '@/@types/shortcuts'
+import type { Binding, QuickText } from '@/@types/shortcuts'
 import { PanelHeader } from '@/components/layout/panel-header'
 import { IS_APPLE } from '@/constants/keyboard'
 import { characterShortcutStatusLine } from '@/helpers/wording'
@@ -10,14 +10,14 @@ import { CharacterShortcutRow } from '@/screens/shortcuts/character-shortcut-row
 
 type CharactersPanelProps = Readonly<{
   characters: readonly Character[]
-  quickReplies: readonly QuickReply[]
+  quickTexts: readonly QuickText[]
   editing: Binding | null
   actions: CharacterShortcutActions
 }>
 
 export const CharactersPanel = ({
   characters,
-  quickReplies,
+  quickTexts,
   editing,
   actions
 }: CharactersPanelProps) => {
@@ -44,7 +44,7 @@ export const CharactersPanel = ({
                 character={character}
                 statusLine={characterShortcutStatusLine(
                   character.shortcutStatus,
-                  quickReplies
+                  quickTexts
                 )}
                 editing={editing}
                 actions={actions}

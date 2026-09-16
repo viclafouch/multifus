@@ -1,6 +1,6 @@
 import { msg } from '@lingui/core/macro'
 import autoFocusLoop from '@multifus/ankama/loops/auto-focus-loop.mp4'
-import quickRepliesLoop from '@multifus/ankama/loops/quick-replies-loop.mp4'
+import quickTextsLoop from '@multifus/ankama/loops/quick-texts-loop.mp4'
 import relayLoop from '@multifus/ankama/loops/relay-loop.mp4'
 import runeTableLoop from '@multifus/ankama/loops/rune-table-loop.mp4'
 import walkLoop from '@multifus/ankama/loops/walk-loop.mp4'
@@ -25,10 +25,10 @@ export const MAP_LOOPS = {
     description: msg`Maintenez vos touches, visez une tête, lâchez : sa fenêtre passe devant.`,
     caption: msg`Les touches maintenues dans le jeu : la roue s’ouvre au milieu de l’écran, la tête visée s’allume, et sa fenêtre passe devant.`
   },
-  quickReplies: {
-    name: 'quickReplies',
-    source: quickRepliesLoop,
-    title: MAP_NAMES.quickReplies,
+  quickTexts: {
+    name: 'quickTexts',
+    source: quickTextsLoop,
+    title: MAP_NAMES.quickTexts,
     description: msg`Une combinaison de touches, et le texte part dans la fenêtre du personnage.`,
     caption: msg`Les touches frappées dans le jeu : le texte tout prêt s’écrit dans la fenêtre du personnage et part, sans quitter le combat.`
   },

@@ -84,7 +84,7 @@ type Arrival = {
 const ARRIVALS = [
   { name: 'shortcuts', mark: 'Changez de personnage sans lâcher la souris.' },
   {
-    name: 'quickReplies',
+    name: 'quickTexts',
     mark: 'Les phrases que vous retapez tous les soirs'
   },
   { name: 'autoFocus', mark: 'Un combat, un échange, un message privé :' },
