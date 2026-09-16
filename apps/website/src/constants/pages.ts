@@ -133,14 +133,14 @@ export const MENU_FEATURES = [
   'quickTexts'
 ] as const satisfies readonly FeatureId[]
 
-export const FOOTER_SOFTWARE = [
+export const SOFTWARE_PAGES = [
   'download',
   'windows',
   'mac',
   'comparison'
 ] as const satisfies readonly PageId[]
 
-export const FOOTER_PROJECT = [
+export const PROJECT_PAGES = [
   'ankama',
   'journal',
   'legal'

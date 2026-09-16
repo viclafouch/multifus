@@ -8,7 +8,7 @@ export const Band = ({ className, children, ...rest }: BandProps) => {
     <section
       {...rest}
       className={cn(
-        'mx-auto flex w-full max-w-world flex-col gap-6 px-4 py-14',
+        'gutter mx-auto flex w-full max-w-world flex-col gap-6 py-14',
         className
       )}
     >

@@ -2,9 +2,14 @@ import React from 'react'
 
 const LINGER = 180
 
+const TIP_WIDE = 288
+
+const TIP_EDGE = 8
+
 type Spot = Readonly<{
   left: number
   top: number
+  wide: number
 }>
 
 export const useTip = () => {
@@ -50,11 +55,33 @@ export const useTip = () => {
     }
   }
 
+  const spotOn = (anchor: HTMLElement): Spot => {
+    const box = anchor.getBoundingClientRect()
+    const wide = Math.min(TIP_WIDE, window.innerWidth - TIP_EDGE * 2)
+    const middle = box.left + box.width / 2
+
+    return {
+      left: Math.min(
+        Math.max(middle, TIP_EDGE + wide / 2),
+        window.innerWidth - TIP_EDGE - wide / 2
+      ),
+      top: box.top,
+      wide
+    }
+  }
+
   const show = (event: React.SyntheticEvent<HTMLElement>) => {
-    const box = event.currentTarget.getBoundingClientRect()
+    hold()
+    setSpot(spotOn(event.currentTarget))
+  }
+
+  const toggle = (event: React.SyntheticEvent<HTMLElement>) => {
+    const anchor = event.currentTarget
 
     hold()
-    setSpot({ left: box.left + box.width / 2, top: box.top })
+    setSpot((shown) => {
+      return shown === null ? spotOn(anchor) : null
+    })
   }
 
   const hide = () => {
@@ -64,5 +91,5 @@ export const useTip = () => {
     }, LINGER)
   }
 
-  return { spot, show, hide, hold }
+  return { spot, show, toggle, hide, hold }
 }

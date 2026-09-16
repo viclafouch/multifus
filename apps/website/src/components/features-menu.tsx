@@ -28,7 +28,7 @@ export const FeaturesMenu = ({ page }: FeaturesMenuProps) => {
   useDismiss(menu)
 
   return (
-    <details ref={menu} className="flex flex-col">
+    <details ref={menu} className="hidden flex-col lg:flex">
       <summary
         aria-current={isHere ? 'location' : undefined}
         className="tab sighted flex cursor-pointer list-none items-center gap-2 text-deed"

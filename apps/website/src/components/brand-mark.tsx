@@ -3,19 +3,24 @@ import { PageLink } from '@/components/page-link'
 
 const LOGO_SIDE = 256
 
-export const BrandMark = () => {
+type BrandMarkProps = Readonly<{
+  onGo?: () => void
+}>
+
+export const BrandMark = ({ onGo }: BrandMarkProps) => {
   return (
     <PageLink
       page="home"
       isBare
-      className="sighted flex items-center gap-2.5 font-carve text-action tracking-chapter text-cream"
+      onClick={onGo}
+      className="sighted flex items-center gap-2.5 font-carve text-bar tracking-micro text-cream lg:text-action lg:tracking-chapter"
     >
       <img
         src={logo}
         alt=""
         width={LOGO_SIDE}
         height={LOGO_SIDE}
-        className="emblem size-9"
+        className="emblem size-8 lg:size-9"
       />
       Multifus
     </PageLink>

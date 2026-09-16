@@ -69,6 +69,8 @@ export const LOOP_HOLD = msg`Pause`
 
 export const INDEPENDENCE = msg`Projet indépendant, sans lien avec Ankama.`
 
+export const TONGUES_TITLE = msg`La langue du site`
+
 export const FEATURES_TAB = msg`Fonctionnalités`
 
 export const FEATURES_TITLE = msg`Les fonctionnalités`

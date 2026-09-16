@@ -47,4 +47,6 @@ export const ANKAMA_FORUM =
 
 export const CONTENT_ANCHOR = 'contenu'
 
+export const MENU_ANCHOR = 'menu'
+
 export const FOLD_ANCHOR = 'ouverture'

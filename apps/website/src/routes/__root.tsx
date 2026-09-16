@@ -63,7 +63,10 @@ export const Route = createRootRoute({
       meta: [
         // oxlint-disable-next-line unicorn/text-encoding-identifier-case -- the HTML specification wants utf-8 on a meta, not the Node label utf8
         { charSet: 'utf-8' },
-        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        {
+          name: 'viewport',
+          content: 'width=device-width, initial-scale=1, viewport-fit=cover'
+        },
         { name: 'robots', content: CRAWL },
         { name: 'author', content: AUTHOR_NAME },
         { name: 'theme-color', content: INK.iron },

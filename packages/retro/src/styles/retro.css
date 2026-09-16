@@ -54,7 +54,7 @@
 
   --text-banner: clamp(2.75rem, 9vw, 5rem);
   --text-banner--line-height: 0.9;
-  --text-chapter: 2.875rem;
+  --text-chapter: clamp(2.125rem, 6.4vw, 2.875rem);
   --text-chapter--line-height: 0.94;
   --text-herald: clamp(1.125rem, 2.2vw, 1.5rem);
   --text-herald--line-height: 1.4;

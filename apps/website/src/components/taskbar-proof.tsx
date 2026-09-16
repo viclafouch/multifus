@@ -51,15 +51,17 @@ export const TaskbarProof = () => {
                 <span className="hand-name rubric">{said}</span>
                 <span className="text-aside text-band">{i18n._(line)}</span>
               </figcaption>
-              <img
-                src={shot.src}
-                alt={i18n._(alt)}
-                width={shot.width}
-                height={shot.height}
-                loading="lazy"
-                decoding="async"
-                className="strip"
-              />
+              <div className="overflow-x-auto">
+                <img
+                  src={shot.src}
+                  alt={i18n._(alt)}
+                  width={shot.width}
+                  height={shot.height}
+                  loading="lazy"
+                  decoding="async"
+                  className="strip w-auto lg:w-full"
+                />
+              </div>
             </figure>
           </React.Fragment>
         )

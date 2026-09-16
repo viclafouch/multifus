@@ -1,43 +1,36 @@
-import { useLingui } from '@lingui/react'
-import { cn, Flag } from '@multifus/retro'
 import type { PageId } from '@/@types/page'
+import { NavGroup } from '@/components/nav-group'
 import { PageLink } from '@/components/page-link'
 import { LANGUAGE_NAMES, LANGUAGES } from '@/constants/languages'
 import { TONGUES_TITLE } from '@/constants/wording'
 
-type LanguageBarProps = Readonly<{
+type LanguageNavProps = Readonly<{
   page: PageId
-  className?: string
+  onGo?: () => void
 }>
 
-export const LanguageBar = ({ page, className }: LanguageBarProps) => {
-  const { i18n } = useLingui()
-
+export const LanguageNav = ({ page, onGo }: LanguageNavProps) => {
   return (
-    <ul
-      aria-label={i18n._(TONGUES_TITLE)}
-      className={cn('flex shrink-0 items-center gap-1.5', className)}
-    >
+    <NavGroup title={TONGUES_TITLE}>
       {LANGUAGES.map((language) => {
         const name = LANGUAGE_NAMES[language]
 
         return (
-          <li key={language} className="flex">
+          <li key={language}>
             <PageLink
               page={page}
               language={language}
               isBare
               hrefLang={language}
               lang={language}
-              aria-label={name}
-              title={name}
-              className="ensign h-4 w-6 sighted"
+              onClick={onGo}
+              className="stud sighted"
             >
-              <Flag language={language} />
+              {name}
             </PageLink>
           </li>
         )
       })}
-    </ul>
+    </NavGroup>
   )
 }

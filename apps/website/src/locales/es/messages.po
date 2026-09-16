@@ -606,6 +606,10 @@ msgstr "F1 en tu primer Enutrof, F2 en el segundo. En Windows una tecla de funci
 msgid "Fenêtres rangées côte à côte"
 msgstr "Ventanas colocadas una al lado de otra"
 
+#: src/components/mast-menu.tsx
+msgid "Fermer le menu"
+msgstr "Cerrar el menú"
+
 #: src/constants/wording.ts
 msgid "Fonctionnalités"
 msgstr "Funcionalidades"
@@ -914,7 +918,7 @@ msgstr "La ventana que juega pasa delante."
 #~ msgid "La forgemagie sans le deuxième écran"
 #~ msgstr "La forjamagia sin la segunda pantalla"
 
-#: src/components/language-bar.tsx
+#: src/constants/wording.ts
 msgid "La langue du site"
 msgstr "El idioma del sitio"
 
@@ -1073,6 +1077,10 @@ msgstr "El juego mantiene el primer plano: un clic en la tabla no trae Multifus 
 #: src/constants/wording.ts
 msgid "Le logiciel"
 msgstr "El programa"
+
+#: src/components/mast-menu.tsx
+msgid "Le menu du site"
+msgstr "El menú del sitio"
 
 #: src/constants/wording.ts
 #~ msgid "Le multicompte Dofus Retro sur Mac Apple Silicon, dans une application signée et notarisée par Apple."
@@ -1585,6 +1593,10 @@ msgstr "Abre Multifus. Te enseña el resto, paso a paso."
 #: src/components/ankama-source.tsx
 msgid "Ouvrir la source"
 msgstr "Abrir la fuente"
+
+#: src/components/mast-menu.tsx
+msgid "Ouvrir le menu"
+msgstr "Abrir el menú"
 
 #: src/constants/ankama.ts
 msgid "Ouvrir ou modifier les fichiers du jeu"

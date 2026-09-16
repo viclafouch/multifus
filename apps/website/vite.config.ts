@@ -145,6 +145,7 @@ export default defineConfig(async ({ mode }) => {
     test: {
       include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
       environment: 'jsdom',
+      setupFiles: ['./src/test-setup.ts'],
       pool: 'vmThreads',
       mockReset: true
     }

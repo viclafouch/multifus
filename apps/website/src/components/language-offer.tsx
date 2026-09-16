@@ -32,7 +32,7 @@ export const LanguageOffer = ({
       aria-label={speaker._(TONGUE_ASIDE)}
       className="absolute inset-x-0 top-full border-b border-border bg-iron shadow-lg"
     >
-      <div className="mx-auto flex max-w-world items-center gap-3 px-4 py-2">
+      <div className="gutter mx-auto flex max-w-world items-center gap-3 py-2">
         <span aria-hidden className="h-4 w-6 shrink-0">
           <Flag language={offered} />
         </span>
@@ -47,7 +47,8 @@ export const LanguageOffer = ({
         </PageLink>
         <Button
           variant="bare"
-          size="icon-tight"
+          size="icon"
+          className="thumbed"
           aria-label={speaker._(TONGUE_CLOSE)}
           onClick={onHide}
         >

@@ -1,7 +1,12 @@
+import React from 'react'
 import ReactDOM from 'react-dom'
 import type { Mark } from '@/@types/rival'
 import { MarkGlyph } from '@/components/mark-glyph'
+import { useMedia } from '@/hooks/use-media'
 import { useTip } from '@/hooks/use-tip'
+import { HOVER } from '@/lib/media'
+
+type TipGeometry = React.CSSProperties & Readonly<Record<'--tip-wide', string>>
 
 type MarkTipProps = Readonly<{
   mark: Mark
@@ -10,17 +15,18 @@ type MarkTipProps = Readonly<{
 }>
 
 export const MarkTip = ({ mark, line, anchor }: MarkTipProps) => {
-  const { spot, show, hide, hold } = useTip()
+  const isHovering = useMedia(HOVER)
+  const { spot, show, toggle, hide, hold } = useTip()
+  const handlers = isHovering
+    ? { onMouseEnter: show, onMouseLeave: hide, onFocus: show, onBlur: hide }
+    : { onClick: toggle }
 
   return (
     <span className="relative block">
       <button
+        {...handlers}
         type="button"
         aria-describedby={anchor}
-        onMouseEnter={show}
-        onMouseLeave={hide}
-        onFocus={show}
-        onBlur={hide}
         className="hinted sighted mx-auto block w-marker"
       >
         <MarkGlyph mark={mark} />
@@ -33,7 +39,13 @@ export const MarkTip = ({ mark, line, anchor }: MarkTipProps) => {
         : ReactDOM.createPortal(
             <span
               role="tooltip"
-              style={{ left: spot.left, top: spot.top }}
+              style={
+                {
+                  left: spot.left,
+                  top: spot.top,
+                  '--tip-wide': `${spot.wide}px`
+                } satisfies TipGeometry
+              }
               onMouseEnter={hold}
               onMouseLeave={hide}
               className="tip"

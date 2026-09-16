@@ -24,6 +24,7 @@ const buttonVariants = cva(
         tight: 'h-6 px-3 text-legend',
         icon: 'size-8',
         'icon-tight': 'size-6',
+        'icon-thumb': 'size-11',
         'icon-pebble': 'size-pebble'
       }
     },

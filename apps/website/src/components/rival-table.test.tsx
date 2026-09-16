@@ -11,6 +11,24 @@ import {
 import { RivalTable } from '@/components/rival-table'
 import { RIVAL_IDS, RIVALS, TRAIT_IDS, TRAIT_NAMES } from '@/constants/rivals'
 import { SPEAKERS } from '@/lib/i18n'
+import { HOVER } from '@/lib/media'
+
+const HALF_NOTE = 'Dans sa fenêtre à lui, pas par-dessus le jeu.'
+
+const pixels = (written: string) => {
+  return Number(written.replace('px', ''))
+}
+
+const pointAt = (kind: 'cursor' | 'finger') => {
+  vi.stubGlobal('matchMedia', (query: string) => {
+    return {
+      matches: query === HOVER && kind === 'cursor',
+      media: query,
+      addEventListener: () => {},
+      removeEventListener: () => {}
+    }
+  })
+}
 
 const show = () => {
   return render(
@@ -23,6 +41,7 @@ const show = () => {
 describe('the table of the comparison', () => {
   afterEach(() => {
     cleanup()
+    vi.unstubAllGlobals()
   })
 
   it('gives its column to Multifus', () => {
@@ -83,6 +102,7 @@ describe('the table of the comparison', () => {
   })
 
   it('raises the bubble when the cursor lands on a half cell', () => {
+    pointAt('cursor')
     show()
 
     const asked = screen.getAllByRole('button')[0]
@@ -91,9 +111,7 @@ describe('the table of the comparison', () => {
 
     fireEvent.mouseEnter(asked)
 
-    expect(screen.getByRole('tooltip').textContent).toBe(
-      'Dans sa fenêtre à lui, pas par-dessus le jeu.'
-    )
+    expect(screen.getByRole('tooltip').textContent).toBe(HALF_NOTE)
 
     vi.useFakeTimers()
     fireEvent.mouseLeave(asked)
@@ -103,6 +121,41 @@ describe('the table of the comparison', () => {
     vi.useRealTimers()
 
     expect(screen.queryByRole('tooltip')).toBeNull()
+  })
+
+  it('opens and shuts the bubble under a finger', () => {
+    pointAt('finger')
+    show()
+
+    const asked = screen.getAllByRole('button')[0]
+
+    fireEvent.click(asked)
+
+    expect(screen.getByRole('tooltip').textContent).toBe(HALF_NOTE)
+
+    fireEvent.click(asked)
+
+    expect(screen.queryByRole('tooltip')).toBeNull()
+  })
+
+  it('keeps the bubble inside the screen near an edge', () => {
+    pointAt('finger')
+    show()
+
+    const asked = screen.getAllByRole('button')[0]
+
+    asked.getBoundingClientRect = () => {
+      return new DOMRect(window.innerWidth - 11, 40, 22, 22)
+    }
+
+    fireEvent.click(asked)
+
+    const bubble = screen.getByRole('tooltip')
+    const wide = pixels(bubble.style.getPropertyValue('--tip-wide'))
+    const left = pixels(bubble.style.left)
+
+    expect(left + wide / 2).toBeLessThanOrEqual(window.innerWidth)
+    expect(left - wide / 2).toBeGreaterThanOrEqual(0)
   })
 
   it('dates its record in French', () => {

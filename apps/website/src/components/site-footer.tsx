@@ -5,14 +5,10 @@ import { buttonVariants } from '@multifus/retro'
 import { GithubLogoIcon } from '@phosphor-icons/react/dist/ssr/GithubLogo'
 import { XLogoIcon } from '@phosphor-icons/react/dist/ssr/XLogo'
 import { BrandMark } from '@/components/brand-mark'
-import { FooterNav } from '@/components/footer-nav'
 import { OutLink } from '@/components/out-link'
+import { PageNav } from '@/components/page-nav'
 import { PerkList } from '@/components/perk-list'
-import {
-  FOOTER_PROJECT,
-  FOOTER_SOFTWARE,
-  MENU_FEATURES
-} from '@/constants/pages'
+import { MENU_FEATURES, PROJECT_PAGES, SOFTWARE_PAGES } from '@/constants/pages'
 import { AUTHOR, AUTHOR_NAME, REPOSITORY } from '@/constants/site'
 import {
   FEATURES_TITLE,
@@ -54,7 +50,7 @@ export const SiteFooter = () => {
   return (
     <footer className="plinth">
       <span aria-hidden className="crest" />
-      <div className="mx-auto flex max-w-world flex-col gap-10 px-4 pt-12 pb-10">
+      <div className="gutter hemmed mx-auto flex max-w-world flex-col gap-10 pt-12">
         <div className="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-brand">
           <div className="flex flex-col items-start gap-5">
             <BrandMark />
@@ -80,9 +76,9 @@ export const SiteFooter = () => {
               })}
             </ul>
           </div>
-          <FooterNav title={FEATURES_TITLE} pages={MENU_FEATURES} />
-          <FooterNav title={SOFTWARE_TITLE} pages={FOOTER_SOFTWARE} />
-          <FooterNav title={PROJECT_TITLE} pages={FOOTER_PROJECT} />
+          <PageNav title={FEATURES_TITLE} pages={MENU_FEATURES} />
+          <PageNav title={SOFTWARE_TITLE} pages={SOFTWARE_PAGES} />
+          <PageNav title={PROJECT_TITLE} pages={PROJECT_PAGES} />
         </div>
         <div className="rule flex flex-col gap-1.5 border-t pt-6">
           <p className="text-aside text-khaki">© {AUTHOR_NAME}</p>

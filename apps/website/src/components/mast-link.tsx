@@ -11,7 +11,11 @@ export const MastLink = ({ page }: MastLinkProps) => {
   const { i18n } = useLingui()
 
   return (
-    <PageLink page={page} isBare className="tab sighted text-deed">
+    <PageLink
+      page={page}
+      isBare
+      className="tab sighted hidden text-deed lg:block"
+    >
       {i18n._(PAGE_NAMES[page])}
     </PageLink>
   )

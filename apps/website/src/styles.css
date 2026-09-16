@@ -17,6 +17,8 @@
   --text-passage: clamp(1.625rem, 2.6vw, 2rem);
   --text-passage--line-height: 1.04;
 
+  --breakpoint-lg: 64rem;
+
   --container-world: var(--page);
   --container-saga: 76ch;
 
@@ -58,6 +60,12 @@
 
   body {
     @apply bg-iron text-foreground antialiased;
+
+    -webkit-tap-highlight-color: color-mix(
+      in srgb,
+      var(--leaf-lit),
+      transparent 82%
+    );
   }
 
   body::before {
@@ -78,6 +86,19 @@
   summary::-webkit-details-marker {
     display: none;
   }
+
+  html:has(.drawer[open]) {
+    overflow: hidden;
+  }
+}
+
+@utility gutter {
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
+}
+
+@utility hemmed {
+  padding-bottom: max(2.5rem, calc(env(safe-area-inset-bottom) + 1.5rem));
 }
 
 @utility world {
@@ -226,11 +247,17 @@
       transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    &:hover::before,
     &:focus-visible::before,
     &:focus-within::before {
       opacity: 1;
       animation: sweep 2.6s linear infinite;
+    }
+
+    @media (hover: hover) {
+      &:hover::before {
+        opacity: 1;
+        animation: sweep 2.6s linear infinite;
+      }
     }
   }
 }
@@ -267,7 +294,7 @@
 
 @utility strip {
   display: block;
-  width: 100%;
+  max-width: none;
   height: auto;
   border-radius: 6px;
   border: 1px solid color-mix(in srgb, var(--band), transparent 66%);
@@ -647,8 +674,16 @@
 
 @utility stud {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 8px;
+  padding-block: --spacing(2);
+  font-size: var(--text-aside);
+  line-height: var(--text-aside--line-height);
+  color: var(--band);
+
+  @media (pointer: coarse) {
+    min-height: --spacing(11);
+  }
   transition-property: color;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 0.2s;
@@ -758,6 +793,82 @@
   border: 1px solid color-mix(in srgb, var(--band), transparent 58%);
   background-color: color-mix(in srgb, var(--deep), transparent 26%);
   box-shadow: 0 22px 48px -30px rgb(0 0 0 / 0.9);
+}
+
+@utility drawer {
+  margin: 0 0 0 auto;
+  width: min(21rem, 86vw);
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  border: 0;
+  padding: 0;
+  overflow: visible;
+  background-color: transparent;
+  color: inherit;
+  translate: 100% 0;
+  transition-property: translate, display, overlay;
+  transition-duration: 0.3s;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-behavior: allow-discrete;
+
+  &[open] {
+    translate: 0 0;
+  }
+
+  &::backdrop {
+    opacity: 0;
+    background-color: color-mix(in srgb, var(--night), transparent 28%);
+    transition-property: opacity, display, overlay;
+    transition-duration: 0.3s;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-behavior: allow-discrete;
+  }
+
+  &[open]::backdrop {
+    opacity: 1;
+  }
+
+  @starting-style {
+    &[open] {
+      translate: 100% 0;
+    }
+
+    &[open]::backdrop {
+      opacity: 0;
+    }
+  }
+}
+
+@utility sheet {
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-block: 1.25rem max(1.75rem, env(safe-area-inset-bottom));
+  padding-inline: 1.25rem max(1.25rem, env(safe-area-inset-right));
+  border-left: 1px solid color-mix(in srgb, var(--band), transparent 48%);
+  background-color: var(--deep);
+  background-image: radial-gradient(
+    116% 54% at 100% 0%,
+    color-mix(in oklch, var(--tint), transparent 86%) 0%,
+    transparent 64%
+  );
+  box-shadow: -28px 0 64px -26px rgb(0 0 0 / 0.95);
+}
+
+@utility brink {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  bottom: 1px;
+  width: 2.5rem;
+  border-radius: 0 12px 12px 0;
+  pointer-events: none;
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--iron), transparent 4%) 100%
+  );
 }
 
 @utility canopy {
@@ -1056,7 +1167,23 @@
   }
 }
 
+@utility thumbed {
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: --spacing(11);
+    height: --spacing(11);
+    transform: translate(-50%, -50%);
+  }
+}
+
 @utility hinted {
+  @apply thumbed;
+
   cursor: help;
   border-radius: 50%;
   transition: box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1083,7 +1210,7 @@
   position: fixed;
   z-index: 60;
   width: max-content;
-  max-width: min(22rem, calc(100vw - 2rem));
+  max-width: var(--tip-wide);
   border-radius: 8px;
   border: 1px solid color-mix(in srgb, var(--amber), transparent 58%);
   background-color: var(--deep);
@@ -1234,6 +1361,11 @@
   }
 
   .ask::details-content {
+    transition: none !important;
+  }
+
+  .drawer,
+  .drawer::backdrop {
     transition: none !important;
   }
 
