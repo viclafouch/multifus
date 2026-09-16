@@ -14,7 +14,7 @@
 - [ ] Écrire à `contact@ankama.com` le jour où le domaine est acheté
 - [ ] Créer le projet Vercel, racine `apps/website`, sur `dist/client`, sans réécriture attrape-tout
 - [ ] Désigner le domaine principal dans Vercel, pour que l'autre variante réponde en 308
-- [ ] Tourner les trois boucles doublures avec `make-loop` : messages privés, textes rapides, accueil, et recouper les deux aperçus qui en descendent
+- [ ] Tourner la boucle doublure de l'accueil avec `make-loop`
 - [ ] Reprendre les quatre phrases des Messages privés et des Textes rapides, les vraies boucles tournées
 - [ ] Poser le crochet de déploiement Vercel dans le workflow `release`, après la publication
 - [ ] Brancher `/journal` sur `apps/desktop/CHANGELOG.md`, que la première release écrira

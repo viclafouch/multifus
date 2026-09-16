@@ -23,7 +23,7 @@ import type { FeatureId, Loop, LoopId } from '@/@types/page'
 
 const FILMED_ON = '2026-09-08'
 
-const QUICK_TEXTS_FILMED_ON = '2026-09-16'
+const REFILMED_ON = '2026-09-16'
 
 export const POSTER_SIZE = { width: 1280, height: 720 } as const satisfies Size
 
@@ -67,17 +67,17 @@ export const LOOPS = {
   },
   relay: {
     source: relayLoop,
-    size: { width: 1384, height: 778 },
+    size: { width: 1152, height: 648 },
     poster: relayPoster,
-    seconds: 13,
-    filmed: FILMED_ON
+    seconds: 5,
+    filmed: REFILMED_ON
   },
   quickTexts: {
     source: quickTextsLoop,
     size: { width: 800, height: 450 },
     poster: quickTextsPoster,
     seconds: 12,
-    filmed: QUICK_TEXTS_FILMED_ON
+    filmed: REFILMED_ON
   }
 } as const satisfies Record<LoopId, Loop>
 
