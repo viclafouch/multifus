@@ -497,18 +497,19 @@
   }
 }
 
-@utility sidenote {
+@utility caveat {
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  border-radius: 10px;
-  border: 1px solid color-mix(in srgb, var(--amber), transparent 76%);
-  background-color: color-mix(in srgb, var(--amber), transparent 93%);
-  padding: 13px 16px;
+
+  &:not(:first-child) {
+    border-top: 1px solid color-mix(in srgb, var(--amber), transparent 86%);
+    padding-top: 16px;
+  }
 
   & > svg {
     flex: none;
-    margin-top: 3px;
+    margin-top: 5px;
     width: 18px;
     height: 18px;
     color: var(--amber);
