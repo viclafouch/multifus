@@ -114,6 +114,10 @@ msgstr "Ankama can change its mind. On that day, Multifus stops."
 #~ msgstr "Backing out is as easy as going"
 
 #: src/constants/bodies.ts
+msgid "Apple a vérifié le fichier"
+msgstr "Apple checked the file"
+
+#: src/constants/bodies.ts
 #~ msgid "Aucun avertissement ne vous dira que l’auteur n’a pas pu être vérifié."
 #~ msgstr "No warning will tell you the developer could not be verified."
 
@@ -191,8 +195,8 @@ msgid "C’est là que ses cases ont été lues, et vous pouvez lire le même co
 msgstr "That is where its marks were read, and you can read the same code we did."
 
 #: src/constants/bodies.ts
-msgid "C’est pour ça que si peu de projets gratuits le font, et le comparatif le montre."
-msgstr "That is why so few free projects do it, and the comparison shows it."
+#~ msgid "C’est pour ça que si peu de projets gratuits le font, et le comparatif le montre."
+#~ msgstr "That is why so few free projects do it, and the comparison shows it."
 
 #: src/screens/comparison-screen.tsx
 msgid "C’est un choix, et il ne changera pas : Multifus amène devant vous celle du personnage qui joue, il ne redessine pas votre bureau."
@@ -239,8 +243,8 @@ msgstr "Does it work on Windows 11?"
 #~ msgstr "This market is full of copycats, and you are right to be wary. Here are four things you can check yourself."
 
 #: src/constants/bodies.ts
-msgid "Ce n’est pas un portage"
-msgstr "Not a port"
+#~ msgid "Ce n’est pas un portage"
+#~ msgstr "Not a port"
 
 #: src/constants/wording.ts
 #~ msgid "Ce qu’Ankama en dit"
@@ -390,6 +394,10 @@ msgstr "Published code"
 msgid "Code publié, sans licence libre."
 msgstr "Code published, with no free licence."
 
+#: src/constants/bodies.ts
+msgid "Commande et Option s’affichent comme sur votre clavier, pas Ctrl et Alt."
+msgstr "Command and Option show up the way your keyboard writes them, not Ctrl and Alt."
+
 #: src/constants/wording.ts
 msgid "Comparatif"
 msgstr "Comparison"
@@ -487,6 +495,10 @@ msgstr "Trade, party, guild, private message, challenge, craft, Perceptor attack
 #~ msgstr "Write to the author"
 
 #: src/constants/bodies.ts
+msgid "Elle fait payer cette vérification chaque année, et peu de logiciels gratuits la paient."
+msgstr "Apple charges for that check every year, and few free apps pay for it."
+
+#: src/constants/bodies.ts
 #~ msgid "Elle ignore vos personnages déconnectés."
 #~ msgstr "It ignores your offline characters."
 
@@ -563,8 +575,8 @@ msgid "Et après ?"
 msgstr "And then?"
 
 #: src/constants/bodies.ts
-msgid "Et la touche s’écrit comme sur votre clavier."
-msgstr "And the key is spelled the way your keyboard spells it."
+#~ msgid "Et la touche s’écrit comme sur votre clavier."
+#~ msgstr "And the key is spelled the way your keyboard spells it."
 
 #: src/screens/windows-screen.tsx
 msgid "Et son exécution au démarrage de Windows, si vous cochez la case."
@@ -735,6 +747,10 @@ msgstr "It carries private messages, and nothing from trade, guild or recruitmen
 #~ msgstr "It switches itself off as soon as it has nowhere left to go."
 
 #: src/constants/bodies.ts
+msgid "Il s’ouvre au premier double-clic"
+msgstr "It opens on the first double-click"
+
+#: src/constants/bodies.ts
 #~ msgid "Il se règle pour ne pas gêner"
 #~ msgstr "It adjusts so it does not get in the way"
 
@@ -861,6 +877,10 @@ msgstr "The colour of the character."
 #: src/constants/bodies.ts
 msgid "La couleur que vous leur donnez les distingue là où le portrait ne suffit plus."
 msgstr "The colour you give them tells them apart where the portrait no longer can."
+
+#: src/constants/shots.ts
+msgid "La fenêtre de Multifus sur Mac, par-dessus les clients Dofus Retro ouverts sur le bureau."
+msgstr "The Multifus window on Mac, over the Dofus Retro clients open on the desktop."
 
 #: src/constants/shots.ts
 msgid "La fenêtre de Multifus sur Windows, par-dessus les clients Dofus Retro, et la barre des tâches avec un bouton par personnage."
@@ -1051,6 +1071,14 @@ msgid "Le logiciel"
 msgstr "The software"
 
 #: src/constants/wording.ts
+#~ msgid "Le multicompte Dofus Retro sur Mac Apple Silicon, dans une application signée et notarisée par Apple."
+#~ msgstr "Dofus Retro multi-accounting on Apple Silicon Macs, in an app signed and notarised by Apple."
+
+#: src/constants/wording.ts
+msgid "Le multicompte Dofus Retro sur Mac, dans une application qu’Apple a vérifiée."
+msgstr "Dofus Retro multi-accounting on Mac, in an app Apple has checked."
+
+#: src/constants/wording.ts
 msgid "Le multicompte Dofus Retro sur Windows 10 et 11, avec une barre des tâches personnalisable."
 msgstr "Dofus Retro multi-accounting on Windows 10 and 11, with a taskbar you can shape yourself."
 
@@ -1091,8 +1119,8 @@ msgstr "The number of clicks does not change: what goes away is hunting for a wi
 #~ msgstr "The number of clicks does not change."
 
 #: src/constants/bodies.ts
-msgid "Le paquet est construit pour Apple Silicon, et ne vise pas les Mac Intel."
-msgstr "The package is built for Apple Silicon, and does not target Intel Macs."
+#~ msgid "Le paquet est construit pour Apple Silicon, et ne vise pas les Mac Intel."
+#~ msgstr "The package is built for Apple Silicon, and does not target Intel Macs."
 
 #: src/constants/bodies.ts
 #~ msgid "Le paquet est construit pour Apple Silicon."
@@ -1199,8 +1227,8 @@ msgstr "Not interested in other people’s crafts? Switch that one off, keep the
 #~ msgstr "The two messages"
 
 #: src/constants/bodies.ts
-msgid "Les deux systèmes sont construits à partir du même code."
-msgstr "Both systems are built from the same code."
+#~ msgid "Les deux systèmes sont construits à partir du même code."
+#~ msgstr "Both systems are built from the same code."
 
 #: src/constants/legal.ts
 #~ msgid "Les images et les vidéos du site viennent du jeu et restent à eux."
@@ -1242,13 +1270,17 @@ msgstr "The sentences you retype twenty times a day"
 msgid "Les questions qu’on se pose"
 msgstr "The questions people ask"
 
+#: src/constants/bodies.ts
+msgid "Les six fonctionnalités du menu sont là, sans exception."
+msgstr "All six features from the menu are there, with none missing."
+
 #: src/screens/home-screen.tsx
 msgid "Les six mécanismes à l’œuvre dans le jeu"
 msgstr "The six mechanisms at work in the game"
 
 #: src/constants/bodies.ts
-msgid "Les six mécanismes sont là"
-msgstr "All six mechanisms are there"
+#~ msgid "Les six mécanismes sont là"
+#~ msgstr "All six mechanisms are there"
 
 #: src/constants/bodies.ts
 #~ msgid "Les six mécanismes sont là."
@@ -1325,6 +1357,10 @@ msgstr "Multifus brings the window of the character playing Dofus Retro right in
 #: src/constants/bodies.ts
 #~ msgid "Multifus est déjà là quand vous ouvrez vos clients, et il vit à côté de l’horloge."
 #~ msgstr "Multifus is already there when you open your clients, and it lives next to the clock."
+
+#: src/constants/bodies.ts
+msgid "Multifus est fait pour les Mac Apple Silicon, ceux qui ont une puce M1 ou plus récente, pas pour les Mac Intel."
+msgstr "Multifus is built for Apple Silicon Macs, the ones with an M1 chip or newer, not for Intel Macs."
 
 #: src/constants/wording.ts
 msgid "Multifus est gratuit, pour Mac et pour Windows. Trois gestes, et vous jouez en multicompte sur Dofus Retro."
@@ -1419,12 +1455,12 @@ msgid "Multifus sur Windows"
 msgstr "Multifus on Windows"
 
 #: src/constants/wording.ts
-msgid "Multifus tourne sur Mac, signé et notarisé par Apple."
-msgstr "Multifus runs on Mac, signed and notarised by Apple."
+#~ msgid "Multifus tourne sur Mac, signé et notarisé par Apple."
+#~ msgstr "Multifus runs on Mac, signed and notarised by Apple."
 
 #: src/constants/bodies.ts
-msgid "Multifus tourne sur macOS avec les mêmes mécanismes que sur Windows, dans un paquet signé et notarisé par Apple."
-msgstr "Multifus runs on macOS with the same mechanisms as on Windows, in a package signed and notarised by Apple."
+#~ msgid "Multifus tourne sur macOS avec les mêmes mécanismes que sur Windows, dans un paquet signé et notarisé par Apple."
+#~ msgstr "Multifus runs on macOS with the same mechanisms as on Windows, in a package signed and notarised by Apple."
 
 #: src/constants/bodies.ts
 #~ msgid "Multifus tourne sur macOS avec les mêmes mécanismes que sur Windows. Le paquet est signé et notarisé par Apple, donc il s’ouvre normalement."
@@ -1555,12 +1591,16 @@ msgid "Par Telegram, sur votre téléphone"
 msgstr "Through Telegram, on your phone"
 
 #: src/constants/bodies.ts
-msgid "Pas de clic droit pour forcer l’ouverture, aucun avertissement sur un auteur non vérifié."
-msgstr "No right click to force it open, no warning about an author who could not be verified."
+#~ msgid "Pas de clic droit pour forcer l’ouverture, aucun avertissement sur un auteur non vérifié."
+#~ msgstr "No right click to force it open, no warning about an author who could not be verified."
 
 #: src/constants/bodies.ts
 #~ msgid "Pas de clic droit pour forcer l’ouverture."
 #~ msgstr "No right-click to force it open."
+
+#: src/constants/bodies.ts
+msgid "Pas de clic droit, pas d’alerte, rien à aller autoriser dans les Réglages."
+msgstr "No right-click, no warning, nothing to go and allow in Settings."
 
 #: src/constants/rivals.ts
 msgid "Pas signé, mais l’attestation GitHub y est."
@@ -1597,6 +1637,10 @@ msgstr "Put it where you like: it comes back there next launch and follows the w
 #: src/constants/bodies.ts
 msgid "Poussé à fond, il reste toujours assez visible pour se lire."
 msgstr "Pushed all the way, it always stays readable."
+
+#: src/constants/bodies.ts
+msgid "Presque tous les gestionnaires pour Dofus Retro s’arrêtent à Windows. Multifus est né sur Mac, et c’est de là que part la version Windows."
+msgstr "Almost every manager for Dofus Retro stops at Windows. Multifus was born on Mac, and the Windows version comes from there."
 
 #: src/constants/wording.ts
 msgid "Projet indépendant, sans lien avec Ankama."
@@ -1655,8 +1699,8 @@ msgstr "Back to the home page"
 #~ msgstr "Back to the top"
 
 #: src/constants/bodies.ts
-msgid "Rien à contourner pour l’installer"
-msgstr "Nothing to work around to install it"
+#~ msgid "Rien à contourner pour l’installer"
+#~ msgstr "Nothing to work around to install it"
 
 #: src/screens/download-screen.tsx
 #~ msgid "Rien à régler avant de jouer : au premier lancement, Multifus vous prend par la main."
@@ -1743,8 +1787,8 @@ msgstr "The nickname only."
 #~ msgstr "Signed by Apple."
 
 #: src/constants/bodies.ts
-msgid "Signer coûte de l’argent chaque année"
-msgstr "Signing costs money every year"
+#~ msgid "Signer coûte de l’argent chaque année"
+#~ msgstr "Signing costs money every year"
 
 #: src/constants/bodies.ts
 #~ msgid "Signer coûte de l’argent chaque année."
@@ -1865,6 +1909,10 @@ msgstr "Quick texts from the keyboard on Dofus Retro"
 #: src/constants/bodies.ts
 #~ msgid "Toujours les mêmes, toujours au pire moment."
 #~ msgstr "Always the same ones, always at the worst moment."
+
+#: src/constants/bodies.ts
+msgid "Tout ce qu’il y a sur PC"
+msgstr "Everything the PC version has"
 
 #: src/screens/download-screen.tsx
 #~ msgid "Tout ce que Multifus fait se lit sur GitHub, et vous pouvez le compiler vous-même."
@@ -2081,6 +2129,10 @@ msgstr "Your clients no longer stack: each one keeps its place."
 #: src/screens/windows-screen.tsx
 #~ msgid "Vos fenêtres vous sont rendues. Multifus fermé, le titre et l’icône d’origine reviennent."
 #~ msgstr "Your windows are handed back. Once Multifus is closed, the original title and icon return."
+
+#: src/constants/bodies.ts
+msgid "Vos raccourcis parlent Mac"
+msgstr "Your shortcuts speak Mac"
 
 #: src/screens/windows-screen.tsx
 msgid "Votre barre des tâches devient votre team"

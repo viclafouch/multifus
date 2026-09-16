@@ -9,7 +9,7 @@ import type {
   WebSite
 } from 'schema-dts'
 import type { Language } from '@/@types/language'
-import type { LoopId, PageId } from '@/@types/page'
+import type { LoopId, PageId, PageKind } from '@/@types/page'
 import { HOST } from '@/constants/host'
 import { LOOPS } from '@/constants/loops'
 import { OG_HEIGHT, OG_IMAGE, OG_WIDTH } from '@/constants/og'
@@ -52,10 +52,10 @@ const WEBSITE_AT = `${HOST}/#website`
 
 const SOFTWARE_AT = `${HOST}/#multifus`
 
-const matchHasSoftware = (page: PageId) => {
-  const { kind } = PAGES[page]
+const SOFTWARE_KINDS = new Set<PageKind>(['home', 'download', 'mac', 'windows'])
 
-  return kind === 'home' || kind === 'download' || kind === 'windows'
+const matchHasSoftware = (page: PageId) => {
+  return SOFTWARE_KINDS.has(PAGES[page].kind)
 }
 
 const personOf = () => {

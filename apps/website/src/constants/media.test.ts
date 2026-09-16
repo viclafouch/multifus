@@ -7,6 +7,7 @@ import { LOOPS, PEEK_SIZE, PEEKS, POSTER_SIZE } from '@/constants/loops'
 import { PAGE_IDS } from '@/constants/pages'
 import {
   HOME_SHOT,
+  MAC_SHOT,
   TASKBAR_SPLIT_SHOT,
   TASKBAR_STACKED_SHOT,
   WINDOWS_SHOT
@@ -59,11 +60,15 @@ const sizeOnDisk = async (served: string) => {
 
 const everySizeDeclared = () => {
   const declared = new Map<string, Size>(
-    [HOME_SHOT, WINDOWS_SHOT, TASKBAR_STACKED_SHOT, TASKBAR_SPLIT_SHOT].map(
-      ({ src, width, height }) => {
-        return [src, { width, height }]
-      }
-    )
+    [
+      HOME_SHOT,
+      MAC_SHOT,
+      WINDOWS_SHOT,
+      TASKBAR_STACKED_SHOT,
+      TASKBAR_SPLIT_SHOT
+    ].map(({ src, width, height }) => {
+      return [src, { width, height }]
+    })
   )
 
   for (const page of PAGE_IDS) {
@@ -98,7 +103,7 @@ const DECLARED = everySizeDeclared()
 
 describe('the sizes the pages reserve', () => {
   it('finds every decor, screenshot, poster, peek and loop', () => {
-    expect(DECLARED).toHaveLength(35)
+    expect(DECLARED).toHaveLength(36)
   })
 
   it.each(DECLARED)('matches the file behind %s', async (served, size) => {

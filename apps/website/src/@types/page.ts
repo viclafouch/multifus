@@ -24,6 +24,7 @@ export type PageKind =
   | 'feature'
   | 'home'
   | 'legal'
+  | 'mac'
   | 'plain'
   | 'windows'
 

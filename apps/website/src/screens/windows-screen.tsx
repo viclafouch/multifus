@@ -9,22 +9,19 @@ import { ShieldCheckIcon } from '@phosphor-icons/react/dist/ssr/ShieldCheck'
 import { UsersThreeIcon } from '@phosphor-icons/react/dist/ssr/UsersThree'
 import type { Point } from '@/@types/body'
 import type { PageScreenProps } from '@/@types/screen'
-import { AppShot } from '@/components/app-shot'
 import { Band } from '@/components/band'
 import { BandTitle } from '@/components/band-title'
 import { CaveatList } from '@/components/caveat-list'
 import { CharacterKeys } from '@/components/character-keys'
-import { DownloadCall } from '@/components/download-call'
 import { FeatureCard } from '@/components/feature-card'
-import { PageHead } from '@/components/page-head'
 import { PageLink } from '@/components/page-link'
 import { PointList } from '@/components/point-list'
 import { Prose } from '@/components/prose'
 import { Question } from '@/components/question'
+import { SystemStage } from '@/components/system-stage'
 import { TaskbarProof } from '@/components/taskbar-proof'
 import { MENU_FEATURES } from '@/constants/pages'
 import { WINDOWS_SHOT, WINDOWS_SHOT_ALT } from '@/constants/shots'
-import { FOLD_ANCHOR } from '@/constants/site'
 import {
   QUESTIONS_TITLE,
   NO_HARM,
@@ -95,18 +92,7 @@ export const WindowsScreen = ({ page }: PageScreenProps) => {
 
   return (
     <>
-      <Band
-        id={FOLD_ANCHOR}
-        className="marquee grid gap-x-12 gap-y-10 pt-12 pb-14"
-      >
-        <div className="flex flex-col gap-7">
-          <PageHead page={page} />
-          <DownloadCall className="surface-4" />
-        </div>
-        <div className="unveil">
-          <AppShot shot={WINDOWS_SHOT} alt={WINDOWS_SHOT_ALT} />
-        </div>
-      </Band>
+      <SystemStage page={page} shot={WINDOWS_SHOT} alt={WINDOWS_SHOT_ALT} />
       <Band className="reveal gap-7 pt-4 pb-10">
         <BandTitle>{i18n._(FEATURES_TITLE)}</BandTitle>
         <ul className="mosaic">

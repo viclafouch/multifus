@@ -17,6 +17,12 @@ const WITH_BODY = PAGE_IDS.flatMap((page) => {
   return body === null ? [] : [{ page, body }]
 })
 
+const BODIED = PAGE_IDS.filter((page) => {
+  const { kind } = PAGES[page]
+
+  return kind === 'feature' || kind === 'mac'
+})
+
 const TRANSLATED = LANGUAGES.filter((language) => {
   return language !== SOURCE_LANGUAGE
 })
@@ -38,18 +44,14 @@ const frenchOf = (body: Body) => {
 }
 
 describe('the body of the pages', () => {
-  it('lays a body only on a feature', () => {
+  it('lays a body only on a feature and on the Mac page', () => {
     for (const page of PAGE_IDS) {
-      expect(PAGE_BODIES[page] === null).toBe(PAGES[page].kind !== 'feature')
+      expect(PAGE_BODIES[page] === null).toBe(!BODIED.includes(page))
     }
   })
 
-  it('writes a body for each feature', () => {
-    const features = PAGE_IDS.filter((page) => {
-      return PAGES[page].kind === 'feature'
-    })
-
-    expect(WITH_BODY).toHaveLength(features.length)
+  it('writes a body for each of them', () => {
+    expect(WITH_BODY).toHaveLength(BODIED.length)
   })
 
   it.each(WITH_BODY)('gives at least three boons to $page', ({ body }) => {

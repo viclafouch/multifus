@@ -60,7 +60,7 @@ export const PAGES = {
     }
   },
   mac: {
-    kind: 'feature',
+    kind: 'mac',
     loop: null,
     kin: ['autoFocus', 'walk'],
     slugs: { fr: 'mac', en: 'mac', es: 'mac' }

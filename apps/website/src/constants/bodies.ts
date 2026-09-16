@@ -21,7 +21,6 @@ import { PowerIcon } from '@phosphor-icons/react/dist/ssr/Power'
 import { PushPinIcon } from '@phosphor-icons/react/dist/ssr/PushPin'
 import { SlidersHorizontalIcon } from '@phosphor-icons/react/dist/ssr/SlidersHorizontal'
 import { SquaresFourIcon } from '@phosphor-icons/react/dist/ssr/SquaresFour'
-import { StackSimpleIcon } from '@phosphor-icons/react/dist/ssr/StackSimple'
 import { StorefrontIcon } from '@phosphor-icons/react/dist/ssr/Storefront'
 import { TelegramLogoIcon } from '@phosphor-icons/react/dist/ssr/TelegramLogo'
 import { TranslateIcon } from '@phosphor-icons/react/dist/ssr/Translate'
@@ -200,31 +199,31 @@ export const PAGE_BODIES = {
     caveats: [msg`Elles posent du texte sur une ligne, et rien d’autre.`]
   },
   mac: {
-    lead: msg`Multifus tourne sur macOS avec les mêmes mécanismes que sur Windows, dans un paquet signé et notarisé par Apple.`,
+    lead: msg`Presque tous les gestionnaires pour Dofus Retro s’arrêtent à Windows. Multifus est né sur Mac, et c’est de là que part la version Windows.`,
     boons: [
       {
         icon: AppleLogoIcon,
-        title: msg`Rien à contourner pour l’installer`,
-        line: msg`Pas de clic droit pour forcer l’ouverture, aucun avertissement sur un auteur non vérifié.`
-      },
-      {
-        icon: StackSimpleIcon,
-        title: msg`Ce n’est pas un portage`,
-        line: msg`Les deux systèmes sont construits à partir du même code.`
-      },
-      {
-        icon: SquaresFourIcon,
-        title: msg`Les six mécanismes sont là`,
-        line: msg`Et la touche s’écrit comme sur votre clavier.`
+        title: msg`Il s’ouvre au premier double-clic`,
+        line: msg`Pas de clic droit, pas d’alerte, rien à aller autoriser dans les Réglages.`
       },
       {
         icon: CertificateIcon,
-        title: msg`Signer coûte de l’argent chaque année`,
-        line: msg`C’est pour ça que si peu de projets gratuits le font, et le comparatif le montre.`
+        title: msg`Apple a vérifié le fichier`,
+        line: msg`Elle fait payer cette vérification chaque année, et peu de logiciels gratuits la paient.`
+      },
+      {
+        icon: SquaresFourIcon,
+        title: msg`Tout ce qu’il y a sur PC`,
+        line: msg`Les six fonctionnalités du menu sont là, sans exception.`
+      },
+      {
+        icon: KeyboardIcon,
+        title: msg`Vos raccourcis parlent Mac`,
+        line: msg`Commande et Option s’affichent comme sur votre clavier, pas Ctrl et Alt.`
       }
     ],
     caveats: [
-      msg`Le paquet est construit pour Apple Silicon, et ne vise pas les Mac Intel.`,
+      msg`Multifus est fait pour les Mac Apple Silicon, ceux qui ont une puce M1 ou plus récente, pas pour les Mac Intel.`,
       msg`Le pseudo, la tête de classe et le bouton par personnage n’existent que sur la barre des tâches de Windows.`,
       msg`Un client en plein écran prend un bureau à lui, et la bascule devient un glissement d’un bureau à l’autre.`
     ]

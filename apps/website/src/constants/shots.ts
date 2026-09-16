@@ -1,5 +1,6 @@
 import { msg } from '@lingui/core/macro'
 import homeShot from '@multifus/ankama/images/multifus-home.webp'
+import macShot from '@multifus/ankama/images/multifus-mac.webp'
 import windowsShot from '@multifus/ankama/images/multifus-windows.webp'
 import taskbarSplitShot from '@multifus/ankama/images/windows-taskbar-split.webp'
 import taskbarStackedShot from '@multifus/ankama/images/windows-taskbar-stacked.webp'
@@ -12,6 +13,14 @@ export const HOME_SHOT = {
 } as const satisfies Picture
 
 export const HOME_SHOT_ALT = msg`La fenêtre de Multifus, avec le menu des fonctionnalités à gauche et la place des personnages connectés au centre.`
+
+export const MAC_SHOT = {
+  src: macShot,
+  width: 1920,
+  height: 1080
+} as const satisfies Picture
+
+export const MAC_SHOT_ALT = msg`La fenêtre de Multifus sur Mac, par-dessus les clients Dofus Retro ouverts sur le bureau.`
 
 export const WINDOWS_SHOT = {
   src: windowsShot,

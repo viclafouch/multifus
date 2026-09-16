@@ -45,7 +45,7 @@ export const PAGE_PROMISES = {
   runeTable: msg`Le poids des runes posé par-dessus le jeu.`,
   relay: msg`Les messages privés vous suivent au téléphone.`,
   quickTexts: msg`Un texte tout prêt part sous vos touches.`,
-  mac: msg`Multifus tourne sur Mac, signé et notarisé par Apple.`,
+  mac: msg`Le multicompte Dofus Retro sur Mac, dans une application qu’Apple a vérifiée.`,
   windows: msg`Le multicompte Dofus Retro sur Windows 10 et 11, avec une barre des tâches personnalisable.`,
   comparison: msg`Multifus et les autres gestionnaires, ligne par ligne.`,
   download: msg`Multifus est gratuit, pour Mac et pour Windows. Trois gestes, et vous jouez en multicompte sur Dofus Retro.`,

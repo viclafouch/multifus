@@ -63,6 +63,7 @@ const WITHOUT_HOME = PAGE_IDS.filter((page) => {
 const WITH_SOFTWARE = [
   'home',
   'download',
+  'mac',
   'windows'
 ] as const satisfies readonly PageId[]
 
