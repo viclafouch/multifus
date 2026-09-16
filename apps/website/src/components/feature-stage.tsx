@@ -13,9 +13,9 @@ export const FeatureStage = ({ page, loop }: FeatureStageProps) => {
   const { i18n } = useLingui()
 
   return (
-    <div className="relative flex w-full flex-col">
-      <LoopPlate loop={loop} caption={i18n._(PAGE_PROMISES[page])} />
+    <div className="flex w-full flex-col gap-8">
       <Blazon page={page} />
+      <LoopPlate loop={loop} caption={i18n._(PAGE_PROMISES[page])} />
     </div>
   )
 }

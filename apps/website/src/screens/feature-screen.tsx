@@ -23,16 +23,16 @@ export const FeatureScreen = ({ page }: PageScreenProps) => {
           <PageHead page={page} />
         </Band>
       ) : (
-        <Band id={FOLD_ANCHOR} className="max-w-theatre pt-10 pb-0">
+        <Band id={FOLD_ANCHOR} className="pt-10 pb-0">
           <FeatureStage page={page} loop={loop} />
         </Band>
       )}
       {body === null ? null : (
         <>
-          <Band className="max-w-theatre pt-14 pb-8">
+          <Band className="pt-14 pb-8">
             <Opening>{i18n._(body.lead)}</Opening>
           </Band>
-          <Band className="reveal max-w-theatre py-8">
+          <Band className="reveal py-8">
             <ul className="grid gap-drop sm:grid-cols-2">
               {body.boons.map((boon) => {
                 return <BoonCard key={i18n._(boon.title)} boon={boon} />
@@ -40,7 +40,7 @@ export const FeatureScreen = ({ page }: PageScreenProps) => {
             </ul>
           </Band>
           {body.caveats.length === 0 ? null : (
-            <Band className="reveal max-w-theatre pt-8 pb-16">
+            <Band className="reveal pt-8 pb-16">
               <CaveatList caveats={body.caveats} />
             </Band>
           )}

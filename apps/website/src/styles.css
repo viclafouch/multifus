@@ -18,7 +18,6 @@
   --text-passage--line-height: 1.04;
 
   --container-world: var(--page);
-  --container-theatre: min(100%, 72rem, max(44rem, (100svh - 11rem) * 16 / 9));
 
   --spacing-mast: 60px;
   --spacing-brim: 34px;
@@ -132,28 +131,6 @@
       color-mix(in srgb, var(--iron), transparent 48%) 46%,
       color-mix(in srgb, var(--iron), transparent 66%) 100%
     );
-}
-
-@utility scrim {
-  background-image: linear-gradient(
-    180deg,
-    transparent 0%,
-    color-mix(in srgb, var(--night), transparent 72%) 20%,
-    color-mix(in srgb, var(--night), transparent 34%) 44%,
-    color-mix(in srgb, var(--night), transparent 12%) 70%,
-    var(--night) 100%
-  );
-}
-
-@utility footing {
-  @media (width >= 40rem) {
-    pointer-events: none;
-    position: absolute;
-    inset-inline: var(--stage-edge);
-    bottom: var(--stage-edge);
-    border-end-start-radius: var(--stage-nook);
-    border-end-end-radius: var(--stage-nook);
-  }
 }
 
 @utility lede {
