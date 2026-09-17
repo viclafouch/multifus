@@ -53,9 +53,19 @@ export const TRAIT_IDS = [
   'relay',
   'quickTexts',
   'split',
-  'teams',
+  'savedOrders',
   'signed',
   'source'
+] as const satisfies readonly TraitId[]
+
+export const PEEK_TRAITS = [
+  'macos',
+  'windows',
+  'wheel',
+  'walk',
+  'autoFocus',
+  'relay',
+  'quickTexts'
 ] as const satisfies readonly TraitId[]
 
 export const TRAITS = {
@@ -149,7 +159,7 @@ export const TRAITS = {
       rorganizer: 'no'
     }
   },
-  teams: {
+  savedOrders: {
     mine: 'no',
     theirs: {
       dracoon: 'yes',
@@ -191,7 +201,7 @@ export const TRAIT_NAMES = {
   relay: PAGE_NAMES.relay,
   quickTexts: PAGE_NAMES.quickTexts,
   split: msg`Fenêtres rangées côte à côte`,
-  teams: msg`Compositions d’équipe enregistrées`,
+  savedOrders: msg`Plusieurs ordres de personnages enregistrés`,
   signed: msg`Paquet signé`,
   source: msg`Code publié`
 } as const satisfies Record<TraitId, MessageDescriptor>
@@ -209,9 +219,9 @@ export const HALF_NOTES = [
     line: msg`Dans sa fenêtre à lui, pas par-dessus le jeu.`
   },
   {
-    trait: 'teams',
+    trait: 'savedOrders',
     rival: 'dosoft',
-    line: msg`Deux équipes fixes, T1 et T2, qu’on ne nomme pas.`
+    line: msg`Deux équipes fixes, T1 et T2 : elles filtrent le cycle, elles n’enregistrent pas d’ordre.`
   },
   {
     trait: 'signed',

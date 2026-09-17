@@ -9,7 +9,13 @@ import {
   within
 } from '@testing-library/react'
 import { RivalTable } from '@/components/rival-table'
-import { RIVAL_IDS, RIVALS, TRAIT_IDS, TRAIT_NAMES } from '@/constants/rivals'
+import {
+  PEEK_TRAITS,
+  RIVAL_IDS,
+  RIVALS,
+  TRAIT_IDS,
+  TRAIT_NAMES
+} from '@/constants/rivals'
 import { SPEAKERS } from '@/lib/i18n'
 import { HOVER } from '@/lib/media'
 
@@ -30,10 +36,10 @@ const pointAt = (kind: 'cursor' | 'finger') => {
   })
 }
 
-const show = () => {
+const show = (isPeek = false) => {
   return render(
     <I18nProvider i18n={SPEAKERS.fr}>
-      <RivalTable />
+      <RivalTable isPeek={isPeek} />
     </I18nProvider>
   )
 }
@@ -162,5 +168,18 @@ describe('the table of the comparison', () => {
     show()
 
     expect(screen.getByText(/14 septembre 2026/u)).toBeDefined()
+  })
+
+  it('holds back most of its rows in a peek', () => {
+    show(true)
+
+    expect(PEEK_TRAITS.length).toBeLessThan(TRAIT_IDS.length)
+    expect(screen.getAllByRole('rowheader')).toHaveLength(PEEK_TRAITS.length)
+  })
+
+  it('leaves no bubble to open under the veil of its peek', () => {
+    show(true)
+
+    expect(screen.queryAllByRole('button')).toHaveLength(0)
   })
 })

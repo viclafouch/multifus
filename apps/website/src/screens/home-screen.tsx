@@ -13,15 +13,10 @@ import { OutLink } from '@/components/out-link'
 import { PageLink } from '@/components/page-link'
 import { PlateBlock } from '@/components/plate-block'
 import { Prose } from '@/components/prose'
-import { WayLink } from '@/components/way-link'
+import { RivalPeek } from '@/components/rival-peek'
 import { MENU_FEATURES } from '@/constants/pages'
 import { FOLD_ANCHOR, REPOSITORY } from '@/constants/site'
-import {
-  BEFORE_INSTALL,
-  LIMITS_TITLE,
-  NO_HARM,
-  PAGE_NAMES
-} from '@/constants/wording'
+import { BEFORE_INSTALL, LIMITS_TITLE, NO_HARM } from '@/constants/wording'
 import { useLoopCarriedIn } from '@/hooks/use-loop-carried-in'
 
 const HERO_LEAD = msg`Le multicompte sur Dofus Retro`
@@ -38,7 +33,9 @@ const SOURCE = msg`Voir le code`
 
 const LOOP_CAPTION = msg`Les six mécanismes à l’œuvre dans le jeu`
 
-const COMPARISON_LEAD = msg`Six gestionnaires de fenêtres, ligne par ligne. Chaque case est relevée dans le code, pas sur la page d’accueil de son auteur.`
+const COMPARISON_TITLE = msg`Multifus face aux autres`
+
+const COMPARISON_LEAD = msg`Dracoon, Focus Retro, Dosoft, Retro Toolbox, ROrganizer : chaque case est relevée dans le code de l’outil, pas sur sa page d’accueil.`
 
 export const HomeScreen = (_props: PageScreenProps) => {
   const { i18n } = useLingui()
@@ -102,9 +99,9 @@ export const HomeScreen = (_props: PageScreenProps) => {
         </PlateBlock>
       </Band>
       <Band className="reveal pt-16 pb-24">
-        <BandTitle>{i18n._(PAGE_NAMES.comparison)}</BandTitle>
+        <BandTitle>{i18n._(COMPARISON_TITLE)}</BandTitle>
         <Prose>{i18n._(COMPARISON_LEAD)}</Prose>
-        <WayLink page="comparison" />
+        <RivalPeek />
       </Band>
     </>
   )

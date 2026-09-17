@@ -435,8 +435,8 @@ msgid "Comparatif des logiciels multicompte Dofus Retro"
 msgstr "Comparativa de programas multicuenta de Dofus Retro"
 
 #: src/constants/rivals.ts
-msgid "Compositions d’équipe enregistrées"
-msgstr "Composiciones de equipo guardadas"
+#~ msgid "Compositions d’équipe enregistrées"
+#~ msgstr "Composiciones de equipo guardadas"
 
 #: src/constants/bodies.ts
 msgid "Confidentialité et sécurité à 100%"
@@ -475,12 +475,16 @@ msgid "Déplacer plusieurs personnages d’un coup"
 msgstr "Mover varios personajes de golpe"
 
 #: src/constants/rivals.ts
-msgid "Deux équipes fixes, T1 et T2, qu’on ne nomme pas."
-msgstr "Dos equipos fijos, T1 y T2, que no se pueden nombrar."
+msgid "Deux équipes fixes, T1 et T2 : elles filtrent le cycle, elles n’enregistrent pas d’ordre."
+msgstr "Dos equipos fijos, T1 y T2: filtran el ciclo, no guardan ningún orden."
+
+#: src/constants/rivals.ts
+#~ msgid "Deux équipes fixes, T1 et T2, qu’on ne nomme pas."
+#~ msgstr "Dos equipos fijos, T1 y T2, que no se pueden nombrar."
 
 #: src/screens/comparison-screen.tsx
-msgid "Deux outils du tableau le font, et pas lui."
-msgstr "Dos herramientas de la tabla lo hacen, y él no."
+#~ msgid "Deux outils du tableau le font, et pas lui."
+#~ msgstr "Dos herramientas de la tabla lo hacen, y él no."
 
 #: src/constants/bodies.ts
 msgid "Deux personnages de la même classe et du même sexe restent reconnaissables."
@@ -521,6 +525,18 @@ msgstr "Dofus, Dofus Retro y Ankama pertenecen a <0>Ankama Games</0>. Las imáge
 #: src/constants/legal.ts
 #~ msgid "Dofus, Dofus Retro et Ankama appartiennent à Ankama Games. Les images et les vidéos du site viennent du jeu et restent à eux."
 #~ msgstr "Dofus, Dofus Retro y Ankama pertenecen a Ankama Games. Las imágenes y los vídeos del sitio vienen del juego y siguen siendo suyos."
+
+#: src/screens/home-screen.tsx
+msgid "Dracoon, Focus Retro, Dosoft, Retro Toolbox, ROrganizer : chaque case est relevée dans le code de l’outil, pas sur sa page d’accueil."
+msgstr "Dracoon, Focus Retro, Dosoft, Retro Toolbox, ROrganizer: cada casilla se lee en el código de la herramienta, no en su página de inicio."
+
+#: src/screens/home-screen.tsx
+#~ msgid "Dracoon, Focus Retro, Dosoft, Retro Toolbox, ROrganizer : chaque case est relevée dans le code de l’outil, pas sur sa page d’accueil. Multifus perd deux lignes."
+#~ msgstr "Dracoon, Focus Retro, Dosoft, Retro Toolbox, ROrganizer: cada casilla se lee en el código de la herramienta, no en su página de inicio. Multifus pierde dos líneas."
+
+#: src/screens/home-screen.tsx
+#~ msgid "Dracoon, Focus Retro, Dosoft, Retro Toolbox, ROrganizer : voilà ce que Multifus fait de plus, et ce qu’il fait de moins. Chaque case est relevée dans le code de l’outil, pas sur sa page d’accueil."
+#~ msgstr "Dracoon, Focus Retro, Dosoft, Retro Toolbox, ROrganizer: esto es lo que Multifus hace de más, y lo que hace de menos. Cada casilla se lee en el código de la herramienta, no en su página de inicio."
 
 #: src/constants/bodies.ts
 #~ msgid "Échange, groupe, guilde, message privé, défi, craft, percepteur attaqué : sept appels surveillés."
@@ -725,6 +741,10 @@ msgstr "Gratis"
 #: src/constants/bodies.ts
 #~ msgid "Il garde sa place."
 #~ msgstr "Se queda donde la pones."
+
+#: src/screens/comparison-screen.tsx
+msgid "Il le retient d’une session à l’autre, mais il n’en garde pas plusieurs : Dracoon et Retro Toolbox enregistrent des ordres nommés, et les rappellent d’un clic."
+msgstr "Lo recuerda de una sesión a otra, pero no guarda más de uno: Dracoon y Retro Toolbox guardan órdenes con nombre, y los recuperan con un clic."
 
 #: src/constants/bodies.ts
 #~ msgid "Il ne déplace pas la team d’un seul clic."
@@ -1570,6 +1590,14 @@ msgstr "¿Está permitido Multifus en Dofus Retro?"
 msgid "Multifus et les autres gestionnaires, ligne par ligne."
 msgstr "Multifus y los demás gestores, línea por línea."
 
+#: src/screens/home-screen.tsx
+msgid "Multifus face aux autres"
+msgstr "Multifus frente a los demás"
+
+#: src/screens/home-screen.tsx
+#~ msgid "Multifus face aux autres logiciels multicompte"
+#~ msgstr "Multifus frente a los otros programas multicuenta"
+
 #: src/screens/windows-screen.tsx
 msgid "Multifus fermé, le titre et l’icône d’origine reviennent."
 msgstr "Con Multifus cerrado, vuelven el título y el icono originales."
@@ -1595,8 +1623,12 @@ msgid "Multifus ne fait que ça."
 msgstr "Multifus solo hace eso."
 
 #: src/screens/comparison-screen.tsx
-msgid "Multifus ne garde pas de compositions d’équipe."
-msgstr "Multifus no guarda composiciones de equipo."
+#~ msgid "Multifus ne garde pas de compositions d’équipe."
+#~ msgstr "Multifus no guarda composiciones de equipo."
+
+#: src/screens/comparison-screen.tsx
+msgid "Multifus ne garde qu’un seul ordre de personnages."
+msgstr "Multifus solo guarda un orden de personajes."
 
 #: src/constants/bodies.ts
 #~ msgid "Multifus ne lit pas ce qu’on vous a écrit."
@@ -1842,6 +1874,10 @@ msgstr "Ni un turno perdido"
 #~ msgid "Plus une fenêtre à parcourir, plus un clic à prendre."
 #~ msgstr "Sin ventanas que recorrer, sin clics que llevarse."
 
+#: src/constants/rivals.ts
+msgid "Plusieurs ordres de personnages enregistrés"
+msgstr "Varios órdenes de personajes guardados"
+
 #: src/constants/bodies.ts
 #~ msgid "Posé où vous voulez, il y revient au lancement suivant et suit la fenêtre quand elle bouge."
 #~ msgstr "Ponla donde quieras: vuelve ahí en el siguiente arranque y sigue a la ventana cuando se mueve."
@@ -2031,8 +2067,8 @@ msgstr "Si buscas que tus personajes jueguen sin ti, Multifus nunca lo hará: tr
 #~ msgstr "Firmar cuesta dinero cada año."
 
 #: src/screens/home-screen.tsx
-msgid "Six gestionnaires de fenêtres, ligne par ligne. Chaque case est relevée dans le code, pas sur la page d’accueil de son auteur."
-msgstr "Seis gestores de ventanas, línea a línea. Cada casilla se lee en el código, no en la página de inicio de su autor."
+#~ msgid "Six gestionnaires de fenêtres, ligne par ligne. Chaque case est relevée dans le code, pas sur la page d’accueil de son auteur."
+#~ msgstr "Seis gestores de ventanas, línea a línea. Cada casilla se lee en el código, no en la página de inicio de su autor."
 
 #: src/screens/home-screen.tsx
 msgid "Six mécanismes, un seul but : ne plus chercher le personnage qui vous attend."
@@ -2425,6 +2461,10 @@ msgstr "Comprueba esta tabla tú mismo"
 #: src/screens/home-screen.tsx
 msgid "Voir le code"
 msgstr "Ver el código"
+
+#: src/components/rival-peek.tsx
+msgid "Voir les {rows} lignes du comparatif"
+msgstr "Ver las {rows} líneas de la comparativa"
 
 #: src/screens/windows-screen.tsx
 msgid "Vos 6 Enutrofs ont la même tête. La couleur les sépare."

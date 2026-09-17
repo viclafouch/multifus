@@ -23,7 +23,7 @@ export type TraitId =
   | 'signed'
   | 'source'
   | 'split'
-  | 'teams'
+  | 'savedOrders'
   | 'walk'
   | 'wheel'
   | 'windows'

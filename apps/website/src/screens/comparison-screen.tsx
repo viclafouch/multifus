@@ -23,8 +23,8 @@ const MISSING_POINTS = [
     line: msg`C’est un choix, et il ne changera pas : Multifus amène devant vous celle du personnage qui joue, il ne redessine pas votre bureau.`
   },
   {
-    lead: msg`Multifus ne garde pas de compositions d’équipe.`,
-    line: msg`Deux outils du tableau le font, et pas lui.`
+    lead: msg`Multifus ne garde qu’un seul ordre de personnages.`,
+    line: msg`Il le retient d’une session à l’autre, mais il n’en garde pas plusieurs : Dracoon et Retro Toolbox enregistrent des ordres nommés, et les rappellent d’un clic.`
   }
 ] as const satisfies readonly Point[]
 

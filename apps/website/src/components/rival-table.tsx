@@ -7,6 +7,7 @@ import { MarkTip } from '@/components/mark-tip'
 import { OutLink } from '@/components/out-link'
 import {
   HALF_NOTES,
+  PEEK_TRAITS,
   RIVAL_IDS,
   RIVALS,
   SURVEYED_ON,
@@ -25,82 +26,96 @@ const HALF_ANCHOR = 'moitie'
 const NAME_CELL =
   'rule sticky left-0 w-44 border-r bg-iron px-4 py-3.5 sm:w-auto'
 
-export const RivalTable = () => {
+type RivalTableProps = Readonly<{
+  isPeek?: boolean
+}>
+
+export const RivalTable = ({ isPeek = false }: RivalTableProps) => {
   const { i18n } = useLingui()
   const surveyed = formatDate({ day: SURVEYED_ON, locale: i18n.locale })
+  const traits = isPeek ? PEEK_TRAITS : TRAIT_IDS
+
+  const ledger = (
+    <div className="relative">
+      <div className="glass ledger overflow-x-auto">
+        <table
+          aria-describedby={isPeek ? undefined : SURVEY_ANCHOR}
+          className="w-full min-w-lintel border-collapse text-left"
+        >
+          <thead>
+            <tr className="rule border-b">
+              <th
+                scope="col"
+                className={cn(NAME_CELL, 'text-aside font-normal text-band')}
+              >
+                {i18n._(TRAIT_COLUMN)}
+              </th>
+              <th
+                scope="col"
+                className="mine px-3 py-3.5 text-center font-carve text-bar tracking-wide text-leaf-lit uppercase"
+              >
+                Multifus
+              </th>
+              {RIVAL_IDS.map((rival) => {
+                const { name, code } = RIVALS[rival]
+
+                return (
+                  <th
+                    key={rival}
+                    scope="col"
+                    className="px-3 py-3.5 text-center text-aside font-normal text-band"
+                  >
+                    <OutLink href={code}>{name}</OutLink>
+                  </th>
+                )
+              })}
+            </tr>
+          </thead>
+          <tbody>
+            {traits.map((trait) => {
+              return (
+                <tr key={trait} className="rule border-b last:border-b-0">
+                  <th
+                    scope="row"
+                    className={cn(
+                      NAME_CELL,
+                      'text-tale font-normal text-cream'
+                    )}
+                  >
+                    {i18n._(TRAIT_NAMES[trait])}
+                  </th>
+                  <td className="mine px-3 py-3">
+                    <MarkGlyph mark={TRAITS[trait].mine} />
+                  </td>
+                  {RIVAL_IDS.map((rival) => {
+                    return (
+                      <td key={rival} className="px-3 py-3">
+                        <MarkCell
+                          mark={TRAITS[trait].theirs[rival]}
+                          trait={trait}
+                          rival={rival}
+                        />
+                      </td>
+                    )
+                  })}
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
+      <span aria-hidden className="brink lg:hidden" />
+      {isPeek ? <span aria-hidden className="shroud" /> : null}
+    </div>
+  )
+
+  if (isPeek) {
+    return ledger
+  }
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="relative">
-        <div className="glass ledger overflow-x-auto">
-          <table
-            aria-describedby={SURVEY_ANCHOR}
-            className="w-full min-w-lintel border-collapse text-left"
-          >
-            <thead>
-              <tr className="rule border-b">
-                <th
-                  scope="col"
-                  className={cn(NAME_CELL, 'text-aside font-normal text-band')}
-                >
-                  {i18n._(TRAIT_COLUMN)}
-                </th>
-                <th
-                  scope="col"
-                  className="mine px-3 py-3.5 text-center font-carve text-bar tracking-wide text-leaf-lit uppercase"
-                >
-                  Multifus
-                </th>
-                {RIVAL_IDS.map((rival) => {
-                  const { name, code } = RIVALS[rival]
-
-                  return (
-                    <th
-                      key={rival}
-                      scope="col"
-                      className="px-3 py-3.5 text-center text-aside font-normal text-band"
-                    >
-                      <OutLink href={code}>{name}</OutLink>
-                    </th>
-                  )
-                })}
-              </tr>
-            </thead>
-            <tbody>
-              {TRAIT_IDS.map((trait) => {
-                return (
-                  <tr key={trait} className="rule border-b last:border-b-0">
-                    <th
-                      scope="row"
-                      className={cn(
-                        NAME_CELL,
-                        'text-tale font-normal text-cream'
-                      )}
-                    >
-                      {i18n._(TRAIT_NAMES[trait])}
-                    </th>
-                    <td className="mine px-3 py-3">
-                      <MarkGlyph mark={TRAITS[trait].mine} />
-                    </td>
-                    {RIVAL_IDS.map((rival) => {
-                      return (
-                        <td key={rival} className="px-3 py-3">
-                          <MarkCell
-                            mark={TRAITS[trait].theirs[rival]}
-                            trait={trait}
-                            rival={rival}
-                          />
-                        </td>
-                      )
-                    })}
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
-        <span aria-hidden className="brink lg:hidden" />
-      </div>
+      {ledger}
       <p id={SURVEY_ANCHOR} className="text-aside text-band">
         {i18n._(msg`Relevé le ${{ surveyed }}, dans le code de chaque outil.`)}
       </p>

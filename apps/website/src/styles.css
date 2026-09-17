@@ -952,6 +952,37 @@
   );
 }
 
+@utility shroud {
+  --floor: color-mix(in srgb, var(--deep) 74%, var(--iron));
+
+  position: absolute;
+  right: 1px;
+  bottom: 1px;
+  left: 1px;
+  height: 16rem;
+  border-radius: 0 0 12px 12px;
+  pointer-events: none;
+  background-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    color-mix(in srgb, var(--floor), transparent 80%) 18%,
+    color-mix(in srgb, var(--floor), transparent 52%) 42%,
+    color-mix(in srgb, var(--floor), transparent 26%) 62%,
+    color-mix(in srgb, var(--floor), transparent 6%) 80%,
+    var(--floor) 94%
+  );
+  transition: height 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@utility lure {
+  position: relative;
+
+  &:hover .shroud,
+  &:focus-within .shroud {
+    height: 14rem;
+  }
+}
+
 @utility canopy {
   border-radius: 12px;
   border: 1px solid color-mix(in srgb, var(--band), transparent 48%);
@@ -1468,6 +1499,7 @@
   .torch::before,
   .stud,
   .stud::before,
+  .shroud,
   .ledger tbody tr {
     transition: none !important;
   }
