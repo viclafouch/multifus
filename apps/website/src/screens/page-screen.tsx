@@ -1,8 +1,10 @@
 import React from 'react'
 import type { PageKind } from '@/@types/page'
 import type { PageScreenProps } from '@/@types/screen'
+import { DownloadSummons } from '@/components/download-summons'
 import { SiteShell } from '@/components/site-shell'
 import { PAGES } from '@/constants/pages'
+import { PAGE_SUMMONS } from '@/constants/summons'
 import { AnkamaScreen } from '@/screens/ankama-screen'
 import { ComparisonScreen } from '@/screens/comparison-screen'
 import { DownloadScreen } from '@/screens/download-screen'
@@ -27,10 +29,12 @@ const PAGE_SCREENS = {
 
 export const PageScreen = ({ page }: PageScreenProps) => {
   const PageBody = PAGE_SCREENS[PAGES[page].kind]
+  const summons = PAGE_SUMMONS[page]
 
   return (
     <SiteShell page={page}>
       <PageBody page={page} />
+      {summons === null ? null : <DownloadSummons summons={summons} />}
     </SiteShell>
   )
 }

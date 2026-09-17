@@ -658,6 +658,87 @@
   }
 }
 
+@utility summons {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  border-top: 1px solid color-mix(in srgb, var(--band), transparent 62%);
+  background-color: var(--deep);
+
+  & > img {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: saturate(0.74);
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--deep), transparent 10%) 0%,
+      color-mix(in srgb, var(--deep), transparent 26%) 100%
+    );
+  }
+
+  &::after {
+    @apply glint;
+
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 2px;
+    width: var(--spacing-thread);
+  }
+
+  &[data-shape='center']::after {
+    left: 50%;
+    translate: -50% 0;
+    background-image: linear-gradient(
+      90deg,
+      transparent 0%,
+      var(--leaf-lit) 50%,
+      transparent 100%
+    );
+  }
+
+  @media (width >= 64rem) {
+    &::before {
+      background-image: linear-gradient(
+        92deg,
+        color-mix(in srgb, var(--deep), transparent 6%) 0%,
+        color-mix(in srgb, var(--deep), transparent 24%) 46%,
+        color-mix(in srgb, var(--deep), transparent 58%) 100%
+      );
+    }
+
+    &[data-shape='split']::before {
+      background-image: linear-gradient(
+        92deg,
+        color-mix(in srgb, var(--deep), transparent 6%) 0%,
+        color-mix(in srgb, var(--deep), transparent 22%) 58%,
+        color-mix(in srgb, var(--deep), transparent 34%) 100%
+      );
+    }
+
+    &[data-shape='center']::before {
+      background-image: radial-gradient(
+        118% 96% at 50% 50%,
+        color-mix(in srgb, var(--deep), transparent 8%) 0%,
+        color-mix(in srgb, var(--deep), transparent 30%) 58%,
+        color-mix(in srgb, var(--deep), transparent 54%) 100%
+      );
+    }
+  }
+}
+
 @utility ledge {
   border-bottom: 1px solid color-mix(in srgb, var(--border), transparent 55%);
   background-color: color-mix(in srgb, var(--deep), transparent 8%);
@@ -1003,18 +1084,14 @@
   box-shadow: 0 22px 48px -30px rgb(0 0 0 / 0.9);
 
   &::after {
+    @apply glint;
+
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     height: 2px;
     width: var(--spacing-thread);
-    background-image: linear-gradient(
-      90deg,
-      var(--leaf-lit) 0%,
-      color-mix(in srgb, var(--leaf), transparent 62%) 38%,
-      transparent 100%
-    );
   }
 
   &[data-bare]::after {

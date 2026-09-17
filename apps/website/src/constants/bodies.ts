@@ -1,5 +1,6 @@
 import { msg } from '@lingui/core/macro'
 import { AppleLogoIcon } from '@phosphor-icons/react/dist/ssr/AppleLogo'
+import { ArrowSquareUpIcon } from '@phosphor-icons/react/dist/ssr/ArrowSquareUp'
 import { ArrowUUpLeftIcon } from '@phosphor-icons/react/dist/ssr/ArrowUUpLeft'
 import { BellRingingIcon } from '@phosphor-icons/react/dist/ssr/BellRinging'
 import { BrowsersIcon } from '@phosphor-icons/react/dist/ssr/Browsers'
@@ -10,18 +11,17 @@ import { CursorClickIcon } from '@phosphor-icons/react/dist/ssr/CursorClick'
 import { DropIcon } from '@phosphor-icons/react/dist/ssr/Drop'
 import { EyeIcon } from '@phosphor-icons/react/dist/ssr/Eye'
 import { FlagIcon } from '@phosphor-icons/react/dist/ssr/Flag'
+import { HammerIcon } from '@phosphor-icons/react/dist/ssr/Hammer'
 import { HourglassHighIcon } from '@phosphor-icons/react/dist/ssr/HourglassHigh'
 import { KeyboardIcon } from '@phosphor-icons/react/dist/ssr/Keyboard'
 import { KeyReturnIcon } from '@phosphor-icons/react/dist/ssr/KeyReturn'
 import { ListNumbersIcon } from '@phosphor-icons/react/dist/ssr/ListNumbers'
-import { MoonStarsIcon } from '@phosphor-icons/react/dist/ssr/MoonStars'
+import { LockKeyIcon } from '@phosphor-icons/react/dist/ssr/LockKey'
 import { PaletteIcon } from '@phosphor-icons/react/dist/ssr/Palette'
 import { PlugsConnectedIcon } from '@phosphor-icons/react/dist/ssr/PlugsConnected'
 import { PowerIcon } from '@phosphor-icons/react/dist/ssr/Power'
 import { PushPinIcon } from '@phosphor-icons/react/dist/ssr/PushPin'
-import { SlidersHorizontalIcon } from '@phosphor-icons/react/dist/ssr/SlidersHorizontal'
 import { SquaresFourIcon } from '@phosphor-icons/react/dist/ssr/SquaresFour'
-import { StorefrontIcon } from '@phosphor-icons/react/dist/ssr/Storefront'
 import { TelegramLogoIcon } from '@phosphor-icons/react/dist/ssr/TelegramLogo'
 import { TranslateIcon } from '@phosphor-icons/react/dist/ssr/Translate'
 import { UserCheckIcon } from '@phosphor-icons/react/dist/ssr/UserCheck'
@@ -32,60 +32,60 @@ import type { PageId } from '@/@types/page'
 export const PAGE_BODIES = {
   home: null,
   autoFocus: {
-    lead: msg`Vous jouez sur votre Iop, et c’est votre Eniripsa qu’on invite. Sa fenêtre arrive devant vous toute seule.`,
+    lead: msg`Un de vos personnages reçoit une invitation ou un message, et sa fenêtre passe devant vous toute seule.`,
     boons: [
       {
         icon: BellRingingIcon,
-        title: msg`Sept appels surveillés`,
+        title: msg`Vous choisissez vos déclencheurs`,
         line: msg`Échange, groupe, guilde, message privé, défi, craft, percepteur attaqué.`
       },
       {
         icon: HourglassHighIcon,
-        title: msg`Votre tour de jouer`,
-        line: msg`La bonne fenêtre est devant vous avant que le chrono ne descende.`
+        title: msg`Plus un tour perdu`,
+        line: msg`La fenêtre du personnage qui joue passe devant dès le début de son tour.`
       },
       {
-        icon: SlidersHorizontalIcon,
-        title: msg`Un interrupteur par appel`,
-        line: msg`Les crafts des autres ne vous intéressent pas ? Coupez celui-là, gardez les six autres.`
+        icon: ArrowSquareUpIcon,
+        title: msg`Même une fenêtre réduite revient`,
+        line: msg`Un personnage rangé dans le Dock ou dans la barre des tâches repasse devant vous.`
       },
       {
-        icon: MoonStarsIcon,
-        title: msg`Une mule se met de côté`,
-        line: msg`Sa fenêtre ne passe plus devant tant que vous ne la rappelez pas.`
+        icon: UserCheckIcon,
+        title: msg`Vous choisissez les personnages inclus`,
+        line: msg`Un personnage exclu garde sa fenêtre en arrière-plan tant que vous ne le remettez pas.`
       }
     ],
     caveats: [
-      msg`Il entend ce que le jeu annonce lui-même, et ne lit rien dans sa mémoire.`
+      msg`Multifus écoute les notifications du jeu, et ne lit rien dans sa mémoire.`
     ]
   },
   wheel: {
-    lead: msg`Vous maintenez une combinaison, un disque de têtes s’ouvre au milieu de l’écran, vous visez, vous lâchez.`,
+    lead: msg`Vous maintenez une combinaison, la roue s’ouvre au milieu de l’écran, vous visez une tête et vous lâchez.`,
     boons: [
       {
         icon: CrosshairSimpleIcon,
-        title: msg`Viser plutôt que se souvenir`,
-        line: msg`Vous reconnaissez la tête de classe et le pseudo, et vous partez dessus.`
+        title: msg`La tête de classe suffit`,
+        line: msg`Vous reconnaissez le portrait et le pseudo, et vous partez dessus.`
       },
       {
         icon: KeyboardIcon,
-        title: msg`Une touche par personnage tient jusqu’à quatre`,
-        line: msg`À huit, vous cherchez si votre Crâ est sur F5 ou sur F6 plus longtemps que vous ne jouez.`
+        title: msg`Plus de touche à retenir`,
+        line: msg`Passé quatre personnages, une touche par fenêtre devient impossible à retenir.`
       },
       {
         icon: PaletteIcon,
-        title: msg`Deux Sadidas femmes se séparent`,
-        line: msg`La couleur que vous leur donnez les distingue là où le portrait ne suffit plus.`
+        title: msg`Une couleur par personnage`,
+        line: msg`Deux personnages de la même classe et du même sexe restent reconnaissables.`
       },
       {
         icon: ArrowUUpLeftIcon,
-        title: msg`Lâchez au centre, rien ne se passe`,
-        line: msg`Un geste commencé par erreur ne coûte pas une fenêtre.`
+        title: msg`Un geste s’annule`,
+        line: msg`Lâchez au centre de la roue, et aucune fenêtre ne bouge.`
       }
     ],
     caveats: [
-      msg`Tant que le disque est ouvert, le jeu ne voit plus votre souris : aucun sort ne part.`,
-      msg`Elle montre les personnages connectés, et n’en reconnecte aucun.`
+      msg`Tant que la roue est ouverte, le jeu ne reçoit plus votre souris.`,
+      msg`La roue montre les personnages connectés, et n’en reconnecte aucun.`
     ]
   },
   walk: {
@@ -94,22 +94,22 @@ export const PAGE_BODIES = {
       {
         icon: CursorClickIcon,
         title: msg`Quatre clics, quatre personnages`,
-        line: msg`Le nombre de clics ne change pas : c’est la recherche de fenêtre entre deux clics qui disparaît.`
+        line: msg`Vous cliquez quatre fois, sans chercher de fenêtre entre deux clics.`
       },
       {
         icon: FlagIcon,
-        title: msg`Une bannière dit où vous en êtes`,
-        line: msg`Elle se pose au coin que vous avez choisi et nomme le personnage qui vient d’arriver.`
+        title: msg`Une bannière nomme le personnage`,
+        line: msg`Elle s’affiche au coin que vous choisissez, à chaque changement de fenêtre.`
       },
       {
         icon: ListNumbersIcon,
-        title: msg`L’ordre du défilement est le vôtre`,
-        line: msg`La mule que vous laissez en banque ne prend aucun de vos clics.`
+        title: msg`Vous choisissez l’ordre`,
+        line: msg`Le personnage laissé en banque ne prend aucun de vos clics.`
       },
       {
         icon: PowerIcon,
-        title: msg`Il démarre toujours éteint`,
-        line: msg`Une touche l’allume, et il s’éteint dès qu’il n’a plus de fenêtre où aller.`
+        title: msg`Rien ne part sans vous`,
+        line: msg`Le Déplacement rapide s’allume à une touche, et s’éteint quand il n’a plus de fenêtre où aller.`
       }
     ],
     caveats: []
@@ -120,27 +120,27 @@ export const PAGE_BODIES = {
       {
         icon: BrowsersIcon,
         title: msg`Le navigateur reste fermé`,
-        line: msg`Plus d’aller-retour vers un onglet à chaque objet brisé.`
+        line: msg`Vous ne quittez plus le jeu pour chercher le poids d’une rune.`
       },
       {
         icon: PushPinIcon,
-        title: msg`Il garde sa place`,
-        line: msg`Posé où vous voulez, il y revient au lancement suivant et suit la fenêtre quand elle bouge.`
+        title: msg`Le tableau garde sa place`,
+        line: msg`Il revient au même endroit au lancement suivant, et suit la fenêtre du jeu.`
       },
       {
         icon: DropIcon,
         title: msg`Taille et transparence se règlent`,
-        line: msg`Poussé à fond, il reste toujours assez visible pour se lire.`
+        line: msg`Même au maximum de transparence, le tableau reste lisible.`
       },
       {
         icon: EyeIcon,
-        title: msg`La même touche le cache et le rappelle`,
-        line: msg`Et un bouton le repose au coin de la fenêtre du jeu quand vous l’avez perdu de vue.`
+        title: msg`Le tableau part et revient`,
+        line: msg`Un bouton le replace au coin de la fenêtre du jeu si vous le perdez de vue.`
       }
     ],
     caveats: [
-      msg`Le jeu garde le premier plan : un clic sur le tableau ne fait pas sauter Multifus devant.`,
-      msg`Il ne se pose pas sur un client en plein écran, où une fenêtre agrandie fait mieux le travail.`
+      msg`Un clic sur le tableau ne fait pas passer Multifus devant le jeu.`,
+      msg`Le tableau ne s’affiche pas sur un client en plein écran.`
     ]
   },
   relay: {
@@ -149,61 +149,61 @@ export const PAGE_BODIES = {
       {
         icon: TelegramLogoIcon,
         title: msg`Par Telegram, sur votre téléphone`,
-        line: msg`Chaque message nomme le personnage qu’on vient d’appeler.`
+        line: msg`Chaque message arrive dans la seconde, et leur nombre n’est pas limité.`
       },
       {
-        icon: StorefrontIcon,
-        title: msg`Le commerce continue sans vous`,
-        line: msg`Une annonce en vente attend des réponses, et l’acheteur ne repart plus faute de vous.`
+        icon: HammerIcon,
+        title: msg`Vos métiers montent plus vite`,
+        line: msg`On vous écrit pour un craft, vous le savez tout de suite, et la commande ne part pas chez un autre artisan.`
       },
       {
-        icon: UserCheckIcon,
-        title: msg`Vous choisissez qui est suivi`,
-        line: msg`Votre principal oui, vos mules non.`
+        icon: LockKeyIcon,
+        title: msg`Confidentialité et sécurité à 100%`,
+        line: msg`Vos messages partent vers votre Telegram, et c’est tout.`
       },
       {
         icon: PlugsConnectedIcon,
-        title: msg`Il vous dit aussi quand il se tait`,
-        line: msg`Dofus Retro déconnecte un personnage qui ne fait rien, et le relais l’annonce.`
+        title: msg`Vous savez qui s’est déconnecté`,
+        line: msg`Dofus Retro déconnecte un personnage qui ne fait rien, et Multifus vous l’annonce.`
       }
     ],
     caveats: [
-      msg`Le relais va dans un sens : vous ne répondez pas depuis le téléphone.`,
-      msg`Il porte le privé, et rien du canal commerce, de la guilde ou du recrutement.`
+      msg`Vous ne pouvez pas répondre depuis votre téléphone.`,
+      msg`Seulement les messages privés, pas les messages de guilde ou de commerce.`
     ]
   },
   quickTexts: {
-    lead: msg`Vous rangez une phrase sous une combinaison de touches. Dans le jeu, vous appuyez, et elle se pose là où vous êtes en train d’écrire.`,
+    lead: msg`Vous rangez une phrase sous une combinaison de touches. Dans le jeu, vous appuyez, et elle s’écrit dans votre champ de discussion.`,
     boons: [
       {
         icon: ChatTextIcon,
-        title: msg`Les phrases qu’on retape vingt fois par jour`,
-        line: msg`Je vends des runes, je reviens dans deux minutes, bienvenue dans la guilde.`
+        title: msg`Vos phrases les plus répétées`,
+        line: msg`« Achète anneau 30 pp, MP moi », « Bon jeu à toi », « Je reviens dans deux minutes ».`
       },
       {
         icon: UsersThreeIcon,
-        title: msg`Elles suivent tous vos personnages`,
-        line: msg`La même combinaison marche sur n’importe lequel d’entre eux.`
+        title: msg`Une phrase, tous vos personnages`,
+        line: msg`Vous l’écrivez une fois, et la combinaison marche sur le personnage qui est devant vous.`
       },
       {
         icon: KeyReturnIcon,
-        title: msg`C’est vous qui appuyez sur Entrée`,
-        line: msg`Vous voyez ce qui part avant que ça parte, et vous pouvez encore le corriger.`
+        title: msg`C’est vous qui envoyez`,
+        line: msg`Le texte se pose dans le champ, et vous le relisez avant d’appuyer sur Entrée.`
       },
       {
         icon: TranslateIcon,
-        title: msg`Elles s’écrivent dans la langue du jeu`,
-        line: msg`Celle qu’un premier lancement vous offre est en français, même si vous lisez Multifus en anglais.`
+        title: msg`Vos phrases parlent français`,
+        line: msg`Les phrases livrées au premier lancement sont en français, même si vous lisez Multifus en anglais.`
       }
     ],
-    caveats: [msg`Elles posent du texte sur une ligne, et rien d’autre.`]
+    caveats: [msg`Une phrase pose du texte, et rien d’autre.`]
   },
   mac: {
     lead: msg`Presque tous les gestionnaires pour Dofus Retro s’arrêtent à Windows. Multifus est né sur Mac, et c’est de là que part la version Windows.`,
     boons: [
       {
         icon: AppleLogoIcon,
-        title: msg`Il s’ouvre au premier double-clic`,
+        title: msg`Multifus s’ouvre au premier double-clic`,
         line: msg`Pas de clic droit, pas d’alerte, rien à aller autoriser dans les Réglages.`
       },
       {
@@ -213,7 +213,7 @@ export const PAGE_BODIES = {
       },
       {
         icon: SquaresFourIcon,
-        title: msg`Tout ce qu’il y a sur PC`,
+        title: msg`Rien ne manque sur Mac`,
         line: msg`Les six fonctionnalités du menu sont là, sans exception.`
       },
       {

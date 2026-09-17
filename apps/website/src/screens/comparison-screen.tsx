@@ -19,11 +19,11 @@ const MISSING_TITLE = msg`Ce que Multifus laisse aux autres`
 
 const MISSING_POINTS = [
   {
-    lead: msg`Il ne range pas les fenêtres côte à côte.`,
+    lead: msg`Multifus ne range pas les fenêtres côte à côte.`,
     line: msg`C’est un choix, et il ne changera pas : Multifus amène devant vous celle du personnage qui joue, il ne redessine pas votre bureau.`
   },
   {
-    lead: msg`Il ne garde pas de compositions d’équipe.`,
+    lead: msg`Multifus ne garde pas de compositions d’équipe.`,
     line: msg`Deux outils du tableau le font, et pas lui.`
   }
 ] as const satisfies readonly Point[]

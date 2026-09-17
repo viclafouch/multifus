@@ -40,11 +40,11 @@ export const PAGE_TITLES = {
 export const PAGE_PROMISES = {
   home: msg`Jouez en multicompte sur Dofus Retro sans jamais chercher une fenêtre.`,
   autoFocus: msg`La fenêtre du personnage qui joue passe devant.`,
-  wheel: msg`Une roue de têtes, et la bonne fenêtre arrive.`,
+  wheel: msg`Le choix de vos personnages au premier plan.`,
   walk: msg`Un clic par personnage, et la team suit.`,
-  runeTable: msg`Le poids des runes posé par-dessus le jeu.`,
-  relay: msg`Les messages privés vous suivent au téléphone.`,
-  quickTexts: msg`Un texte tout prêt part sous vos touches.`,
+  runeTable: msg`Le poids des runes sans quitter le jeu.`,
+  relay: msg`Votre téléphone reçoit vos messages privés du jeu.`,
+  quickTexts: msg`Une combinaison écrit la phrase à votre place.`,
   mac: msg`Le multicompte Dofus Retro sur Mac, dans une application qu’Apple a vérifiée.`,
   windows: msg`Le multicompte Dofus Retro sur Windows 10 et 11, avec une barre des tâches personnalisable.`,
   comparison: msg`Multifus et les autres gestionnaires, ligne par ligne.`,
@@ -56,11 +56,11 @@ export const PAGE_PROMISES = {
 
 export const MENU_HINTS = {
   autoFocus: msg`La fenêtre qui joue passe devant.`,
-  wheel: msg`Une roue de têtes sous le pouce.`,
+  wheel: msg`Le personnage visé passe devant.`,
   walk: msg`Un clic gauche, et la team suit.`,
   runeTable: msg`Le poids des runes posé sur le jeu.`,
-  relay: msg`Ils vous suivent sur le téléphone.`,
-  quickTexts: msg`Un texte prêt part au raccourci.`
+  relay: msg`Votre téléphone les reçoit.`,
+  quickTexts: msg`Une combinaison écrit la phrase.`
 } as const satisfies Record<(typeof MENU_FEATURES)[number], MessageDescriptor>
 
 export const LOOP_PLAY = msg`Lire`

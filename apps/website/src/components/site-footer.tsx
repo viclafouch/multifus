@@ -48,8 +48,8 @@ export const SiteFooter = () => {
   const { i18n } = useLingui()
 
   return (
-    <footer className="plinth">
-      <span aria-hidden className="crest" />
+    <footer className="plinth relative">
+      <span aria-hidden className="seam" />
       <div className="gutter hemmed mx-auto flex max-w-world flex-col gap-10 pt-12">
         <div className="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-brand">
           <div className="flex flex-col items-start gap-5">

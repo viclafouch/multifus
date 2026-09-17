@@ -12,6 +12,7 @@ import {
   TASKBAR_STACKED_SHOT,
   WINDOWS_SHOT
 } from '@/constants/shots'
+import { SUMMONS } from '@/constants/summons'
 
 const SERVED_FROM = '/@fs'
 
@@ -81,6 +82,12 @@ const everySizeDeclared = () => {
     }
   }
 
+  for (const { decor } of Object.values(SUMMONS)) {
+    const { src, width, height } = decor
+
+    declared.set(src, { width, height })
+  }
+
   for (const source of ANKAMA_SOURCE_IDS) {
     const { src, width, height } = ANKAMA_SOURCES[source].shot
 
@@ -103,7 +110,7 @@ const DECLARED = everySizeDeclared()
 
 describe('the sizes the pages reserve', () => {
   it('finds every decor, screenshot, poster, peek and loop', () => {
-    expect(DECLARED).toHaveLength(36)
+    expect(DECLARED).toHaveLength(39)
   })
 
   it.each(DECLARED)('matches the file behind %s', async (served, size) => {

@@ -16,7 +16,7 @@ import {
 } from '@/constants/rivals'
 import { formatDate } from '@/helpers/day'
 
-const TRAIT_COLUMN = msg`Ce qu’il fait`
+const TRAIT_COLUMN = msg`Ce que fait l’outil`
 
 const SURVEY_ANCHOR = 'releve'
 

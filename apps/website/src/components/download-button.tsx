@@ -12,7 +12,6 @@ export const DownloadButton = () => {
       variant="leaf"
       size="lead"
       nativeButton={false}
-      className="self-start"
       render={<PageLink page="download" isBare className="sighted" />}
     >
       <DownloadSimpleIcon weight="bold" aria-hidden />

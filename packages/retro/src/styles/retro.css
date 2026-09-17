@@ -357,6 +357,16 @@
   }
 }
 
+@utility seam {
+  @apply crest;
+
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  translate: 0 -50%;
+}
+
 @utility btn-leaf {
   border: 2px solid var(--stone);
   transition-property: background-image, border-color, color;
