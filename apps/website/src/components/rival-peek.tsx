@@ -19,7 +19,7 @@ export const RivalPeek = () => {
           <PageLink
             page="comparison"
             isBare
-            className="sighted absolute bottom-6 left-1/2 -translate-x-1/2"
+            className="sighted absolute bottom-6 left-1/2 z-3 -translate-x-1/2"
           />
         }
       >

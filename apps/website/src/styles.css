@@ -939,6 +939,7 @@
 
 @utility brink {
   position: absolute;
+  z-index: 2;
   top: 1px;
   right: 1px;
   bottom: 1px;
@@ -956,6 +957,7 @@
   --floor: color-mix(in srgb, var(--deep) 74%, var(--iron));
 
   position: absolute;
+  z-index: 2;
   right: 1px;
   bottom: 1px;
   left: 1px;

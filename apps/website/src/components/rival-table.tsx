@@ -24,7 +24,7 @@ const SURVEY_ANCHOR = 'releve'
 const HALF_ANCHOR = 'moitie'
 
 const NAME_CELL =
-  'rule sticky left-0 w-44 border-r bg-iron px-4 py-3.5 sm:w-auto'
+  'rule sticky left-0 z-1 w-44 border-r bg-iron px-4 py-3.5 sm:w-auto'
 
 type RivalTableProps = Readonly<{
   isPeek?: boolean
