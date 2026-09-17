@@ -4,6 +4,9 @@ Le site.
 Analytics dans son quota gratuit, la Search Console, et rien d'autre. Une
 fonctionnalité qui demande une carte bancaire n'existe pas.
 
+**Le téléphone d'abord.** Une mise en page se dessine et se vérifie en 390 px,
+puis on l'élargit à la tablette et au bureau.
+
 Le site tient trois instances de Lingui, une par langue, parce qu'il prérend les
 trois en parallèle.
 
