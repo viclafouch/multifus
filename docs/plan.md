@@ -4,7 +4,6 @@
 - [ ] Poser les huit secrets Apple et Tauri du workflow `release` dans les réglages du dépôt
 - [ ] Trancher les Mac Intel : ajouter la cible `x86_64-apple-darwin`, ou s'en tenir au README et à `/mac`
 - [ ] Trancher le certificat Authenticode de Windows, une fois la version macOS publiée
-- [ ] Trancher qui relance Multifus après une mise à jour sur Windows, `restart_after_install` ou `app.restart()`
 - [ ] Vérifier l'attestation de provenance à la première publication, et que `gh attestation verify` répond
 - [ ] Vérifier `projectPath: apps/desktop` sur les deux `tauri-action` à la première publication
 - [ ] Enregistrer les cinq écrans manquants de la mise en route, `PAGE_SHOTS` n'en portant qu'un

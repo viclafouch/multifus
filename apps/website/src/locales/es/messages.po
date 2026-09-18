@@ -186,6 +186,10 @@ msgstr "AutoFocus multicuenta para Dofus Retro"
 msgid "Avant d’installer"
 msgstr "Antes de instalar"
 
+#: src/constants/bodies.ts
+msgid "Avant de mettre Multifus à la corbeille, passez par À propos, Tout remettre à neuf : macOS ne prévient aucune application qu’on la jette."
+msgstr "Antes de tirar Multifus a la papelera, pasa por Acerca de, Dejarlo todo como nuevo: macOS no avisa a ninguna aplicación de que la tiran."
+
 #: src/components/taskbar-proof.tsx
 msgid "Avec Multifus"
 msgstr "Con Multifus"

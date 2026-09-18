@@ -10,7 +10,10 @@ import {
   dataUrlOf,
   inkedWith,
   loadFonts,
-  RETRO_FONTS
+  paletteOf,
+  RETRO_FONTS,
+  TAGLINE,
+  WORDMARK
 } from '@multifus/retro/draw'
 
 const runCommand = promisify(execFile)
@@ -27,11 +30,7 @@ const CARVE = RETRO_FONTS.carve.name
 
 const PLAIN = RETRO_FONTS.plain.name
 
-const WORDMARK = 'MULTIFUS'
-
-const TAGLINE = 'Gestionnaire de fenêtres pour Dofus Retro'
-
-const INSTRUCTION = 'GLISSEZ MULTIFUS DANS APPLICATIONS'
+const INSTRUCTION = `GLISSEZ ${WORDMARK} DANS APPLICATIONS`
 
 const demandOf = (minimumSystemVersion) => {
   return `macOS ${minimumSystemVersion} ou plus récent`
@@ -77,38 +76,6 @@ const PLATES = [
   { name: 'background.png', ratio: 1 },
   { name: 'background@2x.png', ratio: 2 }
 ]
-
-const INK_NAMES = {
-  iron: 'iron',
-  slate: 'slate',
-  band: 'band',
-  khaki: 'khaki',
-  cream: 'cream',
-  leaf: 'leaf',
-  leafLit: 'leaf-lit'
-}
-
-const HEX_DECLARATION = /--([a-z-]+):\s*(#[\da-f]{6})\b/gu
-
-const paletteOf = (sheet) => {
-  const declared = new Map()
-
-  for (const [, name, hex] of sheet.matchAll(HEX_DECLARATION)) {
-    declared.set(name, hex)
-  }
-
-  const picked = Object.entries(INK_NAMES).map(([key, name]) => {
-    const hex = declared.get(name)
-
-    if (hex === undefined) {
-      throw new Error(`no retro sheet declares --${name} as a hex color`)
-    }
-
-    return [key, hex]
-  })
-
-  return Object.fromEntries(picked)
-}
 
 const arrowUrl = (ink) => {
   const stem = ARROW_WIDTH - ARROW_HEAD

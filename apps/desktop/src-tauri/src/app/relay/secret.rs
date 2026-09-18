@@ -126,6 +126,16 @@ mod tests {
     }
 
     #[test]
+    fn the_windows_uninstaller_deletes_the_very_credential_this_module_writes() {
+        let hooks = include_str!("../../../nsis/hooks.nsh");
+
+        assert!(
+            hooks.contains(&format!("cmdkey /delete:{ACCOUNT}.{SERVICE}")),
+            "nsis/hooks.nsh leaves the bot token behind in the Credential Manager"
+        );
+    }
+
+    #[test]
     fn a_blank_token_is_an_absence_not_a_token() {
         assert_eq!(BotToken::new(""), None);
         assert_eq!(BotToken::new("  \n "), None);

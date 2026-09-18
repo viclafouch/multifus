@@ -13,6 +13,7 @@
     "tauri": "tauri",
     "draw:dmg": "node scripts/draw-dmg.mjs",
     "preview:dmg": "node scripts/preview-dmg.mjs",
+    "draw:nsis": "node scripts/draw-nsis.mjs",
     "typecheck": "tsc --noEmit",
     "i18n:extract": "lingui extract",
     "i18n:check": "lingui compile --strict",

@@ -225,7 +225,8 @@ export const PAGE_BODIES = {
     caveats: [
       msg`Multifus est fait pour les Mac Apple Silicon, ceux qui ont une puce M1 ou plus récente, pas pour les Mac Intel.`,
       msg`Le pseudo, la tête de classe et le bouton par personnage n’existent que sur la barre des tâches de Windows.`,
-      msg`Un client en plein écran prend un bureau à lui, et la bascule devient un glissement d’un bureau à l’autre.`
+      msg`Un client en plein écran prend un bureau à lui, et la bascule devient un glissement d’un bureau à l’autre.`,
+      msg`Avant de mettre Multifus à la corbeille, passez par À propos, Tout remettre à neuf : macOS ne prévient aucune application qu’on la jette.`
     ]
   },
   windows: null,

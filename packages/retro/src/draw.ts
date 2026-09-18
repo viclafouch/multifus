@@ -1,6 +1,10 @@
 /// <reference types="node" />
 import { readFile } from 'node:fs/promises'
 
+export const WORDMARK = 'MULTIFUS'
+
+export const TAGLINE = 'Gestionnaire de fenêtres pour Dofus Retro'
+
 type RetroFont = Readonly<{
   name: string
   file: string
@@ -23,6 +27,36 @@ export const inkedWith = (color: string, alpha: number) => {
   })
 
   return `rgb(${channels.join(' ')} / ${alpha})`
+}
+
+const HEX_DECLARATION = /--([a-z-]+):\s*(#[\da-f]{6})\b/gu
+
+export const paletteOf = (sheet: string) => {
+  const declared = new Map<string, string>()
+
+  for (const found of sheet.matchAll(HEX_DECLARATION)) {
+    declared.set(found[1], found[2])
+  }
+
+  const hexOf = (name: string) => {
+    const hex = declared.get(name)
+
+    if (hex === undefined) {
+      throw new Error(`no retro sheet declares --${name} as a hex color`)
+    }
+
+    return hex
+  }
+
+  return {
+    iron: hexOf('iron'),
+    slate: hexOf('slate'),
+    band: hexOf('band'),
+    khaki: hexOf('khaki'),
+    cream: hexOf('cream'),
+    leaf: hexOf('leaf'),
+    leafLit: hexOf('leaf-lit')
+  }
 }
 
 export const dataUrlOf = (markup: string) => {
