@@ -21,7 +21,10 @@ export const LoopPlate = ({
   const { source, size, poster } = LOOPS[loop]
 
   return (
-    <div className="stage carried relative aspect-loop w-full">
+    <div
+      className="stage carried relative aspect-loop w-full"
+      data-auto={isAuto ? '' : undefined}
+    >
       <video
         ref={video}
         src={source}

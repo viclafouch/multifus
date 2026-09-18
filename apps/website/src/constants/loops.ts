@@ -35,7 +35,7 @@ export const LOOPS = {
     size: { width: 1280, height: 720 },
     poster: homePoster,
     seconds: 18,
-    filmed: REFILMED_ON
+    filmed: FILMED_ON
   },
   autoFocus: {
     source: autoFocusLoop,

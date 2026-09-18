@@ -7,7 +7,7 @@ type PlayerParams = Readonly<{
 
 export const usePlayer = ({ isStill, isAuto }: PlayerParams) => {
   const video = React.useRef<HTMLVideoElement>(null)
-  const [isPlaying, setIsPlaying] = React.useState(false)
+  const [isPlaying, setIsPlaying] = React.useState(isAuto && !isStill)
 
   React.useEffect(() => {
     const element = video.current

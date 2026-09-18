@@ -46,11 +46,6 @@ export type Loop = Readonly<{
   filmed: string
 }>
 
-export type LoopToggleProps = Readonly<{
-  isPlaying: boolean
-  onToggle: () => void
-}>
-
 export type Page = Readonly<{
   kind: PageKind
   slugs: Readonly<Record<Language, string>>

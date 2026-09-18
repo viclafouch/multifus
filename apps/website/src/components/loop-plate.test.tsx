@@ -1,10 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { I18nProvider } from '@lingui/react'
-import { cleanup, render, screen } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { LoopPlate } from '@/components/loop-plate'
+import { IDLE_AFTER } from '@/hooks/use-idle-pointer'
 import { SPEAKERS } from '@/lib/i18n'
 
-const CAPTION = 'Les six mécanismes à l’œuvre dans le jeu'
+const CAPTION =
+  'La roue des personnages, l’AutoFocus, le déplacement rapide et le tableau des runes, dans le jeu'
 
 const watchMotion = () => {
   return {
@@ -71,14 +73,50 @@ describe('the loop plate', () => {
     expect(play).toHaveBeenCalledWith()
   })
 
-  it('starts the loop of the entrance on its own, behind the same curtain', () => {
+  it('starts the loop of the entrance with its curtain already out', () => {
     const play = spyOnPlayback()
 
     show(true)
 
     expect(play).toHaveBeenCalledWith()
-    expect(
-      screen.getByRole('button', { name: 'Lire' }).querySelector('svg')
-    ).not.toBeNull()
+    expect(screen.getByRole('button', { name: 'Pause' })).toBeDefined()
+  })
+
+  it('sends the curtain to sleep once the pointer stops moving', () => {
+    vi.useFakeTimers()
+    spyOnPlayback()
+
+    show(true)
+
+    const surface = screen.getByRole('button', { name: 'Pause' })
+
+    act(() => {
+      vi.advanceTimersByTime(IDLE_AFTER)
+    })
+
+    expect(surface.hasAttribute('data-idle')).toBe(true)
+
+    fireEvent.pointerMove(surface)
+
+    expect(surface.hasAttribute('data-idle')).toBe(false)
+
+    vi.useRealTimers()
+  })
+
+  it('leaves the curtain awake while the loop stays stopped', () => {
+    vi.useFakeTimers()
+    spyOnPlayback()
+
+    show(false)
+
+    const surface = screen.getByRole('button', { name: 'Lire' })
+
+    act(() => {
+      vi.advanceTimersByTime(IDLE_AFTER)
+    })
+
+    expect(surface.hasAttribute('data-idle')).toBe(false)
+
+    vi.useRealTimers()
   })
 })

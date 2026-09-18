@@ -986,7 +986,9 @@
   gap: 14px;
   cursor: pointer;
   background-color: color-mix(in srgb, var(--night), transparent 52%);
-  transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition:
+    opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.5s,
+    background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:focus-visible {
     outline: 2px solid var(--cream);
@@ -994,24 +996,34 @@
   }
 
   &[data-playing] {
+    opacity: 0;
     background-color: transparent;
-    animation: flash 1.4s cubic-bezier(0.4, 0, 0.2, 1) both;
   }
 
   &[data-playing]:focus-visible {
-    animation: none;
+    opacity: 1;
+    transition-delay: 0s;
     background-color: color-mix(in srgb, var(--night), transparent 76%);
   }
-}
 
-@keyframes flash {
-  0%,
-  55% {
-    opacity: 1;
+  @media (hover: hover) {
+    &[data-playing]:hover {
+      opacity: 1;
+      transition-delay: 0s;
+      background-color: color-mix(in srgb, var(--night), transparent 76%);
+    }
+
+    &[data-playing][data-idle]:not(:focus-visible) {
+      opacity: 0;
+      cursor: none;
+    }
   }
 
-  100% {
-    opacity: 0;
+  @media (hover: none) {
+    &[data-playing]:not([data-idle]) {
+      opacity: 1;
+      background-color: color-mix(in srgb, var(--night), transparent 76%);
+    }
   }
 }
 
@@ -1056,7 +1068,7 @@
     animation: halo 2.8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
   }
 
-  .curtain:not([data-playing]):hover &,
+  .curtain:hover &,
   .curtain:focus-visible & {
     transform: scale(1.06);
     border-color: var(--leaf-lit);
@@ -1065,6 +1077,10 @@
 
   .curtain[data-playing] &::after {
     content: none;
+  }
+
+  .stage[data-auto] & {
+    --spacing-beacon: clamp(2.75rem, 6.25vw, 4.5rem);
   }
 }
 
