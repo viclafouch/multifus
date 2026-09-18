@@ -1,4 +1,3 @@
-import type { MessageDescriptor } from '@lingui/core'
 import { msg } from '@lingui/core/macro'
 import { useLingui } from '@lingui/react'
 import { BellRingingIcon } from '@phosphor-icons/react/dist/ssr/BellRinging'
@@ -11,7 +10,6 @@ import type { Point } from '@/@types/body'
 import type { PageScreenProps } from '@/@types/screen'
 import { Band } from '@/components/band'
 import { BandTitle } from '@/components/band-title'
-import { CaveatList } from '@/components/caveat-list'
 import { CharacterKeys } from '@/components/character-keys'
 import { FeatureCard } from '@/components/feature-card'
 import { PageLink } from '@/components/page-link'
@@ -82,11 +80,6 @@ const MODERN_ANSWER = msg`Non. Multifus ne connaît que Dofus Retro, la 1.29.`
 
 const ASK_ALLOWED = msg`Ankama l’autorise ?`
 
-const CAVEATS = [
-  msg`Windows peut demander confirmation la première fois : il ne connaît pas encore Multifus.`,
-  msg`Multifus fermé, le titre et l’icône d’origine reviennent.`
-] as const satisfies readonly MessageDescriptor[]
-
 export const WindowsScreen = ({ page }: PageScreenProps) => {
   const { i18n } = useLingui()
 
@@ -116,7 +109,7 @@ export const WindowsScreen = ({ page }: PageScreenProps) => {
         <Prose>{i18n._(KEYS_LEAD)}</Prose>
         <CharacterKeys />
       </Band>
-      <Band className="reveal gap-7 py-10">
+      <Band className="reveal gap-7 pt-10 pb-20">
         <BandTitle>{i18n._(QUESTIONS_TITLE)}</BandTitle>
         <ul className="grid items-start gap-4 md:grid-cols-2">
           <li className="reveal">
@@ -157,9 +150,6 @@ export const WindowsScreen = ({ page }: PageScreenProps) => {
             </Question>
           </li>
         </ul>
-      </Band>
-      <Band className="reveal pt-8 pb-20">
-        <CaveatList caveats={CAVEATS} />
       </Band>
     </>
   )

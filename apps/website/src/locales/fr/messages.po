@@ -54,8 +54,8 @@ msgstr "à moitié"
 #~ msgstr "À quatre connectés, la question se pose à chaque fois."
 
 #: src/constants/wording.ts
-msgid "À savoir"
-msgstr "À savoir"
+#~ msgid "À savoir"
+#~ msgstr "À savoir"
 
 #: src/constants/legal.ts
 #~ msgid "À titre personnel, hors de toute société, et sans rien vendre. Son identité est connue de l’hébergeur, comme la loi le demande."
@@ -187,8 +187,8 @@ msgid "Avant d’installer"
 msgstr "Avant d’installer"
 
 #: src/constants/bodies.ts
-msgid "Avant de mettre Multifus à la corbeille, passez par À propos, Tout remettre à neuf : macOS ne prévient aucune application qu’on la jette."
-msgstr "Avant de mettre Multifus à la corbeille, passez par À propos, Tout remettre à neuf : macOS ne prévient aucune application qu’on la jette."
+#~ msgid "Avant de mettre Multifus à la corbeille, passez par À propos, Tout remettre à neuf : macOS ne prévient aucune application qu’on la jette."
+#~ msgstr "Avant de mettre Multifus à la corbeille, passez par À propos, Tout remettre à neuf : macOS ne prévient aucune application qu’on la jette."
 
 #: src/components/taskbar-proof.tsx
 msgid "Avec Multifus"
@@ -1051,8 +1051,8 @@ msgid "La règle d’Ankama"
 msgstr "La règle d’Ankama"
 
 #: src/constants/bodies.ts
-msgid "La roue montre les personnages connectés, et n’en reconnecte aucun."
-msgstr "La roue montre les personnages connectés, et n’en reconnecte aucun."
+#~ msgid "La roue montre les personnages connectés, et n’en reconnecte aucun."
+#~ msgstr "La roue montre les personnages connectés, et n’en reconnecte aucun."
 
 #: src/constants/bodies.ts
 #~ msgid "La roue ne demande rien à votre mémoire."
@@ -1307,8 +1307,8 @@ msgid "Le projet"
 msgstr "Le projet"
 
 #: src/constants/bodies.ts
-msgid "Le pseudo, la tête de classe et le bouton par personnage n’existent que sur la barre des tâches de Windows."
-msgstr "Le pseudo, la tête de classe et le bouton par personnage n’existent que sur la barre des tâches de Windows."
+#~ msgid "Le pseudo, la tête de classe et le bouton par personnage n’existent que sur la barre des tâches de Windows."
+#~ msgstr "Le pseudo, la tête de classe et le bouton par personnage n’existent que sur la barre des tâches de Windows."
 
 #: src/constants/bodies.ts
 #~ msgid "Le relais va dans un sens : vous ne répondez pas depuis le téléphone."
@@ -1351,8 +1351,8 @@ msgid "Le tableau garde sa place"
 msgstr "Le tableau garde sa place"
 
 #: src/constants/bodies.ts
-msgid "Le tableau ne s’affiche pas sur un client en plein écran."
-msgstr "Le tableau ne s’affiche pas sur un client en plein écran."
+#~ msgid "Le tableau ne s’affiche pas sur un client en plein écran."
+#~ msgstr "Le tableau ne s’affiche pas sur un client en plein écran."
 
 #: src/constants/bodies.ts
 msgid "Le tableau part et revient"
@@ -1547,16 +1547,16 @@ msgstr "Multifus amène devant vous la fenêtre du personnage qui joue sur Dofus
 #~ msgstr "Multifus démarre toujours avec lui éteint."
 
 #: src/constants/bodies.ts
-msgid "Multifus écoute les notifications du jeu, et ne lit rien dans sa mémoire."
-msgstr "Multifus écoute les notifications du jeu, et ne lit rien dans sa mémoire."
+#~ msgid "Multifus écoute les notifications du jeu, et ne lit rien dans sa mémoire."
+#~ msgstr "Multifus écoute les notifications du jeu, et ne lit rien dans sa mémoire."
 
 #: src/constants/bodies.ts
 #~ msgid "Multifus est déjà là quand vous ouvrez vos clients, et il vit à côté de l’horloge."
 #~ msgstr "Multifus est déjà là quand vous ouvrez vos clients, et il vit à côté de l’horloge."
 
 #: src/constants/bodies.ts
-msgid "Multifus est fait pour les Mac Apple Silicon, ceux qui ont une puce M1 ou plus récente, pas pour les Mac Intel."
-msgstr "Multifus est fait pour les Mac Apple Silicon, ceux qui ont une puce M1 ou plus récente, pas pour les Mac Intel."
+#~ msgid "Multifus est fait pour les Mac Apple Silicon, ceux qui ont une puce M1 ou plus récente, pas pour les Mac Intel."
+#~ msgstr "Multifus est fait pour les Mac Apple Silicon, ceux qui ont une puce M1 ou plus récente, pas pour les Mac Intel."
 
 #: src/constants/wording.ts
 msgid "Multifus est gratuit, pour Mac et pour Windows. Trois gestes, et vous jouez en multicompte sur Dofus Retro."
@@ -1603,8 +1603,8 @@ msgstr "Multifus face aux autres"
 #~ msgstr "Multifus face aux autres logiciels multicompte"
 
 #: src/screens/windows-screen.tsx
-msgid "Multifus fermé, le titre et l’icône d’origine reviennent."
-msgstr "Multifus fermé, le titre et l’icône d’origine reviennent."
+#~ msgid "Multifus fermé, le titre et l’icône d’origine reviennent."
+#~ msgstr "Multifus fermé, le titre et l’icône d’origine reviennent."
 
 #: src/screens/legal-screen.tsx
 msgid "Multifus n’a aucun lien avec Ankama : ni partenariat, ni approbation, ni soutien d’aucune sorte."
@@ -2047,8 +2047,8 @@ msgid "Seulement le pseudo."
 msgstr "Seulement le pseudo."
 
 #: src/constants/bodies.ts
-msgid "Seulement les messages privés, pas les messages de guilde ou de commerce."
-msgstr "Seulement les messages privés, pas les messages de guilde ou de commerce."
+#~ msgid "Seulement les messages privés, pas les messages de guilde ou de commerce."
+#~ msgstr "Seulement les messages privés, pas les messages de guilde ou de commerce."
 
 #: src/components/bot-ban.tsx
 msgid "Si vous cherchez à faire jouer vos personnages sans vous, Multifus ne le fera jamais : il amène leur fenêtre devant vous, et rien d’autre."
@@ -2135,8 +2135,8 @@ msgid "Taille et transparence se règlent"
 msgstr "Taille et transparence se règlent"
 
 #: src/constants/bodies.ts
-msgid "Tant que la roue est ouverte, le jeu ne reçoit plus votre souris."
-msgstr "Tant que la roue est ouverte, le jeu ne reçoit plus votre souris."
+#~ msgid "Tant que la roue est ouverte, le jeu ne reçoit plus votre souris."
+#~ msgstr "Tant que la roue est ouverte, le jeu ne reçoit plus votre souris."
 
 #: src/constants/bodies.ts
 #~ msgid "Tant que le disque est ouvert, le jeu ne voit plus votre souris : aucun sort ne part."
@@ -2235,8 +2235,8 @@ msgstr "Un clic par personnage, et la team suit."
 #~ msgstr "Un clic par personnage, et toute la team marche au même endroit."
 
 #: src/constants/bodies.ts
-msgid "Un clic sur le tableau ne fait pas passer Multifus devant le jeu."
-msgstr "Un clic sur le tableau ne fait pas passer Multifus devant le jeu."
+#~ msgid "Un clic sur le tableau ne fait pas passer Multifus devant le jeu."
+#~ msgstr "Un clic sur le tableau ne fait pas passer Multifus devant le jeu."
 
 #: src/constants/bodies.ts
 #~ msgid "Un clic sur le tableau ne fait pas sauter Multifus devant."
@@ -2247,8 +2247,8 @@ msgstr "Un clic sur le tableau ne fait pas passer Multifus devant le jeu."
 #~ msgstr "Un clic, un personnage."
 
 #: src/constants/bodies.ts
-msgid "Un client en plein écran prend un bureau à lui, et la bascule devient un glissement d’un bureau à l’autre."
-msgstr "Un client en plein écran prend un bureau à lui, et la bascule devient un glissement d’un bureau à l’autre."
+#~ msgid "Un client en plein écran prend un bureau à lui, et la bascule devient un glissement d’un bureau à l’autre."
+#~ msgstr "Un client en plein écran prend un bureau à lui, et la bascule devient un glissement d’un bureau à l’autre."
 
 #: src/constants/bodies.ts
 msgid "Un de vos personnages reçoit une invitation ou un message, et sa fenêtre passe devant vous toute seule."
@@ -2387,8 +2387,8 @@ msgstr "Une couleur par personnage"
 #~ msgstr "Une mule se met de côté."
 
 #: src/constants/bodies.ts
-msgid "Une phrase pose du texte, et rien d’autre."
-msgstr "Une phrase pose du texte, et rien d’autre."
+#~ msgid "Une phrase pose du texte, et rien d’autre."
+#~ msgstr "Une phrase pose du texte, et rien d’autre."
 
 #: src/constants/bodies.ts
 #~ msgid "Une phrase qui partirait seule finirait mal."
@@ -2671,8 +2671,8 @@ msgstr "Vous maintenez une combinaison, la roue s’ouvre au milieu de l’écra
 #~ msgstr "Vous ne perdez plus de tour"
 
 #: src/constants/bodies.ts
-msgid "Vous ne pouvez pas répondre depuis votre téléphone."
-msgstr "Vous ne pouvez pas répondre depuis votre téléphone."
+#~ msgid "Vous ne pouvez pas répondre depuis votre téléphone."
+#~ msgstr "Vous ne pouvez pas répondre depuis votre téléphone."
 
 #: src/constants/bodies.ts
 msgid "Vous ne quittez plus le jeu pour chercher le poids d’une rune."
@@ -2731,5 +2731,5 @@ msgid "Windows empile les fenêtres d’un même jeu sous un seul bouton. Avec 6
 msgstr "Windows empile les fenêtres d’un même jeu sous un seul bouton. Avec 6 Enutrofs et 2 Crâs, vous cherchez. Multifus donne son bouton à chacun."
 
 #: src/screens/windows-screen.tsx
-msgid "Windows peut demander confirmation la première fois : il ne connaît pas encore Multifus."
-msgstr "Windows peut demander confirmation la première fois : il ne connaît pas encore Multifus."
+#~ msgid "Windows peut demander confirmation la première fois : il ne connaît pas encore Multifus."
+#~ msgstr "Windows peut demander confirmation la première fois : il ne connaît pas encore Multifus."

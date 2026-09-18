@@ -25,5 +25,4 @@ export type Rule = Readonly<{
 export type Body = Readonly<{
   lead: MessageDescriptor
   boons: readonly Boon[]
-  caveats: readonly MessageDescriptor[]
 }>

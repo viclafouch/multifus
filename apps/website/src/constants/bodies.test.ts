@@ -32,8 +32,7 @@ const phrasesOf = (body: Body) => {
     body.lead,
     ...body.boons.flatMap((boon) => {
       return [boon.title, boon.line]
-    }),
-    ...body.caveats
+    })
   ]
 }
 

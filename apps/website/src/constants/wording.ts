@@ -81,8 +81,6 @@ export const PROJECT_TITLE = msg`Le projet`
 
 export const LIMITS_TITLE = msg`Ce que Multifus ne fait pas`
 
-export const CAVEATS_TITLE = msg`À savoir`
-
 export const QUESTIONS_TITLE = msg`Les questions qu’on se pose`
 
 export const NO_HARM = msg`Multifus ne lit pas la mémoire du jeu, ne touche à aucun de ses fichiers, et ne joue à votre place sur aucun personnage.`

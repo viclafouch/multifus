@@ -54,9 +54,6 @@ export const PAGE_BODIES = {
         title: msg`Vous choisissez les personnages inclus`,
         line: msg`Un personnage exclu garde sa fenêtre en arrière-plan tant que vous ne le remettez pas.`
       }
-    ],
-    caveats: [
-      msg`Multifus écoute les notifications du jeu, et ne lit rien dans sa mémoire.`
     ]
   },
   wheel: {
@@ -82,10 +79,6 @@ export const PAGE_BODIES = {
         title: msg`Un geste s’annule`,
         line: msg`Lâchez au centre de la roue, et aucune fenêtre ne bouge.`
       }
-    ],
-    caveats: [
-      msg`Tant que la roue est ouverte, le jeu ne reçoit plus votre souris.`,
-      msg`La roue montre les personnages connectés, et n’en reconnecte aucun.`
     ]
   },
   walk: {
@@ -111,8 +104,7 @@ export const PAGE_BODIES = {
         title: msg`Rien ne part sans vous`,
         line: msg`Le Déplacement rapide s’allume à une touche, et s’éteint quand il n’a plus de fenêtre où aller.`
       }
-    ],
-    caveats: []
+    ]
   },
   runeTable: {
     lead: msg`Le tableau des poids de runes se pose par-dessus la fenêtre du jeu, à la touche que vous avez choisie.`,
@@ -137,10 +129,6 @@ export const PAGE_BODIES = {
         title: msg`Le tableau part et revient`,
         line: msg`Un bouton le replace au coin de la fenêtre du jeu si vous le perdez de vue.`
       }
-    ],
-    caveats: [
-      msg`Un clic sur le tableau ne fait pas passer Multifus devant le jeu.`,
-      msg`Le tableau ne s’affiche pas sur un client en plein écran.`
     ]
   },
   relay: {
@@ -166,10 +154,6 @@ export const PAGE_BODIES = {
         title: msg`Vous savez qui s’est déconnecté`,
         line: msg`Dofus Retro déconnecte un personnage qui ne fait rien, et Multifus vous l’annonce.`
       }
-    ],
-    caveats: [
-      msg`Vous ne pouvez pas répondre depuis votre téléphone.`,
-      msg`Seulement les messages privés, pas les messages de guilde ou de commerce.`
     ]
   },
   quickTexts: {
@@ -195,8 +179,7 @@ export const PAGE_BODIES = {
         title: msg`Vos phrases parlent français`,
         line: msg`Les phrases livrées au premier lancement sont en français, même si vous lisez Multifus en anglais.`
       }
-    ],
-    caveats: [msg`Une phrase pose du texte, et rien d’autre.`]
+    ]
   },
   mac: {
     lead: msg`Presque tous les gestionnaires pour Dofus Retro s’arrêtent à Windows. Multifus est né sur Mac, et c’est de là que part la version Windows.`,
@@ -221,12 +204,6 @@ export const PAGE_BODIES = {
         title: msg`Vos raccourcis parlent Mac`,
         line: msg`Commande et Option s’affichent comme sur votre clavier, pas Ctrl et Alt.`
       }
-    ],
-    caveats: [
-      msg`Multifus est fait pour les Mac Apple Silicon, ceux qui ont une puce M1 ou plus récente, pas pour les Mac Intel.`,
-      msg`Le pseudo, la tête de classe et le bouton par personnage n’existent que sur la barre des tâches de Windows.`,
-      msg`Un client en plein écran prend un bureau à lui, et la bascule devient un glissement d’un bureau à l’autre.`,
-      msg`Avant de mettre Multifus à la corbeille, passez par À propos, Tout remettre à neuf : macOS ne prévient aucune application qu’on la jette.`
     ]
   },
   windows: null,
