@@ -6,14 +6,12 @@ import { DesktopTowerIcon } from '@phosphor-icons/react/dist/ssr/DesktopTower'
 import { GameControllerIcon } from '@phosphor-icons/react/dist/ssr/GameController'
 import { ShieldCheckIcon } from '@phosphor-icons/react/dist/ssr/ShieldCheck'
 import { UsersThreeIcon } from '@phosphor-icons/react/dist/ssr/UsersThree'
-import type { Point } from '@/@types/body'
 import type { PageScreenProps } from '@/@types/screen'
 import { Band } from '@/components/band'
 import { BandTitle } from '@/components/band-title'
 import { CharacterKeys } from '@/components/character-keys'
 import { FeatureCard } from '@/components/feature-card'
 import { PageLink } from '@/components/page-link'
-import { PointList } from '@/components/point-list'
 import { Prose } from '@/components/prose'
 import { Question } from '@/components/question'
 import { SystemStage } from '@/components/system-stage'
@@ -31,26 +29,7 @@ const FEATURES_TITLE = msg`Disponible sur Windows 10 et 11`
 
 const TASKBAR_TITLE = msg`Votre barre des tâches devient votre team`
 
-const TASKBAR_LEAD = msg`Windows empile les fenêtres d’un même jeu sous un seul bouton. Avec 6 Enutrofs et 2 Crâs, vous cherchez. Multifus donne son bouton à chacun.`
-
-const TASKBAR_POINTS = [
-  {
-    lead: msg`Seulement le pseudo.`,
-    line: msg`Vous lisez « Elyandra », pas « Elyandra - Dofus Retro ».`
-  },
-  {
-    lead: msg`La tête de classe.`,
-    line: msg`Votre Enutrof porte sa tête d’Enu, votre Crâ la sienne.`
-  },
-  {
-    lead: msg`La couleur du personnage.`,
-    line: msg`Vos 6 Enutrofs ont la même tête. La couleur les sépare.`
-  },
-  {
-    lead: msg`Un bouton par personnage.`,
-    line: msg`Vos clients ne s’empilent plus : chacun garde sa place.`
-  }
-] as const satisfies readonly Point[]
+const TASKBAR_LEAD = msg`Vos clients Dofus Retro portent tous la même icône, et leur titre finit par « - Dofus Retro », qui coupe les pseudos longs. Multifus réécrit le titre et l’icône de chaque fenêtre, et vous décochez ce que vous ne voulez pas.`
 
 const KEYS_TITLE = msg`Une touche, un personnage`
 
@@ -102,7 +81,6 @@ export const WindowsScreen = ({ page }: PageScreenProps) => {
         <BandTitle>{i18n._(TASKBAR_TITLE)}</BandTitle>
         <Prose>{i18n._(TASKBAR_LEAD)}</Prose>
         <TaskbarProof />
-        <PointList isSplit points={TASKBAR_POINTS} />
       </Band>
       <Band className="reveal gap-7 py-10">
         <BandTitle>{i18n._(KEYS_TITLE)}</BandTitle>

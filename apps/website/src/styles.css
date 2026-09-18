@@ -308,10 +308,6 @@
     --hand-ink: var(--flame);
   }
 
-  &[data-tone='lost'] img {
-    filter: saturate(0.12) brightness(0.72);
-  }
-
   &[data-tone='won'] {
     --hand-ink: var(--leaf-lit);
   }

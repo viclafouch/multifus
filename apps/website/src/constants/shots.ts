@@ -32,12 +32,12 @@ export const WINDOWS_SHOT_ALT = msg`La fenêtre de Multifus sur Windows, par-des
 
 export const TASKBAR_STACKED_SHOT = {
   src: taskbarStackedShot,
-  width: 1024,
-  height: 104
+  width: 640,
+  height: 39
 } as const satisfies Picture
 
 export const TASKBAR_SPLIT_SHOT = {
   src: taskbarSplitShot,
-  width: 1024,
-  height: 104
+  width: 640,
+  height: 39
 } as const satisfies Picture

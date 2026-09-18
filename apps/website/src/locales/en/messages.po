@@ -188,10 +188,6 @@ msgstr "Every column leads to its repository."
 msgid "Chaque message arrive dans la seconde, et leur nombre n’est pas limité."
 msgstr "Every message lands within the second, and their number is not capped."
 
-#: src/components/taskbar-proof.tsx
-msgid "Chaque personnage a le sien."
-msgstr "Every character gets its own."
-
 #: src/constants/systems.ts
 msgid "Cliquez sur le bouton vert. Le fichier arrive dans vos téléchargements."
 msgstr "Click the green button. The file lands in your downloads."
@@ -381,12 +377,8 @@ msgid "L’AutoFocus, la roue, le déplacement rapide, le tableau des runes, les
 msgstr "AutoFocus, the wheel, quick move, the rune table, private messages and quick texts all arrive together."
 
 #: src/components/taskbar-proof.tsx
-msgid "La barre des tâches de Windows avec un seul bouton Dofus Retro, qui empile les fenêtres de tous les personnages."
-msgstr "The Windows taskbar with a single Dofus Retro button, stacking the windows of every character."
-
-#: src/screens/windows-screen.tsx
-msgid "La couleur du personnage."
-msgstr "The colour of the character."
+msgid "L’icône"
+msgstr "The icon"
 
 #: src/constants/shots.ts
 msgid "La fenêtre de Multifus sur Mac, par-dessus les clients Dofus Retro ouverts sur le bureau."
@@ -417,20 +409,20 @@ msgid "La langue du site"
 msgstr "The language of the site"
 
 #: src/components/taskbar-proof.tsx
-msgid "La même barre des tâches avec un bouton par personnage, chacun portant son pseudo et sa tête de classe."
-msgstr "The same taskbar with one button per character, each carrying its nickname and its class head."
+msgid "la même icône pour tous vos clients"
+msgstr "the same icon for all your clients"
 
 #: src/screens/ankama-screen.tsx
 msgid "La règle d’Ankama"
 msgstr "The rule Ankama set"
 
+#: src/components/taskbar-proof.tsx
+msgid "la tête de classe du personnage, à sa couleur"
+msgstr "the class head of the character, in its colour"
+
 #: src/constants/bodies.ts
 msgid "La tête de classe suffit"
 msgstr "The class head is enough"
-
-#: src/screens/windows-screen.tsx
-msgid "La tête de classe."
-msgstr "The class head."
 
 #: src/constants/bodies.ts
 msgid "Lâchez au centre de la roue, et aucune fenêtre ne bouge."
@@ -516,6 +508,10 @@ msgstr "Multiboxing on Dofus Retro"
 msgid "Le navigateur reste fermé"
 msgstr "The browser stays closed"
 
+#: src/components/taskbar-proof.tsx
+msgid "Le nom"
+msgstr "The name"
+
 #: src/screens/home-screen.tsx
 msgid "Le paquet est signé par Apple, le code est ouvert, et Ankama tolère ce genre d’outil tant qu’il ne touche pas au jeu. Les trois se vérifient."
 msgstr "The package is signed by Apple, the code is open, and Ankama tolerates this kind of tool as long as it does not touch the game. All three can be checked."
@@ -539,6 +535,14 @@ msgstr "Rune weights without leaving the game."
 #: src/constants/wording.ts
 msgid "Le projet"
 msgstr "The project"
+
+#: src/components/taskbar-proof.tsx
+msgid "le pseudo, et rien d’autre"
+msgstr "the nickname, and nothing else"
+
+#: src/components/taskbar-proof.tsx
+msgid "le pseudo, puis « - Dofus Retro »"
+msgstr "the nickname, then “- Dofus Retro”"
 
 #: src/components/language-offer.tsx
 msgid "Le site dans votre langue"
@@ -579,6 +583,10 @@ msgstr "Macros, of any kind"
 #: src/screens/legal-screen.tsx
 msgid "Les marques qui ne sont pas les nôtres"
 msgstr "The trademarks that are not ours"
+
+#: src/components/taskbar-proof.tsx
+msgid "Les mêmes quatre boutons avec Multifus : chacun porte la tête de classe de son personnage, cerclée de sa couleur, et son pseudo sans le nom du jeu."
+msgstr "The same four buttons with Multifus: each one carries the class head of its character, ringed in its colour, and its nickname without the name of the game."
 
 #: src/components/site-header.tsx
 msgid "Les pages de Multifus"
@@ -872,6 +880,10 @@ msgstr "Independent project, with no link to Ankama."
 msgid "Qu’est-ce que Multifus demande à Windows ?"
 msgstr "What does Multifus ask Windows for?"
 
+#: src/components/taskbar-proof.tsx
+msgid "Quatre boutons de la barre des tâches de Windows, tous avec la même icône Dofus Retro, et un titre coupé faute de place."
+msgstr "Four Windows taskbar buttons, all with the same Dofus Retro icon, and a title cut short for want of room."
+
 #: src/constants/bodies.ts
 msgid "Quatre clics, quatre personnages"
 msgstr "Four clicks, four characters"
@@ -932,9 +944,9 @@ msgstr "Without Multifus"
 msgid "Sans publicité"
 msgstr "No advertising"
 
-#: src/screens/windows-screen.tsx
-msgid "Seulement le pseudo."
-msgstr "The nickname only."
+#: src/components/taskbar-proof.tsx
+msgid "Si votre Windows colle les fenêtres d’un même jeu sous un seul bouton, Multifus rend son bouton à chacune."
+msgstr "If your Windows sticks the windows of one game under a single button, Multifus gives each one its button back."
 
 #: src/components/bot-ban.tsx
 msgid "Si vous cherchez à faire jouer vos personnages sans vous, Multifus ne le fera jamais : il amène leur fenêtre devant vous, et rien d’autre."
@@ -1012,10 +1024,6 @@ msgstr "Quick texts from the keyboard on Dofus Retro"
 msgid "Un bouton le replace au coin de la fenêtre du jeu si vous le perdez de vue."
 msgstr "A button puts it back in the corner of the game window if you lose sight of it."
 
-#: src/screens/windows-screen.tsx
-msgid "Un bouton par personnage."
-msgstr "One button per character."
-
 #: src/constants/wording.ts
 msgid "Un clic gauche, et la team suit."
 msgstr "One left click, the team follows."
@@ -1047,10 +1055,6 @@ msgstr "An excluded character keeps its window in the background until you put i
 #: src/constants/bodies.ts
 msgid "Un personnage rangé dans le Dock ou dans la barre des tâches repasse devant vous."
 msgstr "A character sitting in the Dock or the taskbar comes back in front of you."
-
-#: src/components/taskbar-proof.tsx
-msgid "Un seul bouton, et le même nom pour tout le monde."
-msgstr "A single button, and the same name for everyone."
 
 #: src/constants/ankama.ts
 msgid "Une action, un seul personnage"
@@ -1101,12 +1105,8 @@ msgid "Voir les {rows} lignes du comparatif"
 msgstr "See the {rows} lines of the comparison"
 
 #: src/screens/windows-screen.tsx
-msgid "Vos 6 Enutrofs ont la même tête. La couleur les sépare."
-msgstr "Your 6 Enutrofs share one face. The colour tells them apart."
-
-#: src/screens/windows-screen.tsx
-msgid "Vos clients ne s’empilent plus : chacun garde sa place."
-msgstr "Your clients no longer stack: each one keeps its place."
+msgid "Vos clients Dofus Retro portent tous la même icône, et leur titre finit par « - Dofus Retro », qui coupe les pseudos longs. Multifus réécrit le titre et l’icône de chaque fenêtre, et vous décochez ce que vous ne voulez pas."
+msgstr "Your Dofus Retro clients all carry the same icon, and their title ends with “- Dofus Retro”, which cuts long nicknames. Multifus rewrites the title and the icon of every window, and you untick whatever you do not want."
 
 #: src/constants/bodies.ts
 msgid "Vos messages partent vers votre Telegram, et c’est tout."
@@ -1136,10 +1136,6 @@ msgstr "Your shortcuts speak Mac"
 msgid "Votre barre des tâches devient votre team"
 msgstr "Your taskbar becomes your team"
 
-#: src/screens/windows-screen.tsx
-msgid "Votre Enutrof porte sa tête d’Enu, votre Crâ la sienne."
-msgstr "Your Enutrof wears its Enu face, your Cra wears its own."
-
 #: src/screens/legal-screen.tsx
 msgid "Votre navigateur ne garde qu’une chose : que la proposition de lire le site dans votre langue vous a déjà été montrée. Elle ne quitte pas votre machine, et vider les données du site l’efface."
 msgstr "Your browser keeps one thing only: that the offer to read the site in your language has already been shown to you. It never leaves your machine, and clearing the site data wipes it."
@@ -1159,6 +1155,10 @@ msgstr "Your phone receives your private messages from the game."
 #: src/constants/bodies.ts
 msgid "Vous allumez le Déplacement rapide, vous cliquez là où vous voulez aller, et c’est le personnage suivant qui arrive devant vous."
 msgstr "You switch Quick move on, you click where you want to go, and the next character lands in front of you."
+
+#: src/components/taskbar-proof.tsx
+msgid "Vous cherchez votre Enutrof."
+msgstr "You hunt for your Enutrof."
 
 #: src/constants/bodies.ts
 msgid "Vous choisissez l’ordre"
@@ -1184,9 +1184,9 @@ msgstr "You went off to eat, your characters stayed online, and someone writes t
 msgid "Vous l’écrivez une fois, et la combinaison marche sur le personnage qui est devant vous."
 msgstr "You write it once, and the shortcut works on whichever character is in front of you."
 
-#: src/screens/windows-screen.tsx
-msgid "Vous lisez « Elyandra », pas « Elyandra - Dofus Retro »."
-msgstr "You read “Elyandra”, not “Elyandra - Dofus Retro”."
+#: src/components/taskbar-proof.tsx
+msgid "Vous le voyez."
+msgstr "You see it."
 
 #: src/constants/bodies.ts
 msgid "Vous maintenez une combinaison, la roue s’ouvre au milieu de l’écran, vous visez une tête et vous lâchez."
@@ -1207,7 +1207,3 @@ msgstr "You recognise the portrait and the nickname, and you go straight to it."
 #: src/constants/bodies.ts
 msgid "Vous savez qui s’est déconnecté"
 msgstr "You know who got disconnected"
-
-#: src/screens/windows-screen.tsx
-msgid "Windows empile les fenêtres d’un même jeu sous un seul bouton. Avec 6 Enutrofs et 2 Crâs, vous cherchez. Multifus donne son bouton à chacun."
-msgstr "Windows stacks the windows of one game under a single button. With 6 Enutrofs and 2 Cras, you go hunting. Multifus gives each one its own button."
