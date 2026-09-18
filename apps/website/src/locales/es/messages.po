@@ -81,7 +81,7 @@ msgid "AutoFocus"
 msgstr "AutoFocus"
 
 #: src/constants/wording.ts
-msgid "AutoFocus multicompte pour Dofus Retro"
+msgid "AutoFocus en multicompte pour Dofus Retro"
 msgstr "AutoFocus multicuenta para Dofus Retro"
 
 #: src/constants/wording.ts
@@ -136,6 +136,10 @@ msgstr "Lo que esta página no promete"
 msgid "Ce que chaque version a changé."
 msgstr "Lo que ha cambiado cada versión."
 
+#: src/constants/wording.ts
+msgid "Ce que chaque version de Multifus a changé pour le multicompte sur Dofus Retro : les fonctionnalités ajoutées, les réglages déplacés, les défauts corrigés."
+msgstr "Lo que cada versión de Multifus ha cambiado para la multicuenta en Dofus Retro: las funciones añadidas, los ajustes movidos, los fallos corregidos."
+
 #: src/components/rival-table.tsx
 msgid "Ce que fait l’outil"
 msgstr "Lo que hace la herramienta"
@@ -163,6 +167,14 @@ msgstr "Lo que hace que te baneen"
 #: src/components/lost-word.tsx
 msgid "Cette page n’existe pas"
 msgstr "Esta página no existe"
+
+#: src/constants/wording.ts
+msgid "Changer de fenêtre en multicompte Dofus Retro"
+msgstr "Cambiar de ventana en multicuenta en Dofus Retro"
+
+#: src/constants/wording.ts
+msgid "Changez de fenêtre sur Dofus Retro sans touche à retenir : maintenez une combinaison, visez une tête de classe dans la roue, lâchez, la fenêtre arrive."
+msgstr "Cambia de ventana en Dofus Retro sin ninguna tecla que recordar: mantén una combinación, apunta a una cabeza de clase en la rueda y suelta."
 
 #: src/screens/comparison-screen.tsx
 msgid "Chaque case est lue dans le code de l’outil, jamais sur sa page d’accueil. Un outil qui garde son code fermé n’a pas de colonne ici. Et Multifus perd deux lignes, parce qu’un comparatif qu’on gagne partout ne vaut rien."
@@ -202,7 +214,7 @@ msgstr "Comparativa"
 
 #: src/constants/wording.ts
 msgid "Comparatif des logiciels multicompte Dofus Retro"
-msgstr "Comparativa de programas multicuenta de Dofus Retro"
+msgstr "Comparativa de programas multicuenta Dofus Retro"
 
 #: src/constants/bodies.ts
 msgid "Confidentialité et sécurité à 100%"
@@ -228,13 +240,13 @@ msgstr "En su propia ventana, no sobre el juego."
 msgid "Déplacement rapide"
 msgstr "Movimiento rápido"
 
-#: src/constants/wording.ts
-msgid "Déplacement rapide multicompte sur Dofus Retro"
-msgstr "Movimiento rápido multicuenta en Dofus Retro"
-
 #: src/constants/ankama.ts
 msgid "Déplacer plusieurs personnages d’un coup"
 msgstr "Mover varios personajes de golpe"
+
+#: src/constants/wording.ts
+msgid "Déplacer sa team en multicompte sur Dofus Retro"
+msgstr "Mover todo tu equipo en Dofus Retro multicuenta"
 
 #: src/constants/rivals.ts
 msgid "Deux équipes fixes, T1 et T2 : elles filtrent le cycle, elles n’enregistrent pas d’ordre."
@@ -341,8 +353,8 @@ msgid "Journal des versions"
 msgstr "Novedades"
 
 #: src/constants/wording.ts
-msgid "Journal des versions de Multifus"
-msgstr "Novedades de Multifus"
+msgid "Journal des versions du multicompte Dofus Retro"
+msgstr "Novedades del programa multicuenta de Dofus Retro"
 
 #: src/screens/windows-screen.tsx
 msgid "L’accès aux notifications, et rien d’autre."
@@ -359,6 +371,10 @@ msgstr "La audiencia se cuenta sin nombrarte. <0>Vercel Analytics</0> cuenta las
 #: src/components/site-footer.tsx
 msgid "L’auteur sur X"
 msgstr "El autor en X"
+
+#: src/constants/wording.ts
+msgid "L’AutoFocus amène devant vous la fenêtre du personnage qui joue sur Dofus Retro : début de tour, invitation, échange, message privé, craft, percepteur."
+msgstr "El AutoFocus trae ante ti la ventana del personaje que juega en Dofus Retro: inicio de turno, invitación, intercambio, mensaje privado, oficio, recaudador."
 
 #: src/constants/summons.ts
 msgid "L’AutoFocus, la roue, le déplacement rapide, le tableau des runes, les messages privés et les textes rapides arrivent ensemble."
@@ -477,8 +493,20 @@ msgid "Le multicompte Dofus Retro sur Mac, dans une application qu’Apple a vé
 msgstr "La multicuenta de Dofus Retro en Mac, en una aplicación que Apple ha revisado."
 
 #: src/constants/wording.ts
+msgid "Le multicompte Dofus Retro sur Mac, dans une application vérifiée par Apple qui s’ouvre au premier double-clic. Les six fonctionnalités y sont, sans exception."
+msgstr "La multicuenta de Dofus Retro en Mac, en una aplicación revisada por Apple que se abre al primer doble clic. Las seis funciones están ahí, sin excepción."
+
+#: src/constants/wording.ts
+msgid "Le multicompte Dofus Retro sur Windows 10 et 11 : chaque personnage prend son bouton dans la barre des tâches, avec son pseudo et sa tête de classe."
+msgstr "La multicuenta de Dofus Retro en Windows 10 y 11: cada personaje tiene su botón en la barra de tareas, con su apodo y su cabeza de clase."
+
+#: src/constants/wording.ts
 msgid "Le multicompte Dofus Retro sur Windows 10 et 11, avec une barre des tâches personnalisable."
 msgstr "La multicuenta de Dofus Retro en Windows 10 y 11, con una barra de tareas personalizable."
+
+#: src/constants/wording.ts
+msgid "Le multicompte est-il autorisé sur Dofus Retro ?"
+msgstr "¿Está permitida la multicuenta en Dofus Retro?"
 
 #: src/screens/home-screen.tsx
 msgid "Le multicompte sur Dofus Retro"
@@ -523,6 +551,10 @@ msgstr "El sitio está alojado por <0>{VERCEL_NAME}</0>, {VERCEL_ADDRESS}, en Es
 #: src/constants/bodies.ts
 msgid "Le tableau des poids de runes se pose par-dessus la fenêtre du jeu, à la touche que vous avez choisie."
 msgstr "La tabla de pesos de runas se pone sobre la ventana del juego, con la tecla que hayas elegido."
+
+#: src/constants/wording.ts
+msgid "Le tableau du poids des runes de Dofus Retro se pose par-dessus le jeu, à la touche de votre choix. Vous forgemagez sans jamais ouvrir votre navigateur."
+msgstr "La tabla del peso de las runas de Dofus Retro se coloca sobre el juego, en la tecla que elijas. Haces forjamagia sin abrir nunca el navegador."
 
 #: src/constants/bodies.ts
 msgid "Le tableau garde sa place"
@@ -592,6 +624,10 @@ msgstr "Programa multicuenta de Dofus Retro para Mac"
 msgid "Logiciel multicompte Dofus Retro sur Windows"
 msgstr "Programa multicuenta de Dofus Retro para Windows"
 
+#: src/constants/wording.ts
+msgid "Logiciel multicompte gratuit pour Dofus Retro"
+msgstr "Programa multicuenta gratuito para Dofus Retro"
+
 #: src/components/language-offer.tsx
 msgid "Masquer cette proposition"
 msgstr "Ocultar esta sugerencia"
@@ -613,7 +649,7 @@ msgid "Messages privés"
 msgstr "Mensajes privados"
 
 #: src/constants/wording.ts
-msgid "Messages privés de Dofus Retro sur Telegram"
+msgid "Messages privés Dofus Retro sur Telegram"
 msgstr "Mensajes privados de Dofus Retro en Telegram"
 
 #: src/screens/windows-screen.tsx
@@ -633,6 +669,10 @@ msgid "Multifus amène devant vous la fenêtre du personnage qui joue sur Dofus 
 msgstr "Multifus trae ante ti la ventana del personaje que juega a Dofus Retro, <0>respetando las reglas de Ankama</0>."
 
 #: src/constants/wording.ts
+msgid "Multifus amène devant vous la fenêtre du personnage qui joue sur Dofus Retro. Gratuit, sur Mac et sur Windows, sans compte et sans publicité."
+msgstr "Multifus trae ante ti la ventana del personaje que juega en Dofus Retro. Gratis, en Mac y en Windows, sin cuenta y sin publicidad."
+
+#: src/constants/wording.ts
 msgid "Multifus est gratuit, pour Mac et pour Windows. Trois gestes, et vous jouez en multicompte sur Dofus Retro."
 msgstr "Multifus es gratis, para Mac y para Windows. Tres gestos, y juegas en multicuenta en Dofus Retro."
 
@@ -643,10 +683,6 @@ msgstr "Multifus lo publica <0>viclafouch</0>, un particular, a título personal
 #: src/constants/wording.ts
 msgid "Multifus est-il autorisé ?"
 msgstr "¿Está permitido Multifus?"
-
-#: src/constants/wording.ts
-msgid "Multifus est-il autorisé sur Dofus Retro ?"
-msgstr "¿Está permitido Multifus en Dofus Retro?"
 
 #: src/constants/wording.ts
 msgid "Multifus et les autres gestionnaires, ligne par ligne."
@@ -713,8 +749,8 @@ msgid "Multifus sur Windows"
 msgstr "Multifus en Windows"
 
 #: src/constants/wording.ts
-msgid "Multifus, logiciel multicompte gratuit pour Dofus Retro"
-msgstr "Multifus, programa multicuenta gratuito para Dofus Retro"
+msgid "Multifus, Dracoon, Focus Retro, Dosoft, Retro Toolbox, ROrganizer : douze lignes comparées, chacune lue dans le code de l’outil et pas sur sa page d’accueil."
+msgstr "Multifus, Dracoon, Focus Retro, Dosoft, Retro Toolbox, ROrganizer: doce líneas comparadas, cada una leída en el código de la herramienta y no en su web."
 
 #: src/constants/ankama.ts
 msgid "Ne rien lire et ne rien changer dans le jeu"
@@ -755,6 +791,10 @@ msgstr "Sí, y para siempre. Nada que pagar, ninguna cuenta que crear, ninguna p
 #: src/screens/windows-screen.tsx
 msgid "Oui, et sur Windows 10 aussi. L’installation prend 3 gestes."
 msgstr "Sí, y en Windows 10 también. La instalación son 3 gestos."
+
+#: src/constants/wording.ts
+msgid "Oui. Ankama tolère les logiciels qui rangent les fenêtres du jeu tant qu’ils n’y touchent à rien. Les deux réponses publiques d’Ankama sont citées ici."
+msgstr "Sí. Ankama tolera los programas que ordenan las ventanas del juego mientras no toquen nada dentro. Las dos respuestas públicas de Ankama se citan aquí."
 
 #: src/constants/wording.ts
 msgid "Oui. Ankama tolère les logiciels qui rangent les fenêtres du jeu, tant qu’ils n’y touchent à rien. Multifus reste dans ce cadre."
@@ -848,9 +888,17 @@ msgstr "Quién publica este sitio, quién lo aloja, y lo poco que guarda de ti."
 msgid "Qui publie le site"
 msgstr "Quién publica el sitio"
 
+#: src/constants/wording.ts
+msgid "Qui publie Multifus, qui héberge le site, ce qu’il garde de vous, et les marques citées ici qui ne sont pas les nôtres."
+msgstr "Quién publica Multifus, quién aloja el sitio, lo que guarda de ti, y las marcas citadas aquí que no son nuestras."
+
 #: src/constants/ankama.ts
 msgid "Ranger et changer les fenêtres du jeu"
 msgstr "Ordenar y cambiar las ventanas del juego"
+
+#: src/constants/wording.ts
+msgid "Rangez vos phrases les plus répétées sous une combinaison de touches. Dans Dofus Retro, vous appuyez, la phrase s’écrit, et c’est vous qui l’envoyez."
+msgstr "Guarda tus frases más repetidas bajo una combinación de teclas. En Dofus Retro pulsas, la frase se escribe, y eres tú quien la envía."
 
 #: src/components/rival-table.tsx
 msgid "Relevé le {surveyed}, dans le code de chaque outil."
@@ -871,10 +919,6 @@ msgstr "Nada se mueve sin ti"
 #: src/constants/wording.ts
 msgid "Roue des personnages"
 msgstr "Rueda de personajes"
-
-#: src/constants/wording.ts
-msgid "Roue des personnages pour le multicompte Dofus Retro"
-msgstr "Rueda de personajes multicuenta en Dofus Retro"
 
 #: src/constants/wording.ts
 msgid "Sans compte"
@@ -925,7 +969,7 @@ msgid "Tableau des runes"
 msgstr "Tabla de runas"
 
 #: src/constants/wording.ts
-msgid "Tableau du poids des runes de Dofus Retro"
+msgid "Tableau du poids des runes Dofus Retro"
 msgstr "Tabla del peso de las runas de Dofus Retro"
 
 #: src/constants/bodies.ts
@@ -937,8 +981,8 @@ msgid "Télécharger"
 msgstr "Descargar"
 
 #: src/constants/wording.ts
-msgid "Télécharger le multicompte Dofus Retro gratuit"
-msgstr "Descargar el multicuenta gratis de Dofus Retro"
+msgid "Télécharger le logiciel multicompte Dofus Retro"
+msgstr "Descargar el programa multicuenta de Dofus Retro"
 
 #: src/constants/systems.ts
 msgid "Télécharger pour Mac"
@@ -951,6 +995,10 @@ msgstr "Descargar para Windows"
 #: src/components/download-take.tsx
 msgid "Télécharger une version antérieure"
 msgstr "Descargar una versión anterior"
+
+#: src/constants/wording.ts
+msgid "Téléchargez Multifus gratuitement, pour Mac et pour Windows. Trois gestes pour installer, aucun compte à créer, aucune publicité, et le code est public."
+msgstr "Descarga Multifus gratis, para Mac y para Windows. Tres gestos para instalar, ninguna cuenta que crear, sin publicidad, y el código es público."
 
 #: src/constants/wording.ts
 msgid "Textes rapides"
@@ -971,6 +1019,10 @@ msgstr "Un botón por personaje."
 #: src/constants/wording.ts
 msgid "Un clic gauche, et la team suit."
 msgstr "Un clic izquierdo, y el equipo sigue."
+
+#: src/constants/wording.ts
+msgid "Un clic par personnage et votre team suit sur Dofus Retro : vous cliquez là où vous allez, la fenêtre du personnage suivant arrive devant vous."
+msgstr "Un clic por personaje y tu equipo te sigue en Dofus Retro: haces clic donde vas, y la ventana del personaje siguiente aparece ante ti."
 
 #: src/constants/wording.ts
 msgid "Un clic par personnage, et la team suit."
@@ -1059,6 +1111,10 @@ msgstr "Tus clientes ya no se apilan: cada uno conserva su sitio."
 #: src/constants/bodies.ts
 msgid "Vos messages partent vers votre Telegram, et c’est tout."
 msgstr "Tus mensajes van a tu Telegram, y a ningún otro sitio."
+
+#: src/constants/wording.ts
+msgid "Vos messages privés de Dofus Retro arrivent sur votre téléphone par Telegram, dans la seconde. Vous savez aussi quel personnage vient d’être déconnecté."
+msgstr "Tus mensajes privados de Dofus Retro llegan a tu teléfono por Telegram, en un segundo. También sabes qué personaje acaba de desconectarse."
 
 #: src/constants/bodies.ts
 msgid "Vos métiers montent plus vite"

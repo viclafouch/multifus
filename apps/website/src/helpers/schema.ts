@@ -23,7 +23,11 @@ import {
   REPOSITORY
 } from '@/constants/site'
 import { SYSTEM_IDS, SYSTEM_VERSIONS } from '@/constants/systems'
-import { PAGE_NAMES, PAGE_PROMISES } from '@/constants/wording'
+import {
+  PAGE_DESCRIPTIONS,
+  PAGE_NAMES,
+  PAGE_PROMISES
+} from '@/constants/wording'
 import { addressOf, ogAddressOf } from '@/helpers/address'
 import type { PathParams } from '@/helpers/page'
 import { SPEAKERS } from '@/lib/i18n'
@@ -76,7 +80,7 @@ const siteOf = (language: Language) => {
     '@id': WEBSITE_AT,
     name: 'Multifus',
     url: addressOf({ page: 'home', language }),
-    description: speaker._(PAGE_PROMISES.home),
+    description: speaker._(PAGE_DESCRIPTIONS.home),
     inLanguage: language,
     publisher: { '@id': AUTHOR_AT }
   } satisfies Addressed<WebSite>
@@ -90,7 +94,7 @@ const softwareOf = (language: Language) => {
     '@id': SOFTWARE_AT,
     name: 'Multifus',
     url: addressOf({ page: 'home', language }),
-    description: speaker._(PAGE_PROMISES.home),
+    description: speaker._(PAGE_DESCRIPTIONS.home),
     applicationCategory: 'UtilitiesApplication',
     operatingSystem: SYSTEMS,
     downloadUrl: RELEASES,
@@ -172,7 +176,7 @@ const webPageOf = ({ page, language }: PathParams) => {
     '@id': `${address}#page`,
     url: address,
     name: speaker._(PAGE_NAMES[page]),
-    description: speaker._(PAGE_PROMISES[page]),
+    description: speaker._(PAGE_DESCRIPTIONS[page]),
     inLanguage: language,
     isPartOf: { '@id': WEBSITE_AT },
     breadcrumb: page === 'home' ? undefined : { '@id': `${address}#crumbs` },

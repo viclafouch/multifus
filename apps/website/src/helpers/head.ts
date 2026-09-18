@@ -6,7 +6,12 @@ import { LOOPS } from '@/constants/loops'
 import { OG_HEIGHT, OG_IMAGE, OG_WIDTH } from '@/constants/og'
 import { PAGES } from '@/constants/pages'
 import { AUTHOR_HANDLE, FOLD_ANCHOR } from '@/constants/site'
-import { PAGE_NAMES, PAGE_PROMISES, PAGE_TITLES } from '@/constants/wording'
+import {
+  PAGE_DESCRIPTIONS,
+  PAGE_NAMES,
+  PAGE_PROMISES,
+  PAGE_TITLES
+} from '@/constants/wording'
 import { addressOf, ogAddressOf } from '@/helpers/address'
 import type { PathParams } from '@/helpers/page'
 import { alternateRefsOf } from '@/helpers/page'
@@ -51,11 +56,10 @@ export const headOf = ({ page, language }: PathParams) => {
   const speaker = SPEAKERS[language]
   const address = addressOf({ page, language })
   const name = speaker._(PAGE_NAMES[page])
-  const description = speaker._(PAGE_PROMISES[page])
-  const written = speaker._(PAGE_TITLES[page])
-  const title = page === 'home' ? written : titleOf(written)
+  const description = speaker._(PAGE_DESCRIPTIONS[page])
+  const title = titleOf(speaker._(PAGE_TITLES[page]))
   const image = ogAddressOf({ page, language })
-  const legend = `${name}. ${description}`
+  const legend = `${name}. ${speaker._(PAGE_PROMISES[page])}`
 
   return {
     meta: [

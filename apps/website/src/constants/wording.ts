@@ -21,20 +21,37 @@ export const PAGE_NAMES = {
 } as const satisfies Record<PageId, MessageDescriptor>
 
 export const PAGE_TITLES = {
-  home: msg`Multifus, logiciel multicompte gratuit pour Dofus Retro`,
-  autoFocus: msg`AutoFocus multicompte pour Dofus Retro`,
-  wheel: msg`Roue des personnages pour le multicompte Dofus Retro`,
-  walk: msg`Déplacement rapide multicompte sur Dofus Retro`,
-  runeTable: msg`Tableau du poids des runes de Dofus Retro`,
-  relay: msg`Messages privés de Dofus Retro sur Telegram`,
+  home: msg`Logiciel multicompte gratuit pour Dofus Retro`,
+  autoFocus: msg`AutoFocus en multicompte pour Dofus Retro`,
+  wheel: msg`Changer de fenêtre en multicompte Dofus Retro`,
+  walk: msg`Déplacer sa team en multicompte sur Dofus Retro`,
+  runeTable: msg`Tableau du poids des runes Dofus Retro`,
+  relay: msg`Messages privés Dofus Retro sur Telegram`,
   quickTexts: msg`Textes rapides au clavier sur Dofus Retro`,
   mac: msg`Logiciel multicompte Dofus Retro sur Mac`,
   windows: msg`Logiciel multicompte Dofus Retro sur Windows`,
   comparison: msg`Comparatif des logiciels multicompte Dofus Retro`,
-  download: msg`Télécharger le multicompte Dofus Retro gratuit`,
-  journal: msg`Journal des versions de Multifus`,
-  ankama: msg`Multifus est-il autorisé sur Dofus Retro ?`,
+  download: msg`Télécharger le logiciel multicompte Dofus Retro`,
+  journal: msg`Journal des versions du multicompte Dofus Retro`,
+  ankama: msg`Le multicompte est-il autorisé sur Dofus Retro ?`,
   legal: msg`Mentions légales`
+} as const satisfies Record<PageId, MessageDescriptor>
+
+export const PAGE_DESCRIPTIONS = {
+  home: msg`Multifus amène devant vous la fenêtre du personnage qui joue sur Dofus Retro. Gratuit, sur Mac et sur Windows, sans compte et sans publicité.`,
+  autoFocus: msg`L’AutoFocus amène devant vous la fenêtre du personnage qui joue sur Dofus Retro : début de tour, invitation, échange, message privé, craft, percepteur.`,
+  wheel: msg`Changez de fenêtre sur Dofus Retro sans touche à retenir : maintenez une combinaison, visez une tête de classe dans la roue, lâchez, la fenêtre arrive.`,
+  walk: msg`Un clic par personnage et votre team suit sur Dofus Retro : vous cliquez là où vous allez, la fenêtre du personnage suivant arrive devant vous.`,
+  runeTable: msg`Le tableau du poids des runes de Dofus Retro se pose par-dessus le jeu, à la touche de votre choix. Vous forgemagez sans jamais ouvrir votre navigateur.`,
+  relay: msg`Vos messages privés de Dofus Retro arrivent sur votre téléphone par Telegram, dans la seconde. Vous savez aussi quel personnage vient d’être déconnecté.`,
+  quickTexts: msg`Rangez vos phrases les plus répétées sous une combinaison de touches. Dans Dofus Retro, vous appuyez, la phrase s’écrit, et c’est vous qui l’envoyez.`,
+  mac: msg`Le multicompte Dofus Retro sur Mac, dans une application vérifiée par Apple qui s’ouvre au premier double-clic. Les six fonctionnalités y sont, sans exception.`,
+  windows: msg`Le multicompte Dofus Retro sur Windows 10 et 11 : chaque personnage prend son bouton dans la barre des tâches, avec son pseudo et sa tête de classe.`,
+  comparison: msg`Multifus, Dracoon, Focus Retro, Dosoft, Retro Toolbox, ROrganizer : douze lignes comparées, chacune lue dans le code de l’outil et pas sur sa page d’accueil.`,
+  download: msg`Téléchargez Multifus gratuitement, pour Mac et pour Windows. Trois gestes pour installer, aucun compte à créer, aucune publicité, et le code est public.`,
+  journal: msg`Ce que chaque version de Multifus a changé pour le multicompte sur Dofus Retro : les fonctionnalités ajoutées, les réglages déplacés, les défauts corrigés.`,
+  ankama: msg`Oui. Ankama tolère les logiciels qui rangent les fenêtres du jeu tant qu’ils n’y touchent à rien. Les deux réponses publiques d’Ankama sont citées ici.`,
+  legal: msg`Qui publie Multifus, qui héberge le site, ce qu’il garde de vous, et les marques citées ici qui ne sont pas les nôtres.`
 } as const satisfies Record<PageId, MessageDescriptor>
 
 export const PAGE_PROMISES = {
