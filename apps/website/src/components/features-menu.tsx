@@ -3,7 +3,7 @@ import { useLingui } from '@lingui/react'
 import type { PageId } from '@/@types/page'
 import { PageLink } from '@/components/page-link'
 import { MENU_FEATURES } from '@/constants/pages'
-import { FEATURE_PORTRAITS, PORTRAIT_SIDE } from '@/constants/portraits'
+import { PAGE_PORTRAITS, PORTRAIT_SIDE } from '@/constants/portraits'
 import { FEATURES_TAB, MENU_HINTS, PAGE_NAMES } from '@/constants/wording'
 import { useDismiss } from '@/hooks/use-dismiss'
 
@@ -47,7 +47,7 @@ export const FeaturesMenu = ({ page }: FeaturesMenuProps) => {
                 className="flex items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-slate/50"
               >
                 <img
-                  src={FEATURE_PORTRAITS[feature]}
+                  src={PAGE_PORTRAITS[feature]}
                   alt=""
                   width={PORTRAIT_SIDE}
                   height={PORTRAIT_SIDE}

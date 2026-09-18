@@ -4,15 +4,23 @@ import eniripsaFemale from '@multifus/ankama/portraits/eniripsa_f.png'
 import enutrofMale from '@multifus/ankama/portraits/enutrof_m.png'
 import pandawaFemale from '@multifus/ankama/portraits/pandawa_f.png'
 import sramMale from '@multifus/ankama/portraits/sram_m.png'
-import type { FeatureId } from '@/@types/page'
+import type { FeatureId, PageId } from '@/@types/page'
 
 export const PORTRAIT_SIDE = 256
 
-export const FEATURE_PORTRAITS = {
+export const PAGE_PORTRAITS = {
+  home: null,
   autoFocus: craFemale,
   wheel: ecaflipMale,
   walk: pandawaFemale,
   runeTable: enutrofMale,
   relay: sramMale,
-  quickTexts: eniripsaFemale
-} as const satisfies Record<FeatureId, string>
+  quickTexts: eniripsaFemale,
+  mac: null,
+  windows: null,
+  comparison: null,
+  download: null,
+  journal: null,
+  ankama: null,
+  legal: null
+} as const satisfies Record<FeatureId, string> & Record<PageId, string | null>

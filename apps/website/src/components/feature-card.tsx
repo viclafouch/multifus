@@ -4,6 +4,7 @@ import type { FeatureId } from '@/@types/page'
 import { PageLink } from '@/components/page-link'
 import { LOOPS, PEEK_SIZE, PEEKS, POSTER_SIZE } from '@/constants/loops'
 import { PAGES } from '@/constants/pages'
+import { PAGE_PORTRAITS, PORTRAIT_SIDE } from '@/constants/portraits'
 import { PAGE_TINTS } from '@/constants/tints'
 import { PAGE_NAMES, PAGE_PROMISES } from '@/constants/wording'
 import { usePeek } from '@/hooks/use-peek'
@@ -28,29 +29,40 @@ export const FeatureCard = ({ page, hasPeek = false }: FeatureCardProps) => {
         PAGE_TINTS[page]
       )}
     >
-      <span className="thumbnail">
+      <span className="relative block">
+        <span className="thumbnail">
+          <img
+            src={LOOPS[loop].poster}
+            alt=""
+            {...POSTER_SIZE}
+            loading="lazy"
+            decoding="async"
+            className="plane poster"
+          />
+          {isPeeking ? (
+            <img
+              src={PEEKS[page]}
+              alt=""
+              {...PEEK_SIZE}
+              decoding="async"
+              fetchPriority="high"
+              data-ready={isReady ? '' : undefined}
+              onLoad={handleLoad}
+              className="plane peek"
+            />
+          ) : null}
+        </span>
         <img
-          src={LOOPS[loop].poster}
+          src={PAGE_PORTRAITS[page]}
           alt=""
-          {...POSTER_SIZE}
+          width={PORTRAIT_SIDE}
+          height={PORTRAIT_SIDE}
           loading="lazy"
           decoding="async"
-          className="plane poster"
+          className="signet absolute -bottom-6 left-5 size-14"
         />
-        {isPeeking ? (
-          <img
-            src={PEEKS[page]}
-            alt=""
-            {...PEEK_SIZE}
-            decoding="async"
-            fetchPriority="high"
-            data-ready={isReady ? '' : undefined}
-            onLoad={handleLoad}
-            className="plane peek"
-          />
-        ) : null}
       </span>
-      <span className="nameplate px-5 pt-5">{i18n._(PAGE_NAMES[page])}</span>
+      <span className="nameplate px-5 pt-9">{i18n._(PAGE_NAMES[page])}</span>
       <span className="px-5 pt-1.5 pb-5 text-tale text-band">
         {i18n._(PAGE_PROMISES[page])}
       </span>
