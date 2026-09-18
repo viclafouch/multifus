@@ -5,6 +5,11 @@ use crate::app::journal::JournalEvent;
 use crate::app::state::lock;
 
 pub fn reconcile(app: &AppHandle) {
+    // A dev build would register the path of target/debug, and open its console at every login.
+    if cfg!(debug_assertions) {
+        return;
+    }
+
     let wanted = lock(app).starts_at_login();
     let manager = app.autolaunch();
 
