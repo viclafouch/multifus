@@ -2200,7 +2200,11 @@ mod tests {
     use windows::core::PCWSTR;
 
     use super::*;
+    use crate::app::portraits::icon_of;
+    use crate::domain::Class;
     use crate::domain::Color;
+    use crate::domain::Gender;
+    use crate::domain::Portrait;
 
     const PAINTED_CLASS: PCWSTR = w!("MultifusPaintedWindow");
 
@@ -2293,7 +2297,10 @@ mod tests {
 
     fn wearing(ring: Option<[u8; 3]>) -> WindowIcon<'static> {
         WindowIcon {
-            portrait: include_bytes!("../../icons/portraits/iop_m.ico").as_slice(),
+            portrait: icon_of(Portrait {
+                class: Class::Iop,
+                gender: Gender::Male,
+            }),
             ring,
         }
     }
