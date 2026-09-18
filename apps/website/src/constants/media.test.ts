@@ -1,4 +1,5 @@
 import { readFile } from 'node:fs/promises'
+import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import type { Size } from '@/@types/media'
 import { ANKAMA_SOURCE_IDS, ANKAMA_SOURCES } from '@/constants/ankama'
@@ -54,7 +55,9 @@ const mp4SizeOf = (bytes: Buffer): Size => {
 }
 
 const sizeOnDisk = async (served: string) => {
-  const bytes = await readFile(served.replace(SERVED_FROM, ''))
+  const bytes = await readFile(
+    fileURLToPath(`file://${served.replace(SERVED_FROM, '')}`)
+  )
 
   return served.endsWith('.mp4') ? mp4SizeOf(bytes) : webpSizeOf(bytes)
 }
