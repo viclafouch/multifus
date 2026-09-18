@@ -26,8 +26,8 @@ export default defineConfig({
     'apps/website/.output/**',
     'apps/website/src/routeTree.gen.ts',
     'apps/desktop/src-tauri/**',
-    'apps/desktop/scripts/*.cjs',
-    'apps/website/scripts/*.mjs',
+    'apps/*/scripts/*.cjs',
+    'apps/*/scripts/*.mjs',
     '.claude/skills/**'
   ],
   options: {

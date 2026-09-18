@@ -1,15 +1,8 @@
+import { dataUrlOf, inkedWith } from '@multifus/retro/draw'
 import { INK } from '@/constants/ink'
 
-export const inkedWith = (color: string, alpha: number) => {
-  const channels = [1, 3, 5].map((at) => {
-    return Number.parseInt(color.slice(at, at + 2), 16)
-  })
-
-  return `rgb(${channels.join(' ')} / ${alpha})`
-}
-
 const svgUrl = (markup: string) => {
-  return `url("data:image/svg+xml,${encodeURIComponent(markup)}")`
+  return `url("${dataUrlOf(markup)}")`
 }
 
 export const GRAIN = svgUrl(

@@ -1,24 +1,23 @@
+import { inkedWith, RETRO_FONTS } from '@multifus/retro/draw'
 import { INK } from '@/constants/ink'
 import { OG_HEIGHT, OG_WIDTH } from '@/constants/og'
 import { SITE_DOMAIN } from '@/constants/site'
 import { INDEPENDENCE, PAGE_NAMES, PAGE_PROMISES } from '@/constants/wording'
 import type { PathParams } from '@/helpers/page'
 import { SPEAKERS } from '@/lib/i18n'
-import { OG_FONTS } from '@/og/fonts'
 import {
   ENGRAVE,
   FLOOR,
   GRAIN,
-  inkedWith,
   LIMELIGHT,
   SCRIM,
   SHEET,
   THREAD
 } from '@/og/layers'
 
-const CARVE = OG_FONTS.carve.name
+const CARVE = RETRO_FONTS.carve.name
 
-const PLAIN = OG_FONTS.plain.name
+const PLAIN = RETRO_FONTS.plain.name
 
 const GAME = 'DOFUS RETRO'
 

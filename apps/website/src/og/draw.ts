@@ -2,12 +2,12 @@ import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { createRequire } from 'node:module'
 import path from 'node:path'
 import { render } from 'takumi-js'
+import { loadFonts } from '@multifus/retro/draw'
 import { OG_DECOR_FILES } from '@/constants/decors'
 import { LANGUAGES } from '@/constants/languages'
 import { OG_DIR, OG_HEIGHT, OG_IMAGE, OG_WIDTH } from '@/constants/og'
 import { PAGE_IDS } from '@/constants/pages'
 import { ogPathOf } from '@/helpers/page'
-import { OG_FONTS } from '@/og/fonts'
 import { OgCard } from '@/og/og-card'
 
 const PUBLIC_DIR = path.join(import.meta.dirname, '..', '..', 'public')
@@ -15,14 +15,6 @@ const PUBLIC_DIR = path.join(import.meta.dirname, '..', '..', 'public')
 const LOGO_FILE = '@multifus/retro/assets/logo.png'
 
 const { resolve } = createRequire(import.meta.url)
-
-const loadFonts = () => {
-  return Promise.all(
-    Object.values(OG_FONTS).map(async ({ name, file }) => {
-      return { name, data: await readFile(resolve(file)) }
-    })
-  )
-}
 
 const loadImage = async (file: string, type: string) => {
   const bytes = await readFile(resolve(file))
@@ -42,7 +34,7 @@ const loadDecors = async () => {
 
 export const drawEveryCard = async () => {
   const [fonts, decors, logo] = await Promise.all([
-    loadFonts(),
+    loadFonts(resolve),
     loadDecors(),
     loadImage(LOGO_FILE, 'image/png')
   ])

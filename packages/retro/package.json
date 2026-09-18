@@ -6,6 +6,7 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
+    "./draw": "./src/draw.ts",
     "./styles/*": "./src/styles/*",
     "./assets/*": "./src/assets/*"
   },
@@ -20,6 +21,7 @@
     "tailwind-merge": "^3.6.0"
   },
   "devDependencies": {
+    "@types/node": "^24.13.4",
     "@types/react": "^19.3.0",
     "typescript": "^7.0.2"
   },

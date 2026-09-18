@@ -11,6 +11,8 @@
     "build:app": "tauri build",
     "preview": "vite preview",
     "tauri": "tauri",
+    "draw:dmg": "node scripts/draw-dmg.mjs",
+    "preview:dmg": "node scripts/preview-dmg.mjs",
     "typecheck": "tsc --noEmit",
     "i18n:extract": "lingui extract",
     "i18n:check": "lingui compile --strict",
@@ -67,6 +69,7 @@
     "oxc-transform-react": "^0.145.0",
     "shadcn": "^4.21.0",
     "tailwindcss": "^4.3.3",
+    "takumi-js": "^2.13.7",
     "typescript": "^7.0.2",
     "vite": "^8.3.0",
     "vitest": "^5.0.0"
