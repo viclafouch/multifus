@@ -4,8 +4,7 @@ import { useLingui } from '@lingui/react'
 import craFemale from '@multifus/ankama/portraits/cra_f.png'
 import enutrofMale from '@multifus/ankama/portraits/enutrof_m.png'
 import { cn, type Tint } from '@multifus/retro'
-
-const PORTRAIT_SIDE = 256
+import { PORTRAIT_SIDE } from '@/constants/portraits'
 
 type CharacterKey = Readonly<{
   cap: string
