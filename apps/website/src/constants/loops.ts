@@ -32,10 +32,10 @@ export const PEEK_SIZE = { width: 720, height: 406 } as const satisfies Size
 export const LOOPS = {
   home: {
     source: homeLoop,
-    size: { width: 1386, height: 780 },
+    size: { width: 1280, height: 720 },
     poster: homePoster,
-    seconds: 12,
-    filmed: FILMED_ON
+    seconds: 18,
+    filmed: REFILMED_ON
   },
   autoFocus: {
     source: autoFocusLoop,

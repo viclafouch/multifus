@@ -1,5 +1,4 @@
 import type { LoopId } from '@/@types/page'
-import { LoopChip } from '@/components/loop-chip'
 import { LoopCurtain } from '@/components/loop-curtain'
 import { LOOPS } from '@/constants/loops'
 import { useMedia } from '@/hooks/use-media'
@@ -9,18 +8,17 @@ import { STILL } from '@/lib/media'
 type LoopPlateProps = Readonly<{
   loop: LoopId
   caption: string
-  isAmbient?: boolean
+  isAuto?: boolean
 }>
 
 export const LoopPlate = ({
   loop,
   caption,
-  isAmbient = false
+  isAuto = false
 }: LoopPlateProps) => {
   const isStill = useMedia(STILL)
-  const { video, isPlaying, toggle } = usePlayer({ isStill, isAuto: isAmbient })
+  const { video, isPlaying, toggle } = usePlayer({ isStill, isAuto })
   const { source, size, poster } = LOOPS[loop]
-  const Toggle = isAmbient ? LoopChip : LoopCurtain
 
   return (
     <div className="stage carried relative aspect-loop w-full">
@@ -38,7 +36,7 @@ export const LoopPlate = ({
         playsInline
         preload="metadata"
       />
-      {isStill ? null : <Toggle isPlaying={isPlaying} onToggle={toggle} />}
+      {isStill ? null : <LoopCurtain isPlaying={isPlaying} onToggle={toggle} />}
     </div>
   )
 }

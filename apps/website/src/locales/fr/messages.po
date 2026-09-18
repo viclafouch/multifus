@@ -416,6 +416,10 @@ msgstr "la même icône pour tous vos clients"
 msgid "La règle d’Ankama"
 msgstr "La règle d’Ankama"
 
+#: src/screens/home-screen.tsx
+msgid "La roue des personnages, l’AutoFocus, le déplacement rapide et le tableau des runes, dans le jeu"
+msgstr "La roue des personnages, l’AutoFocus, le déplacement rapide et le tableau des runes, dans le jeu"
+
 #: src/components/taskbar-proof.tsx
 msgid "la tête de classe du personnage, à sa couleur"
 msgstr "la tête de classe du personnage, à sa couleur"
@@ -607,10 +611,6 @@ msgstr "Les questions qu’on se pose"
 #: src/constants/bodies.ts
 msgid "Les six fonctionnalités du menu sont là, sans exception."
 msgstr "Les six fonctionnalités du menu sont là, sans exception."
-
-#: src/screens/home-screen.tsx
-msgid "Les six mécanismes à l’œuvre dans le jeu"
-msgstr "Les six mécanismes à l’œuvre dans le jeu"
 
 #: src/screens/ankama-screen.tsx
 msgid "Les sources"

@@ -20,10 +20,10 @@ const spyOnPlayback = () => {
   return vi.spyOn(HTMLMediaElement.prototype, 'play').mockResolvedValue()
 }
 
-const show = (isAmbient: boolean) => {
+const show = (isAuto: boolean) => {
   return render(
     <I18nProvider i18n={SPEAKERS.fr}>
-      <LoopPlate loop="home" caption={CAPTION} isAmbient={isAmbient} />
+      <LoopPlate loop="home" caption={CAPTION} isAuto={isAuto} />
     </I18nProvider>
   )
 }
@@ -71,7 +71,7 @@ describe('the loop plate', () => {
     expect(play).toHaveBeenCalledWith()
   })
 
-  it('starts the ambient loop of the entrance, under its only dot', () => {
+  it('starts the loop of the entrance on its own, behind the same curtain', () => {
     const play = spyOnPlayback()
 
     show(true)
@@ -79,6 +79,6 @@ describe('the loop plate', () => {
     expect(play).toHaveBeenCalledWith()
     expect(
       screen.getByRole('button', { name: 'Lire' }).querySelector('svg')
-    ).toBeNull()
+    ).not.toBeNull()
   })
 })
