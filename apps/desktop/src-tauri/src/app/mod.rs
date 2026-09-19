@@ -37,6 +37,7 @@ use crate::platform::PlatformNotificationWatcher;
 use crate::platform::PlatformPasteSender;
 use crate::platform::PlatformWindowManager;
 use crate::platform::key_labels;
+use crate::platform::matches_windows_eleven;
 
 pub use state::AppState;
 pub use state::Multifus;
@@ -111,27 +112,54 @@ fn screen_saver(keeper: &PlatformDisplayKeeper) -> ScreenSaverView {
         .map_or(ScreenSaverView::Unknown, ScreenSaverView::from)
 }
 
-fn system() -> String {
-    named_system(
-        tauri_plugin_os::platform(),
-        &tauri_plugin_os::version().to_string(),
-        tauri_plugin_os::arch(),
-    )
+struct SystemNameParams<'a> {
+    platform: &'a str,
+    version: &'a str,
+    arch: &'a str,
+    is_windows_eleven: bool,
 }
 
-fn named_system(platform: &str, version: &str, arch: &str) -> String {
-    let platform = match platform {
-        "macos" => "macOS",
-        "windows" => "Windows",
-        other => other,
-    };
+fn system() -> String {
+    named_system(SystemNameParams {
+        platform: tauri_plugin_os::platform(),
+        version: &tauri_plugin_os::version().to_string(),
+        arch: tauri_plugin_os::arch(),
+        is_windows_eleven: matches_windows_eleven(),
+    })
+}
+
+fn named_system(params: SystemNameParams<'_>) -> String {
+    let SystemNameParams {
+        platform,
+        version,
+        arch,
+        is_windows_eleven,
+    } = params;
+
     let arch = match arch {
         "aarch64" => "arm64",
         "x86_64" => "x64",
         other => other,
     };
 
-    format!("{platform} {version} ({arch})")
+    match platform {
+        "macos" => format!("macOS {version} ({arch})"),
+        "windows" => format!("{} ({arch})", named_windows(version, is_windows_eleven)),
+        other => format!("{other} {version} ({arch})"),
+    }
+}
+
+fn named_windows(version: &str, is_windows_eleven: bool) -> String {
+    let name = if is_windows_eleven {
+        "Windows 11"
+    } else {
+        "Windows 10"
+    };
+
+    match version.split('.').nth(2) {
+        Some(build) => format!("{name} {build}"),
+        None => format!("{name} {version}"),
+    }
 }
 
 #[cfg(test)]
@@ -141,23 +169,65 @@ mod tests {
     #[test]
     fn the_mac_is_named_the_way_apple_writes_it() {
         assert_eq!(
-            named_system("macos", "26.0.0", "aarch64"),
+            named_system(SystemNameParams {
+                platform: "macos",
+                version: "26.0.0",
+                arch: "aarch64",
+                is_windows_eleven: false,
+            }),
             "macOS 26.0.0 (arm64)"
         );
     }
 
     #[test]
-    fn windows_is_named_with_the_architecture_its_installers_use() {
+    fn windows_eleven_is_named_by_its_marketing_name_and_its_build() {
         assert_eq!(
-            named_system("windows", "10.0.26100", "x86_64"),
-            "Windows 10.0.26100 (x64)"
+            named_system(SystemNameParams {
+                platform: "windows",
+                version: "10.0.26100",
+                arch: "x86_64",
+                is_windows_eleven: true,
+            }),
+            "Windows 11 26100 (x64)",
+            "every Windows 11 still answers 10.0 when asked its version"
+        );
+    }
+
+    #[test]
+    fn windows_ten_keeps_its_own_name_and_the_architecture_its_installers_use() {
+        assert_eq!(
+            named_system(SystemNameParams {
+                platform: "windows",
+                version: "10.0.19045",
+                arch: "x86_64",
+                is_windows_eleven: false,
+            }),
+            "Windows 10 19045 (x64)"
+        );
+    }
+
+    #[test]
+    fn a_windows_that_does_not_say_its_build_is_written_as_the_system_gives_it() {
+        assert_eq!(
+            named_system(SystemNameParams {
+                platform: "windows",
+                version: "10.0",
+                arch: "x86_64",
+                is_windows_eleven: true,
+            }),
+            "Windows 11 10.0 (x64)"
         );
     }
 
     #[test]
     fn a_platform_we_do_not_know_is_written_as_the_system_gives_it() {
         assert_eq!(
-            named_system("linux", "6.12", "riscv64"),
+            named_system(SystemNameParams {
+                platform: "linux",
+                version: "6.12",
+                arch: "riscv64",
+                is_windows_eleven: false,
+            }),
             "linux 6.12 (riscv64)"
         );
     }

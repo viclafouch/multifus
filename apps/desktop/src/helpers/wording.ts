@@ -19,6 +19,7 @@ import type { LampState } from '@/components/lamp'
 import { IS_APPLE } from '@/constants/keyboard'
 import { CLASS_LABELS, COLOR_LABELS } from '@/constants/roster'
 import { SHORTCUT_ACTIONS } from '@/constants/shortcuts'
+import { IS_WINDOWS_ELEVEN } from '@/constants/system'
 import type { Phrase } from '@/lib/i18n'
 
 export type TonedLine = {
@@ -60,6 +61,14 @@ export const quoted = (name: string) => {
   return t`« ${name} »`
 }
 
+const focusWord = () => {
+  if (IS_APPLE) {
+    return t`Concentration`
+  }
+
+  return IS_WINDOWS_ELEVEN ? t`Ne pas déranger` : t`Assistant de concentration`
+}
+
 export const systemWords = () => {
   return {
     settings: IS_APPLE
@@ -69,11 +78,18 @@ export const systemWords = () => {
           context:
             'l’application de réglages de Windows, et non un écran de Multifus'
         }),
-    privacy: IS_APPLE ? t`Confidentialité et sécurité` : t`Confidentialité`,
+    privacy:
+      IS_APPLE || IS_WINDOWS_ELEVEN
+        ? t`Confidentialité et sécurité`
+        : t`Confidentialité`,
     accessibility: t`Accessibilité`,
     notifications: t`Notifications`,
+    systemNotifications:
+      IS_APPLE || IS_WINDOWS_ELEVEN
+        ? t`Notifications`
+        : t`Notifications et actions`,
     system: t`Système`,
-    focus: IS_APPLE ? t`Concentration` : t`Assistant de concentration`,
+    focus: focusWord(),
     options: t`Options`,
     general: t`Général`,
     miscellaneous: t`Divers`,

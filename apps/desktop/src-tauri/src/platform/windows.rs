@@ -28,6 +28,7 @@ use windows::UI::Notifications::NotificationKinds;
 use windows::UI::Notifications::NotificationSetting;
 use windows::UI::Notifications::ToastNotificationManager;
 use windows::UI::Notifications::UserNotification;
+use windows::Wdk::System::SystemServices::RtlGetVersion;
 use windows::Win32::Foundation::CloseHandle;
 use windows::Win32::Foundation::ERROR_INVALID_WINDOW_HANDLE;
 use windows::Win32::Foundation::ERROR_MORE_DATA;
@@ -39,6 +40,7 @@ use windows::Win32::Foundation::LPARAM;
 use windows::Win32::Foundation::LRESULT;
 use windows::Win32::Foundation::POINT;
 use windows::Win32::Foundation::RECT;
+use windows::Win32::Foundation::STATUS_SUCCESS;
 use windows::Win32::Foundation::WPARAM;
 use windows::Win32::Graphics::Gdi::MONITOR_DEFAULTTONEAREST;
 use windows::Win32::Graphics::Gdi::MonitorFromWindow;
@@ -59,6 +61,7 @@ use windows::Win32::System::Registry::RegCloseKey;
 use windows::Win32::System::Registry::RegEnumKeyExW;
 use windows::Win32::System::Registry::RegGetValueW;
 use windows::Win32::System::Registry::RegOpenKeyExW;
+use windows::Win32::System::SystemInformation::OSVERSIONINFOW;
 use windows::Win32::System::Threading::AttachThreadInput;
 use windows::Win32::System::Threading::GetCurrentThreadId;
 use windows::Win32::System::Threading::OpenProcess;
@@ -87,6 +90,9 @@ use windows::Win32::UI::Input::KeyboardAndMouse::VK_CONTROL;
 use windows::Win32::UI::Input::KeyboardAndMouse::VK_V;
 use windows::Win32::UI::Shell::PropertiesSystem::IPropertyStore;
 use windows::Win32::UI::Shell::PropertiesSystem::SHGetPropertyStoreForWindow;
+use windows::Win32::UI::Shell::QUNS_ACCEPTS_NOTIFICATIONS;
+use windows::Win32::UI::Shell::QUNS_QUIET_TIME;
+use windows::Win32::UI::Shell::SHQueryUserNotificationState;
 use windows::Win32::UI::WindowsAndMessaging::BringWindowToTop;
 use windows::Win32::UI::WindowsAndMessaging::CHILDID_SELF;
 use windows::Win32::UI::WindowsAndMessaging::CallNextHookEx;
@@ -234,6 +240,10 @@ const TASKBAR_GLOM_LEVEL: PCWSTR = w!("TaskbarGlomLevel");
 
 const NEVER_COMBINE: u32 = 2;
 
+const FIRST_WINDOWS_ELEVEN_BUILD: u32 = 22_000;
+
+const FIRST_BUILD_HONOURING_GLOM_LEVEL: u32 = 22_621;
+
 const PUSH_NOTIFICATIONS_KEY: &str = r"Software\Microsoft\Windows\CurrentVersion\PushNotifications";
 
 const TOAST_ENABLED: PCWSTR = w!("ToastEnabled");
@@ -242,12 +252,6 @@ const NOTIFICATION_SETTINGS_KEY: &str =
     r"Software\Microsoft\Windows\CurrentVersion\Notifications\Settings";
 
 const NOTIFICATION_ENABLED: PCWSTR = w!("Enabled");
-
-const GLOBAL_DO_NOT_DISTURB: PCWSTR = w!("NOC_GLOBAL_SETTING_DND");
-
-const FOCUS_ASSIST_KEY: &str = r"Software\Microsoft\Windows\CurrentVersion\FocusAssist";
-
-const QUIET_HOURS_ACTIVE: PCWSTR = w!("QuietHoursActive");
 
 const DOFUS_IN_APPLICATION_ID: &str = "dofus";
 
@@ -541,6 +545,10 @@ impl WindowManager for Win32WindowManager {
     }
 
     fn taskbar_combines(&self) -> Result<bool> {
+        if !taskbar_honours_glom_level(*WINDOWS_BUILD) {
+            return Ok(true);
+        }
+
         Ok(taskbar_glom_level() != Some(NEVER_COMBINE))
     }
 
@@ -665,6 +673,31 @@ fn application_id(group: Option<&str>) -> Result<PROPVARIANT> {
     Ok(value)
 }
 
+static WINDOWS_BUILD: LazyLock<u32> = LazyLock::new(read_windows_build);
+
+fn read_windows_build() -> u32 {
+    let mut read = OSVERSIONINFOW {
+        dwOSVersionInfoSize: size_of::<OSVERSIONINFOW>() as u32,
+        ..OSVERSIONINFOW::default()
+    };
+
+    // SAFETY: the structure outlives the call, and its first field says how much it may write.
+    if unsafe { RtlGetVersion(&raw mut read) } != STATUS_SUCCESS {
+        return 0;
+    }
+
+    read.dwBuildNumber
+}
+
+#[must_use]
+pub fn matches_windows_eleven() -> bool {
+    *WINDOWS_BUILD >= FIRST_WINDOWS_ELEVEN_BUILD
+}
+
+fn taskbar_honours_glom_level(build: u32) -> bool {
+    build < FIRST_WINDOWS_ELEVEN_BUILD || build >= FIRST_BUILD_HONOURING_GLOM_LEVEL
+}
+
 fn taskbar_glom_level() -> Option<u32> {
     registry_dword(TASKBAR_ADVANCED_KEY, TASKBAR_GLOM_LEVEL)
 }
@@ -703,10 +736,14 @@ fn toast_setting(application_id: &str) -> Option<bool> {
 }
 
 fn focus_off() -> Option<bool> {
-    let quiet = registry_flag(NOTIFICATION_SETTINGS_KEY, GLOBAL_DO_NOT_DISTURB)
-        .or_else(|| registry_flag(FOCUS_ASSIST_KEY, QUIET_HOURS_ACTIVE))?;
+    // SAFETY: the call reads what the shell is doing with notifications, and writes nothing of ours.
+    let state = unsafe { SHQueryUserNotificationState() }.ok()?;
 
-    Some(!quiet)
+    match state {
+        QUNS_ACCEPTS_NOTIFICATIONS => Some(true),
+        QUNS_QUIET_TIME => Some(false),
+        _ => None,
+    }
 }
 
 static DOFUS_APPLICATION_ID: LazyLock<Mutex<Option<String>>> = LazyLock::new(|| Mutex::new(None));
@@ -2441,6 +2478,21 @@ mod tests {
             !waking.notices(EVENT_OBJECT_DESTROY, mine, || { false }),
             "a window dies once"
         );
+    }
+
+    #[test]
+    fn the_taskbar_setting_is_honoured_everywhere_but_the_first_windows_eleven() {
+        assert!(taskbar_honours_glom_level(19045), "Windows 10 honours it");
+        assert!(
+            !taskbar_honours_glom_level(22000),
+            "the rewritten taskbar of Windows 11 21H2 ignores it"
+        );
+        assert!(!taskbar_honours_glom_level(22620));
+        assert!(
+            taskbar_honours_glom_level(22621),
+            "Windows 11 22H2 gave the setting back"
+        );
+        assert!(taskbar_honours_glom_level(26100));
     }
 
     #[test]

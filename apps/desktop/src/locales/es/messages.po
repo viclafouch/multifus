@@ -433,6 +433,10 @@ msgstr "Encendido"
 msgid "Allume ou éteint le Déplacement rapide."
 msgstr "Activa o desactiva el Desplazamiento rápido."
 
+#: src/helpers/onboarding.ts
+msgid "Allumé, ce réglage retient les notifications : votre percepteur se fait taper à l’autre bout du monde et vous ne l’apprenez qu’en rentrant."
+msgstr "Mientras está activado, este ajuste retiene las notificaciones: a su recaudador le pegan al otro lado del mundo y usted no se entera hasta volver."
+
 #: src/screens/about/legal-panel.tsx
 msgid "Ankama ne répond pas de Multifus."
 msgstr "Ankama no responde por Multifus."
@@ -1205,10 +1209,6 @@ msgstr "¿Funciona todo?"
 #: src/screens/onboarding/guide.tsx
 msgid "Étape {rank} sur {count}"
 msgstr "Paso {rank} de {count}"
-
-#: src/helpers/onboarding.ts
-msgid "Éteignez-la. Allumée, elle retient les notifications : votre percepteur se fait taper à l’autre bout du monde et vous ne l’apprenez qu’en rentrant."
-msgstr "Apáguela. Mientras está activada, retiene las notificaciones: a su recaudador le pegan al otro lado del mundo y usted no se entera hasta volver."
 
 #: src/helpers/journal.ts
 msgid "éteint"
@@ -2045,6 +2045,10 @@ msgstr "Multifus, que ya no tenía ni una ventana que recorrer"
 msgid "Multifus, qui n’écoutait plus les clics"
 msgstr "Multifus, que ya no escuchaba los clics"
 
+#: src/helpers/wording.ts
+msgid "Ne pas déranger"
+msgstr "No molestar"
+
 #: src/components/main-toggle.tsx
 msgid "Ne plus en faire votre personnage principal"
 msgstr "Dejar de tenerlo como personaje principal"
@@ -2072,6 +2076,10 @@ msgstr "Notificaciones"
 #: src/helpers/wording.ts
 msgid "Notifications en arrière-plan"
 msgstr "Notificaciones en segundo plano"
+
+#: src/helpers/wording.ts
+msgid "Notifications et actions"
+msgstr "Notificaciones y acciones"
 
 #: src/helpers/onboarding.ts
 msgid "On essaie pour de vrai"

@@ -1,4 +1,11 @@
+import type { Platform } from '@tauri-apps/plugin-os'
+
 export type KeyLabels = Readonly<Record<string, string | undefined>>
+
+export type SystemInternals = Readonly<{
+  platform: Platform
+  version: string
+}>
 
 export type Authorization = {
   readonly granted: boolean

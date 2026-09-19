@@ -8,6 +8,7 @@ import {
   characterOf,
   onboardingOf,
   pending,
+  runOnWindowsTen,
   speakFrench
 } from '@/test-doubles'
 
@@ -43,6 +44,7 @@ type ShowParams = {
   readonly agent?: string
   readonly characters?: readonly Character[]
   readonly onboarding?: Onboarding
+  readonly isWindowsTen?: boolean
 }
 
 const show = async ({
@@ -51,10 +53,15 @@ const show = async ({
   onboarding = onboardingOf({
     done: false,
     steps: stepsWith({ authorization: 'blocked' })
-  })
+  }),
+  isWindowsTen = false
 }: ShowParams = {}) => {
   vi.resetModules()
   vi.stubGlobal('navigator', { userAgent: agent })
+
+  if (isWindowsTen) {
+    runOnWindowsTen()
+  }
 
   await speakFrench()
 
@@ -402,5 +409,44 @@ describe('the setup', () => {
     expect(
       screen.getByText('Multifus n’entend rien, et ne peut rien faire.')
     ).not.toBeNull()
+  })
+})
+
+describe('the words of Windows', () => {
+  it('names the switch Windows 11 shows, on the page it hides it under', async () => {
+    await show({ agent: WINDOWS_AGENT })
+
+    goTo('La concentration')
+
+    expect(screen.getByText('Coupez « Ne pas déranger »')).not.toBeNull()
+    expect(screen.getByText('Système')).not.toBeNull()
+    expect(screen.getByText('Notifications')).not.toBeNull()
+  })
+
+  it('names the screen Windows 10 shows, which is one of its own', async () => {
+    await show({ agent: WINDOWS_AGENT, isWindowsTen: true })
+
+    goTo('La concentration')
+
+    expect(
+      screen.getByText('Coupez « Assistant de concentration »')
+    ).not.toBeNull()
+    expect(screen.queryByText('Notifications')).toBeNull()
+  })
+
+  it('names the privacy screen the way Windows 11 writes it', async () => {
+    await show({ agent: WINDOWS_AGENT })
+
+    goTo('L’autorisation')
+
+    expect(screen.getByText('Confidentialité et sécurité')).not.toBeNull()
+  })
+
+  it('keeps the shorter privacy name of Windows 10', async () => {
+    await show({ agent: WINDOWS_AGENT, isWindowsTen: true })
+
+    goTo('L’autorisation')
+
+    expect(screen.getByText('Confidentialité')).not.toBeNull()
   })
 })

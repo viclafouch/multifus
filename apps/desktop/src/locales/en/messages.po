@@ -433,6 +433,10 @@ msgstr "On"
 msgid "Allume ou éteint le Déplacement rapide."
 msgstr "Turns Quick Walk on or off."
 
+#: src/helpers/onboarding.ts
+msgid "Allumé, ce réglage retient les notifications : votre percepteur se fait taper à l’autre bout du monde et vous ne l’apprenez qu’en rentrant."
+msgstr "While it is on, this setting holds notifications back: your tax collector gets hit on the other side of the world and you only find out when you come home."
+
 #: src/screens/about/legal-panel.tsx
 msgid "Ankama ne répond pas de Multifus."
 msgstr "Ankama does not answer for Multifus."
@@ -1205,10 +1209,6 @@ msgstr "Is everything working?"
 #: src/screens/onboarding/guide.tsx
 msgid "Étape {rank} sur {count}"
 msgstr "Step {rank} of {count}"
-
-#: src/helpers/onboarding.ts
-msgid "Éteignez-la. Allumée, elle retient les notifications : votre percepteur se fait taper à l’autre bout du monde et vous ne l’apprenez qu’en rentrant."
-msgstr "Turn it off. While it is on, it holds notifications back: your tax collector gets hit on the other side of the world and you only find out when you come home."
 
 #: src/helpers/journal.ts
 msgid "éteint"
@@ -2045,6 +2045,10 @@ msgstr "Multifus, which had no window left to walk through"
 msgid "Multifus, qui n’écoutait plus les clics"
 msgstr "Multifus, which was no longer listening to the clicks"
 
+#: src/helpers/wording.ts
+msgid "Ne pas déranger"
+msgstr "Do not disturb"
+
 #: src/components/main-toggle.tsx
 msgid "Ne plus en faire votre personnage principal"
 msgstr "Stop making them your main character"
@@ -2072,6 +2076,10 @@ msgstr "Notifications"
 #: src/helpers/wording.ts
 msgid "Notifications en arrière-plan"
 msgstr "Background notifications"
+
+#: src/helpers/wording.ts
+msgid "Notifications et actions"
+msgstr "Notifications & actions"
 
 #: src/helpers/onboarding.ts
 msgid "On essaie pour de vrai"

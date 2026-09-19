@@ -10,6 +10,7 @@ import type {
 import { IS_APPLE } from '@/constants/keyboard'
 import type { Shot } from '@/constants/onboarding'
 import { PAGE_SHOTS, SYSTEM_PAGES, WELCOME_PAGE } from '@/constants/onboarding'
+import { IS_WINDOWS_ELEVEN } from '@/constants/system'
 import { quoted, systemWords } from '@/helpers/wording'
 
 export const pagesOf = (onboarding: Onboarding): readonly Page[] => {
@@ -101,7 +102,7 @@ const pageBody = (page: Page) => {
       return t`Trouvez ${game} dans la liste et laissez-le envoyer des notifications. Combat, échange, défi, percepteur : tout passe par là.`
     }
     case 'focus': {
-      return t`Éteignez-la. Allumée, elle retient les notifications : votre percepteur se fait taper à l’autre bout du monde et vous ne l’apprenez qu’en rentrant.`
+      return t`Allumé, ce réglage retient les notifications : votre percepteur se fait taper à l’autre bout du monde et vous ne l’apprenez qu’en rentrant.`
     }
     case 'gameSetting': {
       const options = quoted(systemWords().options)
@@ -140,10 +141,16 @@ export const pageWay = (page: Page) => {
     case 'notifications': {
       return IS_APPLE
         ? [words.settings, words.notifications, words.game]
-        : [words.settings, words.system, words.notifications]
+        : [words.settings, words.system, words.systemNotifications]
     }
     case 'focus': {
-      return [words.settings, words.focus]
+      if (IS_APPLE) {
+        return [words.settings, words.focus]
+      }
+
+      return IS_WINDOWS_ELEVEN
+        ? [words.settings, words.system, words.systemNotifications, words.focus]
+        : [words.settings, words.system, words.focus]
     }
     case 'gameSetting': {
       return [words.options, words.general, words.miscellaneous]

@@ -48,6 +48,14 @@ pub use window::WindowManager;
 pub use window::matches_game_in_front;
 #[cfg(target_os = "windows")]
 pub use windows::matches_frontmost;
+#[cfg(target_os = "windows")]
+pub use windows::matches_windows_eleven;
+
+#[cfg(not(target_os = "windows"))]
+#[must_use]
+pub fn matches_windows_eleven() -> bool {
+    false
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Authorization {

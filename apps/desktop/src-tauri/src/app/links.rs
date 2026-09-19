@@ -7,6 +7,8 @@ use tauri_plugin_opener::OpenerExt;
 use crate::app::journal::JournalEvent;
 use crate::app::runtime;
 use crate::app::state::lock;
+#[cfg(target_os = "windows")]
+use crate::platform::matches_windows_eleven;
 
 const SOURCE_URL: &str = "https://github.com/viclafouch/multifus";
 
@@ -46,7 +48,9 @@ const NOTIFICATIONS_PAGE_URL: &str =
     "x-apple.systempreferences:com.apple.Notifications-Settings.extension";
 
 #[cfg(target_os = "macos")]
-const FOCUS_PAGE_URL: &str = "x-apple.systempreferences:com.apple.Focus-Settings.extension";
+fn focus_page_url() -> &'static str {
+    "x-apple.systempreferences:com.apple.Focus-Settings.extension"
+}
 
 #[cfg(target_os = "windows")]
 const AUTHORIZATION_PAGE_URL: &str = "ms-settings:privacy-notifications";
@@ -55,7 +59,16 @@ const AUTHORIZATION_PAGE_URL: &str = "ms-settings:privacy-notifications";
 const NOTIFICATIONS_PAGE_URL: &str = "ms-settings:notifications";
 
 #[cfg(target_os = "windows")]
-const FOCUS_PAGE_URL: &str = "ms-settings:quiethours";
+const FOCUS_ASSIST_PAGE_URL: &str = "ms-settings:quiethours";
+
+#[cfg(target_os = "windows")]
+fn focus_page_url() -> &'static str {
+    if matches_windows_eleven() {
+        NOTIFICATIONS_PAGE_URL
+    } else {
+        FOCUS_ASSIST_PAGE_URL
+    }
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -71,7 +84,7 @@ impl SystemPage {
         match self {
             Self::Authorization => AUTHORIZATION_PAGE_URL,
             Self::Notifications => NOTIFICATIONS_PAGE_URL,
-            Self::Focus => FOCUS_PAGE_URL,
+            Self::Focus => focus_page_url(),
         }
     }
 }
@@ -166,13 +179,26 @@ mod tests {
     }
 
     #[test]
-    fn the_three_system_pages_are_three_different_pages() {
+    fn the_authorization_page_is_never_one_of_the_other_two() {
         let authorization = SystemPage::Authorization.url();
-        let notifications = SystemPage::Notifications.url();
-        let focus = SystemPage::Focus.url();
 
-        assert_ne!(authorization, notifications);
-        assert_ne!(notifications, focus);
-        assert_ne!(focus, authorization);
+        assert_ne!(authorization, SystemPage::Notifications.url());
+        assert_ne!(authorization, SystemPage::Focus.url());
+    }
+
+    #[cfg(target_os = "macos")]
+    #[test]
+    fn the_mac_holds_concentration_on_a_page_of_its_own() {
+        assert_ne!(
+            SystemPage::Notifications.url(),
+            SystemPage::Focus.url(),
+            "Réglages Système lists Concentration next to Notifications"
+        );
+    }
+
+    #[cfg(target_os = "windows")]
+    #[test]
+    fn focus_assist_had_a_page_of_its_own_before_windows_eleven_folded_it_in() {
+        assert_ne!(FOCUS_ASSIST_PAGE_URL, NOTIFICATIONS_PAGE_URL);
     }
 }
