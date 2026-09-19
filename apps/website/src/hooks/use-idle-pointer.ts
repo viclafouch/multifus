@@ -1,6 +1,6 @@
 import React from 'react'
 
-export const IDLE_AFTER = 2500
+export const IDLE_AFTER = 1250
 
 export const useIdlePointer = (isArmed: boolean) => {
   const target = React.useRef<HTMLButtonElement>(null)
