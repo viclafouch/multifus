@@ -37,7 +37,7 @@ export const RivalTable = ({ isPeek = false }: RivalTableProps) => {
 
   const ledger = (
     <div className="relative">
-      <div className="glass ledger overflow-x-auto">
+      <div className="glass ledger overflow-x-auto overscroll-x-none">
         <table
           aria-describedby={isPeek ? undefined : SURVEY_ANCHOR}
           className="w-full min-w-lintel border-collapse text-left"
@@ -63,7 +63,7 @@ export const RivalTable = ({ isPeek = false }: RivalTableProps) => {
                   <th
                     key={rival}
                     scope="col"
-                    className="px-3 py-3.5 text-center text-aside font-normal text-band"
+                    className="px-3 py-3.5 text-center text-aside font-normal whitespace-nowrap text-band"
                   >
                     <OutLink href={code}>{name}</OutLink>
                   </th>
