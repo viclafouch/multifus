@@ -29,9 +29,11 @@ export const inkedWith = (color: string, alpha: number) => {
   return `rgb(${channels.join(' ')} / ${alpha})`
 }
 
+const RETRO_SHEET = '@multifus/retro/styles/retro.css'
+
 const HEX_DECLARATION = /--([a-z-]+):\s*(#[\da-f]{6})\b/gu
 
-export const paletteOf = (sheet: string) => {
+const paletteOf = (sheet: string) => {
   const declared = new Map<string, string>()
 
   for (const found of sheet.matchAll(HEX_DECLARATION)) {
@@ -57,6 +59,10 @@ export const paletteOf = (sheet: string) => {
     leaf: hexOf('leaf'),
     leafLit: hexOf('leaf-lit')
   }
+}
+
+export const loadPalette = async (resolve: (specifier: string) => string) => {
+  return paletteOf(await readFile(resolve(RETRO_SHEET), 'utf8'))
 }
 
 export const dataUrlOf = (markup: string) => {

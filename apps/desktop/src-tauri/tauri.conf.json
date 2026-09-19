@@ -73,7 +73,7 @@
       "icons/icon.ico"
     ],
     "macOS": {
-      "minimumSystemVersion": "12.4",
+      "minimumSystemVersion": "13.3",
       "dmg": {
         "background": "dmg/background.tiff",
         "windowSize": {

@@ -15,7 +15,7 @@ export const SYSTEM_NAMES = {
 } as const satisfies Record<SystemId, string>
 
 export const SYSTEM_VERSIONS = {
-  macos: 'macOS 12.4',
+  macos: 'macOS 13.3',
   windows: 'Windows 10'
 } as const satisfies Record<SystemId, string>
 
@@ -25,7 +25,7 @@ export const SYSTEM_PACKAGES = {
 } as const satisfies Record<SystemId, MessageDescriptor>
 
 export const SYSTEM_FLOORS = {
-  macos: msg`${SYSTEM_VERSIONS.macos} ou plus récent, sur un Mac Apple Silicon`,
+  macos: msg`${SYSTEM_VERSIONS.macos} ou plus récent, sur Mac Intel comme Apple Silicon`,
   windows: msg`${SYSTEM_VERSIONS.windows} ou plus récent`
 } as const satisfies Record<SystemId, MessageDescriptor>
 

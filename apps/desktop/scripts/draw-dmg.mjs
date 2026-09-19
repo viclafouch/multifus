@@ -1,30 +1,21 @@
-import { execFile } from 'node:child_process'
-import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
 import { createRequire } from 'node:module'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import process from 'node:process'
-import { promisify } from 'node:util'
 import { render } from 'takumi-js'
 import {
   dataUrlOf,
   inkedWith,
   loadFonts,
-  paletteOf,
+  loadPalette,
   RETRO_FONTS,
   TAGLINE,
   WORDMARK
 } from '@multifus/retro/draw'
-
-const runCommand = promisify(execFile)
+import { readConfig, runCommand, TAURI_DIR } from './tauri.mjs'
 
 const { resolve } = createRequire(import.meta.url)
-
-const TAURI_DIR = path.join(import.meta.dirname, '..', 'src-tauri')
-
-const CONFIG_FILE = path.join(TAURI_DIR, 'tauri.conf.json')
-
-const RETRO_SHEET = '@multifus/retro/styles/retro.css'
 
 const CARVE = RETRO_FONTS.carve.name
 
@@ -289,14 +280,13 @@ const platesOf = async ({ stageDir, html, css, layout, fonts }) => {
 }
 
 const drawBackground = async () => {
-  const [config, sheet, fonts] = await Promise.all([
-    readFile(CONFIG_FILE, 'utf8'),
-    readFile(resolve(RETRO_SHEET), 'utf8'),
+  const [config, ink, fonts] = await Promise.all([
+    readConfig(),
+    loadPalette(resolve),
     loadFonts(resolve)
   ])
 
-  const { dmg, minimumSystemVersion } = JSON.parse(config).bundle.macOS
-  const ink = paletteOf(sheet)
+  const { dmg, minimumSystemVersion } = config.bundle.macOS
   const layout = layoutOf(dmg)
   const background = path.join(TAURI_DIR, dmg.background)
   const stageDir = await mkdtemp(path.join(tmpdir(), 'multifus-dmg-'))

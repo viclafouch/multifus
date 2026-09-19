@@ -7,7 +7,7 @@ const DOWNLOAD =
 const ASSETS = [
   { name: 'Multifus.app.tar.gz', browser_download_url: `${DOWNLOAD}/a.tar.gz` },
   {
-    name: 'Multifus_1.0.0_aarch64.dmg',
+    name: 'Multifus_1.0.0_universal.dmg',
     browser_download_url: `${DOWNLOAD}/b.dmg`
   },
   {

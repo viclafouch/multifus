@@ -9,7 +9,7 @@ import react from '@vitejs/plugin-react'
 const host = process.env.TAURI_DEV_HOST ?? ''
 const isRemoteHost = host !== ''
 
-const OLDEST_WEBVIEW = 'safari15.5'
+const OLDEST_WEBVIEW = 'safari16.4'
 
 export default defineConfig({
   plugins: [

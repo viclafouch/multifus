@@ -34,6 +34,9 @@ export default defineConfig({
     typeAware: true,
     typeCheck: true
   },
+  rules: {
+    'unicorn/number-literal-case': 'off'
+  },
   overrides: [
     {
       files: [
@@ -54,6 +57,7 @@ export default defineConfig({
     },
     {
       files: [
+        'apps/desktop/src/icon.test.ts',
         'apps/desktop/src/lib/character-marks.test.ts',
         'apps/desktop/src/lib/multifus.test.ts',
         'apps/desktop/src/test-doubles.ts'

@@ -11,6 +11,7 @@
     "build:app": "tauri build",
     "preview": "vite preview",
     "tauri": "tauri",
+    "draw:icon": "node scripts/draw-icon.mjs",
     "draw:dmg": "node scripts/draw-dmg.mjs",
     "preview:dmg": "node scripts/preview-dmg.mjs",
     "draw:nsis": "node scripts/draw-nsis.mjs",

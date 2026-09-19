@@ -24,8 +24,8 @@ msgstr "{0} o más reciente"
 
 #. placeholder {0}: SYSTEM_VERSIONS.macos
 #: src/constants/systems.ts
-msgid "{0} ou plus récent, sur un Mac Apple Silicon"
-msgstr "{0} o más reciente, en un Mac con Apple Silicon"
+msgid "{0} ou plus récent, sur Mac Intel comme Apple Silicon"
+msgstr "{0} o más reciente, tanto en Mac Intel como con Apple Silicon"
 
 #: src/constants/rivals.ts
 msgid "à moitié"
@@ -111,6 +111,10 @@ msgstr "Eres tú quien envía"
 #: src/screens/windows-screen.tsx
 msgid "Ça marche sur Dofus 2 ou Dofus 3 ?"
 msgstr "¿Funciona en Dofus 2 o Dofus 3?"
+
+#: src/screens/mac-screen.tsx
+msgid "Ça marche sur mon Mac ?"
+msgstr "¿Funciona en mi Mac?"
 
 #: src/screens/download-screen.tsx
 msgid "Ça marche sur mon ordinateur ?"
@@ -296,6 +300,10 @@ msgstr "¿Y después?"
 msgid "Et son exécution au démarrage de Windows, si vous cochez la case."
 msgstr "Y ejecutarse al iniciar Windows, si marcas la casilla."
 
+#: src/screens/mac-screen.tsx
+msgid "Et son ouverture au démarrage du Mac, si vous cochez la case."
+msgstr "Y ejecutarse al iniciar el Mac, si marcas la casilla."
+
 #: src/screens/windows-screen.tsx
 msgid "F1 sur votre premier Enutrof, F2 sur le second. Sur Windows, une touche de fonction se pose seule."
 msgstr "F1 en tu primer Enutrof, F2 en el segundo. En Windows una tecla de función se pone sola."
@@ -315,6 +323,11 @@ msgstr "Funcionalidades"
 #: src/constants/wording.ts
 msgid "Gratuit"
 msgstr "Gratis"
+
+#. placeholder {0}: SYSTEM_VERSIONS.macos
+#: src/screens/mac-screen.tsx
+msgid "Il faut {0} ou plus récent. Les Mac Intel et les Mac Apple Silicon reçoivent le même fichier."
+msgstr "Hace falta {0} o más reciente. Los Mac Intel y los Mac con Apple Silicon reciben el mismo archivo."
 
 #: src/screens/comparison-screen.tsx
 msgid "Il le retient d’une session à l’autre, mais il n’en garde pas plusieurs : Dracoon et Retro Toolbox enregistrent des ordres nommés, et les rappellent d’un clic."
@@ -351,6 +364,10 @@ msgstr "Novedades"
 #: src/constants/wording.ts
 msgid "Journal des versions du multicompte Dofus Retro"
 msgstr "Novedades del programa multicuenta de Dofus Retro"
+
+#: src/screens/mac-screen.tsx
+msgid "L’accès à l’Accessibilité, et rien d’autre. C’est ce qui lui permet de voir et de ranger les fenêtres du jeu."
+msgstr "El acceso a Accesibilidad, y nada más. Es lo que le permite ver y ordenar las ventanas del juego."
 
 #: src/screens/windows-screen.tsx
 msgid "L’accès aux notifications, et rien d’autre."
@@ -660,6 +677,10 @@ msgstr "Mensajes privados"
 msgid "Messages privés Dofus Retro sur Telegram"
 msgstr "Mensajes privados de Dofus Retro en Telegram"
 
+#: src/screens/mac-screen.tsx
+msgid "Mon Mac est sous Monterey, ça marche ?"
+msgstr "Mi Mac lleva Monterey, ¿funciona?"
+
 #: src/screens/windows-screen.tsx
 msgid "Mon PC est sous Windows 7, ça marche ?"
 msgstr "Mi PC lleva Windows 7, ¿funciona?"
@@ -768,6 +789,11 @@ msgstr "No leer ni cambiar nada en el juego"
 msgid "non"
 msgstr "no"
 
+#. placeholder {0}: SYSTEM_VERSIONS.macos
+#: src/screens/mac-screen.tsx
+msgid "Non. Il faut {0} ou plus récent."
+msgstr "No. Hace falta {0} o más reciente."
+
 #: src/screens/windows-screen.tsx
 msgid "Non. Il faut Windows 10 ou Windows 11."
 msgstr "No. Hace falta Windows 10 o Windows 11."
@@ -868,6 +894,10 @@ msgstr "Ni un turno perdido"
 msgid "Plusieurs ordres de personnages enregistrés"
 msgstr "Varios órdenes de personajes guardados"
 
+#: src/screens/mac-screen.tsx
+msgid "Pour lire votre version : menu <0/><1>Pomme</1>, puis À propos de ce Mac."
+msgstr "Para ver tu versión: menú <0/><1>Apple</1>, y luego Acerca de este Mac."
+
 #: src/constants/bodies.ts
 msgid "Presque tous les gestionnaires pour Dofus Retro s’arrêtent à Windows. Multifus est né sur Mac, et c’est de là que part la version Windows."
 msgstr "Casi todos los gestores para Dofus Retro se quedan en Windows. Multifus nació en Mac, y de ahí sale la versión de Windows."
@@ -875,6 +905,10 @@ msgstr "Casi todos los gestores para Dofus Retro se quedan en Windows. Multifus 
 #: src/constants/wording.ts
 msgid "Projet indépendant, sans lien avec Ankama."
 msgstr "Proyecto independiente, sin vínculo con Ankama."
+
+#: src/screens/mac-screen.tsx
+msgid "Qu’est-ce que Multifus demande à macOS ?"
+msgstr "¿Qué le pide Multifus a macOS?"
 
 #: src/screens/windows-screen.tsx
 msgid "Qu’est-ce que Multifus demande à Windows ?"
@@ -931,6 +965,10 @@ msgstr "Nada se mueve sin ti"
 #: src/constants/wording.ts
 msgid "Roue des personnages"
 msgstr "Rueda de personajes"
+
+#: src/screens/mac-screen.tsx
+msgid "Sans cet accès, Multifus ne voit rien et ne peut rien faire."
+msgstr "Sin ese acceso, Multifus no ve nada y no puede hacer nada."
 
 #: src/constants/wording.ts
 msgid "Sans compte"

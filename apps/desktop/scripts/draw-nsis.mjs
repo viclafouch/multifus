@@ -7,19 +7,14 @@ import { render } from 'takumi-js'
 import {
   inkedWith,
   loadFonts,
-  paletteOf,
+  loadPalette,
   RETRO_FONTS,
   TAGLINE,
   WORDMARK
 } from '@multifus/retro/draw'
+import { readConfig, TAURI_DIR } from './tauri.mjs'
 
 const { resolve } = createRequire(import.meta.url)
-
-const TAURI_DIR = path.join(import.meta.dirname, '..', 'src-tauri')
-
-const CONFIG_FILE = path.join(TAURI_DIR, 'tauri.conf.json')
-
-const RETRO_SHEET = '@multifus/retro/styles/retro.css'
 
 const APP_ICON = path.join(TAURI_DIR, 'icons', '128x128@2x.png')
 
@@ -230,15 +225,14 @@ const plateOf = async ({ file, html, css, width, height, fonts }) => {
 }
 
 const drawImages = async () => {
-  const [config, sheet, icon, fonts] = await Promise.all([
-    readFile(CONFIG_FILE, 'utf8'),
-    readFile(resolve(RETRO_SHEET), 'utf8'),
+  const [config, ink, icon, fonts] = await Promise.all([
+    readConfig(),
+    loadPalette(resolve),
     readFile(APP_ICON),
     loadFonts(resolve)
   ])
 
-  const { headerImage, sidebarImage } = JSON.parse(config).bundle.windows.nsis
-  const ink = paletteOf(sheet)
+  const { headerImage, sidebarImage } = config.bundle.windows.nsis
   const badge = `data:image/png;base64,${icon.toString('base64')}`
 
   await Promise.all([
