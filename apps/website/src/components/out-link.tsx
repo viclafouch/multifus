@@ -34,7 +34,8 @@ export const OutLink = ({
     <a
       href={href}
       {...(isMailed ? null : NEW_TAB)}
-      className={
+      className={cn(
+        'relative',
         isBare
           ? className
           : cn(
@@ -42,7 +43,7 @@ export const OutLink = ({
               isInline ? 'inline' : 'inline-flex items-center gap-1.5',
               className
             )
-      }
+      )}
     >
       {children}
       {isBare ? null : (
