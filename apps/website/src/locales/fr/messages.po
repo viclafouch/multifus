@@ -256,6 +256,10 @@ msgstr "Deux équipes fixes, T1 et T2 : elles filtrent le cycle, elles n’enreg
 msgid "Deux personnages de la même classe et du même sexe restent reconnaissables."
 msgstr "Deux personnages de la même classe et du même sexe restent reconnaissables."
 
+#: src/components/author-word.tsx
+msgid "Développeur web depuis 10 ans"
+msgstr "Développeur web depuis 10 ans"
+
 #: src/screens/windows-screen.tsx
 msgid "Disponible sur Windows 10 et 11"
 msgstr "Disponible sur Windows 10 et 11"
@@ -345,6 +349,10 @@ msgstr "Images et vidéos © Ankama Games. Dofus Retro est une marque d’Ankama
 msgid "Installer, c’est trois gestes"
 msgstr "Installer, c’est trois gestes"
 
+#: src/components/author-word.tsx
+msgid "Je fais du web depuis 10 ans, et je sais ce qu’on risque en installant un logiciel trouvé sur un Discord. Multifus ne voit jamais votre mot de passe, parce qu’il ne fait que ranger vos fenêtres de Dofus Retro. Son code est public, libre à vous d’aller le vérifier."
+msgstr "Je fais du web depuis 10 ans, et je sais ce qu’on risque en installant un logiciel trouvé sur un Discord. Multifus ne voit jamais votre mot de passe, parce qu’il ne fait que ranger vos fenêtres de Dofus Retro. Son code est public, libre à vous d’aller le vérifier."
+
 #: src/screens/windows-screen.tsx
 msgid "Je peux jouer combien de comptes ?"
 msgstr "Je peux jouer combien de comptes ?"
@@ -396,6 +404,10 @@ msgstr "L’AutoFocus, la roue, le déplacement rapide, le tableau des runes, le
 #: src/components/taskbar-proof.tsx
 msgid "L’icône"
 msgstr "L’icône"
+
+#: src/components/author-word.tsx
+msgid "L’image de profil de l’auteur de Multifus."
+msgstr "L’image de profil de l’auteur de Multifus."
 
 #: src/constants/shots.ts
 msgid "La fenêtre de Multifus sur Mac, par-dessus les clients Dofus Retro ouverts sur le bureau."
@@ -708,6 +720,10 @@ msgstr "Multifus est gratuit, pour Mac et pour Windows. Trois gestes, et vous jo
 #: src/screens/legal-screen.tsx
 msgid "Multifus est publié par <0>viclafouch</0>, un particulier, à titre personnel, hors de toute société, et sans rien vendre. Son identité est connue de l’hébergeur, comme la loi le demande."
 msgstr "Multifus est publié par <0>viclafouch</0>, un particulier, à titre personnel, hors de toute société, et sans rien vendre. Son identité est connue de l’hébergeur, comme la loi le demande."
+
+#: src/screens/home-screen.tsx
+msgid "Multifus est sûr, et ça se vérifie"
+msgstr "Multifus est sûr, et ça se vérifie"
 
 #: src/constants/wording.ts
 msgid "Multifus est-il autorisé ?"
@@ -1134,6 +1150,7 @@ msgstr "Une touche, un personnage"
 msgid "Vérifiez ce tableau vous-même"
 msgstr "Vérifiez ce tableau vous-même"
 
+#: src/components/author-word.tsx
 #: src/screens/home-screen.tsx
 msgid "Voir le code"
 msgstr "Voir le code"

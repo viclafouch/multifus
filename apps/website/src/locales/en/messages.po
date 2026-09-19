@@ -256,6 +256,10 @@ msgstr "Two fixed teams, T1 and T2: they filter the cycle, they save no order."
 msgid "Deux personnages de la même classe et du même sexe restent reconnaissables."
 msgstr "Two characters of the same class and sex stay recognisable."
 
+#: src/components/author-word.tsx
+msgid "Développeur web depuis 10 ans"
+msgstr "Web developer for 10 years"
+
 #: src/screens/windows-screen.tsx
 msgid "Disponible sur Windows 10 et 11"
 msgstr "Available on Windows 10 and 11"
@@ -345,6 +349,10 @@ msgstr "Images and videos © Ankama Games. Dofus Retro is a trademark of Ankama.
 msgid "Installer, c’est trois gestes"
 msgstr "Installing takes three moves"
 
+#: src/components/author-word.tsx
+msgid "Je fais du web depuis 10 ans, et je sais ce qu’on risque en installant un logiciel trouvé sur un Discord. Multifus ne voit jamais votre mot de passe, parce qu’il ne fait que ranger vos fenêtres de Dofus Retro. Son code est public, libre à vous d’aller le vérifier."
+msgstr "I have been building for the web for 10 years, and I know what you risk when you install software you found on a Discord. Multifus never sees your password, because all it does is arrange your Dofus Retro windows. Its code is public, and you are free to go and check it."
+
 #: src/screens/windows-screen.tsx
 msgid "Je peux jouer combien de comptes ?"
 msgstr "How many accounts can I play?"
@@ -396,6 +404,10 @@ msgstr "AutoFocus, the wheel, quick move, the rune table, private messages and q
 #: src/components/taskbar-proof.tsx
 msgid "L’icône"
 msgstr "The icon"
+
+#: src/components/author-word.tsx
+msgid "L’image de profil de l’auteur de Multifus."
+msgstr "The profile picture of the author of Multifus."
 
 #: src/constants/shots.ts
 msgid "La fenêtre de Multifus sur Mac, par-dessus les clients Dofus Retro ouverts sur le bureau."
@@ -708,6 +720,10 @@ msgstr "Multifus is free, for Mac and for Windows. Three moves, and you are play
 #: src/screens/legal-screen.tsx
 msgid "Multifus est publié par <0>viclafouch</0>, un particulier, à titre personnel, hors de toute société, et sans rien vendre. Son identité est connue de l’hébergeur, comme la loi le demande."
 msgstr "Multifus is published by <0>viclafouch</0>, a private individual, in a private capacity, outside any company, and selling nothing. The host knows who they are, as the law requires."
+
+#: src/screens/home-screen.tsx
+msgid "Multifus est sûr, et ça se vérifie"
+msgstr "Multifus is safe, and you can check"
 
 #: src/constants/wording.ts
 msgid "Multifus est-il autorisé ?"
@@ -1134,6 +1150,7 @@ msgstr "One key, one character"
 msgid "Vérifiez ce tableau vous-même"
 msgstr "Check this table yourself"
 
+#: src/components/author-word.tsx
 #: src/screens/home-screen.tsx
 msgid "Voir le code"
 msgstr "See the code"

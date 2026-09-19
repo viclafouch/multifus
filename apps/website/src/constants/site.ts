@@ -1,6 +1,8 @@
 export const SITE_DOMAIN = 'multifus.app'
 
-export const REPOSITORY_PATH = 'viclafouch/multifus'
+export const AUTHOR_LOGIN = 'viclafouch'
+
+export const REPOSITORY_PATH = `${AUTHOR_LOGIN}/multifus`
 
 export const REPOSITORY = `https://github.com/${REPOSITORY_PATH}`
 
@@ -10,7 +12,7 @@ export const AUTHOR_HANDLE = '@TrustedSheriff'
 
 export const AUTHOR_NAME = 'Victor de la Fouchardière'
 
-export const AUTHOR_CODE = 'https://github.com/viclafouch'
+export const AUTHOR_CODE = `https://github.com/${AUTHOR_LOGIN}`
 
 export const AUTHOR_MAIL = 'victor.delafouchardiere@gmail.com'
 

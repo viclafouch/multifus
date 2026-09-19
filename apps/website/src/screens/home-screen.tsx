@@ -3,6 +3,7 @@ import { useLingui } from '@lingui/react'
 import { Trans } from '@lingui/react/macro'
 import { Button } from '@multifus/retro'
 import type { PageScreenProps } from '@/@types/screen'
+import { AuthorWord } from '@/components/author-word'
 import { Band } from '@/components/band'
 import { BandTitle } from '@/components/band-title'
 import { BotBan } from '@/components/bot-ban'
@@ -26,6 +27,8 @@ const HERO_TURN = msg`enfin jouable`
 const FEATURES_TITLE = msg`Ce que Multifus fait`
 
 const FEATURES_LEAD = msg`Six mécanismes, un seul but : ne plus chercher le personnage qui vous attend.`
+
+const TRUST_TITLE = msg`Multifus est sûr, et ça se vérifie`
 
 const TRUST_PROOF = msg`Le paquet est signé par Apple, le code est ouvert, et Ankama tolère ce genre d’outil tant qu’il ne touche pas au jeu. Les trois se vérifient.`
 
@@ -80,6 +83,10 @@ export const HomeScreen = (_props: PageScreenProps) => {
             )
           })}
         </ul>
+      </Band>
+      <Band className="reveal gap-10 py-20">
+        <BandTitle>{i18n._(TRUST_TITLE)}</BandTitle>
+        <AuthorWord />
       </Band>
       <Band className="reveal py-16">
         <PlateBlock title={i18n._(LIMITS_TITLE)}>
