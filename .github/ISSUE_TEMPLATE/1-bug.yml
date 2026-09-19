@@ -1,0 +1,54 @@
+name: Bug
+description: Multifus does something wrong.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Write in French, English or Spanish.
+
+  - type: dropdown
+    id: app
+    attributes:
+      label: Where
+      options:
+        - The application
+        - The website
+    validations:
+      required: true
+
+  - type: dropdown
+    id: system
+    attributes:
+      label: System
+      options:
+        - macOS
+        - Windows
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Multifus version
+      description: Read it in the About screen. Leave it empty for the website.
+      placeholder: 1.4.2
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: Tell what you did, then what Multifus did, then what it must do.
+      placeholder: |
+        I pressed F2.
+        Multifus kept the window of the first character in front.
+        It must show the window of the second character.
+    validations:
+      required: true
+
+  - type: upload
+    id: capture
+    attributes:
+      label: Screenshot or video
+      description: Show the problem. This is the fastest way to explain it.
+    validations:
+      accept: .png,.jpg,.jpeg,.gif,.webp,.mp4,.mov,.webm

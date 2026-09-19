@@ -1,0 +1,39 @@
+name: Idea
+description: Multifus must do something new.
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: Write in French, English or Spanish.
+
+  - type: dropdown
+    id: app
+    attributes:
+      label: Where
+      options:
+        - The application
+        - The website
+    validations:
+      required: true
+
+  - type: dropdown
+    id: system
+    attributes:
+      label: System
+      options:
+        - macOS
+        - Windows
+        - Both
+    validations:
+      required: true
+
+  - type: textarea
+    id: idea
+    attributes:
+      label: Your idea
+      description: Tell what you want, then what stops you today.
+      placeholder: |
+        I want a key to put all my windows in a line.
+        Today I move each window with the mouse.
+    validations:
+      required: true
