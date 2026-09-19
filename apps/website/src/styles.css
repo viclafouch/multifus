@@ -49,6 +49,23 @@
   --horizon-stops:
     #000 0%, #000 24%, rgb(0 0 0 / 0.74) 46%, rgb(0 0 0 / 0.4) 66%,
     rgb(0 0 0 / 0.14) 84%, transparent 100%;
+
+  --fold: 100svh;
+
+  --cell-gap: 34px;
+  --cell-span: calc(var(--cell-gap) * 5);
+  --cell-rise: 26.57deg;
+  --cell-fall: 153.43deg;
+  --cell-line: color-mix(in srgb, var(--khaki), transparent 93%);
+  --cell-line-dim: color-mix(in srgb, var(--khaki), transparent 97%);
+
+  --lattice-in: calc(var(--fold) + 30rem);
+  --lattice-out: max(var(--lattice-in), calc(100% - 46rem));
+  --lattice-stops:
+    transparent 0, transparent var(--fold),
+    rgb(0 0 0 / 0.4) calc(var(--fold) + 14rem), #000 var(--lattice-in),
+    #000 var(--lattice-out), rgb(0 0 0 / 0.3) calc(var(--lattice-out) + 20rem),
+    transparent calc(var(--lattice-out) + 34rem);
 }
 
 @layer base {
@@ -118,27 +135,118 @@
   filter: saturate(0.78);
 }
 
+@utility lattice {
+  position: absolute;
+  inset: 0;
+  z-index: -12;
+  pointer-events: none;
+  background-image:
+    repeating-linear-gradient(
+      var(--cell-rise),
+      var(--cell-line) 0 1px,
+      transparent 1px var(--cell-span)
+    ),
+    repeating-linear-gradient(
+      var(--cell-fall),
+      var(--cell-line) 0 1px,
+      transparent 1px var(--cell-span)
+    ),
+    repeating-linear-gradient(
+      var(--cell-rise),
+      var(--cell-line-dim) 0 1px,
+      transparent 1px var(--cell-gap)
+    ),
+    repeating-linear-gradient(
+      var(--cell-fall),
+      var(--cell-line-dim) 0 1px,
+      transparent 1px var(--cell-gap)
+    );
+  -webkit-mask-image: linear-gradient(180deg, var(--lattice-stops));
+  mask-image: linear-gradient(180deg, var(--lattice-stops));
+}
+
+@keyframes chill {
+  to {
+    opacity: 0.45;
+  }
+}
+
+@keyframes ember {
+  to {
+    opacity: 1;
+  }
+}
+
 @utility aura {
   position: fixed;
   inset: 0;
   z-index: -11;
   pointer-events: none;
-  background-image:
-    radial-gradient(
-      128% 58% at 50% -8%,
-      color-mix(in oklch, var(--tint), transparent 84%) 0%,
-      transparent 64%
-    ),
-    radial-gradient(
-      82% 54% at 4% 102%,
-      color-mix(in oklch, var(--tint), transparent 91%) 0%,
-      transparent 72%
-    ),
-    radial-gradient(
-      58% 42% at 100% 52%,
-      color-mix(in srgb, var(--leaf), transparent 92%) 0%,
-      transparent 74%
-    );
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  &::before {
+    background-image:
+      radial-gradient(
+        128% 58% at 50% -8%,
+        color-mix(in oklch, var(--tint), transparent 84%) 0%,
+        transparent 64%
+      ),
+      radial-gradient(
+        82% 54% at 4% 102%,
+        color-mix(in oklch, var(--tint), transparent 91%) 0%,
+        transparent 72%
+      ),
+      radial-gradient(
+        58% 42% at 100% 52%,
+        color-mix(in srgb, var(--leaf), transparent 92%) 0%,
+        transparent 74%
+      );
+  }
+
+  &::after {
+    opacity: 0;
+    background-image:
+      radial-gradient(
+        118% 64% at 50% 110%,
+        color-mix(in srgb, var(--amber), transparent 89%) 0%,
+        transparent 66%
+      ),
+      radial-gradient(
+        56% 44% at 98% 58%,
+        color-mix(in srgb, var(--gold), transparent 94%) 0%,
+        transparent 72%
+      ),
+      radial-gradient(
+        50% 40% at 0% 80%,
+        color-mix(in srgb, var(--olive-deep), transparent 93%) 0%,
+        transparent 74%
+      );
+  }
+
+  @supports (animation-timeline: scroll()) {
+    &::before,
+    &::after {
+      animation-duration: 1ms;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: scroll(root block);
+      animation-range: var(--fold) max(76%, calc(var(--fold) + 50vh));
+    }
+
+    &::before {
+      animation-name: chill;
+    }
+
+    &::after {
+      animation-name: ember;
+    }
+  }
 }
 
 @utility gloam {
@@ -1548,6 +1656,8 @@
     scroll-behavior: auto;
   }
 
+  .aura::before,
+  .aura::after,
   .surface-1,
   .surface-2,
   .surface-3,

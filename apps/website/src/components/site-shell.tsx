@@ -22,6 +22,7 @@ export const SiteShell = ({ page, children }: SiteShellProps) => {
       className={cn('relative flex min-h-screen flex-col', PAGE_TINTS[page])}
     >
       <SkipLink />
+      <div aria-hidden className="lattice" />
       <div aria-hidden className="aura" />
       {decor === null ? null : <SiteWorld decor={decor} />}
       <SiteHeader page={page} />
