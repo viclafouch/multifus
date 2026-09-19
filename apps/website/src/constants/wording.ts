@@ -80,6 +80,8 @@ export const MENU_HINTS = {
   quickTexts: msg`Une combinaison écrit la phrase.`
 } as const satisfies Record<(typeof MENU_FEATURES)[number], MessageDescriptor>
 
+export const SOFTWARE_CATEGORY = msg`Gestionnaire de fenêtres`
+
 export const LOOP_PLAY = msg`Lire`
 
 export const LOOP_HOLD = msg`Pause`

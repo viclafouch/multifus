@@ -17,10 +17,14 @@ const ASSET = zod.object({
 })
 
 const RELEASE = zod.object({
+  tag_name: zod.string(),
+  published_at: zod.iso.datetime(),
   assets: zod.array(ASSET)
 })
 
 type Asset = zod.infer<typeof ASSET>
+
+const VERSION_PREFIX = /^v/u
 
 const packageOf = (assets: readonly Asset[], system: SystemId) => {
   const asset = assets.find((candidate) => {
@@ -30,9 +34,13 @@ const packageOf = (assets: readonly Asset[], system: SystemId) => {
   return asset?.browser_download_url ?? null
 }
 
-export type ReleaseLinks = Readonly<Record<SystemId, string>>
+export type Release = Readonly<{
+  packages: Readonly<Record<SystemId, string>>
+  version: string
+  published: string
+}>
 
-export const latestReleaseLinks = async () => {
+export const latestRelease = async (): Promise<Release | null> => {
   const answer = await fetch(LATEST_RELEASE, {
     headers: { accept: 'application/vnd.github+json' },
     signal: AbortSignal.timeout(ANSWER_CEILING)
@@ -57,5 +65,13 @@ export const latestReleaseLinks = async () => {
   const macos = packageOf(release.data.assets, 'macos')
   const windows = packageOf(release.data.assets, 'windows')
 
-  return macos === null || windows === null ? null : { macos, windows }
+  if (macos === null || windows === null) {
+    return null
+  }
+
+  return {
+    packages: { macos, windows },
+    version: release.data.tag_name.replace(VERSION_PREFIX, ''),
+    published: release.data.published_at
+  }
 }

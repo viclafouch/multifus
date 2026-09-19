@@ -34,8 +34,6 @@ const TRUST_PROOF = msg`Le paquet est signé par Apple, le code est ouvert, et A
 
 const SOURCE = msg`Voir le code`
 
-const LOOP_CAPTION = msg`La roue des personnages, l’AutoFocus, le déplacement rapide et le tableau des runes, dans le jeu`
-
 const COMPARISON_TITLE = msg`Multifus face aux autres`
 
 const COMPARISON_LEAD = msg`Dracoon, Focus Retro, Dosoft, Retro Toolbox, ROrganizer : chaque case est relevée dans le code de l’outil, pas sur sa page d’accueil.`
@@ -68,7 +66,7 @@ export const HomeScreen = (_props: PageScreenProps) => {
           <DownloadCall className="surface-3" />
         </div>
         <div className="surface-4" data-carried={isCarriedIn ? '' : undefined}>
-          <LoopPlate loop="home" caption={i18n._(LOOP_CAPTION)} isAuto />
+          <LoopPlate loop="home" isAuto />
         </div>
       </Band>
       <Band className="reveal py-16">

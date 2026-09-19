@@ -17,7 +17,7 @@ type DownloadTakeProps = Readonly<{
 
 export const DownloadTake = ({ shown, onPick }: DownloadTakeProps) => {
   const { i18n } = useLingui()
-  const takes = __RELEASE_LINKS__ ?? { macos: RELEASES, windows: RELEASES }
+  const takes = __RELEASE__?.packages ?? { macos: RELEASES, windows: RELEASES }
 
   return (
     <div className="flex flex-col items-start gap-5">

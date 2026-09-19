@@ -1,3 +1,4 @@
+import { msg } from '@lingui/core/macro'
 import autoFocusPeek from '@multifus/ankama/loops/auto-focus-loop-peek.webp'
 import autoFocusPoster from '@multifus/ankama/loops/auto-focus-loop-poster.webp'
 import autoFocusLoop from '@multifus/ankama/loops/auto-focus-loop.mp4'
@@ -20,10 +21,13 @@ import wheelPoster from '@multifus/ankama/loops/wheel-loop-poster.webp'
 import wheelLoop from '@multifus/ankama/loops/wheel-loop.mp4'
 import type { Size } from '@/@types/media'
 import type { FeatureId, Loop, LoopId } from '@/@types/page'
+import { PAGE_PROMISES } from '@/constants/wording'
 
-const FILMED_ON = '2026-09-08'
+const FILMED_ON = '2026-09-08T12:00:00+02:00'
 
-const REFILMED_ON = '2026-09-16'
+const REFILMED_ON = '2026-09-16T12:00:00+02:00'
+
+export const LOOP_FORMAT = 'video/mp4'
 
 export const POSTER_SIZE = { width: 1280, height: 720 } as const satisfies Size
 
@@ -80,6 +84,12 @@ export const LOOPS = {
     filmed: REFILMED_ON
   }
 } as const satisfies Record<LoopId, Loop>
+
+const HOME_CAPTION = msg`La roue des personnages, l’AutoFocus, le déplacement rapide et le tableau des runes, dans le jeu`
+
+export const captionOf = (loop: LoopId) => {
+  return loop === 'home' ? HOME_CAPTION : PAGE_PROMISES[loop]
+}
 
 export const PEEKS = {
   autoFocus: autoFocusPeek,

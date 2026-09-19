@@ -2,11 +2,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { I18nProvider } from '@lingui/react'
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { LoopPlate } from '@/components/loop-plate'
+import { captionOf } from '@/constants/loops'
 import { IDLE_AFTER } from '@/hooks/use-idle-pointer'
 import { SPEAKERS } from '@/lib/i18n'
-
-const CAPTION =
-  'La roue des personnages, l’AutoFocus, le déplacement rapide et le tableau des runes, dans le jeu'
 
 const watchMotion = () => {
   return {
@@ -25,7 +23,7 @@ const spyOnPlayback = () => {
 const show = (isAuto: boolean) => {
   return render(
     <I18nProvider i18n={SPEAKERS.fr}>
-      <LoopPlate loop="home" caption={CAPTION} isAuto={isAuto} />
+      <LoopPlate loop="home" isAuto={isAuto} />
     </I18nProvider>
   )
 }
@@ -47,6 +45,16 @@ describe('the loop plate', () => {
     show(false)
 
     expect(play).not.toHaveBeenCalled()
+  })
+
+  it('says out loud what the loop shows', () => {
+    spyOnPlayback()
+
+    const { container } = show(false)
+
+    expect(container.querySelector('video')?.getAttribute('aria-label')).toBe(
+      SPEAKERS.fr._(captionOf('home'))
+    )
   })
 
   it('stays in the page on iOS rather than going full screen', () => {

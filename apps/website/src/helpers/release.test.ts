@@ -1,8 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { latestReleaseLinks } from '@/helpers/release'
+import { latestRelease } from '@/helpers/release'
 
 const DOWNLOAD =
   'https://github.com/viclafouch/multifus/releases/download/v1.0.0'
+
+const PUBLISHED_AT = '2026-09-18T09:30:00Z'
+
+const RELEASE = { tag_name: 'v1.0.0', published_at: PUBLISHED_AT }
 
 const ASSETS = [
   { name: 'Multifus.app.tar.gz', browser_download_url: `${DOWNLOAD}/a.tar.gz` },
@@ -37,42 +41,54 @@ const githubAnswers = ({ body, ok = true }: AnswerParams) => {
   })
 }
 
-describe('the packages of the latest release', () => {
+describe('the latest release', () => {
   beforeEach(() => {
     vi.unstubAllGlobals()
   })
 
   it('takes the dmg for the Mac and the exe for Windows', async () => {
-    githubAnswers({ body: { assets: ASSETS } })
+    githubAnswers({ body: { ...RELEASE, assets: ASSETS } })
 
-    expect(await latestReleaseLinks()).toStrictEqual({
-      macos: `${DOWNLOAD}/b.dmg`,
-      windows: `${DOWNLOAD}/d.exe`
+    expect(await latestRelease()).toStrictEqual({
+      packages: { macos: `${DOWNLOAD}/b.dmg`, windows: `${DOWNLOAD}/d.exe` },
+      version: '1.0.0',
+      published: PUBLISHED_AT
     })
+  })
+
+  it('reads a tag that carries no v as a version all the same', async () => {
+    githubAnswers({
+      body: { ...RELEASE, tag_name: '1.2.3', assets: ASSETS }
+    })
+
+    const release = await latestRelease()
+
+    expect(release?.version).toBe('1.2.3')
   })
 
   it('gives nothing when one of the two systems has no package', async () => {
     githubAnswers({
       body: {
+        ...RELEASE,
         assets: ASSETS.filter((asset) => {
           return !asset.name.endsWith('.exe')
         })
       }
     })
 
-    expect(await latestReleaseLinks()).toBeNull()
+    expect(await latestRelease()).toBeNull()
   })
 
   it('gives nothing when no release is published yet', async () => {
     githubAnswers({ body: { message: 'Not Found' }, ok: false })
 
-    expect(await latestReleaseLinks()).toBeNull()
+    expect(await latestRelease()).toBeNull()
   })
 
   it('gives nothing when GitHub answers a shape we do not know', async () => {
-    githubAnswers({ body: { assets: [{ name: 'Multifus.dmg' }] } })
+    githubAnswers({ body: { ...RELEASE, assets: [{ name: 'Multifus.dmg' }] } })
 
-    expect(await latestReleaseLinks()).toBeNull()
+    expect(await latestRelease()).toBeNull()
   })
 
   it('gives nothing when the answer is not JSON at all', async () => {
@@ -85,7 +101,7 @@ describe('the packages of the latest release', () => {
       })
     })
 
-    expect(await latestReleaseLinks()).toBeNull()
+    expect(await latestRelease()).toBeNull()
   })
 
   it('gives nothing when the network refuses', async () => {
@@ -93,6 +109,6 @@ describe('the packages of the latest release', () => {
       return Promise.reject(new Error('offline'))
     })
 
-    expect(await latestReleaseLinks()).toBeNull()
+    expect(await latestRelease()).toBeNull()
   })
 })

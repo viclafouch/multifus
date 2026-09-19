@@ -6,6 +6,7 @@ import { GiftIcon } from '@phosphor-icons/react/dist/ssr/Gift'
 import { SealCheckIcon } from '@phosphor-icons/react/dist/ssr/SealCheck'
 import { ShieldCheckIcon } from '@phosphor-icons/react/dist/ssr/ShieldCheck'
 import type { PageScreenProps } from '@/@types/screen'
+import { Answer } from '@/components/answer'
 import { AppShot } from '@/components/app-shot'
 import { Band } from '@/components/band'
 import { BandTitle } from '@/components/band-title'
@@ -19,9 +20,9 @@ import { Plate } from '@/components/plate'
 import { Prose } from '@/components/prose'
 import { Question } from '@/components/question'
 import { PAGES } from '@/constants/pages'
+import { QUESTIONS } from '@/constants/questions'
 import { HOME_SHOT, HOME_SHOT_ALT } from '@/constants/shots'
 import { FOLD_ANCHOR } from '@/constants/site'
-import { SYSTEM_FLOORS, SYSTEM_IDS, SYSTEM_NAMES } from '@/constants/systems'
 import { QUESTIONS_TITLE, PAGE_NAMES, PERKS } from '@/constants/wording'
 import { usePickedSystem } from '@/hooks/use-picked-system'
 
@@ -32,20 +33,6 @@ const MOVES_LEAD = msg`Suivez les trois lignes de votre ordinateur. Il n’y a r
 const FIRST_TITLE = msg`Et après ?`
 
 const FIRST_LEAD = msg`Multifus s’ouvre et vous guide. Il vous montre les cases à cocher, dans votre ordinateur et dans Dofus. Deux minutes, une seule fois.`
-
-const ASK_FREE = msg`C’est gratuit ?`
-
-const FREE_ANSWER = msg`Oui, et pour toujours. Rien à payer, aucun compte à créer, aucune publicité. Il n’y a pas de version payante cachée derrière.`
-
-const ASK_RISK = msg`Je risque quelque chose sur mon compte ?`
-
-const RISK_ANSWER = msg`Multifus ne touche pas au jeu. Il ne lit rien dedans, il ne change rien dedans, et il ne joue jamais à votre place. Ankama accepte ce genre de logiciel tant qu’il reste comme ça.`
-
-const ASK_SAFE = msg`Le fichier est sûr ?`
-
-const SAFE_ANSWER = msg`Sur Mac, Apple vérifie le fichier avant qu’il s’ouvre, et aucun avertissement ne s’affiche. Sur Windows, votre ordinateur peut demander confirmation : Multifus est encore jeune, et Windows ne le connaît pas encore. Dans les deux cas, il ne vous demande aucune information, et n’en envoie aucune.`
-
-const ASK_MACHINE = msg`Ça marche sur mon ordinateur ?`
 
 export const DownloadScreen = ({ page }: PageScreenProps) => {
   const { i18n } = useLingui()
@@ -91,13 +78,13 @@ export const DownloadScreen = ({ page }: PageScreenProps) => {
         <BandTitle>{i18n._(QUESTIONS_TITLE)}</BandTitle>
         <ul className="grid items-start gap-4 md:grid-cols-2">
           <li className="reveal">
-            <Question ask={ASK_FREE} icon={GiftIcon}>
-              <p>{i18n._(FREE_ANSWER)}</p>
+            <Question ask={QUESTIONS.free.ask} icon={GiftIcon}>
+              <Answer lines={QUESTIONS.free.answer} />
             </Question>
           </li>
           <li className="reveal">
-            <Question ask={ASK_RISK} icon={ShieldCheckIcon}>
-              <p>{i18n._(RISK_ANSWER)}</p>
+            <Question ask={QUESTIONS.risk.ask} icon={ShieldCheckIcon}>
+              <Answer lines={QUESTIONS.risk.answer} />
               <p>
                 <PageLink page="ankama" className="rule border-b text-cream">
                   {i18n._(PAGE_NAMES.ankama)}
@@ -106,20 +93,17 @@ export const DownloadScreen = ({ page }: PageScreenProps) => {
             </Question>
           </li>
           <li className="reveal">
-            <Question ask={ASK_SAFE} icon={SealCheckIcon}>
-              <p>{i18n._(SAFE_ANSWER)}</p>
+            <Question ask={QUESTIONS.safe.ask} icon={SealCheckIcon}>
+              <Answer lines={QUESTIONS.safe.answer} />
             </Question>
           </li>
           <li className="reveal">
-            <Question ask={ASK_MACHINE} icon={DesktopIcon}>
+            <Question ask={QUESTIONS.machine.ask} icon={DesktopIcon}>
               <ul className="flex flex-col gap-2">
-                {SYSTEM_IDS.map((system) => {
+                {QUESTIONS.machine.answer.map((line) => {
                   return (
-                    <li key={system} className="pointed">
-                      <strong className="font-medium text-cream">
-                        {SYSTEM_NAMES[system]}
-                      </strong>{' '}
-                      : {i18n._(SYSTEM_FLOORS[system])}
+                    <li key={line.id} className="pointed">
+                      {i18n._(line)}
                     </li>
                   )
                 })}

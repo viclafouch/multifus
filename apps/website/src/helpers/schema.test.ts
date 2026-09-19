@@ -2,12 +2,14 @@ import { describe, expect, it } from 'vitest'
 import type { Language } from '@/@types/language'
 import type { PageId } from '@/@types/page'
 import { HOST } from '@/constants/host'
-import { LOOPS } from '@/constants/loops'
+import { captionOf, LOOP_FORMAT, LOOPS } from '@/constants/loops'
 import { PAGES, PAGE_IDS } from '@/constants/pages'
-import { RELEASES } from '@/constants/site'
+import { PAGE_QUESTIONS, QUESTIONS } from '@/constants/questions'
+import { PAST_RELEASES, RELEASES } from '@/constants/site'
 import type { PathParams } from '@/helpers/page'
 import type { SchemaNode } from '@/helpers/schema'
 import { graphOf, schemaOf, scriptOf } from '@/helpers/schema'
+import { SPEAKERS } from '@/lib/i18n'
 
 const ADDRESS_KEYS = new Set([
   '@id',
@@ -17,10 +19,15 @@ const ADDRESS_KEYS = new Set([
   'thumbnailUrl',
   'downloadUrl',
   'installUrl',
+  'releaseNotes',
   'screenshot',
   'image',
   'license'
 ])
+
+const DAY = /^\d{4}-\d{2}-\d{2}$/u
+
+const DAY_AND_HOUR = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}$/u
 
 type SchemaType = SchemaNode['@type']
 
@@ -60,17 +67,26 @@ const WITHOUT_HOME = PAGE_IDS.filter((page) => {
   return page !== 'home'
 })
 
-const WITH_SOFTWARE = [
-  'home',
-  'download',
-  'mac',
-  'windows'
-] as const satisfies readonly PageId[]
+const WITH_SOFTWARE = PAGE_IDS.filter((page) => {
+  return page !== 'legal'
+})
 
-const WITHOUT_SOFTWARE = PAGE_IDS.filter((page) => {
-  return !WITH_SOFTWARE.some((carrier) => {
-    return carrier === page
-  })
+const ASKING = PAGE_IDS.filter((page) => {
+  return PAGE_QUESTIONS[page] !== null
+})
+
+const SILENT = PAGE_IDS.filter((page) => {
+  return PAGE_QUESTIONS[page] === null
+})
+
+const ASKED_ON = PAGE_IDS.flatMap((page) => {
+  const asked = PAGE_QUESTIONS[page]
+
+  return asked === null ? [] : [{ page, asked }]
+})
+
+const ABOUT_SOFTWARE = SILENT.filter((page) => {
+  return page !== 'home' && page !== 'legal'
 })
 
 describe('the software record', () => {
@@ -78,8 +94,8 @@ describe('the software record', () => {
     expect(typesOf({ page, language: 'fr' })).toContain('SoftwareApplication')
   })
 
-  it.each(WITHOUT_SOFTWARE)('does not land on %s', (page) => {
-    expect(typesOf({ page, language: 'fr' })).not.toContain(
+  it('stays out of the legal notice, which talks about the site', () => {
+    expect(typesOf({ page: 'legal', language: 'fr' })).not.toContain(
       'SoftwareApplication'
     )
   })
@@ -90,7 +106,14 @@ describe('the software record', () => {
     ).toMatchObject({
       name: 'Multifus',
       downloadUrl: RELEASES,
-      offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' }
+      releaseNotes: PAST_RELEASES,
+      offers: {
+        '@type': 'Offer',
+        price: '0',
+        priceCurrency: 'EUR',
+        availability: 'https://schema.org/InStock',
+        url: RELEASES
+      }
     })
   })
 
@@ -104,19 +127,57 @@ describe('the software record', () => {
     expect(software?.operatingSystem).toContain('Windows')
   })
 
-  it('describes only one software on both pages', () => {
-    const home = nodeOf({
+  it('speaks the three languages of the site, whatever the page reads in', () => {
+    const software = nodeOf({
+      page: 'home',
+      language: 'es',
+      type: 'SoftwareApplication'
+    })
+
+    expect(software?.inLanguage).toStrictEqual(['fr', 'en', 'es'])
+  })
+
+  it('shows the window of the software, with its size', () => {
+    expect(
+      nodeOf({ page: 'home', language: 'fr', type: 'SoftwareApplication' })
+        ?.screenshot
+    ).toMatchObject({
+      '@type': 'ImageObject',
+      width: '1400',
+      height: '995'
+    })
+  })
+
+  it('tells no version while no release is published', () => {
+    const software = nodeOf({
       page: 'home',
       language: 'fr',
       type: 'SoftwareApplication'
     })
-    const download = nodeOf({
-      page: 'download',
+
+    expect(software?.softwareVersion).toBeUndefined()
+    expect(software?.dateModified).toBeUndefined()
+  })
+
+  it('gives the software one record per language, and one per language only', () => {
+    const french = nodeOf({
+      page: 'home',
       language: 'fr',
       type: 'SoftwareApplication'
     })
+    const english = nodeOf({
+      page: 'download',
+      language: 'en',
+      type: 'SoftwareApplication'
+    })
+    const alsoEnglish = nodeOf({
+      page: 'wheel',
+      language: 'en',
+      type: 'SoftwareApplication'
+    })
 
-    expect(home?.['@id']).toBe(download?.['@id'])
+    expect(french?.['@id']).not.toBe(english?.['@id'])
+    expect(english?.['@id']).toBe(alsoEnglish?.['@id'])
   })
 })
 
@@ -133,13 +194,34 @@ describe('the video record', () => {
     expect(
       nodeOf({ page: 'wheel', language: 'fr', type: 'VideoObject' })
     ).toMatchObject({
-      name: 'Roue des personnages',
-      description: 'Le choix de vos personnages au premier plan.',
+      name: 'Le choix de vos personnages au premier plan.',
       contentUrl: `${HOST}${LOOPS.wheel.source}`,
       thumbnailUrl: `${HOST}${LOOPS.wheel.poster}`,
       duration: 'PT12S',
       uploadDate: LOOPS.wheel.filmed
     })
+  })
+
+  it('gives the file its format and its size', () => {
+    expect(
+      nodeOf({ page: 'wheel', language: 'fr', type: 'VideoObject' })
+    ).toMatchObject({
+      encodingFormat: LOOP_FORMAT,
+      width: String(LOOPS.wheel.size.width),
+      height: String(LOOPS.wheel.size.height)
+    })
+  })
+
+  it.each(FILMED)('dates the loop of %s to the hour and the zone', (page) => {
+    expect(
+      nodeOf({ page, language: 'fr', type: 'VideoObject' })?.uploadDate
+    ).toMatch(DAY_AND_HOUR)
+  })
+
+  it('names the loop of the home page after what it shows', () => {
+    expect(
+      nodeOf({ page: 'home', language: 'fr', type: 'VideoObject' })?.name
+    ).toBe(SPEAKERS.fr._(captionOf('home')))
   })
 
   it('counts the duration of each loop in whole seconds', () => {
@@ -222,12 +304,21 @@ describe('the site and its author', () => {
     expect(typesOf({ page, language: 'fr' })).toContain('Person')
   })
 
-  it('gives the site one address for the three languages', () => {
+  it('gives the site one record per language, each on its own address', () => {
     const french = nodeOf({ page: 'home', language: 'fr', type: 'WebSite' })
     const spanish = nodeOf({ page: 'wheel', language: 'es', type: 'WebSite' })
 
-    expect(french?.['@id']).toBe(spanish?.['@id'])
+    expect(french?.['@id']).toBe(`${HOST}/#website`)
+    expect(spanish?.['@id']).toBe(`${HOST}/es#website`)
     expect(french?.url).not.toBe(spanish?.url)
+  })
+
+  it('hangs every page of a language under the site of that language', () => {
+    const site = nodeOf({ page: 'home', language: 'en', type: 'WebSite' })
+
+    expect(
+      nodeOf({ page: 'wheel', language: 'en', type: 'WebPage' })?.isPartOf
+    ).toStrictEqual({ '@id': site?.['@id'] })
   })
 
   it('makes the author the publisher of the site', () => {
@@ -236,23 +327,27 @@ describe('the site and its author', () => {
 
     expect(site?.publisher).toStrictEqual({ '@id': author?.['@id'] })
   })
+
+  it('keeps one author for the three languages', () => {
+    const french = nodeOf({ page: 'home', language: 'fr', type: 'Person' })
+    const spanish = nodeOf({ page: 'home', language: 'es', type: 'Person' })
+
+    expect(french).toStrictEqual(spanish)
+  })
 })
 
 describe('the page record', () => {
-  it.each(PAGE_IDS)('lands on %s', (page) => {
+  it.each(SILENT)('lands on %s', (page) => {
     expect(typesOf({ page, language: 'fr' })).toContain('WebPage')
   })
 
-  it('hangs the page under the site', () => {
-    const site = nodeOf({ page: 'wheel', language: 'fr', type: 'WebSite' })
-
+  it('carries the page, its name and its language', () => {
     expect(
       nodeOf({ page: 'wheel', language: 'fr', type: 'WebPage' })
     ).toMatchObject({
       url: `${HOST}/roue-des-personnages`,
       name: 'Roue des personnages',
-      inLanguage: 'fr',
-      isPartOf: { '@id': site?.['@id'] }
+      inLanguage: 'fr'
     })
   })
 
@@ -271,7 +366,7 @@ describe('the page record', () => {
     ).toBeUndefined()
   })
 
-  it('makes the software the subject of the two pages that carry it', () => {
+  it('makes the software the subject of the home page', () => {
     const software = nodeOf({
       page: 'home',
       language: 'fr',
@@ -279,21 +374,99 @@ describe('the page record', () => {
     })
 
     expect(
-      nodeOf({ page: 'download', language: 'fr', type: 'WebPage' })?.mainEntity
+      nodeOf({ page: 'home', language: 'fr', type: 'WebPage' })?.mainEntity
     ).toStrictEqual({ '@id': software?.['@id'] })
+  })
+
+  it.each(ABOUT_SOFTWARE)('says that %s is about the software', (page) => {
+    const software = nodeOf({
+      page,
+      language: 'fr',
+      type: 'SoftwareApplication'
+    })
+
     expect(
-      nodeOf({ page: 'wheel', language: 'fr', type: 'WebPage' })?.mainEntity
-    ).toBeUndefined()
+      nodeOf({ page, language: 'fr', type: 'WebPage' })?.about
+    ).toStrictEqual({ '@id': software?.['@id'] })
+  })
+
+  it('leaves the legal notice out of the software', () => {
+    const legal = nodeOf({ page: 'legal', language: 'fr', type: 'WebPage' })
+
+    expect(legal?.about).toBeUndefined()
+    expect(legal?.mainEntity).toBeUndefined()
+  })
+
+  it.each(SILENT)('says the day %s last changed', (page) => {
+    expect(
+      nodeOf({ page, language: 'fr', type: 'WebPage' })?.dateModified
+    ).toMatch(DAY)
+  })
+
+  it.each(ASKING)('says the day the questions of %s last changed', (page) => {
+    expect(
+      nodeOf({ page, language: 'fr', type: 'FAQPage' })?.dateModified
+    ).toMatch(DAY)
   })
 
   it('shows the Open Graph image of the page', () => {
     expect(
-      nodeOf({ page: 'mac', language: 'en', type: 'WebPage' })
+      nodeOf({ page: 'mac', language: 'en', type: 'FAQPage' })
         ?.primaryImageOfPage
     ).toMatchObject({
       '@type': 'ImageObject',
       contentUrl: `${HOST}/og/en/mac.webp`
     })
+  })
+})
+
+describe('the questions of a page', () => {
+  it.each(ASKING)('turns %s into a page of questions', (page) => {
+    expect(typesOf({ page, language: 'fr' })).toContain('FAQPage')
+    expect(typesOf({ page, language: 'fr' })).not.toContain('WebPage')
+  })
+
+  it.each(SILENT)('leaves %s a plain page', (page) => {
+    expect(typesOf({ page, language: 'fr' })).not.toContain('FAQPage')
+  })
+
+  it.each(ASKED_ON)(
+    'asks on $page the questions the screen shows',
+    ({ page, asked }) => {
+      const written = nodeOf({ page, language: 'fr', type: 'FAQPage' })
+
+      expect(
+        written?.mainEntity.map((question) => {
+          return question.name
+        })
+      ).toStrictEqual(
+        asked.map((id) => {
+          return SPEAKERS.fr._(QUESTIONS[id].ask)
+        })
+      )
+    }
+  )
+
+  it('joins the lines of an answer that takes three of them', () => {
+    const written = nodeOf({ page: 'mac', language: 'fr', type: 'FAQPage' })
+    const answer = written?.mainEntity.find((question) => {
+      return question.name === SPEAKERS.fr._(QUESTIONS.macAccess.ask)
+    })
+
+    expect(answer?.acceptedAnswer.text).toBe(
+      QUESTIONS.macAccess.answer
+        .map((line) => {
+          return SPEAKERS.fr._(line)
+        })
+        .join(' ')
+    )
+  })
+
+  it('asks in the language of the page', () => {
+    const spanish = nodeOf({ page: 'windows', language: 'es', type: 'FAQPage' })
+    const french = nodeOf({ page: 'windows', language: 'fr', type: 'FAQPage' })
+
+    expect(spanish?.mainEntity[0]?.name).not.toBe(french?.mainEntity[0]?.name)
   })
 })
 

@@ -75,6 +75,20 @@ const complain = (pathname, what) => {
 
 const SCHEMA = /<script type="application\/ld\+json">(.+?)<\/script>/su
 
+const ASK = /<details[^>]*class="[^"]*\bask\b/gu
+
+const VIDEO_WANTED = [
+  'name',
+  'description',
+  'thumbnailUrl',
+  'uploadDate',
+  'contentUrl',
+  'duration',
+  'encodingFormat',
+  'width',
+  'height'
+]
+
 const OG_IMAGE = /<meta[^>]*property="og:image"[^>]*content="([^"]+)"/u
 
 const TITLE = /<title>([^<]*)<\/title>/u
@@ -150,13 +164,51 @@ for (const pathname of addresses) {
       complain(pathname, 'a graph laid outside of schema.org')
     }
 
-    const types = (graph['@graph'] ?? []).map((node) => {
-      return node['@type']
-    })
+    const nodes = graph['@graph'] ?? []
 
-    for (const wanted of ['WebSite', 'Person', 'WebPage']) {
-      if (!types.includes(wanted)) {
+    const nodeOf = (type) => {
+      return nodes.find((node) => {
+        return node['@type'] === type
+      })
+    }
+
+    for (const wanted of ['WebSite', 'Person']) {
+      if (nodeOf(wanted) === undefined) {
         complain(pathname, `no ${wanted} record`)
+      }
+    }
+
+    const sheet = nodeOf('WebPage') ?? nodeOf('FAQPage')
+
+    if (sheet === undefined) {
+      complain(pathname, 'no page record')
+    } else if (sheet.dateModified === undefined) {
+      complain(pathname, 'no day of last change on the page record')
+    }
+
+    const shown = [...body.matchAll(ASK)].length
+    const written = nodeOf('FAQPage')?.mainEntity ?? []
+
+    if (written.length !== shown) {
+      complain(
+        pathname,
+        `${written.length} questions written down for ${shown} shown`
+      )
+    }
+
+    for (const question of written) {
+      if (!question.name || !question.acceptedAnswer?.text) {
+        complain(pathname, 'a question written down without its answer')
+      }
+    }
+
+    const video = nodeOf('VideoObject')
+
+    if (video !== undefined) {
+      for (const wanted of VIDEO_WANTED) {
+        if (video[wanted] === undefined) {
+          complain(pathname, `a video written down without its ${wanted}`)
+        }
       }
     }
   }

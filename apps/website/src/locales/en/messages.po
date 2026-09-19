@@ -39,7 +39,7 @@ msgstr "See also"
 msgid "Aller au contenu"
 msgstr "Skip to content"
 
-#: src/screens/windows-screen.tsx
+#: src/constants/questions.ts
 msgid "Ankama l’autorise ?"
 msgstr "Does Ankama allow it?"
 
@@ -71,7 +71,7 @@ msgstr "No game file is read, and no action is played in your place."
 msgid "Aucun logiciel de la communauté n’est soutenu par le jeu. Vous l’installez sous votre responsabilité."
 msgstr "No community software is backed by the game. You install it at your own risk."
 
-#: src/screens/windows-screen.tsx
+#: src/constants/questions.ts
 msgid "Autant que votre PC en ouvre. 4, 6, 8 clients Dofus Retro : Multifus les range tous pareil."
 msgstr "As many as your PC can open. 4, 6, 8 Dofus Retro clients: Multifus sorts them all the same."
 
@@ -92,7 +92,7 @@ msgstr "Before you install"
 msgid "Avec Multifus"
 msgstr "With Multifus"
 
-#: src/screens/download-screen.tsx
+#: src/constants/questions.ts
 msgid "C’est gratuit ?"
 msgstr "Is it free?"
 
@@ -108,19 +108,19 @@ msgstr "That is a choice, and it will not change: Multifus brings you the window
 msgid "C’est vous qui envoyez"
 msgstr "You are the one who sends"
 
-#: src/screens/windows-screen.tsx
+#: src/constants/questions.ts
 msgid "Ça marche sur Dofus 2 ou Dofus 3 ?"
 msgstr "Does it work on Dofus 2 or Dofus 3?"
 
-#: src/screens/mac-screen.tsx
+#: src/constants/questions.ts
 msgid "Ça marche sur mon Mac ?"
 msgstr "Will it work on my Mac?"
 
-#: src/screens/download-screen.tsx
+#: src/constants/questions.ts
 msgid "Ça marche sur mon ordinateur ?"
 msgstr "Will it work on my computer?"
 
-#: src/screens/windows-screen.tsx
+#: src/constants/questions.ts
 msgid "Ça marche sur Windows 11 ?"
 msgstr "Does it work on Windows 11?"
 
@@ -300,11 +300,11 @@ msgstr "Enutrof"
 msgid "Et après ?"
 msgstr "And then?"
 
-#: src/screens/windows-screen.tsx
+#: src/constants/questions.ts
 msgid "Et son exécution au démarrage de Windows, si vous cochez la case."
 msgstr "And running at Windows startup, if you tick the box."
 
-#: src/screens/mac-screen.tsx
+#: src/constants/questions.ts
 msgid "Et son ouverture au démarrage du Mac, si vous cochez la case."
 msgstr "And running at Mac startup, if you tick the box."
 
@@ -325,11 +325,15 @@ msgid "Fonctionnalités"
 msgstr "Features"
 
 #: src/constants/wording.ts
+msgid "Gestionnaire de fenêtres"
+msgstr "Window manager"
+
+#: src/constants/wording.ts
 msgid "Gratuit"
 msgstr "Free"
 
 #. placeholder {0}: SYSTEM_VERSIONS.macos
-#: src/screens/mac-screen.tsx
+#: src/constants/questions.ts
 msgid "Il faut {0} ou plus récent. Les Mac Intel et les Mac Apple Silicon reçoivent le même fichier."
 msgstr "{0} or newer is needed. Intel Macs and Apple Silicon Macs get the same file."
 
@@ -353,11 +357,11 @@ msgstr "Installing takes three moves"
 msgid "Je fais du web depuis 10 ans, et je sais ce qu’on risque en installant un logiciel trouvé sur un Discord. Multifus ne voit jamais votre mot de passe, parce qu’il ne fait que ranger vos fenêtres de Dofus Retro. Son code est public, libre à vous d’aller le vérifier."
 msgstr "I have been building for the web for 10 years, and I know what you risk when you install software you found on a Discord. Multifus never sees your password, because all it does is arrange your Dofus Retro windows. Its code is public, and you are free to go and check it."
 
-#: src/screens/windows-screen.tsx
+#: src/constants/questions.ts
 msgid "Je peux jouer combien de comptes ?"
 msgstr "How many accounts can I play?"
 
-#: src/screens/download-screen.tsx
+#: src/constants/questions.ts
 msgid "Je risque quelque chose sur mon compte ?"
 msgstr "Am I risking anything on my account?"
 
@@ -373,11 +377,11 @@ msgstr "Changelog"
 msgid "Journal des versions du multicompte Dofus Retro"
 msgstr "Changelog of the Dofus Retro multi-account app"
 
-#: src/screens/mac-screen.tsx
+#: src/constants/questions.ts
 msgid "L’accès à l’Accessibilité, et rien d’autre. C’est ce qui lui permet de voir et de ranger les fenêtres du jeu."
 msgstr "Access to Accessibility, and nothing else. That is what lets it see and sort the game windows."
 
-#: src/screens/windows-screen.tsx
+#: src/constants/questions.ts
 msgid "L’accès aux notifications, et rien d’autre."
 msgstr "Access to notifications, and nothing else."
 
@@ -445,7 +449,7 @@ msgstr "the same icon for all your clients"
 msgid "La règle d’Ankama"
 msgstr "The rule Ankama set"
 
-#: src/screens/home-screen.tsx
+#: src/constants/loops.ts
 msgid "La roue des personnages, l’AutoFocus, le déplacement rapide et le tableau des runes, dans le jeu"
 msgstr "The character wheel, AutoFocus, quick move and the rune table, inside the game"
 
@@ -493,7 +497,7 @@ msgstr "Quick move switches on with a key, and switches off when it runs out of 
 msgid "Le dépôt de Multifus sur GitHub"
 msgstr "The Multifus repository on GitHub"
 
-#: src/screens/download-screen.tsx
+#: src/constants/questions.ts
 msgid "Le fichier est sûr ?"
 msgstr "Is the file safe?"
 
@@ -689,11 +693,11 @@ msgstr "Private messages"
 msgid "Messages privés Dofus Retro sur Telegram"
 msgstr "Dofus Retro private messages on Telegram"
 
-#: src/screens/mac-screen.tsx
+#: src/constants/questions.ts
 msgid "Mon Mac est sous Monterey, ça marche ?"
 msgstr "My Mac runs Monterey, does it work?"
 
-#: src/screens/windows-screen.tsx
+#: src/constants/questions.ts
 msgid "Mon PC est sous Windows 7, ça marche ?"
 msgstr "My PC runs Windows 7, does it work?"
 
@@ -761,7 +765,7 @@ msgstr "Multifus does not read the game’s memory, does not touch any of its fi
 msgid "Multifus ne range pas les fenêtres côte à côte."
 msgstr "Multifus does not lay windows side by side."
 
-#: src/screens/download-screen.tsx
+#: src/constants/questions.ts
 msgid "Multifus ne touche pas au jeu. Il ne lit rien dedans, il ne change rien dedans, et il ne joue jamais à votre place. Ankama accepte ce genre de logiciel tant qu’il reste comme ça."
 msgstr "Multifus does not touch the game. It reads nothing inside it, changes nothing inside it, and never plays for you. Ankama accepts this kind of software as long as it stays that way."
 
@@ -806,15 +810,15 @@ msgid "non"
 msgstr "no"
 
 #. placeholder {0}: SYSTEM_VERSIONS.macos
-#: src/screens/mac-screen.tsx
+#: src/constants/questions.ts
 msgid "Non. Il faut {0} ou plus récent."
 msgstr "No. {0} or newer is needed."
 
-#: src/screens/windows-screen.tsx
+#: src/constants/questions.ts
 msgid "Non. Il faut Windows 10 ou Windows 11."
 msgstr "No. Windows 10 or Windows 11 is needed."
 
-#: src/screens/windows-screen.tsx
+#: src/constants/questions.ts
 msgid "Non. Multifus ne connaît que Dofus Retro, la 1.29."
 msgstr "No. Multifus only knows Dofus Retro, version 1.29."
 
@@ -834,11 +838,11 @@ msgstr "Someone messages you for a craft, you know right away, and the order doe
 msgid "oui"
 msgstr "yes"
 
-#: src/screens/download-screen.tsx
+#: src/constants/questions.ts
 msgid "Oui, et pour toujours. Rien à payer, aucun compte à créer, aucune publicité. Il n’y a pas de version payante cachée derrière."
 msgstr "Yes, and forever. Nothing to pay, no account to create, no advertising. There is no paid version hiding behind it."
 
-#: src/screens/windows-screen.tsx
+#: src/constants/questions.ts
 msgid "Oui, et sur Windows 10 aussi. L’installation prend 3 gestes."
 msgstr "Yes, and on Windows 10 too. Installing takes 3 moves."
 
@@ -922,11 +926,11 @@ msgstr "Almost every manager for Dofus Retro stops at Windows. Multifus was born
 msgid "Projet indépendant, sans lien avec Ankama."
 msgstr "Independent project, with no link to Ankama."
 
-#: src/screens/mac-screen.tsx
+#: src/constants/questions.ts
 msgid "Qu’est-ce que Multifus demande à macOS ?"
 msgstr "What does Multifus ask macOS for?"
 
-#: src/screens/windows-screen.tsx
+#: src/constants/questions.ts
 msgid "Qu’est-ce que Multifus demande à Windows ?"
 msgstr "What does Multifus ask Windows for?"
 
@@ -982,7 +986,7 @@ msgstr "Nothing starts without you"
 msgid "Roue des personnages"
 msgstr "Character wheel"
 
-#: src/screens/mac-screen.tsx
+#: src/constants/questions.ts
 msgid "Sans cet accès, Multifus ne voit rien et ne peut rien faire."
 msgstr "Without it, Multifus sees nothing and can do nothing."
 
@@ -1022,13 +1026,23 @@ msgstr "Follow the three lines for your computer. There is nothing else to do."
 msgid "Sur Mac"
 msgstr "On Mac"
 
-#: src/screens/download-screen.tsx
+#: src/constants/questions.ts
 msgid "Sur Mac, Apple vérifie le fichier avant qu’il s’ouvre, et aucun avertissement ne s’affiche. Sur Windows, votre ordinateur peut demander confirmation : Multifus est encore jeune, et Windows ne le connaît pas encore. Dans les deux cas, il ne vous demande aucune information, et n’en envoie aucune."
 msgstr "On Mac, Apple checks the file before it opens, and no warning shows up. On Windows, your computer may ask you to confirm: Multifus is still young, and Windows does not know it yet. Either way, it asks you for no information, and sends none."
+
+#. placeholder {0}: SYSTEM_VERSIONS.macos
+#: src/constants/questions.ts
+msgid "Sur Mac, il faut {0} ou plus récent, sur Mac Intel comme Apple Silicon."
+msgstr "On Mac, {0} or newer is needed, on Intel and Apple Silicon Macs alike."
 
 #: src/constants/rivals.ts
 msgid "Sur Windows"
 msgstr "On Windows"
+
+#. placeholder {0}: SYSTEM_VERSIONS.windows
+#: src/constants/questions.ts
+msgid "Sur Windows, il faut {0} ou plus récent."
+msgstr "On Windows, {0} or newer is needed."
 
 #: src/constants/wording.ts
 msgid "Tableau des runes"

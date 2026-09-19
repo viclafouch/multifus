@@ -7,6 +7,7 @@ import { GameControllerIcon } from '@phosphor-icons/react/dist/ssr/GameControlle
 import { ShieldCheckIcon } from '@phosphor-icons/react/dist/ssr/ShieldCheck'
 import { UsersThreeIcon } from '@phosphor-icons/react/dist/ssr/UsersThree'
 import type { PageScreenProps } from '@/@types/screen'
+import { Answer } from '@/components/answer'
 import { Band } from '@/components/band'
 import { BandTitle } from '@/components/band-title'
 import { CharacterKeys } from '@/components/character-keys'
@@ -17,13 +18,9 @@ import { Question } from '@/components/question'
 import { SystemStage } from '@/components/system-stage'
 import { TaskbarProof } from '@/components/taskbar-proof'
 import { MENU_FEATURES } from '@/constants/pages'
+import { QUESTIONS } from '@/constants/questions'
 import { WINDOWS_SHOT, WINDOWS_SHOT_ALT } from '@/constants/shots'
-import {
-  QUESTIONS_TITLE,
-  NO_HARM,
-  PAGE_NAMES,
-  PAGE_PROMISES
-} from '@/constants/wording'
+import { QUESTIONS_TITLE, PAGE_NAMES } from '@/constants/wording'
 
 const FEATURES_TITLE = msg`Disponible sur Windows 10 et 11`
 
@@ -34,30 +31,6 @@ const TASKBAR_LEAD = msg`Vos clients Dofus Retro portent tous la même icône, e
 const KEYS_TITLE = msg`Une touche, un personnage`
 
 const KEYS_LEAD = msg`F1 sur votre premier Enutrof, F2 sur le second. Sur Windows, une touche de fonction se pose seule.`
-
-const ASK_COUNT = msg`Je peux jouer combien de comptes ?`
-
-const COUNT_ANSWER = msg`Autant que votre PC en ouvre. 4, 6, 8 clients Dofus Retro : Multifus les range tous pareil.`
-
-const ASK_ELEVEN = msg`Ça marche sur Windows 11 ?`
-
-const ELEVEN_ANSWER = msg`Oui, et sur Windows 10 aussi. L’installation prend 3 gestes.`
-
-const ASK_SEVEN = msg`Mon PC est sous Windows 7, ça marche ?`
-
-const SEVEN_ANSWER = msg`Non. Il faut Windows 10 ou Windows 11.`
-
-const ASK_ACCESS = msg`Qu’est-ce que Multifus demande à Windows ?`
-
-const ACCESS_ANSWER = msg`L’accès aux notifications, et rien d’autre.`
-
-const ACCESS_START = msg`Et son exécution au démarrage de Windows, si vous cochez la case.`
-
-const ASK_MODERN = msg`Ça marche sur Dofus 2 ou Dofus 3 ?`
-
-const MODERN_ANSWER = msg`Non. Multifus ne connaît que Dofus Retro, la 1.29.`
-
-const ASK_ALLOWED = msg`Ankama l’autorise ?`
 
 export const WindowsScreen = ({ page }: PageScreenProps) => {
   const { i18n } = useLingui()
@@ -91,35 +64,33 @@ export const WindowsScreen = ({ page }: PageScreenProps) => {
         <BandTitle>{i18n._(QUESTIONS_TITLE)}</BandTitle>
         <ul className="grid items-start gap-4 md:grid-cols-2">
           <li className="reveal">
-            <Question ask={ASK_COUNT} icon={UsersThreeIcon}>
-              <p>{i18n._(COUNT_ANSWER)}</p>
+            <Question ask={QUESTIONS.count.ask} icon={UsersThreeIcon}>
+              <Answer lines={QUESTIONS.count.answer} />
             </Question>
           </li>
           <li className="reveal">
-            <Question ask={ASK_ELEVEN} icon={DesktopIcon}>
-              <p>{i18n._(ELEVEN_ANSWER)}</p>
+            <Question ask={QUESTIONS.eleven.ask} icon={DesktopIcon}>
+              <Answer lines={QUESTIONS.eleven.answer} />
             </Question>
           </li>
           <li className="reveal">
-            <Question ask={ASK_SEVEN} icon={DesktopTowerIcon}>
-              <p>{i18n._(SEVEN_ANSWER)}</p>
+            <Question ask={QUESTIONS.seven.ask} icon={DesktopTowerIcon}>
+              <Answer lines={QUESTIONS.seven.answer} />
             </Question>
           </li>
           <li className="reveal">
-            <Question ask={ASK_ACCESS} icon={BellRingingIcon}>
-              <p>{i18n._(ACCESS_ANSWER)}</p>
-              <p>{i18n._(ACCESS_START)}</p>
+            <Question ask={QUESTIONS.windowsAccess.ask} icon={BellRingingIcon}>
+              <Answer lines={QUESTIONS.windowsAccess.answer} />
             </Question>
           </li>
           <li className="reveal">
-            <Question ask={ASK_MODERN} icon={GameControllerIcon}>
-              <p>{i18n._(MODERN_ANSWER)}</p>
+            <Question ask={QUESTIONS.modern.ask} icon={GameControllerIcon}>
+              <Answer lines={QUESTIONS.modern.answer} />
             </Question>
           </li>
           <li className="reveal">
-            <Question ask={ASK_ALLOWED} icon={ShieldCheckIcon}>
-              <p>{i18n._(PAGE_PROMISES.ankama)}</p>
-              <p>{i18n._(NO_HARM)}</p>
+            <Question ask={QUESTIONS.allowed.ask} icon={ShieldCheckIcon}>
+              <Answer lines={QUESTIONS.allowed.answer} />
               <p>
                 <PageLink page="ankama" className="rule border-b text-cream">
                   {i18n._(PAGE_NAMES.ankama)}
