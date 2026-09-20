@@ -3,6 +3,7 @@ import { cn } from '@multifus/retro'
 import type { PageId } from '@/@types/page'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
+import { SiteLurkers } from '@/components/site-lurkers'
 import { SiteWorld } from '@/components/site-world'
 import { SkipLink } from '@/components/skip-link'
 import { PAGE_DECORS } from '@/constants/decors'
@@ -22,7 +23,9 @@ export const SiteShell = ({ page, children }: SiteShellProps) => {
       className={cn('relative flex min-h-screen flex-col', PAGE_TINTS[page])}
     >
       <SkipLink />
-      <div aria-hidden className="lattice" />
+      <div aria-hidden className="lattice">
+        <SiteLurkers page={page} />
+      </div>
       <div aria-hidden className="aura" />
       {decor === null ? null : <SiteWorld decor={decor} />}
       <SiteHeader page={page} />

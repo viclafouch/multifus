@@ -52,12 +52,10 @@
 
   --fold: 100svh;
 
-  --cell-gap: 34px;
-  --cell-span: calc(var(--cell-gap) * 5);
-  --cell-rise: 26.57deg;
-  --cell-fall: 153.43deg;
-  --cell-line: color-mix(in srgb, var(--khaki), transparent 93%);
-  --cell-line-dim: color-mix(in srgb, var(--khaki), transparent 97%);
+  --cell-span: 76px;
+  --cell-rise: 38px;
+  --field-span: calc(var(--cell-span) * 14);
+  --field-rise: calc(var(--cell-rise) * 18);
 
   --lattice-in: calc(var(--fold) + 30rem);
   --lattice-out: max(var(--lattice-in), calc(100% - 46rem));
@@ -139,30 +137,58 @@
   position: absolute;
   inset: 0;
   z-index: -12;
+  overflow: clip;
   pointer-events: none;
   background-image:
-    repeating-linear-gradient(
-      var(--cell-rise),
-      var(--cell-line) 0 1px,
-      transparent 1px var(--cell-span)
-    ),
-    repeating-linear-gradient(
-      var(--cell-fall),
-      var(--cell-line) 0 1px,
-      transparent 1px var(--cell-span)
-    ),
-    repeating-linear-gradient(
-      var(--cell-rise),
-      var(--cell-line-dim) 0 1px,
-      transparent 1px var(--cell-gap)
-    ),
-    repeating-linear-gradient(
-      var(--cell-fall),
-      var(--cell-line-dim) 0 1px,
-      transparent 1px var(--cell-gap)
-    );
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1064' height='684'%3E%3Cg fill='%23000' fill-opacity='.16'%3E%3Cpolygon points='874,513 912,494 950,513 912,532'/%3E%3Cpolygon points='912,532 950,513 988,532 950,551'/%3E%3Cpolygon points='950,551 988,532 1026,551 988,570'/%3E%3Cpolygon points='912,570 950,551 988,570 950,589'/%3E%3Cpolygon points='950,589 988,570 1026,589 988,608'/%3E%3Cpolygon points='532,380 570,361 608,380 570,399'/%3E%3Cpolygon points='570,399 608,380 646,399 608,418'/%3E%3Cpolygon points='608,380 646,361 684,380 646,399'/%3E%3Cpolygon points='532,418 570,399 608,418 570,437'/%3E%3Cpolygon points='570,361 608,342 646,361 608,380'/%3E%3Cpolygon points='114,247 152,228 190,247 152,266'/%3E%3Cpolygon points='76,266 114,247 152,266 114,285'/%3E%3Cpolygon points='152,266 190,247 228,266 190,285'/%3E%3Cpolygon points='114,285 152,266 190,285 152,304'/%3E%3Cpolygon points='38,247 76,228 114,247 76,266'/%3E%3C/g%3E%3Cg fill='%23289b33' fill-opacity='.07'%3E%3Cpolygon points='304,342 342,323 380,342 342,361'/%3E%3Cpolygon points='798,285 836,266 874,285 836,304'/%3E%3Cpolygon points='722,133 760,114 798,133 760,152'/%3E%3Cpolygon points='418,133 456,114 494,133 456,152'/%3E%3Cpolygon points='608,494 646,475 684,494 646,513'/%3E%3Cpolygon points='76,76 114,57 152,76 114,95'/%3E%3Cpolygon points='304,532 342,513 380,532 342,551'/%3E%3C/g%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='76' height='38'%3E%3Cpath d='M0 0L76 38M0 38L76 0' stroke='%23c7bfa1' stroke-opacity='.03'/%3E%3C/svg%3E");
+  background-size:
+    var(--field-span) var(--field-rise),
+    var(--cell-span) var(--cell-rise);
   -webkit-mask-image: linear-gradient(180deg, var(--lattice-stops));
   mask-image: linear-gradient(180deg, var(--lattice-stops));
+}
+
+@utility haunt {
+  position: absolute;
+  top: calc(var(--haunt-rise) * var(--cell-rise) / 2);
+  width: 0;
+  height: 0;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: calc(var(--cell-rise) / -2);
+    left: calc(var(--cell-span) / -2);
+    width: var(--cell-span);
+    height: var(--cell-rise);
+    background-color: color-mix(in srgb, var(--flame), transparent 88%);
+    clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+  }
+}
+
+@utility haunt-west {
+  left: calc(var(--haunt-span) * var(--cell-span) / 2);
+}
+
+@utility haunt-east {
+  /* the second line is the same anchor snapped back onto the lattice, and it wins where round() is known */
+  left: calc(100% - var(--haunt-span) * var(--cell-span) / 2);
+  left: calc(
+    round(down, 100%, var(--cell-span)) - var(--haunt-span) * var(--cell-span) /
+      2
+  );
+}
+
+@utility lurker {
+  position: absolute;
+  top: calc(-1 * var(--lurker-foot-rise) * var(--lurker-scale));
+  left: calc(-1 * var(--lurker-foot-span) * var(--lurker-scale));
+  width: calc(var(--lurker-span) * var(--lurker-scale));
+  /* the haunt is zero-wide, so the preflight max-width: 100% would resolve to 0 */
+  max-width: none;
+  height: calc(var(--lurker-rise) * var(--lurker-scale));
+  opacity: 0.25;
 }
 
 @keyframes chill {
