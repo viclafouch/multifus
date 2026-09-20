@@ -5,7 +5,7 @@ import { HOST } from '@/constants/host'
 import { captionOf, LOOP_FORMAT, LOOPS } from '@/constants/loops'
 import { PAGES, PAGE_IDS } from '@/constants/pages'
 import { PAGE_QUESTIONS, QUESTIONS } from '@/constants/questions'
-import { PAST_RELEASES, RELEASES } from '@/constants/site'
+import { RELEASES } from '@/constants/site'
 import type { PathParams } from '@/helpers/page'
 import type { SchemaNode } from '@/helpers/schema'
 import { graphOf, schemaOf, scriptOf } from '@/helpers/schema'
@@ -106,7 +106,7 @@ describe('the software record', () => {
     ).toMatchObject({
       name: 'Multifus',
       downloadUrl: RELEASES,
-      releaseNotes: PAST_RELEASES,
+      releaseNotes: `${HOST}/journal`,
       offers: {
         '@type': 'Offer',
         price: '0',

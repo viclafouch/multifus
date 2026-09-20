@@ -5,6 +5,10 @@
     "build": {
       "outputs": ["dist/**", ".output/**", ".vercel/**"]
     },
+    "@multifus/website#build": {
+      "inputs": ["$TURBO_DEFAULT$", "../desktop/CHANGELOG.*.md"],
+      "outputs": ["dist/**", ".output/**", ".vercel/**"]
+    },
     "typecheck": {},
     "test": {},
     "i18n:check": {},

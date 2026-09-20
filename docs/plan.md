@@ -8,9 +8,6 @@
 - [ ] Vérifier `projectPath: apps/desktop` sur les deux `tauri-action` à la première publication
 - [ ] Enregistrer les cinq écrans manquants de la mise en route, `PAGE_SHOTS` n'en portant qu'un
 - [ ] Écrire à `contact@ankama.com` le jour où le domaine est acheté
-- [ ] Brancher `/journal` sur `apps/desktop/CHANGELOG.md`, que la première release écrira
-- [ ] Ouvrir `/journal` depuis À propos, et trancher si le panneau de mise à jour y renvoie
-- [ ] Porter `softwareVersion` et `releaseNotes` dans le `SoftwareApplication`, une fois `/journal` branché
 - [ ] Retirer `scripts/tidy-build.mjs` le jour où cet espace de noms est corrigé en amont
 - [ ] Descendre le LCP mobile sous 2,5 s, mesuré à 4,2 s : la boucle d'accueil tire 780 Ko avant lui, et les posters happés par la marge du chargement différé 530 Ko
 - [ ] Passer les pages au Rich Results Test, à `validator.schema.org` et à un valideur de sitemap, une fois en ligne

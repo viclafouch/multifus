@@ -1,4 +1,5 @@
 import { execFileSync } from 'node:child_process'
+import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { loadEnv } from 'vite'
 import { defineConfig } from 'vitest/config'
@@ -7,6 +8,7 @@ import babel from '@rolldown/plugin-babel'
 import tailwindcss from '@tailwindcss/vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import react from '@vitejs/plugin-react'
+import type { Language } from './src/@types/language.ts'
 import type { PageId } from './src/@types/page.ts'
 import {
   LOST_FILE,
@@ -43,6 +45,23 @@ export const SOURCE_PLUGINS = [
   react({ compiler: true }),
   lingui({ failOnMissing: true, failOnCompileError: true })
 ]
+
+const CHANGELOG_DIR = path.resolve(import.meta.dirname, '..', 'desktop')
+
+const changelogOf = (language: Language) => {
+  return readFileSync(
+    path.join(CHANGELOG_DIR, `CHANGELOG.${language}.md`),
+    'utf8'
+  )
+}
+
+const everyChangelog = () => {
+  return {
+    fr: changelogOf('fr'),
+    en: changelogOf('en'),
+    es: changelogOf('es')
+  } satisfies Record<Language, string>
+}
 
 const siteWrittenOn = () => {
   try {
@@ -108,7 +127,8 @@ export default defineConfig(async ({ mode }) => {
   return {
     define: {
       __RELEASE__: JSON.stringify(release),
-      __WRITTEN_ON__: JSON.stringify(day)
+      __WRITTEN_ON__: JSON.stringify(day),
+      __CHANGELOG__: JSON.stringify(everyChangelog())
     },
     plugins: [
       tanstackStart({

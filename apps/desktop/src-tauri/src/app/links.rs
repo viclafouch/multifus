@@ -7,6 +7,7 @@ use tauri_plugin_opener::OpenerExt;
 use crate::app::journal::JournalEvent;
 use crate::app::runtime;
 use crate::app::state::lock;
+use crate::config::Language;
 #[cfg(target_os = "windows")]
 use crate::platform::matches_windows_eleven;
 
@@ -18,6 +19,12 @@ const FORUM_URL: &str = "https://www.dofus-retro.com/fr/forum/12-suggestions-ret
 
 const POST_URL: &str = "https://x.com/DOFUSRetro_FR/status/2031323028072681799";
 
+const JOURNAL_FR_URL: &str = "https://www.multifus.app/journal";
+
+const JOURNAL_EN_URL: &str = "https://www.multifus.app/en/changelog";
+
+const JOURNAL_ES_URL: &str = "https://www.multifus.app/es/novedades";
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum AboutLink {
@@ -25,16 +32,22 @@ pub enum AboutLink {
     Issues,
     Forum,
     Post,
+    Journal,
 }
 
 impl AboutLink {
     #[must_use]
-    fn url(self) -> &'static str {
+    fn url(self, language: Language) -> &'static str {
         match self {
             Self::Source => SOURCE_URL,
             Self::Issues => ISSUES_URL,
             Self::Forum => FORUM_URL,
             Self::Post => POST_URL,
+            Self::Journal => match language {
+                Language::Fr => JOURNAL_FR_URL,
+                Language::En => JOURNAL_EN_URL,
+                Language::Es => JOURNAL_ES_URL,
+            },
         }
     }
 }
@@ -94,7 +107,9 @@ pub fn open_system_page(app: &AppHandle, page: SystemPage) {
 }
 
 pub fn open_about(app: &AppHandle, link: AboutLink) {
-    open_url(app, link.url());
+    let language = lock(app).language();
+
+    open_url(app, link.url(language));
 }
 
 pub fn open_url(app: &AppHandle, url: &str) {
@@ -117,12 +132,14 @@ pub fn failed(app: &AppHandle, detail: String) {
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashSet;
+
     use super::*;
 
     #[test]
     fn the_project_links_go_to_the_repository() {
         for link in [AboutLink::Source, AboutLink::Issues] {
-            let url = link.url();
+            let url = link.url(Language::Fr);
 
             assert!(
                 url.starts_with("https://github.com/viclafouch/multifus"),
@@ -135,28 +152,47 @@ mod tests {
     fn the_tolerance_links_go_to_what_ankama_wrote() {
         assert!(
             AboutLink::Forum
-                .url()
+                .url(Language::Fr)
                 .starts_with("https://www.dofus-retro.com/fr/forum/")
         );
         assert!(
             AboutLink::Post
-                .url()
+                .url(Language::Fr)
                 .starts_with("https://x.com/DOFUSRetro_FR/status/")
         );
+    }
+
+    fn repeated<'a>(urls: &[&'a str]) -> Option<&'a str> {
+        let mut seen = HashSet::new();
+
+        urls.iter().find(|url| !seen.insert(**url)).copied()
     }
 
     #[test]
     fn every_about_link_goes_to_its_own_page() {
         let urls = [
-            AboutLink::Source.url(),
-            AboutLink::Issues.url(),
-            AboutLink::Forum.url(),
-            AboutLink::Post.url(),
+            AboutLink::Source.url(Language::Fr),
+            AboutLink::Issues.url(Language::Fr),
+            AboutLink::Forum.url(Language::Fr),
+            AboutLink::Post.url(Language::Fr),
+            AboutLink::Journal.url(Language::Fr),
         ];
 
-        for (rank, url) in urls.iter().enumerate() {
-            assert!(!urls[rank + 1..].contains(url), "{url} is given twice");
+        assert_eq!(repeated(&urls), None, "a link is given twice");
+    }
+
+    #[test]
+    fn the_journal_opens_the_page_of_the_site_in_the_language_that_is_read() {
+        let urls = Language::ALL.map(|language| AboutLink::Journal.url(language));
+
+        for url in urls {
+            assert!(
+                url.starts_with("https://www.multifus.app/"),
+                "{url} is not a page of the site"
+            );
         }
+
+        assert_eq!(repeated(&urls), None, "a page is read in two languages");
     }
 
     #[test]

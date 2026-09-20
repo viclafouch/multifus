@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { HOST } from '@/constants/host'
 import { LANGUAGES } from '@/constants/languages'
@@ -11,6 +13,11 @@ import {
   pageOf,
   pathOf
 } from '@/helpers/page'
+
+const LINKS_FILE = resolve(
+  import.meta.dirname,
+  '../../../desktop/src-tauri/src/app/links.rs'
+)
 
 describe('pathOf', () => {
   it('leaves French at the root', () => {
@@ -200,5 +207,21 @@ describe('alternateRefsOf', () => {
     })
 
     expect(fallback?.href).toBe(french?.href)
+  })
+})
+
+describe('the journal addresses written in Rust', () => {
+  it('match the pages the site serves, in the three languages', () => {
+    const links = readFileSync(LINKS_FILE, 'utf8')
+
+    for (const language of LANGUAGES) {
+      const name = `JOURNAL_${language.toUpperCase()}_URL`
+      const written = new RegExp(
+        `const ${name}: &str = "(?<url>[^"]+)"`,
+        'u'
+      ).exec(links)?.groups?.url
+
+      expect(written).toBe(`${HOST}${pathOf({ page: 'journal', language })}`)
+    }
   })
 })

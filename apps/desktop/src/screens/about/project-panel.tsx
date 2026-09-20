@@ -48,6 +48,17 @@ export const ProjectPanel = ({ update, run }: ProjectPanelProps) => {
         />
       </FieldRow>
       <FieldRow
+        label={t`Notes de version`}
+        description={t`Ce que chaque version a changé, sur le site.`}
+      >
+        <LinkButton
+          label={t`Aller lire`}
+          onOpen={() => {
+            return openAboutLink('journal')
+          }}
+        />
+      </FieldRow>
+      <FieldRow
         label={t`Signaler un problème`}
         description={t`Un bug, une idée : c’est ici que ça se raconte.`}
       >

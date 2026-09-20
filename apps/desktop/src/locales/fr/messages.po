@@ -418,6 +418,10 @@ msgid "Aller le dire"
 msgstr "Aller le dire"
 
 #: src/screens/about/project-panel.tsx
+msgid "Aller lire"
+msgstr "Aller lire"
+
+#: src/screens/about/project-panel.tsx
 msgid "Aller voir"
 msgstr "Aller voir"
 
@@ -673,6 +677,10 @@ msgstr "Ce qu’Ankama autorise"
 #: src/helpers/health.ts
 msgid "Ce que ce système le laisse lire est en place. Pour le reste, seul un appel du jeu qui vous ramène devant tranchera."
 msgstr "Ce que ce système le laisse lire est en place. Pour le reste, seul un appel du jeu qui vous ramène devant tranchera."
+
+#: src/screens/about/project-panel.tsx
+msgid "Ce que chaque version a changé, sur le site."
+msgstr "Ce que chaque version a changé, sur le site."
 
 #: src/helpers/wording.ts
 msgid "Ce que vous voyez à l’écran est bon, mais rien n’a été écrit sur le disque."
@@ -2052,6 +2060,10 @@ msgstr "Ni sa mémoire, ni ses fichiers, ni ses paquets : il range vos fenêtres
 #: src/helpers/journal.ts
 msgid "non attribué"
 msgstr "non attribué"
+
+#: src/screens/about/project-panel.tsx
+msgid "Notes de version"
+msgstr "Notes de version"
 
 #: src/constants/journal.ts
 msgid "Notification impossible à lire"

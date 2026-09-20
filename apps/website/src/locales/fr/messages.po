@@ -445,6 +445,10 @@ msgstr "La langue du site"
 msgid "la même icône pour tous vos clients"
 msgstr "la même icône pour tous vos clients"
 
+#: src/screens/journal-screen.tsx
+msgid "La première version de Multifus n’est pas encore publiée."
+msgstr "La première version de Multifus n’est pas encore publiée."
+
 #: src/screens/ankama-screen.tsx
 msgid "La règle d’Ankama"
 msgstr "La règle d’Ankama"
@@ -1163,6 +1167,10 @@ msgstr "Une touche, un personnage"
 #: src/screens/comparison-screen.tsx
 msgid "Vérifiez ce tableau vous-même"
 msgstr "Vérifiez ce tableau vous-même"
+
+#: src/screens/journal-screen.tsx
+msgid "Version"
+msgstr "Version"
 
 #: src/components/author-word.tsx
 #: src/screens/home-screen.tsx

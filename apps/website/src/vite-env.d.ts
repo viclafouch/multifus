@@ -14,6 +14,11 @@ declare const __RELEASE__: import('@/helpers/release').Release | null
 
 declare const __WRITTEN_ON__: string | null
 
+declare const __CHANGELOG__: Record<
+  import('@/@types/language').Language,
+  string
+>
+
 declare module '*.po' {
   import type { Messages } from '@lingui/core'
 

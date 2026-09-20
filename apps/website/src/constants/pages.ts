@@ -84,7 +84,7 @@ export const PAGES = {
     slugs: { fr: 'telecharger', en: 'download', es: 'descargar' }
   },
   journal: {
-    kind: 'plain',
+    kind: 'journal',
     loop: null,
     kin: ['runeTable', 'quickTexts'],
     slugs: { fr: 'journal', en: 'changelog', es: 'novedades' }

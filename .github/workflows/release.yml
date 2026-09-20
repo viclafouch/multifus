@@ -81,7 +81,7 @@ jobs:
           projectPath: apps/desktop
           tagName: ${{ github.ref_name }}
           releaseName: Multifus ${{ github.ref_name }}
-          releaseBody: 'Le détail des changements est dans le CHANGELOG.'
+          releaseBody: 'Le détail des changements est sur https://www.multifus.app/journal'
           releaseDraft: true
           prerelease: false
           args: --target universal-apple-darwin
@@ -133,7 +133,7 @@ jobs:
           projectPath: apps/desktop
           tagName: ${{ github.ref_name }}
           releaseName: Multifus ${{ github.ref_name }}
-          releaseBody: 'Le détail des changements est dans le CHANGELOG.'
+          releaseBody: 'Le détail des changements est sur https://www.multifus.app/journal'
           releaseDraft: true
           prerelease: false
           args: --bundles nsis

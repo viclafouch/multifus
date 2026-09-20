@@ -25,7 +25,6 @@ import {
   AUTHOR,
   AUTHOR_CODE,
   AUTHOR_NAME,
-  PAST_RELEASES,
   RELEASES,
   REPOSITORY
 } from '@/constants/site'
@@ -115,7 +114,7 @@ const softwareOf = (language: Language) => {
     dateModified: release?.published,
     downloadUrl: RELEASES,
     installUrl: RELEASES,
-    releaseNotes: PAST_RELEASES,
+    releaseNotes: addressOf({ page: 'journal', language }),
     softwareHelp: {
       '@id': `${addressOf({ page: 'download', language })}#page`
     },

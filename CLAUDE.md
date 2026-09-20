@@ -41,7 +41,8 @@ memories of Retro are thinner than you think, and this is not today's Dofus.
    it adds.
 3. **Three languages by construction.** French is the source and Lingui carries
    the rest. Text is not shared between the software and the site: each keeps its
-   own catalogue. One language working is half a feature.
+   own catalogue, and the three `apps/desktop/CHANGELOG.<language>.md` the site
+   renders are the one exception. One language working is half a feature.
 4. **Two webviews, then every browser.** The software only runs in WebKit on Mac
    and Chromium on Windows, so its fallbacks aim at those two alone. The site is
    open to every browser, and its fallbacks are written instead of hoped for.

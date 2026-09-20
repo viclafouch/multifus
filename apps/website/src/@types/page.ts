@@ -23,6 +23,7 @@ export type PageKind =
   | 'download'
   | 'feature'
   | 'home'
+  | 'journal'
   | 'legal'
   | 'mac'
   | 'plain'
