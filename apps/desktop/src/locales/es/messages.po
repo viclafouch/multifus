@@ -1320,10 +1320,6 @@ msgstr "No se ha podido poner el icono de una ventana"
 msgid "Il arrive ici"
 msgstr "Llega aquí"
 
-#: src/components/silence-notice.tsx
-msgid "Il écoute, l’AutoFocus est allumé, et aucune notification ne lui est parvenue. Reprenez la mise en route : un réglage a pu changer sans le dire."
-msgstr "Está escuchando, el AutoFocus está encendido, y no le ha llegado ninguna notificación. Repase la puesta en marcha: un ajuste puede haber cambiado sin decirlo."
-
 #: src/helpers/health.ts
 msgid "Il regarde d’abord s’il voit vos fenêtres, puis ce que le système le laisse lire."
 msgstr "Primero mira si ve sus ventanas, y luego lo que el sistema le deja leer."
@@ -1976,10 +1972,6 @@ msgstr "Multifus no tiene a nadie a quien escuchar. Marca un personaje más abaj
 #: src/screens/about/legal-panel.tsx
 msgid "Multifus n’a rien à voir avec Ankama."
 msgstr "Multifus no tiene nada que ver con Ankama."
-
-#: src/components/silence-notice.tsx
-msgid "Multifus n’a rien entendu depuis longtemps"
-msgstr "Multifus no ha oído nada desde hace mucho"
 
 #: src/helpers/onboarding.ts
 msgid "Multifus n’entend rien, et ne peut rien faire."
@@ -2923,7 +2915,6 @@ msgstr "Comprobación"
 msgid "Vérification en cours…"
 msgstr "Comprobando…"
 
-#: src/components/silence-notice.tsx
 #: src/screens/about/project-panel.tsx
 #: src/screens/settings/help-section.tsx
 msgid "Vérifier"

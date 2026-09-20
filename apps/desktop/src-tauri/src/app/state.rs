@@ -178,7 +178,6 @@ pub struct Multifus {
     listening_since: Option<Instant>,
     heard: bool,
     last_heard: Option<Instant>,
-    silence_dismissed: bool,
     silence_told: bool,
     problem: Option<ConfigProblem>,
     update: UpdateView,
@@ -272,7 +271,6 @@ impl Multifus {
             listening_since: None,
             heard: false,
             last_heard: None,
-            silence_dismissed: false,
             silence_told: false,
             problem,
             update: UpdateView::Checking,
@@ -1686,16 +1684,8 @@ impl Multifus {
         self.notice_dismissed = true;
     }
 
-    pub fn dismiss_silence_notice(&mut self) {
-        self.silence_dismissed = true;
-    }
-
     pub fn follow_silence(&mut self) -> bool {
-        if !self.hears_nothing_for_long() {
-            self.silence_dismissed = false;
-        }
-
-        let silent = self.warns_of_a_silent_ear();
+        let silent = self.hears_nothing_for_long();
 
         if self.silence_told == silent {
             return false;
@@ -1710,11 +1700,6 @@ impl Multifus {
         }
 
         true
-    }
-
-    #[must_use]
-    fn warns_of_a_silent_ear(&self) -> bool {
-        !self.silence_dismissed && self.hears_nothing_for_long()
     }
 
     #[must_use]
@@ -1748,7 +1733,6 @@ impl Multifus {
                 })
                 .collect(),
             has_notice: self.warns_of_a_closed_check(),
-            has_silence: self.warns_of_a_silent_ear(),
         }
     }
 
@@ -4313,16 +4297,15 @@ mod tests {
         let mut state = ear_listening_for(&directory, Duration::ZERO);
 
         assert!(!state.follow_silence());
-        assert!(!state.snapshot().onboarding.has_silence);
+        assert!(!state.hears_nothing_for_long());
     }
 
     #[test]
-    fn an_ear_that_heard_nothing_for_long_warns_once_and_writes_one_line() {
+    fn an_ear_that_heard_nothing_for_long_writes_one_line() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = ear_listening_for(&directory, SILENT_EAR);
 
         assert!(state.follow_silence());
-        assert!(state.snapshot().onboarding.has_silence);
         assert!(!state.follow_silence(), "nothing moved, nothing to tell");
 
         assert_eq!(
@@ -4344,50 +4327,43 @@ mod tests {
         state.note_heard();
 
         assert!(!state.follow_silence());
-        assert!(!state.snapshot().onboarding.has_silence);
+        assert!(!state.hears_nothing_for_long());
 
         state.last_heard = Instant::now().checked_sub(SILENT_EAR);
 
         assert!(
-            state.snapshot().onboarding.has_silence,
+            state.hears_nothing_for_long(),
             "an ear that heard once and then nothing for long is the evening the player lost"
         );
     }
 
     #[test]
-    fn an_ear_that_hears_again_takes_back_the_notice_it_was_told_about() {
+    fn a_silence_that_comes_back_is_news_again() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = ear_listening_for(&directory, SILENT_EAR);
 
         state.follow_silence();
-        state.dismiss_silence_notice();
         state.note_heard();
-        state.follow_silence();
+
+        assert!(state.follow_silence(), "the ear heard, the line is stale");
 
         state.last_heard = Instant::now().checked_sub(SILENT_EAR);
 
-        assert!(
-            state.snapshot().onboarding.has_silence,
-            "a silence that comes back is news again"
-        );
+        assert!(state.follow_silence());
     }
 
     #[test]
-    fn the_silence_says_nothing_while_the_autofocus_is_off_or_the_player_said_they_knew() {
+    fn the_silence_says_nothing_while_the_autofocus_is_off() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = ear_listening_for(&directory, SILENT_EAR);
 
         state.set_auto_focus_enabled(false, Surface::Window);
 
-        assert!(!state.snapshot().onboarding.has_silence);
+        assert!(!state.hears_nothing_for_long());
 
         state.set_auto_focus_enabled(true, Surface::Window);
 
-        assert!(state.snapshot().onboarding.has_silence);
-
-        state.dismiss_silence_notice();
-
-        assert!(!state.snapshot().onboarding.has_silence);
+        assert!(state.hears_nothing_for_long());
     }
 
     #[test]
@@ -4397,11 +4373,11 @@ mod tests {
 
         state.set_listening(false);
 
-        assert!(!state.snapshot().onboarding.has_silence);
+        assert!(!state.hears_nothing_for_long());
 
         state.set_listening(true);
 
-        assert!(!state.snapshot().onboarding.has_silence);
+        assert!(!state.hears_nothing_for_long());
     }
 
     #[test]

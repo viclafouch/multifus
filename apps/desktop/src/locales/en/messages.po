@@ -1320,10 +1320,6 @@ msgstr "A window icon could not be set"
 msgid "Il arrive ici"
 msgstr "They land here"
 
-#: src/components/silence-notice.tsx
-msgid "Il écoute, l’AutoFocus est allumé, et aucune notification ne lui est parvenue. Reprenez la mise en route : un réglage a pu changer sans le dire."
-msgstr "It is listening, AutoFocus is on, and no notification has reached it. Go through the setup again: a setting may have changed without saying so."
-
 #: src/helpers/health.ts
 msgid "Il regarde d’abord s’il voit vos fenêtres, puis ce que le système le laisse lire."
 msgstr "It first looks at whether it can see your windows, then at what the system lets it read."
@@ -1976,10 +1972,6 @@ msgstr "Multifus has nobody to listen to. Tick a character below, or log one in 
 #: src/screens/about/legal-panel.tsx
 msgid "Multifus n’a rien à voir avec Ankama."
 msgstr "Multifus has nothing to do with Ankama."
-
-#: src/components/silence-notice.tsx
-msgid "Multifus n’a rien entendu depuis longtemps"
-msgstr "Multifus has heard nothing for a long while"
 
 #: src/helpers/onboarding.ts
 msgid "Multifus n’entend rien, et ne peut rien faire."
@@ -2923,7 +2915,6 @@ msgstr "Check-up"
 msgid "Vérification en cours…"
 msgstr "Checking…"
 
-#: src/components/silence-notice.tsx
 #: src/screens/about/project-panel.tsx
 #: src/screens/settings/help-section.tsx
 msgid "Vérifier"

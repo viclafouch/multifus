@@ -26,7 +26,6 @@ const bridge = {
   onClients: vi.fn(pending),
   dismissConfigProblem: vi.fn(pending),
   dismissCheckNotice: vi.fn(pending),
-  dismissSilenceNotice: vi.fn(pending),
   revealJournal: vi.fn(pending),
   revealConfig: vi.fn(pending),
   revealQuarantinedConfig: vi.fn(pending),
@@ -100,10 +99,6 @@ const ARRIVALS = [
   { name: 'settings', mark: 'Les réglages de Multifus :' },
   { name: 'about', mark: 'Mentions légales' }
 ] as const satisfies readonly Arrival[]
-
-const silentSnapshot = () => {
-  return snapshotOf({ onboarding: onboardingOf({ hasSilence: true }) })
-}
 
 describe('the Multifus window', () => {
   beforeEach(() => {
@@ -440,45 +435,5 @@ describe('the notice about a closed check', () => {
     fireEvent.click(screen.getByRole('button', { name: 'J’ai compris' }))
 
     expect(bridge.dismissCheckNotice).toHaveBeenCalledWith()
-  })
-})
-
-describe('the notice about an ear that stayed deaf', () => {
-  it('says nothing while Multifus hears the game', async () => {
-    await open(snapshotOf())
-
-    expect(
-      screen.queryByText('Multifus n’a rien entendu depuis longtemps')
-    ).toBeNull()
-  })
-
-  it('says nothing has reached it for a long time', async () => {
-    await open(silentSnapshot())
-
-    expect(
-      screen.getByText('Multifus n’a rien entendu depuis longtemps')
-    ).not.toBeNull()
-  })
-
-  it('leads to the settings', async () => {
-    const scrolled = vi.spyOn(Element.prototype, 'scrollIntoView')
-
-    await open(silentSnapshot())
-
-    fireEvent.click(screen.getByRole('button', { name: 'Vérifier' }))
-
-    expect(currentMap()).toBe('Paramètres')
-    expect(bridge.dismissSilenceNotice).not.toHaveBeenCalled()
-    expect(scrolled.mock.contexts).toStrictEqual([
-      document.querySelector(`#${ONBOARDING_ANCHOR}`)
-    ])
-  })
-
-  it('goes away when you say you understood', async () => {
-    await open(silentSnapshot())
-
-    fireEvent.click(screen.getByRole('button', { name: 'J’ai compris' }))
-
-    expect(bridge.dismissSilenceNotice).toHaveBeenCalledWith()
   })
 })

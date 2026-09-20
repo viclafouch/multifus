@@ -456,7 +456,6 @@ pub struct OnboardingView {
     pub done: bool,
     pub steps: Vec<StepView>,
     pub has_notice: bool,
-    pub has_silence: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -590,7 +589,6 @@ mod tests {
                     check: Check::Ready,
                     proven: false,
                 }],
-                has_silence: false,
                 has_notice: false,
             },
             config: ConfigView {
