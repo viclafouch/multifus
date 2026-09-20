@@ -441,14 +441,6 @@ msgstr "Allume ou éteint le Déplacement rapide."
 msgid "Allumé, ce réglage retient les notifications : votre percepteur se fait taper à l’autre bout du monde et vous ne l’apprenez qu’en rentrant."
 msgstr "Allumé, ce réglage retient les notifications : votre percepteur se fait taper à l’autre bout du monde et vous ne l’apprenez qu’en rentrant."
 
-#: src/screens/about/legal-panel.tsx
-msgid "Ankama ne répond pas de Multifus."
-msgstr "Ankama ne répond pas de Multifus."
-
-#: src/screens/about/legal-panel.tsx
-msgid "Ankama tolère les gestionnaires de fenêtres."
-msgstr "Ankama tolère les gestionnaires de fenêtres."
-
 #: src/components/language-picker.tsx
 #: src/screens/about/reset-panel.tsx
 msgid "Annuler"
@@ -481,10 +473,6 @@ msgstr "Aucun client ouvert"
 #: src/helpers/wording.ts
 msgid "Aucun homme connecté"
 msgstr "Aucun homme connecté"
-
-#: src/screens/about/legal-panel.tsx
-msgid "Aucun outil de la communauté n’est soutenu par elle. Le code de Multifus est public : lisez-le, et n’installez que depuis sa page."
-msgstr "Aucun outil de la communauté n’est soutenu par elle. Le code de Multifus est public : lisez-le, et n’installez que depuis sa page."
 
 #: src/helpers/onboarding.ts
 #: src/screens/relay/state-panel.tsx
@@ -670,9 +658,13 @@ msgstr "C’est parti. Regardez votre téléphone."
 msgid "Ce n’est pas en place."
 msgstr "Ce n’est pas en place."
 
-#: src/screens/about/legal-panel.tsx
+#: src/screens/about/project-panel.tsx
 msgid "Ce qu’Ankama autorise"
 msgstr "Ce qu’Ankama autorise"
+
+#: src/screens/about/project-panel.tsx
+msgid "Ce qu’elle tolère, et les deux messages où elle l’écrit."
+msgstr "Ce qu’elle tolère, et les deux messages où elle l’écrit."
 
 #: src/helpers/health.ts
 msgid "Ce que ce système le laisse lire est en place. Pour le reste, seul un appel du jeu qui vous ramène devant tranchera."
@@ -821,10 +813,6 @@ msgstr "Combat, échange ou défi : la fenêtre du personnage passe devant."
 #: src/screens/about/project-panel.tsx
 msgid "Comment Multifus est développé"
 msgstr "Comment Multifus est développé"
-
-#: src/constants/tolerance.ts
-msgid "Compte DOFUS Rétro sur X, le 10 mars 2026"
-msgstr "Compte DOFUS Rétro sur X, le 10 mars 2026"
 
 #: src/components/empty-roster.tsx
 msgid "Compte, serveur, puis votre personnage."
@@ -1045,10 +1033,6 @@ msgstr "Depuis une fenêtre du jeu, et nulle part ailleurs."
 msgid "Divers"
 msgstr "Divers"
 
-#: src/screens/about/legal-panel.tsx
-msgid "Dofus, Dofus Retro et les têtes de classe appartiennent à Ankama."
-msgstr "Dofus, Dofus Retro et les têtes de classe appartiennent à Ankama."
-
 #: src/constants/runes.ts
 msgid "Dommages"
 msgstr "Dommages"
@@ -1112,10 +1096,6 @@ msgstr "Écrivez-lui /newbot et répondez à ses questions, il parle anglais. Ce
 #: src/screens/walk-screen/banner-panel.tsx
 msgid "Elle affiche le personnage sur lequel vous venez d’arriver."
 msgstr "Elle affiche le personnage sur lequel vous venez d’arriver."
-
-#: src/screens/about/legal-panel.tsx
-msgid "Elle l’a écrit deux fois en public, sur son forum et sur son compte X. Les deux messages sont ici, en entier."
-msgstr "Elle l’a écrit deux fois en public, sur son forum et sur son compte X. Les deux messages sont ici, en entier."
 
 #: src/screens/walk-screen/corner-picker.tsx
 msgid "En bas à droite"
@@ -1270,7 +1250,6 @@ msgstr "Fenêtres illisibles"
 #: src/components/loop-dialog.tsx
 #: src/components/questions-dialog.tsx
 #: src/components/ui/dialog.tsx
-#: src/screens/about/tolerance-shot.tsx
 #: src/screens/onboarding/shot-dialog.tsx
 #: src/screens/onboarding/shot-window.tsx
 msgid "Fermer"
@@ -1283,10 +1262,6 @@ msgstr "Fermer le tableau des runes"
 #: src/components/character-dialog.tsx
 msgid "Fermer sans rien changer"
 msgstr "Fermer sans rien changer"
-
-#: src/constants/tolerance.ts
-msgid "Forum de Dofus Retro, le 1ᵉʳ avril 2026"
-msgstr "Forum de Dofus Retro, le 1ᵉʳ avril 2026"
 
 #: src/screens/settings/index.tsx
 msgid "Garder Multifus en arrière-plan"
@@ -1480,10 +1455,6 @@ msgstr "La langue de Multifus"
 #: src/constants/journal.ts
 msgid "La lecture des fenêtres"
 msgstr "La lecture des fenêtres"
-
-#: src/screens/about/legal-panel.tsx
-msgid "La limite, c’est le jeu lui-même."
-msgstr "La limite, c’est le jeu lui-même."
 
 #: src/helpers/wording.ts
 msgid "La mise à jour a échoué : {detail}"
@@ -1759,13 +1730,13 @@ msgstr "Les touches frappées pendant une casse : le tableau s’ouvre sur le je
 msgid "Les touches maintenues dans le jeu : la roue s’ouvre au milieu de l’écran, la tête visée s’allume, et sa fenêtre passe devant."
 msgstr "Les touches maintenues dans le jeu : la roue s’ouvre au milieu de l’écran, la tête visée s’allume, et sa fenêtre passe devant."
 
-#: src/screens/about/tolerance-shot.tsx
-msgid "Lire"
-msgstr "Lire"
+#: src/screens/about/project-panel.tsx
+msgid "Lire la règle"
+msgstr "Lire la règle"
 
-#: src/screens/about/tolerance-shot.tsx
-msgid "Lire {source}"
-msgstr "Lire {source}"
+#: src/screens/about/project-panel.tsx
+msgid "Lire les mentions"
+msgstr "Lire les mentions"
 
 #: src/screens/about/identity-panel.tsx
 #: src/screens/clearing/index.tsx
@@ -1808,7 +1779,7 @@ msgstr "Même un personnage rangé dans la barre des tâches revient devant vous
 msgid "Même un personnage rangé dans le Dock revient devant vous."
 msgstr "Même un personnage rangé dans le Dock revient devant vous."
 
-#: src/screens/about/legal-panel.tsx
+#: src/screens/about/project-panel.tsx
 msgid "Mentions légales"
 msgstr "Mentions légales"
 
@@ -1929,10 +1900,6 @@ msgstr "Multifus a été quitté depuis la barre système."
 msgid "Multifus attend votre autorisation"
 msgstr "Multifus attend votre autorisation"
 
-#: src/screens/about/legal-panel.tsx
-msgid "Multifus cherche ses mises à jour, et relaie vos messages privés seulement si vous reliez Telegram."
-msgstr "Multifus cherche ses mises à jour, et relaie vos messages privés seulement si vous reliez Telegram."
-
 #: src/screens/quick-texts/index.tsx
 msgid "Multifus colle, c’est vous qui appuyez sur Entrée. Le temps du collage, il emprunte votre presse-papiers, puis vous le rend."
 msgstr "Multifus colle, c’est vous qui appuyez sur Entrée. Le temps du collage, il emprunte votre presse-papiers, puis vous le rend."
@@ -1977,10 +1944,6 @@ msgstr "Multifus n’a pas réussi à mettre le fichier de côté. Le prochain e
 msgid "Multifus n’a personne à écouter. Cochez un personnage plus bas, ou connectez-en un dans Dofus Retro."
 msgstr "Multifus n’a personne à écouter. Cochez un personnage plus bas, ou connectez-en un dans Dofus Retro."
 
-#: src/screens/about/legal-panel.tsx
-msgid "Multifus n’a rien à voir avec Ankama."
-msgstr "Multifus n’a rien à voir avec Ankama."
-
 #: src/helpers/onboarding.ts
 msgid "Multifus n’entend rien, et ne peut rien faire."
 msgstr "Multifus n’entend rien, et ne peut rien faire."
@@ -1996,10 +1959,6 @@ msgstr "Multifus ne peut pas lire les fenêtres du jeu."
 #: src/helpers/health.ts
 msgid "Multifus ne peut pas tout lire ici"
 msgstr "Multifus ne peut pas tout lire ici"
-
-#: src/screens/about/legal-panel.tsx
-msgid "Multifus ne touche pas au jeu."
-msgstr "Multifus ne touche pas au jeu."
 
 #: src/helpers/onboarding.ts
 msgid "Multifus ne voit rien, et ne peut rien faire."
@@ -2052,10 +2011,6 @@ msgstr "Ne pas déranger"
 #: src/components/main-toggle.tsx
 msgid "Ne plus en faire votre personnage principal"
 msgstr "Ne plus en faire votre personnage principal"
-
-#: src/screens/about/legal-panel.tsx
-msgid "Ni sa mémoire, ni ses fichiers, ni ses paquets : il range vos fenêtres, lit les notifications et prend vos clics."
-msgstr "Ni sa mémoire, ni ses fichiers, ni ses paquets : il range vos fenêtres, lit les notifications et prend vos clics."
 
 #: src/helpers/journal.ts
 msgid "non attribué"
@@ -2152,10 +2107,6 @@ msgstr "Ouvrir {name}"
 #: src/screens/relay/pairing-guide.tsx
 msgid "Ouvrir BotFather"
 msgstr "Ouvrir BotFather"
-
-#: src/screens/about/tolerance-shot.tsx
-msgid "Ouvrir la source"
-msgstr "Ouvrir la source"
 
 #: src/screens/relay/pairing-guide.tsx
 msgid "Ouvrir Telegram Web"
@@ -2296,6 +2247,10 @@ msgstr "Quelqu’un vous propose un échange."
 #: src/screens/settings/help-section.tsx
 msgid "Questions fréquentes"
 msgstr "Questions fréquentes"
+
+#: src/screens/about/project-panel.tsx
+msgid "Qui publie Multifus, et ce qui appartient à Ankama."
+msgstr "Qui publie Multifus, et ce qui appartient à Ankama."
 
 #: src/screens/rune-table-window/rune-sheet.tsx
 msgid "Ra"
@@ -2504,10 +2459,6 @@ msgstr "Revoir la mise en route"
 #: src/components/journal-panel.tsx
 msgid "Rien à signaler pour l’instant."
 msgstr "Rien à signaler pour l’instant."
-
-#: src/screens/about/legal-panel.tsx
-msgid "Rien ne quitte votre ordinateur sans vous."
-msgstr "Rien ne quitte votre ordinateur sans vous."
 
 #: src/screens/relay/bot-panel.tsx
 msgid "Robot Telegram relié"
@@ -2858,10 +2809,6 @@ msgstr "Un joueur écrit à un personnage : son message part sur le téléphone.
 #: src/screens/relay/index.tsx
 msgid "Un joueur vous écrit pendant que vous êtes ailleurs ? Son message arrive sur votre téléphone, dans Telegram."
 msgstr "Un joueur vous écrit pendant que vous êtes ailleurs ? Son message arrive sur votre téléphone, dans Telegram."
-
-#: src/screens/about/legal-panel.tsx
-msgid "Un logiciel qui ouvre ses fichiers, ou qui joue à votre place, fait bannir le compte. Multifus range des fenêtres, et rien d’autre."
-msgstr "Un logiciel qui ouvre ses fichiers, ou qui joue à votre place, fait bannir le compte. Multifus range des fenêtres, et rien d’autre."
 
 #: src/constants/loops.ts
 msgid "Un message privé arrive sur un personnage pendant qu’on joue ailleurs : Multifus le pose sur le téléphone, dans Telegram, avec le nom de qui l’a écrit."

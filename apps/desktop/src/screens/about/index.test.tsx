@@ -44,21 +44,6 @@ const buttonNamed = (label: string) => {
   return screen.getByRole('button', { name: label })
 }
 
-const LEGAL = [
-  {
-    lead: 'Multifus n’a rien à voir avec Ankama.',
-    body: 'Dofus, Dofus Retro et les têtes de classe appartiennent à Ankama.'
-  },
-  {
-    lead: 'Multifus ne touche pas au jeu.',
-    body: 'Ni sa mémoire, ni ses fichiers, ni ses paquets : il range vos fenêtres, lit les notifications et prend vos clics.'
-  },
-  {
-    lead: 'Rien ne quitte votre ordinateur sans vous.',
-    body: 'Multifus cherche ses mises à jour, et relaie vos messages privés seulement si vous reliez Telegram.'
-  }
-]
-
 describe('the About screen', () => {
   it('says what Multifus is and everything it can do', () => {
     show()
@@ -90,96 +75,6 @@ describe('the About screen', () => {
     expect(bridge.revealConfig).toHaveBeenCalledWith()
   })
 
-  it('leads to each legal notice through the sentence that matters', () => {
-    show()
-
-    for (const { lead } of LEGAL) {
-      expect(screen.getByText(lead).tagName).toBe('STRONG')
-    }
-  })
-
-  it('says Ankama, the packages nobody touches, and the internet', () => {
-    show()
-
-    const said = LEGAL.map(({ lead, body }) => {
-      return `${lead} ${body}`
-    }).join(' ')
-
-    for (const owned of ['Ankama', 'mémoire', 'paquets', 'clics']) {
-      expect(said).toContain(owned)
-    }
-  })
-
-  it('says Telegram only leaves on request', () => {
-    show()
-
-    const telegram = LEGAL.find(({ body }) => {
-      return body.includes('Telegram')
-    })
-
-    expect(telegram?.body).toContain('seulement si vous')
-  })
-
-  describe('what Ankama allows', () => {
-    it('says the tolerance, the limit and who answers for Multifus', () => {
-      show()
-
-      expect(
-        screen.getByText('Ankama tolère les gestionnaires de fenêtres.').tagName
-      ).toBe('STRONG')
-      expect(
-        screen.getByText('La limite, c’est le jeu lui-même.')
-      ).not.toBeNull()
-      expect(
-        screen.getByText('Ankama ne répond pas de Multifus.')
-      ).not.toBeNull()
-    })
-
-    it('shows the two messages of Ankama, dated and placed', () => {
-      show()
-
-      expect(
-        buttonNamed('Lire Forum de Dofus Retro, le 1ᵉʳ avril 2026')
-      ).not.toBeNull()
-      expect(
-        buttonNamed('Lire Compte DOFUS Rétro sur X, le 10 mars 2026')
-      ).not.toBeNull()
-    })
-
-    it('opens a message at full size, its source on top of it', async () => {
-      show()
-
-      fireEvent.click(
-        buttonNamed('Lire Forum de Dofus Retro, le 1ᵉʳ avril 2026')
-      )
-
-      await waitFor(() => {
-        expect(
-          screen.getByRole('img', {
-            name: 'Forum de Dofus Retro, le 1ᵉʳ avril 2026'
-          })
-        ).not.toBeNull()
-      })
-      expect(buttonNamed('Fermer')).not.toBeNull()
-    })
-
-    it('leads to the Ankama page where the message was written', async () => {
-      bridge.openAboutLink.mockResolvedValue(null)
-      show()
-
-      fireEvent.click(
-        buttonNamed('Lire Compte DOFUS Rétro sur X, le 10 mars 2026')
-      )
-
-      await waitFor(() => {
-        expect(buttonNamed('Ouvrir la source')).not.toBeNull()
-      })
-      fireEvent.click(buttonNamed('Ouvrir la source'))
-
-      expect(bridge.openAboutLink).toHaveBeenCalledWith('post')
-    })
-  })
-
   describe('the project', () => {
     it('leads to the source code and to the place where a bug is told', () => {
       bridge.openAboutLink.mockResolvedValue(null)
@@ -190,6 +85,30 @@ describe('the About screen', () => {
 
       expect(bridge.openAboutLink).toHaveBeenCalledWith('source')
       expect(bridge.openAboutLink).toHaveBeenCalledWith('issues')
+    })
+
+    it('reads what Ankama allows and the legal notice on the site', () => {
+      bridge.openAboutLink.mockResolvedValue(null)
+      show()
+
+      fireEvent.click(buttonNamed('Lire la règle'))
+      fireEvent.click(buttonNamed('Lire les mentions'))
+
+      expect(bridge.openAboutLink).toHaveBeenCalledWith('ankama')
+      expect(bridge.openAboutLink).toHaveBeenCalledWith('legal')
+    })
+
+    it('says what each page of the site holds before leaving for it', () => {
+      show()
+
+      expect(
+        screen.getByText(
+          'Ce qu’elle tolère, et les deux messages où elle l’écrit.'
+        )
+      ).not.toBeNull()
+      expect(
+        screen.getByText('Qui publie Multifus, et ce qui appartient à Ankama.')
+      ).not.toBeNull()
     })
   })
 

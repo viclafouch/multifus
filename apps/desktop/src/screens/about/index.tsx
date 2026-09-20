@@ -4,7 +4,6 @@ import type { ConfigStatus, UpdateStatus } from '@/@types/system'
 import { Screen } from '@/components/layout/screen'
 import { MAP_NAMES } from '@/constants/world'
 import { IdentityPanel } from '@/screens/about/identity-panel'
-import { LegalPanel } from '@/screens/about/legal-panel'
 import { ProjectPanel } from '@/screens/about/project-panel'
 import { ResetPanel } from '@/screens/about/reset-panel'
 
@@ -31,7 +30,6 @@ export const AboutScreen = ({
         configPath={config.path}
       />
       <ProjectPanel update={update} run={run} />
-      <LegalPanel />
       <ResetPanel run={run} />
     </Screen>
   )

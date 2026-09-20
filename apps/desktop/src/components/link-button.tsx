@@ -1,3 +1,4 @@
+import { ArrowUpRight } from 'lucide-react'
 import { Button, type ButtonLook } from '@multifus/retro'
 import { ignore } from '@/lib/utils'
 
@@ -21,6 +22,7 @@ export const LinkButton = ({
   return (
     <Button variant={variant} size={size} onClick={handleClick}>
       {label}
+      <ArrowUpRight aria-hidden className="size-3" strokeWidth={2.5} />
     </Button>
   )
 }

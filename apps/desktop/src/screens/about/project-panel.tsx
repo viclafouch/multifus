@@ -69,6 +69,28 @@ export const ProjectPanel = ({ update, run }: ProjectPanelProps) => {
           }}
         />
       </FieldRow>
+      <FieldRow
+        label={t`Ce qu’Ankama autorise`}
+        description={t`Ce qu’elle tolère, et les deux messages où elle l’écrit.`}
+      >
+        <LinkButton
+          label={t`Lire la règle`}
+          onOpen={() => {
+            return openAboutLink('ankama')
+          }}
+        />
+      </FieldRow>
+      <FieldRow
+        label={t`Mentions légales`}
+        description={t`Qui publie Multifus, et ce qui appartient à Ankama.`}
+      >
+        <LinkButton
+          label={t`Lire les mentions`}
+          onOpen={() => {
+            return openAboutLink('legal')
+          }}
+        />
+      </FieldRow>
     </Panel>
   )
 }

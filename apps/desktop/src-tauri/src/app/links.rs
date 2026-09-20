@@ -15,39 +15,43 @@ const SOURCE_URL: &str = "https://github.com/viclafouch/multifus";
 
 const ISSUES_URL: &str = "https://github.com/viclafouch/multifus/issues";
 
-const FORUM_URL: &str = "https://www.dofus-retro.com/fr/forum/12-suggestions-retours/2950-pourquoi-ankama-autorise-outils-crees-communaute";
+const SITE_URL: &str = "https://www.multifus.app";
 
-const POST_URL: &str = "https://x.com/DOFUSRetro_FR/status/2031323028072681799";
-
-const JOURNAL_FR_URL: &str = "https://www.multifus.app/journal";
-
-const JOURNAL_EN_URL: &str = "https://www.multifus.app/en/changelog";
-
-const JOURNAL_ES_URL: &str = "https://www.multifus.app/es/novedades";
+fn site_page(slug: &str) -> String {
+    format!("{SITE_URL}/{slug}")
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum AboutLink {
     Source,
     Issues,
-    Forum,
-    Post,
     Journal,
+    Ankama,
+    Legal,
 }
 
 impl AboutLink {
     #[must_use]
-    fn url(self, language: Language) -> &'static str {
+    fn url(self, language: Language) -> String {
         match self {
-            Self::Source => SOURCE_URL,
-            Self::Issues => ISSUES_URL,
-            Self::Forum => FORUM_URL,
-            Self::Post => POST_URL,
-            Self::Journal => match language {
-                Language::Fr => JOURNAL_FR_URL,
-                Language::En => JOURNAL_EN_URL,
-                Language::Es => JOURNAL_ES_URL,
-            },
+            Self::Source => SOURCE_URL.to_owned(),
+            Self::Issues => ISSUES_URL.to_owned(),
+            Self::Journal => site_page(match language {
+                Language::Fr => "journal",
+                Language::En => "en/changelog",
+                Language::Es => "es/novedades",
+            }),
+            Self::Ankama => site_page(match language {
+                Language::Fr => "ankama",
+                Language::En => "en/ankama",
+                Language::Es => "es/ankama",
+            }),
+            Self::Legal => site_page(match language {
+                Language::Fr => "mentions-legales",
+                Language::En => "en/legal-notice",
+                Language::Es => "es/aviso-legal",
+            }),
         }
     }
 }
@@ -109,7 +113,7 @@ pub fn open_system_page(app: &AppHandle, page: SystemPage) {
 pub fn open_about(app: &AppHandle, link: AboutLink) {
     let language = lock(app).language();
 
-    open_url(app, link.url(language));
+    open_url(app, &link.url(language));
 }
 
 pub fn open_url(app: &AppHandle, url: &str) {
@@ -148,24 +152,14 @@ mod tests {
         }
     }
 
-    #[test]
-    fn the_tolerance_links_go_to_what_ankama_wrote() {
-        assert!(
-            AboutLink::Forum
-                .url(Language::Fr)
-                .starts_with("https://www.dofus-retro.com/fr/forum/")
-        );
-        assert!(
-            AboutLink::Post
-                .url(Language::Fr)
-                .starts_with("https://x.com/DOFUSRetro_FR/status/")
-        );
-    }
+    const SITE_PAGES: [AboutLink; 3] = [AboutLink::Journal, AboutLink::Ankama, AboutLink::Legal];
 
-    fn repeated<'a>(urls: &[&'a str]) -> Option<&'a str> {
+    fn repeated(urls: &[String]) -> Option<&str> {
         let mut seen = HashSet::new();
 
-        urls.iter().find(|url| !seen.insert(**url)).copied()
+        urls.iter()
+            .find(|url| !seen.insert(url.as_str()))
+            .map(String::as_str)
     }
 
     #[test]
@@ -173,26 +167,32 @@ mod tests {
         let urls = [
             AboutLink::Source.url(Language::Fr),
             AboutLink::Issues.url(Language::Fr),
-            AboutLink::Forum.url(Language::Fr),
-            AboutLink::Post.url(Language::Fr),
             AboutLink::Journal.url(Language::Fr),
+            AboutLink::Ankama.url(Language::Fr),
+            AboutLink::Legal.url(Language::Fr),
         ];
 
         assert_eq!(repeated(&urls), None, "a link is given twice");
     }
 
     #[test]
-    fn the_journal_opens_the_page_of_the_site_in_the_language_that_is_read() {
-        let urls = Language::ALL.map(|language| AboutLink::Journal.url(language));
+    fn what_the_site_explains_opens_in_the_language_that_is_read() {
+        for link in SITE_PAGES {
+            let urls = Language::ALL.map(|language| link.url(language));
 
-        for url in urls {
-            assert!(
-                url.starts_with("https://www.multifus.app/"),
-                "{url} is not a page of the site"
+            for url in &urls {
+                assert!(
+                    url.starts_with("https://www.multifus.app/"),
+                    "{url} is not a page of the site"
+                );
+            }
+
+            assert_eq!(
+                repeated(&urls),
+                None,
+                "{link:?} is read in two languages at the same address"
             );
         }
-
-        assert_eq!(repeated(&urls), None, "a page is read in two languages");
     }
 
     #[test]
