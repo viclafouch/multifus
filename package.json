@@ -28,10 +28,10 @@
   "devDependencies": {
     "@viclafouch/oxc-config": "^1.0.0-alpha.28",
     "husky": "^9.1.7",
-    "oxfmt": "^0.67.0",
-    "oxlint": "^1.82.0",
+    "oxfmt": "^0.68.0",
+    "oxlint": "^1.83.0",
     "oxlint-tsgolint": "^7.0.2001",
-    "turbo": "^2.10.12",
+    "turbo": "^2.10.13",
     "typescript": "^7.0.2"
   },
   "engines": {
