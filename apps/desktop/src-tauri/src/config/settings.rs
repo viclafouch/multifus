@@ -58,10 +58,10 @@ impl Default for Settings {
             wheel: Wheel::default(),
             rune_table: RuneTable::default(),
             loops_seen: LoopsSeen::default(),
-            maximize_on_launch: false,
-            short_titles: false,
+            maximize_on_launch: true,
+            short_titles: true,
             paint_portraits: true,
-            ungroup_taskbar: false,
+            ungroup_taskbar: true,
             client_title_suffix: None,
             start_at_login: false,
             onboarding_done: false,
@@ -383,19 +383,26 @@ mod tests {
         assert_eq!(settings.language, None);
         assert!(settings.roster.is_empty());
         assert!(!settings.start_at_login);
-        assert!(!settings.maximize_on_launch);
-        assert!(!settings.short_titles);
-        assert!(!settings.ungroup_taskbar);
         assert_eq!(settings.client_title_suffix, None);
     }
 
     #[test]
-    fn a_file_written_before_the_maximizing_existed_leaves_the_windows_alone() {
+    fn a_first_launch_already_tidies_the_windows_of_the_clients() {
+        let settings = Settings::default();
+
+        assert!(settings.maximize_on_launch);
+        assert!(settings.short_titles);
+        assert!(settings.ungroup_taskbar);
+        assert!(settings.paint_portraits);
+    }
+
+    #[test]
+    fn a_file_written_before_the_maximizing_existed_tidies_the_windows_too() {
         let settings = serde_json::from_str::<Settings>("{}").expect("an empty configuration");
 
-        assert!(!settings.maximize_on_launch);
-        assert!(!settings.short_titles);
-        assert!(!settings.ungroup_taskbar);
+        assert!(settings.maximize_on_launch);
+        assert!(settings.short_titles);
+        assert!(settings.ungroup_taskbar);
     }
 
     #[test]

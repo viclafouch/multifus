@@ -3419,19 +3419,19 @@ mod tests {
     }
 
     #[test]
-    fn nothing_is_filled_to_the_screen_until_somebody_asks_for_it() {
+    fn every_client_is_filled_to_the_screen_until_somebody_stops_it() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
-
-        assert!(!state.maximizes_on_launch());
-
-        state.set_maximize_on_launch(true);
 
         assert!(state.maximizes_on_launch());
-        assert!(state.snapshot().maximize_on_launch);
+
+        state.set_maximize_on_launch(false);
+
+        assert!(!state.maximizes_on_launch());
+        assert!(!state.snapshot().maximize_on_launch);
         assert!(
             journalled(&state).contains(&JournalEvent::Setting {
-                change: SettingChange::MaximizeOnLaunch { maximize: true }
+                change: SettingChange::MaximizeOnLaunch { maximize: false }
             }),
             "{:?}",
             journalled(&state)
@@ -3439,19 +3439,19 @@ mod tests {
     }
 
     #[test]
-    fn no_window_is_renamed_until_somebody_asks_for_it() {
+    fn every_window_is_renamed_until_somebody_stops_it() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
-
-        assert!(!state.shortens_titles());
-
-        state.set_short_titles(true);
 
         assert!(state.shortens_titles());
-        assert!(state.snapshot().short_titles);
+
+        state.set_short_titles(false);
+
+        assert!(!state.shortens_titles());
+        assert!(!state.snapshot().short_titles);
         assert!(
             journalled(&state).contains(&JournalEvent::Setting {
-                change: SettingChange::ShortTitles { short: true }
+                change: SettingChange::ShortTitles { short: false }
             }),
             "{:?}",
             journalled(&state)
@@ -3459,19 +3459,19 @@ mod tests {
     }
 
     #[test]
-    fn no_taskbar_is_ungrouped_until_somebody_asks_for_it() {
+    fn the_taskbar_is_ungrouped_until_somebody_stops_it() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
 
-        assert!(!state.ungroups_taskbar());
-
-        state.set_ungroup_taskbar(true);
-
         assert!(state.ungroups_taskbar());
-        assert!(state.snapshot().ungroup_taskbar);
+
+        state.set_ungroup_taskbar(false);
+
+        assert!(!state.ungroups_taskbar());
+        assert!(!state.snapshot().ungroup_taskbar);
         assert!(
             journalled(&state).contains(&JournalEvent::Setting {
-                change: SettingChange::UngroupTaskbar { ungroup: true }
+                change: SettingChange::UngroupTaskbar { ungroup: false }
             }),
             "{:?}",
             journalled(&state)
@@ -3607,6 +3607,7 @@ mod tests {
     fn a_window_is_painted_once_and_repainted_when_its_portrait_changes() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
+        state.set_ungroup_taskbar(false);
         state.apply_windows(&[window(1, "Alpha")]);
 
         let bare = painting("Alpha", 1, WindowLook::default());
@@ -3641,6 +3642,7 @@ mod tests {
     fn a_head_is_only_painted_while_somebody_wants_it_there() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
+        state.set_ungroup_taskbar(false);
         state.apply_windows(&[window(1, "Alpha")]);
         state.set_gender("Alpha", Some(Gender::Male));
         state.set_class("Alpha", Some(Class::Iop));
@@ -3714,6 +3716,7 @@ mod tests {
     fn a_client_that_closes_is_painted_again_when_it_comes_back() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
+        state.set_ungroup_taskbar(false);
         state.apply_windows(&[window(1, "Alpha")]);
 
         let bare = painting("Alpha", 1, WindowLook::default());
@@ -3787,6 +3790,7 @@ mod tests {
     fn a_portrait_posed_by_a_multifus_that_died_is_given_back_at_the_next_start() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut died = multifus(&directory);
+        died.set_ungroup_taskbar(false);
         died.apply_windows(&[window(1, "Alpha")]);
         died.set_gender("Alpha", Some(Gender::Male));
         died.set_class("Alpha", Some(Class::Iop));
@@ -3827,6 +3831,7 @@ mod tests {
     fn a_window_of_a_character_left_out_of_the_roster_is_given_back_what_it_wore() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
+        state.set_ungroup_taskbar(false);
         state.apply_windows(&[window(1, "Alpha")]);
         state.set_gender("Alpha", Some(Gender::Male));
         state.set_class("Alpha", Some(Class::Iop));
@@ -3865,6 +3870,7 @@ mod tests {
     fn a_character_the_game_logged_out_stops_wearing_his_face() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
+        state.set_ungroup_taskbar(false);
         state.apply_windows(&[window(1, "Alpha")]);
         state.set_gender("Alpha", Some(Gender::Male));
         state.set_class("Alpha", Some(Class::Iop));
@@ -4741,7 +4747,7 @@ mod tests {
         state.apply_windows(&[window(1, "Alpha")]);
         state.set_class("Alpha", Some(Class::Iop));
         state.set_paired(42);
-        state.set_short_titles(true);
+        state.set_short_titles(false);
         state.set_banner_corner(BannerCorner::TopLeft);
 
         state.reset();
@@ -4749,7 +4755,7 @@ mod tests {
         let snapshot = state.snapshot();
 
         assert_eq!(snapshot.characters, Vec::new());
-        assert!(!snapshot.short_titles);
+        assert!(snapshot.short_titles);
         assert!(!snapshot.relay.paired);
         assert_eq!(snapshot.walk.banner.corner, BannerCorner::BottomRight);
         assert!(journalled(&state).contains(&JournalEvent::Reset));
