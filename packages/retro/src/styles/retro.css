@@ -1139,7 +1139,7 @@
 }
 
 @utility deepen {
-  background-color: color-mix(in srgb, var(--iron), transparent 80%);
+  background-color: color-mix(in srgb, var(--iron), transparent 58%);
   opacity: 0;
   transition: opacity 0.42s cubic-bezier(0.4, 0, 0.2, 1);
 
