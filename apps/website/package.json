@@ -15,7 +15,7 @@
     "i18n:extract": "lingui extract --clean",
     "i18n:check": "lingui compile --strict",
     "verify:html": "node scripts/verify-html.mjs",
-    "check": "pnpm run i18n:check && pnpm run typecheck && pnpm run test && pnpm run build && pnpm run verify:html"
+    "check:web": "pnpm run i18n:check && pnpm run typecheck && pnpm run test && pnpm run build && pnpm run verify:html"
   },
   "dependencies": {
     "@fontsource/bebas-neue": "^5.3.0",

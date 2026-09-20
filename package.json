@@ -21,7 +21,7 @@
     "format": "oxfmt",
     "format:check": "oxfmt --check",
     "check": "pnpm run check:web && pnpm run check:rust",
-    "check:web": "pnpm run format:check && pnpm run lint && turbo run check",
+    "check:web": "pnpm run format:check && pnpm run lint && turbo run check:web",
     "check:rust": "turbo run check:rust",
     "prepare": "husky"
   },

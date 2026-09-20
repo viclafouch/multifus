@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "check": "pnpm run typecheck && pnpm run test"
+    "check:web": "pnpm run typecheck && pnpm run test"
   },
   "devDependencies": {
     "typescript": "^7.0.2",

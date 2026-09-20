@@ -25,7 +25,7 @@
     "deny:rust": "cargo deny --manifest-path src-tauri/Cargo.toml check",
     "format:rust": "cargo fmt --manifest-path src-tauri/Cargo.toml",
     "format:rust:check": "cargo fmt --check --manifest-path src-tauri/Cargo.toml",
-    "check": "pnpm run i18n:check && pnpm run test && pnpm run build",
+    "check:web": "pnpm run i18n:check && pnpm run test && pnpm run build",
     "check:rust": "pnpm run format:rust:check && pnpm run lint:rust && pnpm run test:rust",
     "release": "commit-and-tag-version"
   },
