@@ -1,6 +1,8 @@
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
+import type { Language } from '@/@types/language'
+import type { PageId } from '@/@types/page'
 import { HOST } from '@/constants/host'
 import { LANGUAGES } from '@/constants/languages'
 import { OG_IMAGE } from '@/constants/og'
@@ -210,18 +212,68 @@ describe('alternateRefsOf', () => {
   })
 })
 
-describe('the journal addresses written in Rust', () => {
+const RUST_LANGUAGES = {
+  fr: 'Fr',
+  en: 'En',
+  es: 'Es'
+} as const satisfies Record<Language, string>
+
+const RUST_SITE_PAGES = [
+  { variant: 'Journal', page: 'journal' },
+  { variant: 'Ankama', page: 'ankama' },
+  { variant: 'Legal', page: 'legal' }
+] as const satisfies readonly { variant: string; page: PageId }[]
+
+type CaptureOfParams = Readonly<{
+  source: string
+  pattern: string
+}>
+
+const captureOf = ({ source, pattern }: CaptureOfParams) => {
+  return new RegExp(pattern, 'u').exec(source)?.groups?.captured
+}
+
+type SlugWrittenForParams = Readonly<{
+  links: string
+  variant: (typeof RUST_SITE_PAGES)[number]['variant']
+  language: Language
+}>
+
+const slugWrittenFor = ({ links, variant, language }: SlugWrittenForParams) => {
+  const arms = captureOf({
+    source: links,
+    pattern: `Self::${variant} => site_page\\(match language \\{(?<captured>[^}]*)\\}`
+  })
+
+  return captureOf({
+    source: arms ?? '',
+    pattern: `Language::${RUST_LANGUAGES[language]} => "(?<captured>[^"]*)"`
+  })
+}
+
+describe('the site addresses written in Rust', () => {
+  const links = readFileSync(LINKS_FILE, 'utf8')
+
+  it('starts from the host the site is served on', () => {
+    expect(
+      captureOf({
+        source: links,
+        pattern: 'const SITE_URL: &str = "(?<captured>[^"]+)"'
+      })
+    ).toBe(HOST)
+  })
+
+  it('joins the host and the page with a single slash', () => {
+    expect(links).toContain('format!("{SITE_URL}/{slug}")')
+  })
+
   it('match the pages the site serves, in the three languages', () => {
-    const links = readFileSync(LINKS_FILE, 'utf8')
+    for (const { variant, page } of RUST_SITE_PAGES) {
+      for (const language of LANGUAGES) {
+        const written = slugWrittenFor({ links, variant, language })
 
-    for (const language of LANGUAGES) {
-      const name = `JOURNAL_${language.toUpperCase()}_URL`
-      const written = new RegExp(
-        `const ${name}: &str = "(?<url>[^"]+)"`,
-        'u'
-      ).exec(links)?.groups?.url
-
-      expect(written).toBe(`${HOST}${pathOf({ page: 'journal', language })}`)
+        expect(written).toBe(pathOf({ page, language }).slice(1))
+      }
     }
   })
 })
