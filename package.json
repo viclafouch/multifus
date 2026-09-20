@@ -22,7 +22,7 @@
     "format:check": "oxfmt --check",
     "check": "pnpm run check:web && pnpm run check:rust",
     "check:web": "pnpm run format:check && pnpm run lint && turbo run check:web",
-    "check:rust": "turbo run check:rust",
+    "check:rust": "turbo run check:rust --filter @multifus/desktop",
     "prepare": "husky"
   },
   "devDependencies": {
