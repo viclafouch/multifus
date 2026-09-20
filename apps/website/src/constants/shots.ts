@@ -16,11 +16,11 @@ export const HOME_SHOT_ALT = msg`La fenêtre de Multifus, avec le menu des fonct
 
 export const MAC_SHOT = {
   src: macShot,
-  width: 1920,
-  height: 1080
+  width: 1400,
+  height: 980
 } as const satisfies Picture
 
-export const MAC_SHOT_ALT = msg`La fenêtre de Multifus sur Mac, par-dessus les clients Dofus Retro ouverts sur le bureau.`
+export const MAC_SHOT_ALT = msg`La fenêtre de Multifus sur Mac, avec le menu des fonctionnalités à gauche et quatre personnages connectés au centre.`
 
 export const WINDOWS_SHOT = {
   src: windowsShot,

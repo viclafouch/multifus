@@ -25,7 +25,7 @@ export const MacScreen = ({ page }: PageScreenProps) => {
 
   return (
     <>
-      <SystemStage page={page} shot={MAC_SHOT} alt={MAC_SHOT_ALT} />
+      <SystemStage page={page} shot={MAC_SHOT} alt={MAC_SHOT_ALT} isBare />
       {body === null ? null : <PageBody body={body} />}
       <Band className="reveal gap-7 pt-10 pb-20">
         <BandTitle>{i18n._(QUESTIONS_TITLE)}</BandTitle>

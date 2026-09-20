@@ -11,9 +11,15 @@ type SystemStageProps = Readonly<{
   page: PageId
   shot: Picture
   alt: MessageDescriptor
+  isBare?: boolean
 }>
 
-export const SystemStage = ({ page, shot, alt }: SystemStageProps) => {
+export const SystemStage = ({
+  page,
+  shot,
+  alt,
+  isBare = false
+}: SystemStageProps) => {
   return (
     <Band
       id={FOLD_ANCHOR}
@@ -24,7 +30,7 @@ export const SystemStage = ({ page, shot, alt }: SystemStageProps) => {
         <DownloadCall className="surface-4" />
       </div>
       <div className="unveil">
-        <AppShot shot={shot} alt={alt} />
+        <AppShot shot={shot} alt={alt} isBare={isBare} />
       </div>
     </Band>
   )

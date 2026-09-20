@@ -414,8 +414,8 @@ msgid "L’image de profil de l’auteur de Multifus."
 msgstr "L’image de profil de l’auteur de Multifus."
 
 #: src/constants/shots.ts
-msgid "La fenêtre de Multifus sur Mac, par-dessus les clients Dofus Retro ouverts sur le bureau."
-msgstr "La fenêtre de Multifus sur Mac, par-dessus les clients Dofus Retro ouverts sur le bureau."
+msgid "La fenêtre de Multifus sur Mac, avec le menu des fonctionnalités à gauche et quatre personnages connectés au centre."
+msgstr "La fenêtre de Multifus sur Mac, avec le menu des fonctionnalités à gauche et quatre personnages connectés au centre."
 
 #: src/constants/shots.ts
 msgid "La fenêtre de Multifus sur Windows, par-dessus les clients Dofus Retro, et la barre des tâches avec un bouton par personnage."
