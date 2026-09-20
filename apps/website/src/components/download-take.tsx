@@ -2,6 +2,7 @@ import { msg } from '@lingui/core/macro'
 import { useLingui } from '@lingui/react'
 import { Button } from '@multifus/retro'
 import { DownloadSimpleIcon } from '@phosphor-icons/react/dist/ssr/DownloadSimple'
+import { track } from '@vercel/analytics/react'
 import type { SystemId } from '@/@types/system'
 import { OutLink } from '@/components/out-link'
 import { SystemPick } from '@/components/system-pick'
@@ -10,6 +11,8 @@ import { SYSTEM_FLOORS, SYSTEM_PACKAGES } from '@/constants/systems'
 
 const PAST_TAKE = msg`Télécharger une version antérieure`
 
+const TAKE_EVENT = 'Download'
+
 type DownloadTakeProps = Readonly<{
   shown: SystemId
   onPick: (system: SystemId) => void
@@ -17,7 +20,16 @@ type DownloadTakeProps = Readonly<{
 
 export const DownloadTake = ({ shown, onPick }: DownloadTakeProps) => {
   const { i18n } = useLingui()
-  const takes = __RELEASE__?.packages ?? { macos: RELEASES, windows: RELEASES }
+  const release = __RELEASE__
+  const takes = release?.packages ?? { macos: RELEASES, windows: RELEASES }
+
+  const handleTake = () => {
+    if (release === null) {
+      return
+    }
+
+    track(TAKE_EVENT, { system: shown })
+  }
 
   return (
     <div className="flex flex-col items-start gap-5">
@@ -30,7 +42,7 @@ export const DownloadTake = ({ shown, onPick }: DownloadTakeProps) => {
           className="h-auto max-w-full py-3 text-center whitespace-normal"
           render={
             /* oxlint-disable-next-line control-has-associated-label -- Base UI puts the children of the Button in this link, which the rule reads as empty */
-            <a className="sighted" href={takes[shown]} />
+            <a className="sighted" href={takes[shown]} onClick={handleTake} />
           }
         >
           <DownloadSimpleIcon weight="bold" aria-hidden />

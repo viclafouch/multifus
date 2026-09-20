@@ -27,6 +27,7 @@
     "@phosphor-icons/react": "^2.1.10",
     "@tanstack/react-router": "^1.170.34",
     "@tanstack/react-start": "^1.168.51",
+    "@vercel/analytics": "^2.0.1",
     "react": "^19.3.0",
     "react-dom": "^19.3.0"
   },

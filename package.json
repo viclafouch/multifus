@@ -2,7 +2,7 @@
   "name": "multifus",
   "private": true,
   "description": "A multi-account window manager for Dofus Retro, on macOS and Windows.",
-  "homepage": "https://multifus.app",
+  "homepage": "https://www.multifus.app",
   "bugs": {
     "url": "https://github.com/viclafouch/multifus/issues"
   },

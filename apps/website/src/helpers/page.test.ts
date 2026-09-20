@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { HOST } from '@/constants/host'
 import { LANGUAGES } from '@/constants/languages'
 import { OG_IMAGE } from '@/constants/og'
 import { PAGES, PAGE_IDS } from '@/constants/pages'
@@ -175,15 +176,13 @@ describe('everyPage', () => {
 
 describe('alternateRefsOf', () => {
   it('names the three languages and the default', () => {
-    expect(
-      alternateRefsOf({ page: 'wheel', origin: 'https://multifus.app' })
-    ).toStrictEqual([
-      { hreflang: 'fr', href: 'https://multifus.app/roue-des-personnages' },
-      { hreflang: 'en', href: 'https://multifus.app/en/character-wheel' },
-      { hreflang: 'es', href: 'https://multifus.app/es/rueda-de-personajes' },
+    expect(alternateRefsOf({ page: 'wheel', origin: HOST })).toStrictEqual([
+      { hreflang: 'fr', href: `${HOST}/roue-des-personnages` },
+      { hreflang: 'en', href: `${HOST}/en/character-wheel` },
+      { hreflang: 'es', href: `${HOST}/es/rueda-de-personajes` },
       {
         hreflang: 'x-default',
-        href: 'https://multifus.app/roue-des-personnages'
+        href: `${HOST}/roue-des-personnages`
       }
     ])
   })
@@ -191,7 +190,7 @@ describe('alternateRefsOf', () => {
   it('sends the default to the French page', () => {
     const refs = alternateRefsOf({
       page: 'mac',
-      origin: 'https://multifus.app'
+      origin: HOST
     })
     const french = refs.find(({ hreflang }) => {
       return hreflang === 'fr'

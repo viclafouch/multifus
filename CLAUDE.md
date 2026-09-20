@@ -48,10 +48,11 @@ memories of Retro are thinner than you think, and this is not today's Dofus.
 
 ## Cost discipline
 
-Every service sits on a free tier and stays there: Vercel Hobby, Vercel Analytics
-inside its free quota, the Search Console, GitHub. A feature that asks for a bank
-card does not exist. Before anything that runs on a schedule or calls an API on a
-hot path, say out loud how many calls a month it costs at current traffic.
+The Vercel account is on the Pro plan, and Web Analytics with its custom events
+rides on that one bill. Every other service sits on a free tier and stays there:
+the Search Console, GitHub. A feature that adds a second bill does not exist.
+Before anything that runs on a schedule or calls an API on a hot path, say out
+loud how many calls a month it costs at current traffic.
 
 ## A note from Victor
 

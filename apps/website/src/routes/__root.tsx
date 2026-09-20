@@ -7,6 +7,7 @@ import {
   Scripts,
   useRouterState
 } from '@tanstack/react-router'
+import { Analytics } from '@vercel/analytics/react'
 import { INK } from '@/constants/ink'
 import { LANGUAGES, OPEN_GRAPH_LOCALES } from '@/constants/languages'
 import { AUTHOR_NAME } from '@/constants/site'
@@ -51,6 +52,7 @@ const RootDocument = () => {
         <I18nProvider i18n={SPEAKERS[language]}>
           <Outlet />
         </I18nProvider>
+        <Analytics />
         <Scripts />
       </body>
     </html>

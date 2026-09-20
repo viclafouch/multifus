@@ -2,7 +2,7 @@
 
 A multi-account window manager for Dofus Retro, on macOS and Windows.
 
-Downloads, features and documentation: [multifus.app](https://multifus.app).
+Downloads, features and documentation: [multifus.app](https://www.multifus.app).
 
 ## Architecture
 

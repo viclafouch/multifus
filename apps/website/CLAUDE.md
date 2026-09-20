@@ -1,8 +1,8 @@
 Le site.
 
-**Aucun service payant.** La règle le tient entier : Vercel en plan Hobby, Vercel
-Analytics dans son quota gratuit, la Search Console, et rien d'autre. Une
-fonctionnalité qui demande une carte bancaire n'existe pas.
+**Une seule facture.** Vercel est en plan Pro, et Vercel Analytics avec ses
+événements personnalisés tient dedans. Le reste est gratuit : la Search Console,
+et rien d'autre. Une fonctionnalité qui ajoute une facture n'existe pas.
 
 **Le téléphone d'abord.** Une mise en page se dessine et se vérifie en 390 px,
 puis on l'élargit à la tablette et au bureau.

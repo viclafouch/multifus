@@ -1,7 +1,7 @@
 import { inkedWith, RETRO_FONTS } from '@multifus/retro/draw'
+import { HOST } from '@/constants/host'
 import { INK } from '@/constants/ink'
 import { OG_HEIGHT, OG_WIDTH } from '@/constants/og'
-import { SITE_DOMAIN } from '@/constants/site'
 import { INDEPENDENCE, PAGE_NAMES, PAGE_PROMISES } from '@/constants/wording'
 import type { PathParams } from '@/helpers/page'
 import { SPEAKERS } from '@/lib/i18n'
@@ -22,6 +22,8 @@ const PLAIN = RETRO_FONTS.plain.name
 const GAME = 'DOFUS RETRO'
 
 const SYSTEMS = 'MACOS · WINDOWS'
+
+const SITE_DOMAIN = new URL(HOST).host
 
 const legendOf = (color: string) => {
   return {

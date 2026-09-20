@@ -5,6 +5,7 @@ import { SOURCE_ALIAS, SOURCE_PLUGINS } from '../vite.config.ts'
 
 const server = await createServer({
   configFile: false,
+  mode: 'production',
   root: path.join(import.meta.dirname, '..'),
   logLevel: 'warn',
   server: { middlewareMode: true },

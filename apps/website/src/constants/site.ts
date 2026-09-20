@@ -1,5 +1,3 @@
-export const SITE_DOMAIN = 'multifus.app'
-
 export const AUTHOR_LOGIN = 'viclafouch'
 
 export const REPOSITORY_PATH = `${AUTHOR_LOGIN}/multifus`
