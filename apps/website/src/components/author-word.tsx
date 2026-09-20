@@ -1,5 +1,7 @@
 import { msg } from '@lingui/core/macro'
 import { useLingui } from '@lingui/react'
+import { Trans } from '@lingui/react/macro'
+import { SmileyWinkIcon } from '@phosphor-icons/react/dist/ssr/SmileyWink'
 import authorFace from '@/assets/author.webp'
 import { OutLink } from '@/components/out-link'
 import { PageLink } from '@/components/page-link'
@@ -11,8 +13,6 @@ const FACE_SIDE = 256
 const AUTHOR_TRADE = msg`Développeur web depuis 10 ans`
 
 const AUTHOR_FACE_ALT = msg`L’image de profil de l’auteur de Multifus.`
-
-const AUTHOR_WORD = msg`Je fais du web depuis 10 ans, et je sais ce qu’on risque en installant un logiciel trouvé sur un Discord. Multifus ne voit jamais votre mot de passe, parce qu’il ne fait que ranger vos fenêtres de Dofus Retro. Son code est public, libre à vous d’aller le vérifier.`
 
 const SOURCE = msg`Voir le code`
 
@@ -38,7 +38,19 @@ export const AuthorWord = () => {
       </div>
       <div className="lede flex flex-col gap-9 pl-6 lg:pl-12">
         <p className="text-herald leading-snug text-cream sm:text-passage">
-          {i18n._(AUTHOR_WORD)}
+          <Trans>
+            « Je fais du web depuis 10 ans, et je sais que les joueurs ont peur
+            d’installer un logiciel qui vole nos identifiants. Multifus ne voit
+            jamais votre mot de passe, parce qu’il ne fait que ranger vos
+            fenêtres de Dofus Retro. Son code est public, libre à vous d’aller
+            le vérifier. Et non, ce n’est pas un projet vibe codé en 3 jours{' '}
+            <SmileyWinkIcon
+              weight="fill"
+              className="inline align-middle text-gold"
+              aria-hidden
+            />{' '}
+            »
+          </Trans>
         </p>
         <ul className="flex flex-wrap items-center gap-x-8 gap-y-3 text-aside">
           <li>

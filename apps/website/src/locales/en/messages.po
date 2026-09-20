@@ -17,6 +17,10 @@ msgstr ""
 msgid "« Achète anneau 30 pp, MP moi », « Bon jeu à toi », « Je reviens dans deux minutes »."
 msgstr "“Buying 30 pp ring, PM me”, “Have a good game”, “Back in two minutes”."
 
+#: src/components/author-word.tsx
+msgid "« Je fais du web depuis 10 ans, et je sais que les joueurs ont peur d’installer un logiciel qui vole nos identifiants. Multifus ne voit jamais votre mot de passe, parce qu’il ne fait que ranger vos fenêtres de Dofus Retro. Son code est public, libre à vous d’aller le vérifier. Et non, ce n’est pas un projet vibe codé en 3 jours <0/> »"
+msgstr "“I have been building for the web for 10 years, and I know players are afraid of installing software that steals our login details. Multifus never sees your password, because all it does is arrange your Dofus Retro windows. Its code is public, and you are free to go and check it. And no, it was not vibe coded in 3 days <0/>”"
+
 #. placeholder {0}: SYSTEM_VERSIONS.windows
 #: src/constants/systems.ts
 msgid "{0} ou plus récent"
@@ -352,10 +356,6 @@ msgstr "Images and videos © Ankama Games. Dofus Retro is a trademark of Ankama.
 #: src/screens/download-screen.tsx
 msgid "Installer, c’est trois gestes"
 msgstr "Installing takes three moves"
-
-#: src/components/author-word.tsx
-msgid "Je fais du web depuis 10 ans, et je sais ce qu’on risque en installant un logiciel trouvé sur un Discord. Multifus ne voit jamais votre mot de passe, parce qu’il ne fait que ranger vos fenêtres de Dofus Retro. Son code est public, libre à vous d’aller le vérifier."
-msgstr "I have been building for the web for 10 years, and I know what you risk when you install software you found on a Discord. Multifus never sees your password, because all it does is arrange your Dofus Retro windows. Its code is public, and you are free to go and check it."
 
 #: src/constants/questions.ts
 msgid "Je peux jouer combien de comptes ?"

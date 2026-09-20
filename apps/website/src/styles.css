@@ -10,6 +10,7 @@
 @theme inline {
   --color-leaf-lit: var(--leaf-lit);
   --color-amber: var(--amber);
+  --color-gold: var(--gold);
   --color-night: var(--night);
 
   --text-blazon: clamp(2.125rem, 4.4vw, 3.5rem);
