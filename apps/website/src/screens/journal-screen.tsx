@@ -33,10 +33,10 @@ export const JournalScreen = ({ page }: PageScreenProps) => {
 
   return (
     <>
-      <Band id={FOLD_ANCHOR} className="pt-12 pb-8">
+      <Band id={FOLD_ANCHOR} className="pt-rest-sm pb-8">
         <PageHead page={page} />
       </Band>
-      <Band className="reveal gap-8 pb-20">
+      <Band className="reveal gap-8 pb-rest-lg">
         {releases.length === 0 ? (
           <Prose isWide>{i18n._(NOTHING_YET)}</Prose>
         ) : null}

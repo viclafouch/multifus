@@ -38,7 +38,7 @@ export const WindowsScreen = ({ page }: PageScreenProps) => {
   return (
     <>
       <SystemStage page={page} shot={WINDOWS_SHOT} alt={WINDOWS_SHOT_ALT} />
-      <Band className="reveal gap-7 pt-4 pb-10">
+      <Band className="reveal gap-7 pt-4 pb-rest-xs">
         <BandTitle>{i18n._(FEATURES_TITLE)}</BandTitle>
         <ul className="mosaic">
           {MENU_FEATURES.map((feature) => {
@@ -50,17 +50,17 @@ export const WindowsScreen = ({ page }: PageScreenProps) => {
           })}
         </ul>
       </Band>
-      <Band className="reveal gap-7 py-10">
+      <Band className="reveal gap-7 py-rest-xs">
         <BandTitle>{i18n._(TASKBAR_TITLE)}</BandTitle>
         <Prose>{i18n._(TASKBAR_LEAD)}</Prose>
         <TaskbarProof />
       </Band>
-      <Band className="reveal gap-7 py-10">
+      <Band className="reveal gap-7 py-rest-xs">
         <BandTitle>{i18n._(KEYS_TITLE)}</BandTitle>
         <Prose>{i18n._(KEYS_LEAD)}</Prose>
         <CharacterKeys />
       </Band>
-      <Band className="reveal gap-7 pt-10 pb-20">
+      <Band className="reveal gap-7 pt-rest-xs pb-rest-lg">
         <BandTitle>{i18n._(QUESTIONS_TITLE)}</BandTitle>
         <ul className="grid items-start gap-4 md:grid-cols-2">
           <li className="reveal">

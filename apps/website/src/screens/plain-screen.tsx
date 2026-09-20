@@ -10,7 +10,7 @@ export const PlainScreen = ({ page }: PageScreenProps) => {
 
   return (
     <>
-      <Band id={FOLD_ANCHOR} className="pt-12 pb-8">
+      <Band id={FOLD_ANCHOR} className="pt-rest-sm pb-8">
         <PageHead page={page} />
       </Band>
       {kin.length === 0 ? null : <PageKin pages={kin} />}

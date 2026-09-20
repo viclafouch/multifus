@@ -8,7 +8,7 @@ export const LostScreen = () => {
 
   return (
     <SiteShell page="home">
-      <Band className="pt-12 pb-20">
+      <Band className="pt-rest-sm pb-rest-lg">
         <LostWord language={language} level={1} />
       </Band>
     </SiteShell>

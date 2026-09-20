@@ -11,10 +11,10 @@ const OFFERED = LANGUAGES.filter((language) => {
 export const LostTonguesScreen = () => {
   return (
     <SiteShell page="home">
-      <Band className="pt-12 pb-6">
+      <Band className="pt-rest-sm pb-6">
         <LostWord language={SOURCE_LANGUAGE} level={1} />
       </Band>
-      <Band className="grid gap-6 pt-4 pb-20 sm:grid-cols-2">
+      <Band className="grid gap-6 pt-4 pb-rest-lg sm:grid-cols-2">
         {OFFERED.map((language) => {
           return (
             <Plate key={language}>

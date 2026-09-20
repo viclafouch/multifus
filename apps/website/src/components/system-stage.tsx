@@ -23,7 +23,7 @@ export const SystemStage = ({
   return (
     <Band
       id={FOLD_ANCHOR}
-      className="marquee grid gap-x-12 gap-y-10 pt-12 pb-14"
+      className="marquee grid gap-x-12 gap-y-10 pt-rest-sm pb-rest"
     >
       <div className="flex flex-col gap-7">
         <PageHead page={page} />

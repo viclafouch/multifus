@@ -47,14 +47,14 @@ export const ComparisonScreen = ({ page }: PageScreenProps) => {
 
   return (
     <>
-      <Band id={FOLD_ANCHOR} className="pt-12 pb-2">
+      <Band id={FOLD_ANCHOR} className="pt-rest-sm pb-2">
         <PageHead page={page} />
       </Band>
-      <Band className="gap-7 pt-8 pb-10">
+      <Band className="gap-7 pt-8 pb-rest-xs">
         <Prose>{i18n._(HOW_READ)}</Prose>
         <RivalTable />
       </Band>
-      <Band className="reveal gap-10 py-10">
+      <Band className="reveal gap-10 py-rest-xs">
         <ProseBlock level={2} title={i18n._(MISSING_TITLE)}>
           <PointList points={MISSING_POINTS} />
         </ProseBlock>

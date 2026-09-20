@@ -32,6 +32,13 @@
   --spacing-lozenge: 46px;
   --spacing-thread: 9rem;
   --spacing-beacon: clamp(3.25rem, 7.5vw, 5.25rem);
+
+  --spacing-rest-xs: clamp(2rem, 3.9vw, 2.5rem);
+  --spacing-rest-sm: clamp(2rem, 4.7vw, 3rem);
+  --spacing-rest: clamp(2.25rem, 5.5vw, 3.5rem);
+  --spacing-rest-md: clamp(2.5rem, 6.25vw, 4rem);
+  --spacing-rest-lg: clamp(2.75rem, 7.8vw, 5rem);
+  --spacing-rest-xl: clamp(3rem, 9.4vw, 6rem);
 }
 
 @property --sweep {
@@ -59,12 +66,12 @@
   --field-rise: calc(var(--cell-rise) * 18);
 
   --lattice-in: calc(var(--fold) + 30rem);
-  --lattice-out: max(var(--lattice-in), calc(100% - 46rem));
+  --lattice-out: max(var(--lattice-in), calc(100% - 26rem));
   --lattice-stops:
     transparent 0, transparent var(--fold),
     rgb(0 0 0 / 0.4) calc(var(--fold) + 14rem), #000 var(--lattice-in),
-    #000 var(--lattice-out), rgb(0 0 0 / 0.3) calc(var(--lattice-out) + 20rem),
-    transparent calc(var(--lattice-out) + 34rem);
+    #000 var(--lattice-out), rgb(0 0 0 / 0.3) calc(100% - 10rem),
+    transparent 100%;
 }
 
 @layer base {

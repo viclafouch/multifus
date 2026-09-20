@@ -13,10 +13,10 @@ export const PageBody = ({ body }: PageBodyProps) => {
 
   return (
     <>
-      <Band className="pt-14 pb-8">
+      <Band className="pt-rest pb-8">
         <Opening>{i18n._(body.lead)}</Opening>
       </Band>
-      <Band className="reveal pt-8 pb-16">
+      <Band className="reveal pt-8 pb-rest-md">
         <ul className="grid gap-drop sm:grid-cols-2">
           {body.boons.map((boon) => {
             return <BoonCard key={i18n._(boon.title)} boon={boon} />

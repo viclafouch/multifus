@@ -11,15 +11,15 @@ type ShapeLook = Readonly<{
 
 const SHAPE_LOOKS = {
   stack: {
-    band: 'items-start gap-8 py-20',
+    band: 'items-start gap-8 py-rest-lg',
     text: 'items-start'
   },
   split: {
-    band: 'items-start gap-7 py-14 lg:flex-row lg:items-center lg:gap-14',
+    band: 'items-start gap-7 py-rest lg:flex-row lg:items-center lg:gap-14',
     text: 'items-start'
   },
   center: {
-    band: 'gap-6 py-12 lg:items-center lg:text-center',
+    band: 'gap-6 py-rest-sm lg:items-center lg:text-center',
     text: 'items-start lg:items-center'
   }
 } as const satisfies Record<SummonsShape, ShapeLook>

@@ -46,7 +46,7 @@ export const HomeScreen = (_props: PageScreenProps) => {
     <>
       <Band
         id={FOLD_ANCHOR}
-        className="marquee grid gap-x-12 gap-y-12 pt-12 pb-20"
+        className="marquee grid gap-x-12 gap-y-12 pt-rest-sm pb-rest-lg"
       >
         <div className="flex flex-col gap-8">
           <h1 className="surface-1 headline limelight max-w-lintel text-balance">
@@ -72,7 +72,7 @@ export const HomeScreen = (_props: PageScreenProps) => {
           <LoopPlate loop="home" isAuto />
         </div>
       </Band>
-      <Band className="reveal py-16">
+      <Band className="reveal py-rest-md">
         <BandTitle>{i18n._(FEATURES_TITLE)}</BandTitle>
         <Prose>{i18n._(FEATURES_LEAD)}</Prose>
         <ul className="mosaic">
@@ -85,11 +85,11 @@ export const HomeScreen = (_props: PageScreenProps) => {
           })}
         </ul>
       </Band>
-      <Band className="reveal gap-10 py-20">
+      <Band className="reveal gap-10 py-rest-lg">
         <BandTitle>{i18n._(TRUST_TITLE)}</BandTitle>
         <AuthorWord />
       </Band>
-      <Band className="reveal py-16">
+      <Band className="reveal py-rest-md">
         <PlateBlock title={i18n._(LIMITS_TITLE)}>
           <BotBan />
           <Prose>{i18n._(NO_HARM)}</Prose>
@@ -106,7 +106,7 @@ export const HomeScreen = (_props: PageScreenProps) => {
           </div>
         </PlateBlock>
       </Band>
-      <Band className="reveal pt-16 pb-24">
+      <Band className="reveal pt-rest-md pb-rest-xl">
         <BandTitle>{i18n._(COMPARISON_TITLE)}</BandTitle>
         <Prose>{i18n._(COMPARISON_LEAD)}</Prose>
         <RivalPeek />

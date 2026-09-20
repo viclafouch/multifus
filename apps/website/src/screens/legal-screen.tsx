@@ -33,10 +33,10 @@ export const LegalScreen = ({ page }: PageScreenProps) => {
 
   return (
     <>
-      <Band id={FOLD_ANCHOR} className="pt-12 pb-8">
+      <Band id={FOLD_ANCHOR} className="pt-rest-sm pb-8">
         <PageHead page={page} />
       </Band>
-      <Band className="reveal gap-8 pb-20">
+      <Band className="reveal gap-8 pb-rest-lg">
         <ProseBlock level={2} title={i18n._(PUBLISHER_TITLE)}>
           <Prose isWide>
             <Trans>

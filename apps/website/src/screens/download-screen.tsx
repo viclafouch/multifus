@@ -43,7 +43,7 @@ export const DownloadScreen = ({ page }: PageScreenProps) => {
     <>
       <Band
         id={FOLD_ANCHOR}
-        className="marquee grid gap-x-12 gap-y-10 pt-12 pb-16"
+        className="marquee grid gap-x-12 gap-y-10 pt-rest-sm pb-rest-md"
       >
         <div className="flex flex-col gap-7">
           <PageHead page={page} />
@@ -58,12 +58,12 @@ export const DownloadScreen = ({ page }: PageScreenProps) => {
           <AppShot shot={HOME_SHOT} alt={HOME_SHOT_ALT} />
         </div>
       </Band>
-      <Band className="reveal py-14">
+      <Band className="reveal py-rest">
         <BandTitle>{i18n._(MOVES_TITLE)}</BandTitle>
         <Prose>{i18n._(MOVES_LEAD)}</Prose>
         <InstallSteps key={shown} system={shown} />
       </Band>
-      <Band className="reveal py-10">
+      <Band className="reveal py-rest-xs">
         <Plate isBare className="flex-row items-start gap-6 sm:p-8">
           <span className="rosette">
             <CompassIcon weight="duotone" aria-hidden />
@@ -74,7 +74,7 @@ export const DownloadScreen = ({ page }: PageScreenProps) => {
           </span>
         </Plate>
       </Band>
-      <Band className="reveal py-14">
+      <Band className="reveal py-rest">
         <BandTitle>{i18n._(QUESTIONS_TITLE)}</BandTitle>
         <ul className="grid items-start gap-4 md:grid-cols-2">
           <li className="reveal">

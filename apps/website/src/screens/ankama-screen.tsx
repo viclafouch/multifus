@@ -32,10 +32,10 @@ export const AnkamaScreen = ({ page }: PageScreenProps) => {
 
   return (
     <>
-      <Band id={FOLD_ANCHOR} className="pt-12 pb-2">
+      <Band id={FOLD_ANCHOR} className="pt-rest-sm pb-2">
         <PageHead page={page} />
       </Band>
-      <Band className="gap-7 pt-8 pb-10">
+      <Band className="gap-7 pt-8 pb-rest-xs">
         <BandTitle>{i18n._(RULES_TITLE)}</BandTitle>
         <ul className="surface-4 grid gap-drop md:grid-cols-2">
           {ANKAMA_RULES.map((rule) => {
@@ -43,7 +43,7 @@ export const AnkamaScreen = ({ page }: PageScreenProps) => {
           })}
         </ul>
       </Band>
-      <Band className="reveal gap-7 py-10">
+      <Band className="reveal gap-7 py-rest-xs">
         <BandTitle>{i18n._(SOURCES_TITLE)}</BandTitle>
         <Prose>{i18n._(SOURCES_LEAD)}</Prose>
         <ul className="grid gap-drop md:grid-cols-2 md:grid-rows-[auto_auto]">
@@ -52,7 +52,7 @@ export const AnkamaScreen = ({ page }: PageScreenProps) => {
           })}
         </ul>
       </Band>
-      <Band className="reveal gap-10 pt-10 pb-12">
+      <Band className="reveal gap-10 pt-rest-xs pb-rest-sm">
         <PlateBlock title={i18n._(LIMIT_TITLE)}>
           <PointList points={ANKAMA_LIMIT} />
         </PlateBlock>

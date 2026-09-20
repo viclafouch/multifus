@@ -15,11 +15,11 @@ export const FeatureScreen = ({ page }: PageScreenProps) => {
   return (
     <>
       {loop === null ? (
-        <Band id={FOLD_ANCHOR} className="pt-12 pb-2">
+        <Band id={FOLD_ANCHOR} className="pt-rest-sm pb-2">
           <PageHead page={page} />
         </Band>
       ) : (
-        <Band id={FOLD_ANCHOR} className="pt-10 pb-0">
+        <Band id={FOLD_ANCHOR} className="pt-rest-xs pb-0">
           <FeatureStage page={page} loop={loop} />
         </Band>
       )}
