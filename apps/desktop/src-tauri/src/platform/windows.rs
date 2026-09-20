@@ -695,7 +695,7 @@ pub fn matches_windows_eleven() -> bool {
 }
 
 fn taskbar_honours_glom_level(build: u32) -> bool {
-    build < FIRST_WINDOWS_ELEVEN_BUILD || build >= FIRST_BUILD_HONOURING_GLOM_LEVEL
+    !(FIRST_WINDOWS_ELEVEN_BUILD..FIRST_BUILD_HONOURING_GLOM_LEVEL).contains(&build)
 }
 
 fn taskbar_glom_level() -> Option<u32> {
