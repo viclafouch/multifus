@@ -39,15 +39,7 @@ use crate::platform::PlatformError;
 use crate::platform::WindowId;
 
 struct MenuWords {
-    characters: &'static str,
-    shortcuts: &'static str,
-    quick_texts: &'static str,
-    auto_focus_screen: &'static str,
-    walk_screen: &'static str,
-    rune_table_screen: &'static str,
-    relay: &'static str,
-    settings: &'static str,
-    about: &'static str,
+    open: &'static str,
     quit: &'static str,
     nobody: &'static str,
     excluded: &'static str,
@@ -59,8 +51,6 @@ struct MenuWords {
     rune_table_on: &'static str,
     rune_table_off: &'static str,
     rune_table_home: &'static str,
-    wake_minimized: &'static str,
-    leave_minimized: &'static str,
     relay_setup: &'static str,
     relay_on: &'static str,
     relay_off: &'static str,
@@ -71,15 +61,7 @@ struct MenuWords {
 }
 
 const FRENCH_MENU: MenuWords = MenuWords {
-    characters: "Personnages",
-    shortcuts: "Raccourcis",
-    quick_texts: "Textes rapides",
-    auto_focus_screen: "AutoFocus",
-    walk_screen: "Déplacement rapide",
-    rune_table_screen: "Tableau des runes",
-    relay: "Messages privés",
-    settings: "Paramètres",
-    about: "À propos",
+    open: "Ouvrir Multifus",
     quit: "Quitter Multifus",
     nobody: "Aucun personnage connecté",
     excluded: " (exclu)",
@@ -91,8 +73,6 @@ const FRENCH_MENU: MenuWords = MenuWords {
     rune_table_on: "Montrer le tableau des runes",
     rune_table_off: "Cacher le tableau des runes",
     rune_table_home: "Remettre le tableau à sa position initiale",
-    wake_minimized: "Aller chercher les fenêtres réduites",
-    leave_minimized: "Laisser les fenêtres réduites",
     relay_setup: "Configurer les messages privés…",
     relay_on: "Recevoir mes messages privés",
     relay_off: "Ne plus les recevoir",
@@ -107,15 +87,7 @@ const FRENCH_MENU: MenuWords = MenuWords {
 };
 
 const ENGLISH_MENU: MenuWords = MenuWords {
-    characters: "Characters",
-    shortcuts: "Shortcuts",
-    quick_texts: "Quick texts",
-    auto_focus_screen: "AutoFocus",
-    walk_screen: "Quick move",
-    rune_table_screen: "Rune table",
-    relay: "Private messages",
-    settings: "Settings",
-    about: "About",
+    open: "Open Multifus",
     quit: "Quit Multifus",
     nobody: "Nobody online",
     excluded: " (set aside)",
@@ -127,8 +99,6 @@ const ENGLISH_MENU: MenuWords = MenuWords {
     rune_table_on: "Show the rune table",
     rune_table_off: "Hide the rune table",
     rune_table_home: "Put the table back where it started",
-    wake_minimized: "Go and fetch minimized windows",
-    leave_minimized: "Leave minimized windows alone",
     relay_setup: "Set up private messages…",
     relay_on: "Get my private messages",
     relay_off: "Stop getting them",
@@ -143,15 +113,7 @@ const ENGLISH_MENU: MenuWords = MenuWords {
 };
 
 const SPANISH_MENU: MenuWords = MenuWords {
-    characters: "Personajes",
-    shortcuts: "Atajos",
-    quick_texts: "Textos rápidos",
-    auto_focus_screen: "AutoFocus",
-    walk_screen: "Movimiento rápido",
-    rune_table_screen: "Tabla de runas",
-    relay: "Mensajes privados",
-    settings: "Ajustes",
-    about: "Acerca de",
+    open: "Abrir Multifus",
     quit: "Salir de Multifus",
     nobody: "Ningún personaje conectado",
     excluded: " (apartado)",
@@ -163,8 +125,6 @@ const SPANISH_MENU: MenuWords = MenuWords {
     rune_table_on: "Mostrar la tabla de runas",
     rune_table_off: "Ocultar la tabla de runas",
     rune_table_home: "Devolver la tabla a su posición inicial",
-    wake_minimized: "Ir a buscar las ventanas minimizadas",
-    leave_minimized: "Dejar las ventanas minimizadas",
     relay_setup: "Configurar los mensajes privados…",
     relay_on: "Recibir mis mensajes privados",
     relay_off: "Dejar de recibirlos",
@@ -196,7 +156,7 @@ fn update_label(version: &str, language: Language) -> String {
 
 const TRAY_ID: &str = "multifus";
 
-const SCREEN_PREFIX: &str = "multifus://screen/";
+const OPEN_ID: &str = "multifus://open";
 
 const QUIT_ID: &str = "multifus://quit";
 
@@ -211,8 +171,6 @@ const WALK_ID: &str = "multifus://walk";
 const RUNE_TABLE_ID: &str = "multifus://rune-table";
 
 const RUNE_TABLE_HOME_ID: &str = "multifus://rune-table-home";
-
-const WAKE_MINIMIZED_ID: &str = "multifus://wake-minimized";
 
 const UPDATE_ID: &str = "multifus://update";
 
@@ -246,7 +204,6 @@ struct Contents {
     auto_focus: bool,
     walk: bool,
     rune_table: bool,
-    wakes_minimized: bool,
     granted: bool,
     update: Option<String>,
     relay: RelayItem,
@@ -286,7 +243,6 @@ fn contents(state: &Multifus) -> Contents {
         auto_focus: state.is_auto_focus_enabled(),
         walk: state.is_walk_enabled(),
         rune_table: state.is_rune_table_open(),
-        wakes_minimized: state.wakes_minimized(),
         granted: state.is_granted(),
         update: state.available_update(),
         relay: relay_item(state),
@@ -487,18 +443,6 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
 
     menu.append(&MenuItem::with_id(
         app,
-        WAKE_MINIMIZED_ID,
-        switch_label(
-            contents.wakes_minimized,
-            words.leave_minimized,
-            words.wake_minimized,
-        ),
-        true,
-        None::<&str>,
-    )?)?;
-
-    menu.append(&MenuItem::with_id(
-        app,
         RELAY_ID,
         relay_label(contents.relay, contents.language),
         true,
@@ -507,15 +451,13 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
 
     menu.append(&PredefinedMenuItem::separator(app)?)?;
 
-    for screen in Screen::ALL {
-        menu.append(&MenuItem::with_id(
-            app,
-            format!("{SCREEN_PREFIX}{}", screen_id(screen)),
-            screen_label(screen, contents.language),
-            true,
-            None::<&str>,
-        )?)?;
-    }
+    menu.append(&MenuItem::with_id(
+        app,
+        OPEN_ID,
+        words.open,
+        true,
+        None::<&str>,
+    )?)?;
 
     menu.append(&MenuItem::with_id(
         app,
@@ -579,12 +521,7 @@ fn on_menu_event(app: &AppHandle, event: MenuEvent) {
         return;
     }
 
-    if let Some(name) = id.strip_prefix(SCREEN_PREFIX) {
-        let Some(screen) = screen_of(name) else {
-            return;
-        };
-
-        runtime::navigate(app, screen);
+    if id == OPEN_ID {
         main_window::show(app);
 
         return;
@@ -630,14 +567,6 @@ fn on_menu_event(app: &AppHandle, event: MenuEvent) {
         return;
     }
 
-    if id == WAKE_MINIMIZED_ID {
-        lock(app).toggle_wakes_minimized();
-
-        runtime::emit_snapshot(app);
-
-        return;
-    }
-
     if id == RELAY_ID {
         if lock(app).is_relay_ready() {
             relay::run::toggle(app);
@@ -679,42 +608,6 @@ fn hand_over(app: &AppHandle, work: TrayWork) {
 
 fn switch_label(on: bool, undo: &'static str, redo: &'static str) -> &'static str {
     if on { undo } else { redo }
-}
-
-fn screen_id(screen: Screen) -> &'static str {
-    match screen {
-        Screen::Characters => "characters",
-        Screen::Shortcuts => "shortcuts",
-        Screen::QuickTexts => "quickTexts",
-        Screen::AutoFocus => "autoFocus",
-        Screen::Walk => "walk",
-        Screen::RuneTable => "runeTable",
-        Screen::Relay => "relay",
-        Screen::Settings => "settings",
-        Screen::About => "about",
-    }
-}
-
-fn screen_of(name: &str) -> Option<Screen> {
-    Screen::ALL
-        .into_iter()
-        .find(|screen| screen_id(*screen) == name)
-}
-
-fn screen_label(screen: Screen, language: Language) -> &'static str {
-    let words = words(language);
-
-    match screen {
-        Screen::Characters => words.characters,
-        Screen::Shortcuts => words.shortcuts,
-        Screen::QuickTexts => words.quick_texts,
-        Screen::AutoFocus => words.auto_focus_screen,
-        Screen::Walk => words.walk_screen,
-        Screen::RuneTable => words.rune_table_screen,
-        Screen::Relay => words.relay,
-        Screen::Settings => words.settings,
-        Screen::About => words.about,
-    }
 }
 
 fn start_worker(app: &AppHandle) {
@@ -941,34 +834,17 @@ mod tests {
             "Activer le Déplacement rapide"
         );
         assert_eq!(
-            switch_label(true, french.leave_minimized, french.wake_minimized),
-            "Laisser les fenêtres réduites"
+            switch_label(true, french.rune_table_off, french.rune_table_on),
+            "Cacher le tableau des runes"
         );
     }
 
     #[test]
-    fn every_screen_of_the_rail_is_named_once_in_the_menu_and_read_back() {
-        for screen in Screen::ALL {
-            assert_eq!(screen_of(screen_id(screen)), Some(screen));
-        }
+    fn the_menu_offers_the_window_in_every_language() {
+        let labels = Language::ALL.map(|language| words(language).open);
 
-        let ids = Screen::ALL.map(screen_id);
-
-        assert_eq!(ids.len(), ids.iter().collect::<HashSet<_>>().len());
-
-        for language in Language::ALL {
-            let labels = Screen::ALL.map(|screen| screen_label(screen, language));
-
-            assert!(labels.iter().all(|label| !label.is_empty()));
-            assert_eq!(labels.len(), labels.iter().collect::<HashSet<_>>().len());
-        }
-    }
-
-    #[test]
-    fn a_menu_line_that_names_no_screen_takes_the_window_nowhere() {
-        assert_eq!(screen_of("journal"), None);
-        assert_eq!(screen_of(""), None);
-        assert_eq!(screen_of("Characters"), None);
+        assert!(labels.iter().all(|label| !label.is_empty()));
+        assert_eq!(labels.len(), labels.iter().collect::<HashSet<_>>().len());
     }
 
     #[test]
@@ -1007,7 +883,6 @@ mod tests {
             auto_focus: true,
             walk: false,
             rune_table: false,
-            wakes_minimized: true,
             granted: true,
             update: None,
             relay: RelayItem::NotReady,
@@ -1031,7 +906,6 @@ mod tests {
             auto_focus: true,
             walk: false,
             rune_table: false,
-            wakes_minimized: true,
             granted: true,
             update: None,
             relay: RelayItem::NotReady,

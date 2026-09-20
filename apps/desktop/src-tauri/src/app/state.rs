@@ -1200,15 +1200,6 @@ impl Multifus {
         self.set_auto_focus_enabled(!self.settings.auto_focus.enabled, Surface::Tray);
     }
 
-    #[must_use]
-    pub fn wakes_minimized(&self) -> bool {
-        self.settings.auto_focus.wakes_minimized
-    }
-
-    pub fn toggle_wakes_minimized(&mut self) {
-        self.set_wakes_minimized(!self.settings.auto_focus.wakes_minimized, Surface::Tray);
-    }
-
     pub fn reset(&mut self) {
         self.settings = Settings::default();
         self.windows.clear();
