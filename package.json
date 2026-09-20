@@ -20,7 +20,9 @@
     "lint:fix": "oxlint --fix && oxfmt",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
-    "check": "pnpm run format:check && pnpm run lint && turbo run check",
+    "check": "pnpm run check:web && pnpm run check:rust",
+    "check:web": "pnpm run format:check && pnpm run lint && turbo run check",
+    "check:rust": "turbo run check:rust",
     "prepare": "husky"
   },
   "devDependencies": {

@@ -8,6 +8,9 @@
     "typecheck": {},
     "test": {},
     "i18n:check": {},
-    "check": {}
+    "check": {},
+    "check:rust": {
+      "dependsOn": ["build"]
+    }
   }
 }
