@@ -11,7 +11,6 @@
 - [ ] Poser le crochet de déploiement Vercel dans le workflow `release`, après la publication
 - [ ] Brancher `/journal` sur `apps/desktop/CHANGELOG.md`, que la première release écrira
 - [ ] Ouvrir `/journal` depuis À propos, et trancher si le panneau de mise à jour y renvoie
-- [ ] Déclarer le site à la Search Console et y déposer le sitemap
 - [ ] Porter `softwareVersion` et `releaseNotes` dans le `SoftwareApplication`, une fois `/journal` branché
 - [ ] Retirer `scripts/tidy-build.mjs` le jour où cet espace de noms est corrigé en amont
 - [ ] Passer les pages au Rich Results Test, à `validator.schema.org` et à un valideur de sitemap, une fois en ligne

@@ -12,6 +12,7 @@ export const SiteWorld = ({ decor }: SiteWorldProps) => {
         alt=""
         width={decor.width}
         height={decor.height}
+        fetchPriority="high"
         className="decor size-full object-cover"
       />
       <div className="gloam absolute inset-0" />

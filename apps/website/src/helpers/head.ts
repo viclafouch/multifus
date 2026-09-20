@@ -26,8 +26,7 @@ const alternatesOf = (page: PageId) => {
 
 const POSTER_PRELOAD = {
   rel: 'preload',
-  as: 'image',
-  fetchPriority: 'high'
+  as: 'image'
 } as const
 
 const posterOf = (page: PageId) => {
