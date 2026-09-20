@@ -59,6 +59,10 @@ msgstr "Ankama ne répond pas de Multifus."
 msgid "Ankama peut changer d’avis. Ce jour-là, Multifus s’arrête."
 msgstr "Ankama peut changer d’avis. Ce jour-là, Multifus s’arrête."
 
+#: src/constants/wording.ts
+msgid "Ankama tolère-t-il Multifus ?"
+msgstr "Ankama tolère-t-il Multifus ?"
+
 #: src/constants/bodies.ts
 msgid "Apple a vérifié le fichier"
 msgstr "Apple a vérifié le fichier"
@@ -677,6 +681,10 @@ msgstr "Logiciel multicompte gratuit pour Dofus Retro"
 msgid "Masquer cette proposition"
 msgstr "Masquer cette proposition"
 
+#: src/constants/wording.ts
+msgid "Me contacter"
+msgstr "Me contacter"
+
 #: src/constants/bodies.ts
 msgid "Même au maximum de transparence, le tableau reste lisible."
 msgstr "Même au maximum de transparence, le tableau reste lisible."
@@ -732,10 +740,6 @@ msgstr "Multifus est publié par <0>viclafouch</0>, un particulier, à titre per
 #: src/screens/home-screen.tsx
 msgid "Multifus est sûr, et ça se vérifie"
 msgstr "Multifus est sûr, et ça se vérifie"
-
-#: src/constants/wording.ts
-msgid "Multifus est-il autorisé ?"
-msgstr "Multifus est-il autorisé ?"
 
 #: src/constants/wording.ts
 msgid "Multifus et les autres gestionnaires, ligne par ligne."
@@ -831,8 +835,8 @@ msgid "nouvel onglet"
 msgstr "nouvel onglet"
 
 #: src/screens/legal-screen.tsx
-msgid "On l’écrit à <0>{AUTHOR_MAIL}</0>, ou sur son <1>compte X</1>. C’est par là que passent une erreur du comparatif et une faute de traduction."
-msgstr "On l’écrit à <0>{AUTHOR_MAIL}</0>, ou sur son <1>compte X</1>. C’est par là que passent une erreur du comparatif et une faute de traduction."
+msgid "On lui écrit sur son <0>compte X</0>, et nulle part ailleurs. C’est par là que passent une erreur du comparatif et une faute de traduction."
+msgstr "On lui écrit sur son <0>compte X</0>, et nulle part ailleurs. C’est par là que passent une erreur du comparatif et une faute de traduction."
 
 #: src/constants/bodies.ts
 msgid "On vous écrit pour un craft, vous le savez tout de suite, et la commande ne part pas chez un autre artisan."
@@ -1025,6 +1029,10 @@ msgstr "Six mécanismes, une seule installation"
 #: src/screens/download-screen.tsx
 msgid "Suivez les trois lignes de votre ordinateur. Il n’y a rien d’autre à faire."
 msgstr "Suivez les trois lignes de votre ordinateur. Il n’y a rien d’autre à faire."
+
+#: src/constants/wording.ts
+msgid "Support"
+msgstr "Support"
 
 #: src/constants/rivals.ts
 msgid "Sur Mac"

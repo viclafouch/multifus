@@ -12,7 +12,7 @@
 - [ ] Descendre le LCP mobile sous 2,5 s, mesuré à 4,2 s : la boucle d'accueil tire 780 Ko avant lui, et les posters happés par la marge du chargement différé 530 Ko
 - [ ] Passer les pages au Rich Results Test, à `validator.schema.org` et à un valideur de sitemap, une fois en ligne
 - [ ] Ouvrir le site dans Firefox, qui ne connaît pas `animation-timeline` : les replis n'ont jamais tourné
-- [ ] Repasser le site en ligne sur l'adresse réelle et sur un téléphone : icônes, `robots.txt`, 404
+- [ ] Ouvrir le site en ligne sur un téléphone : l'icône posée sur l'écran d'accueil, la mise en page en 390 px, la taille des cibles tactiles
 
 La paire de clés de l'updater existe déjà, dans `~/.tauri/multifus.key` et son
 `.pub`, et sa moitié publique est le champ `plugins.updater.pubkey` de

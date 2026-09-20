@@ -3,7 +3,7 @@ import { I18nProvider } from '@lingui/react'
 import { cleanup, screen } from '@testing-library/react'
 import type { Language } from '@/@types/language'
 import { SiteFooter } from '@/components/site-footer'
-import { LANGUAGES } from '@/constants/languages'
+import { LANGUAGE_NAMES, LANGUAGES } from '@/constants/languages'
 import { PAGE_IDS } from '@/constants/pages'
 import { PAGE_NAMES } from '@/constants/wording'
 import { pathOf } from '@/helpers/page'
@@ -15,7 +15,7 @@ const show = (language: Language) => {
     at: pathOf({ page: 'home', language }),
     children: (
       <I18nProvider i18n={SPEAKERS[language]}>
-        <SiteFooter />
+        <SiteFooter page="home" />
       </I18nProvider>
     )
   })
@@ -55,6 +55,18 @@ describe('the site footer', () => {
 
     for (const title of ['Les fonctionnalités', 'Le logiciel', 'Le projet']) {
       expect(screen.getByRole('navigation', { name: title })).toBeDefined()
+    }
+  })
+
+  it('offers the three languages on the page being read', () => {
+    show('fr')
+
+    for (const language of LANGUAGES) {
+      expect(
+        screen
+          .getByRole('link', { name: LANGUAGE_NAMES[language] })
+          .getAttribute('href')
+      ).toBe(pathOf({ page: 'home', language }))
     }
   })
 

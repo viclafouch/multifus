@@ -57,9 +57,12 @@ export const HomeScreen = (_props: PageScreenProps) => {
             <Trans>
               Multifus amène devant vous la fenêtre du personnage qui joue sur
               Dofus Retro,{' '}
-              <span className="underline decoration-leaf-lit decoration-2 underline-offset-4">
+              <PageLink
+                page="ankama"
+                className="underline decoration-leaf-lit decoration-2 underline-offset-4"
+              >
                 dans le respect des règles d’Ankama
-              </span>
+              </PageLink>
               .
             </Trans>
           </p>

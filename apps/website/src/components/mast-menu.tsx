@@ -6,7 +6,6 @@ import { ListIcon } from '@phosphor-icons/react/dist/ssr/List'
 import { XIcon } from '@phosphor-icons/react/dist/ssr/X'
 import type { PageId } from '@/@types/page'
 import { BrandMark } from '@/components/brand-mark'
-import { LanguageNav } from '@/components/language-nav'
 import { PageLink } from '@/components/page-link'
 import { PageNav } from '@/components/page-nav'
 import { MENU_FEATURES, PROJECT_PAGES, SOFTWARE_PAGES } from '@/constants/pages'
@@ -81,7 +80,6 @@ export const MastMenu = ({ page }: MastMenuProps) => {
           <PageNav title={FEATURES_TITLE} pages={MENU_FEATURES} onGo={close} />
           <PageNav title={SOFTWARE_TITLE} pages={SOFTWARE_PAGES} onGo={close} />
           <PageNav title={PROJECT_TITLE} pages={PROJECT_PAGES} onGo={close} />
-          <LanguageNav page={page} onGo={close} />
         </div>
       </dialog>
     </>

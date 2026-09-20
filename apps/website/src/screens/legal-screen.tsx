@@ -11,10 +11,8 @@ import {
   ANKAMA,
   AUTHOR,
   AUTHOR_CODE,
-  AUTHOR_MAIL,
   FOLD_ANCHOR,
   GAME,
-  MAIL_SCHEME,
   REPOSITORY,
   VERCEL,
   VERCEL_ADDRESS,
@@ -53,16 +51,12 @@ export const LegalScreen = ({ page }: PageScreenProps) => {
           </Prose>
           <Prose isWide>
             <Trans>
-              On l’écrit à{' '}
-              <OutLink isInline href={`${MAIL_SCHEME}${AUTHOR_MAIL}`}>
-                {AUTHOR_MAIL}
-              </OutLink>
-              , ou sur son{' '}
+              On lui écrit sur son{' '}
               <OutLink isInline href={AUTHOR}>
                 compte X
               </OutLink>
-              . C’est par là que passent une erreur du comparatif et une faute
-              de traduction.
+              , et nulle part ailleurs. C’est par là que passent une erreur du
+              comparatif et une faute de traduction.
             </Trans>
           </Prose>
           <Prose isWide>

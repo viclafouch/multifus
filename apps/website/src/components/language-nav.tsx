@@ -6,10 +6,9 @@ import { TONGUES_TITLE } from '@/constants/wording'
 
 type LanguageNavProps = Readonly<{
   page: PageId
-  onGo?: () => void
 }>
 
-export const LanguageNav = ({ page, onGo }: LanguageNavProps) => {
+export const LanguageNav = ({ page }: LanguageNavProps) => {
   return (
     <NavGroup title={TONGUES_TITLE}>
       {LANGUAGES.map((language) => {
@@ -23,7 +22,6 @@ export const LanguageNav = ({ page, onGo }: LanguageNavProps) => {
               isBare
               hrefLang={language}
               lang={language}
-              onClick={onGo}
               className="stud sighted"
             >
               {name}

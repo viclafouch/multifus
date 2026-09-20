@@ -16,7 +16,7 @@ export const PAGE_NAMES = {
   comparison: msg`Comparatif`,
   download: msg`Télécharger`,
   journal: msg`Journal des versions`,
-  ankama: msg`Multifus est-il autorisé ?`,
+  ankama: msg`Ankama tolère-t-il Multifus ?`,
   legal: msg`Mentions légales`
 } as const satisfies Record<PageId, MessageDescriptor>
 
@@ -92,6 +92,8 @@ export const TONGUES_TITLE = msg`La langue du site`
 
 export const FEATURES_TAB = msg`Fonctionnalités`
 
+export const SUPPORT_TAB = msg`Support`
+
 export const FEATURES_TITLE = msg`Les fonctionnalités`
 
 export const SOFTWARE_TITLE = msg`Le logiciel`
@@ -105,6 +107,8 @@ export const QUESTIONS_TITLE = msg`Les questions qu’on se pose`
 export const NO_HARM = msg`Multifus ne lit pas la mémoire du jeu, ne touche à aucun de ses fichiers, et ne joue à votre place sur aucun personnage.`
 
 export const BEFORE_INSTALL = msg`Avant d’installer`
+
+export const CONTACT_AUTHOR = msg`Me contacter`
 
 export const PERKS = [
   msg`Gratuit`,

@@ -2,7 +2,7 @@
 name = "multifus"
 version = "0.1.0"
 description = "Gestionnaire de fenêtres Dofus Retro en multicompte, macOS et Windows."
-authors = ["Victor de la Fouchardiere <victor.delafouchardiere@gmail.com>"]
+authors = ["Victor de la Fouchardiere"]
 license = "MIT"
 repository = "https://github.com/viclafouch/multifus"
 edition = "2024"

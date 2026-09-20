@@ -36,7 +36,7 @@ export const SiteShell = ({ page, children }: SiteShellProps) => {
       >
         {children}
       </main>
-      <SiteFooter />
+      <SiteFooter page={page} />
     </div>
   )
 }

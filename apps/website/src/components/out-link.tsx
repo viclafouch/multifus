@@ -3,7 +3,6 @@ import { msg } from '@lingui/core/macro'
 import { useLingui } from '@lingui/react'
 import { cn } from '@multifus/retro'
 import { ArrowUpRightIcon } from '@phosphor-icons/react/dist/ssr/ArrowUpRight'
-import { MAIL_SCHEME } from '@/constants/site'
 
 const NEW_TAB_HINT = msg`nouvel onglet`
 
@@ -12,28 +11,29 @@ const NEW_TAB = {
   rel: 'noopener'
 } as const satisfies Pick<React.ComponentProps<'a'>, 'rel' | 'target'>
 
-type OutLinkProps = Readonly<{
-  href: string
-  children: React.ReactNode
-  className?: string
-  isInline?: boolean
-  isBare?: boolean
-}>
+type OutLinkProps = Readonly<
+  Omit<React.ComponentProps<'a'>, 'href' | 'rel' | 'target'> & {
+    href: string
+    isInline?: boolean
+    isBare?: boolean
+  }
+>
 
 export const OutLink = ({
   href,
   children,
   className,
   isInline = false,
-  isBare = false
+  isBare = false,
+  ...rest
 }: OutLinkProps) => {
   const { i18n } = useLingui()
-  const isMailed = href.startsWith(MAIL_SCHEME)
 
   return (
     <a
+      {...rest}
       href={href}
-      {...(isMailed ? null : NEW_TAB)}
+      {...NEW_TAB}
       className={cn(
         'relative',
         isBare
@@ -53,9 +53,7 @@ export const OutLink = ({
           className={cn('size-[0.9em]', isInline ? 'ml-1 inline' : null)}
         />
       )}
-      {isMailed ? null : (
-        <span className="sr-only"> ({i18n._(NEW_TAB_HINT)})</span>
-      )}
+      <span className="sr-only"> ({i18n._(NEW_TAB_HINT)})</span>
     </a>
   )
 }

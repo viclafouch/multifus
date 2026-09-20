@@ -10,6 +10,7 @@ import { LanguageOffer } from '@/components/language-offer'
 import { MastLink } from '@/components/mast-link'
 import { MastMenu } from '@/components/mast-menu'
 import { PageLink } from '@/components/page-link'
+import { SupportMenu } from '@/components/support-menu'
 import { INDEPENDENCE, PAGE_NAMES } from '@/constants/wording'
 import { useLanguage } from '@/hooks/use-language'
 import { useOffer } from '@/hooks/use-offer'
@@ -41,6 +42,7 @@ export const SiteHeader = ({ page }: SiteHeaderProps) => {
           <BrandMark />
           <FeaturesMenu page={page} />
           <MastLink page="comparison" />
+          <SupportMenu page={page} />
           <LanguageBar page={page} className="ml-auto hidden lg:flex" />
           <Button
             variant={isOnDownload ? 'slate' : 'leaf'}

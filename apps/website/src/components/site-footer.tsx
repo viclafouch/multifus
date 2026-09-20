@@ -2,9 +2,12 @@ import type { MessageDescriptor } from '@lingui/core'
 import { msg } from '@lingui/core/macro'
 import { useLingui } from '@lingui/react'
 import { buttonVariants } from '@multifus/retro'
+import type { Icon } from '@phosphor-icons/react'
 import { GithubLogoIcon } from '@phosphor-icons/react/dist/ssr/GithubLogo'
 import { XLogoIcon } from '@phosphor-icons/react/dist/ssr/XLogo'
+import type { PageId } from '@/@types/page'
 import { BrandMark } from '@/components/brand-mark'
+import { LanguageNav } from '@/components/language-nav'
 import { OutLink } from '@/components/out-link'
 import { PageNav } from '@/components/page-nav'
 import { PerkList } from '@/components/perk-list'
@@ -30,7 +33,7 @@ const AUTHOR_ON_X = msg`L’auteur sur X`
 type Signet = Readonly<{
   href: string
   name: MessageDescriptor
-  Mark: typeof GithubLogoIcon
+  Mark: Icon
 }>
 
 const SIGNETS = [
@@ -44,7 +47,11 @@ const SIGNET_LOOK = buttonVariants({
   className: 'size-10'
 })
 
-export const SiteFooter = () => {
+type SiteFooterProps = Readonly<{
+  page: PageId
+}>
+
+export const SiteFooter = ({ page }: SiteFooterProps) => {
   const { i18n } = useLingui()
 
   return (
@@ -79,6 +86,9 @@ export const SiteFooter = () => {
           <PageNav title={FEATURES_TITLE} pages={MENU_FEATURES} />
           <PageNav title={SOFTWARE_TITLE} pages={SOFTWARE_PAGES} />
           <PageNav title={PROJECT_TITLE} pages={PROJECT_PAGES} />
+          <div className="lg:hidden">
+            <LanguageNav page={page} />
+          </div>
         </div>
         <div className="rule flex flex-col gap-1.5 border-t pt-6">
           <p className="text-aside text-khaki">© {AUTHOR_NAME}</p>

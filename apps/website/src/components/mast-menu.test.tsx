@@ -97,16 +97,14 @@ describe('the menu of the mast', () => {
     }
   })
 
-  it('offers the three languages on the page being read', () => {
+  it('leaves the choice of language to the footer', () => {
     show('fr')
     openIn('fr')
 
     for (const language of LANGUAGES) {
       expect(
-        screen
-          .getByRole('link', { name: LANGUAGE_NAMES[language] })
-          .getAttribute('href')
-      ).toBe(pathOf({ page: 'home', language }))
+        screen.queryByRole('link', { name: LANGUAGE_NAMES[language] })
+      ).toBeNull()
     }
   })
 
