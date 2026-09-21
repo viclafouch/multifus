@@ -28,6 +28,7 @@ Dans l'ordre :
 - [ ] `APTABASE_KEY=A-EU-... pnpm run dev:app`, et voir `app_started` arriver dans le bac Debug du tableau de bord
 - [ ] Décocher la case dans l'écran Réglages, relancer, vérifier que plus rien n'arrive
 - [ ] Quitter Multifus réseau coupé, et chronométrer la fermeture. Le plafond est de cinq secondes, dans `ANSWER_CEILING`
+- [ ] Regarder la ligne dans l'écran Réglages. Le badge « Anonyme » doit lire franchement vert, pas vert olive : il porte `plaque-leaf`, créé à côté de `plaque` dans `packages/retro`. Et la description doit tenir sur une ligne, 84 caractères contre 69 pour la plus longue ligne existante de cet écran. Si elle passe à la ligne, couper à « Ce que vous écrivez ne part pas. »
 
 ## Ce qui reste offert, à faire maintenant ou jamais
 
@@ -36,15 +37,26 @@ Dans l'ordre :
 - [ ] `authorized` part dans `app_stopped` et non dans `app_started` : au lancement, le premier balayage n'a pas encore répondu. Le porter aussi au lancement demande d'attendre ce balayage
 - [ ] Dire la mesure dans la mise en route, et non seulement sur la page légale du site. La case est cochée d'avance : un joueur qui ne va jamais dans Réglages ne saura pas qu'elle existe
 
-## Ce qui a été écarté, et pourquoi
+## Ce qui a été tranché, et pourquoi
 
-- **`characters_excluded` et `walk`.** Ni l'un ni l'autre n'est écrit dans le
-  fichier de configuration : au lancement ils valent toujours zéro et faux.
+- **Les douze classes, une propriété chacune**, `class_iop`, `class_eniripsa`
+  et les dix autres, valant le compte de personnages de cette classe. Les douze
+  partent toujours, même à zéro, sinon le tableau de bord confond « aucun
+  Sacrieur » et « propriété absente ». Une seule chaîne triée aurait fait un
+  groupe par joueur, illisible. Les classes sont posées par le joueur dans
+  Multifus, jamais lues dans un fichier du jeu.
+- **`characters_excluded` et la case `walk`.** Ni l'un ni l'autre n'est écrit
+  dans le fichier de configuration : au lancement ils valent toujours zéro et
+  faux. La promenade est couverte autrement, par `walk_turned_on` dans
+  `app_stopped`, qui sépare « activée » de « utilisée ».
 - **`health_checks`, `walk_switches`, `rune_table_opens`.** Aucun des trois ne
   passe par le journal : une bascule de promenade réussie et une ouverture de
   table des runes n'écrivent rien, et le raccourci de santé délègue à la
   fenêtre. Ils sont comptés à la main, respectivement dans `check_health`, dans
   `walk::switch_over` et dans `Multifus::set_rune_table_shown`.
+- **`named_kind`, `named_class` et les autres tables de noms** répètent ce que
+  serde déclare déjà sur ces énumérations. C'est voulu : si un `rename_all`
+  bouge un jour, l'historique du tableau de bord reste comparable.
 
 ## Le budget
 
