@@ -314,6 +314,10 @@ msgstr "accordée"
 msgid "actif"
 msgstr "actif"
 
+#: src/helpers/wording.ts
+msgid "Actions et notifications"
+msgstr "Actions et notifications"
+
 #: src/helpers/journal.ts
 msgid "active"
 msgstr "active"
@@ -2032,10 +2036,6 @@ msgstr "Notifications"
 #: src/helpers/wording.ts
 msgid "Notifications en arrière-plan"
 msgstr "Notifications en arrière-plan"
-
-#: src/helpers/wording.ts
-msgid "Notifications et actions"
-msgstr "Notifications et actions"
 
 #: src/helpers/onboarding.ts
 msgid "On essaie pour de vrai"

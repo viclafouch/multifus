@@ -83,14 +83,14 @@ export const systemWords = () => {
     systemNotifications:
       IS_APPLE || IS_WINDOWS_ELEVEN
         ? t`Notifications`
-        : t`Notifications et actions`,
+        : t`Actions et notifications`,
     system: t`Système`,
     focus: focusWord(),
     options: t`Options`,
     general: t`Général`,
     miscellaneous: t`Divers`,
     backgroundNotifications: t`Notifications en arrière-plan`,
-    game: 'Dofus Retro'
+    game: IS_APPLE ? 'Dofus Retro' : 'Dofus 1'
   }
 }
 

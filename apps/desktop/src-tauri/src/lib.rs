@@ -11,6 +11,7 @@ use crate::app::main_window;
 
 pub fn run() {
     tauri::Builder::default()
+        .manage(main_window::Readiness::default())
         .plugin(tauri_plugin_single_instance::init(
             |app, arguments, _cwd| {
                 main_window::show_on_second_launch(app, arguments);

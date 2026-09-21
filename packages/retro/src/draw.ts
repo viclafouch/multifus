@@ -29,6 +29,23 @@ export const inkedWith = (color: string, alpha: number) => {
   return `rgb(${channels.join(' ')} / ${alpha})`
 }
 
+type ThreadInk = Readonly<{
+  leaf: string
+  leafLit: string
+}>
+
+export const threadOf = (ink: ThreadInk) => {
+  return `linear-gradient(90deg, ${ink.leafLit} 0%, ${inkedWith(ink.leaf, 0.38)} 38%, transparent 100%)`
+}
+
+export const limelightOf = (iron: string) => {
+  return [
+    `0 2px 0 ${inkedWith(iron, 0.6)}`,
+    '0 1px 4px rgb(0 0 0 / 0.95)',
+    '0 4px 22px rgb(0 0 0 / 0.8)'
+  ].join(', ')
+}
+
 const RETRO_SHEET = '@multifus/retro/styles/retro.css'
 
 const HEX_DECLARATION = /--([a-z-]+):\s*(#[\da-f]{6})\b/gu

@@ -1,4 +1,9 @@
-import { dataUrlOf, inkedWith } from '@multifus/retro/draw'
+import {
+  dataUrlOf,
+  inkedWith,
+  limelightOf,
+  threadOf
+} from '@multifus/retro/draw'
 import { INK } from '@/constants/ink'
 
 const svgUrl = (markup: string) => {
@@ -13,13 +18,9 @@ export const SCRIM = `linear-gradient(94deg, ${inkedWith(INK.iron, 0.97)} 0%, ${
 
 export const FLOOR = `linear-gradient(180deg, ${inkedWith(INK.iron, 0.62)} 0%, ${inkedWith(INK.iron, 0.2)} 16%, transparent 30%, transparent 54%, ${inkedWith(INK.iron, 0.46)} 76%, ${inkedWith(INK.iron, 0.92)} 100%)`
 
-export const THREAD = `linear-gradient(90deg, ${INK.leafLit} 0%, ${inkedWith(INK.leaf, 0.38)} 38%, transparent 100%)`
+export const THREAD = threadOf(INK)
 
-export const LIMELIGHT = [
-  `0 2px 0 ${inkedWith(INK.iron, 0.6)}`,
-  '0 1px 4px rgb(0 0 0 / 0.95)',
-  '0 4px 22px rgb(0 0 0 / 0.8)'
-].join(', ')
+export const LIMELIGHT = limelightOf(INK.iron)
 
 export const ENGRAVE = '0 1px 2px rgb(0 0 0 / 0.65)'
 

@@ -1,5 +1,5 @@
-use std::sync::atomic::AtomicBool;
-use std::sync::atomic::Ordering;
+use std::sync::Mutex;
+use std::sync::PoisonError;
 
 use tauri::AppHandle;
 use tauri::Manager;
@@ -20,12 +20,45 @@ pub const LABEL: &str = "main";
 
 pub const FROM_SESSION_ARG: &str = "--from-session";
 
-struct Awaited(AtomicBool);
+#[derive(Default)]
+struct Wait {
+    is_painted: bool,
+    is_awaited: Option<bool>,
+    is_shown: bool,
+}
+
+impl Wait {
+    fn take_due(&mut self) -> bool {
+        let is_due = self.is_painted && self.is_awaited == Some(true) && !self.is_shown;
+
+        self.is_shown |= is_due;
+
+        is_due
+    }
+}
+
+#[derive(Default)]
+pub struct Readiness(Mutex<Wait>);
+
+impl Readiness {
+    fn settle(&self, change: impl FnOnce(&mut Wait)) -> bool {
+        let mut wait = self.0.lock().unwrap_or_else(PoisonError::into_inner);
+
+        change(&mut wait);
+
+        wait.take_due()
+    }
+}
 
 pub fn hold_until_ready(app: &AppHandle) {
-    let awaited = matches_awaited(launch(), tray::is_present(app));
+    let is_awaited = matches_awaited(launch(), tray::is_present(app));
+    let is_due = app.state::<Readiness>().settle(|wait| {
+        wait.is_awaited = Some(is_awaited);
+    });
 
-    app.manage(Awaited(AtomicBool::new(awaited)));
+    if is_due {
+        show(app);
+    }
 }
 
 pub fn show_when_ready(app: &AppHandle, label: &str) {
@@ -33,7 +66,11 @@ pub fn show_when_ready(app: &AppHandle, label: &str) {
         return;
     }
 
-    if app.state::<Awaited>().0.swap(false, Ordering::AcqRel) {
+    let is_due = app.state::<Readiness>().settle(|wait| {
+        wait.is_painted = true;
+    });
+
+    if is_due {
         show(app);
     }
 }
@@ -156,5 +193,43 @@ mod tests {
     fn the_session_awaits_the_window_only_without_a_tray() {
         assert!(!matches_awaited(Launch::Session, true));
         assert!(matches_awaited(Launch::Session, false));
+    }
+
+    #[test]
+    fn a_window_painted_before_the_setup_ends_shows_once_it_ends() {
+        let mut wait = Wait {
+            is_painted: true,
+            ..Wait::default()
+        };
+
+        assert!(!wait.take_due());
+
+        wait.is_awaited = Some(true);
+        assert!(wait.take_due());
+        assert!(!wait.take_due());
+    }
+
+    #[test]
+    fn a_window_painted_after_the_setup_ends_shows_at_once() {
+        let mut wait = Wait {
+            is_awaited: Some(true),
+            ..Wait::default()
+        };
+
+        assert!(!wait.take_due());
+
+        wait.is_painted = true;
+        assert!(wait.take_due());
+    }
+
+    #[test]
+    fn a_window_nobody_awaits_stays_hidden() {
+        let mut wait = Wait {
+            is_painted: true,
+            is_awaited: Some(false),
+            is_shown: false,
+        };
+
+        assert!(!wait.take_due());
     }
 }

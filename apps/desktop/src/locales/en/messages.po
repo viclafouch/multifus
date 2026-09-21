@@ -314,6 +314,10 @@ msgstr "granted"
 msgid "actif"
 msgstr "on"
 
+#: src/helpers/wording.ts
+msgid "Actions et notifications"
+msgstr "Notifications & actions"
+
 #: src/helpers/journal.ts
 msgid "active"
 msgstr "on"
@@ -2032,10 +2036,6 @@ msgstr "Notifications"
 #: src/helpers/wording.ts
 msgid "Notifications en arrière-plan"
 msgstr "Background notifications"
-
-#: src/helpers/wording.ts
-msgid "Notifications et actions"
-msgstr "Notifications & actions"
 
 #: src/helpers/onboarding.ts
 msgid "On essaie pour de vrai"

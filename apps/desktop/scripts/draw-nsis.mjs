@@ -7,9 +7,10 @@ import { render } from 'takumi-js'
 import {
   inkedWith,
   loadFonts,
+  limelightOf,
   loadPalette,
   RETRO_FONTS,
-  TAGLINE,
+  threadOf,
   WORDMARK
 } from '@multifus/retro/draw'
 import { readConfig, TAURI_DIR } from './tauri.mjs'
@@ -18,13 +19,9 @@ const { resolve } = createRequire(import.meta.url)
 
 const APP_ICON = path.join(TAURI_DIR, 'icons', '128x128@2x.png')
 
+const DECOR = '@multifus/ankama/images/village.webp'
+
 const CARVE = RETRO_FONTS.carve.name
-
-const PLAIN = RETRO_FONTS.plain.name
-
-const HEADER_WIDTH = 150
-
-const HEADER_HEIGHT = 57
 
 const SIDEBAR_WIDTH = 164
 
@@ -36,9 +33,9 @@ const FRAME_INSET = 8
 
 const FRAME_RADIUS = 6
 
-const BADGE_SIZE = 84
+const BADGE_SIZE = 36
 
-const TAGLINE_ROOM = 122
+const SIDEBAR_PADDING = 22
 
 const BMP_HEADER_SIZE = 54
 
@@ -88,72 +85,35 @@ const bmpOf = ({ pixels, width, height }) => {
   return Buffer.concat([header, body])
 }
 
-const paperCss = (ink, { width, height }) => {
+const sidebarCss = (ink) => {
   return `
     .sheet {
       position: relative;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      width: ${width}px;
-      height: ${height}px;
-      background-color: ${ink.cream};
+      justify-content: flex-end;
+      width: ${SIDEBAR_WIDTH}px;
+      height: ${SIDEBAR_HEIGHT}px;
+      padding: ${SIDEBAR_PADDING}px;
+      background-color: ${ink.iron};
     }
 
-    .wear {
+    .layer {
       position: absolute;
       top: 0;
       left: 0;
-      width: ${width}px;
-      height: ${height}px;
-      background-image: linear-gradient(159deg, ${inkedWith(ink.khaki, 0.26)} 0%, ${inkedWith(ink.cream, 0)} 26%, ${inkedWith(ink.cream, 0)} 58%, ${inkedWith(ink.khaki, 0.3)} 84%, ${inkedWith(ink.band, 0.42)} 100%);
+      width: ${SIDEBAR_WIDTH}px;
+      height: ${SIDEBAR_HEIGHT}px;
     }
 
-    .thread {
-      height: ${THREAD_HEIGHT}px;
-      border-radius: ${THREAD_HEIGHT}px;
-      background-image: linear-gradient(90deg, ${ink.leafLit} 0%, ${inkedWith(ink.leaf, 0.5)} 22%, ${inkedWith(ink.band, 0.42)} 48%, ${inkedWith(ink.band, 0.3)} 100%);
-    }
-  `
-}
-
-const headerCss = (ink) => {
-  return `
-    ${paperCss(ink, { width: HEADER_WIDTH, height: HEADER_HEIGHT })}
-
-    .wordmark {
-      display: flex;
-      font-family: '${CARVE}';
-      font-size: 27px;
-      line-height: 1;
-      letter-spacing: 0.14em;
-      color: ${ink.iron};
+    .decor {
+      object-fit: cover;
+      filter: saturate(0.88);
     }
 
-    .thread {
-      position: absolute;
-      top: ${HEADER_HEIGHT - THREAD_HEIGHT}px;
-      left: 0;
-      width: ${HEADER_WIDTH}px;
-      border-radius: 0;
+    .floor {
+      background-image: linear-gradient(180deg, ${inkedWith(ink.iron, 0.55)} 0%, ${inkedWith(ink.iron, 0.18)} 22%, ${inkedWith(ink.iron, 0.3)} 46%, ${inkedWith(ink.iron, 0.9)} 72%, ${inkedWith(ink.iron, 0.98)} 100%);
     }
-  `
-}
-
-const headerHtml = () => {
-  return `
-    <div class="sheet">
-      <div class="wear"></div>
-      <div class="wordmark">${WORDMARK}</div>
-      <div class="thread"></div>
-    </div>
-  `
-}
-
-const sidebarCss = (ink) => {
-  return `
-    ${paperCss(ink, { width: SIDEBAR_WIDTH, height: SIDEBAR_HEIGHT })}
 
     .frame {
       position: absolute;
@@ -161,52 +121,48 @@ const sidebarCss = (ink) => {
       left: ${FRAME_INSET}px;
       width: ${SIDEBAR_WIDTH - FRAME_INSET * 2}px;
       height: ${SIDEBAR_HEIGHT - FRAME_INSET * 2}px;
-      border: 1px solid ${inkedWith(ink.band, 0.62)};
+      border: 1px solid ${inkedWith(ink.band, 0.3)};
       border-radius: ${FRAME_RADIUS}px;
     }
 
     .badge {
+      position: relative;
       width: ${BADGE_SIZE}px;
       height: ${BADGE_SIZE}px;
     }
 
     .wordmark {
+      position: relative;
       display: flex;
-      margin-top: 22px;
+      margin-top: 14px;
       font-family: '${CARVE}';
-      font-size: 32px;
-      line-height: 1;
-      letter-spacing: 0.15em;
-      color: ${ink.iron};
+      font-size: 34px;
+      line-height: 0.9;
+      letter-spacing: 0.02em;
+      color: ${ink.cream};
+      text-shadow: ${limelightOf(ink.iron)};
     }
 
     .thread {
-      margin-top: 14px;
-      width: 62px;
-    }
-
-    .tagline {
-      display: flex;
-      margin-top: 16px;
-      width: ${TAGLINE_ROOM}px;
-      font-family: '${PLAIN}';
-      font-size: 11px;
-      line-height: 1.5;
-      text-align: center;
-      color: ${inkedWith(ink.slate, 0.76)};
+      position: relative;
+      margin-top: 12px;
+      width: 72px;
+      height: ${THREAD_HEIGHT}px;
+      border-radius: ${THREAD_HEIGHT}px;
+      background-image: ${threadOf(ink)};
     }
   `
 }
 
-const sidebarHtml = (badge) => {
+const sidebarHtml = ({ badge, decor }) => {
   return `
     <div class="sheet">
-      <div class="wear"></div>
+      <img class="layer decor" src="${decor}" />
+      <div class="layer floor"></div>
       <div class="frame"></div>
       <img class="badge" src="${badge}" />
       <div class="wordmark">${WORDMARK}</div>
       <div class="thread"></div>
-      <div class="tagline">${TAGLINE}</div>
     </div>
   `
 }
@@ -224,41 +180,31 @@ const plateOf = async ({ file, html, css, width, height, fonts }) => {
   await writeFile(file, bmpOf({ pixels, width, height }))
 }
 
-const drawImages = async () => {
-  const [config, ink, icon, fonts] = await Promise.all([
+const drawSidebar = async () => {
+  const [config, ink, icon, scene, fonts] = await Promise.all([
     readConfig(),
     loadPalette(resolve),
     readFile(APP_ICON),
+    readFile(resolve(DECOR)),
     loadFonts(resolve)
   ])
 
-  const { headerImage, sidebarImage } = config.bundle.windows.nsis
+  const { sidebarImage } = config.bundle.windows.nsis
   const badge = `data:image/png;base64,${icon.toString('base64')}`
+  const decor = `data:image/webp;base64,${scene.toString('base64')}`
 
-  await Promise.all([
-    plateOf({
-      file: path.join(TAURI_DIR, headerImage),
-      html: headerHtml(),
-      css: headerCss(ink),
-      width: HEADER_WIDTH,
-      height: HEADER_HEIGHT,
-      fonts
-    }),
-    plateOf({
-      file: path.join(TAURI_DIR, sidebarImage),
-      html: sidebarHtml(badge),
-      css: sidebarCss(ink),
-      width: SIDEBAR_WIDTH,
-      height: SIDEBAR_HEIGHT,
-      fonts
-    })
-  ])
+  await plateOf({
+    file: path.join(TAURI_DIR, sidebarImage),
+    html: sidebarHtml({ badge, decor }),
+    css: sidebarCss(ink),
+    width: SIDEBAR_WIDTH,
+    height: SIDEBAR_HEIGHT,
+    fonts
+  })
 
-  return [headerImage, sidebarImage]
+  return sidebarImage
 }
 
-const drawn = await drawImages()
+const drawn = await drawSidebar()
 
-process.stdout.write(
-  `${drawn.join(' and ')} drawn at ${HEADER_WIDTH}x${HEADER_HEIGHT} and ${SIDEBAR_WIDTH}x${SIDEBAR_HEIGHT}\n`
-)
+process.stdout.write(`${drawn} drawn at ${SIDEBAR_WIDTH}x${SIDEBAR_HEIGHT}\n`)

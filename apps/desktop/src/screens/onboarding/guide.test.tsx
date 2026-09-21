@@ -442,6 +442,22 @@ describe('the words of Windows', () => {
     expect(screen.getByText('Confidentialité et sécurité')).not.toBeNull()
   })
 
+  it('names the game the way Windows lists it', async () => {
+    await show({ agent: WINDOWS_AGENT })
+
+    goTo('Les notifications')
+
+    expect(screen.getByText(/Trouvez « Dofus 1 »/u)).not.toBeNull()
+  })
+
+  it('names the notification screen the way Windows 10 writes it', async () => {
+    await show({ agent: WINDOWS_AGENT, isWindowsTen: true })
+
+    goTo('Les notifications')
+
+    expect(screen.getByText('Actions et notifications')).not.toBeNull()
+  })
+
   it('keeps the shorter privacy name of Windows 10', async () => {
     await show({ agent: WINDOWS_AGENT, isWindowsTen: true })
 
