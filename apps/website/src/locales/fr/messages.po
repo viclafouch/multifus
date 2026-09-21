@@ -469,6 +469,10 @@ msgstr "la tête de classe du personnage, à sa couleur"
 msgid "La tête de classe suffit"
 msgstr "La tête de classe suffit"
 
+#: src/screens/legal-screen.tsx
+msgid "La vitesse des pages est mesurée de la même manière. <0>Vercel Speed Insights</0> relève le temps d’affichage d’une page chez vous, sans identifiant et sans profil."
+msgstr "La vitesse des pages est mesurée de la même manière. <0>Vercel Speed Insights</0> relève le temps d’affichage d’une page chez vous, sans identifiant et sans profil."
+
 #: src/constants/bodies.ts
 msgid "Lâchez au centre de la roue, et aucune fenêtre ne bouge."
 msgstr "Lâchez au centre de la roue, et aucune fenêtre ne bouge."

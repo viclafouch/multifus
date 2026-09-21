@@ -5,9 +5,11 @@ import {
   HeadContent,
   Outlet,
   Scripts,
+  useParams,
   useRouterState
 } from '@tanstack/react-router'
 import { Analytics } from '@vercel/analytics/react'
+import { computeRoute, SpeedInsights } from '@vercel/speed-insights/react'
 import { INK } from '@/constants/ink'
 import { LANGUAGES, OPEN_GRAPH_LOCALES } from '@/constants/languages'
 import { AUTHOR_NAME } from '@/constants/site'
@@ -29,6 +31,7 @@ const RootDocument = () => {
       return state.location.pathname
     }
   })
+  const params = useParams({ strict: false })
   const language = languageOf(pathname)
   const others = LANGUAGES.filter((spoken) => {
     return spoken !== language
@@ -53,6 +56,7 @@ const RootDocument = () => {
           <Outlet />
         </I18nProvider>
         <Analytics />
+        <SpeedInsights route={computeRoute(pathname, params)} />
         <Scripts />
       </body>
     </html>

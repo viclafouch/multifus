@@ -17,7 +17,8 @@ import {
   VERCEL,
   VERCEL_ADDRESS,
   VERCEL_ANALYTICS,
-  VERCEL_NAME
+  VERCEL_NAME,
+  VERCEL_SPEED_INSIGHTS
 } from '@/constants/site'
 
 const PUBLISHER_TITLE = msg`Qui publie le site`
@@ -108,6 +109,16 @@ export const LegalScreen = ({ page }: PageScreenProps) => {
               </OutLink>{' '}
               compte les pages vues et les téléchargements, sans identifiant,
               sans profil, et sans vous suivre d’un site à l’autre.
+            </Trans>
+          </Prose>
+          <Prose isWide>
+            <Trans>
+              La vitesse des pages est mesurée de la même manière.{' '}
+              <OutLink isInline href={VERCEL_SPEED_INSIGHTS}>
+                Vercel Speed Insights
+              </OutLink>{' '}
+              relève le temps d’affichage d’une page chez vous, sans identifiant
+              et sans profil.
             </Trans>
           </Prose>
         </ProseBlock>

@@ -21,6 +21,9 @@ export const VERCEL_ADDRESS = '440 N Barranca Avenue #4133, Covina, CA 91723'
 export const VERCEL_ANALYTICS =
   'https://vercel.com/docs/analytics/privacy-policy'
 
+export const VERCEL_SPEED_INSIGHTS =
+  'https://vercel.com/docs/speed-insights/privacy-policy'
+
 export const ANKAMA = 'https://www.ankama.com'
 
 export const GAME = 'https://www.dofus-retro.com'

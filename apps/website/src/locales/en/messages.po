@@ -469,6 +469,10 @@ msgstr "the class head of the character, in its colour"
 msgid "La tête de classe suffit"
 msgstr "The class head is enough"
 
+#: src/screens/legal-screen.tsx
+msgid "La vitesse des pages est mesurée de la même manière. <0>Vercel Speed Insights</0> relève le temps d’affichage d’une page chez vous, sans identifiant et sans profil."
+msgstr "Page speed is measured the same way. <0>Vercel Speed Insights</0> records how long a page takes to show up on your side, with no identifier and no profile."
+
 #: src/constants/bodies.ts
 msgid "Lâchez au centre de la roue, et aucune fenêtre ne bouge."
 msgstr "Let go at the centre of the wheel, and no window moves."
