@@ -19,7 +19,7 @@ import {
 import { SPEAKERS } from '@/lib/i18n'
 import { HOVER } from '@/lib/media'
 
-const HALF_NOTE = 'Dans sa fenêtre à lui, pas par-dessus le jeu.'
+const HALF_NOTE = 'Sur Mac, l’outil se dit lui-même en bêta.'
 
 const pixels = (written: string) => {
   return Number(written.replace('px', ''))
@@ -167,7 +167,7 @@ describe('the table of the comparison', () => {
   it('dates its record in French', () => {
     show()
 
-    expect(screen.getByText(/14 septembre 2026/u)).toBeDefined()
+    expect(screen.getByText(/21 septembre 2026/u)).toBeDefined()
   })
 
   it('holds back most of its rows in a peek', () => {

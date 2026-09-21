@@ -324,6 +324,14 @@ msgstr "Fermer le menu"
 msgid "Fonctionnalités"
 msgstr "Fonctionnalités"
 
+#: src/constants/rivals.ts
+msgid "Français, anglais et portugais, mais pas espagnol."
+msgstr "Français, anglais et portugais, mais pas espagnol."
+
+#: src/constants/rivals.ts
+msgid "Français, anglais, espagnol"
+msgstr "Français, anglais, espagnol"
+
 #: src/constants/wording.ts
 msgid "Gestionnaire de fenêtres"
 msgstr "Gestionnaire de fenêtres"
@@ -392,6 +400,10 @@ msgstr "L’auteur sur X"
 #: src/constants/wording.ts
 msgid "L’AutoFocus amène devant vous la fenêtre du personnage qui joue sur Dofus Retro : début de tour, invitation, échange, message privé, craft, percepteur."
 msgstr "L’AutoFocus amène devant vous la fenêtre du personnage qui joue sur Dofus Retro : début de tour, invitation, échange, message privé, craft, percepteur."
+
+#: src/constants/rivals.ts
+msgid "L’AutoFocus amène le bon personnage tout seul : l’ordre ne sert qu’au défilement."
+msgstr "L’AutoFocus amène le bon personnage tout seul : l’ordre ne sert qu’au défilement."
 
 #: src/constants/summons.ts
 msgid "L’AutoFocus, la roue, le déplacement rapide, le tableau des runes, les messages privés et les textes rapides arrivent ensemble."
@@ -488,6 +500,10 @@ msgstr "Le code de Multifus sur GitHub"
 #: src/constants/ankama.ts
 msgid "Le compte Dofus Retro sur X"
 msgstr "Le compte Dofus Retro sur X"
+
+#: src/constants/rivals.ts
+msgid "Le défi et le percepteur ne le réveillent pas."
+msgstr "Le défi et le percepteur ne le réveillent pas."
 
 #: src/constants/bodies.ts
 msgid "Le Déplacement rapide s’allume à une touche, et s’éteint quand il n’a plus de fenêtre où aller."
@@ -709,6 +725,10 @@ msgstr "Mon PC est sous Windows 7, ça marche ?"
 msgid "Multifus"
 msgstr "Multifus"
 
+#: src/constants/rivals.ts
+msgid "Multifus agrandit la fenêtre qui joue, il ne rétrécit jamais les autres."
+msgstr "Multifus agrandit la fenêtre qui joue, il ne rétrécit jamais les autres."
+
 #: src/components/site-footer.tsx
 msgid "Multifus ailleurs"
 msgstr "Multifus ailleurs"
@@ -790,8 +810,8 @@ msgid "Multifus sur Windows"
 msgstr "Multifus sur Windows"
 
 #: src/constants/wording.ts
-msgid "Multifus, Dracoon, Focus Retro, Dosoft, Retro Toolbox, ROrganizer : douze lignes comparées, chacune lue dans le code de l’outil et pas sur sa page d’accueil."
-msgstr "Multifus, Dracoon, Focus Retro, Dosoft, Retro Toolbox, ROrganizer : douze lignes comparées, chacune lue dans le code de l’outil et pas sur sa page d’accueil."
+msgid "Multifus, Dracoon, Focus Retro, Dosoft, Retro Toolbox, ROrganizer : quatorze lignes comparées, chacune lue dans le code de l’outil et pas sur sa page d’accueil."
+msgstr "Multifus, Dracoon, Focus Retro, Dosoft, Retro Toolbox, ROrganizer : quatorze lignes comparées, chacune lue dans le code de l’outil et pas sur sa page d’accueil."
 
 #: src/constants/ankama.ts
 msgid "Ne rien lire et ne rien changer dans le jeu"
@@ -1032,6 +1052,10 @@ msgid "Sur Mac, il faut {0} ou plus récent, sur Mac Intel comme Apple Silicon."
 msgstr "Sur Mac, il faut {0} ou plus récent, sur Mac Intel comme Apple Silicon."
 
 #: src/constants/rivals.ts
+msgid "Sur Mac, l’outil se dit lui-même en bêta."
+msgstr "Sur Mac, l’outil se dit lui-même en bêta."
+
+#: src/constants/rivals.ts
 msgid "Sur Windows"
 msgstr "Sur Windows"
 
@@ -1151,6 +1175,10 @@ msgstr "Une phrase, tous vos personnages"
 #: src/constants/ankama.ts
 msgid "Une tolérance n’est pas une autorisation."
 msgstr "Une tolérance n’est pas une autorisation."
+
+#: src/constants/rivals.ts
+msgid "Une touche par personnage"
+msgstr "Une touche par personnage"
 
 #: src/screens/windows-screen.tsx
 msgid "Une touche, un personnage"

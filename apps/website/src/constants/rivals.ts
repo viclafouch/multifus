@@ -3,6 +3,7 @@ import { msg } from '@lingui/core/macro'
 import type {
   HalfNote,
   Mark,
+  MineNote,
   Rival,
   RivalId,
   Trait,
@@ -10,7 +11,7 @@ import type {
 } from '@/@types/rival'
 import { PAGE_NAMES } from '@/constants/wording'
 
-export const SURVEYED_ON = '2026-09-14'
+export const SURVEYED_ON = '2026-09-21'
 
 export const RIVAL_IDS = [
   'dracoon',
@@ -46,6 +47,7 @@ export const RIVALS = {
 export const TRAIT_IDS = [
   'macos',
   'windows',
+  'charShortcut',
   'wheel',
   'walk',
   'autoFocus',
@@ -54,6 +56,7 @@ export const TRAIT_IDS = [
   'quickTexts',
   'split',
   'savedOrders',
+  'tongues',
   'signed',
   'source'
 ] as const satisfies readonly TraitId[]
@@ -75,7 +78,7 @@ export const TRAITS = {
       dracoon: 'no',
       focusRetro: 'yes',
       dosoft: 'no',
-      retroToolbox: 'no',
+      retroToolbox: 'half',
       rorganizer: 'no'
     }
   },
@@ -86,6 +89,16 @@ export const TRAITS = {
       focusRetro: 'yes',
       dosoft: 'yes',
       retroToolbox: 'yes',
+      rorganizer: 'yes'
+    }
+  },
+  charShortcut: {
+    mine: 'yes',
+    theirs: {
+      dracoon: 'no',
+      focusRetro: 'no',
+      dosoft: 'yes',
+      retroToolbox: 'no',
       rorganizer: 'yes'
     }
   },
@@ -105,7 +118,7 @@ export const TRAITS = {
       dracoon: 'yes',
       focusRetro: 'no',
       dosoft: 'no',
-      retroToolbox: 'no',
+      retroToolbox: 'yes',
       rorganizer: 'no'
     }
   },
@@ -113,8 +126,8 @@ export const TRAITS = {
     mine: 'yes',
     theirs: {
       dracoon: 'yes',
-      focusRetro: 'yes',
-      dosoft: 'no',
+      focusRetro: 'half',
+      dosoft: 'yes',
       retroToolbox: 'yes',
       rorganizer: 'no'
     }
@@ -169,6 +182,16 @@ export const TRAITS = {
       rorganizer: 'no'
     }
   },
+  tongues: {
+    mine: 'yes',
+    theirs: {
+      dracoon: 'yes',
+      focusRetro: 'yes',
+      dosoft: 'half',
+      retroToolbox: 'no',
+      rorganizer: 'yes'
+    }
+  },
   signed: {
     mine: 'yes',
     theirs: {
@@ -194,6 +217,7 @@ export const TRAITS = {
 export const TRAIT_NAMES = {
   macos: msg`Sur Mac`,
   windows: msg`Sur Windows`,
+  charShortcut: msg`Une touche par personnage`,
   wheel: PAGE_NAMES.wheel,
   walk: PAGE_NAMES.walk,
   autoFocus: msg`AutoFocus`,
@@ -202,6 +226,7 @@ export const TRAIT_NAMES = {
   quickTexts: PAGE_NAMES.quickTexts,
   split: msg`Fenêtres rangées côte à côte`,
   savedOrders: msg`Plusieurs ordres de personnages enregistrés`,
+  tongues: msg`Français, anglais, espagnol`,
   signed: msg`Paquet signé`,
   source: msg`Code publié`
 } as const satisfies Record<TraitId, MessageDescriptor>
@@ -212,7 +237,28 @@ export const MARK_NAMES = {
   no: msg`non`
 } as const satisfies Record<Mark, MessageDescriptor>
 
+export const MINE_NOTES = [
+  {
+    trait: 'split',
+    line: msg`Multifus agrandit la fenêtre qui joue, il ne rétrécit jamais les autres.`
+  },
+  {
+    trait: 'savedOrders',
+    line: msg`L’AutoFocus amène le bon personnage tout seul : l’ordre ne sert qu’au défilement.`
+  }
+] as const satisfies readonly MineNote[]
+
 export const HALF_NOTES = [
+  {
+    trait: 'macos',
+    rival: 'retroToolbox',
+    line: msg`Sur Mac, l’outil se dit lui-même en bêta.`
+  },
+  {
+    trait: 'autoFocus',
+    rival: 'focusRetro',
+    line: msg`Le défi et le percepteur ne le réveillent pas.`
+  },
   {
     trait: 'runeTable',
     rival: 'retroToolbox',
@@ -222,6 +268,11 @@ export const HALF_NOTES = [
     trait: 'savedOrders',
     rival: 'dosoft',
     line: msg`Deux équipes fixes, T1 et T2 : elles filtrent le cycle, elles n’enregistrent pas d’ordre.`
+  },
+  {
+    trait: 'tongues',
+    rival: 'dosoft',
+    line: msg`Français, anglais et portugais, mais pas espagnol.`
   },
   {
     trait: 'signed',

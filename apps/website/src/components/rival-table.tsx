@@ -1,12 +1,14 @@
 import { msg } from '@lingui/core/macro'
 import { useLingui } from '@lingui/react'
-import { cn } from '@multifus/retro'
+import { cn, Flag } from '@multifus/retro'
 import type { Mark, RivalId, TraitId } from '@/@types/rival'
 import { MarkGlyph } from '@/components/mark-glyph'
 import { MarkTip } from '@/components/mark-tip'
 import { OutLink } from '@/components/out-link'
+import { LANGUAGES } from '@/constants/languages'
 import {
   HALF_NOTES,
+  MINE_NOTES,
   PEEK_TRAITS,
   RIVAL_IDS,
   RIVALS,
@@ -22,6 +24,8 @@ const TRAIT_COLUMN = msg`Ce que fait l’outil`
 const SURVEY_ANCHOR = 'releve'
 
 const HALF_ANCHOR = 'moitie'
+
+const MINE_ANCHOR = 'choix'
 
 const NAME_CELL =
   'rule sticky left-0 z-1 w-44 border-r bg-iron px-4 py-3.5 sm:w-auto'
@@ -82,19 +86,27 @@ export const RivalTable = ({ isPeek = false }: RivalTableProps) => {
                       'text-tale font-normal text-cream'
                     )}
                   >
-                    {i18n._(TRAIT_NAMES[trait])}
+                    <TraitLabel trait={trait} />
                   </th>
                   <td className="mine px-3 py-3">
-                    <MarkGlyph mark={TRAITS[trait].mine} />
+                    {isPeek ? (
+                      <MarkGlyph mark={TRAITS[trait].mine} />
+                    ) : (
+                      <MineCell mark={TRAITS[trait].mine} trait={trait} />
+                    )}
                   </td>
                   {RIVAL_IDS.map((rival) => {
                     return (
                       <td key={rival} className="px-3 py-3">
-                        <MarkCell
-                          mark={TRAITS[trait].theirs[rival]}
-                          trait={trait}
-                          rival={rival}
-                        />
+                        {isPeek ? (
+                          <MarkGlyph mark={TRAITS[trait].theirs[rival]} />
+                        ) : (
+                          <MarkCell
+                            mark={TRAITS[trait].theirs[rival]}
+                            trait={trait}
+                            rival={rival}
+                          />
+                        )}
                       </td>
                     )
                   })}
@@ -120,6 +132,61 @@ export const RivalTable = ({ isPeek = false }: RivalTableProps) => {
         {i18n._(msg`Relevé le ${{ surveyed }}, dans le code de chaque outil.`)}
       </p>
     </div>
+  )
+}
+
+type TraitLabelProps = Readonly<{
+  trait: TraitId
+}>
+
+const TraitLabel = ({ trait }: TraitLabelProps) => {
+  const { i18n } = useLingui()
+  const name = i18n._(TRAIT_NAMES[trait])
+
+  if (trait !== 'tongues') {
+    return name
+  }
+
+  return (
+    <>
+      <span className="sr-only">{name}</span>
+      <span aria-hidden className="flex items-center gap-1.5">
+        {LANGUAGES.map((language) => {
+          return (
+            <span
+              key={language}
+              className="h-4 w-6 overflow-clip rounded-xs border border-band/45"
+            >
+              <Flag language={language} />
+            </span>
+          )
+        })}
+      </span>
+    </>
+  )
+}
+
+type MineCellProps = Readonly<{
+  mark: Mark
+  trait: TraitId
+}>
+
+const MineCell = ({ mark, trait }: MineCellProps) => {
+  const { i18n } = useLingui()
+  const note = MINE_NOTES.find((mine) => {
+    return mine.trait === trait
+  })
+
+  if (note === undefined) {
+    return <MarkGlyph mark={mark} />
+  }
+
+  return (
+    <MarkTip
+      mark={mark}
+      line={i18n._(note.line)}
+      anchor={`${MINE_ANCHOR}-${trait}`}
+    />
   )
 }
 

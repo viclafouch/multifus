@@ -47,7 +47,7 @@ export const PAGE_DESCRIPTIONS = {
   quickTexts: msg`Rangez vos phrases les plus répétées sous une combinaison de touches. Dans Dofus Retro, vous appuyez, la phrase s’écrit, et c’est vous qui l’envoyez.`,
   mac: msg`Le multicompte Dofus Retro sur Mac, dans une application vérifiée par Apple qui s’ouvre au premier double-clic. Les six fonctionnalités y sont, sans exception.`,
   windows: msg`Le multicompte Dofus Retro sur Windows 10 et 11 : chaque personnage prend son bouton dans la barre des tâches, avec son pseudo et sa tête de classe.`,
-  comparison: msg`Multifus, Dracoon, Focus Retro, Dosoft, Retro Toolbox, ROrganizer : douze lignes comparées, chacune lue dans le code de l’outil et pas sur sa page d’accueil.`,
+  comparison: msg`Multifus, Dracoon, Focus Retro, Dosoft, Retro Toolbox, ROrganizer : quatorze lignes comparées, chacune lue dans le code de l’outil et pas sur sa page d’accueil.`,
   download: msg`Téléchargez Multifus gratuitement, pour Mac et pour Windows. Trois gestes pour installer, aucun compte à créer, aucune publicité, et le code est public.`,
   journal: msg`Ce que chaque version de Multifus a changé pour le multicompte sur Dofus Retro : les fonctionnalités ajoutées, les réglages déplacés, les défauts corrigés.`,
   ankama: msg`Oui. Ankama tolère les logiciels qui rangent les fenêtres du jeu tant qu’ils n’y touchent à rien. Les deux réponses publiques d’Ankama sont citées ici.`,

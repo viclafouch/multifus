@@ -16,6 +16,7 @@ export type Mark = 'half' | 'no' | 'yes'
 
 export type TraitId =
   | 'autoFocus'
+  | 'charShortcut'
   | 'macos'
   | 'quickTexts'
   | 'relay'
@@ -24,6 +25,7 @@ export type TraitId =
   | 'source'
   | 'split'
   | 'savedOrders'
+  | 'tongues'
   | 'walk'
   | 'wheel'
   | 'windows'
@@ -36,5 +38,10 @@ export type Trait = Readonly<{
 export type HalfNote = Readonly<{
   trait: TraitId
   rival: RivalId
+  line: MessageDescriptor
+}>
+
+export type MineNote = Readonly<{
+  trait: TraitId
   line: MessageDescriptor
 }>

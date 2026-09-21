@@ -3,6 +3,7 @@ import { LANGUAGES } from '@/constants/languages'
 import {
   HALF_NOTES,
   MARK_NAMES,
+  MINE_NOTES,
   RIVAL_IDS,
   RIVALS,
   SURVEYED_ON,
@@ -42,9 +43,9 @@ describe('the table of the comparison', () => {
     expect(new Set(names).size).toBe(names.length)
   })
 
-  it('holds between ten and twelve rows', () => {
+  it('holds between ten and fourteen rows', () => {
     expect(TRAIT_IDS.length).toBeGreaterThanOrEqual(10)
-    expect(TRAIT_IDS.length).toBeLessThanOrEqual(12)
+    expect(TRAIT_IDS.length).toBeLessThanOrEqual(14)
   })
 
   it('lists exactly the rows the table carries', () => {
@@ -65,6 +66,25 @@ describe('the table of the comparison', () => {
     })
 
     expect(lost).toHaveLength(LOST_BY_MULTIFUS)
+  })
+
+  it('says why on each row Multifus loses, and there alone', () => {
+    const lost = TRAIT_IDS.filter((trait) => {
+      return TRAITS[trait].mine === 'no'
+    })
+    const told = MINE_NOTES.map((note) => {
+      return note.trait
+    })
+
+    expect(told.toSorted(alphabetical)).toStrictEqual(
+      lost.toSorted(alphabetical)
+    )
+  })
+
+  it.each(LANGUAGES)('writes each reason of Multifus in %s', (language) => {
+    for (const note of MINE_NOTES) {
+      expect(SPEAKERS[language]._(note.line)).not.toBe('')
+    }
   })
 
   it.each(RIVAL_IDS)('leaves at least one row to %s', (rival) => {
