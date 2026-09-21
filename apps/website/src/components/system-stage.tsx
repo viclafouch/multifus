@@ -18,7 +18,7 @@ export const SystemStage = ({ page, system }: SystemStageProps) => {
       className="marquee grid gap-x-12 gap-y-10 pt-rest-sm pb-rest"
     >
       <div className="flex flex-col gap-7">
-        <PageHead page={page} />
+        <PageHead page={page} hasTwoLineTitle />
         <DownloadCall className="surface-4" />
       </div>
       <div className="unveil">

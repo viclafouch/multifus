@@ -5,15 +5,28 @@ import { PAGE_NAMES, PAGE_PROMISES } from '@/constants/wording'
 
 type PageHeadProps = Readonly<{
   page: PageId
+  hasTwoLineTitle?: boolean
 }>
 
-export const PageHead = ({ page }: PageHeadProps) => {
+export const PageHead = ({ page, hasTwoLineTitle = false }: PageHeadProps) => {
   const { i18n } = useLingui()
+  const name = i18n._(PAGE_NAMES[page])
+  const [brand, ...rest] = name.split(' ')
+
+  const title = hasTwoLineTitle ? (
+    <>
+      {brand}
+      <br />
+      {rest.join(' ')}
+    </>
+  ) : (
+    name
+  )
 
   return (
     <>
       <h1 className="surface-1 font-carve text-banner tracking-hero text-balance text-cream uppercase">
-        {i18n._(PAGE_NAMES[page])}
+        {title}
       </h1>
       <p className="surface-2 engraved max-w-lead text-herald text-balance text-cream">
         {i18n._(PAGE_PROMISES[page])}
