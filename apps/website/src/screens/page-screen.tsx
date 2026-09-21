@@ -8,6 +8,7 @@ import { PAGE_SUMMONS } from '@/constants/summons'
 import { AnkamaScreen } from '@/screens/ankama-screen'
 import { ComparisonScreen } from '@/screens/comparison-screen'
 import { DownloadScreen } from '@/screens/download-screen'
+import { FaqScreen } from '@/screens/faq-screen'
 import { FeatureScreen } from '@/screens/feature-screen'
 import { HomeScreen } from '@/screens/home-screen'
 import { JournalScreen } from '@/screens/journal-screen'
@@ -23,6 +24,7 @@ const PAGE_SCREENS = {
   windows: WindowsScreen,
   download: DownloadScreen,
   comparison: ComparisonScreen,
+  faq: FaqScreen,
   plain: PlainScreen,
   journal: JournalScreen,
   ankama: AnkamaScreen,

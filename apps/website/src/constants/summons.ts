@@ -38,6 +38,7 @@ export const PAGE_SUMMONS = {
   windows: SUMMONS.whole,
   comparison: SUMMONS.trust,
   download: null,
+  faq: SUMMONS.start,
   journal: SUMMONS.whole,
   ankama: SUMMONS.start,
   legal: SUMMONS.trust

@@ -13,7 +13,7 @@ export const Question = ({ ask, icon: AskIcon, children }: QuestionProps) => {
   const { i18n } = useLingui()
 
   return (
-    <details data-bare className="ask slab">
+    <details data-ask data-bare className="ask asking swell slab">
       <summary className="sighted">
         <span className="flex items-center gap-3.5">
           <AskIcon

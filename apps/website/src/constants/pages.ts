@@ -83,6 +83,12 @@ export const PAGES = {
     kin: ['wheel', 'walk'],
     slugs: { fr: 'telecharger', en: 'download', es: 'descargar' }
   },
+  faq: {
+    kind: 'faq',
+    loop: null,
+    kin: ['autoFocus', 'wheel'],
+    slugs: { fr: 'faq', en: 'faq', es: 'preguntas-frecuentes' }
+  },
   journal: {
     kind: 'journal',
     loop: null,
@@ -119,6 +125,7 @@ export const PAGE_IDS = [
   'windows',
   'comparison',
   'download',
+  'faq',
   'journal',
   'ankama',
   'legal'
@@ -137,7 +144,15 @@ export const SOFTWARE_PAGES = [
   'download',
   'windows',
   'mac',
-  'comparison'
+  'comparison',
+  'faq'
+] as const satisfies readonly PageId[]
+
+export const HELP_PAGES = [
+  'faq',
+  'windows',
+  'mac',
+  'ankama'
 ] as const satisfies readonly PageId[]
 
 export const PROJECT_PAGES = [

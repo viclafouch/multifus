@@ -24,6 +24,7 @@
   --container-saga: 76ch;
 
   --grid-template-columns-brand: minmax(0, 1.3fr) repeat(3, minmax(0, 1fr));
+  --grid-template-columns-asks: minmax(0, 0.78fr) minmax(0, 1.22fr);
 
   --spacing-mast: 60px;
   --spacing-brim: 34px;
@@ -689,27 +690,7 @@
   }
 }
 
-@utility ask {
-  & > summary {
-    display: flex;
-    cursor: pointer;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    list-style: none;
-    border-bottom: 1px solid transparent;
-    padding: 16px 24px;
-    transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  & > summary:hover {
-    background-color: color-mix(in srgb, var(--deep), transparent 40%);
-  }
-
-  &[open] > summary {
-    border-bottom-color: color-mix(in srgb, var(--band), transparent 74%);
-  }
-
+@utility swell {
   @supports (interpolate-size: allow-keywords) {
     interpolate-size: allow-keywords;
 
@@ -727,6 +708,93 @@
       height: auto;
       opacity: 1;
     }
+  }
+}
+
+@utility asking {
+  & > summary {
+    display: flex;
+    cursor: pointer;
+    align-items: center;
+    list-style: none;
+    transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+@utility ask {
+  & > summary {
+    justify-content: space-between;
+    gap: 16px;
+    border-bottom: 1px solid transparent;
+    padding: 16px 24px;
+  }
+
+  & > summary:hover {
+    background-color: color-mix(in srgb, var(--deep), transparent 40%);
+  }
+
+  &[open] > summary {
+    border-bottom-color: color-mix(in srgb, var(--band), transparent 74%);
+  }
+}
+
+@utility asked {
+  --asked-rim: 16px;
+  --asked-gap: 14px;
+  --asked-mark: var(--spacing-lozenge);
+
+  @media (width >= 40rem) {
+    --asked-rim: 22px;
+    --asked-gap: 18px;
+  }
+
+  & > summary {
+    gap: var(--asked-gap);
+    padding: var(--asked-rim);
+  }
+
+  &:not([open]) > summary:hover {
+    background-color: color-mix(in srgb, var(--deep), transparent 42%);
+  }
+}
+
+@utility answered {
+  padding: 10px var(--asked-rim) var(--asked-rim);
+
+  @media (width >= 40rem) {
+    padding-left: calc(var(--asked-rim) + var(--asked-mark) + var(--asked-gap));
+  }
+}
+
+@utility clasp {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  border: 1px solid color-mix(in srgb, var(--band), transparent 56%);
+  color: var(--khaki);
+  transition-property: transform, background-color, border-color, color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 0.3s;
+
+  & > svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  summary:hover &,
+  summary:focus-visible & {
+    border-color: color-mix(in oklch, var(--tint), transparent 42%);
+    color: var(--cream);
+  }
+
+  [open] & {
+    transform: rotate(180deg);
+    border-color: color-mix(in oklch, var(--tint), transparent 28%);
+    background-color: color-mix(in oklch, var(--tint), transparent 84%);
+    color: var(--leaf-lit);
   }
 }
 
@@ -1597,7 +1665,7 @@
     animation: none !important;
   }
 
-  .ask::details-content {
+  .swell::details-content {
     transition: none !important;
   }
 
@@ -1632,7 +1700,8 @@
   .hinted,
   .picked,
   .pick::before,
-  .ask > summary,
+  .asking > summary,
+  .clasp,
   .torch::before,
   .stud,
   .stud::before,

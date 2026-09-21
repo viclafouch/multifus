@@ -13,6 +13,7 @@ export const PAGE_TINTS = {
   windows: 'tint-blue',
   comparison: 'tint-green',
   download: 'tint-green',
+  faq: 'tint-green',
   journal: 'tint-green',
   ankama: 'tint-green',
   legal: 'tint-green'

@@ -11,11 +11,11 @@ import { Band } from '@/components/band'
 import { BandTitle } from '@/components/band-title'
 import { DownloadTake } from '@/components/download-take'
 import { InstallSteps } from '@/components/install-steps'
+import { MarkPlate } from '@/components/mark-plate'
 import { PageHead } from '@/components/page-head'
 import { PageKin } from '@/components/page-kin'
 import { PageLink } from '@/components/page-link'
 import { PerkList } from '@/components/perk-list'
-import { Plate } from '@/components/plate'
 import { Prose } from '@/components/prose'
 import { Question } from '@/components/question'
 import { SystemSwap } from '@/components/system-swap'
@@ -63,15 +63,11 @@ export const DownloadScreen = ({ page }: PageScreenProps) => {
         <InstallSteps key={shown} system={shown} />
       </Band>
       <Band className="reveal py-rest-xs">
-        <Plate isBare className="flex-row items-start gap-6 sm:p-8">
-          <span className="rosette">
-            <CompassIcon weight="duotone" aria-hidden />
-          </span>
-          <span className="flex flex-col gap-3">
-            <h2 className="nameplate">{i18n._(FIRST_TITLE)}</h2>
-            <Prose>{i18n._(FIRST_LEAD)}</Prose>
-          </span>
-        </Plate>
+        <MarkPlate
+          Mark={CompassIcon}
+          title={i18n._(FIRST_TITLE)}
+          lead={i18n._(FIRST_LEAD)}
+        />
       </Band>
       <Band className="reveal py-rest">
         <BandTitle>{i18n._(QUESTIONS_TITLE)}</BandTitle>
@@ -99,13 +95,7 @@ export const DownloadScreen = ({ page }: PageScreenProps) => {
           <li className="reveal">
             <Question ask={QUESTIONS.machine.ask} icon={DesktopIcon}>
               <ul className="flex flex-col gap-2">
-                {QUESTIONS.machine.answer.map((line) => {
-                  return (
-                    <li key={line.id} className="pointed">
-                      {i18n._(line)}
-                    </li>
-                  )
-                })}
+                <Answer lines={QUESTIONS.machine.answer} isPointed />
               </ul>
             </Question>
           </li>

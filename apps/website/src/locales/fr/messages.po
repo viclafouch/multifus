@@ -31,6 +31,22 @@ msgstr "{0} ou plus récent"
 msgid "{0} ou plus récent, sur Mac Intel comme Apple Silicon"
 msgstr "{0} ou plus récent, sur Mac Intel comme Apple Silicon"
 
+#: src/constants/questions.ts
+msgid "<0>Autant que votre PC en ouvre.</0> 4, 6, 8 clients Dofus Retro : Multifus les range tous pareil."
+msgstr "<0>Autant que votre PC en ouvre.</0> 4, 6, 8 clients Dofus Retro : Multifus les range tous pareil."
+
+#: src/constants/questions.ts
+msgid "<0>Dofus 2 et Dofus 3 ne sont pas concernés.</0> Ils n’ont ni les mêmes fenêtres ni les mêmes notifications."
+msgstr "<0>Dofus 2 et Dofus 3 ne sont pas concernés.</0> Ils n’ont ni les mêmes fenêtres ni les mêmes notifications."
+
+#: src/constants/questions.ts
+msgid "<0>Français, anglais, espagnol.</0> Il prend celle de votre ordinateur, et vous en changez dans les réglages."
+msgstr "<0>Français, anglais, espagnol.</0> Il prend celle de votre ordinateur, et vous en changez dans les réglages."
+
+#: src/constants/questions.ts
+msgid "<0>Moi.</0> Pas de publicité, pas de compte, pas de version payante. Je paie l’hébergement et le certificat d’Apple."
+msgstr "<0>Moi.</0> Pas de publicité, pas de compte, pas de version payante. Je paie l’hébergement et le certificat d’Apple."
+
 #: src/constants/rivals.ts
 msgid "à moitié"
 msgstr "à moitié"
@@ -38,6 +54,10 @@ msgstr "à moitié"
 #: src/components/page-kin.tsx
 msgid "À voir aussi"
 msgstr "À voir aussi"
+
+#: src/constants/wording.ts
+msgid "Aide"
+msgstr "Aide"
 
 #: src/components/skip-link.tsx
 msgid "Aller au contenu"
@@ -51,6 +71,10 @@ msgstr "Ankama l’autorise ?"
 msgid "Ankama n’a jamais publié de règle écrite sur ces logiciels, mais a répondu deux fois en public. Tout ce qui est écrit plus haut vient de ces deux messages."
 msgstr "Ankama n’a jamais publié de règle écrite sur ces logiciels, mais a répondu deux fois en public. Tout ce qui est écrit plus haut vient de ces deux messages."
 
+#: src/constants/questions.ts
+msgid "Ankama ne met aucune limite au nombre de clients ouverts, et Multifus non plus. Le <0>comparatif</0> dit ce que font les autres."
+msgstr "Ankama ne met aucune limite au nombre de clients ouverts, et Multifus non plus. Le <0>comparatif</0> dit ce que font les autres."
+
 #: src/constants/ankama.ts
 msgid "Ankama ne répond pas de Multifus."
 msgstr "Ankama ne répond pas de Multifus."
@@ -59,9 +83,17 @@ msgstr "Ankama ne répond pas de Multifus."
 msgid "Ankama peut changer d’avis. Ce jour-là, Multifus s’arrête."
 msgstr "Ankama peut changer d’avis. Ce jour-là, Multifus s’arrête."
 
+#: src/constants/questions.ts
+msgid "Ankama tolère ce genre de logiciel tant qu’il reste comme ça. Elle l’a dit dans un <0>message de Dofus Retro</0> et dans un <1>sujet du forum officiel</1>, tous deux repris sur <2>Ankama et Multifus</2>."
+msgstr "Ankama tolère ce genre de logiciel tant qu’il reste comme ça. Elle l’a dit dans un <0>message de Dofus Retro</0> et dans un <1>sujet du forum officiel</1>, tous deux repris sur <2>Ankama et Multifus</2>."
+
 #: src/constants/wording.ts
 msgid "Ankama tolère-t-il Multifus ?"
 msgstr "Ankama tolère-t-il Multifus ?"
+
+#: src/constants/wording.ts
+msgid "Ankama, votre compte, votre ordinateur, votre langue, le prix : les questions qu’on me pose avant d’installer un logiciel multicompte sur Dofus Retro."
+msgstr "Ankama, votre compte, votre ordinateur, votre langue, le prix : les questions qu’on me pose avant d’installer un logiciel multicompte sur Dofus Retro."
 
 #: src/constants/bodies.ts
 msgid "Apple a vérifié le fichier"
@@ -78,10 +110,6 @@ msgstr "Aucun fichier du jeu n’est lu, et aucune action n’est jouée à votr
 #: src/constants/ankama.ts
 msgid "Aucun logiciel de la communauté n’est soutenu par le jeu. Vous l’installez sous votre responsabilité."
 msgstr "Aucun logiciel de la communauté n’est soutenu par le jeu. Vous l’installez sous votre responsabilité."
-
-#: src/constants/questions.ts
-msgid "Autant que votre PC en ouvre. 4, 6, 8 clients Dofus Retro : Multifus les range tous pareil."
-msgstr "Autant que votre PC en ouvre. 4, 6, 8 clients Dofus Retro : Multifus les range tous pareil."
 
 #: src/constants/rivals.ts
 #: src/constants/wording.ts
@@ -103,6 +131,10 @@ msgstr "Avec Multifus"
 #: src/constants/questions.ts
 msgid "C’est gratuit ?"
 msgstr "C’est gratuit ?"
+
+#: src/constants/questions.ts
+msgid "C’est gratuit, alors qui paie ?"
+msgstr "C’est gratuit, alors qui paie ?"
 
 #: src/screens/comparison-screen.tsx
 msgid "C’est là que ses cases ont été lues, et vous pouvez lire le même code que nous."
@@ -135,6 +167,10 @@ msgstr "Ce n’est pas un bot"
 #: src/constants/ankama.ts
 msgid "Ce qu’Ankama tolère"
 msgstr "Ce qu’Ankama tolère"
+
+#: src/constants/wording.ts
+msgid "Ce qu’on me demande avant d’installer Multifus."
+msgstr "Ce qu’on me demande avant d’installer Multifus."
 
 #: src/screens/ankama-screen.tsx
 msgid "Ce que cette page ne promet pas"
@@ -208,6 +244,10 @@ msgstr "Code publié, sans licence libre."
 msgid "Commande et Option s’affichent comme sur votre clavier, pas Ctrl et Alt."
 msgstr "Commande et Option s’affichent comme sur votre clavier, pas Ctrl et Alt."
 
+#: src/constants/questions.ts
+msgid "Comment ça marche ?"
+msgstr "Comment ça marche ?"
+
 #: src/constants/wording.ts
 msgid "Comparatif"
 msgstr "Comparatif"
@@ -231,6 +271,10 @@ msgstr "Copie du message publié par le compte Dofus Retro sur X."
 #: src/components/character-keys.tsx
 msgid "Crâ"
 msgstr "Crâ"
+
+#: src/constants/questions.ts
+msgid "Dans les deux cas, il ne crée aucun compte et <0>n’envoie rien de votre ordinateur</0>. La seule sortie est Telegram, si vous branchez vous-même les <1>Messages privés</1>."
+msgstr "Dans les deux cas, il ne crée aucun compte et <0>n’envoie rien de votre ordinateur</0>. La seule sortie est Telegram, si vous branchez vous-même les <1>Messages privés</1>."
 
 #: src/constants/rivals.ts
 msgid "Dans sa fenêtre à lui, pas par-dessus le jeu."
@@ -279,6 +323,10 @@ msgstr "Dracoon, Focus Retro, Dosoft, Retro Toolbox, ROrganizer : chaque case es
 #: src/constants/bodies.ts
 msgid "Échange, groupe, guilde, message privé, défi, craft, percepteur attaqué."
 msgstr "Échange, groupe, guilde, message privé, défi, craft, percepteur attaqué."
+
+#: src/constants/wording.ts
+msgid "Écrivez-moi, je réponds."
+msgstr "Écrivez-moi, je réponds."
 
 #: src/constants/bodies.ts
 msgid "Elle fait payer cette vérification chaque année, et peu de logiciels gratuits la paient."
@@ -345,6 +393,14 @@ msgstr "Gratuit"
 msgid "Il faut {0} ou plus récent. Les Mac Intel et les Mac Apple Silicon reçoivent le même fichier."
 msgstr "Il faut {0} ou plus récent. Les Mac Intel et les Mac Apple Silicon reçoivent le même fichier."
 
+#: src/constants/questions.ts
+msgid "Il lit le <0>titre de vos fenêtres</0> Dofus Retro, où le jeu écrit le pseudo du personnage. La <1>Roue des personnages</1> et le <2>Déplacement rapide</2> voient votre clic, et les <3>Textes rapides</3> collent la phrase dans la fenêtre devant vous."
+msgstr "Il lit le <0>titre de vos fenêtres</0> Dofus Retro, où le jeu écrit le pseudo du personnage. La <1>Roue des personnages</1> et le <2>Déplacement rapide</2> voient votre clic, et les <3>Textes rapides</3> collent la phrase dans la fenêtre devant vous."
+
+#: src/constants/questions.ts
+msgid "Il n’ouvre aucun fichier de Dofus Retro, et ne lit pas sa mémoire. Le <0>code est public</0>, vous pouvez le lire."
+msgstr "Il n’ouvre aucun fichier de Dofus Retro, et ne lit pas sa mémoire. Le <0>code est public</0>, vous pouvez le lire."
+
 #: src/constants/bodies.ts
 msgid "Il revient au même endroit au lancement suivant, et suit la fenêtre du jeu."
 msgstr "Il revient au même endroit au lancement suivant, et suit la fenêtre du jeu."
@@ -356,6 +412,10 @@ msgstr "Images et vidéos © Ankama Games. Dofus Retro est une marque d’Ankama
 #: src/screens/download-screen.tsx
 msgid "Installer, c’est trois gestes"
 msgstr "Installer, c’est trois gestes"
+
+#: src/constants/questions.ts
+msgid "Je ne vends rien et je ne demande rien. Si le projet vous plaît, une étoile sur <0>GitHub</0> suffit."
+msgstr "Je ne vends rien et je ne demande rien. Si le projet vous plaît, une étoile sur <0>GitHub</0> suffit."
 
 #: src/constants/questions.ts
 msgid "Je peux jouer combien de comptes ?"
@@ -393,10 +453,6 @@ msgstr "L’adresse est peut-être mal recopiée, ou la page a changé de nom. L
 msgid "L’audience est comptée sans vous nommer. <0>Vercel Analytics</0> compte les pages vues et les téléchargements, sans identifiant, sans profil, et sans vous suivre d’un site à l’autre."
 msgstr "L’audience est comptée sans vous nommer. <0>Vercel Analytics</0> compte les pages vues et les téléchargements, sans identifiant, sans profil, et sans vous suivre d’un site à l’autre."
 
-#: src/components/site-footer.tsx
-msgid "L’auteur sur X"
-msgstr "L’auteur sur X"
-
 #: src/constants/wording.ts
 msgid "L’AutoFocus amène devant vous la fenêtre du personnage qui joue sur Dofus Retro : début de tour, invitation, échange, message privé, craft, percepteur."
 msgstr "L’AutoFocus amène devant vous la fenêtre du personnage qui joue sur Dofus Retro : début de tour, invitation, échange, message privé, craft, percepteur."
@@ -416,6 +472,10 @@ msgstr "L’icône"
 #: src/components/author-word.tsx
 msgid "L’image de profil de l’auteur de Multifus."
 msgstr "L’image de profil de l’auteur de Multifus."
+
+#: src/constants/questions.ts
+msgid "La barre des tâches de Windows donne un bouton par personnage, avec son pseudo seul dessus et sa tête de classe. Le Mac n’a pas cette barre, donc pas ces boutons."
+msgstr "La barre des tâches de Windows donne un bouton par personnage, avec son pseudo seul dessus et sa tête de classe. Le Mac n’a pas cette barre, donc pas ces boutons."
 
 #: src/constants/shots.ts
 msgid "La fenêtre de Multifus sur Mac, avec le menu des fonctionnalités à gauche et quatre personnages connectés au centre."
@@ -489,9 +549,9 @@ msgstr "Le 1ᵉʳ avril 2026"
 msgid "Le choix de vos personnages au premier plan."
 msgstr "Le choix de vos personnages au premier plan."
 
-#: src/components/site-footer.tsx
-msgid "Le code de Multifus sur GitHub"
-msgstr "Le code de Multifus sur GitHub"
+#: src/constants/elsewhere.ts
+msgid "Le code sur GitHub"
+msgstr "Le code sur GitHub"
 
 #: src/constants/ankama.ts
 msgid "Le compte Dofus Retro sur X"
@@ -508,6 +568,10 @@ msgstr "Le Déplacement rapide s’allume à une touche, et s’éteint quand il
 #: src/screens/comparison-screen.tsx
 msgid "Le dépôt de Multifus sur GitHub"
 msgstr "Le dépôt de Multifus sur GitHub"
+
+#: src/constants/questions.ts
+msgid "Le détail par système est sur <0>Multifus sur Mac</0> et <1>Multifus sur Windows</1>."
+msgstr "Le détail par système est sur <0>Multifus sur Mac</0> et <1>Multifus sur Windows</1>."
 
 #: src/constants/questions.ts
 msgid "Le fichier est sûr ?"
@@ -528,6 +592,10 @@ msgstr "Le logiciel"
 #: src/components/mast-menu.tsx
 msgid "Le menu du site"
 msgstr "Le menu du site"
+
+#: src/constants/wording.ts
+msgid "Le multicompte Dofus Retro en questions"
+msgstr "Le multicompte Dofus Retro en questions"
 
 #: src/constants/wording.ts
 msgid "Le multicompte Dofus Retro sur Mac, dans une application qu’Apple a vérifiée."
@@ -597,6 +665,10 @@ msgstr "le pseudo, puis « - Dofus Retro »"
 msgid "Le site dans votre langue"
 msgstr "Le site dans votre langue"
 
+#: src/constants/elsewhere.ts
+msgid "Le site de Dofus Retro"
+msgstr "Le site de Dofus Retro"
+
 #: src/screens/legal-screen.tsx
 msgid "Le site est hébergé par <0>{VERCEL_NAME}</0>, {VERCEL_ADDRESS}, aux États-Unis."
 msgstr "Le site est hébergé par <0>{VERCEL_NAME}</0>, {VERCEL_ADDRESS}, aux États-Unis."
@@ -657,6 +729,10 @@ msgstr "Les questions qu’on se pose"
 msgid "Les six fonctionnalités du menu sont là, sans exception."
 msgstr "Les six fonctionnalités du menu sont là, sans exception."
 
+#: src/constants/questions.ts
+msgid "Les six mécanismes sont sur les deux. <0>Trois choses manquent au Mac.</0>"
+msgstr "Les six mécanismes sont sur les deux. <0>Trois choses manquent au Mac.</0>"
+
 #: src/screens/ankama-screen.tsx
 msgid "Les sources"
 msgstr "Les sources"
@@ -685,7 +761,7 @@ msgstr "Logiciel multicompte gratuit pour Dofus Retro"
 msgid "Masquer cette proposition"
 msgstr "Masquer cette proposition"
 
-#: src/constants/wording.ts
+#: src/constants/elsewhere.ts
 msgid "Me contacter"
 msgstr "Me contacter"
 
@@ -725,7 +801,7 @@ msgstr "Multifus"
 msgid "Multifus agrandit la fenêtre qui joue, il ne rétrécit jamais les autres."
 msgstr "Multifus agrandit la fenêtre qui joue, il ne rétrécit jamais les autres."
 
-#: src/components/site-footer.tsx
+#: src/constants/wording.ts
 msgid "Multifus ailleurs"
 msgstr "Multifus ailleurs"
 
@@ -736,6 +812,10 @@ msgstr "Multifus amène devant vous la fenêtre du personnage qui joue sur Dofus
 #: src/constants/wording.ts
 msgid "Multifus amène devant vous la fenêtre du personnage qui joue sur Dofus Retro. Gratuit, sur Mac et sur Windows, sans compte et sans publicité."
 msgstr "Multifus amène devant vous la fenêtre du personnage qui joue sur Dofus Retro. Gratuit, sur Mac et sur Windows, sans compte et sans publicité."
+
+#: src/constants/questions.ts
+msgid "Multifus écoute les <0>notifications</0> que Dofus Retro envoie à votre ordinateur : début de tour, invitation, échange, message privé, craft, percepteur attaqué. Windows lui en donne l’accès, macOS passe par l’Accessibilité."
+msgstr "Multifus écoute les <0>notifications</0> que Dofus Retro envoie à votre ordinateur : début de tour, invitation, échange, message privé, craft, percepteur attaqué. Windows lui en donne l’accès, macOS passe par l’Accessibilité."
 
 #: src/constants/wording.ts
 msgid "Multifus est gratuit, pour Mac et pour Windows. Trois gestes, et vous jouez en multicompte sur Dofus Retro."
@@ -774,8 +854,12 @@ msgid "Multifus ne lit pas la mémoire du jeu, ne touche à aucun de ses fichier
 msgstr "Multifus ne lit pas la mémoire du jeu, ne touche à aucun de ses fichiers, et ne joue à votre place sur aucun personnage."
 
 #: src/constants/questions.ts
-msgid "Multifus ne touche pas au jeu. Il ne lit rien dedans, il ne change rien dedans, et il ne joue jamais à votre place. Ankama accepte ce genre de logiciel tant qu’il reste comme ça."
-msgstr "Multifus ne touche pas au jeu. Il ne lit rien dedans, il ne change rien dedans, et il ne joue jamais à votre place. Ankama accepte ce genre de logiciel tant qu’il reste comme ça."
+msgid "Multifus ne touche pas à Dofus Retro. Il ne lit rien dedans, il ne change rien dedans, et il ne joue <0>jamais</0> à votre place."
+msgstr "Multifus ne touche pas à Dofus Retro. Il ne lit rien dedans, il ne change rien dedans, et il ne joue <0>jamais</0> à votre place."
+
+#: src/constants/questions.ts
+msgid "Multifus parle ma langue ?"
+msgstr "Multifus parle ma langue ?"
 
 #: src/constants/summons.ts
 msgid "Multifus respecte les CGU d’Ankama"
@@ -827,8 +911,8 @@ msgid "Non. Il faut Windows 10 ou Windows 11."
 msgstr "Non. Il faut Windows 10 ou Windows 11."
 
 #: src/constants/questions.ts
-msgid "Non. Multifus ne connaît que Dofus Retro, la 1.29."
-msgstr "Non. Multifus ne connaît que Dofus Retro, la 1.29."
+msgid "Non. Multifus ne connaît que <0>Dofus Retro</0>, toutes versions 1.x : la 1.29, la 1.40, et celles d’après."
+msgstr "Non. Multifus ne connaît que <0>Dofus Retro</0>, toutes versions 1.x : la 1.29, la 1.40, et celles d’après."
 
 #: src/components/out-link.tsx
 msgid "nouvel onglet"
@@ -950,6 +1034,10 @@ msgstr "Quatre boutons de la barre des tâches de Windows, tous avec la même ic
 msgid "Quatre clics, quatre personnages"
 msgstr "Quatre clics, quatre personnages"
 
+#: src/constants/wording.ts
+msgid "Questions fréquentes"
+msgstr "Questions fréquentes"
+
 #: src/screens/legal-screen.tsx
 msgid "Qui l’héberge"
 msgstr "Qui l’héberge"
@@ -1018,6 +1106,10 @@ msgstr "Si votre Windows colle les fenêtres d’un même jeu sous un seul bouto
 msgid "Si vous cherchez à faire jouer vos personnages sans vous, Multifus ne le fera jamais : il amène leur fenêtre devant vous, et rien d’autre."
 msgstr "Si vous cherchez à faire jouer vos personnages sans vous, Multifus ne le fera jamais : il amène leur fenêtre devant vous, et rien d’autre."
 
+#: src/constants/elsewhere.ts
+msgid "Signaler un problème"
+msgstr "Signaler un problème"
+
 #: src/screens/home-screen.tsx
 msgid "Six mécanismes, un seul but : ne plus chercher le personnage qui vous attend."
 msgstr "Six mécanismes, un seul but : ne plus chercher le personnage qui vous attend."
@@ -1030,17 +1122,13 @@ msgstr "Six mécanismes, une seule installation"
 msgid "Suivez les trois lignes de votre ordinateur. Il n’y a rien d’autre à faire."
 msgstr "Suivez les trois lignes de votre ordinateur. Il n’y a rien d’autre à faire."
 
-#: src/constants/wording.ts
-msgid "Support"
-msgstr "Support"
-
 #: src/constants/rivals.ts
 msgid "Sur Mac"
 msgstr "Sur Mac"
 
 #: src/constants/questions.ts
-msgid "Sur Mac, Apple vérifie le fichier avant qu’il s’ouvre, et aucun avertissement ne s’affiche. Sur Windows, votre ordinateur peut demander confirmation : Multifus est encore jeune, et Windows ne le connaît pas encore. Dans les deux cas, il ne vous demande aucune information, et n’en envoie aucune."
-msgstr "Sur Mac, Apple vérifie le fichier avant qu’il s’ouvre, et aucun avertissement ne s’affiche. Sur Windows, votre ordinateur peut demander confirmation : Multifus est encore jeune, et Windows ne le connaît pas encore. Dans les deux cas, il ne vous demande aucune information, et n’en envoie aucune."
+msgid "Sur Mac, Apple vérifie le fichier avant qu’il s’ouvre, et aucun avertissement ne s’affiche. Sur Windows, votre ordinateur peut demander confirmation : Multifus est encore jeune, et Windows ne le connaît pas encore."
+msgstr "Sur Mac, Apple vérifie le fichier avant qu’il s’ouvre, et aucun avertissement ne s’affiche. Sur Windows, votre ordinateur peut demander confirmation : Multifus est encore jeune, et Windows ne le connaît pas encore."
 
 #. placeholder {0}: SYSTEM_VERSIONS.macos
 #: src/constants/questions.ts
@@ -1059,6 +1147,14 @@ msgstr "Sur Windows"
 #: src/constants/questions.ts
 msgid "Sur Windows, il faut {0} ou plus récent."
 msgstr "Sur Windows, il faut {0} ou plus récent."
+
+#: src/constants/questions.ts
+msgid "Sur Windows, la touche <0>F1 seule</0> appelle un personnage. Sur Mac, il faut une combinaison, Ctrl+Maj+1 par exemple."
+msgstr "Sur Windows, la touche <0>F1 seule</0> appelle un personnage. Sur Mac, il faut une combinaison, Ctrl+Maj+1 par exemple."
+
+#: src/constants/questions.ts
+msgid "Sur Windows, Multifus efface la notification une fois qu’il vous a amené sur le personnage. Sur Mac, la bannière reste jusqu’à ce qu’elle parte d’elle-même."
+msgstr "Sur Windows, Multifus efface la notification une fois qu’il vous a amené sur le personnage. Sur Mac, la bannière reste jusqu’à ce qu’elle parte d’elle-même."
 
 #: src/constants/wording.ts
 msgid "Tableau des runes"
@@ -1103,6 +1199,10 @@ msgstr "Textes rapides"
 #: src/constants/wording.ts
 msgid "Textes rapides au clavier sur Dofus Retro"
 msgstr "Textes rapides au clavier sur Dofus Retro"
+
+#: src/constants/questions.ts
+msgid "Tout est pareil sur Mac et sur Windows ?"
+msgstr "Tout est pareil sur Mac et sur Windows ?"
 
 #: src/constants/bodies.ts
 msgid "Un bouton le replace au coin de la fenêtre du jeu si vous le perdez de vue."
@@ -1236,6 +1336,10 @@ msgstr "Votre navigateur ne garde qu’une chose : que la proposition de lire le
 #: src/components/system-pick.tsx
 msgid "Votre ordinateur"
 msgstr "Votre ordinateur"
+
+#: src/constants/wording.ts
+msgid "Votre question n’est pas là ?"
+msgstr "Votre question n’est pas là ?"
 
 #: src/constants/wording.ts
 msgid "Votre téléphone les reçoit."

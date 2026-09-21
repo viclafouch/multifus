@@ -58,6 +58,16 @@ const nodeOf = <Wanted extends SchemaType>({
   )
 }
 
+const EVERY_FAQ_ANSWER = LANGUAGES.flatMap((language) => {
+  const written = nodeOf({ page: 'faq', language, type: 'FAQPage' })
+
+  return written === undefined
+    ? []
+    : written.mainEntity.map((question) => {
+        return question.acceptedAnswer.text
+      })
+})
+
 const FILMED = PAGE_IDS.filter((page) => {
   return PAGES[page].loop !== null
 })
@@ -469,11 +479,17 @@ describe('the questions of a page', () => {
 
     expect(answer?.acceptedAnswer.text).toBe(
       QUESTIONS.macAccess.answer
-        .map((line) => {
-          return SPEAKERS.fr._(line)
+        .map(({ said }) => {
+          return SPEAKERS.fr._(said)
         })
         .join(' ')
     )
+  })
+
+  it('hands the search engine an answer without any markup in it', () => {
+    for (const answered of EVERY_FAQ_ANSWER) {
+      expect(answered).not.toMatch(/<\/?\d/u)
+    }
   })
 
   it('asks in the language of the page', () => {

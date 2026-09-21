@@ -34,6 +34,8 @@ export const LOST_FILE = '/404.html'
 
 export const ROBOTS_PATH = '/robots.txt'
 
+export const ISSUES = `${REPOSITORY}/issues`
+
 export const RELEASES = `${REPOSITORY}/releases/latest`
 
 export const PAST_RELEASES = `${REPOSITORY}/releases`

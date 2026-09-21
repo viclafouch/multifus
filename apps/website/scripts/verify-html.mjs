@@ -75,7 +75,7 @@ const complain = (pathname, what) => {
 
 const SCHEMA = /<script type="application\/ld\+json">(.+?)<\/script>/su
 
-const ASK = /<details[^>]*class="[^"]*\bask\b/gu
+const ASK = /\sdata-ask\b/gu
 
 const VIDEO_WANTED = [
   'name',

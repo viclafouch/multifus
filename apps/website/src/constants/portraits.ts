@@ -20,6 +20,7 @@ export const PAGE_PORTRAITS = {
   windows: null,
   comparison: null,
   download: null,
+  faq: null,
   journal: null,
   ankama: null,
   legal: null

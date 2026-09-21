@@ -1,18 +1,14 @@
-import type { MessageDescriptor } from '@lingui/core'
 import { msg } from '@lingui/core/macro'
 import { useLingui } from '@lingui/react'
-import { buttonVariants } from '@multifus/retro'
-import type { Icon } from '@phosphor-icons/react'
-import { GithubLogoIcon } from '@phosphor-icons/react/dist/ssr/GithubLogo'
-import { XLogoIcon } from '@phosphor-icons/react/dist/ssr/XLogo'
 import type { PageId } from '@/@types/page'
 import { BrandMark } from '@/components/brand-mark'
 import { LanguageNav } from '@/components/language-nav'
-import { OutLink } from '@/components/out-link'
+import { LinkNav } from '@/components/link-nav'
 import { PageNav } from '@/components/page-nav'
 import { PerkList } from '@/components/perk-list'
+import { ELSEWHERE_LINKS } from '@/constants/elsewhere'
 import { MENU_FEATURES, PROJECT_PAGES, SOFTWARE_PAGES } from '@/constants/pages'
-import { AUTHOR, AUTHOR_NAME, REPOSITORY } from '@/constants/site'
+import { AUTHOR_NAME } from '@/constants/site'
 import {
   FEATURES_TITLE,
   PERKS,
@@ -23,29 +19,6 @@ import {
 const ANKAMA_CREDIT = msg`Images et vidéos © Ankama Games. Dofus Retro est une marque d’Ankama.`
 
 const FOOTER_PITCH = msg`Le gestionnaire de fenêtres qui amène devant vous le personnage qui joue, sur Mac comme sur Windows.`
-
-const ELSEWHERE = msg`Multifus ailleurs`
-
-const SOURCE_CODE = msg`Le code de Multifus sur GitHub`
-
-const AUTHOR_ON_X = msg`L’auteur sur X`
-
-type Signet = Readonly<{
-  href: string
-  name: MessageDescriptor
-  Mark: Icon
-}>
-
-const SIGNETS = [
-  { href: REPOSITORY, name: SOURCE_CODE, Mark: GithubLogoIcon },
-  { href: AUTHOR, name: AUTHOR_ON_X, Mark: XLogoIcon }
-] as const satisfies readonly Signet[]
-
-const SIGNET_LOOK = buttonVariants({
-  variant: 'slate',
-  size: 'icon',
-  className: 'size-10'
-})
 
 type SiteFooterProps = Readonly<{
   page: PageId
@@ -65,23 +38,7 @@ export const SiteFooter = ({ page }: SiteFooterProps) => {
               {i18n._(FOOTER_PITCH)}
             </p>
             <PerkList perks={PERKS} />
-            <ul
-              aria-label={i18n._(ELSEWHERE)}
-              className="flex items-center gap-2.5"
-            >
-              {SIGNETS.map(({ href, name, Mark }) => {
-                const said = i18n._(name)
-
-                return (
-                  <li key={href}>
-                    <OutLink href={href} isBare className={SIGNET_LOOK}>
-                      <Mark weight="fill" aria-hidden className="size-5" />
-                      <span className="sr-only">{said}</span>
-                    </OutLink>
-                  </li>
-                )
-              })}
-            </ul>
+            <LinkNav links={ELSEWHERE_LINKS} />
           </div>
           <PageNav title={FEATURES_TITLE} pages={MENU_FEATURES} />
           <PageNav title={SOFTWARE_TITLE} pages={SOFTWARE_PAGES} />

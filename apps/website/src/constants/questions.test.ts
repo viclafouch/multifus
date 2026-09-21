@@ -18,6 +18,8 @@ const SCREENS = [
   { page: 'windows', screen: 'windows-screen.tsx' }
 ] as const satisfies readonly Screened[]
 
+const TABLED_PAGES = ['faq'] as const satisfies readonly PageId[]
+
 const ASKED = /QUESTIONS\.(\w+)\.ask/gu
 
 const shownBy = (screen: string) => {
@@ -35,6 +37,10 @@ const ASKING = PAGE_IDS.filter((page) => {
   return PAGE_QUESTIONS[page] !== null
 })
 
+const EVERY_ASKED = PAGE_IDS.flatMap((page) => {
+  return PAGE_QUESTIONS[page] ?? []
+})
+
 describe('the questions of a page', () => {
   it.each(SCREENS)(
     'shows on $page the ones the markup announces, in the same order',
@@ -48,17 +54,15 @@ describe('the questions of a page', () => {
       return page
     })
 
-    expect(screened.toSorted(alphabetical)).toStrictEqual(
+    expect([...screened, ...TABLED_PAGES].toSorted(alphabetical)).toStrictEqual(
       ASKING.toSorted(alphabetical)
     )
   })
 
   it('holds no question it never asks, and asks none it does not hold', () => {
-    const asked = SCREENS.flatMap(({ page }) => {
-      return [...PAGE_QUESTIONS[page]]
-    })
+    const asked = new Set(EVERY_ASKED)
 
-    expect(asked.toSorted(alphabetical)).toStrictEqual(
+    expect([...asked].toSorted(alphabetical)).toStrictEqual(
       Object.keys(QUESTIONS).toSorted(alphabetical)
     )
   })

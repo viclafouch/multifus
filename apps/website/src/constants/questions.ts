@@ -1,83 +1,221 @@
 import { msg } from '@lingui/core/macro'
 import type { Ask, AskId } from '@/@types/ask'
 import type { PageId } from '@/@types/page'
+import { ANKAMA_FORUM, ANKAMA_POST, GAME, REPOSITORY } from '@/constants/site'
 import { SYSTEM_VERSIONS } from '@/constants/systems'
 import { NO_HARM, PAGE_PROMISES } from '@/constants/wording'
 
 export const QUESTIONS = {
+  inside: {
+    ask: msg`Comment ça marche ?`,
+    answer: [
+      {
+        said: msg`Multifus écoute les <0>notifications</0> que Dofus Retro envoie à votre ordinateur : début de tour, invitation, échange, message privé, craft, percepteur attaqué. Windows lui en donne l’accès, macOS passe par l’Accessibilité.`,
+        marks: [{ kind: 'stress' }]
+      },
+      {
+        said: msg`Il lit le <0>titre de vos fenêtres</0> Dofus Retro, où le jeu écrit le pseudo du personnage. La <1>Roue des personnages</1> et le <2>Déplacement rapide</2> voient votre clic, et les <3>Textes rapides</3> collent la phrase dans la fenêtre devant vous.`,
+        marks: [
+          { kind: 'stress' },
+          { kind: 'page', page: 'wheel' },
+          { kind: 'page', page: 'walk' },
+          { kind: 'page', page: 'quickTexts' }
+        ]
+      },
+      {
+        said: msg`Il n’ouvre aucun fichier de Dofus Retro, et ne lit pas sa mémoire. Le <0>code est public</0>, vous pouvez le lire.`,
+        marks: [{ kind: 'out', href: REPOSITORY }]
+      }
+    ]
+  },
+  parity: {
+    ask: msg`Tout est pareil sur Mac et sur Windows ?`,
+    answer: [
+      {
+        said: msg`Les six mécanismes sont sur les deux. <0>Trois choses manquent au Mac.</0>`,
+        marks: [{ kind: 'stress' }]
+      },
+      {
+        said: msg`La barre des tâches de Windows donne un bouton par personnage, avec son pseudo seul dessus et sa tête de classe. Le Mac n’a pas cette barre, donc pas ces boutons.`
+      },
+      {
+        said: msg`Sur Windows, la touche <0>F1 seule</0> appelle un personnage. Sur Mac, il faut une combinaison, Ctrl+Maj+1 par exemple.`,
+        marks: [{ kind: 'stress' }]
+      },
+      {
+        said: msg`Sur Windows, Multifus efface la notification une fois qu’il vous a amené sur le personnage. Sur Mac, la bannière reste jusqu’à ce qu’elle parte d’elle-même.`
+      },
+      {
+        said: msg`Le détail par système est sur <0>Multifus sur Mac</0> et <1>Multifus sur Windows</1>.`,
+        marks: [
+          { kind: 'page', page: 'mac' },
+          { kind: 'page', page: 'windows' }
+        ]
+      }
+    ]
+  },
+  tongue: {
+    ask: msg`Multifus parle ma langue ?`,
+    answer: [
+      {
+        said: msg`<0>Français, anglais, espagnol.</0> Il prend celle de votre ordinateur, et vous en changez dans les réglages.`,
+        marks: [{ kind: 'stress' }]
+      }
+    ]
+  },
+  money: {
+    ask: msg`C’est gratuit, alors qui paie ?`,
+    answer: [
+      {
+        said: msg`<0>Moi.</0> Pas de publicité, pas de compte, pas de version payante. Je paie l’hébergement et le certificat d’Apple.`,
+        marks: [{ kind: 'stress' }]
+      },
+      {
+        said: msg`Je ne vends rien et je ne demande rien. Si le projet vous plaît, une étoile sur <0>GitHub</0> suffit.`,
+        marks: [{ kind: 'out', href: REPOSITORY }]
+      }
+    ]
+  },
   free: {
     ask: msg`C’est gratuit ?`,
     answer: [
-      msg`Oui, et pour toujours. Rien à payer, aucun compte à créer, aucune publicité. Il n’y a pas de version payante cachée derrière.`
+      {
+        said: msg`Oui, et pour toujours. Rien à payer, aucun compte à créer, aucune publicité. Il n’y a pas de version payante cachée derrière.`
+      }
     ]
   },
   risk: {
     ask: msg`Je risque quelque chose sur mon compte ?`,
     answer: [
-      msg`Multifus ne touche pas au jeu. Il ne lit rien dedans, il ne change rien dedans, et il ne joue jamais à votre place. Ankama accepte ce genre de logiciel tant qu’il reste comme ça.`
+      {
+        said: msg`Multifus ne touche pas à Dofus Retro. Il ne lit rien dedans, il ne change rien dedans, et il ne joue <0>jamais</0> à votre place.`,
+        marks: [{ kind: 'stress' }]
+      },
+      {
+        said: msg`Ankama tolère ce genre de logiciel tant qu’il reste comme ça. Elle l’a dit dans un <0>message de Dofus Retro</0> et dans un <1>sujet du forum officiel</1>, tous deux repris sur <2>Ankama et Multifus</2>.`,
+        marks: [
+          { kind: 'out', href: ANKAMA_POST },
+          { kind: 'out', href: ANKAMA_FORUM },
+          { kind: 'page', page: 'ankama' }
+        ]
+      }
     ]
   },
   safe: {
     ask: msg`Le fichier est sûr ?`,
     answer: [
-      msg`Sur Mac, Apple vérifie le fichier avant qu’il s’ouvre, et aucun avertissement ne s’affiche. Sur Windows, votre ordinateur peut demander confirmation : Multifus est encore jeune, et Windows ne le connaît pas encore. Dans les deux cas, il ne vous demande aucune information, et n’en envoie aucune.`
+      {
+        said: msg`Sur Mac, Apple vérifie le fichier avant qu’il s’ouvre, et aucun avertissement ne s’affiche. Sur Windows, votre ordinateur peut demander confirmation : Multifus est encore jeune, et Windows ne le connaît pas encore.`
+      },
+      {
+        said: msg`Dans les deux cas, il ne crée aucun compte et <0>n’envoie rien de votre ordinateur</0>. La seule sortie est Telegram, si vous branchez vous-même les <1>Messages privés</1>.`,
+        marks: [{ kind: 'stress' }, { kind: 'page', page: 'relay' }]
+      }
     ]
   },
   machine: {
     ask: msg`Ça marche sur mon ordinateur ?`,
     answer: [
-      msg`Sur Mac, il faut ${SYSTEM_VERSIONS.macos} ou plus récent, sur Mac Intel comme Apple Silicon.`,
-      msg`Sur Windows, il faut ${SYSTEM_VERSIONS.windows} ou plus récent.`
+      {
+        said: msg`Sur Mac, il faut ${SYSTEM_VERSIONS.macos} ou plus récent, sur Mac Intel comme Apple Silicon.`
+      },
+      {
+        said: msg`Sur Windows, il faut ${SYSTEM_VERSIONS.windows} ou plus récent.`
+      }
     ]
   },
   macFloor: {
     ask: msg`Ça marche sur mon Mac ?`,
     answer: [
-      msg`Il faut ${SYSTEM_VERSIONS.macos} ou plus récent. Les Mac Intel et les Mac Apple Silicon reçoivent le même fichier.`
+      {
+        said: msg`Il faut ${SYSTEM_VERSIONS.macos} ou plus récent. Les Mac Intel et les Mac Apple Silicon reçoivent le même fichier.`
+      }
     ]
   },
   monterey: {
     ask: msg`Mon Mac est sous Monterey, ça marche ?`,
-    answer: [msg`Non. Il faut ${SYSTEM_VERSIONS.macos} ou plus récent.`]
+    answer: [
+      { said: msg`Non. Il faut ${SYSTEM_VERSIONS.macos} ou plus récent.` }
+    ]
   },
   macAccess: {
     ask: msg`Qu’est-ce que Multifus demande à macOS ?`,
     answer: [
-      msg`L’accès à l’Accessibilité, et rien d’autre. C’est ce qui lui permet de voir et de ranger les fenêtres du jeu.`,
-      msg`Sans cet accès, Multifus ne voit rien et ne peut rien faire.`,
-      msg`Et son ouverture au démarrage du Mac, si vous cochez la case.`
+      {
+        said: msg`L’accès à l’Accessibilité, et rien d’autre. C’est ce qui lui permet de voir et de ranger les fenêtres du jeu.`
+      },
+      {
+        said: msg`Sans cet accès, Multifus ne voit rien et ne peut rien faire.`
+      },
+      {
+        said: msg`Et son ouverture au démarrage du Mac, si vous cochez la case.`
+      }
     ]
   },
   count: {
     ask: msg`Je peux jouer combien de comptes ?`,
     answer: [
-      msg`Autant que votre PC en ouvre. 4, 6, 8 clients Dofus Retro : Multifus les range tous pareil.`
+      {
+        said: msg`<0>Autant que votre PC en ouvre.</0> 4, 6, 8 clients Dofus Retro : Multifus les range tous pareil.`,
+        marks: [{ kind: 'stress' }]
+      },
+      {
+        said: msg`Ankama ne met aucune limite au nombre de clients ouverts, et Multifus non plus. Le <0>comparatif</0> dit ce que font les autres.`,
+        marks: [{ kind: 'page', page: 'comparison' }]
+      }
     ]
   },
   eleven: {
     ask: msg`Ça marche sur Windows 11 ?`,
-    answer: [msg`Oui, et sur Windows 10 aussi. L’installation prend 3 gestes.`]
+    answer: [
+      {
+        said: msg`Oui, et sur Windows 10 aussi. L’installation prend 3 gestes.`
+      }
+    ]
   },
   seven: {
     ask: msg`Mon PC est sous Windows 7, ça marche ?`,
-    answer: [msg`Non. Il faut Windows 10 ou Windows 11.`]
+    answer: [{ said: msg`Non. Il faut Windows 10 ou Windows 11.` }]
   },
   windowsAccess: {
     ask: msg`Qu’est-ce que Multifus demande à Windows ?`,
     answer: [
-      msg`L’accès aux notifications, et rien d’autre.`,
-      msg`Et son exécution au démarrage de Windows, si vous cochez la case.`
+      { said: msg`L’accès aux notifications, et rien d’autre.` },
+      {
+        said: msg`Et son exécution au démarrage de Windows, si vous cochez la case.`
+      }
     ]
   },
   modern: {
     ask: msg`Ça marche sur Dofus 2 ou Dofus 3 ?`,
-    answer: [msg`Non. Multifus ne connaît que Dofus Retro, la 1.29.`]
+    answer: [
+      {
+        said: msg`Non. Multifus ne connaît que <0>Dofus Retro</0>, toutes versions 1.x : la 1.29, la 1.40, et celles d’après.`,
+        marks: [{ kind: 'out', href: GAME }]
+      },
+      {
+        said: msg`<0>Dofus 2 et Dofus 3 ne sont pas concernés.</0> Ils n’ont ni les mêmes fenêtres ni les mêmes notifications.`,
+        marks: [{ kind: 'stress' }]
+      }
+    ]
   },
   allowed: {
     ask: msg`Ankama l’autorise ?`,
-    answer: [PAGE_PROMISES.ankama, NO_HARM]
+    answer: [{ said: PAGE_PROMISES.ankama }, { said: NO_HARM }]
   }
 } as const satisfies Record<AskId, Ask>
+
+export const FAQ_ASKS = [
+  'inside',
+  'risk',
+  'safe',
+  'machine',
+  'modern',
+  'parity',
+  'count',
+  'tongue',
+  'money'
+] as const satisfies readonly AskId[]
 
 export const PAGE_QUESTIONS = {
   home: null,
@@ -91,6 +229,7 @@ export const PAGE_QUESTIONS = {
   windows: ['count', 'eleven', 'seven', 'windowsAccess', 'modern', 'allowed'],
   comparison: null,
   download: ['free', 'risk', 'safe', 'machine'],
+  faq: FAQ_ASKS,
   journal: null,
   ankama: null,
   legal: null

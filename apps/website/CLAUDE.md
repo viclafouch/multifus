@@ -19,6 +19,8 @@ Une phrase, un fait, lu du premier coup et vérifiable. Le registre est celui de
 la notice, pas celui du récit.
 
 - Le mot courant, le verbe simple, la phrase courte.
+- « Je » est l'auteur du site, « vous » est le lecteur. Un lien vers son compte
+  dit « Me contacter », une dépense dit « Je paie ».
 - Le sujet est nommé : le lecteur, Multifus, le jeu, la fenêtre. Un titre qui
   commence par « il » ou « elle » laisse le lecteur deviner.
 - Un titre de carte tient en cinq mots et annonce le gain.

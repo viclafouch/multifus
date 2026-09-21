@@ -58,6 +58,7 @@ export const PAGE_DECORS = {
   windows: DECORS.camp,
   comparison: DECORS.arena,
   download: DECORS.standingStone,
+  faq: DECORS.standingStone,
   journal: null,
   ankama: DECORS.village,
   legal: null
@@ -75,6 +76,7 @@ export const OG_DECOR_FILES = {
   windows: `${DECOR_DIR}/camp.webp`,
   comparison: `${DECOR_DIR}/arena.webp`,
   download: `${DECOR_DIR}/standing-stone.webp`,
+  faq: `${DECOR_DIR}/standing-stone.webp`,
   journal: `${DECOR_DIR}/standing-stone.webp`,
   ankama: `${DECOR_DIR}/village.webp`,
   legal: `${DECOR_DIR}/standing-stone.webp`

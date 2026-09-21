@@ -5,12 +5,12 @@ import { DownloadSimpleIcon } from '@phosphor-icons/react/dist/ssr/DownloadSimpl
 import type { PageId } from '@/@types/page'
 import { BrandMark } from '@/components/brand-mark'
 import { FeaturesMenu } from '@/components/features-menu'
+import { HelpMenu } from '@/components/help-menu'
 import { LanguageBar } from '@/components/language-bar'
 import { LanguageOffer } from '@/components/language-offer'
 import { MastLink } from '@/components/mast-link'
 import { MastMenu } from '@/components/mast-menu'
 import { PageLink } from '@/components/page-link'
-import { SupportMenu } from '@/components/support-menu'
 import { INDEPENDENCE, PAGE_NAMES } from '@/constants/wording'
 import { useLanguage } from '@/hooks/use-language'
 import { useOffer } from '@/hooks/use-offer'
@@ -42,7 +42,7 @@ export const SiteHeader = ({ page }: SiteHeaderProps) => {
           <BrandMark />
           <FeaturesMenu page={page} />
           <MastLink page="comparison" />
-          <SupportMenu page={page} />
+          <HelpMenu page={page} />
           <LanguageBar page={page} className="ml-auto hidden lg:flex" />
           <Button
             variant={isOnDownload ? 'slate' : 'leaf'}

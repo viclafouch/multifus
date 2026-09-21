@@ -15,6 +15,7 @@ export const PAGE_NAMES = {
   windows: msg`Multifus sur Windows`,
   comparison: msg`Comparatif`,
   download: msg`Télécharger`,
+  faq: msg`Questions fréquentes`,
   journal: msg`Journal des versions`,
   ankama: msg`Ankama tolère-t-il Multifus ?`,
   legal: msg`Mentions légales`
@@ -32,6 +33,7 @@ export const PAGE_TITLES = {
   windows: msg`Logiciel multicompte Dofus Retro sur Windows`,
   comparison: msg`Comparatif des logiciels multicompte Dofus Retro`,
   download: msg`Télécharger le logiciel multicompte Dofus Retro`,
+  faq: msg`Le multicompte Dofus Retro en questions`,
   journal: msg`Journal des versions du multicompte Dofus Retro`,
   ankama: msg`Le multicompte est-il autorisé sur Dofus Retro ?`,
   legal: msg`Mentions légales`
@@ -49,6 +51,7 @@ export const PAGE_DESCRIPTIONS = {
   windows: msg`Le multicompte Dofus Retro sur Windows 10 et 11 : chaque personnage prend son bouton dans la barre des tâches, avec son pseudo et sa tête de classe.`,
   comparison: msg`Multifus, Dracoon, Focus Retro, Dosoft, Retro Toolbox, ROrganizer : quatorze lignes comparées, chacune lue dans le code de l’outil et pas sur sa page d’accueil.`,
   download: msg`Téléchargez Multifus gratuitement, pour Mac et pour Windows. Trois gestes pour installer, aucun compte à créer, aucune publicité, et le code est public.`,
+  faq: msg`Ankama, votre compte, votre ordinateur, votre langue, le prix : les questions qu’on me pose avant d’installer un logiciel multicompte sur Dofus Retro.`,
   journal: msg`Ce que chaque version de Multifus a changé pour le multicompte sur Dofus Retro : les fonctionnalités ajoutées, les réglages déplacés, les défauts corrigés.`,
   ankama: msg`Oui. Ankama tolère les logiciels qui rangent les fenêtres du jeu tant qu’ils n’y touchent à rien. Les deux réponses publiques d’Ankama sont citées ici.`,
   legal: msg`Qui publie Multifus, qui héberge le site, ce qu’il garde de vous, et les marques citées ici qui ne sont pas les nôtres.`
@@ -66,6 +69,7 @@ export const PAGE_PROMISES = {
   windows: msg`Le multicompte Dofus Retro sur Windows, un bouton par personnage.`,
   comparison: msg`Multifus et les autres gestionnaires, ligne par ligne.`,
   download: msg`Multifus est gratuit, pour Mac et pour Windows. Trois gestes, et vous jouez en multicompte sur Dofus Retro.`,
+  faq: msg`Ce qu’on me demande avant d’installer Multifus.`,
   journal: msg`Ce que chaque version a changé.`,
   ankama: msg`Oui. Ankama tolère les logiciels qui rangent les fenêtres du jeu, tant qu’ils n’y touchent à rien. Multifus reste dans ce cadre.`,
   legal: msg`Qui publie ce site, qui l’héberge, et le peu qu’il garde de vous.`
@@ -92,13 +96,19 @@ export const TONGUES_TITLE = msg`La langue du site`
 
 export const FEATURES_TAB = msg`Fonctionnalités`
 
-export const SUPPORT_TAB = msg`Support`
+export const HELP_TAB = msg`Aide`
 
 export const FEATURES_TITLE = msg`Les fonctionnalités`
 
 export const SOFTWARE_TITLE = msg`Le logiciel`
 
 export const PROJECT_TITLE = msg`Le projet`
+
+export const ELSEWHERE_TITLE = msg`Multifus ailleurs`
+
+export const REACH_TITLE = msg`Votre question n’est pas là ?`
+
+export const REACH_LEAD = msg`Écrivez-moi, je réponds.`
 
 export const LIMITS_TITLE = msg`Ce que Multifus ne fait pas`
 
@@ -107,8 +117,6 @@ export const QUESTIONS_TITLE = msg`Les questions qu’on se pose`
 export const NO_HARM = msg`Multifus ne lit pas la mémoire du jeu, ne touche à aucun de ses fichiers, et ne joue à votre place sur aucun personnage.`
 
 export const BEFORE_INSTALL = msg`Avant d’installer`
-
-export const CONTACT_AUTHOR = msg`Me contacter`
 
 export const PERKS = [
   msg`Gratuit`,

@@ -3,6 +3,7 @@ import { I18nProvider } from '@lingui/react'
 import { act, cleanup, fireEvent, screen } from '@testing-library/react'
 import type { Language } from '@/@types/language'
 import { MastMenu, MENU_OPEN, MENU_SHUT } from '@/components/mast-menu'
+import { ELSEWHERE_LINKS } from '@/constants/elsewhere'
 import { LANGUAGE_NAMES, LANGUAGES } from '@/constants/languages'
 import { PAGE_IDS } from '@/constants/pages'
 import { PAGE_NAMES } from '@/constants/wording'
@@ -94,6 +95,24 @@ describe('the menu of the mast', () => {
 
     for (const page of PAGE_IDS) {
       expect(written.has(pathOf({ page, language }))).toBe(true)
+    }
+  })
+
+  it.each(LANGUAGES)('leads outside the site in %s', (language) => {
+    show(language)
+    openIn(language)
+
+    for (const { href, name } of ELSEWHERE_LINKS) {
+      const said = SPEAKERS[language]._(name)
+      const link = screen.getByRole('link', {
+        name: (found) => {
+          return found.startsWith(said)
+        }
+      })
+
+      expect(link.getAttribute('href')).toBe(href)
+      expect(link.getAttribute('target')).toBe('_blank')
+      expect(link.getAttribute('rel')).toContain('noopener')
     }
   })
 

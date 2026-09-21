@@ -197,6 +197,8 @@ const crumbsOf = ({ page, language }: PathParams) => {
   } satisfies Addressed<BreadcrumbList>
 }
 
+const MARKUP = /<\d+\s*\/?>|<\/\d+>/gu
+
 type AskedOfParams = PathParams & Readonly<{ asked: readonly AskId[] }>
 
 const askedOf = ({ page, language, asked }: AskedOfParams) => {
@@ -212,8 +214,8 @@ const askedOf = ({ page, language, asked }: AskedOfParams) => {
       acceptedAnswer: {
         '@type': 'Answer',
         text: answer
-          .map((line) => {
-            return speaker._(line)
+          .map(({ said }) => {
+            return speaker._(said).replaceAll(MARKUP, '')
           })
           .join(' ')
       }
