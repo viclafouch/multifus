@@ -542,8 +542,8 @@ msgid "Le multicompte Dofus Retro sur Windows 10 et 11 : chaque personnage prend
 msgstr "La multicuenta de Dofus Retro en Windows 10 y 11: cada personaje tiene su botón en la barra de tareas, con su apodo y su cabeza de clase."
 
 #: src/constants/wording.ts
-msgid "Le multicompte Dofus Retro sur Windows 10 et 11, avec une barre des tâches personnalisable."
-msgstr "La multicuenta de Dofus Retro en Windows 10 y 11, con una barra de tareas personalizable."
+msgid "Le multicompte Dofus Retro sur Windows, un bouton par personnage."
+msgstr "La multicuenta de Dofus Retro en Windows, un botón por personaje."
 
 #: src/constants/wording.ts
 msgid "Le multicompte est-il autorisé sur Dofus Retro ?"

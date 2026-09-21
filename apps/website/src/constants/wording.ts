@@ -63,7 +63,7 @@ export const PAGE_PROMISES = {
   relay: msg`Votre téléphone reçoit vos messages privés du jeu.`,
   quickTexts: msg`Une combinaison écrit la phrase à votre place.`,
   mac: msg`Le multicompte Dofus Retro sur Mac, dans une application qu’Apple a vérifiée.`,
-  windows: msg`Le multicompte Dofus Retro sur Windows 10 et 11, avec une barre des tâches personnalisable.`,
+  windows: msg`Le multicompte Dofus Retro sur Windows, un bouton par personnage.`,
   comparison: msg`Multifus et les autres gestionnaires, ligne par ligne.`,
   download: msg`Multifus est gratuit, pour Mac et pour Windows. Trois gestes, et vous jouez en multicompte sur Dofus Retro.`,
   journal: msg`Ce que chaque version a changé.`,
