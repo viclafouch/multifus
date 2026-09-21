@@ -68,16 +68,16 @@ describe('the table of the comparison', () => {
     expect(lost).toHaveLength(LOST_BY_MULTIFUS)
   })
 
-  it('says why on each row Multifus loses, and there alone', () => {
-    const lost = TRAIT_IDS.filter((trait) => {
-      return TRAITS[trait].mine === 'no'
+  it('says why on each row Multifus does not win outright, and there alone', () => {
+    const unwon = TRAIT_IDS.filter((trait) => {
+      return TRAITS[trait].mine !== 'yes'
     })
     const told = MINE_NOTES.map((note) => {
       return note.trait
     })
 
     expect(told.toSorted(alphabetical)).toStrictEqual(
-      lost.toSorted(alphabetical)
+      unwon.toSorted(alphabetical)
     )
   })
 

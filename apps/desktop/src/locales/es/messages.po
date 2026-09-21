@@ -671,12 +671,12 @@ msgid "Ce n’est pas en place."
 msgstr "No está en su sitio."
 
 #: src/screens/about/project-panel.tsx
-msgid "Ce qu’Ankama autorise"
-msgstr "Lo que Ankama permite"
+msgid "Ce qu’Ankama tolère"
+msgstr "Lo que Ankama tolera"
 
 #: src/screens/about/project-panel.tsx
-msgid "Ce qu’elle tolère, et les deux messages où elle l’écrit."
-msgstr "Lo que tolera, y los dos mensajes donde lo dice."
+msgid "Ce qu’elle laisse faire, et ce qui fait bannir."
+msgstr "Lo que deja hacer, y lo que hace que te baneen."
 
 #: src/helpers/health.ts
 msgid "Ce que ce système le laisse lire est en place. Pour le reste, seul un appel du jeu qui vous ramène devant tranchera."
@@ -1739,13 +1739,13 @@ msgstr "Las teclas pulsadas mientras rompes: la tabla se abre sobre el juego, lo
 msgid "Les touches maintenues dans le jeu : la roue s’ouvre au milieu de l’écran, la tête visée s’allume, et sa fenêtre passe devant."
 msgstr "Las teclas mantenidas dentro del juego: la rueda se abre en medio de la pantalla, la cara apuntada se enciende y su ventana pasa al frente."
 
-#: src/screens/about/project-panel.tsx
-msgid "Lire la règle"
-msgstr "Leer la regla"
-
 #: src/components/world/loop-curtain.tsx
 msgid "Lire la vidéo"
 msgstr "Reproducir el vídeo"
+
+#: src/screens/about/project-panel.tsx
+msgid "Lire les deux messages"
+msgstr "Leer los dos mensajes"
 
 #: src/screens/about/project-panel.tsx
 msgid "Lire les mentions"

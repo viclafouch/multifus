@@ -18,7 +18,7 @@ import {
 import { PAGES } from '@/constants/pages'
 import { FOLD_ANCHOR } from '@/constants/site'
 
-const RULES_TITLE = msg`La règle d’Ankama`
+const RULES_TITLE = msg`La tolérance d’Ankama`
 
 const SOURCES_TITLE = msg`Les sources`
 

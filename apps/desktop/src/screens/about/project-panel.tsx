@@ -70,11 +70,11 @@ export const ProjectPanel = ({ update, run }: ProjectPanelProps) => {
         />
       </FieldRow>
       <FieldRow
-        label={t`Ce qu’Ankama autorise`}
-        description={t`Ce qu’elle tolère, et les deux messages où elle l’écrit.`}
+        label={t`Ce qu’Ankama tolère`}
+        description={t`Ce qu’elle laisse faire, et ce qui fait bannir.`}
       >
         <LinkButton
-          label={t`Lire la règle`}
+          label={t`Lire les deux messages`}
           onOpen={() => {
             return openAboutLink('ankama')
           }}

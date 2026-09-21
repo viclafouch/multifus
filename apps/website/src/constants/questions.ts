@@ -1,7 +1,13 @@
 import { msg } from '@lingui/core/macro'
 import type { Ask, AskId } from '@/@types/ask'
 import type { PageId } from '@/@types/page'
-import { ANKAMA_FORUM, ANKAMA_POST, GAME, REPOSITORY } from '@/constants/site'
+import {
+  ANKAMA_FORUM,
+  ANKAMA_POST,
+  GAME,
+  RELEASES,
+  REPOSITORY
+} from '@/constants/site'
 import { SYSTEM_VERSIONS } from '@/constants/systems'
 import { NO_HARM, PAGE_PROMISES } from '@/constants/wording'
 
@@ -177,6 +183,22 @@ export const QUESTIONS = {
     ask: msg`Mon PC est sous Windows 7, ça marche ?`,
     answer: [{ said: msg`Non. Il faut Windows 10 ou Windows 11.` }]
   },
+  warning: {
+    ask: msg`Windows affiche un avertissement, c’est normal ?`,
+    answer: [
+      {
+        said: msg`<0>Oui. Cliquez sur « Informations complémentaires », puis sur « Exécuter quand même ».</0>`,
+        marks: [{ kind: 'stress' }]
+      },
+      {
+        said: msg`Windows prévient pour tout logiciel qu’il voit encore peu, et Multifus vient de sortir. L’avertissement partira quand assez de monde l’aura téléchargé.`
+      },
+      {
+        said: msg`Payer un certificat ne le ferait pas partir plus vite. Chaque version porte une <0>attestation GitHub</0> qui dit de quel code elle a été construite.`,
+        marks: [{ kind: 'out', href: RELEASES }]
+      }
+    ]
+  },
   windowsAccess: {
     ask: msg`Qu’est-ce que Multifus demande à Windows ?`,
     answer: [
@@ -226,7 +248,15 @@ export const PAGE_QUESTIONS = {
   relay: null,
   quickTexts: null,
   mac: ['macFloor', 'monterey', 'macAccess'],
-  windows: ['count', 'eleven', 'seven', 'windowsAccess', 'modern', 'allowed'],
+  windows: [
+    'warning',
+    'count',
+    'eleven',
+    'seven',
+    'windowsAccess',
+    'modern',
+    'allowed'
+  ],
   comparison: null,
   download: ['free', 'risk', 'safe', 'machine'],
   faq: FAQ_ASKS,

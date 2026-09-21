@@ -47,6 +47,10 @@ msgstr "<0>French, English, Spanish.</0> It takes the one your computer uses, an
 msgid "<0>Moi.</0> Pas de publicité, pas de compte, pas de version payante. Je paie l’hébergement et le certificat d’Apple."
 msgstr "<0>Me.</0> No adverts, no account, no paid version. I pay for the hosting and the Apple certificate."
 
+#: src/constants/questions.ts
+msgid "<0>Oui. Cliquez sur « Informations complémentaires », puis sur « Exécuter quand même ».</0>"
+msgstr "<0>Yes. Click “More info”, then “Run anyway”.</0>"
+
 #: src/constants/rivals.ts
 msgid "à moitié"
 msgstr "partly"
@@ -86,6 +90,10 @@ msgstr "Ankama can change its mind. On that day, Multifus stops."
 #: src/constants/questions.ts
 msgid "Ankama tolère ce genre de logiciel tant qu’il reste comme ça. Elle l’a dit dans un <0>message de Dofus Retro</0> et dans un <1>sujet du forum officiel</1>, tous deux repris sur <2>Ankama et Multifus</2>."
 msgstr "Ankama tolerates this kind of software as long as it stays that way. It said so in a <0>post from Dofus Retro</0> and in a <1>thread on the official forum</1>, both quoted on <2>Ankama and Multifus</2>."
+
+#: src/constants/summons.ts
+msgid "Ankama tolère ce que Multifus fait"
+msgstr "Ankama tolerates what Multifus does"
 
 #: src/constants/wording.ts
 msgid "Ankama tolère-t-il Multifus ?"
@@ -509,10 +517,6 @@ msgstr "the same icon for all your clients"
 msgid "La première version de Multifus n’est pas encore publiée."
 msgstr "The first version of Multifus is not published yet."
 
-#: src/screens/ankama-screen.tsx
-msgid "La règle d’Ankama"
-msgstr "The rule Ankama set"
-
 #: src/constants/loops.ts
 msgid "La roue des personnages, l’AutoFocus, le déplacement rapide et le tableau des runes, dans le jeu"
 msgstr "The character wheel, AutoFocus, quick move and the rune table, inside the game"
@@ -524,6 +528,10 @@ msgstr "the class head of the character, in its colour"
 #: src/constants/bodies.ts
 msgid "La tête de classe suffit"
 msgstr "The class head is enough"
+
+#: src/screens/ankama-screen.tsx
+msgid "La tolérance d’Ankama"
+msgstr "Ankama’s tolerance"
 
 #: src/screens/legal-screen.tsx
 msgid "La vitesse des pages est mesurée de la même manière. <0>Vercel Speed Insights</0> relève le temps d’affichage d’une page chez vous, sans identifiant et sans profil."
@@ -798,8 +806,8 @@ msgid "Multifus"
 msgstr "Multifus"
 
 #: src/constants/rivals.ts
-msgid "Multifus agrandit la fenêtre qui joue, il ne rétrécit jamais les autres."
-msgstr "Multifus enlarges the window that plays, it never shrinks the others."
+msgid "Multifus agrandit les clients à leur ouverture, il ne les range jamais côte à côte."
+msgstr "Multifus maximizes clients as they open, it never lays them side by side."
 
 #: src/constants/wording.ts
 msgid "Multifus ailleurs"
@@ -860,10 +868,6 @@ msgstr "Multifus does not touch Dofus Retro. It reads nothing inside, it changes
 #: src/constants/questions.ts
 msgid "Multifus parle ma langue ?"
 msgstr "Does Multifus speak my language?"
-
-#: src/constants/summons.ts
-msgid "Multifus respecte les CGU d’Ankama"
-msgstr "Multifus follows Ankama’s terms of use"
 
 #: src/constants/summons.ts
 msgid "Multifus s’installe sur Mac et sur Windows"
@@ -994,6 +998,10 @@ msgstr "Past four characters, one key per window becomes impossible to remember.
 msgid "Pause"
 msgstr "Pause"
 
+#: src/constants/questions.ts
+msgid "Payer un certificat ne le ferait pas partir plus vite. Chaque version porte une <0>attestation GitHub</0> qui dit de quel code elle a été construite."
+msgstr "Paying for a certificate would not make it go any faster. Every release carries a <0>GitHub attestation</0> that says which code it was built from."
+
 #: src/constants/bodies.ts
 msgid "Plus de touche à retenir"
 msgstr "No key to remember"
@@ -1109,6 +1117,10 @@ msgstr "If you are looking to have your characters play without you, Multifus wi
 #: src/constants/elsewhere.ts
 msgid "Signaler un problème"
 msgstr "Report a problem"
+
+#: src/constants/rivals.ts
+msgid "Signé et vérifié par Apple sur Mac. Sur Windows, seule l’attestation GitHub y est."
+msgstr "Signed and checked by Apple on Mac. On Windows, only the GitHub attestation is there."
 
 #: src/screens/home-screen.tsx
 msgid "Six mécanismes, un seul but : ne plus chercher le personnage qui vous attend."
@@ -1404,3 +1416,11 @@ msgstr "You recognise the portrait and the nickname, and you go straight to it."
 #: src/constants/bodies.ts
 msgid "Vous savez qui s’est déconnecté"
 msgstr "You know who got disconnected"
+
+#: src/constants/questions.ts
+msgid "Windows affiche un avertissement, c’est normal ?"
+msgstr "Windows shows a warning, is that normal?"
+
+#: src/constants/questions.ts
+msgid "Windows prévient pour tout logiciel qu’il voit encore peu, et Multifus vient de sortir. L’avertissement partira quand assez de monde l’aura téléchargé."
+msgstr "Windows warns about any software it has not seen much of yet, and Multifus has just come out. The warning will go once enough people have downloaded it."

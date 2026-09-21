@@ -671,12 +671,12 @@ msgid "Ce n’est pas en place."
 msgstr "It is not in place."
 
 #: src/screens/about/project-panel.tsx
-msgid "Ce qu’Ankama autorise"
-msgstr "What Ankama allows"
+msgid "Ce qu’Ankama tolère"
+msgstr "What Ankama tolerates"
 
 #: src/screens/about/project-panel.tsx
-msgid "Ce qu’elle tolère, et les deux messages où elle l’écrit."
-msgstr "What it tolerates, and the two messages that say so."
+msgid "Ce qu’elle laisse faire, et ce qui fait bannir."
+msgstr "What it lets you do, and what gets you banned."
 
 #: src/helpers/health.ts
 msgid "Ce que ce système le laisse lire est en place. Pour le reste, seul un appel du jeu qui vous ramène devant tranchera."
@@ -1739,13 +1739,13 @@ msgstr "The keys struck while breaking runes: the table opens over the game, the
 msgid "Les touches maintenues dans le jeu : la roue s’ouvre au milieu de l’écran, la tête visée s’allume, et sa fenêtre passe devant."
 msgstr "The keys held down in the game: the wheel opens in the middle of the screen, the face you aim at lights up, and its window comes to the front."
 
-#: src/screens/about/project-panel.tsx
-msgid "Lire la règle"
-msgstr "Read the rule"
-
 #: src/components/world/loop-curtain.tsx
 msgid "Lire la vidéo"
 msgstr "Play the video"
+
+#: src/screens/about/project-panel.tsx
+msgid "Lire les deux messages"
+msgstr "Read the two posts"
 
 #: src/screens/about/project-panel.tsx
 msgid "Lire les mentions"

@@ -15,7 +15,7 @@ export const SUMMONS = {
   trust: {
     decor: BAND_DECORS.bones,
     shape: 'center',
-    title: msg`Multifus respecte les CGU d’Ankama`,
+    title: msg`Ankama tolère ce que Multifus fait`,
     line: msg`Aucun fichier du jeu n’est lu, et aucune action n’est jouée à votre place.`
   },
   whole: {

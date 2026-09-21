@@ -193,7 +193,7 @@ export const TRAITS = {
     }
   },
   signed: {
-    mine: 'yes',
+    mine: 'half',
     theirs: {
       dracoon: 'no',
       focusRetro: 'half',
@@ -240,11 +240,15 @@ export const MARK_NAMES = {
 export const MINE_NOTES = [
   {
     trait: 'split',
-    line: msg`Multifus agrandit la fenêtre qui joue, il ne rétrécit jamais les autres.`
+    line: msg`Multifus agrandit les clients à leur ouverture, il ne les range jamais côte à côte.`
   },
   {
     trait: 'savedOrders',
     line: msg`L’AutoFocus amène le bon personnage tout seul : l’ordre ne sert qu’au défilement.`
+  },
+  {
+    trait: 'signed',
+    line: msg`Signé et vérifié par Apple sur Mac. Sur Windows, seule l’attestation GitHub y est.`
   }
 ] as const satisfies readonly MineNote[]
 

@@ -87,11 +87,11 @@ describe('the About screen', () => {
       expect(bridge.openAboutLink).toHaveBeenCalledWith('issues')
     })
 
-    it('reads what Ankama allows and the legal notice on the site', () => {
+    it('reads what Ankama tolerates and the legal notice on the site', () => {
       bridge.openAboutLink.mockResolvedValue(null)
       show()
 
-      fireEvent.click(buttonNamed('Lire la règle'))
+      fireEvent.click(buttonNamed('Lire les deux messages'))
       fireEvent.click(buttonNamed('Lire les mentions'))
 
       expect(bridge.openAboutLink).toHaveBeenCalledWith('ankama')
@@ -102,9 +102,7 @@ describe('the About screen', () => {
       show()
 
       expect(
-        screen.getByText(
-          'Ce qu’elle tolère, et les deux messages où elle l’écrit.'
-        )
+        screen.getByText('Ce qu’elle laisse faire, et ce qui fait bannir.')
       ).not.toBeNull()
       expect(
         screen.getByText('Qui publie Multifus, et ce qui appartient à Ankama.')

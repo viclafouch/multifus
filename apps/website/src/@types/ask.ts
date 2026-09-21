@@ -18,6 +18,7 @@ export type AskId =
   | 'safe'
   | 'seven'
   | 'tongue'
+  | 'warning'
   | 'windowsAccess'
 
 export type AskMark =
