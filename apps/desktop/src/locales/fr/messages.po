@@ -1950,8 +1950,8 @@ msgid "Multifus n’a pas pu relire les réglages"
 msgstr "Multifus n’a pas pu relire les réglages"
 
 #: src/helpers/wording.ts
-msgid "Multifus n’a pas retrouvé le code de votre robot ({detail})."
-msgstr "Multifus n’a pas retrouvé le code de votre robot ({detail})."
+msgid "Multifus n’a pas retrouvé le code de votre robot ({detail}). Retirez ce robot, puis refaites les cinq étapes."
+msgstr "Multifus n’a pas retrouvé le code de votre robot ({detail}). Retirez ce robot, puis refaites les cinq étapes."
 
 #: src/helpers/wording.ts
 msgid "Multifus n’a pas réussi à mettre le fichier de côté. Le prochain enregistrement l’écrasera. Copiez-le ailleurs si son contenu compte."

@@ -169,7 +169,7 @@ export const pairingProblemLine = (problem: PairingProblem) => {
 export const relayFailureLine = ({ reason, detail }: RelayFailure) => {
   switch (reason) {
     case 'keychain': {
-      return t`Multifus n’a pas retrouvé le code de votre robot (${detail}).`
+      return t`Multifus n’a pas retrouvé le code de votre robot (${detail}). Retirez ce robot, puis refaites les cinq étapes.`
     }
     case 'telegram': {
       return t`Telegram a refusé la demande (${detail}).`

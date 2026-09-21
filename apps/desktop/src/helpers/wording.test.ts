@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { PairingProblem } from '@/@types/relay'
+import type { PairingProblem, RelayFailure } from '@/@types/relay'
 import type { Character } from '@/@types/roster'
 import type { QuickText, ShortcutStatus } from '@/@types/shortcuts'
 import type { UpdateStatus } from '@/@types/system'
@@ -18,6 +18,7 @@ import {
   listeningLine,
   missingGenderLine,
   pairingProblemLine,
+  relayFailureLine,
   shortcutStatusLine,
   updateLine
 } from '@/helpers/wording'
@@ -77,6 +78,26 @@ const PAIRING_CASES = {
     line: 'Telegram n’a pas répondu. Vérifiez votre connexion (délai dépassé).'
   }
 } as const satisfies Record<PairingProblem['kind'], PairingCase>
+
+type RelayFailureCase = {
+  readonly failure: RelayFailure
+  readonly line: string
+}
+
+const RELAY_FAILURE_CASES = {
+  keychain: {
+    failure: { reason: 'keychain', detail: 'accès refusé' },
+    line: 'Multifus n’a pas retrouvé le code de votre robot (accès refusé). Retirez ce robot, puis refaites les cinq étapes.'
+  },
+  telegram: {
+    failure: { reason: 'telegram', detail: 'HTTP 401' },
+    line: 'Telegram a refusé la demande (HTTP 401).'
+  },
+  network: {
+    failure: { reason: 'network', detail: 'délai dépassé' },
+    line: 'Telegram n’a pas répondu. Vérifiez votre connexion (délai dépassé).'
+  }
+} as const satisfies Record<RelayFailure['reason'], RelayFailureCase>
 
 type StatusCase = {
   readonly status: ShortcutStatus
@@ -154,6 +175,17 @@ describe('pairingProblemLine', () => {
     'puts into words the pairing failure $problem.kind',
     ({ problem, line }) => {
       const written = pairingProblemLine(problem)
+
+      expect(written).toBe(line)
+    }
+  )
+})
+
+describe('relayFailureLine', () => {
+  it.each(Object.values(RELAY_FAILURE_CASES))(
+    'puts into words the relay failure $failure.reason',
+    ({ failure, line }) => {
+      const written = relayFailureLine(failure)
 
       expect(written).toBe(line)
     }
