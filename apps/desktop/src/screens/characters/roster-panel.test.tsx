@@ -344,6 +344,9 @@ describe('the main character', () => {
       return within(row).getByText(/^Iop · /u).textContent
     })
 
-    expect(subLines).toStrictEqual(['Iop · Exclu', 'Iop · Déconnecté'])
+    expect(subLines).toStrictEqual([
+      'Iop · Exclu des raccourcis',
+      'Iop · Déconnecté'
+    ])
   })
 })

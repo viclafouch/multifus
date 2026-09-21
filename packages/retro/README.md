@@ -1,12 +1,17 @@
 # @multifus/retro
 
 The design material shared by the desktop application and the website: the style
-sheets, the `cn` helper, the portable React components, and the logo.
+sheets, the `cn` helper, the portable React components and hooks, and the logo.
 
 ```ts
-import { Button, cn } from '@multifus/retro'
+import { Button, cn, Curtain, usePlayer } from '@multifus/retro'
 import logo from '@multifus/retro/assets/logo.png'
 ```
+
+A component here carries a shape, never a word: `Curtain` draws the play screen
+laid on a video, and takes its label and its icon from the application that
+renders it. The two catalogues stay apart, so a string never crosses this
+package.
 
 ```css
 @import '@multifus/retro/styles/retro.css';

@@ -31,7 +31,6 @@
   --spacing-marker: 22px;
   --spacing-lozenge: 46px;
   --spacing-thread: 9rem;
-  --spacing-beacon: clamp(3.25rem, 7.5vw, 5.25rem);
 
   --spacing-rest-xs: clamp(2rem, 3.9vw, 2.5rem);
   --spacing-rest-sm: clamp(2rem, 4.7vw, 3rem);
@@ -50,7 +49,6 @@
 :root {
   --page: 72rem;
 
-  --deep: #1b1712;
   --tint: var(--leaf-lit);
 
   --horizon: min(100svh, 48rem);
@@ -1116,108 +1114,6 @@
   border: 1px solid color-mix(in srgb, var(--band), transparent 48%);
   background-color: var(--deep);
   box-shadow: 0 28px 64px -26px rgb(0 0 0 / 0.95);
-}
-
-@utility curtain {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  cursor: pointer;
-  background-color: color-mix(in srgb, var(--night), transparent 52%);
-  transition:
-    opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-    background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-
-  &:focus-visible {
-    outline: 2px solid var(--cream);
-    outline-offset: -5px;
-  }
-
-  &[data-playing] {
-    opacity: 0;
-    background-color: transparent;
-    transition-delay: 0.5s, 0s;
-  }
-
-  &[data-playing]:focus-visible {
-    opacity: 1;
-    transition-delay: 0s;
-    background-color: color-mix(in srgb, var(--night), transparent 76%);
-  }
-
-  @media (hover: hover) {
-    &[data-playing]:hover {
-      opacity: 1;
-      transition-delay: 0s;
-      background-color: color-mix(in srgb, var(--night), transparent 76%);
-    }
-
-    &[data-playing][data-idle]:not(:focus-visible) {
-      opacity: 0;
-      cursor: none;
-    }
-  }
-}
-
-@keyframes halo {
-  from {
-    opacity: 0.62;
-    transform: scale(1);
-  }
-
-  to {
-    opacity: 0;
-    transform: scale(1.55);
-  }
-}
-
-@utility beacon {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: var(--spacing-beacon);
-  height: var(--spacing-beacon);
-  border-radius: 50%;
-  border: 2px solid color-mix(in srgb, var(--leaf-lit), transparent 42%);
-  background-color: color-mix(in srgb, var(--deep), transparent 14%);
-  color: var(--cream);
-  box-shadow: 0 20px 44px -16px rgb(0 0 0 / 0.95);
-  transition-property: transform, border-color, background-color;
-  transition-duration: 0.3s;
-  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
-
-  & > svg {
-    width: 34%;
-    height: 34%;
-  }
-
-  &::after {
-    content: '';
-    position: absolute;
-    inset: -2px;
-    border-radius: 50%;
-    border: 2px solid var(--leaf-lit);
-    animation: halo 2.8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
-  }
-
-  .curtain:hover &,
-  .curtain:focus-visible & {
-    transform: scale(1.06);
-    border-color: var(--leaf-lit);
-    background-color: var(--deep);
-  }
-
-  .curtain[data-playing] &::after {
-    content: none;
-  }
-
-  .stage[data-auto] & {
-    --spacing-beacon: clamp(2.75rem, 6.25vw, 4.5rem);
-  }
 }
 
 @utility carved {

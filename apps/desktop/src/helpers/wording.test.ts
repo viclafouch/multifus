@@ -320,7 +320,7 @@ describe('cycleToggleTooltip', () => {
     const tooltip = cycleToggleTooltip(ONLINE_CHARACTER)
 
     expect(tooltip).toBe(
-      'L’exclure du défilement, du Déplacement rapide et de l’AutoFocus. Ses messages privés arrivent quand même.'
+      'L’exclure du défilement, du Déplacement rapide et de l’AutoFocus'
     )
   })
 
@@ -449,7 +449,7 @@ describe('characterStateLine', () => {
 
     const line = characterStateLine(character)
 
-    expect(line).toBe('Exclu')
+    expect(line).toBe('Exclu des raccourcis')
   })
 
   it('says the disconnection before the exclusion for an offline character', () => {

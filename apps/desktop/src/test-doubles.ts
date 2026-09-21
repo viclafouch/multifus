@@ -36,6 +36,10 @@ export const findLateDialog = () => {
   return screen.findByRole('dialog', {}, { timeout: LATE_DIALOG_WAIT_MS })
 }
 
+export const findLateButton = (name: string) => {
+  return screen.findByRole('button', { name }, { timeout: LATE_DIALOG_WAIT_MS })
+}
+
 const BLANK_CHARACTER: Character = {
   nickname: 'Alpha',
   gender: 'male',

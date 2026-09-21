@@ -92,6 +92,8 @@
   --spacing-way: 15.5rem;
   --spacing-rung: clamp(28px, 5.1vh, 36px);
   --spacing-crown: 28px;
+  --spacing-beacon: clamp(3.25rem, 7.5vw, 5.25rem);
+  --spacing-porthole: 248px;
   --spacing-ledger: 37px;
   --spacing-hem: 56px;
   --spacing-fall: 104px;
@@ -113,7 +115,7 @@
   --container-scene: 34rem;
   --container-roll: 44rem;
   --container-world: 58rem;
-  --container-loop: min(100vw - 3rem, (100vh - 8rem) * 16 / 9);
+  --container-loop: calc(min(100vw - 3rem, (100vh - 8rem) * 16 / 9) * 2 / 3);
 
   --aspect-loop: 16 / 9;
 }
@@ -123,6 +125,7 @@
   --plain: 'Roboto', 'Helvetica Neue', sans-serif;
 
   --iron: #241f19;
+  --deep: #1b1712;
   --slate: #4b463c;
   --band: #978870;
   --khaki: #c7bfa1;
@@ -1160,6 +1163,189 @@
     0 24px 48px -18px rgb(0 0 0 / 0.9);
 }
 
+@keyframes surface {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.94);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes ebb {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.94);
+  }
+}
+
+@utility porthole {
+  overflow: clip;
+  border-radius: calc(var(--stage-edge) + var(--stage-nook));
+  border: var(--stage-edge) solid
+    color-mix(in srgb, var(--band), transparent 38%);
+  background-color: var(--iron);
+  box-shadow:
+    inset 0 0 0 1px rgb(0 0 0 / 0.55),
+    0 18px 38px -14px rgb(0 0 0 / 0.95);
+  animation: surface 460ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  transition: border-color 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+
+  &:hover {
+    border-color: color-mix(in srgb, var(--khaki), transparent 40%);
+  }
+
+  &[data-leaving] {
+    animation: ebb 300ms cubic-bezier(0.4, 0, 1, 1) forwards;
+  }
+}
+
+::view-transition-group(loop-film) {
+  animation-duration: 420ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+::view-transition-old(loop-film),
+::view-transition-new(loop-film) {
+  animation-duration: 420ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  object-fit: cover;
+  height: 100%;
+}
+
+@utility porthole-eye {
+  border: 2px solid color-mix(in srgb, var(--leaf-lit), transparent 35%);
+  background-color: color-mix(in srgb, var(--iron), transparent 20%);
+  box-shadow: 0 10px 24px -10px rgb(0 0 0 / 0.95);
+}
+
+@keyframes tide {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@utility porthole-tide {
+  transform-origin: left;
+  background-color: var(--leaf-lit);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--leaf-glow), transparent 55%);
+  animation: tide linear forwards;
+}
+
+@utility curtain {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  cursor: pointer;
+  background-color: color-mix(in srgb, var(--night), transparent 52%);
+  transition:
+    opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:focus-visible {
+    outline: 2px solid var(--cream);
+    outline-offset: -5px;
+  }
+
+  &[data-playing] {
+    opacity: 0;
+    background-color: transparent;
+    transition-delay: 0.5s, 0s;
+  }
+
+  &[data-playing]:focus-visible {
+    opacity: 1;
+    transition-delay: 0s;
+    background-color: color-mix(in srgb, var(--night), transparent 76%);
+  }
+
+  @media (hover: hover) {
+    &[data-playing]:hover {
+      opacity: 1;
+      transition-delay: 0s;
+      background-color: color-mix(in srgb, var(--night), transparent 76%);
+    }
+
+    &[data-playing][data-idle]:not(:focus-visible) {
+      opacity: 0;
+      cursor: none;
+    }
+  }
+}
+
+@keyframes halo {
+  from {
+    opacity: 0.62;
+    transform: scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(1.55);
+  }
+}
+
+@utility beacon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--spacing-beacon);
+  height: var(--spacing-beacon);
+  border-radius: 50%;
+  border: 2px solid color-mix(in srgb, var(--leaf-lit), transparent 42%);
+  background-color: color-mix(in srgb, var(--deep), transparent 14%);
+  color: var(--cream);
+  box-shadow: 0 20px 44px -16px rgb(0 0 0 / 0.95);
+  transition-property: transform, border-color, background-color;
+  transition-duration: 0.3s;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+
+  & > svg {
+    width: 34%;
+    height: 34%;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 50%;
+    border: 2px solid var(--leaf-lit);
+    animation: halo 2.8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  }
+
+  .curtain:hover &,
+  .curtain:focus-visible & {
+    transform: scale(1.06);
+    border-color: var(--leaf-lit);
+    background-color: var(--deep);
+  }
+
+  .curtain[data-playing] &::after {
+    content: none;
+  }
+
+  .stage[data-auto] & {
+    --spacing-beacon: clamp(2.75rem, 6.25vw, 4.5rem);
+  }
+}
+
 @keyframes dawn {
   from {
     opacity: 0;
@@ -1194,6 +1380,15 @@
 
   &[data-ready] .reel-word + .reel-word {
     animation-delay: 430ms;
+  }
+
+  & .reel-front {
+    visibility: hidden;
+  }
+
+  &[data-ready] .reel-front {
+    visibility: visible;
+    animation: dawn 520ms cubic-bezier(0.22, 1, 0.36, 1) 220ms backwards;
   }
 }
 
@@ -1459,7 +1654,10 @@
 
   .reel .reel-picture,
   .reel .reel-veil,
-  .reel .reel-word {
+  .reel .reel-word,
+  .reel .reel-front,
+  .porthole,
+  .porthole-tide {
     animation: none !important;
   }
 

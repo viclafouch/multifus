@@ -56,7 +56,7 @@ export const RosterPanel = ({
       <Panel>
         <PanelHeader
           title={t`Votre roster`}
-          description={t`Cliquez une tête pour changer sa classe, son sexe ou sa couleur. Tirez une ligne pour changer l’ordre, la croix retire un déconnecté.`}
+          description={t`Cet ordre est celui des raccourcis suivant et précédent, la case en retire un.`}
         >
           {GENDERS.map((gender) => {
             const { isEmpty, isIncluded } = genderGroupOf({

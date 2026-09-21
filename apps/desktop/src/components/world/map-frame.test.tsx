@@ -3,7 +3,7 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import type { LoopsSeen } from '@/@types/loop'
 import type { ScreenName } from '@/@types/snapshot'
 import { MAPS } from '@/constants/world'
-import { findLateDialog, pending } from '@/test-doubles'
+import { pending } from '@/test-doubles'
 
 const bridge = {
   setLoopSeen: vi.fn(pending)
@@ -33,6 +33,8 @@ const MAPS_WITH_A_LOOP = [
 ]
 
 const BUTTON = 'Voir la vidéo'
+
+const HIDE = 'Cacher l’aperçu'
 
 const frameOf = (map: ScreenName, loopsSeen: LoopsSeen) => {
   return (
@@ -68,18 +70,16 @@ describe('the frame of a map', () => {
     }
   })
 
-  it('gives its fresh video to the next map, which opens and records in its turn', async () => {
+  it('gives its fresh video to the next map, which peeks and records in its turn', () => {
     motion.matchIsStill.mockReturnValue(true)
 
     const view = render(frameOf('characters', { ...SEEN, walk: false }))
 
-    expect(screen.queryByRole('dialog')).toBeNull()
+    expect(screen.queryByRole('button', { name: HIDE })).toBeNull()
 
     view.rerender(frameOf('walk', { ...SEEN, walk: false }))
 
-    await findLateDialog()
-
-    fireEvent.click(screen.getByRole('button', { name: 'Fermer' }))
+    fireEvent.click(screen.getByRole('button', { name: HIDE }))
 
     expect(bridge.setLoopSeen).toHaveBeenCalledExactlyOnceWith('walk')
   })

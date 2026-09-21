@@ -2,6 +2,7 @@ import React from 'react'
 import type { LoopName } from '@/@types/loop'
 import type { Snapshot } from '@/@types/snapshot'
 import { useLateOpening } from '@/hooks/use-late-opening'
+import { morph } from '@/lib/morph'
 import { setLoopSeen } from '@/lib/multifus'
 
 type LoopOnceParams = {
@@ -11,21 +12,47 @@ type LoopOnceParams = {
 }
 
 export const useLoopOnce = ({ loop, isSeen, run }: LoopOnceParams) => {
-  const opening = useLateOpening(!isSeen)
+  const peek = useLateOpening(!isSeen)
+  const [isOpen, setIsOpen] = React.useState(false)
+  const [from, setFrom] = React.useState<number | null>(null)
   const isSeenTold = React.useRef(false)
 
-  const handleOpen = () => {
-    opening.setIsOpen(true)
-  }
-
-  const handleOpenChange = (isOpen: boolean) => {
-    opening.setIsOpen(isOpen)
-
-    if (!isOpen && !isSeen && !isSeenTold.current) {
+  const tellItIsSeen = () => {
+    if (!isSeen && !isSeenTold.current) {
       isSeenTold.current = true
       run(setLoopSeen(loop))
     }
   }
 
-  return { isOpen: opening.isOpen, handleOpen, handleOpenChange }
+  const handleDismiss = () => {
+    peek.setIsOpen(false)
+    tellItIsSeen()
+  }
+
+  const handleOpen = () => {
+    peek.setIsOpen(false)
+    tellItIsSeen()
+    setFrom(null)
+    setIsOpen(true)
+  }
+
+  const handleGrow = (start: number) => {
+    tellItIsSeen()
+
+    morph(() => {
+      peek.setIsOpen(false)
+      setFrom(start)
+      setIsOpen(true)
+    })
+  }
+
+  return {
+    isPeeking: peek.isOpen,
+    isOpen,
+    from,
+    handleOpen,
+    handleGrow,
+    handleDismiss,
+    handleOpenChange: setIsOpen
+  }
 }

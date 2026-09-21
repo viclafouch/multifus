@@ -1,9 +1,9 @@
 import { useLingui } from '@lingui/react'
+import { usePlayer } from '@multifus/retro'
 import type { LoopId } from '@/@types/page'
 import { LoopCurtain } from '@/components/loop-curtain'
 import { captionOf, LOOPS } from '@/constants/loops'
 import { useMedia } from '@/hooks/use-media'
-import { usePlayer } from '@/hooks/use-player'
 import { STILL } from '@/lib/media'
 
 type LoopPlateProps = Readonly<{

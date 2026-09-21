@@ -16,6 +16,7 @@ type LoopDialogProps = Readonly<{
   description: string
   caption: string
   source: string | null
+  from: number | null
   isOpen: boolean
   onOpenChange: (isOpen: boolean) => void
 }>
@@ -25,26 +26,41 @@ export const LoopDialog = ({
   description,
   caption,
   source,
+  from,
   isOpen,
   onOpenChange
 }: LoopDialogProps) => {
-  const [isPlaying, setIsPlaying] = React.useState(false)
+  const [isLoaded, setIsLoaded] = React.useState(false)
 
-  const isReady = source === null || isPlaying
+  const isReady = source === null || isLoaded || from !== null
 
   const handleReady = () => {
-    setIsPlaying(true)
+    setIsLoaded(true)
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(isShown) => {
+        if (!isShown) {
+          setIsLoaded(false)
+        }
+
+        onOpenChange(isShown)
+      }}
+    >
       <DialogContent
         steady
         showCloseButton={false}
         data-ready={isReady ? '' : undefined}
         className="reel block overflow-clip bg-transparent p-0 ring-0 sm:max-w-loop"
       >
-        <LoopStage source={source} caption={caption} onReady={handleReady} />
+        <LoopStage
+          source={source}
+          caption={caption}
+          from={from}
+          onReady={handleReady}
+        />
         <div
           aria-hidden
           className="reel-veil hem-deep pointer-events-none absolute inset-x-0 bottom-0 h-1/2"
@@ -63,7 +79,7 @@ export const LoopDialog = ({
               variant="slate"
               size="icon"
               aria-label={t`Fermer`}
-              className="absolute top-3.5 right-3.5 shadow-xs"
+              className="absolute top-3.5 right-3.5 z-20 shadow-xs"
             />
           }
         >

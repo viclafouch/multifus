@@ -383,7 +383,7 @@ const lampLine = (state: LampState) => {
       return t`Déconnecté`
     }
     case 'excluded': {
-      return t`Exclu`
+      return t`Exclu des raccourcis`
     }
     case 'live': {
       return t`Connecté`
@@ -483,7 +483,7 @@ export const cycleToggleTooltip = (character: Character) => {
 
   return character.excluded
     ? t`Le réintégrer au défilement, au Déplacement rapide et à l’AutoFocus`
-    : t`L’exclure du défilement, du Déplacement rapide et de l’AutoFocus. Ses messages privés arrivent quand même.`
+    : t`L’exclure du défilement, du Déplacement rapide et de l’AutoFocus`
 }
 
 export const characterRemoveLabel = (nickname: string) => {

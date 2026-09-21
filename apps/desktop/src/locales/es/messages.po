@@ -662,6 +662,10 @@ msgstr "Vamos allá"
 msgid "C’est parti. Regardez votre téléphone."
 msgstr "Ya está en marcha. Mira tu teléfono."
 
+#: src/components/world/loop-porthole.tsx
+msgid "Cacher l’aperçu"
+msgstr "Ocultar la vista previa"
+
 #: src/helpers/onboarding.ts
 msgid "Ce n’est pas en place."
 msgstr "No está en su sitio."
@@ -689,6 +693,10 @@ msgstr "Lo que ves en pantalla es correcto, pero no se ha escrito nada en el dis
 #: src/helpers/wording.ts
 msgid "Ces touches ne peuvent pas servir de raccourci."
 msgstr "Estas teclas no pueden servir de atajo."
+
+#: src/screens/characters/roster-panel.tsx
+msgid "Cet ordre est celui des raccourcis suivant et précédent, la case en retire un."
+msgstr "Los atajos siguiente y anterior siguen este orden, la casilla quita uno."
 
 #: src/components/shortcut-field.tsx
 msgid "Cette touche ne peut pas servir de raccourci."
@@ -777,10 +785,6 @@ msgstr "Pulse el botón y luego marque Multifus en la lista. Sin este permiso, n
 #: src/components/questions-dialog.tsx
 msgid "Cliquez une question pour voir la réponse."
 msgstr "Haga clic en una pregunta para ver la respuesta."
-
-#: src/screens/characters/roster-panel.tsx
-msgid "Cliquez une tête pour changer sa classe, son sexe ou sa couleur. Tirez une ligne pour changer l’ordre, la croix retire un déconnecté."
-msgstr "Haz clic en una cabeza para cambiar su clase, sexo o color. Arrastra una fila para cambiar el orden, la cruz quita uno desconectado."
 
 #: src/screens/relay/index.tsx
 msgid "Coché, vous lisez son message dans Telegram. Décoché, vous savez seulement lequel de vos personnages a reçu un message privé."
@@ -1216,8 +1220,8 @@ msgid "Éteint"
 msgstr "Apagado"
 
 #: src/helpers/wording.ts
-msgid "Exclu"
-msgstr "Apartado"
+msgid "Exclu des raccourcis"
+msgstr "Apartado de los atajos"
 
 #: src/constants/shortcuts.ts
 msgid "Exclure ou réintégrer"
@@ -1394,8 +1398,8 @@ msgid "L’essai"
 msgstr "La prueba"
 
 #: src/helpers/wording.ts
-msgid "L’exclure du défilement, du Déplacement rapide et de l’AutoFocus. Ses messages privés arrivent quand même."
-msgstr "Apartarlo del ciclo, del Movimiento rápido y del AutoFocus. Sus mensajes privados siguen llegando."
+msgid "L’exclure du défilement, du Déplacement rapide et de l’AutoFocus"
+msgstr "Apartarlo del ciclo, del Movimiento rápido y del AutoFocus"
 
 #: src/screens/walk-screen/banner-panel.tsx
 msgid "La bannière"
@@ -1739,6 +1743,10 @@ msgstr "Las teclas mantenidas dentro del juego: la rueda se abre en medio de la 
 msgid "Lire la règle"
 msgstr "Leer la regla"
 
+#: src/components/world/loop-curtain.tsx
+msgid "Lire la vidéo"
+msgstr "Reproducir el vídeo"
+
 #: src/screens/about/project-panel.tsx
 msgid "Lire les mentions"
 msgstr "Leer el aviso"
@@ -1823,6 +1831,10 @@ msgstr "Mensajes privados: Telegram ha rechazado la petición ({detail})."
 #: src/helpers/journal.ts
 msgid "Messages privés : Telegram n’a pas répondu ({detail})."
 msgstr "Mensajes privados: Telegram no ha respondido ({detail})."
+
+#: src/components/world/loop-curtain.tsx
+msgid "Mettre la vidéo en pause"
+msgstr "Pausar el vídeo"
 
 #: src/screens/about/project-panel.tsx
 msgid "Mise à jour"
@@ -2917,6 +2929,10 @@ msgstr "Ver la imagen"
 #: src/components/world/map-loop.tsx
 msgid "Voir la vidéo"
 msgstr "Ver el vídeo"
+
+#: src/components/world/loop-porthole.tsx
+msgid "Voir la vidéo en grand"
+msgstr "Ver el vídeo en grande"
 
 #: src/components/move-button.tsx
 msgid "Voir le réglage"

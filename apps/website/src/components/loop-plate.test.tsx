@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { I18nProvider } from '@lingui/react'
+import { IDLE_AFTER } from '@multifus/retro'
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { LoopPlate } from '@/components/loop-plate'
 import { captionOf } from '@/constants/loops'
-import { IDLE_AFTER } from '@/hooks/use-idle-pointer'
 import { SPEAKERS } from '@/lib/i18n'
 
 const watchMotion = () => {
