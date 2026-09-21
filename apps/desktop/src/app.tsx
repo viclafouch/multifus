@@ -102,16 +102,14 @@ export const App = () => {
                   }}
                 />
               ) : null}
+              {shouldWarnAboutAuthorization ? (
+                <AuthorizationBanner run={run} />
+              ) : null}
               <div className="relative flex min-h-0 flex-1 flex-col">
                 <LanguageBar
                   version={snapshot.version}
                   language={snapshot.language}
                 />
-                {shouldWarnAboutAuthorization ? (
-                  <div className="pointer-events-none absolute inset-x-0 top-0 z-40">
-                    <AuthorizationBanner run={run} />
-                  </div>
-                ) : null}
                 {map === CLEARING ? (
                   <ClearingScreen
                     characters={snapshot.characters}

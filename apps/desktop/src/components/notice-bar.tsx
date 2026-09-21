@@ -62,7 +62,7 @@ export const NoticeBar = ({
     <div
       role="alert"
       className={cn(
-        'pointer-events-auto relative shrink-0 border-b-2 bg-iron/95 px-6',
+        'relative z-30 shrink-0 border-b-2 bg-iron/95 px-6',
         look.bar
       )}
     >
