@@ -454,6 +454,10 @@ msgstr "Allumé, ce réglage retient les notifications : votre percepteur se fai
 msgid "Annuler"
 msgstr "Annuler"
 
+#: src/screens/settings/index.tsx
+msgid "Anonyme"
+msgstr "Anonyme"
+
 #: src/screens/banner-screen/banner-pill.tsx
 msgid "Aperçu"
 msgstr "Aperçu"
@@ -633,6 +637,10 @@ msgstr "BotFather finit par une longue suite de chiffres et de lettres. Un clic 
 #: src/constants/notification.ts
 msgid "C’est à votre tour de jouer."
 msgstr "C’est à votre tour de jouer."
+
+#: src/screens/settings/index.tsx
+msgid "C’est comme ça que Multifus sait quoi améliorer. Ce que vous écrivez ne part jamais."
+msgstr "C’est comme ça que Multifus sait quoi améliorer. Ce que vous écrivez ne part jamais."
 
 #: src/helpers/onboarding.ts
 msgid "C’est en place : le jeu a réussi à vous appeler."
@@ -1643,7 +1651,7 @@ msgstr "Le tableau des runes"
 msgid "Le tableau des runes n’a pas suivi"
 msgstr "Le tableau des runes n’a pas suivi"
 
-#: src/screens/rune-table/index.tsx
+#: src/screens/rune-table/preview-panel.tsx
 msgid "Le tableau ne s’affiche pas sur un client en plein écran. Forgez dans une fenêtre agrandie."
 msgstr "Le tableau ne s’affiche pas sur un client en plein écran. Forgez dans une fenêtre agrandie."
 
@@ -2150,6 +2158,18 @@ msgctxt "l’application de réglages de Windows, et non un écran de Multifus"
 msgid "Paramètres"
 msgstr "Paramètres"
 
+#: src/helpers/journal.ts
+msgid "Partage des statistiques d’usage activé."
+msgstr "Partage des statistiques d’usage activé."
+
+#: src/helpers/journal.ts
+msgid "Partage des statistiques d’usage désactivé."
+msgstr "Partage des statistiques d’usage désactivé."
+
+#: src/screens/settings/index.tsx
+msgid "Partager des statistiques d’usage"
+msgstr "Partager des statistiques d’usage"
+
 #: src/constants/shortcuts.ts
 msgid "Passe au personnage d’après, dans votre ordre."
 msgstr "Passe au personnage d’après, dans votre ordre."
@@ -2610,7 +2630,7 @@ msgid "Stat"
 msgstr "Stat"
 
 #: src/screens/settings/index.tsx
-#: src/screens/walk-screen/index.tsx
+#: src/screens/walk-screen/state-panel.tsx
 msgid "Sur Mac, Multifus tourne mieux sans plein écran : gardez tous vos clients Dofus Retro sur le même bureau, en fenêtre agrandie."
 msgstr "Sur Mac, Multifus tourne mieux sans plein écran : gardez tous vos clients Dofus Retro sur le même bureau, en fenêtre agrandie."
 

@@ -24,6 +24,10 @@ export const VERCEL_ANALYTICS =
 export const VERCEL_SPEED_INSIGHTS =
   'https://vercel.com/docs/speed-insights/privacy-policy'
 
+export const APTABASE = 'https://aptabase.com'
+
+export const APTABASE_PRIVACY = 'https://aptabase.com/legal/privacy'
+
 export const ANKAMA = 'https://www.ankama.com'
 
 export const GAME = 'https://www.dofus-retro.com'

@@ -19,7 +19,8 @@ const bridge = {
   onClients: vi.fn(),
   setShortTitles: vi.fn(),
   setPaintPortraits: vi.fn(),
-  setUngroupTaskbar: vi.fn()
+  setUngroupTaskbar: vi.fn(),
+  setShareStats: vi.fn()
 }
 
 vi.mock(import('@/lib/multifus'), () => {
@@ -63,6 +64,7 @@ const show = async ({
         paintPortraits
         ungroupTaskbar={false}
         taskbarCombines={taskbarCombines}
+        shareStats
         run={() => {}}
       />
     </TooltipProvider>
@@ -221,6 +223,29 @@ describe('the settings screen', () => {
     fireEvent.click(switchNamed('Agrandir les clients à leur ouverture'))
 
     expect(bridge.setMaximizeOnLaunch).toHaveBeenCalledWith(true)
+  })
+
+  it('sells the measuring rather than listing it, and marks it anonymous', async () => {
+    await show({ agent: APPLE_AGENT })
+
+    expect(screen.getByText('Partager des statistiques d’usage')).not.toBeNull()
+    expect(
+      screen.getByText(
+        'C’est comme ça que Multifus sait quoi améliorer. Ce que vous écrivez ne part jamais.'
+      )
+    ).not.toBeNull()
+
+    const anonymous = screen.getByText('Anonyme')
+
+    expect(anonymous.className).toContain('plaque-leaf')
+  })
+
+  it('stops the measuring when the switch is moved', async () => {
+    await show({ agent: APPLE_AGENT })
+
+    fireEvent.click(switchNamed('Partager des statistiques d’usage'))
+
+    expect(bridge.setShareStats).toHaveBeenCalledWith(false)
   })
 
   it('cuts the class head when the switch is moved, on Windows', async () => {

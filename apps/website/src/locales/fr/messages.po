@@ -209,6 +209,10 @@ msgid "Ce que fait l’outil"
 msgstr "Ce que fait l’outil"
 
 #: src/screens/legal-screen.tsx
+msgid "Ce que le logiciel envoie"
+msgstr "Ce que le logiciel envoie"
+
+#: src/screens/legal-screen.tsx
 msgid "Ce que le site garde de vous"
 msgstr "Ce que le site garde de vous"
 
@@ -223,6 +227,18 @@ msgstr "Ce que Multifus ne fait pas"
 #: src/constants/ankama.ts
 msgid "Ce qui fait bannir"
 msgstr "Ce qui fait bannir"
+
+#: src/screens/legal-screen.tsx
+msgid "Ce qui ne part jamais : un pseudo, le texte d’un message, un fichier du jeu, votre configuration, et rien qui vous nomme. Une panique envoie le nom du fichier et la ligne, jamais son message."
+msgstr "Ce qui ne part jamais : un pseudo, le texte d’un message, un fichier du jeu, votre configuration, et rien qui vous nomme. Une panique envoie le nom du fichier et la ligne, jamais son message."
+
+#: src/screens/legal-screen.tsx
+msgid "Ce qui part : le système, la version de Multifus, la langue de la machine, les cases que vous avez cochées, le nombre de vos personnages et leurs classes, et les compteurs de la session, comme le nombre de bascules de fenêtre."
+msgstr "Ce qui part : le système, la version de Multifus, la langue de la machine, les cases que vous avez cochées, le nombre de vos personnages et leurs classes, et les compteurs de la session, comme le nombre de bascules de fenêtre."
+
+#: src/screens/legal-screen.tsx
+msgid "Ces mesures sont gardées par <0>Aptabase</0>, dans l’Union européenne, sans cookie, sans identifiant qui vous suive d’une session à l’autre, et sans garder votre adresse IP. Sa <1>politique de confidentialité</1> le dit en entier."
+msgstr "Ces mesures sont gardées par <0>Aptabase</0>, dans l’Union européenne, sans cookie, sans identifiant qui vous suive d’une session à l’autre, et sans garder votre adresse IP. Sa <1>politique de confidentialité</1> le dit en entier."
 
 #: src/components/lost-word.tsx
 msgid "Cette page n’existe pas"
@@ -836,6 +852,10 @@ msgstr "Multifus amène devant vous la fenêtre du personnage qui joue sur Dofus
 #: src/constants/questions.ts
 msgid "Multifus écoute les <0>notifications</0> que Dofus Retro envoie à votre ordinateur : début de tour, invitation, échange, message privé, craft, percepteur attaqué. Windows lui en donne l’accès, macOS passe par l’Accessibilité."
 msgstr "Multifus écoute les <0>notifications</0> que Dofus Retro envoie à votre ordinateur : début de tour, invitation, échange, message privé, craft, percepteur attaqué. Windows lui en donne l’accès, macOS passe par l’Accessibilité."
+
+#: src/screens/legal-screen.tsx
+msgid "Multifus envoie deux mesures par session, une à l’ouverture et une à la fermeture. La case « Partager des statistiques d’usage », dans l’écran Réglages, les coupe, et rien ne part plus."
+msgstr "Multifus envoie deux mesures par session, une à l’ouverture et une à la fermeture. La case « Partager des statistiques d’usage », dans l’écran Réglages, les coupe, et rien ne part plus."
 
 #: src/constants/wording.ts
 msgid "Multifus est gratuit, pour Mac et pour Windows. Trois gestes, et vous jouez en multicompte sur Dofus Retro."

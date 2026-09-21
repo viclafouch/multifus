@@ -15,6 +15,7 @@ import { useClients } from '@/hooks/use-clients'
 import {
   setMaximizeOnLaunch,
   setPaintPortraits,
+  setShareStats,
   setShortTitles,
   setStartAtLogin,
   setUngroupTaskbar
@@ -29,6 +30,7 @@ type SettingsScreenProps = Readonly<{
   paintPortraits: boolean
   ungroupTaskbar: boolean
   taskbarCombines: boolean
+  shareStats: boolean
   run: (action: Promise<Snapshot>) => void
 }>
 
@@ -39,6 +41,7 @@ export const SettingsScreen = ({
   paintPortraits,
   ungroupTaskbar,
   taskbarCombines,
+  shareStats,
   run
 }: SettingsScreenProps) => {
   const startupLabel = t`Lancer Multifus au démarrage de l’ordinateur`
@@ -47,6 +50,7 @@ export const SettingsScreen = ({
   const portraitLabel = t`La tête de classe dans la barre des tâches`
   const ungroupLabel = t`Un bouton par personnage dans la barre des tâches`
   const backgroundLabel = t`Garder Multifus en arrière-plan`
+  const statsLabel = t`Partager des statistiques d’usage`
 
   const isAlreadyUngrouped = !IS_APPLE && !taskbarCombines
   const clients = useClients()
@@ -142,6 +146,22 @@ export const SettingsScreen = ({
             checked
             label={backgroundLabel}
             reason={t`Multifus doit rester en arrière-plan pour fonctionner.`}
+          />
+        </FieldRow>
+      </Panel>
+      <Panel>
+        <FieldRow
+          label={statsLabel}
+          mention={t`Anonyme`}
+          isMentionGood
+          description={t`C’est comme ça que Multifus sait quoi améliorer. Ce que vous écrivez ne part jamais.`}
+        >
+          <Tick
+            checked={shareStats}
+            aria-label={statsLabel}
+            onCheckedChange={(share) => {
+              run(setShareStats(share))
+            }}
           />
         </FieldRow>
       </Panel>

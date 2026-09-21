@@ -120,6 +120,7 @@ export type SettingChange =
   | { readonly kind: 'paintPortraits'; readonly paint: boolean }
   | { readonly kind: 'ungroupTaskbar'; readonly ungroup: boolean }
   | { readonly kind: 'relayBody'; readonly sendBody: boolean }
+  | { readonly kind: 'shareStats'; readonly share: boolean }
   | { readonly kind: 'language'; readonly language: Language }
   | {
       readonly kind: 'wakesMinimized'

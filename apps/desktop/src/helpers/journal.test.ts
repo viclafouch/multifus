@@ -346,6 +346,22 @@ const SETTING_CASES = {
       line: 'Un bouton par personnage dans la barre des tâches désactivé.'
     }
   ],
+  shareStats: [
+    {
+      event: {
+        kind: 'setting',
+        change: { kind: 'shareStats', share: true }
+      },
+      line: 'Partage des statistiques d’usage activé.'
+    },
+    {
+      event: {
+        kind: 'setting',
+        change: { kind: 'shareStats', share: false }
+      },
+      line: 'Partage des statistiques d’usage désactivé.'
+    }
+  ],
   shortTitles: [
     {
       event: {
@@ -1434,6 +1450,7 @@ const SNAPSHOT = {
   paintPortraits: true,
   ungroupTaskbar: false,
   taskbarCombines: true,
+  shareStats: true,
   authorization: { granted: true, listening: true },
   onboarding: { done: true, steps: [], hasNotice: false },
   config: { path: '/tmp/multifus/config.json', problem: null },

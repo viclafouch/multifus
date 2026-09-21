@@ -52,6 +52,7 @@ export type Snapshot = {
   readonly paintPortraits: boolean
   readonly ungroupTaskbar: boolean
   readonly taskbarCombines: boolean
+  readonly shareStats: boolean
   readonly authorization: Authorization
   readonly onboarding: Onboarding
   readonly config: ConfigStatus

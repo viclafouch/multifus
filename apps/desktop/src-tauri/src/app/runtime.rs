@@ -33,6 +33,7 @@ use crate::app::state::WatcherState;
 use crate::app::state::hold;
 use crate::app::state::lock;
 use crate::app::state::windows;
+use crate::app::stats;
 use crate::app::tray;
 use crate::app::view::ClientsView;
 use crate::app::view::Screen;
@@ -540,6 +541,7 @@ const GROUP_PREFIX: &str = "multifus.window.";
 pub fn on_run_event(app: &AppHandle, event: RunEvent) {
     if matches!(event, RunEvent::Exit) {
         give_traces_back(app);
+        stats::app_stopped(app);
 
         return;
     }

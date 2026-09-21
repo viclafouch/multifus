@@ -448,6 +448,12 @@ const CALLS = [
     }
   },
   {
+    name: 'setShareStats',
+    run: () => {
+      return multifus.setShareStats(true)
+    }
+  },
+  {
     name: 'maximizeAllClients',
     run: () => {
       return multifus.maximizeAllClients()

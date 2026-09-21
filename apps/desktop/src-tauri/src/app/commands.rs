@@ -17,6 +17,7 @@ use crate::app::rune_table;
 use crate::app::runtime;
 use crate::app::shortcuts;
 use crate::app::state::lock;
+use crate::app::stats;
 use crate::app::update;
 use crate::app::view::BannerStep;
 use crate::app::view::ClientsView;
@@ -63,7 +64,11 @@ pub fn request_authorization(app: AppHandle) -> Snapshot {
 pub fn check_health(app: AppHandle) -> Snapshot {
     runtime::read_health(&app);
 
-    lock(&app).snapshot()
+    let mut state = lock(&app);
+
+    state.count_health_check();
+
+    state.snapshot()
 }
 
 #[tauri::command]
@@ -74,6 +79,8 @@ pub fn open_system_page(app: AppHandle, page: SystemPage) {
 #[tauri::command]
 pub fn finish_onboarding(app: AppHandle) -> Snapshot {
     lock(&app).finish_onboarding();
+
+    stats::onboarding_finished(&app);
 
     runtime::emit_snapshot(&app)
 }
@@ -419,6 +426,15 @@ pub fn set_start_at_login(app: AppHandle, start_at_login: bool) -> Snapshot {
 #[tauri::command]
 pub fn set_maximize_on_launch(app: AppHandle, maximize: bool) -> Snapshot {
     lock(&app).set_maximize_on_launch(maximize);
+
+    runtime::emit_snapshot(&app)
+}
+
+#[tauri::command]
+pub fn set_share_stats(app: AppHandle, share: bool) -> Snapshot {
+    lock(&app).set_share_stats(share);
+
+    stats::share(&app, share);
 
     runtime::emit_snapshot(&app)
 }

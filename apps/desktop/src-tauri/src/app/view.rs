@@ -45,6 +45,7 @@ pub struct Snapshot {
     pub paint_portraits: bool,
     pub ungroup_taskbar: bool,
     pub taskbar_combines: bool,
+    pub share_stats: bool,
     pub authorization: AuthorizationView,
     pub onboarding: OnboardingView,
     pub config: ConfigView,
@@ -578,6 +579,7 @@ mod tests {
             paint_portraits: true,
             ungroup_taskbar: false,
             taskbar_combines: true,
+            share_stats: true,
             authorization: AuthorizationView {
                 granted: true,
                 listening: true,
@@ -688,6 +690,7 @@ mod tests {
                 "quickTexts",
                 "relay",
                 "runeTable",
+                "shareStats",
                 "shortTitles",
                 "shortcuts",
                 "startAtLogin",

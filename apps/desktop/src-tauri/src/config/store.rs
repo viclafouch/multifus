@@ -76,6 +76,7 @@ impl ConfigStore {
 
                 Loaded {
                     settings: Settings::default(),
+                    first_launch: false,
                     failure: Some(failure),
                     quarantined,
                     quarantine_failure,
@@ -182,6 +183,7 @@ fn write_whole_file(path: &Path, bytes: &[u8]) -> Result<()> {
 #[derive(Debug, Clone, PartialEq)]
 pub struct Loaded {
     pub settings: Settings,
+    pub first_launch: bool,
     pub failure: Option<ConfigError>,
     pub quarantined: Option<PathBuf>,
     pub quarantine_failure: Option<ConfigError>,
@@ -191,6 +193,7 @@ impl Loaded {
     fn first_launch() -> Self {
         Self {
             settings: Settings::default(),
+            first_launch: true,
             failure: None,
             quarantined: None,
             quarantine_failure: None,
@@ -206,6 +209,7 @@ impl Loaded {
 
         Self {
             settings,
+            first_launch: false,
             failure: None,
             quarantined: None,
             quarantine_failure: None,
@@ -215,6 +219,7 @@ impl Loaded {
     fn failed(failure: ConfigError) -> Self {
         Self {
             settings: Settings::default(),
+            first_launch: false,
             failure: Some(failure),
             quarantined: None,
             quarantine_failure: None,
@@ -297,6 +302,7 @@ mod tests {
             short_titles: true,
             paint_portraits: false,
             ungroup_taskbar: true,
+            share_stats: false,
             client_title_suffix: Some(" - Dofus Retro v1.48.21".to_owned()),
             quick_texts: vec![QuickText {
                 id: QuickTextId::default().next(),
@@ -437,10 +443,20 @@ mod tests {
         assert_eq!(loaded.settings, Settings::default());
         assert_eq!(loaded.failure, None);
         assert_eq!(loaded.quarantined, None);
+        assert!(loaded.first_launch);
         assert!(
             !store.path().exists(),
             "loading must not create anything on its own"
         );
+    }
+
+    #[test]
+    fn a_file_already_written_is_no_longer_a_first_launch() {
+        let (_directory, store) = store();
+
+        store.save(&Settings::default()).expect("a saved file");
+
+        assert!(!store.load().first_launch);
     }
 
     #[test]

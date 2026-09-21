@@ -395,6 +395,11 @@ const settingLine = (change: SettingChange) => {
         ? t`Envoi du texte des messages privés activé.`
         : t`Envoi du texte des messages privés désactivé.`
     }
+    case 'shareStats': {
+      return change.share
+        ? t`Partage des statistiques d’usage activé.`
+        : t`Partage des statistiques d’usage désactivé.`
+    }
     case 'language': {
       const label = LANGUAGE_LABELS[change.language]
 

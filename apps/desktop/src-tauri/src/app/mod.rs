@@ -15,6 +15,7 @@ pub mod rune_table;
 pub mod runtime;
 pub mod shortcuts;
 pub mod state;
+pub mod stats;
 pub mod tray;
 pub mod update;
 pub mod view;
@@ -76,6 +77,8 @@ pub fn setup(app: &AppHandle) -> Result<(), ConfigError> {
     app.manage::<PasteState>(Arc::new(PlatformPasteSender::new()));
     app.manage::<WatcherState>(Mutex::new(PlatformNotificationWatcher::new()));
 
+    stats::setup(app);
+
     relay::run::setup(app, keeper);
 
     banner::setup(app);
@@ -98,6 +101,8 @@ pub fn setup(app: &AppHandle) -> Result<(), ConfigError> {
     runtime::start(app.clone());
 
     main_window::hold_until_ready(app);
+
+    stats::app_started(app);
 
     Ok(())
 }

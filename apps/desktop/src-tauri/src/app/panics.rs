@@ -9,6 +9,7 @@ use tauri::AppHandle;
 use crate::app::journal::JournalEvent;
 use crate::app::journal_file;
 use crate::app::state::lock_if_free;
+use crate::app::stats;
 
 thread_local! {
     static INSIDE_A_GUARD: Cell<bool> = const { Cell::new(false) };
@@ -33,6 +34,8 @@ pub fn watch(app: &AppHandle) {
                 }
                 None => journal_file::append_unnumbered(&event),
             }
+
+            stats::app_crashed(&app, info.location());
         }
 
         previous(info);

@@ -295,6 +295,7 @@ pub fn game_window(id: u64, nickname: &str) -> GameWindow {
 pub fn intact(settings: Settings) -> Loaded {
     Loaded {
         settings,
+        first_launch: false,
         failure: None,
         quarantined: None,
         quarantine_failure: None,

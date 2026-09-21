@@ -406,6 +406,10 @@ pub enum SettingChange {
         send_body: bool,
     },
 
+    ShareStats {
+        share: bool,
+    },
+
     Language {
         language: Language,
     },

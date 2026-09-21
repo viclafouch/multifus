@@ -9,6 +9,8 @@ import { Prose } from '@/components/prose'
 import { ProseBlock } from '@/components/prose-block'
 import {
   ANKAMA,
+  APTABASE,
+  APTABASE_PRIVACY,
   AUTHOR,
   AUTHOR_CODE,
   FOLD_ANCHOR,
@@ -26,6 +28,8 @@ const PUBLISHER_TITLE = msg`Qui publie le site`
 const HOSTING_TITLE = msg`Qui l’héberge`
 
 const PRIVACY_TITLE = msg`Ce que le site garde de vous`
+
+const SOFTWARE_TITLE = msg`Ce que le logiciel envoie`
 
 const MARKS_TITLE = msg`Les marques qui ne sont pas les nôtres`
 
@@ -119,6 +123,44 @@ export const LegalScreen = ({ page }: PageScreenProps) => {
               </OutLink>{' '}
               relève le temps d’affichage d’une page chez vous, sans identifiant
               et sans profil.
+            </Trans>
+          </Prose>
+        </ProseBlock>
+        <ProseBlock level={2} title={i18n._(SOFTWARE_TITLE)}>
+          <Prose isWide>
+            <Trans>
+              Multifus envoie deux mesures par session, une à l’ouverture et une
+              à la fermeture. La case « Partager des statistiques d’usage »,
+              dans l’écran Réglages, les coupe, et rien ne part plus.
+            </Trans>
+          </Prose>
+          <Prose isWide>
+            <Trans>
+              Ce qui part : le système, la version de Multifus, la langue de la
+              machine, les cases que vous avez cochées, le nombre de vos
+              personnages et leurs classes, et les compteurs de la session,
+              comme le nombre de bascules de fenêtre.
+            </Trans>
+          </Prose>
+          <Prose isWide>
+            <Trans>
+              Ce qui ne part jamais : un pseudo, le texte d’un message, un
+              fichier du jeu, votre configuration, et rien qui vous nomme. Une
+              panique envoie le nom du fichier et la ligne, jamais son message.
+            </Trans>
+          </Prose>
+          <Prose isWide>
+            <Trans>
+              Ces mesures sont gardées par{' '}
+              <OutLink isInline href={APTABASE}>
+                Aptabase
+              </OutLink>
+              , dans l’Union européenne, sans cookie, sans identifiant qui vous
+              suive d’une session à l’autre, et sans garder votre adresse IP. Sa{' '}
+              <OutLink isInline href={APTABASE_PRIVACY}>
+                politique de confidentialité
+              </OutLink>{' '}
+              le dit en entier.
             </Trans>
           </Prose>
         </ProseBlock>

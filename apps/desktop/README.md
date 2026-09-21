@@ -7,6 +7,23 @@ Requirements and bootstrap are in the [root README](../../README.md). The
 commands are the scripts of `package.json`, and `pnpm run check` is the one CI
 runs.
 
+## The measuring key
+
+`APTABASE_KEY` is read at compile time and baked into the binary. The release
+workflow hands it over from the repository secrets, so only a CI build measures
+anything. A local build compiles without it and sends nothing, whatever the
+Settings box says.
+
+To watch the events arrive in the Debug bucket of the dashboard, pass the key to
+the dev command:
+
+```
+APTABASE_KEY=A-EU-... pnpm run dev:app
+```
+
+`build.rs` declares `cargo:rerun-if-env-changed=APTABASE_KEY`, so changing the
+key recompiles the crate instead of reusing the one already built in.
+
 ## The Accessibility tick, on macOS
 
 Every local build is signed ad-hoc, with a fresh signature each time. macOS ties

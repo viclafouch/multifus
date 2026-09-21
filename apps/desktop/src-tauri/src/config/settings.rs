@@ -28,6 +28,7 @@ pub struct Settings {
     pub client_title_suffix: Option<String>,
     pub start_at_login: bool,
     pub onboarding_done: bool,
+    pub share_stats: bool,
     pub traces: Traces,
 }
 
@@ -65,6 +66,7 @@ impl Default for Settings {
             client_title_suffix: None,
             start_at_login: false,
             onboarding_done: false,
+            share_stats: true,
             traces: Traces::default(),
         }
     }
@@ -403,6 +405,26 @@ mod tests {
         assert!(settings.maximize_on_launch);
         assert!(settings.short_titles);
         assert!(settings.ungroup_taskbar);
+    }
+
+    #[test]
+    fn a_first_launch_shares_what_is_measured() {
+        assert!(Settings::default().share_stats);
+    }
+
+    #[test]
+    fn a_file_written_before_the_measuring_existed_shares_it_too() {
+        let settings = serde_json::from_str::<Settings>("{}").expect("an empty configuration");
+
+        assert!(settings.share_stats);
+    }
+
+    #[test]
+    fn a_file_that_says_no_to_the_measuring_is_believed() {
+        let settings = serde_json::from_str::<Settings>(r#"{ "share_stats": false }"#)
+            .expect("a configuration that refuses the measuring");
+
+        assert!(!settings.share_stats);
     }
 
     #[test]

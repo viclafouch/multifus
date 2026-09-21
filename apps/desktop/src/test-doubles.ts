@@ -160,6 +160,7 @@ const BLANK_SNAPSHOT: Snapshot = {
   paintPortraits: true,
   ungroupTaskbar: true,
   taskbarCombines: true,
+  shareStats: true,
   authorization: { granted: true, listening: true },
   onboarding: BLANK_ONBOARDING,
   config: { path: '/tmp/multifus.json', problem: null },

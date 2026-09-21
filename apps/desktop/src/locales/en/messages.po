@@ -454,6 +454,10 @@ msgstr "While it is on, this setting holds notifications back: your tax collecto
 msgid "Annuler"
 msgstr "Cancel"
 
+#: src/screens/settings/index.tsx
+msgid "Anonyme"
+msgstr "Anonymous"
+
 #: src/screens/banner-screen/banner-pill.tsx
 msgid "Aperçu"
 msgstr "Preview"
@@ -633,6 +637,10 @@ msgstr "BotFather ends with a long run of numbers and letters. One click on it c
 #: src/constants/notification.ts
 msgid "C’est à votre tour de jouer."
 msgstr "It is your turn to play."
+
+#: src/screens/settings/index.tsx
+msgid "C’est comme ça que Multifus sait quoi améliorer. Ce que vous écrivez ne part jamais."
+msgstr "That is how Multifus knows what to improve. What you type never leaves."
 
 #: src/helpers/onboarding.ts
 msgid "C’est en place : le jeu a réussi à vous appeler."
@@ -1643,7 +1651,7 @@ msgstr "The rune table"
 msgid "Le tableau des runes n’a pas suivi"
 msgstr "The rune table did not keep up"
 
-#: src/screens/rune-table/index.tsx
+#: src/screens/rune-table/preview-panel.tsx
 msgid "Le tableau ne s’affiche pas sur un client en plein écran. Forgez dans une fenêtre agrandie."
 msgstr "The table does not show on a client in full screen. Forge in a maximized window."
 
@@ -2150,6 +2158,18 @@ msgctxt "l’application de réglages de Windows, et non un écran de Multifus"
 msgid "Paramètres"
 msgstr "Settings"
 
+#: src/helpers/journal.ts
+msgid "Partage des statistiques d’usage activé."
+msgstr "Usage statistics sharing turned on."
+
+#: src/helpers/journal.ts
+msgid "Partage des statistiques d’usage désactivé."
+msgstr "Usage statistics sharing turned off."
+
+#: src/screens/settings/index.tsx
+msgid "Partager des statistiques d’usage"
+msgstr "Share usage statistics"
+
 #: src/constants/shortcuts.ts
 msgid "Passe au personnage d’après, dans votre ordre."
 msgstr "Moves to the next character, in your order."
@@ -2610,7 +2630,7 @@ msgid "Stat"
 msgstr "Stat"
 
 #: src/screens/settings/index.tsx
-#: src/screens/walk-screen/index.tsx
+#: src/screens/walk-screen/state-panel.tsx
 msgid "Sur Mac, Multifus tourne mieux sans plein écran : gardez tous vos clients Dofus Retro sur le même bureau, en fenêtre agrandie."
 msgstr "On a Mac, Multifus works better without full screen: keep all your Dofus Retro clients on the same desktop, in maximized windows."
 

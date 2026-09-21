@@ -23,6 +23,8 @@ use crate::app::journal::SettingChange;
 use crate::app::journal::ShortcutOutcome;
 use crate::app::journal::Surface;
 use crate::app::journal::WalkFrom;
+use crate::app::stats::Measured;
+use crate::app::stats::Tally;
 use crate::app::view::AuthorizationView;
 use crate::app::view::AutoFocusView;
 use crate::app::view::BannerCharacter;
@@ -193,7 +195,9 @@ pub struct Multifus {
     banner_character: Option<BannerCharacter>,
     rune_table_open: bool,
     rune_table_previewing: bool,
+    first_launch: bool,
     journal: Journal,
+    tally: Tally,
 }
 
 #[derive(Debug)]
@@ -226,6 +230,7 @@ impl Multifus {
 
         let Loaded {
             settings,
+            first_launch,
             failure,
             quarantined,
             quarantine_failure,
@@ -286,7 +291,9 @@ impl Multifus {
             banner_character: None,
             rune_table_open: false,
             rune_table_previewing: false,
+            first_launch,
             journal,
+            tally: Tally::new(),
         }
     }
 
@@ -312,6 +319,7 @@ impl Multifus {
             paint_portraits: self.settings.paint_portraits,
             ungroup_taskbar: self.settings.ungroup_taskbar,
             taskbar_combines: self.taskbar_combines,
+            share_stats: self.settings.share_stats,
             shortcuts: ShortcutAction::ALL
                 .into_iter()
                 .map(|action| ShortcutView {
@@ -404,11 +412,45 @@ impl Multifus {
     }
 
     pub fn log(&mut self, event: JournalEvent) {
+        self.tally.count(&event);
         self.journal.push(event);
     }
 
     pub fn log_unless_repeated(&mut self, event: JournalEvent) -> bool {
+        self.tally.count(&event);
         self.journal.push_unless_repeated(event)
+    }
+
+    #[must_use]
+    pub fn measured(&self) -> Measured<'_> {
+        Measured {
+            settings: &self.settings,
+            tally: &self.tally,
+            is_first_launch: self.first_launch,
+            is_authorized: self.is_granted(),
+            has_config_problem: self.problem.is_some(),
+        }
+    }
+
+    #[must_use]
+    pub fn shares_stats(&self) -> bool {
+        self.settings.share_stats
+    }
+
+    pub fn set_share_stats(&mut self, share: bool) {
+        self.settings.share_stats = share;
+        self.log(JournalEvent::Setting {
+            change: SettingChange::ShareStats { share },
+        });
+        self.save();
+    }
+
+    pub fn count_walk_switch(&mut self) {
+        self.tally.count_walk_switch();
+    }
+
+    pub fn count_health_check(&mut self) {
+        self.tally.count_health_check();
     }
 
     pub fn save(&mut self) {
@@ -1175,6 +1217,10 @@ impl Multifus {
     }
 
     pub fn set_rune_table_shown(&mut self, open: bool, previewing: bool) {
+        if open && !previewing && !self.rune_table_open {
+            self.tally.count_rune_table_open();
+        }
+
         self.rune_table_open = open;
         self.rune_table_previewing = previewing;
     }
@@ -2033,9 +2079,11 @@ mod tests {
     use std::fs;
     use std::io;
 
+    use serde_json::json;
     use tempfile::TempDir;
 
     use crate::app::journal::RelayFailure;
+    use crate::app::stats;
     use crate::test_doubles;
 
     use super::*;
@@ -2048,6 +2096,77 @@ mod tests {
         let loaded = ConfigStore::in_directory(directory.path()).load();
 
         test_doubles::multifus(directory, loaded)
+    }
+
+    #[test]
+    fn what_the_journal_is_told_the_session_counter_hears_too() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        state.log(JournalEvent::Notification {
+            nickname: "Ilyzaelle".to_owned(),
+            notification_kind: Some(NotificationKind::Combat),
+            outcome: Outcome::Focused { focus_micros: 900 },
+        });
+        state.log(JournalEvent::QuickTextPasted {
+            excerpt: "Bon jeu à toi !".to_owned(),
+        });
+        state.count_walk_switch();
+        state.count_health_check();
+        state.set_rune_table_shown(true, false);
+
+        let counted = counters(&state);
+
+        assert_eq!(counted["auto_focus_switches"], json!(1));
+        assert_eq!(counted["auto_focus_combat"], json!(1));
+        assert_eq!(counted["quick_texts_pasted"], json!(1));
+        assert_eq!(counted["walk_switches"], json!(1));
+        assert_eq!(counted["health_checks"], json!(1));
+        assert_eq!(counted["rune_table_opens"], json!(1));
+    }
+
+    #[test]
+    fn a_line_the_journal_turns_away_is_counted_all_the_same() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+        let lost = JournalEvent::ListeningLost {
+            detail: "the centre stopped answering".to_owned(),
+        };
+
+        assert!(state.log_unless_repeated(lost.clone()));
+        assert!(!state.log_unless_repeated(lost));
+
+        assert_eq!(counters(&state)["listening_lost"], json!(2));
+    }
+
+    #[test]
+    fn a_rune_table_previewed_in_the_settings_is_not_a_table_opened_in_the_game() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        state.set_rune_table_shown(true, true);
+        state.set_rune_table_shown(false, false);
+        state.set_rune_table_shown(true, false);
+        state.set_rune_table_shown(true, false);
+
+        assert_eq!(counters(&state)["rune_table_opens"], json!(1));
+    }
+
+    #[test]
+    fn a_configuration_that_refuses_the_measuring_is_kept_that_way() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        assert!(state.shares_stats());
+
+        state.set_share_stats(false);
+
+        assert!(!state.shares_stats());
+        assert!(!multifus_reloaded(&directory).shares_stats());
+    }
+
+    fn counters(state: &Multifus) -> serde_json::Value {
+        stats::stopped_props(&state.measured())
     }
 
     fn journalled(state: &Multifus) -> Vec<JournalEvent> {
@@ -3952,6 +4071,7 @@ mod tests {
             &directory,
             Loaded {
                 settings: Settings::default(),
+                first_launch: false,
                 failure: Some(ConfigError::malformed(
                     directory.path().join("config.json"),
                     "unexpected character",
@@ -3991,6 +4111,7 @@ mod tests {
             &directory,
             Loaded {
                 settings: Settings::default(),
+                first_launch: false,
                 failure: Some(ConfigError::malformed(path.clone(), "unexpected character")),
                 quarantined: None,
                 quarantine_failure: Some(ConfigError::io(

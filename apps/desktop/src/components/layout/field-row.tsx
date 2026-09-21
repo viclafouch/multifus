@@ -1,9 +1,11 @@
 import React from 'react'
+import { cn } from '@multifus/retro'
 
 type FieldRowProps = Readonly<{
   label: string
   description: string
   mention?: string
+  isMentionGood?: boolean
   id?: string
   children: React.ReactNode
 }>
@@ -12,6 +14,7 @@ export const FieldRow = ({
   label,
   description,
   mention,
+  isMentionGood = false,
   id,
   children
 }: FieldRowProps) => {
@@ -24,7 +27,12 @@ export const FieldRow = ({
         <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-tale leading-snug text-cream">
           {label}
           {mention === undefined ? null : (
-            <span className="plaque rounded-xs px-1.5 py-px font-carve text-mark tracking-widest uppercase">
+            <span
+              className={cn(
+                'rounded-xs px-1.5 py-px font-carve text-mark tracking-widest uppercase',
+                isMentionGood ? 'plaque-leaf' : 'plaque'
+              )}
+            >
               {mention}
             </span>
           )}

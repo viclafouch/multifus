@@ -91,6 +91,7 @@ export const CurrentMap = ({ map, snapshot, run }: CurrentMapProps) => {
           paintPortraits={snapshot.paintPortraits}
           ungroupTaskbar={snapshot.ungroupTaskbar}
           taskbarCombines={snapshot.taskbarCombines}
+          shareStats={snapshot.shareStats}
           run={run}
         />
       )

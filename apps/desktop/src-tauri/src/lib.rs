@@ -87,6 +87,7 @@ pub fn run() {
             app::commands::rune_table_measured,
             app::commands::set_start_at_login,
             app::commands::set_maximize_on_launch,
+            app::commands::set_share_stats,
             app::commands::maximize_all_clients,
             app::commands::clients,
             app::commands::watch_clients,

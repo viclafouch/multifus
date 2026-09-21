@@ -10,6 +10,7 @@ use tauri_plugin_updater::UpdaterExt;
 use crate::app::journal::JournalEvent;
 use crate::app::runtime;
 use crate::app::state::lock;
+use crate::app::stats;
 use crate::app::view::UpdateView;
 
 type PendingUpdate = Mutex<Option<Update>>;
@@ -76,6 +77,7 @@ pub fn install(app: &AppHandle) {
     let app = app.clone();
 
     tauri::async_runtime::spawn(async move {
+        let version = update.version.clone();
         let installed = update.download_and_install(|_, _| {}, || {}).await;
 
         if let Err(error) = installed {
@@ -85,6 +87,8 @@ pub fn install(app: &AppHandle) {
 
             return;
         }
+
+        stats::app_updated(&app, &version);
 
         app.restart();
     });

@@ -329,6 +329,10 @@ fn switch_over(switch: &Switch, clicked: ClickedAt) {
     let arrived = {
         let mut state = hold(switch.state);
 
+        if landed {
+            state.count_walk_switch();
+        }
+
         if let Some(said) = switch_said(asked.err().as_ref(), landed) {
             state.log_unless_repeated(said);
         }

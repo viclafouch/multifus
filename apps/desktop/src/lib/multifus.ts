@@ -326,6 +326,10 @@ export const setMaximizeOnLaunch = async (maximize: boolean) => {
   return invoke<Snapshot>('set_maximize_on_launch', { maximize })
 }
 
+export const setShareStats = async (share: boolean) => {
+  return invoke<Snapshot>('set_share_stats', { share })
+}
+
 export const maximizeAllClients = async () => {
   return invoke<Snapshot>('maximize_all_clients')
 }
