@@ -17,7 +17,7 @@ export const HOME_SHOT_ALT = msg`La fenêtre de Multifus, avec le menu des fonct
 export const MAC_SHOT = {
   src: macShot,
   width: 1400,
-  height: 980
+  height: 1131
 } as const satisfies Picture
 
 export const MAC_SHOT_ALT = msg`La fenêtre de Multifus sur Mac, avec le menu des fonctionnalités à gauche et quatre personnages connectés au centre.`

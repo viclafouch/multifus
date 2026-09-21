@@ -15,19 +15,6 @@ import { FOLD_ANCHOR, REPOSITORY } from '@/constants/site'
 
 const HOW_READ = msg`Chaque case est lue dans le code de l’outil, jamais sur sa page d’accueil. Un outil qui garde son code fermé n’a pas de colonne ici. Et Multifus perd deux lignes, parce qu’un comparatif qu’on gagne partout ne vaut rien.`
 
-const MISSING_TITLE = msg`Ce que Multifus laisse aux autres`
-
-const MISSING_POINTS = [
-  {
-    lead: msg`Multifus ne range pas les fenêtres côte à côte.`,
-    line: msg`C’est un choix, et il ne changera pas : Multifus amène devant vous celle du personnage qui joue, il ne redessine pas votre bureau.`
-  },
-  {
-    lead: msg`Multifus ne garde qu’un seul ordre de personnages.`,
-    line: msg`Il le retient d’une session à l’autre, mais il n’en garde pas plusieurs : Dracoon et Retro Toolbox enregistrent des ordres nommés, et les rappellent d’un clic.`
-  }
-] as const satisfies readonly Point[]
-
 const CHECK_TITLE = msg`Vérifiez ce tableau vous-même`
 
 const CHECK_POINTS = [
@@ -54,10 +41,7 @@ export const ComparisonScreen = ({ page }: PageScreenProps) => {
         <Prose>{i18n._(HOW_READ)}</Prose>
         <RivalTable />
       </Band>
-      <Band className="reveal gap-10 py-rest-xs">
-        <ProseBlock level={2} title={i18n._(MISSING_TITLE)}>
-          <PointList points={MISSING_POINTS} />
-        </ProseBlock>
+      <Band className="reveal py-rest-xs">
         <ProseBlock level={2} title={i18n._(CHECK_TITLE)}>
           <PointList points={CHECK_POINTS} />
           <p className="max-w-saga text-tale text-band">

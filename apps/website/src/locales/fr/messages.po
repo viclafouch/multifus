@@ -108,10 +108,6 @@ msgstr "C’est gratuit ?"
 msgid "C’est là que ses cases ont été lues, et vous pouvez lire le même code que nous."
 msgstr "C’est là que ses cases ont été lues, et vous pouvez lire le même code que nous."
 
-#: src/screens/comparison-screen.tsx
-msgid "C’est un choix, et il ne changera pas : Multifus amène devant vous celle du personnage qui joue, il ne redessine pas votre bureau."
-msgstr "C’est un choix, et il ne changera pas : Multifus amène devant vous celle du personnage qui joue, il ne redessine pas votre bureau."
-
 #: src/constants/bodies.ts
 msgid "C’est vous qui envoyez"
 msgstr "C’est vous qui envoyez"
@@ -163,10 +159,6 @@ msgstr "Ce que le site garde de vous"
 #: src/screens/home-screen.tsx
 msgid "Ce que Multifus fait"
 msgstr "Ce que Multifus fait"
-
-#: src/screens/comparison-screen.tsx
-msgid "Ce que Multifus laisse aux autres"
-msgstr "Ce que Multifus laisse aux autres"
 
 #: src/constants/wording.ts
 msgid "Ce que Multifus ne fait pas"
@@ -344,10 +336,6 @@ msgstr "Gratuit"
 #: src/constants/questions.ts
 msgid "Il faut {0} ou plus récent. Les Mac Intel et les Mac Apple Silicon reçoivent le même fichier."
 msgstr "Il faut {0} ou plus récent. Les Mac Intel et les Mac Apple Silicon reçoivent le même fichier."
-
-#: src/screens/comparison-screen.tsx
-msgid "Il le retient d’une session à l’autre, mais il n’en garde pas plusieurs : Dracoon et Retro Toolbox enregistrent des ordres nommés, et les rappellent d’un clic."
-msgstr "Il le retient d’une session à l’autre, mais il n’en garde pas plusieurs : Dracoon et Retro Toolbox enregistrent des ordres nommés, et les rappellent d’un clic."
 
 #: src/constants/bodies.ts
 msgid "Il revient au même endroit au lancement suivant, et suit la fenêtre du jeu."
@@ -765,17 +753,9 @@ msgstr "Multifus n’en fait rien."
 msgid "Multifus ne fait que ça."
 msgstr "Multifus ne fait que ça."
 
-#: src/screens/comparison-screen.tsx
-msgid "Multifus ne garde qu’un seul ordre de personnages."
-msgstr "Multifus ne garde qu’un seul ordre de personnages."
-
 #: src/constants/wording.ts
 msgid "Multifus ne lit pas la mémoire du jeu, ne touche à aucun de ses fichiers, et ne joue à votre place sur aucun personnage."
 msgstr "Multifus ne lit pas la mémoire du jeu, ne touche à aucun de ses fichiers, et ne joue à votre place sur aucun personnage."
-
-#: src/screens/comparison-screen.tsx
-msgid "Multifus ne range pas les fenêtres côte à côte."
-msgstr "Multifus ne range pas les fenêtres côte à côte."
 
 #: src/constants/questions.ts
 msgid "Multifus ne touche pas au jeu. Il ne lit rien dedans, il ne change rien dedans, et il ne joue jamais à votre place. Ankama accepte ce genre de logiciel tant qu’il reste comme ça."
