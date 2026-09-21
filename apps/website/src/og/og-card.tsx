@@ -23,7 +23,7 @@ const GAME = 'DOFUS RETRO'
 
 const SYSTEMS = 'MACOS · WINDOWS'
 
-const SITE_DOMAIN = new URL(HOST).host
+const SITE_DOMAIN = new URL(HOST).host.replace(/^www\./u, '')
 
 const legendOf = (color: string) => {
   return {
