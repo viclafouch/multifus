@@ -8,25 +8,29 @@ type PageHeadProps = Readonly<{
   hasTwoLineTitle?: boolean
 }>
 
-export const PageHead = ({ page, hasTwoLineTitle = false }: PageHeadProps) => {
-  const { i18n } = useLingui()
-  const name = i18n._(PAGE_NAMES[page])
-  const [brand, ...rest] = name.split(' ')
+const titleOnTwoLines = (name: string) => {
+  const [firstWord, ...rest] = name.split(' ')
 
-  const title = hasTwoLineTitle ? (
-    <>
-      {brand}
-      <br />
-      {rest.join(' ')}
-    </>
-  ) : (
-    name
-  )
+  if (rest.length === 0) {
+    return name
+  }
 
   return (
     <>
-      <h1 className="surface-1 font-carve text-banner tracking-hero text-balance text-cream uppercase">
-        {title}
+      {firstWord} <br />
+      {rest.join(' ')}
+    </>
+  )
+}
+
+export const PageHead = ({ page, hasTwoLineTitle = false }: PageHeadProps) => {
+  const { i18n } = useLingui()
+  const name = i18n._(PAGE_NAMES[page])
+
+  return (
+    <>
+      <h1 className="surface-1 font-carve text-banner tracking-hero text-cream uppercase">
+        {hasTwoLineTitle ? titleOnTwoLines(name) : name}
       </h1>
       <p className="surface-2 engraved max-w-lead text-herald text-balance text-cream">
         {i18n._(PAGE_PROMISES[page])}
