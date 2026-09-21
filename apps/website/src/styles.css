@@ -1129,7 +1129,7 @@
   cursor: pointer;
   background-color: color-mix(in srgb, var(--night), transparent 52%);
   transition:
-    opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.5s,
+    opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1),
     background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:focus-visible {
@@ -1140,6 +1140,7 @@
   &[data-playing] {
     opacity: 0;
     background-color: transparent;
+    transition-delay: 0.5s, 0s;
   }
 
   &[data-playing]:focus-visible {
@@ -1158,13 +1159,6 @@
     &[data-playing][data-idle]:not(:focus-visible) {
       opacity: 0;
       cursor: none;
-    }
-  }
-
-  @media (hover: none) {
-    &[data-playing]:not([data-idle]) {
-      opacity: 1;
-      background-color: color-mix(in srgb, var(--night), transparent 76%);
     }
   }
 }
