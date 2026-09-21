@@ -123,16 +123,18 @@ describe('the Multifus window', () => {
   })
 
   it('opens only the onboarding while it is not done', async () => {
+    const onboarding = onboardingOf({ done: false })
+
     bridge.onSnapshot.mockResolvedValue(ignore)
     bridge.onNavigate.mockResolvedValue(ignore)
-    bridge.snapshot.mockResolvedValue(
-      snapshotOf({ onboarding: onboardingOf({ done: false }) })
-    )
+    bridge.snapshot.mockResolvedValue(snapshotOf({ onboarding }))
 
     render(<App />)
 
     expect(
-      await screen.findByText('Vous ne chercherez plus la bonne fenêtre')
+      await screen.findByText(
+        `${onboarding.steps.length} petites étapes vous attendent`
+      )
     ).not.toBeNull()
     expect(screen.queryByRole('heading', { name: 'Multifus' })).toBeNull()
   })

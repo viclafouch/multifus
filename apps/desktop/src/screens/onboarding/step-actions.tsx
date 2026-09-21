@@ -1,6 +1,7 @@
 import { i18n } from '@lingui/core'
 import { t } from '@lingui/core/macro'
 import { Button } from '@multifus/retro'
+import type { Language } from '@/@types/language'
 import type { Page } from '@/@types/onboarding'
 import { PAGE_SHOTS, SYSTEM_PAGES } from '@/constants/onboarding'
 import { leadOf, nextLabel } from '@/helpers/onboarding'
@@ -9,6 +10,7 @@ import { ShotWindow } from '@/screens/onboarding/shot-window'
 
 type StepActionsProps = Readonly<{
   page: Page
+  language: Language
   rank: number
   count: number
   isReady: boolean
@@ -18,6 +20,7 @@ type StepActionsProps = Readonly<{
 
 export const StepActions = ({
   page,
+  language,
   rank,
   count,
   isReady,
@@ -41,7 +44,7 @@ export const StepActions = ({
       ) : null}
       {lead.kind === 'show' ? (
         <ShotWindow
-          source={lead.shot.full}
+          source={lead.shot.full[language]}
           alt={i18n._(lead.shot.alt)}
           variant="leaf"
           size="lead"
@@ -58,7 +61,7 @@ export const StepActions = ({
         )}
         {shot === null || lead.kind === 'show' ? null : (
           <ShotWindow
-            source={shot.full}
+            source={shot.full[language]}
             alt={i18n._(shot.alt)}
             variant="slate"
             size="default"

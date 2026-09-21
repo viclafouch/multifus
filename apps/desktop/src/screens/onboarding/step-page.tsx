@@ -1,3 +1,4 @@
+import type { Language } from '@/@types/language'
 import type { Page, StepStatus } from '@/@types/onboarding'
 import type { Character } from '@/@types/roster'
 import { FeatureRoll } from '@/components/retro/features'
@@ -12,8 +13,10 @@ type StepPageProps = Readonly<{
   page: Page
   status: StepStatus | null
   characters: readonly Character[]
+  language: Language
   rank: number
   count: number
+  stepCount: number
   onNext: () => void
   onAsk: () => void
 }>
@@ -22,24 +25,23 @@ export const StepPage = ({
   page,
   status,
   characters,
+  language,
   rank,
   count,
+  stepCount,
   onNext,
   onAsk
 }: StepPageProps) => {
   const title = useArrival()
   const way = pageWay(page)
   const check = status?.check ?? 'unknown'
-  const head = pageHead(page, check)
+  const head = pageHead({ page, check, stepCount })
   const isProof = page === 'proof'
-  const isWelcome = page === 'welcome'
-  const isDone = isProof && check === 'ready'
-  const isWide = isWelcome || isDone
 
   return (
     <section className="flex min-h-full w-full flex-col justify-center">
       <div
-        data-wide={isWide ? '' : undefined}
+        data-wide={isProof ? '' : undefined}
         className="plate unfurl group mx-auto w-full max-w-scene data-wide:max-w-roll"
       >
         <div className="flex flex-col items-center gap-4 px-8 py-6 text-center group-data-wide:py-4">
@@ -50,7 +52,7 @@ export const StepPage = ({
           >
             {head.title}
           </h1>
-          {isDone ? null : (
+          {isProof ? null : (
             <span aria-hidden className="lift lift-1 crest w-crest" />
           )}
           <p className="lift lift-2 max-w-tale text-tale text-balance text-khaki">
@@ -66,8 +68,7 @@ export const StepPage = ({
               <ProofBand characters={characters} check={check} />
             </div>
           ) : null}
-          {isWelcome ? <FeatureRoll hasLines={false} /> : null}
-          {isDone ? <FeatureRoll hasLines /> : null}
+          {isProof ? <FeatureRoll /> : null}
           {isProof || status === null || status.check === 'unknown' ? null : (
             <div className="lift lift-4">
               <StepState
@@ -83,6 +84,7 @@ export const StepPage = ({
           <div className="lift lift-5 pt-1">
             <StepActions
               page={page}
+              language={language}
               rank={rank}
               count={count}
               isReady={check === 'ready'}

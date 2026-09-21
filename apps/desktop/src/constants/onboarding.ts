@@ -1,11 +1,14 @@
 import { msg } from '@lingui/core/macro'
 import arena from '@multifus/ankama/images/arena.webp'
 import camp from '@multifus/ankama/images/camp.webp'
-import optionsGeneral from '@multifus/ankama/images/dofus-options-general.png'
+import optionsGeneralEnglish from '@multifus/ankama/images/dofus-options-general.en.webp'
+import optionsGeneralSpanish from '@multifus/ankama/images/dofus-options-general.es.webp'
+import optionsGeneralFrench from '@multifus/ankama/images/dofus-options-general.fr.webp'
 import forest from '@multifus/ankama/images/forest.webp'
 import harbour from '@multifus/ankama/images/harbour.webp'
 import pen from '@multifus/ankama/images/pen.webp'
 import village from '@multifus/ankama/images/village.webp'
+import type { Language } from '@/@types/language'
 import type { Page, Step, SystemPage } from '@/@types/onboarding'
 import type { Phrase } from '@/lib/i18n'
 
@@ -38,8 +41,14 @@ export const SYSTEM_PAGES = {
   proof: null
 } as const satisfies Record<Page, SystemPage | null>
 
+const OPTIONS_GENERAL = {
+  fr: optionsGeneralFrench,
+  en: optionsGeneralEnglish,
+  es: optionsGeneralSpanish
+} as const satisfies Record<Language, string>
+
 export type Shot = {
-  readonly full: string
+  readonly full: Record<Language, string>
   readonly alt: Phrase
 }
 
@@ -49,7 +58,7 @@ export const PAGE_SHOTS = {
   notifications: null,
   focus: null,
   gameSetting: {
-    full: optionsGeneral,
+    full: OPTIONS_GENERAL,
     alt: msg`Les options de Dofus, avec la case Notifications en arrière-plan cochée`
   },
   proof: null

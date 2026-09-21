@@ -34,6 +34,7 @@ export const OnboardingGuide = ({
   const last = pages.length - 1
   const rank = current + 1
   const count = pages.length
+  const stepCount = onboarding.steps.length
   const status =
     onboarding.steps.find((candidate) => {
       return candidate.step === page
@@ -48,7 +49,9 @@ export const OnboardingGuide = ({
       <Scene scenes={PAGE_SCENES} here={page} />
       <ChapterCard
         key={page}
-        legend={t`Étape ${rank} sur ${count}`}
+        legend={
+          current === 0 ? 'Multifus' : t`Étape ${current} sur ${stepCount}`
+        }
         title={pageLabel(page)}
       />
       <header className="brow lift lift-chrome relative flex shrink-0 items-center px-4 py-3">
@@ -78,8 +81,10 @@ export const OnboardingGuide = ({
           page={page}
           status={status}
           characters={characters}
+          language={language}
           rank={rank}
           count={count}
+          stepCount={stepCount}
           onNext={() => {
             if (current === last) {
               finish()

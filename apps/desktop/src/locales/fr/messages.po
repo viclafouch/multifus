@@ -222,6 +222,10 @@ msgstr "{rest, plural, one {# autre} other {# autres}}"
 msgid "{small, plural, one {# client en petit} other {# clients en petit}}"
 msgstr "{small, plural, one {# client en petit} other {# clients en petit}}"
 
+#: src/helpers/onboarding.ts
+msgid "{stepCount, plural, one {# petite étape vous attend} other {# petites étapes vous attendent}}"
+msgstr "{stepCount, plural, one {# petite étape vous attend} other {# petites étapes vous attendent}}"
+
 #: src/helpers/journal.ts
 msgid "{subject} : {detail}"
 msgstr "{subject} : {detail}"
@@ -281,6 +285,10 @@ msgstr "% piège"
 #: src/constants/runes.ts
 msgid "% résistance"
 msgstr "% résistance"
+
+#: src/helpers/onboarding.ts
+msgid "2 minutes, pas plus : quelques cases à cocher pour que le système et le jeu autorisent Multifus. Sans elles, il ne peut rien faire."
+msgstr "2 minutes, pas plus : quelques cases à cocher pour que le système et le jeu autorisent Multifus. Sans elles, il ne peut rien faire."
 
 #: src/screens/auto-focus-screen.tsx
 msgid "À ces moments, le personnage concerné passe devant. Un personnage exclu dans les Personnages ne bouge pas."
@@ -1196,8 +1204,8 @@ msgid "Est-ce que tout marche ?"
 msgstr "Est-ce que tout marche ?"
 
 #: src/screens/onboarding/guide.tsx
-msgid "Étape {rank} sur {count}"
-msgstr "Étape {rank} sur {count}"
+msgid "Étape {current} sur {stepCount}"
+msgstr "Étape {current} sur {stepCount}"
 
 #: src/helpers/journal.ts
 msgid "éteint"
@@ -1267,10 +1275,6 @@ msgstr "Fermer sans rien changer"
 #: src/screens/settings/index.tsx
 msgid "Garder Multifus en arrière-plan"
 msgstr "Garder Multifus en arrière-plan"
-
-#: src/helpers/onboarding.ts
-msgid "Gardez vos huit clients ouverts sans jamais chercher lequel vous appelle. Multifus regarde à votre place, et voici tout ce qu’il sait faire."
-msgstr "Gardez vos huit clients ouverts sans jamais chercher lequel vous appelle. Multifus regarde à votre place, et voici tout ce qu’il sait faire."
 
 #: src/helpers/questions.ts
 msgid "Gardez-la : sur Mac, c’est elle qui prévient Multifus. Sans elle, plus personne ne passe devant."
@@ -2993,10 +2997,6 @@ msgstr "Vous êtes à jour."
 #: src/screens/settings/index.tsx
 msgid "Vous lisez « Elyandra » au lieu de « Elyandra - Dofus Retro »."
 msgstr "Vous lisez « Elyandra » au lieu de « Elyandra - Dofus Retro »."
-
-#: src/helpers/onboarding.ts
-msgid "Vous ne chercherez plus la bonne fenêtre"
-msgstr "Vous ne chercherez plus la bonne fenêtre"
 
 #: src/screens/relay/state-panel.tsx
 msgid "Vous ne raterez rien tant que Dofus Retro vous garde connecté. Un raccourci qui vous ramène sur une fenêtre coupe l’envoi, puisque vous voilà revenu."

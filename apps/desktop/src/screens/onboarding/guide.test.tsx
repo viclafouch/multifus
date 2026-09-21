@@ -1,7 +1,9 @@
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
+import type { Language } from '@/@types/language'
 import type { Check, Onboarding, Step } from '@/@types/onboarding'
 import type { Character } from '@/@types/roster'
+import { LANGUAGES } from '@/constants/language'
 import {
   APPLE_AGENT,
   WINDOWS_AGENT,
@@ -24,6 +26,14 @@ const FEATURE_NAMES = [
   'Les fenêtres agrandies'
 ]
 
+const STEP_COUNT = onboardingOf().steps.length
+
+const shownFeatures = () => {
+  return FEATURE_NAMES.filter((name) => {
+    return screen.queryByText(name) !== null
+  })
+}
+
 const bridge = {
   finishOnboarding: vi.fn(pending),
   requestAuthorization: vi.fn(pending),
@@ -44,6 +54,7 @@ type ShowParams = {
   readonly agent?: string
   readonly characters?: readonly Character[]
   readonly onboarding?: Onboarding
+  readonly language?: Language
   readonly isWindowsTen?: boolean
 }
 
@@ -54,6 +65,7 @@ const show = async ({
     done: false,
     steps: stepsWith({ authorization: 'blocked' })
   }),
+  language = 'fr',
   isWindowsTen = false
 }: ShowParams = {}) => {
   vi.resetModules()
@@ -72,7 +84,7 @@ const show = async ({
     <OnboardingGuide
       onboarding={onboarding}
       characters={characters}
-      language="fr"
+      language={language}
       run={run}
     />
   )
@@ -99,33 +111,44 @@ describe('the setup', () => {
     expect(buttonNamed('English').getAttribute('aria-pressed')).toBe('false')
   })
 
-  it('opens on what Multifus does, the first of the six pages', async () => {
+  it('opens on the steps to come, and counts none of them yet', async () => {
     await show()
 
     expect(
-      screen.getByText('Vous ne chercherez plus la bonne fenêtre')
+      screen.getByText(`${STEP_COUNT} petites étapes vous attendent`)
     ).not.toBeNull()
-    expect(screen.getByText('Étape 1 sur 6')).not.toBeNull()
+    expect(screen.queryByText(/^Étape /u)).toBeNull()
   })
 
-  it('says the pain of multi accounting before saying the cure', async () => {
+  it('numbers a step against the count the welcome page announced', async () => {
+    await show()
+
+    goTo('L’autorisation')
+
+    expect(screen.getByText(`Étape 1 sur ${STEP_COUNT}`)).not.toBeNull()
+  })
+
+  it('says the setup is short, and that nothing works without it', async () => {
     await show()
 
     expect(
-      screen.getByText(/sans jamais chercher lequel vous appelle/u, {
-        exact: false
-      })
+      screen.getByText(/Sans elles, il ne peut rien faire/u, { exact: false })
     ).not.toBeNull()
   })
 
-  it('announces everything Multifus can do, and not only AutoFocus', async () => {
+  it('keeps the features for the last page, and not the welcome one', async () => {
     await show()
 
-    const named = FEATURE_NAMES.filter((name) => {
-      return screen.queryByText(name) !== null
-    })
+    expect(screen.queryByText('L’AutoFocus')).toBeNull()
+    expect(shownFeatures()).toStrictEqual([])
+  })
 
-    expect(named).toStrictEqual(FEATURE_NAMES)
+  it('shows what Multifus can do even when the trial has not run', async () => {
+    await show()
+
+    goTo('L’essai')
+
+    expect(shownFeatures()).toStrictEqual(FEATURE_NAMES)
   })
 
   it('says who the scenery belongs to', async () => {
@@ -288,19 +311,6 @@ describe('the setup', () => {
     expect(screen.getByText('Divers')).not.toBeNull()
   })
 
-  it('keeps the screenshot of the game for whoever asks for it', async () => {
-    await show()
-
-    goTo('Dans le jeu')
-
-    expect(screen.queryByRole('img')).toBeNull()
-
-    fireEvent.click(buttonNamed('Voir l’image'))
-
-    expect(screen.getByRole('img')).not.toBeNull()
-    expect(screen.getByRole('button', { name: 'Fermer' })).not.toBeNull()
-  })
-
   it('waits for a character to come online', async () => {
     await show()
 
@@ -366,6 +376,7 @@ describe('the setup', () => {
       screen.getByText('Le jeu vous a appelé, Multifus l’a entendu.')
     ).not.toBeNull()
     expect(screen.getByText('Alpha')).not.toBeNull()
+    expect(shownFeatures()).toStrictEqual(FEATURE_NAMES)
 
     fireEvent.click(buttonNamed('Terminer'))
 
@@ -409,6 +420,32 @@ describe('the setup', () => {
     expect(
       screen.getByText('Multifus n’entend rien, et ne peut rien faire.')
     ).not.toBeNull()
+  })
+})
+
+describe('the screenshot of the game', () => {
+  it('stays behind a button, for whoever asks for it', async () => {
+    await show()
+
+    goTo('Dans le jeu')
+
+    expect(screen.queryByRole('img')).toBeNull()
+
+    fireEvent.click(buttonNamed('Voir l’image'))
+
+    expect(screen.getByRole('img')).not.toBeNull()
+    expect(screen.getByRole('button', { name: 'Fermer' })).not.toBeNull()
+  })
+
+  it.each(LANGUAGES)('is the one taken in %s', async (language) => {
+    await show({ language })
+
+    goTo('Dans le jeu')
+    fireEvent.click(buttonNamed('Voir l’image'))
+
+    expect(screen.getByRole('img').getAttribute('src')).toContain(
+      `dofus-options-general.${language}`
+    )
   })
 })
 

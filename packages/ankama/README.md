@@ -14,4 +14,12 @@ dungeon monster illustrations, each one 100 by 120.
 import camp from '@multifus/ankama/images/camp.webp'
 ```
 
+An image holding text the player reads is taken once per language, and carries
+that language before its extension. Every language of the application has its
+own file, so the importer can pick one without a fallback.
+
+```ts
+import optionsGeneralFrench from '@multifus/ankama/images/dofus-options-general.fr.webp'
+```
+
 Icons have no entry in `exports`: they are read from disk at build time.

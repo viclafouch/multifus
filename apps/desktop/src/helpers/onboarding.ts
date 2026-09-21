@@ -48,11 +48,15 @@ export const pageLabel = (page: Page) => {
   }
 }
 
-export const pageTitle = (page: Page) => {
+const welcomeTitle = (stepCount: number) => {
+  return plural(stepCount, {
+    one: '# petite étape vous attend',
+    other: '# petites étapes vous attendent'
+  })
+}
+
+const stepTitle = (page: Exclude<Page, 'welcome'>) => {
   switch (page) {
-    case 'welcome': {
-      return t`Vous ne chercherez plus la bonne fenêtre`
-    }
     case 'authorization': {
       return IS_APPLE
         ? t`Laissez Multifus voir vos fenêtres`
@@ -83,7 +87,7 @@ export const pageTitle = (page: Page) => {
 const pageBody = (page: Page) => {
   switch (page) {
     case 'welcome': {
-      return t`Gardez vos huit clients ouverts sans jamais chercher lequel vous appelle. Multifus regarde à votre place, et voici tout ce qu’il sait faire.`
+      return t`2 minutes, pas plus : quelques cases à cocher pour que le système et le jeu autorisent Multifus. Sans elles, il ne peut rien faire.`
     }
     case 'authorization': {
       return IS_APPLE
@@ -112,7 +116,13 @@ const pageBody = (page: Page) => {
   }
 }
 
-export const pageHead = (page: Page, check: Check) => {
+type PageHeadParams = Readonly<{
+  page: Page
+  check: Check
+  stepCount: number
+}>
+
+export const pageHead = ({ page, check, stepCount }: PageHeadParams) => {
   if (page === 'proof' && check === 'ready') {
     return {
       title: t`Tout est en place`,
@@ -120,7 +130,11 @@ export const pageHead = (page: Page, check: Check) => {
     }
   }
 
-  return { title: pageTitle(page), body: pageBody(page) }
+  if (page === 'welcome') {
+    return { title: welcomeTitle(stepCount), body: pageBody(page) }
+  }
+
+  return { title: stepTitle(page), body: pageBody(page) }
 }
 
 export const pageWay = (page: Page) => {
