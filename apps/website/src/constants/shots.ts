@@ -29,13 +29,13 @@ const MAC_SMALL_SIZE = {
 } as const satisfies Size
 
 const WINDOWS_FULL_SIZE = {
-  width: 975,
-  height: 788
+  width: 1128,
+  height: 803
 } as const satisfies Size
 
 const WINDOWS_SMALL_SIZE = {
   width: 760,
-  height: 614
+  height: 541
 } as const satisfies Size
 
 export const SYSTEM_SHOTS = {
