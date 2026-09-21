@@ -78,7 +78,7 @@
   --text-mark--line-height: 1.3;
   --text-log: var(--size-mark);
   --text-log--line-height: 1.75;
-  --text-way: clamp(1.0625rem, 2.7vh, 1.375rem);
+  --text-way: clamp(1rem, 2.62vh, 1.3125rem);
   --text-way--line-height: 1.1;
 
   --spacing-head: var(--head);
@@ -88,9 +88,9 @@
   --spacing-paving: clamp(6.5rem, 18vw, 11rem);
   --spacing-board: clamp(8.25rem, 16vw, 11.5rem);
   --spacing-emblem: 52px;
-  --spacing-banner: 66px;
+  --spacing-banner: 58px;
   --spacing-way: 15.5rem;
-  --spacing-rung: clamp(30px, 6.1vh, 40px);
+  --spacing-rung: clamp(28px, 5.1vh, 36px);
   --spacing-crown: 28px;
   --spacing-ledger: 37px;
   --spacing-hem: 56px;
