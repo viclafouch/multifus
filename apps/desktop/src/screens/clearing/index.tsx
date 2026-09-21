@@ -2,7 +2,6 @@ import React from 'react'
 import { i18n } from '@lingui/core'
 import { t } from '@lingui/core/macro'
 import logo from '@multifus/retro/assets/logo.png'
-import type { Onboarding } from '@/@types/onboarding'
 import type { Character } from '@/@types/roster'
 import type { ScreenName, Snapshot } from '@/@types/snapshot'
 import type { Authorization } from '@/@types/system'
@@ -13,16 +12,12 @@ import { StandingStone } from '@/components/world/standing-stone'
 import { WayList } from '@/components/world/way-list'
 import { CLEARING, MAP_NAMES } from '@/constants/world'
 import { colorHolders } from '@/helpers/colors'
-import { matchIsAsking } from '@/helpers/onboarding'
-import { authorizationLine, authorizationState } from '@/helpers/wording'
+import { listeningLine, listeningState } from '@/helpers/wording'
 import { characterMarks } from '@/lib/character-marks'
-
-const ASKING_SCREEN = 'settings' as const satisfies ScreenName
 
 type ClearingScreenProps = Readonly<{
   characters: readonly Character[]
   authorization: Authorization
-  onboarding: Onboarding
   paintPortraits: boolean
   onGo: (screen: ScreenName) => void
   run: (action: Promise<Snapshot>) => void
@@ -31,15 +26,12 @@ type ClearingScreenProps = Readonly<{
 export const ClearingScreen = ({
   characters,
   authorization,
-  onboarding,
   paintPortraits,
   onGo,
   run
 }: ClearingScreenProps) => {
   const [opened, setOpened] = React.useState<string | null>(null)
   const marks = characterMarks({ run })
-
-  const asking = matchIsAsking(onboarding) ? ASKING_SCREEN : null
 
   const character =
     characters.find((candidate) => {
@@ -49,10 +41,12 @@ export const ClearingScreen = ({
   return (
     <main className="relative flex min-h-0 flex-1 flex-col px-6 pt-3">
       <header className="relative z-30 flex h-crown shrink-0 items-center gap-3 pr-40">
-        <p className="limelight flex items-center gap-2 text-mark text-khaki">
-          <Lamp state={authorizationState(authorization)} />
-          {authorizationLine(authorization)}
-        </p>
+        {authorization.granted ? (
+          <p className="limelight flex items-center gap-2 text-mark text-khaki">
+            <Lamp state={listeningState(authorization.listening)} />
+            {listeningLine(authorization.listening)}
+          </p>
+        ) : null}
       </header>
       <div className="flex min-h-0 flex-1 flex-col items-start overflow-y-auto">
         <div className="settle my-auto flex flex-col items-start gap-4">
@@ -66,7 +60,7 @@ export const ClearingScreen = ({
             </div>
           </div>
           <span aria-hidden className="crest w-way" />
-          <WayList asking={asking} onGo={onGo} />
+          <WayList onGo={onGo} />
         </div>
       </div>
       <StandingStone

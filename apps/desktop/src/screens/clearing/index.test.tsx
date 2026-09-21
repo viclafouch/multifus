@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import type { Character } from '@/@types/roster'
-import { characterOf, onboardingOf } from '@/test-doubles'
+import { characterOf } from '@/test-doubles'
 
 const bridge = {
   removeCharacter: vi.fn(),
@@ -24,7 +24,6 @@ const show = (characters: readonly Character[]) => {
     <ClearingScreen
       characters={characters}
       authorization={{ granted: true, listening: true }}
-      onboarding={onboardingOf()}
       paintPortraits
       onGo={() => {}}
       run={() => {}}

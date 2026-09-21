@@ -122,28 +122,6 @@ describe('the Multifus window', () => {
     expect(screen.getByText('0 connecté')).not.toBeNull()
   })
 
-  it('marks the settings when a check is closed', async () => {
-    await open(
-      snapshotOf({
-        onboarding: onboardingOf({
-          steps: [{ step: 'authorization', check: 'blocked', proven: false }]
-        })
-      })
-    )
-
-    expect(
-      screen.getByRole('button', { name: /Paramètres/u }).textContent
-    ).toContain('À régler')
-  })
-
-  it('marks nothing when every check holds', async () => {
-    await open(snapshotOf())
-
-    expect(
-      screen.getByRole('button', { name: /Paramètres/u }).textContent
-    ).not.toContain('À régler')
-  })
-
   it('opens only the onboarding while it is not done', async () => {
     bridge.onSnapshot.mockResolvedValue(ignore)
     bridge.onNavigate.mockResolvedValue(ignore)
@@ -271,20 +249,45 @@ describe('the Multifus window', () => {
       expect(screen.getByText('Écoute interrompue')).not.toBeNull()
     })
 
-    it('says when the authorization is missing', async () => {
+    it('says nothing about the listening when the authorization is missing', async () => {
       await open(
         snapshotOf({
           authorization: { granted: false, listening: false }
         })
       )
 
-      expect(screen.getByText('Autorisation manquante')).not.toBeNull()
+      expect(screen.queryByText('Écoute interrompue')).toBeNull()
     })
   })
 
   describe('without the system authorization', () => {
     const denied = snapshotOf({
       authorization: { granted: false, listening: false }
+    })
+
+    it('raises a banner on the home screen', async () => {
+      await open(denied)
+
+      expect(screen.getByText('Autorisation manquante')).not.toBeNull()
+    })
+
+    it('leaves the banner home, where nothing of the map hides behind it', async () => {
+      await open(denied)
+
+      navigateTo('settings')
+
+      expect(screen.queryByText('Autorisation manquante')).toBeNull()
+      expect(screen.getByRole('button', { name: 'Retour' })).not.toBeNull()
+    })
+
+    it('leaves the banner out once the authorization is granted', async () => {
+      await open(
+        snapshotOf({
+          authorization: { granted: true, listening: true }
+        })
+      )
+
+      expect(screen.queryByText('Autorisation manquante')).toBeNull()
     })
 
     it('asks for the authorization instead of the characters', async () => {

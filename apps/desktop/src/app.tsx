@@ -1,5 +1,6 @@
 import { Shade } from '@multifus/retro'
 import type { ConfigProblem } from '@/@types/system'
+import { AuthorizationBanner } from '@/components/authorization-banner'
 import { CheckNotice } from '@/components/check-notice'
 import { ConfigNotice } from '@/components/config-notice'
 import { HelpProvider } from '@/components/help-provider'
@@ -62,6 +63,9 @@ export const App = () => {
     )
   }
 
+  const shouldWarnAboutAuthorization =
+    !snapshot.authorization.granted && map === CLEARING
+
   return (
     <KeyLabelsProvider labels={snapshot.keyboard}>
       <MapNavigationProvider onGo={setMap}>
@@ -103,11 +107,15 @@ export const App = () => {
                   version={snapshot.version}
                   language={snapshot.language}
                 />
+                {shouldWarnAboutAuthorization ? (
+                  <div className="pointer-events-none absolute inset-x-0 top-0 z-40">
+                    <AuthorizationBanner run={run} />
+                  </div>
+                ) : null}
                 {map === CLEARING ? (
                   <ClearingScreen
                     characters={snapshot.characters}
                     authorization={snapshot.authorization}
-                    onboarding={snapshot.onboarding}
                     paintPortraits={snapshot.paintPortraits}
                     onGo={setMap}
                     run={run}

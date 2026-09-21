@@ -6,7 +6,6 @@ import type { UpdateStatus } from '@/@types/system'
 import { IS_APPLE } from '@/constants/keyboard'
 import type { TonedLine } from '@/helpers/wording'
 import {
-  authorizationLine,
   bindingLabel,
   characterMarksLabel,
   characterMarksTooltip,
@@ -16,6 +15,7 @@ import {
   cycleToggleTooltip,
   dialogNote,
   genderGroupHint,
+  listeningLine,
   missingGenderLine,
   pairingProblemLine,
   shortcutStatusLine,
@@ -222,32 +222,13 @@ describe('bindingLabel', () => {
   })
 })
 
-describe('authorizationLine', () => {
+describe('listeningLine', () => {
   it('says the listening is on when the system hears', () => {
-    const line = authorizationLine({
-      granted: true,
-      listening: true
-    })
-
-    expect(line).toBe('À l’écoute du jeu')
+    expect(listeningLine(true)).toBe('À l’écoute du jeu')
   })
 
   it('says the listening is stopped when it is not running', () => {
-    const line = authorizationLine({
-      granted: true,
-      listening: false
-    })
-
-    expect(line).toBe('Écoute interrompue')
-  })
-
-  it('says the authorization is missing before everything else', () => {
-    const line = authorizationLine({
-      granted: false,
-      listening: true
-    })
-
-    expect(line).toBe('Autorisation manquante')
+    expect(listeningLine(false)).toBe('Écoute interrompue')
   })
 })
 

@@ -5,11 +5,10 @@ import type { ScreenName } from '@/@types/snapshot'
 import { MAP_NAMES, MAPS } from '@/constants/world'
 
 type WayListProps = Readonly<{
-  asking: ScreenName | null
   onGo: (screen: ScreenName) => void
 }>
 
-export const WayList = ({ asking, onGo }: WayListProps) => {
+export const WayList = ({ onGo }: WayListProps) => {
   return (
     <nav aria-label={t`Les maps de Multifus`}>
       <ul className="flex w-way flex-col gap-0.5">
@@ -25,15 +24,6 @@ export const WayList = ({ asking, onGo }: WayListProps) => {
                 }}
               >
                 <span className="wayname">{i18n._(MAP_NAMES[map])}</span>
-                {map === asking ? (
-                  <>
-                    <span
-                      aria-hidden
-                      className="relative ml-auto size-1.5 rounded-full bg-flame"
-                    />
-                    <span className="sr-only">{t`À régler`}</span>
-                  </>
-                ) : null}
               </Button>
             </li>
           )

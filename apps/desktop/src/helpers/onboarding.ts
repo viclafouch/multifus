@@ -22,12 +22,6 @@ export const pagesOf = (onboarding: Onboarding): readonly Page[] => {
   ]
 }
 
-export const matchIsAsking = (onboarding: Onboarding) => {
-  return onboarding.steps.some(({ check }) => {
-    return check === 'blocked'
-  })
-}
-
 export const pageLabel = (page: Page) => {
   switch (page) {
     case 'welcome': {

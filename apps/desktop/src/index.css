@@ -62,6 +62,14 @@
   );
 }
 
+@utility alarm {
+  background-image: radial-gradient(
+    128% 190% at 2% 50%,
+    color-mix(in oklch, var(--flame), transparent 82%),
+    transparent 64%
+  );
+}
+
 @utility live-light {
   background-image: radial-gradient(
     92% 108% at 50% 0%,

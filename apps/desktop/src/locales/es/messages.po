@@ -302,10 +302,6 @@ msgstr "Acerca de"
 msgid "À quoi sert un robot Telegram ?"
 msgstr "¿Para qué sirve un bot de Telegram?"
 
-#: src/components/world/way-list.tsx
-msgid "À régler"
-msgstr "Por arreglar"
-
 #: src/helpers/wording.ts
 msgid "Accessibilité"
 msgstr "Accesibilidad"
@@ -954,6 +950,7 @@ msgstr "ya lo tiene {holder}"
 msgid "Déjà pris par {label}."
 msgstr "Ya lo tiene {label}."
 
+#: src/components/authorization-banner.tsx
 #: src/screens/authorization-screen.tsx
 msgid "Demander l’autorisation"
 msgstr "Pedir la autorización"
@@ -2504,6 +2501,10 @@ msgstr "Sadida"
 msgid "Sagesse"
 msgstr "Sabiduría"
 
+#: src/helpers/wording.ts
+msgid "Sans l’accès aux {notifications}, Multifus n’entend pas le jeu vous appeler et ne ramènera personne devant vous."
+msgstr "Sin acceso a {notifications}, Multifus no oye al juego llamarle y no traerá a nadie ante usted."
+
 #: src/screens/authorization-screen.tsx
 msgid "Sans l’accès aux notifications, Multifus ne peut pas entendre le jeu vous appeler, ni mettre la bonne fenêtre Dofus Retro devant vous."
 msgstr "Sin acceso a las notificaciones, Multifus no puede oír que el juego te llama, ni poner delante de ti la ventana de Dofus Retro correcta."
@@ -2511,6 +2512,10 @@ msgstr "Sin acceso a las notificaciones, Multifus no puede oír que el juego te 
 #: src/screens/authorization-screen.tsx
 msgid "Sans l’autorisation {accessibility}, Multifus ne peut pas lire le pseudo dans le titre de vos fenêtres Dofus Retro, les mettre devant vous, ni entendre le jeu vous appeler."
 msgstr "Sin la autorización de {accessibility}, Multifus no puede leer el apodo en el título de tus ventanas de Dofus Retro, ni ponerlas delante de ti, ni oír que el juego te llama."
+
+#: src/helpers/wording.ts
+msgid "Sans l’autorisation {accessibility}, Multifus ne voit aucune fenêtre Dofus Retro et ne ramènera personne devant vous."
+msgstr "Sin el permiso {accessibility}, Multifus no ve ninguna ventana de Dofus Retro y no traerá a nadie ante usted."
 
 #: src/screens/quick-texts/text-row.tsx
 msgid "Sans texte, il n’y aura rien à coller."

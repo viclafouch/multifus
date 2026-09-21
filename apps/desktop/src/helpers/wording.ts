@@ -10,11 +10,7 @@ import type {
   ShortcutStatus
 } from '@/@types/shortcuts'
 import type { Clients, ClientsState } from '@/@types/snapshot'
-import type {
-  Authorization,
-  ConfigProblem,
-  UpdateStatus
-} from '@/@types/system'
+import type { ConfigProblem, UpdateStatus } from '@/@types/system'
 import type { LampState } from '@/components/lamp'
 import { IS_APPLE } from '@/constants/keyboard'
 import { CLASS_LABELS, COLOR_LABELS } from '@/constants/roster'
@@ -287,20 +283,25 @@ export const characterShortcutStatusLine = (
     : shortcutStatusLine(status, quickTexts)
 }
 
-export const authorizationState = (authorization: Authorization): LampState => {
-  if (!authorization.granted) {
-    return 'excluded'
-  }
+export const authorizationNoticeLines = () => {
+  const words = systemWords()
+  const accessibility = quoted(words.accessibility)
+  const notifications = quoted(words.systemNotifications)
 
-  return authorization.listening ? 'live' : 'offline'
+  return {
+    title: t`Autorisation manquante`,
+    body: IS_APPLE
+      ? t`Sans l’autorisation ${accessibility}, Multifus ne voit aucune fenêtre Dofus Retro et ne ramènera personne devant vous.`
+      : t`Sans l’accès aux ${notifications}, Multifus n’entend pas le jeu vous appeler et ne ramènera personne devant vous.`
+  }
 }
 
-export const authorizationLine = (authorization: Authorization) => {
-  if (!authorization.granted) {
-    return t`Autorisation manquante`
-  }
+export const listeningState = (isListening: boolean): LampState => {
+  return isListening ? 'live' : 'offline'
+}
 
-  return authorization.listening ? t`À l’écoute du jeu` : t`Écoute interrompue`
+export const listeningLine = (isListening: boolean) => {
+  return isListening ? t`À l’écoute du jeu` : t`Écoute interrompue`
 }
 
 const clientsState = ({ open, small, readable }: Clients): ClientsState => {

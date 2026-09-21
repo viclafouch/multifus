@@ -302,10 +302,6 @@ msgstr "À propos"
 msgid "À quoi sert un robot Telegram ?"
 msgstr "À quoi sert un robot Telegram ?"
 
-#: src/components/world/way-list.tsx
-msgid "À régler"
-msgstr "À régler"
-
 #: src/helpers/wording.ts
 msgid "Accessibilité"
 msgstr "Accessibilité"
@@ -954,6 +950,7 @@ msgstr "déjà pris par {holder}"
 msgid "Déjà pris par {label}."
 msgstr "Déjà pris par {label}."
 
+#: src/components/authorization-banner.tsx
 #: src/screens/authorization-screen.tsx
 msgid "Demander l’autorisation"
 msgstr "Demander l’autorisation"
@@ -2504,6 +2501,10 @@ msgstr "Sadida"
 msgid "Sagesse"
 msgstr "Sagesse"
 
+#: src/helpers/wording.ts
+msgid "Sans l’accès aux {notifications}, Multifus n’entend pas le jeu vous appeler et ne ramènera personne devant vous."
+msgstr "Sans l’accès aux {notifications}, Multifus n’entend pas le jeu vous appeler et ne ramènera personne devant vous."
+
 #: src/screens/authorization-screen.tsx
 msgid "Sans l’accès aux notifications, Multifus ne peut pas entendre le jeu vous appeler, ni mettre la bonne fenêtre Dofus Retro devant vous."
 msgstr "Sans l’accès aux notifications, Multifus ne peut pas entendre le jeu vous appeler, ni mettre la bonne fenêtre Dofus Retro devant vous."
@@ -2511,6 +2512,10 @@ msgstr "Sans l’accès aux notifications, Multifus ne peut pas entendre le jeu 
 #: src/screens/authorization-screen.tsx
 msgid "Sans l’autorisation {accessibility}, Multifus ne peut pas lire le pseudo dans le titre de vos fenêtres Dofus Retro, les mettre devant vous, ni entendre le jeu vous appeler."
 msgstr "Sans l’autorisation {accessibility}, Multifus ne peut pas lire le pseudo dans le titre de vos fenêtres Dofus Retro, les mettre devant vous, ni entendre le jeu vous appeler."
+
+#: src/helpers/wording.ts
+msgid "Sans l’autorisation {accessibility}, Multifus ne voit aucune fenêtre Dofus Retro et ne ramènera personne devant vous."
+msgstr "Sans l’autorisation {accessibility}, Multifus ne voit aucune fenêtre Dofus Retro et ne ramènera personne devant vous."
 
 #: src/screens/quick-texts/text-row.tsx
 msgid "Sans texte, il n’y aura rien à coller."

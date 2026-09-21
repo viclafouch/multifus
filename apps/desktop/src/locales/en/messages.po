@@ -302,10 +302,6 @@ msgstr "About"
 msgid "À quoi sert un robot Telegram ?"
 msgstr "What is a Telegram bot for?"
 
-#: src/components/world/way-list.tsx
-msgid "À régler"
-msgstr "To fix"
-
 #: src/helpers/wording.ts
 msgid "Accessibilité"
 msgstr "Accessibility"
@@ -954,6 +950,7 @@ msgstr "already taken by {holder}"
 msgid "Déjà pris par {label}."
 msgstr "Already taken by {label}."
 
+#: src/components/authorization-banner.tsx
 #: src/screens/authorization-screen.tsx
 msgid "Demander l’autorisation"
 msgstr "Ask for the permission"
@@ -2504,6 +2501,10 @@ msgstr "Sadida"
 msgid "Sagesse"
 msgstr "Wisdom"
 
+#: src/helpers/wording.ts
+msgid "Sans l’accès aux {notifications}, Multifus n’entend pas le jeu vous appeler et ne ramènera personne devant vous."
+msgstr "Without access to {notifications}, Multifus cannot hear the game calling you and will bring no one in front of you."
+
 #: src/screens/authorization-screen.tsx
 msgid "Sans l’accès aux notifications, Multifus ne peut pas entendre le jeu vous appeler, ni mettre la bonne fenêtre Dofus Retro devant vous."
 msgstr "Without access to notifications, Multifus cannot hear the game calling you, nor put the right Dofus Retro window in front of you."
@@ -2511,6 +2512,10 @@ msgstr "Without access to notifications, Multifus cannot hear the game calling y
 #: src/screens/authorization-screen.tsx
 msgid "Sans l’autorisation {accessibility}, Multifus ne peut pas lire le pseudo dans le titre de vos fenêtres Dofus Retro, les mettre devant vous, ni entendre le jeu vous appeler."
 msgstr "Without the {accessibility} permission, Multifus cannot read the name in the title of your Dofus Retro windows, put them in front of you, or hear the game calling you."
+
+#: src/helpers/wording.ts
+msgid "Sans l’autorisation {accessibility}, Multifus ne voit aucune fenêtre Dofus Retro et ne ramènera personne devant vous."
+msgstr "Without the {accessibility} permission, Multifus sees no Dofus Retro window and will bring no one in front of you."
 
 #: src/screens/quick-texts/text-row.tsx
 msgid "Sans texte, il n’y aura rien à coller."

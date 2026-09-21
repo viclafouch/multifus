@@ -8,7 +8,7 @@
     "dev": "vite",
     "dev:app": "tauri dev",
     "build": "tsc && vite build",
-    "build:app": "tauri build",
+    "build:app": "node scripts/reset-authorization.mjs && tauri build",
     "preview": "vite preview",
     "tauri": "tauri",
     "draw:icon": "node scripts/draw-icon.mjs",
