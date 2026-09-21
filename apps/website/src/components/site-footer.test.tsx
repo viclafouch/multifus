@@ -3,7 +3,6 @@ import { I18nProvider } from '@lingui/react'
 import { cleanup, screen } from '@testing-library/react'
 import type { Language } from '@/@types/language'
 import { SiteFooter } from '@/components/site-footer'
-import { ELSEWHERE_LINKS } from '@/constants/elsewhere'
 import { LANGUAGE_NAMES, LANGUAGES } from '@/constants/languages'
 import { PAGE_IDS } from '@/constants/pages'
 import { PAGE_NAMES } from '@/constants/wording'
@@ -56,23 +55,6 @@ describe('the site footer', () => {
 
     for (const title of ['Les fonctionnalités', 'Le logiciel', 'Le projet']) {
       expect(screen.getByRole('navigation', { name: title })).toBeDefined()
-    }
-  })
-
-  it.each(LANGUAGES)('leads outside the site in %s', (language) => {
-    show(language)
-
-    const speaker = SPEAKERS[language]
-
-    for (const { href, name } of ELSEWHERE_LINKS) {
-      const link = screen.getByRole('link', {
-        name: (found) => {
-          return found.startsWith(speaker._(name))
-        }
-      })
-
-      expect(link.getAttribute('href')).toBe(href)
-      expect(link.getAttribute('rel')).toBe('noopener')
     }
   })
 

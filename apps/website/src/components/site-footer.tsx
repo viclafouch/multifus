@@ -3,10 +3,8 @@ import { useLingui } from '@lingui/react'
 import type { PageId } from '@/@types/page'
 import { BrandMark } from '@/components/brand-mark'
 import { LanguageNav } from '@/components/language-nav'
-import { LinkNav } from '@/components/link-nav'
 import { PageNav } from '@/components/page-nav'
 import { PerkList } from '@/components/perk-list'
-import { ELSEWHERE_LINKS } from '@/constants/elsewhere'
 import { MENU_FEATURES, PROJECT_PAGES, SOFTWARE_PAGES } from '@/constants/pages'
 import { AUTHOR_NAME } from '@/constants/site'
 import {
@@ -38,7 +36,6 @@ export const SiteFooter = ({ page }: SiteFooterProps) => {
               {i18n._(FOOTER_PITCH)}
             </p>
             <PerkList perks={PERKS} />
-            <LinkNav links={ELSEWHERE_LINKS} />
           </div>
           <PageNav title={FEATURES_TITLE} pages={MENU_FEATURES} />
           <PageNav title={SOFTWARE_TITLE} pages={SOFTWARE_PAGES} />
