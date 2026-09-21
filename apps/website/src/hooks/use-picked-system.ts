@@ -6,5 +6,9 @@ export const usePickedSystem = () => {
   const detected = useSystem()
   const [picked, setPicked] = React.useState<SystemId | null>(null)
 
-  return { shown: picked ?? detected, pick: setPicked }
+  return {
+    shown: picked ?? detected,
+    hasPicked: picked !== null,
+    pick: setPicked
+  }
 }

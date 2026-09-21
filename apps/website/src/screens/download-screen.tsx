@@ -7,7 +7,6 @@ import { SealCheckIcon } from '@phosphor-icons/react/dist/ssr/SealCheck'
 import { ShieldCheckIcon } from '@phosphor-icons/react/dist/ssr/ShieldCheck'
 import type { PageScreenProps } from '@/@types/screen'
 import { Answer } from '@/components/answer'
-import { AppShot } from '@/components/app-shot'
 import { Band } from '@/components/band'
 import { BandTitle } from '@/components/band-title'
 import { DownloadTake } from '@/components/download-take'
@@ -19,9 +18,9 @@ import { PerkList } from '@/components/perk-list'
 import { Plate } from '@/components/plate'
 import { Prose } from '@/components/prose'
 import { Question } from '@/components/question'
+import { SystemSwap } from '@/components/system-swap'
 import { PAGES } from '@/constants/pages'
 import { QUESTIONS } from '@/constants/questions'
-import { HOME_SHOT, HOME_SHOT_ALT } from '@/constants/shots'
 import { FOLD_ANCHOR } from '@/constants/site'
 import { QUESTIONS_TITLE, PAGE_NAMES, PERKS } from '@/constants/wording'
 import { usePickedSystem } from '@/hooks/use-picked-system'
@@ -37,7 +36,7 @@ const FIRST_LEAD = msg`Multifus s’ouvre et vous guide. Il vous montre les case
 export const DownloadScreen = ({ page }: PageScreenProps) => {
   const { i18n } = useLingui()
   const { kin } = PAGES[page]
-  const { shown, pick } = usePickedSystem()
+  const { shown, hasPicked, pick } = usePickedSystem()
 
   return (
     <>
@@ -55,7 +54,7 @@ export const DownloadScreen = ({ page }: PageScreenProps) => {
           </div>
         </div>
         <div className="unveil">
-          <AppShot shot={HOME_SHOT} alt={HOME_SHOT_ALT} />
+          <SystemSwap shown={shown} hasPicked={hasPicked} />
         </div>
       </Band>
       <Band className="reveal py-rest">

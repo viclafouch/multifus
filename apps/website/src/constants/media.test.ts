@@ -4,16 +4,16 @@ import { describe, expect, it } from 'vitest'
 import type { Size } from '@/@types/media'
 import { ANKAMA_SOURCE_IDS, ANKAMA_SOURCES } from '@/constants/ankama'
 import { PAGE_DECORS } from '@/constants/decors'
+import { LANGUAGES } from '@/constants/languages'
 import { LOOPS, PEEK_SIZE, PEEKS, POSTER_SIZE } from '@/constants/loops'
 import { PAGE_IDS } from '@/constants/pages'
 import {
-  HOME_SHOT,
-  MAC_SHOT,
+  SYSTEM_SHOTS,
   TASKBAR_SPLIT_SHOT,
-  TASKBAR_STACKED_SHOT,
-  WINDOWS_SHOT
+  TASKBAR_STACKED_SHOT
 } from '@/constants/shots'
 import { SUMMONS } from '@/constants/summons'
+import { SYSTEM_IDS } from '@/constants/systems'
 
 const SERVED_FROM = '/@fs'
 
@@ -64,16 +64,19 @@ const sizeOnDisk = async (served: string) => {
 
 const everySizeDeclared = () => {
   const declared = new Map<string, Size>(
-    [
-      HOME_SHOT,
-      MAC_SHOT,
-      WINDOWS_SHOT,
-      TASKBAR_STACKED_SHOT,
-      TASKBAR_SPLIT_SHOT
-    ].map(({ src, width, height }) => {
+    [TASKBAR_STACKED_SHOT, TASKBAR_SPLIT_SHOT].map(({ src, width, height }) => {
       return [src, { width, height }]
     })
   )
+
+  for (const system of SYSTEM_IDS) {
+    for (const language of LANGUAGES) {
+      const { full, small } = SYSTEM_SHOTS[system][language]
+
+      declared.set(full.src, { width: full.width, height: full.height })
+      declared.set(small.src, { width: small.width, height: small.height })
+    }
+  }
 
   for (const page of PAGE_IDS) {
     const decor = PAGE_DECORS[page]
@@ -113,7 +116,7 @@ const DECLARED = everySizeDeclared()
 
 describe('the sizes the pages reserve', () => {
   it('finds every decor, screenshot, poster, peek and loop', () => {
-    expect(DECLARED).toHaveLength(39)
+    expect(DECLARED).toHaveLength(48)
   })
 
   it.each(DECLARED)('matches the file behind %s', async (served, size) => {

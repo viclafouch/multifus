@@ -15,7 +15,6 @@ import { SystemStage } from '@/components/system-stage'
 import { PAGE_BODIES } from '@/constants/bodies'
 import { PAGES } from '@/constants/pages'
 import { QUESTIONS } from '@/constants/questions'
-import { MAC_SHOT, MAC_SHOT_ALT } from '@/constants/shots'
 import { QUESTIONS_TITLE } from '@/constants/wording'
 
 export const MacScreen = ({ page }: PageScreenProps) => {
@@ -25,7 +24,7 @@ export const MacScreen = ({ page }: PageScreenProps) => {
 
   return (
     <>
-      <SystemStage page={page} shot={MAC_SHOT} alt={MAC_SHOT_ALT} isBare />
+      <SystemStage page={page} system="macos" />
       {body === null ? null : <PageBody body={body} />}
       <Band className="reveal gap-7 pt-rest-xs pb-rest-lg">
         <BandTitle>{i18n._(QUESTIONS_TITLE)}</BandTitle>

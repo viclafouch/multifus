@@ -19,7 +19,6 @@ import { SystemStage } from '@/components/system-stage'
 import { TaskbarProof } from '@/components/taskbar-proof'
 import { MENU_FEATURES } from '@/constants/pages'
 import { QUESTIONS } from '@/constants/questions'
-import { WINDOWS_SHOT, WINDOWS_SHOT_ALT } from '@/constants/shots'
 import { QUESTIONS_TITLE, PAGE_NAMES } from '@/constants/wording'
 
 const FEATURES_TITLE = msg`Disponible sur Windows 10 et 11`
@@ -37,7 +36,7 @@ export const WindowsScreen = ({ page }: PageScreenProps) => {
 
   return (
     <>
-      <SystemStage page={page} shot={WINDOWS_SHOT} alt={WINDOWS_SHOT_ALT} />
+      <SystemStage page={page} system="windows" />
       <Band className="reveal gap-7 pt-4 pb-rest-xs">
         <BandTitle>{i18n._(FEATURES_TITLE)}</BandTitle>
         <ul className="mosaic">

@@ -2,10 +2,13 @@ import { describe, expect, it } from 'vitest'
 import type { Language } from '@/@types/language'
 import type { PageId } from '@/@types/page'
 import { HOST } from '@/constants/host'
+import { LANGUAGES } from '@/constants/languages'
 import { captionOf, LOOP_FORMAT, LOOPS } from '@/constants/loops'
 import { PAGES, PAGE_IDS } from '@/constants/pages'
 import { PAGE_QUESTIONS, QUESTIONS } from '@/constants/questions'
+import { SYSTEM_SHOT_ALTS, SYSTEM_SHOTS } from '@/constants/shots'
 import { RELEASES } from '@/constants/site'
+import { SYSTEM_IDS } from '@/constants/systems'
 import type { PathParams } from '@/helpers/page'
 import type { SchemaNode } from '@/helpers/schema'
 import { graphOf, schemaOf, scriptOf } from '@/helpers/schema'
@@ -137,16 +140,27 @@ describe('the software record', () => {
     expect(software?.inLanguage).toStrictEqual(['fr', 'en', 'es'])
   })
 
-  it('shows the window of the software, with its size', () => {
-    expect(
-      nodeOf({ page: 'home', language: 'fr', type: 'SoftwareApplication' })
-        ?.screenshot
-    ).toMatchObject({
-      '@type': 'ImageObject',
-      width: '1400',
-      height: '995'
-    })
-  })
+  it.each(LANGUAGES)(
+    'shows the window of the software in %s, one system at a time',
+    (language) => {
+      expect(
+        nodeOf({ page: 'home', language, type: 'SoftwareApplication' })
+          ?.screenshot
+      ).toStrictEqual(
+        SYSTEM_IDS.map((system) => {
+          const { full } = SYSTEM_SHOTS[system][language]
+
+          return {
+            '@type': 'ImageObject',
+            contentUrl: `${HOST}${full.src}`,
+            width: String(full.width),
+            height: String(full.height),
+            caption: SPEAKERS[language]._(SYSTEM_SHOT_ALTS[system])
+          }
+        })
+      )
+    }
+  )
 
   it('tells no version while no release is published', () => {
     const software = nodeOf({

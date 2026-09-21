@@ -422,12 +422,8 @@ msgid "La fenêtre de Multifus sur Mac, avec le menu des fonctionnalités à gau
 msgstr "The Multifus window on Mac, with the menu of features on the left and four connected characters in the middle."
 
 #: src/constants/shots.ts
-msgid "La fenêtre de Multifus sur Windows, par-dessus les clients Dofus Retro, et la barre des tâches avec un bouton par personnage."
-msgstr "The Multifus window on Windows, over the Dofus Retro clients, and the taskbar with one button per character."
-
-#: src/constants/shots.ts
-msgid "La fenêtre de Multifus, avec le menu des fonctionnalités à gauche et la place des personnages connectés au centre."
-msgstr "The Multifus window, with the menu of features on the left and the spot for connected characters in the middle."
+msgid "La fenêtre de Multifus sur Windows, avec le menu des fonctionnalités à gauche et quatre personnages connectés au centre."
+msgstr "The Multifus window on Windows, with the menu of features on the left and four connected characters in the middle."
 
 #: src/constants/bodies.ts
 msgid "La fenêtre du personnage qui joue passe devant dès le début de son tour."

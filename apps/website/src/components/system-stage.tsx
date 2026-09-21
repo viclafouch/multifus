@@ -1,25 +1,17 @@
-import type { MessageDescriptor } from '@lingui/core'
-import type { Picture } from '@/@types/media'
 import type { PageId } from '@/@types/page'
-import { AppShot } from '@/components/app-shot'
+import type { SystemId } from '@/@types/system'
 import { Band } from '@/components/band'
 import { DownloadCall } from '@/components/download-call'
 import { PageHead } from '@/components/page-head'
+import { SystemShot } from '@/components/system-shot'
 import { FOLD_ANCHOR } from '@/constants/site'
 
 type SystemStageProps = Readonly<{
   page: PageId
-  shot: Picture
-  alt: MessageDescriptor
-  isBare?: boolean
+  system: SystemId
 }>
 
-export const SystemStage = ({
-  page,
-  shot,
-  alt,
-  isBare = false
-}: SystemStageProps) => {
+export const SystemStage = ({ page, system }: SystemStageProps) => {
   return (
     <Band
       id={FOLD_ANCHOR}
@@ -30,7 +22,7 @@ export const SystemStage = ({
         <DownloadCall className="surface-4" />
       </div>
       <div className="unveil">
-        <AppShot shot={shot} alt={alt} isBare={isBare} />
+        <SystemShot system={system} />
       </div>
     </Band>
   )

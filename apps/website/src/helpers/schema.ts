@@ -20,7 +20,7 @@ import { captionOf, LOOP_FORMAT, LOOPS } from '@/constants/loops'
 import { OG_HEIGHT, OG_IMAGE, OG_WIDTH } from '@/constants/og'
 import { MENU_FEATURES, PAGES } from '@/constants/pages'
 import { PAGE_QUESTIONS, QUESTIONS } from '@/constants/questions'
-import { HOME_SHOT, HOME_SHOT_ALT } from '@/constants/shots'
+import { SYSTEM_SHOT_ALTS, SYSTEM_SHOTS } from '@/constants/shots'
 import {
   AUTHOR,
   AUTHOR_CODE,
@@ -118,13 +118,17 @@ const softwareOf = (language: Language) => {
     softwareHelp: {
       '@id': `${addressOf({ page: 'download', language })}#page`
     },
-    screenshot: {
-      '@type': 'ImageObject',
-      contentUrl: `${HOST}${HOME_SHOT.src}`,
-      width: String(HOME_SHOT.width),
-      height: String(HOME_SHOT.height),
-      caption: speaker._(HOME_SHOT_ALT)
-    },
+    screenshot: SYSTEM_IDS.map((system) => {
+      const { full } = SYSTEM_SHOTS[system][language]
+
+      return {
+        '@type': 'ImageObject',
+        contentUrl: `${HOST}${full.src}`,
+        width: String(full.width),
+        height: String(full.height),
+        caption: speaker._(SYSTEM_SHOT_ALTS[system])
+      } satisfies ImageObject
+    }),
     image: ogAddressOf({ page: 'home', language }),
     featureList: MENU_FEATURES.map((feature) => {
       return speaker._(PAGE_NAMES[feature])
