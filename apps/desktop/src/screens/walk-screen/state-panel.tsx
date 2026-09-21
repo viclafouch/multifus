@@ -2,9 +2,11 @@ import { t } from '@lingui/core/macro'
 import { Panel } from '@multifus/retro'
 import type { Snapshot } from '@/@types/snapshot'
 import type { WalkLiveState, WalkStatus } from '@/@types/walk'
+import { Note } from '@/components/layout/note'
 import { Tick } from '@/components/retro/tick'
 import { ShortcutRecall } from '@/components/shortcut-recall'
 import { StateBadge } from '@/components/state-badge'
+import { IS_APPLE } from '@/constants/keyboard'
 import { setWalkEnabled } from '@/lib/multifus'
 
 const TONES = 'data-[walk=on]:tone-live data-[walk=off]:tone-idle'
@@ -34,6 +36,13 @@ export const StatePanel = ({ walk, accelerator, run }: StatePanelProps) => {
           }}
         />
       </div>
+      {IS_APPLE ? (
+        <div className="px-3.5 pb-3">
+          <Note
+            isWarning
+          >{t`Sur Mac, Multifus tourne mieux sans plein écran : gardez tous vos clients Dofus Retro sur le même bureau, en fenêtre agrandie.`}</Note>
+        </div>
+      ) : null}
       <div className="flex items-center justify-between gap-2 border-t border-band/25 px-3.5 py-2.5">
         <span className="text-aside text-khaki">{t`Raccourci`}</span>
         <ShortcutRecall accelerator={accelerator} />

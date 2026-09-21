@@ -39,6 +39,7 @@ export const Answer = ({ lines, isPointed = false }: AnswerProps) => {
             <Trans
               id={said.id}
               message={said.message}
+              values={said.values}
               components={markedBy(marks)}
             />
           </Line>

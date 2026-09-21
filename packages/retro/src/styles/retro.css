@@ -51,6 +51,7 @@
   --color-leaf: var(--leaf);
   --color-stone: var(--stone);
   --color-flame: var(--flame);
+  --color-amber: var(--amber);
 
   --text-banner: clamp(2.75rem, 9vw, 5rem);
   --text-banner--line-height: 0.9;
@@ -323,6 +324,11 @@
   backdrop-filter: saturate(1.15);
   text-shadow: var(--engrave);
   background-color: color-mix(in srgb, var(--iron), transparent 28%);
+}
+
+@utility note-warning {
+  border-left-color: color-mix(in oklch, var(--amber), transparent 30%);
+  background-color: color-mix(in oklch, var(--amber), var(--iron) 88%);
 }
 
 @utility crest {

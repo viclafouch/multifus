@@ -10,7 +10,6 @@ import { PanelHeader } from '@/components/layout/panel-header'
 import { Screen } from '@/components/layout/screen'
 import { Tick } from '@/components/retro/tick'
 import { ShortcutRecall } from '@/components/shortcut-recall'
-import { IS_APPLE } from '@/constants/keyboard'
 import { MAP_NAMES } from '@/constants/world'
 import { recallRuneTable, setRuneTableEverywhere } from '@/lib/multifus'
 import { PreviewPanel } from '@/screens/rune-table/preview-panel'
@@ -82,9 +81,6 @@ export const RuneTableScreen = ({
           </Button>
         </FieldRow>
       </Panel>
-      {IS_APPLE ? (
-        <Note>{t`Le tableau ne s’affiche pas sur un client en plein écran. Forgez dans une fenêtre agrandie.`}</Note>
-      ) : null}
     </Screen>
   )
 }

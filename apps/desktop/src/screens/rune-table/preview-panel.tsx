@@ -3,7 +3,9 @@ import { Button, Panel } from '@multifus/retro'
 import type { RuneTableStatus } from '@/@types/rune'
 import type { Snapshot } from '@/@types/snapshot'
 import { GaugeRow } from '@/components/gauge-row'
+import { Note } from '@/components/layout/note'
 import { PanelHeader } from '@/components/layout/panel-header'
+import { IS_APPLE } from '@/constants/keyboard'
 import { useDraft } from '@/hooks/use-draft'
 import {
   fadeRuneTable,
@@ -40,6 +42,11 @@ export const PreviewPanel = ({ runeTable, run }: PreviewPanelProps) => {
         </Button>
       </PanelHeader>
       <div className="flex flex-col gap-2.5 px-4 py-4">
+        {IS_APPLE ? (
+          <Note
+            isWarning
+          >{t`Le tableau ne s’affiche pas sur un client en plein écran. Forgez dans une fenêtre agrandie.`}</Note>
+        ) : null}
         <GaugeRow
           label={t`Taille`}
           reading={t`${size.draft} px`}

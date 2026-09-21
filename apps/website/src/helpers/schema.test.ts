@@ -478,11 +478,7 @@ describe('the questions of a page', () => {
     })
 
     expect(answer?.acceptedAnswer.text).toBe(
-      QUESTIONS.macAccess.answer
-        .map(({ said }) => {
-          return SPEAKERS.fr._(said)
-        })
-        .join(' ')
+      'L’accès à l’Accessibilité, et rien d’autre. C’est ce qui lui permet de voir et de ranger les fenêtres du jeu. Sans cet accès, Multifus ne voit rien et ne peut rien faire. Et son ouverture au démarrage du Mac, si vous cochez la case.'
     )
   })
 

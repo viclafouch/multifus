@@ -3,7 +3,14 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import type { ShortcutBinding } from '@/@types/shortcuts'
 import type { WheelSize } from '@/@types/wheel'
 import { DEMO_FEWEST, DEMO_USUAL } from '@/constants/wheel'
-import { displayOf, pending, wheelSizeOf } from '@/test-doubles'
+import {
+  APPLE_AGENT,
+  WINDOWS_AGENT,
+  displayOf,
+  pending,
+  speakFrench,
+  wheelSizeOf
+} from '@/test-doubles'
 
 const bridge = {
   setWheelDiameter: vi.fn(pending),
@@ -15,12 +22,13 @@ vi.mock(import('@/lib/multifus'), () => {
   return bridge
 })
 
-const { WheelPanel } = await import('@/screens/characters/wheel-panel')
-
 const SIZE = wheelSizeOf()
 
 const HEADER_LINE =
   'Maintenez vos touches dans le jeu, et nulle part ailleurs. Visez une tête au milieu de l’écran, lâchez : ce personnage s’affiche.'
+
+const FULL_SCREEN_LINE =
+  'La roue ne s’affiche pas sur un client en plein écran. Jouez en fenêtre agrandie.'
 
 const wheelShortcut = (accelerator: string | null): ShortcutBinding => {
   return {
@@ -34,13 +42,22 @@ const wheelShortcut = (accelerator: string | null): ShortcutBinding => {
 type ShowParams = {
   readonly size?: WheelSize
   readonly shortcuts?: readonly ShortcutBinding[]
+  readonly agent?: string
 }
 
 const show = async ({
   size = SIZE,
-  shortcuts = [wheelShortcut('Control+Shift+KeyW')]
+  shortcuts = [wheelShortcut('Control+Shift+KeyW')],
+  agent = WINDOWS_AGENT
 }: ShowParams = {}) => {
+  vi.resetModules()
+  vi.stubGlobal('navigator', { userAgent: agent })
+
+  await speakFrench()
+
   bridge.wheelDisplay.mockResolvedValue(displayOf())
+
+  const { WheelPanel } = await import('@/screens/characters/wheel-panel')
 
   render(<WheelPanel wheel={size} shortcuts={shortcuts} run={() => {}} />)
 
@@ -187,5 +204,21 @@ describe('the plate of the characters wheel', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Voir en vrai' }))
 
     expect(bridge.previewWheel).toHaveBeenCalledWith(DEMO_USUAL + 1)
+  })
+
+  describe('the warning about full screen', () => {
+    it('says the wheel stays hidden there, on a Mac', async () => {
+      await show({ agent: APPLE_AGENT })
+
+      expect(
+        screen.getByText(FULL_SCREEN_LINE).closest('.note-warning')
+      ).not.toBeNull()
+    })
+
+    it('says nothing on Windows', async () => {
+      await show({ agent: WINDOWS_AGENT })
+
+      expect(screen.queryByText(FULL_SCREEN_LINE)).toBeNull()
+    })
   })
 })

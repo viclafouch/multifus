@@ -1506,6 +1506,10 @@ msgstr "La rueda de personajes"
 msgid "La roue n’a pas suivi"
 msgstr "La rueda no ha seguido el ritmo"
 
+#: src/screens/characters/wheel-panel.tsx
+msgid "La roue ne s’affiche pas sur un client en plein écran. Jouez en fenêtre agrandie."
+msgstr "La rueda no se muestra en un cliente a pantalla completa. Juega en una ventana maximizada."
+
 #: src/screens/rune-table-window/rune-line.tsx
 msgid "La rune n’existe pas"
 msgstr "Esta runa no existe"

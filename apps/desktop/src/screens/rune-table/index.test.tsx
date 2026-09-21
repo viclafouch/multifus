@@ -2,7 +2,13 @@ import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import type { RuneTableStatus } from '@/@types/rune'
 import type { ShortcutBinding } from '@/@types/shortcuts'
-import { pending, snapshotOf } from '@/test-doubles'
+import {
+  APPLE_AGENT,
+  WINDOWS_AGENT,
+  pending,
+  snapshotOf,
+  speakFrench
+} from '@/test-doubles'
 
 const bridge = {
   sizeRuneTable: vi.fn(pending),
@@ -19,9 +25,10 @@ vi.mock(import('@/lib/multifus'), () => {
   return bridge
 })
 
-const { RuneTableScreen } = await import('@/screens/rune-table')
-
 const RUNE_TABLE: RuneTableStatus = snapshotOf().runeTable
+
+const FULL_SCREEN_LINE =
+  'Le tableau ne s’affiche pas sur un client en plein écran. Forgez dans une fenêtre agrandie.'
 
 const runeTableShortcut = (accelerator: string | null): ShortcutBinding => {
   return {
@@ -35,12 +42,21 @@ const runeTableShortcut = (accelerator: string | null): ShortcutBinding => {
 type ShowParams = {
   readonly runeTable?: RuneTableStatus
   readonly shortcuts?: readonly ShortcutBinding[]
+  readonly agent?: string
 }
 
-const show = ({
+const show = async ({
   runeTable = RUNE_TABLE,
-  shortcuts = [runeTableShortcut('Control+Shift+KeyR')]
+  shortcuts = [runeTableShortcut('Control+Shift+KeyR')],
+  agent = WINDOWS_AGENT
 }: ShowParams = {}) => {
+  vi.resetModules()
+  vi.stubGlobal('navigator', { userAgent: agent })
+
+  await speakFrench()
+
+  const { RuneTableScreen } = await import('@/screens/rune-table')
+
   render(
     <RuneTableScreen
       runeTable={runeTable}
@@ -74,8 +90,8 @@ const veil = () => {
 }
 
 describe('the rune table screen', () => {
-  it('recalls the combination, without saying anything more than it', () => {
-    show()
+  it('recalls the combination, without saying anything more than it', async () => {
+    await show()
 
     expect(screen.getByText('Ctrl')).not.toBeNull()
     expect(screen.queryByText('au maintien')).toBeNull()
@@ -86,8 +102,8 @@ describe('the rune table screen', () => {
     ).toBeNull()
   })
 
-  it('says at the top that the table no longer shows without a combination', () => {
-    show({ shortcuts: [runeTableShortcut(null)] })
+  it('says at the top that the table no longer shows without a combination', async () => {
+    await show({ shortcuts: [runeTableShortcut(null)] })
 
     expect(
       screen.getByText(
@@ -96,8 +112,8 @@ describe('the rune table screen', () => {
     ).not.toBeNull()
   })
 
-  it('carries the width gauge, its bounds and the current value', () => {
-    show()
+  it('carries the width gauge, its bounds and the current value', async () => {
+    await show()
 
     expect(gauge().getAttribute('min')).toBe('320')
     expect(gauge().getAttribute('max')).toBe('560')
@@ -107,7 +123,7 @@ describe('the rune table screen', () => {
   })
 
   it('pushes the size to the preview while it is touched, and records it once released', async () => {
-    show()
+    await show()
 
     gauge().focus()
     fireEvent.keyDown(gauge(), { key: 'ArrowRight' })
@@ -118,8 +134,8 @@ describe('the rune table screen', () => {
     expect(bridge.setRuneTableWidth).toHaveBeenCalledWith(440)
   })
 
-  it('carries the transparency gauge, from the full table to the ghost table', () => {
-    show()
+  it('carries the transparency gauge, from the full table to the ghost table', async () => {
+    await show()
 
     expect(veil().getAttribute('min')).toBe('0')
     expect(veil().getAttribute('max')).toBe('100')
@@ -128,7 +144,7 @@ describe('the rune table screen', () => {
   })
 
   it('lightens the table while it is touched, and records it only once released', async () => {
-    show()
+    await show()
 
     veil().focus()
     fireEvent.keyDown(veil(), { key: 'ArrowRight' })
@@ -139,8 +155,8 @@ describe('the rune table screen', () => {
     expect(bridge.setRuneTableTransparency).toHaveBeenCalledWith(5)
   })
 
-  it('carries the switch of the other characters, off at the start', () => {
-    show()
+  it('carries the switch of the other characters, off at the start', async () => {
+    await show()
 
     const everywhere = screen.getByRole('switch', {
       name: 'Afficher sur tous les personnages connectés'
@@ -153,8 +169,8 @@ describe('the rune table screen', () => {
     expect(bridge.setRuneTableEverywhere).toHaveBeenCalledWith(true)
   })
 
-  it('turns off the switch that is on', () => {
-    show({ runeTable: { ...RUNE_TABLE, everywhere: true } })
+  it('turns off the switch that is on', async () => {
+    await show({ runeTable: { ...RUNE_TABLE, everywhere: true } })
 
     fireEvent.click(
       screen.getByRole('switch', {
@@ -165,8 +181,8 @@ describe('the rune table screen', () => {
     expect(bridge.setRuneTableEverywhere).toHaveBeenCalledWith(false)
   })
 
-  it('lays the real table on the button, and does not offer a second one', () => {
-    show()
+  it('lays the real table on the button, and does not offer a second one', async () => {
+    await show()
 
     const posers = screen.getAllByRole('button', { name: 'Voir en vrai' })
 
@@ -176,11 +192,27 @@ describe('the rune table screen', () => {
     expect(posers).toHaveLength(1)
   })
 
-  it('brings back the table pushed off the screen to the corner of the client', () => {
-    show()
+  it('brings back the table pushed off the screen to the corner of the client', async () => {
+    await show()
 
     fireEvent.click(screen.getByRole('button', { name: 'Remettre' }))
 
     expect(bridge.recallRuneTable).toHaveBeenCalledExactlyOnceWith()
+  })
+
+  describe('the warning about full screen', () => {
+    it('stands inside the preview plate, on a Mac', async () => {
+      await show({ agent: APPLE_AGENT })
+
+      expect(
+        screen.getByText(FULL_SCREEN_LINE).closest('.note-warning')
+      ).not.toBeNull()
+    })
+
+    it('says nothing on Windows', async () => {
+      await show({ agent: WINDOWS_AGENT })
+
+      expect(screen.queryByText(FULL_SCREEN_LINE)).toBeNull()
+    })
   })
 })

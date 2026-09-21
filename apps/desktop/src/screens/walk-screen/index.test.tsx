@@ -180,13 +180,15 @@ describe('the Quick move screen', () => {
   })
 
   describe('the advice about full screen', () => {
-    it('says to keep the clients in an enlarged window, on a Mac', async () => {
+    it('stands inside the state plate, on a Mac', async () => {
       await show({ agent: APPLE_AGENT })
 
       expect(
-        screen.getByText(
-          'Sur Mac, Multifus tourne mieux sans plein écran : gardez tous vos clients Dofus Retro sur le même bureau, en fenêtre agrandie.'
-        )
+        screen
+          .getByText(
+            'Sur Mac, Multifus tourne mieux sans plein écran : gardez tous vos clients Dofus Retro sur le même bureau, en fenêtre agrandie.'
+          )
+          .closest('.note-warning')
       ).not.toBeNull()
     })
 

@@ -1,6 +1,7 @@
 import type { Icon } from '@phosphor-icons/react'
 import { BinocularsIcon } from '@phosphor-icons/react/dist/ssr/Binoculars'
 import { CoinsIcon } from '@phosphor-icons/react/dist/ssr/Coins'
+import { CornersOutIcon } from '@phosphor-icons/react/dist/ssr/CornersOut'
 import { DesktopIcon } from '@phosphor-icons/react/dist/ssr/Desktop'
 import { GameControllerIcon } from '@phosphor-icons/react/dist/ssr/GameController'
 import { SealCheckIcon } from '@phosphor-icons/react/dist/ssr/SealCheck'
@@ -28,6 +29,7 @@ const FAQ_MARKS = {
   machine: DesktopIcon,
   modern: GameControllerIcon,
   parity: SquaresFourIcon,
+  macFullScreen: CornersOutIcon,
   count: UsersThreeIcon,
   tongue: TranslateIcon,
   money: CoinsIcon

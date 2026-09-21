@@ -9,6 +9,7 @@ import { GaugeRow } from '@/components/gauge-row'
 import { Note } from '@/components/layout/note'
 import { PanelHeader } from '@/components/layout/panel-header'
 import { ShortcutRecall } from '@/components/shortcut-recall'
+import { IS_APPLE } from '@/constants/keyboard'
 import { HELD, SHORTCUT_ACTIONS } from '@/constants/shortcuts'
 import { DEMO_FEWEST, DEMO_USUAL } from '@/constants/wheel'
 import { useDraft } from '@/hooks/use-draft'
@@ -43,6 +44,11 @@ export const WheelPanel = ({ wheel, shortcuts, run }: WheelPanelProps) => {
       <div className="flex flex-col gap-3 px-4 py-4">
         {accelerator === null ? (
           <Note>{t`Sans touches, la roue n’existe pas. Posez-en dans l’écran Raccourcis.`}</Note>
+        ) : null}
+        {IS_APPLE ? (
+          <Note
+            isWarning
+          >{t`La roue ne s’affiche pas sur un client en plein écran. Jouez en fenêtre agrandie.`}</Note>
         ) : null}
         <WheelDrawing
           screen={screen}

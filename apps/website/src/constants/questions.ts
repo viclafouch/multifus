@@ -134,7 +134,8 @@ export const QUESTIONS = {
     ask: msg`Ça marche sur mon Mac ?`,
     answer: [
       {
-        said: msg`Il faut ${SYSTEM_VERSIONS.macos} ou plus récent. Les Mac Intel et les Mac Apple Silicon reçoivent le même fichier.`
+        said: msg`Il faut <0>${SYSTEM_VERSIONS.macos} ou plus récent</0>. Les Mac Intel et les Mac Apple Silicon reçoivent le même fichier.`,
+        marks: [{ kind: 'stress' }]
       }
     ]
   },
@@ -148,13 +149,34 @@ export const QUESTIONS = {
     ask: msg`Qu’est-ce que Multifus demande à macOS ?`,
     answer: [
       {
-        said: msg`L’accès à l’Accessibilité, et rien d’autre. C’est ce qui lui permet de voir et de ranger les fenêtres du jeu.`
+        said: msg`<0>L’accès à l’Accessibilité, et rien d’autre.</0> C’est ce qui lui permet de voir et de ranger les fenêtres du jeu.`,
+        marks: [{ kind: 'stress' }]
       },
       {
         said: msg`Sans cet accès, Multifus ne voit rien et ne peut rien faire.`
       },
       {
         said: msg`Et son ouverture au démarrage du Mac, si vous cochez la case.`
+      }
+    ]
+  },
+  macFullScreen: {
+    ask: msg`Le plein écran du Mac, ça marche ?`,
+    answer: [
+      {
+        said: msg`<0>Non.</0> Le plein écran du Mac donne au client un bureau à lui seul, et macOS n’y laisse rien s’afficher par-dessus.`,
+        marks: [{ kind: 'stress' }]
+      },
+      {
+        said: msg`Tant que le client reste en plein écran, la <0>Roue des personnages</0>, le <1>Tableau des runes</1> et la bannière du <2>Déplacement rapide</2> ne s’affichent pas.`,
+        marks: [
+          { kind: 'page', page: 'wheel' },
+          { kind: 'page', page: 'runeTable' },
+          { kind: 'page', page: 'walk' }
+        ]
+      },
+      {
+        said: msg`Quittez le plein écran. En fenêtre agrandie, tout revient.`
       }
     ]
   },
@@ -175,7 +197,8 @@ export const QUESTIONS = {
     ask: msg`Ça marche sur Windows 11 ?`,
     answer: [
       {
-        said: msg`Oui, et sur Windows 10 aussi. L’installation prend 3 gestes.`
+        said: msg`<0>Oui, et sur Windows 10 aussi.</0> L’installation prend 3 gestes.`,
+        marks: [{ kind: 'stress' }]
       }
     ]
   },
@@ -234,6 +257,7 @@ export const FAQ_ASKS = [
   'machine',
   'modern',
   'parity',
+  'macFullScreen',
   'count',
   'tongue',
   'money'
@@ -247,7 +271,7 @@ export const PAGE_QUESTIONS = {
   runeTable: null,
   relay: null,
   quickTexts: null,
-  mac: ['macFloor', 'monterey', 'macAccess'],
+  mac: ['macFloor', 'monterey', 'macAccess', 'macFullScreen'],
   windows: [
     'warning',
     'count',

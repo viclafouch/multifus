@@ -44,8 +44,20 @@ msgid "<0>Français, anglais, espagnol.</0> Il prend celle de votre ordinateur, 
 msgstr "<0>French, English, Spanish.</0> It takes the one your computer uses, and you change it in the settings."
 
 #: src/constants/questions.ts
+msgid "<0>L’accès à l’Accessibilité, et rien d’autre.</0> C’est ce qui lui permet de voir et de ranger les fenêtres du jeu."
+msgstr "<0>Access to Accessibility, and nothing else.</0> That is what lets it see and sort the game windows."
+
+#: src/constants/questions.ts
 msgid "<0>Moi.</0> Pas de publicité, pas de compte, pas de version payante. Je paie l’hébergement et le certificat d’Apple."
 msgstr "<0>Me.</0> No adverts, no account, no paid version. I pay for the hosting and the Apple certificate."
+
+#: src/constants/questions.ts
+msgid "<0>Non.</0> Le plein écran du Mac donne au client un bureau à lui seul, et macOS n’y laisse rien s’afficher par-dessus."
+msgstr "<0>No.</0> Mac full screen gives the client a desktop of its own, and macOS lets nothing show on top of it."
+
+#: src/constants/questions.ts
+msgid "<0>Oui, et sur Windows 10 aussi.</0> L’installation prend 3 gestes."
+msgstr "<0>Yes, and on Windows 10 too.</0> Installing takes 3 moves."
 
 #: src/constants/questions.ts
 msgid "<0>Oui. Cliquez sur « Informations complémentaires », puis sur « Exécuter quand même ».</0>"
@@ -398,8 +410,8 @@ msgstr "Free"
 
 #. placeholder {0}: SYSTEM_VERSIONS.macos
 #: src/constants/questions.ts
-msgid "Il faut {0} ou plus récent. Les Mac Intel et les Mac Apple Silicon reçoivent le même fichier."
-msgstr "{0} or newer is needed. Intel Macs and Apple Silicon Macs get the same file."
+msgid "Il faut <0>{0} ou plus récent</0>. Les Mac Intel et les Mac Apple Silicon reçoivent le même fichier."
+msgstr "<0>{0} or newer</0> is needed. Intel Macs and Apple Silicon Macs get the same file."
 
 #: src/constants/questions.ts
 msgid "Il lit le <0>titre de vos fenêtres</0> Dofus Retro, où le jeu écrit le pseudo du personnage. La <1>Roue des personnages</1> et le <2>Déplacement rapide</2> voient votre clic, et les <3>Textes rapides</3> collent la phrase dans la fenêtre devant vous."
@@ -444,10 +456,6 @@ msgstr "Changelog"
 #: src/constants/wording.ts
 msgid "Journal des versions du multicompte Dofus Retro"
 msgstr "Changelog of the Dofus Retro multi-account app"
-
-#: src/constants/questions.ts
-msgid "L’accès à l’Accessibilité, et rien d’autre. C’est ce qui lui permet de voir et de ranger les fenêtres du jeu."
-msgstr "Access to Accessibility, and nothing else. That is what lets it see and sort the game windows."
 
 #: src/constants/questions.ts
 msgid "L’accès aux notifications, et rien d’autre."
@@ -648,6 +656,10 @@ msgstr "The character left at the bank takes none of your clicks."
 #: src/constants/wording.ts
 msgid "Le personnage visé passe devant."
 msgstr "The character you aim at comes forward."
+
+#: src/constants/questions.ts
+msgid "Le plein écran du Mac, ça marche ?"
+msgstr "Does Mac full screen work?"
 
 #: src/constants/wording.ts
 msgid "Le poids des runes posé sur le jeu."
@@ -938,10 +950,6 @@ msgstr "yes"
 msgid "Oui, et pour toujours. Rien à payer, aucun compte à créer, aucune publicité. Il n’y a pas de version payante cachée derrière."
 msgstr "Yes, and forever. Nothing to pay, no account to create, no advertising. There is no paid version hiding behind it."
 
-#: src/constants/questions.ts
-msgid "Oui, et sur Windows 10 aussi. L’installation prend 3 gestes."
-msgstr "Yes, and on Windows 10 too. Installing takes 3 moves."
-
 #: src/constants/wording.ts
 msgid "Oui. Ankama tolère les logiciels qui rangent les fenêtres du jeu tant qu’ils n’y touchent à rien. Les deux réponses publiques d’Ankama sont citées ici."
 msgstr "Yes. Ankama tolerates software that tidies the game windows as long as it touches nothing inside. Ankama’s two public answers are quoted here."
@@ -1062,6 +1070,10 @@ msgstr "Who publishes the site"
 msgid "Qui publie Multifus, qui héberge le site, ce qu’il garde de vous, et les marques citées ici qui ne sont pas les nôtres."
 msgstr "Who publishes Multifus, who hosts the site, what it keeps of you, and the trademarks named here that are not ours."
 
+#: src/constants/questions.ts
+msgid "Quittez le plein écran. En fenêtre agrandie, tout revient."
+msgstr "Leave full screen. In a maximised window, everything comes back."
+
 #: src/constants/ankama.ts
 msgid "Ranger et changer les fenêtres du jeu"
 msgstr "Arranging and switching the game windows"
@@ -1179,6 +1191,10 @@ msgstr "Dofus Retro rune weight table"
 #: src/constants/bodies.ts
 msgid "Taille et transparence se règlent"
 msgstr "Size and transparency adjust"
+
+#: src/constants/questions.ts
+msgid "Tant que le client reste en plein écran, la <0>Roue des personnages</0>, le <1>Tableau des runes</1> et la bannière du <2>Déplacement rapide</2> ne s’affichent pas."
+msgstr "As long as the client stays in full screen, the <0>Character wheel</0>, the <1>Rune table</1> and the <2>Quick move</2> banner do not show."
 
 #: src/constants/wording.ts
 msgid "Télécharger"

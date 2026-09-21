@@ -1,6 +1,7 @@
 import { useLingui } from '@lingui/react'
 import { Trans } from '@lingui/react/macro'
 import { AppleLogoIcon } from '@phosphor-icons/react/dist/ssr/AppleLogo'
+import { CornersOutIcon } from '@phosphor-icons/react/dist/ssr/CornersOut'
 import { DesktopIcon } from '@phosphor-icons/react/dist/ssr/Desktop'
 import { DesktopTowerIcon } from '@phosphor-icons/react/dist/ssr/DesktopTower'
 import { KeyIcon } from '@phosphor-icons/react/dist/ssr/Key'
@@ -54,6 +55,11 @@ export const MacScreen = ({ page }: PageScreenProps) => {
           <li className="reveal">
             <Question ask={QUESTIONS.macAccess.ask} icon={KeyIcon}>
               <Answer lines={QUESTIONS.macAccess.answer} />
+            </Question>
+          </li>
+          <li className="reveal">
+            <Question ask={QUESTIONS.macFullScreen.ask} icon={CornersOutIcon}>
+              <Answer lines={QUESTIONS.macFullScreen.answer} />
             </Question>
           </li>
         </ul>

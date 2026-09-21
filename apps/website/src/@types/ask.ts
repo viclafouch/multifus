@@ -10,6 +10,7 @@ export type AskId =
   | 'machine'
   | 'macAccess'
   | 'macFloor'
+  | 'macFullScreen'
   | 'modern'
   | 'money'
   | 'monterey'
