@@ -16,16 +16,23 @@ export const usePlayer = ({ isStill, isAuto }: PlayerParams) => {
       setIsPlaying(element !== null && !element.paused)
     }
 
+    const play = () => {
+      element?.play().catch(handlePlayback)
+    }
+
     element?.addEventListener('play', handlePlayback)
     element?.addEventListener('pause', handlePlayback)
 
     if (isStill) {
       element?.pause()
+    } else if (isAuto && document.readyState === 'complete') {
+      play()
     } else if (isAuto) {
-      element?.play().catch(handlePlayback)
+      window.addEventListener('load', play, { once: true })
     }
 
     return () => {
+      window.removeEventListener('load', play)
       element?.removeEventListener('play', handlePlayback)
       element?.removeEventListener('pause', handlePlayback)
     }

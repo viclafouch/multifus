@@ -34,7 +34,7 @@ export const LoopPlate = ({ loop, isAuto = false }: LoopPlateProps) => {
         loop
         muted
         playsInline
-        preload="metadata"
+        preload="none"
       />
       {isStill ? null : <LoopCurtain isPlaying={isPlaying} onToggle={toggle} />}
     </div>

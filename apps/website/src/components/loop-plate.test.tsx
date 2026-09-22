@@ -90,6 +90,19 @@ describe('the loop plate', () => {
     expect(screen.getByRole('button', { name: 'Pause' })).toBeDefined()
   })
 
+  it('holds the loop of the entrance until the page has loaded', () => {
+    const play = spyOnPlayback()
+    vi.spyOn(document, 'readyState', 'get').mockReturnValue('loading')
+
+    show(true)
+
+    expect(play).not.toHaveBeenCalled()
+
+    window.dispatchEvent(new Event('load'))
+
+    expect(play).toHaveBeenCalledWith()
+  })
+
   it('sends the curtain to sleep once the pointer stops moving', () => {
     vi.useFakeTimers()
     spyOnPlayback()
