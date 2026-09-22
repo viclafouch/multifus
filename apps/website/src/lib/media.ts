@@ -10,6 +10,8 @@ export const WIDE_FLOOR = '64rem'
 
 export const WIDE = `(width >= ${WIDE_FLOOR})`
 
+export const UPRIGHT = '(max-aspect-ratio: 3/5) and (max-width: 36rem)'
+
 export const GUTTER = '2rem'
 
 const HALF_PAGE = `calc(50vw - 1.5rem)`

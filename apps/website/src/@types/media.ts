@@ -12,3 +12,8 @@ export type Shot = Readonly<{
   full: Picture
   small: Picture
 }>
+
+export type Decor = Readonly<{
+  wide: Picture
+  upright: Picture
+}>

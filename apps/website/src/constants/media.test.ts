@@ -90,9 +90,9 @@ const everySizeDeclared = () => {
     const decor = PAGE_DECORS[page]
 
     if (decor !== null) {
-      const { src, width, height } = decor
-
-      declared.set(src, { width, height })
+      for (const { src, width, height } of [decor.wide, decor.upright]) {
+        declared.set(src, { width, height })
+      }
     }
   }
 
@@ -128,7 +128,7 @@ const DECLARED = everySizeDeclared()
 
 describe('the sizes the pages reserve', () => {
   it('finds every decor, screenshot, poster, peek and loop', () => {
-    expect(DECLARED).toHaveLength(55)
+    expect(DECLARED).toHaveLength(64)
   })
 
   it.each(DECLARED)('matches the file behind %s', async (served, size) => {
