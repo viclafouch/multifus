@@ -1,8 +1,8 @@
 import type { MessageDescriptor } from '@lingui/core'
 import { msg } from '@lingui/core/macro'
 import { useLingui } from '@lingui/react'
-import craFemale from '@multifus/ankama/portraits/cra_f.png'
-import enutrofMale from '@multifus/ankama/portraits/enutrof_m.png'
+import craFemale from '@multifus/ankama/portraits/cra_f.webp'
+import enutrofMale from '@multifus/ankama/portraits/enutrof_m.webp'
 import { cn, type Tint } from '@multifus/retro'
 import { PORTRAIT_SIDE } from '@/constants/portraits'
 

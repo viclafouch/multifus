@@ -1,9 +1,9 @@
-import craFemale from '@multifus/ankama/portraits/cra_f.png'
-import ecaflipMale from '@multifus/ankama/portraits/ecaflip_m.png'
-import eniripsaFemale from '@multifus/ankama/portraits/eniripsa_f.png'
-import enutrofMale from '@multifus/ankama/portraits/enutrof_m.png'
-import pandawaFemale from '@multifus/ankama/portraits/pandawa_f.png'
-import sramMale from '@multifus/ankama/portraits/sram_m.png'
+import craFemale from '@multifus/ankama/portraits/cra_f.webp'
+import ecaflipMale from '@multifus/ankama/portraits/ecaflip_m.webp'
+import eniripsaFemale from '@multifus/ankama/portraits/eniripsa_f.webp'
+import enutrofMale from '@multifus/ankama/portraits/enutrof_m.webp'
+import pandawaFemale from '@multifus/ankama/portraits/pandawa_f.webp'
+import sramMale from '@multifus/ankama/portraits/sram_m.webp'
 import type { FeatureId, PageId } from '@/@types/page'
 
 export const PORTRAIT_SIDE = 256
