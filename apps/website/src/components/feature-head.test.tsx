@@ -9,6 +9,7 @@ import { MENU_FEATURES } from '@/constants/pages'
 import { PAGE_PORTRAITS } from '@/constants/portraits'
 import { pathOf } from '@/helpers/page'
 import { SPEAKERS } from '@/lib/i18n'
+import { MOSAIC_SIZES } from '@/lib/media'
 import { showAt } from '@/test-router'
 
 const show = (children: React.ReactNode) => {
@@ -28,7 +29,7 @@ describe('the head of a feature', () => {
   })
 
   it.each(MENU_FEATURES)('signs the card that leads to %s', (feature) => {
-    expect(show(<FeatureCard page={feature} />)).toContain(
+    expect(show(<FeatureCard page={feature} sizes={MOSAIC_SIZES} />)).toContain(
       PAGE_PORTRAITS[feature]
     )
   })

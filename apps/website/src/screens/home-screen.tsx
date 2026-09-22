@@ -19,6 +19,7 @@ import { MENU_FEATURES } from '@/constants/pages'
 import { FOLD_ANCHOR, REPOSITORY } from '@/constants/site'
 import { BEFORE_INSTALL, LIMITS_TITLE, NO_HARM } from '@/constants/wording'
 import { useLoopCarriedIn } from '@/hooks/use-loop-carried-in'
+import { MOSAIC_SIZES } from '@/lib/media'
 
 const HERO_LEAD = msg`Le multicompte sur Dofus Retro`
 
@@ -79,7 +80,7 @@ export const HomeScreen = (_props: PageScreenProps) => {
           {MENU_FEATURES.map((feature) => {
             return (
               <li key={feature}>
-                <FeatureCard page={feature} hasPeek />
+                <FeatureCard page={feature} sizes={MOSAIC_SIZES} hasPeek />
               </li>
             )
           })}

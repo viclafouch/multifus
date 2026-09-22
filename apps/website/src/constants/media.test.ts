@@ -3,9 +3,15 @@ import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import type { Size } from '@/@types/media'
 import { ANKAMA_SOURCE_IDS, ANKAMA_SOURCES } from '@/constants/ankama'
-import { PAGE_DECORS } from '@/constants/decors'
+import { BAN_DECOR, PAGE_DECORS } from '@/constants/decors'
 import { LANGUAGES } from '@/constants/languages'
-import { LOOPS, PEEK_SIZE, PEEKS, POSTER_SIZE } from '@/constants/loops'
+import {
+  CARD_POSTERS,
+  LOOPS,
+  PEEK_SIZE,
+  PEEKS,
+  POSTER_SIZE
+} from '@/constants/loops'
 import { PAGE_IDS } from '@/constants/pages'
 import {
   SYSTEM_SHOTS,
@@ -64,9 +70,11 @@ const sizeOnDisk = async (served: string) => {
 
 const everySizeDeclared = () => {
   const declared = new Map<string, Size>(
-    [TASKBAR_STACKED_SHOT, TASKBAR_SPLIT_SHOT].map(({ src, width, height }) => {
-      return [src, { width, height }]
-    })
+    [TASKBAR_STACKED_SHOT, TASKBAR_SPLIT_SHOT, BAN_DECOR.small].map(
+      ({ src, width, height }) => {
+        return [src, { width, height }]
+      }
+    )
   )
 
   for (const system of SYSTEM_IDS) {
@@ -109,6 +117,10 @@ const everySizeDeclared = () => {
     declared.set(peek, PEEK_SIZE)
   }
 
+  for (const { small } of Object.values(CARD_POSTERS)) {
+    declared.set(small.src, { width: small.width, height: small.height })
+  }
+
   return [...declared]
 }
 
@@ -116,7 +128,7 @@ const DECLARED = everySizeDeclared()
 
 describe('the sizes the pages reserve', () => {
   it('finds every decor, screenshot, poster, peek and loop', () => {
-    expect(DECLARED).toHaveLength(48)
+    expect(DECLARED).toHaveLength(55)
   })
 
   it.each(DECLARED)('matches the file behind %s', async (served, size) => {

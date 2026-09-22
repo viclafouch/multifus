@@ -21,6 +21,7 @@ import { TaskbarProof } from '@/components/taskbar-proof'
 import { MENU_FEATURES } from '@/constants/pages'
 import { QUESTIONS } from '@/constants/questions'
 import { QUESTIONS_TITLE, PAGE_NAMES } from '@/constants/wording'
+import { MOSAIC_SIZES } from '@/lib/media'
 
 const FEATURES_TITLE = msg`Disponible sur Windows 10 et 11`
 
@@ -44,7 +45,7 @@ export const WindowsScreen = ({ page }: PageScreenProps) => {
           {MENU_FEATURES.map((feature) => {
             return (
               <li key={feature}>
-                <FeatureCard page={feature} hasPeek />
+                <FeatureCard page={feature} sizes={MOSAIC_SIZES} hasPeek />
               </li>
             )
           })}

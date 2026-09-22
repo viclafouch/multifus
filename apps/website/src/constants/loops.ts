@@ -1,25 +1,31 @@
 import { msg } from '@lingui/core/macro'
 import autoFocusPeek from '@multifus/ankama/loops/auto-focus-loop-peek.webp'
+import autoFocusSmall from '@multifus/ankama/loops/auto-focus-loop-poster-760.webp'
 import autoFocusPoster from '@multifus/ankama/loops/auto-focus-loop-poster.webp'
 import autoFocusLoop from '@multifus/ankama/loops/auto-focus-loop.mp4'
 import homePoster from '@multifus/ankama/loops/home-loop-poster.webp'
 import homeLoop from '@multifus/ankama/loops/home-loop.mp4'
 import quickTextsPeek from '@multifus/ankama/loops/quick-texts-loop-peek.webp'
+import quickTextsSmall from '@multifus/ankama/loops/quick-texts-loop-poster-760.webp'
 import quickTextsPoster from '@multifus/ankama/loops/quick-texts-loop-poster.webp'
 import quickTextsLoop from '@multifus/ankama/loops/quick-texts-loop.mp4'
 import relayPeek from '@multifus/ankama/loops/relay-loop-peek.webp'
+import relaySmall from '@multifus/ankama/loops/relay-loop-poster-760.webp'
 import relayPoster from '@multifus/ankama/loops/relay-loop-poster.webp'
 import relayLoop from '@multifus/ankama/loops/relay-loop.mp4'
 import runeTablePeek from '@multifus/ankama/loops/rune-table-loop-peek.webp'
+import runeTableSmall from '@multifus/ankama/loops/rune-table-loop-poster-760.webp'
 import runeTablePoster from '@multifus/ankama/loops/rune-table-loop-poster.webp'
 import runeTableLoop from '@multifus/ankama/loops/rune-table-loop.mp4'
 import walkPeek from '@multifus/ankama/loops/walk-loop-peek.webp'
+import walkSmall from '@multifus/ankama/loops/walk-loop-poster-760.webp'
 import walkPoster from '@multifus/ankama/loops/walk-loop-poster.webp'
 import walkLoop from '@multifus/ankama/loops/walk-loop.mp4'
 import wheelPeek from '@multifus/ankama/loops/wheel-loop-peek.webp'
+import wheelSmall from '@multifus/ankama/loops/wheel-loop-poster-760.webp'
 import wheelPoster from '@multifus/ankama/loops/wheel-loop-poster.webp'
 import wheelLoop from '@multifus/ankama/loops/wheel-loop.mp4'
-import type { Size } from '@/@types/media'
+import type { Shot, Size } from '@/@types/media'
 import type { FeatureId, Loop, LoopId } from '@/@types/page'
 import { PAGE_PROMISES } from '@/constants/wording'
 
@@ -30,6 +36,11 @@ const REFILMED_ON = '2026-09-16T12:00:00+02:00'
 export const LOOP_FORMAT = 'video/mp4'
 
 export const POSTER_SIZE = { width: 1280, height: 720 } as const satisfies Size
+
+export const SMALL_POSTER_SIZE = {
+  width: 760,
+  height: 428
+} as const satisfies Size
 
 export const PEEK_SIZE = { width: 720, height: 406 } as const satisfies Size
 
@@ -99,3 +110,19 @@ export const PEEKS = {
   relay: relayPeek,
   quickTexts: quickTextsPeek
 } as const satisfies Record<FeatureId, string>
+
+const cardPosterOf = (poster: string, small: string) => {
+  return {
+    full: { ...POSTER_SIZE, src: poster },
+    small: { ...SMALL_POSTER_SIZE, src: small }
+  }
+}
+
+export const CARD_POSTERS = {
+  autoFocus: cardPosterOf(LOOPS.autoFocus.poster, autoFocusSmall),
+  wheel: cardPosterOf(LOOPS.wheel.poster, wheelSmall),
+  walk: cardPosterOf(LOOPS.walk.poster, walkSmall),
+  runeTable: cardPosterOf(LOOPS.runeTable.poster, runeTableSmall),
+  relay: cardPosterOf(LOOPS.relay.poster, relaySmall),
+  quickTexts: cardPosterOf(LOOPS.quickTexts.poster, quickTextsSmall)
+} as const satisfies Record<FeatureId, Shot>

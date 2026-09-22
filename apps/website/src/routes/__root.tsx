@@ -1,4 +1,6 @@
 import carve from '@fontsource/bebas-neue/files/bebas-neue-latin-400-normal.woff2?url'
+import plain from '@fontsource/roboto/files/roboto-latin-400-normal.woff2?url'
+import bold from '@fontsource/roboto/files/roboto-latin-700-normal.woff2?url'
 import { I18nProvider } from '@lingui/react'
 import {
   createRootRoute,
@@ -24,6 +26,18 @@ const CRAWL = [
   'max-image-preview:large',
   'max-video-preview:-1'
 ].join(', ')
+
+const FOLD_FONTS = [carve, plain, bold] as const satisfies readonly string[]
+
+const preloadOf = (href: string) => {
+  return {
+    rel: 'preload',
+    as: 'font',
+    type: 'font/woff2',
+    href,
+    crossOrigin: 'anonymous'
+  } as const
+}
 
 const RootDocument = () => {
   const pathname = useRouterState({
@@ -86,13 +100,7 @@ export const Route = createRootRoute({
         { rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' },
         { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
         { rel: 'manifest', href: '/site.webmanifest' },
-        {
-          rel: 'preload',
-          as: 'font',
-          type: 'font/woff2',
-          href: carve,
-          crossOrigin: 'anonymous'
-        },
+        ...FOLD_FONTS.map(preloadOf),
         { rel: 'stylesheet', href: styles }
       ]
     }

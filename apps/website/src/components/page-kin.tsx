@@ -4,6 +4,7 @@ import type { FeatureId } from '@/@types/page'
 import { Band } from '@/components/band'
 import { BandTitle } from '@/components/band-title'
 import { FeatureCard } from '@/components/feature-card'
+import { PAIR_SIZES } from '@/lib/media'
 
 const ALSO_SEE = msg`À voir aussi`
 
@@ -21,7 +22,7 @@ export const PageKin = ({ pages }: PageKinProps) => {
         {pages.map((page) => {
           return (
             <li key={page}>
-              <FeatureCard page={page} />
+              <FeatureCard page={page} sizes={PAIR_SIZES} />
             </li>
           )
         })}

@@ -5,7 +5,7 @@ import { LostScreen } from './screens/lost-screen'
 export function getRouter() {
   return createRouter({
     routeTree,
-    scrollRestoration: false,
+    scrollRestoration: true,
     defaultPreload: 'intent',
     defaultViewTransition: true,
     defaultNotFoundComponent: LostScreen

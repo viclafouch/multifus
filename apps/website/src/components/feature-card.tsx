@@ -2,22 +2,27 @@ import { useLingui } from '@lingui/react'
 import { cn } from '@multifus/retro'
 import type { FeatureId } from '@/@types/page'
 import { PageLink } from '@/components/page-link'
-import { LOOPS, PEEK_SIZE, PEEKS, POSTER_SIZE } from '@/constants/loops'
-import { PAGES } from '@/constants/pages'
+import { CARD_POSTERS, PEEK_SIZE, PEEKS } from '@/constants/loops'
 import { PAGE_PORTRAITS, PORTRAIT_SIDE } from '@/constants/portraits'
 import { PAGE_TINTS } from '@/constants/tints'
 import { PAGE_NAMES, PAGE_PROMISES } from '@/constants/wording'
 import { usePeek } from '@/hooks/use-peek'
+import { sourcesOf } from '@/lib/media'
 
 type FeatureCardProps = Readonly<{
   page: FeatureId
+  sizes: string
   hasPeek?: boolean
 }>
 
-export const FeatureCard = ({ page, hasPeek = false }: FeatureCardProps) => {
+export const FeatureCard = ({
+  page,
+  sizes,
+  hasPeek = false
+}: FeatureCardProps) => {
   const { i18n } = useLingui()
   const { isPeeking, isReady, handleLoad, handlers } = usePeek({ hasPeek })
-  const { loop } = PAGES[page]
+  const poster = CARD_POSTERS[page]
 
   return (
     <PageLink
@@ -32,9 +37,12 @@ export const FeatureCard = ({ page, hasPeek = false }: FeatureCardProps) => {
       <span className="relative block">
         <span className="thumbnail">
           <img
-            src={LOOPS[loop].poster}
+            src={poster.full.src}
+            srcSet={sourcesOf(poster)}
+            sizes={sizes}
             alt=""
-            {...POSTER_SIZE}
+            width={poster.full.width}
+            height={poster.full.height}
             loading="lazy"
             decoding="async"
             className="plane poster"
