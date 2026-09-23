@@ -16,6 +16,16 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
 
+env:
+  RELEASE_BODY: |
+    **Français** · [Télécharger Multifus](https://www.multifus.app/telecharger) · [Ce que cette version change](https://www.multifus.app/journal)
+
+    **English** · [Download Multifus](https://www.multifus.app/en/download) · [What this version changes](https://www.multifus.app/en/changelog)
+
+    **Español** · [Descargar Multifus](https://www.multifus.app/es/descargar) · [Lo que cambia esta versión](https://www.multifus.app/es/novedades)
+
+    Mac `.dmg` · Windows `.exe`
+
 jobs:
   checks:
     uses: ./.github/workflows/checks.yml
@@ -81,7 +91,7 @@ jobs:
           projectPath: apps/desktop
           tagName: ${{ github.ref_name }}
           releaseName: Multifus ${{ github.ref_name }}
-          releaseBody: 'Le détail des changements est sur https://www.multifus.app/journal'
+          releaseBody: ${{ env.RELEASE_BODY }}
           releaseDraft: true
           prerelease: false
           args: --target universal-apple-darwin
@@ -133,7 +143,7 @@ jobs:
           projectPath: apps/desktop
           tagName: ${{ github.ref_name }}
           releaseName: Multifus ${{ github.ref_name }}
-          releaseBody: 'Le détail des changements est sur https://www.multifus.app/journal'
+          releaseBody: ${{ env.RELEASE_BODY }}
           releaseDraft: true
           prerelease: false
           args: --bundles nsis

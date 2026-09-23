@@ -1,8 +1,5 @@
 # Plan
 
-- [ ] Créer un certificat Developer ID Application sur developer.apple.com, et l'exporter en `.p12`
-- [ ] Poser les huit secrets Apple et Tauri du workflow `release` dans les réglages du dépôt
-- [ ] Trancher les Mac Intel : ajouter la cible `x86_64-apple-darwin`, ou s'en tenir au README et à `/mac`
 - [ ] Trancher le certificat Authenticode de Windows, une fois la version macOS publiée
 - [ ] Vérifier l'attestation de provenance à la première publication, et que `gh attestation verify` répond
 - [ ] Vérifier `projectPath: apps/desktop` sur les deux `tauri-action` à la première publication
@@ -12,4 +9,9 @@
 La paire de clés de l'updater existe déjà, dans `~/.tauri/multifus.key` et son
 `.pub`, et sa moitié publique est le champ `plugins.updater.pubkey` de
 `tauri.conf.json`. En régénérer une rendrait insignables les mises à jour des
-versions déjà installées.
+versions déjà installées. Son mot de passe est vide, et le secret
+`TAURI_SIGNING_PRIVATE_KEY_PASSWORD` reste absent : un secret absent vaut la
+chaîne vide que la clé attend.
+
+Le certificat Developer ID Application expire le 17 septembre 2031. Sa clé
+privée, le `.p12` et son mot de passe sont dans `~/.apple-developer-id/`.
