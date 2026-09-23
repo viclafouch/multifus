@@ -5,13 +5,7 @@ import type { Size } from '@/@types/media'
 import { ANKAMA_SOURCE_IDS, ANKAMA_SOURCES } from '@/constants/ankama'
 import { BAN_DECOR, PAGE_DECORS } from '@/constants/decors'
 import { LANGUAGES } from '@/constants/languages'
-import {
-  CARD_POSTERS,
-  LOOPS,
-  PEEK_SIZE,
-  PEEKS,
-  POSTER_SIZE
-} from '@/constants/loops'
+import { LOOPS, PEEK_SIZE, PEEKS } from '@/constants/loops'
 import { PAGE_IDS } from '@/constants/pages'
 import {
   SYSTEM_SHOTS,
@@ -110,15 +104,14 @@ const everySizeDeclared = () => {
 
   for (const { source, size, poster } of Object.values(LOOPS)) {
     declared.set(source, size)
-    declared.set(poster, POSTER_SIZE)
+
+    for (const { src, width, height } of [poster.full, poster.small]) {
+      declared.set(src, { width, height })
+    }
   }
 
   for (const peek of Object.values(PEEKS)) {
     declared.set(peek, PEEK_SIZE)
-  }
-
-  for (const { small } of Object.values(CARD_POSTERS)) {
-    declared.set(small.src, { width: small.width, height: small.height })
   }
 
   return [...declared]
@@ -128,7 +121,7 @@ const DECLARED = everySizeDeclared()
 
 describe('the sizes the pages reserve', () => {
   it('finds every decor, screenshot, poster, peek and loop', () => {
-    expect(DECLARED).toHaveLength(64)
+    expect(DECLARED).toHaveLength(65)
   })
 
   it.each(DECLARED)('matches the file behind %s', async (served, size) => {

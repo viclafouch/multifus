@@ -24,6 +24,15 @@ export const MOSAIC_SIZES = [
   FULL_PAGE
 ].join(', ')
 
+export const ENTRANCE_SIZES = [
+  `(min-width: ${WIDE_FLOOR}) 40rem`,
+  FULL_PAGE
+].join(', ')
+
+export const STAGE_SIZES = [`(min-width: ${WIDE_FLOOR}) 70rem`, FULL_PAGE].join(
+  ', '
+)
+
 export const PAIR_SIZES = [
   `(min-width: ${WIDE_FLOOR}) 34rem`,
   `(min-width: ${PAIR_FLOOR}) ${HALF_PAGE}`,

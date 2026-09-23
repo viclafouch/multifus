@@ -2,9 +2,7 @@ import type { MessageDescriptor } from '@lingui/core'
 import type { PageId } from '@/@types/page'
 import { HOST } from '@/constants/host'
 import { LANGUAGES, OPEN_GRAPH_LOCALES } from '@/constants/languages'
-import { LOOPS } from '@/constants/loops'
 import { OG_HEIGHT, OG_IMAGE, OG_WIDTH } from '@/constants/og'
-import { PAGES } from '@/constants/pages'
 import { AUTHOR_HANDLE, FOLD_ANCHOR } from '@/constants/site'
 import {
   PAGE_DESCRIPTIONS,
@@ -22,21 +20,6 @@ const alternatesOf = (page: PageId) => {
   return alternateRefsOf({ page, origin: HOST }).map(({ hreflang, href }) => {
     return { rel: 'alternate', hrefLang: hreflang, href }
   })
-}
-
-const POSTER_PRELOAD = {
-  rel: 'preload',
-  as: 'image'
-} as const
-
-const posterOf = (page: PageId) => {
-  const { loop } = PAGES[page]
-
-  if (loop === null) {
-    return []
-  }
-
-  return [{ ...POSTER_PRELOAD, href: LOOPS[loop].poster }]
 }
 
 export const titleOf = (name: string) => {
@@ -86,7 +69,6 @@ export const headOf = ({ page, language }: PathParams) => {
     links: [
       { rel: 'canonical', href: address },
       { rel: 'expect', href: `#${FOLD_ANCHOR}`, blocking: 'render' },
-      ...posterOf(page),
       ...alternatesOf(page)
     ],
     scripts: [

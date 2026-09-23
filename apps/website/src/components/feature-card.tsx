@@ -2,7 +2,7 @@ import { useLingui } from '@lingui/react'
 import { cn } from '@multifus/retro'
 import type { FeatureId } from '@/@types/page'
 import { PageLink } from '@/components/page-link'
-import { CARD_POSTERS, PEEK_SIZE, PEEKS } from '@/constants/loops'
+import { LOOPS, PEEK_SIZE, PEEKS } from '@/constants/loops'
 import { PAGE_PORTRAITS, PORTRAIT_SIDE } from '@/constants/portraits'
 import { PAGE_TINTS } from '@/constants/tints'
 import { PAGE_NAMES, PAGE_PROMISES } from '@/constants/wording'
@@ -22,7 +22,7 @@ export const FeatureCard = ({
 }: FeatureCardProps) => {
   const { i18n } = useLingui()
   const { isPeeking, isReady, handleLoad, handlers } = usePeek({ hasPeek })
-  const poster = CARD_POSTERS[page]
+  const { poster } = LOOPS[page]
 
   return (
     <PageLink

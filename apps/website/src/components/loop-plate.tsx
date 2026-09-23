@@ -2,9 +2,9 @@ import { useLingui } from '@lingui/react'
 import { usePlayer } from '@multifus/retro'
 import type { LoopId } from '@/@types/page'
 import { LoopCurtain } from '@/components/loop-curtain'
-import { captionOf, LOOPS } from '@/constants/loops'
+import { captionOf, LOOPS, posterSizesOf } from '@/constants/loops'
 import { useMedia } from '@/hooks/use-media'
-import { STILL } from '@/lib/media'
+import { sourcesOf, STILL } from '@/lib/media'
 
 type LoopPlateProps = Readonly<{
   loop: LoopId
@@ -22,10 +22,18 @@ export const LoopPlate = ({ loop, isAuto = false }: LoopPlateProps) => {
       className="stage carried relative aspect-loop w-full"
       data-auto={isAuto ? '' : undefined}
     >
+      <img
+        src={poster.full.src}
+        srcSet={sourcesOf(poster)}
+        sizes={posterSizesOf(loop)}
+        alt=""
+        width={poster.full.width}
+        height={poster.full.height}
+        className="absolute inset-0 size-full object-cover"
+      />
       <video
         ref={video}
         src={source}
-        poster={poster}
         width={size.width}
         height={size.height}
         aria-label={i18n._(captionOf(loop))}

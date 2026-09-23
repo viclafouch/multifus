@@ -220,7 +220,7 @@ describe('the video record', () => {
     ).toMatchObject({
       name: 'Le choix de vos personnages au premier plan.',
       contentUrl: `${HOST}${LOOPS.wheel.source}`,
-      thumbnailUrl: `${HOST}${LOOPS.wheel.poster}`,
+      thumbnailUrl: `${HOST}${LOOPS.wheel.poster.full.src}`,
       duration: 'PT12S',
       uploadDate: LOOPS.wheel.filmed
     })

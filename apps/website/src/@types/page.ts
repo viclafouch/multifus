@@ -1,5 +1,5 @@
 import type { Language } from './language'
-import type { Size } from './media'
+import type { Shot, Size } from './media'
 
 export type PageId =
   | 'ankama'
@@ -44,7 +44,7 @@ export type LoopId = FeatureId | 'home'
 export type Loop = Readonly<{
   source: string
   size: Size
-  poster: string
+  poster: Shot
   seconds: number
   filmed: string
 }>

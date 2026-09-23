@@ -3,6 +3,7 @@ import autoFocusPeek from '@multifus/ankama/loops/auto-focus-loop-peek.webp'
 import autoFocusSmall from '@multifus/ankama/loops/auto-focus-loop-poster-760.webp'
 import autoFocusPoster from '@multifus/ankama/loops/auto-focus-loop-poster.webp'
 import autoFocusLoop from '@multifus/ankama/loops/auto-focus-loop.mp4'
+import homeSmall from '@multifus/ankama/loops/home-loop-poster-760.webp'
 import homePoster from '@multifus/ankama/loops/home-loop-poster.webp'
 import homeLoop from '@multifus/ankama/loops/home-loop.mp4'
 import quickTextsPeek from '@multifus/ankama/loops/quick-texts-loop-peek.webp'
@@ -25,9 +26,10 @@ import wheelPeek from '@multifus/ankama/loops/wheel-loop-peek.webp'
 import wheelSmall from '@multifus/ankama/loops/wheel-loop-poster-760.webp'
 import wheelPoster from '@multifus/ankama/loops/wheel-loop-poster.webp'
 import wheelLoop from '@multifus/ankama/loops/wheel-loop.mp4'
-import type { Shot, Size } from '@/@types/media'
+import type { Size } from '@/@types/media'
 import type { FeatureId, Loop, LoopId } from '@/@types/page'
 import { PAGE_PROMISES } from '@/constants/wording'
+import { ENTRANCE_SIZES, STAGE_SIZES } from '@/lib/media'
 
 const FILMED_ON = '2026-09-08T12:00:00+02:00'
 
@@ -44,53 +46,60 @@ export const SMALL_POSTER_SIZE = {
 
 export const PEEK_SIZE = { width: 720, height: 406 } as const satisfies Size
 
+const posterOf = (full: string, small: string) => {
+  return {
+    full: { ...POSTER_SIZE, src: full },
+    small: { ...SMALL_POSTER_SIZE, src: small }
+  }
+}
+
 export const LOOPS = {
   home: {
     source: homeLoop,
     size: { width: 1280, height: 720 },
-    poster: homePoster,
+    poster: posterOf(homePoster, homeSmall),
     seconds: 18,
     filmed: FILMED_ON
   },
   autoFocus: {
     source: autoFocusLoop,
     size: { width: 1384, height: 778 },
-    poster: autoFocusPoster,
+    poster: posterOf(autoFocusPoster, autoFocusSmall),
     seconds: 13,
     filmed: FILMED_ON
   },
   wheel: {
     source: wheelLoop,
     size: { width: 1386, height: 780 },
-    poster: wheelPoster,
+    poster: posterOf(wheelPoster, wheelSmall),
     seconds: 12,
     filmed: FILMED_ON
   },
   walk: {
     source: walkLoop,
     size: { width: 1386, height: 780 },
-    poster: walkPoster,
+    poster: posterOf(walkPoster, walkSmall),
     seconds: 14,
     filmed: FILMED_ON
   },
   runeTable: {
     source: runeTableLoop,
     size: { width: 1384, height: 778 },
-    poster: runeTablePoster,
+    poster: posterOf(runeTablePoster, runeTableSmall),
     seconds: 14,
     filmed: FILMED_ON
   },
   relay: {
     source: relayLoop,
     size: { width: 1152, height: 648 },
-    poster: relayPoster,
+    poster: posterOf(relayPoster, relaySmall),
     seconds: 5,
     filmed: REFILMED_ON
   },
   quickTexts: {
     source: quickTextsLoop,
     size: { width: 800, height: 450 },
-    poster: quickTextsPoster,
+    poster: posterOf(quickTextsPoster, quickTextsSmall),
     seconds: 12,
     filmed: REFILMED_ON
   }
@@ -102,6 +111,10 @@ export const captionOf = (loop: LoopId) => {
   return loop === 'home' ? HOME_CAPTION : PAGE_PROMISES[loop]
 }
 
+export const posterSizesOf = (loop: LoopId) => {
+  return loop === 'home' ? ENTRANCE_SIZES : STAGE_SIZES
+}
+
 export const PEEKS = {
   autoFocus: autoFocusPeek,
   wheel: wheelPeek,
@@ -110,19 +123,3 @@ export const PEEKS = {
   relay: relayPeek,
   quickTexts: quickTextsPeek
 } as const satisfies Record<FeatureId, string>
-
-const cardPosterOf = (poster: string, small: string) => {
-  return {
-    full: { ...POSTER_SIZE, src: poster },
-    small: { ...SMALL_POSTER_SIZE, src: small }
-  }
-}
-
-export const CARD_POSTERS = {
-  autoFocus: cardPosterOf(LOOPS.autoFocus.poster, autoFocusSmall),
-  wheel: cardPosterOf(LOOPS.wheel.poster, wheelSmall),
-  walk: cardPosterOf(LOOPS.walk.poster, walkSmall),
-  runeTable: cardPosterOf(LOOPS.runeTable.poster, runeTableSmall),
-  relay: cardPosterOf(LOOPS.relay.poster, relaySmall),
-  quickTexts: cardPosterOf(LOOPS.quickTexts.poster, quickTextsSmall)
-} as const satisfies Record<FeatureId, Shot>

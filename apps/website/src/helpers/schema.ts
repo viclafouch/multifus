@@ -163,7 +163,7 @@ const videoOf = ({ page, language, loop }: VideoOfParams) => {
     description: speaker._(PAGE_DESCRIPTIONS[page]),
     contentUrl: `${HOST}${source}`,
     encodingFormat: LOOP_FORMAT,
-    thumbnailUrl: `${HOST}${poster}`,
+    thumbnailUrl: `${HOST}${poster.full.src}`,
     width: String(size.width),
     height: String(size.height),
     uploadDate: filmed,
