@@ -14,7 +14,8 @@ use crate::app::state::lock;
 use crate::platform::matches_windows_eleven;
 
 pub use props::Measured;
-pub use props::stopped_props;
+pub use props::SessionEnd;
+pub use props::ended_props;
 pub use tally::Tally;
 
 use aptabase::Aptabase;
@@ -23,14 +24,11 @@ use aptabase::shortened;
 use props::StartedParams;
 use props::started_props;
 
-const KEY: &str = match option_env!("APTABASE_KEY") {
-    Some(key) => key,
-    None => "",
-};
+const KEY: &str = "A-EU-6756966272";
 
 const STARTED: &str = "app_started";
 
-const STOPPED: &str = "app_stopped";
+const ENDED: &str = "session_ended";
 
 const ONBOARDING_FINISHED: &str = "onboarding_finished";
 
@@ -93,11 +91,34 @@ pub fn app_stopped(app: &AppHandle) {
     let props = {
         let state = lock(app);
 
-        stopped_props(&state.measured())
+        ended_props(&state.measured(), SessionEnd::Quit)
     };
 
-    stats.track(STOPPED, props);
+    stats.track(ENDED, props);
     stats.send_and_wait();
+}
+
+pub fn end_long_session(app: &AppHandle) {
+    let Some(stats) = app.try_state::<Arc<Aptabase>>() else {
+        return;
+    };
+
+    if !stats.is_session_over() {
+        return;
+    }
+
+    let props = {
+        let mut state = lock(app);
+        let props = ended_props(&state.measured(), SessionEnd::Day);
+
+        state.start_tally_over();
+
+        props
+    };
+
+    stats.renew_session();
+    stats.track(ENDED, props);
+    stats.send_apart();
 }
 
 pub fn onboarding_finished(app: &AppHandle) {
@@ -152,6 +173,11 @@ fn named_file(file: &str, line: u32) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn the_key_of_the_build_reaches_the_european_ingestion() {
+        assert!(aptabase::endpoint(KEY).is_some());
+    }
 
     #[test]
     fn a_panic_in_our_own_files_says_the_file_and_the_line() {

@@ -243,6 +243,8 @@ impl TurnMechanisms for AppTurnMechanisms<'_> {
 fn tick(app: &AppHandle) {
     listen_for_wakes(app);
 
+    stats::end_long_session(app);
+
     turn_over(&Turn::of(app), &AppTurnMechanisms(app));
 }
 

@@ -7,22 +7,29 @@ Requirements and bootstrap are in the [root README](../../README.md). The
 commands are the scripts of `package.json`, and `pnpm run check` is the one CI
 runs.
 
-## The measuring key
+## Measuring
 
-`APTABASE_KEY` is read at compile time and baked into the binary. The release
-workflow hands it over from the repository secrets, so only a CI build measures
-anything. A local build compiles without it and sends nothing, whatever the
-Settings box says.
+The Aptabase key is written in `src-tauri/src/app/stats/mod.rs`. It can only
+send events, and any binary shows it to `strings`, so it is no secret.
 
-To watch the events arrive in the Debug bucket of the dashboard, pass the key to
-the dev command:
+Every build measures, `pnpm run dev:app` included: a debug build lands in the
+Debug bucket of the dashboard, apart from the players. Untick the Settings box to
+keep a machine out.
 
-```
-APTABASE_KEY=A-EU-... pnpm run dev:app
-```
+The client in `stats/` is written by hand. The published `tauri-plugin-aptabase`
+would bring a second `reqwest` and a second TLS stack.
 
-`build.rs` declares `cargo:rerun-if-env-changed=APTABASE_KEY`, so changing the
-key recompiles the crate instead of reusing the one already built in.
+`named_kind`, `named_class` and the other name tables repeat what serde already
+declares, on purpose: a `rename_all` that moves would otherwise break the history
+of the dashboard.
+
+A session ends after 24 hours of wall-clock time, because Aptabase drops every
+event of a session older than seven days, and a Mac put to sleep keeps Multifus
+open for weeks.
+
+About two events leave per session. The free tier of 20,000 a month holds around
+200 active players, and past it Aptabase pauses the measuring until the month
+ends, it never bills.
 
 ## The Accessibility tick, on macOS
 

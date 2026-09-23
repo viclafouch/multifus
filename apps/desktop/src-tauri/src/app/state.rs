@@ -445,6 +445,10 @@ impl Multifus {
         self.save();
     }
 
+    pub fn start_tally_over(&mut self) {
+        self.tally.start_over();
+    }
+
     pub fn count_walk_switch(&mut self) {
         self.tally.count_walk_switch();
     }
@@ -2166,7 +2170,7 @@ mod tests {
     }
 
     fn counters(state: &Multifus) -> serde_json::Value {
-        stats::stopped_props(&state.measured())
+        stats::ended_props(&state.measured(), stats::SessionEnd::Quit)
     }
 
     fn journalled(state: &Multifus) -> Vec<JournalEvent> {

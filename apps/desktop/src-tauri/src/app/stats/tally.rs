@@ -104,6 +104,14 @@ impl Tally {
         counted
     }
 
+    pub fn start_over(&mut self) {
+        *self = Self {
+            online: self.online,
+            clients_peak: self.online,
+            ..Self::default()
+        };
+    }
+
     pub fn count_walk_switch(&mut self) {
         self.walk_switches = self.walk_switches.saturating_add(1);
     }
@@ -475,6 +483,27 @@ mod tests {
         tally.count(&online("Ilyzaelle"));
 
         assert_eq!(tally.clients_peak, 1);
+    }
+
+    #[test]
+    fn a_tally_started_over_forgets_the_counts_and_keeps_the_clients_still_open() {
+        let mut tally = Tally::new();
+
+        tally.count(&online("Ilyzaelle"));
+        tally.count(&online("Aryenne"));
+        tally.count(&online("Nokatt"));
+        tally.count(&offline("Nokatt"));
+        tally.count_walk_switch();
+
+        tally.start_over();
+
+        assert_eq!(tally.walk_switches, 0);
+        assert_eq!(tally.clients_peak, 2);
+
+        tally.count(&offline("Aryenne"));
+        tally.count(&offline("Ilyzaelle"));
+
+        assert_eq!(tally.online, 0);
     }
 
     #[test]

@@ -20,6 +20,12 @@ pub struct Measured<'a> {
     pub has_config_problem: bool,
 }
 
+#[derive(Debug, Clone, Copy)]
+pub enum SessionEnd {
+    Quit,
+    Day,
+}
+
 pub struct StartedParams<'a> {
     pub measured: &'a Measured<'a>,
     pub launch: Launch,
@@ -114,10 +120,11 @@ pub fn started_props(params: StartedParams<'_>) -> Value {
 }
 
 #[must_use]
-pub fn stopped_props(measured: &Measured<'_>) -> Value {
+pub fn ended_props(measured: &Measured<'_>, end: SessionEnd) -> Value {
     let mut props = measured.tally.counted();
 
     props["authorized"] = json!(measured.is_authorized);
+    props["ended_by"] = json!(named_end(end));
 
     props
 }
@@ -166,6 +173,13 @@ fn named_launch(launch: Launch) -> &'static str {
     match launch {
         Launch::ByHand => "by_hand",
         Launch::Session => "session",
+    }
+}
+
+fn named_end(end: SessionEnd) -> &'static str {
+    match end {
+        SessionEnd::Quit => "quit",
+        SessionEnd::Day => "day",
     }
 }
 
@@ -221,7 +235,7 @@ mod tests {
 
     const EVENT_NAMES: [&str; 5] = [
         "app_started",
-        "app_stopped",
+        "session_ended",
         "onboarding_finished",
         "app_updated",
         "app_crashed",
@@ -362,8 +376,9 @@ mod tests {
         tally.count_rune_table_open();
         tally.count_health_check();
 
-        let props = stopped_props(&measured(&settings, &tally));
+        let props = ended_props(&measured(&settings, &tally), SessionEnd::Quit);
 
+        assert_eq!(props["ended_by"], json!("quit"));
         assert_eq!(props["auto_focus_switches"], json!(1));
         assert_eq!(props["auto_focus_combat"], json!(1));
         assert_eq!(props["auto_focus_trade"], json!(0));
@@ -394,7 +409,7 @@ mod tests {
                 launch: Launch::ByHand,
                 is_windows_eleven: false,
             }),
-            stopped_props(&measured(&settings, &tally)),
+            ended_props(&measured(&settings, &tally), SessionEnd::Day),
         ];
 
         for props in sent {

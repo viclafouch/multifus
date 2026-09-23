@@ -33,6 +33,8 @@ const ANSWER_CEILING: Duration = Duration::from_secs(5);
 
 const SESSION_SPREAD: u64 = 100_000_000;
 
+const SESSION_CEILING: Duration = Duration::from_secs(24 * 60 * 60);
+
 const WORD_CEILING: usize = 180;
 
 const SDK: &str = "multifus";
@@ -70,10 +72,16 @@ struct Poster {
 }
 
 #[derive(Debug)]
+struct Session {
+    id: String,
+    born: SystemTime,
+}
+
+#[derive(Debug)]
 pub struct Aptabase {
     poster: Option<Poster>,
     sharing: AtomicBool,
-    session: String,
+    session: Mutex<Session>,
     system: Value,
     queue: Mutex<Vec<Value>>,
 }
@@ -84,7 +92,7 @@ impl Aptabase {
         Self {
             poster: poster(key),
             sharing: AtomicBool::new(false),
-            session: new_session(),
+            session: Mutex::new(new_session()),
             system: described(system),
             queue: Mutex::new(Vec::new()),
         }
@@ -99,14 +107,25 @@ impl Aptabase {
         self.poster.is_some() && self.sharing.load(Ordering::Relaxed)
     }
 
+    #[must_use]
+    pub fn is_session_over(&self) -> bool {
+        self.current_session().born.elapsed().unwrap_or_default() >= SESSION_CEILING
+    }
+
+    pub fn renew_session(&self) {
+        *self.current_session() = new_session();
+    }
+
     pub fn track(&self, name: &str, props: Value) {
         if !self.is_measuring() {
             return;
         }
 
+        let session = self.current_session().id.clone();
+
         self.queued().push(json!({
             "timestamp": stamped_now(),
-            "sessionId": self.session,
+            "sessionId": session,
             "eventName": name,
             "systemProps": self.system,
             "props": props,
@@ -131,6 +150,10 @@ impl Aptabase {
     }
 
     async fn send(&self) {
+        if !self.is_measuring() {
+            return;
+        }
+
         let Some(poster) = &self.poster else {
             return;
         };
@@ -144,6 +167,10 @@ impl Aptabase {
         if let Some(kept) = post(poster, events).await {
             self.give_back(kept);
         }
+    }
+
+    fn current_session(&self) -> MutexGuard<'_, Session> {
+        self.session.lock().unwrap_or_else(PoisonError::into_inner)
     }
 
     fn queued(&self) -> MutexGuard<'_, Vec<Value>> {
@@ -195,7 +222,7 @@ fn poster(key: &str) -> Option<Poster> {
     Some(Poster { client, endpoint })
 }
 
-fn endpoint(key: &str) -> Option<String> {
+pub(super) fn endpoint(key: &str) -> Option<String> {
     let parts = key.split('-').collect::<Vec<_>>();
 
     let [_, region, _] = parts.as_slice() else {
@@ -229,17 +256,20 @@ fn described(system: SystemParams) -> Value {
     })
 }
 
-fn new_session() -> String {
-    let since_epoch = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .unwrap_or_default();
-    let spread = u64::from(since_epoch.subsec_nanos()) % SESSION_SPREAD;
+fn new_session() -> Session {
+    session_born_at(SystemTime::now())
+}
 
-    since_epoch
+fn session_born_at(born: SystemTime) -> Session {
+    let since_epoch = born.duration_since(UNIX_EPOCH).unwrap_or_default();
+    let spread = u64::from(since_epoch.subsec_nanos()) % SESSION_SPREAD;
+    let id = since_epoch
         .as_secs()
         .saturating_mul(SESSION_SPREAD)
         .saturating_add(spread)
-        .to_string()
+        .to_string();
+
+    Session { id, born }
 }
 
 #[must_use]
@@ -340,6 +370,7 @@ mod tests {
     #[test]
     fn the_session_says_the_second_it_was_born_in() {
         let session = new_session()
+            .id
             .parse::<u64>()
             .expect("a session made of digits");
         let born = session / SESSION_SPREAD;
@@ -355,10 +386,46 @@ mod tests {
     }
 
     #[test]
+    fn a_session_younger_than_a_day_goes_on() {
+        let stats = measuring();
+
+        assert!(!stats.is_session_over());
+    }
+
+    #[test]
+    fn a_session_a_day_old_is_over_and_a_renewed_one_starts_afresh() {
+        let stats = measuring();
+        let a_day_ago = SystemTime::now() - SESSION_CEILING;
+
+        *stats.current_session() = session_born_at(a_day_ago);
+
+        assert!(stats.is_session_over());
+
+        let ended = stats.current_session().id.clone();
+
+        stats.renew_session();
+
+        assert!(!stats.is_session_over());
+        assert_ne!(stats.current_session().id, ended);
+    }
+
+    #[test]
+    fn the_box_unticked_holds_back_what_was_already_waiting() {
+        let stats = measuring();
+
+        stats.track("app_started", json!({}));
+        stats.share(false);
+
+        tauri::async_runtime::block_on(stats.send());
+
+        assert_eq!(stats.queued().len(), 1, "nothing left the machine");
+    }
+
+    #[test]
     fn events_given_back_keep_their_place_before_the_newer_ones() {
         let stats = measuring();
 
-        stats.track("app_stopped", json!({}));
+        stats.track("session_ended", json!({}));
         stats.give_back(vec![json!({ "eventName": "app_started" })]);
 
         let queued = stats.queued();
@@ -367,7 +434,7 @@ mod tests {
             .map(|event| event["eventName"].clone())
             .collect::<Vec<_>>();
 
-        assert_eq!(names, vec![json!("app_started"), json!("app_stopped")]);
+        assert_eq!(names, vec![json!("app_started"), json!("session_ended")]);
     }
 
     #[test]
