@@ -1,9 +1,9 @@
+use std::ffi::c_void;
 use std::sync::Mutex;
 use std::sync::MutexGuard;
 use std::sync::PoisonError;
 use std::sync::atomic::AtomicBool;
 use std::sync::atomic::Ordering;
-use std::thread;
 use std::time::Duration;
 
 use tauri::AppHandle;
@@ -14,6 +14,7 @@ use tauri::Manager;
 use tauri::Monitor;
 use tauri::WebviewWindow;
 
+use crate::app::alarm::Alarm;
 use crate::app::journal::JournalEvent;
 use crate::app::journal::Work;
 use crate::app::main_window;
@@ -26,9 +27,11 @@ use crate::app::state::windows;
 use crate::config::RUNE_TABLE_CLEAREST;
 use crate::config::RuneOffset;
 use crate::platform;
+use crate::platform::PlatformError;
 use crate::platform::ScreenFrame;
 use crate::platform::ScreenPoint;
 use crate::platform::WindowId;
+use crate::platform::WindowManager;
 
 const OVERLAY: Overlay = Overlay {
     label: "rune-table",
@@ -42,6 +45,8 @@ const OVERLAY: Overlay = Overlay {
 const LOOK_EVENT: &str = "multifus://rune-table-look";
 
 const FOLLOW: Duration = Duration::from_millis(100);
+
+static NEXT_FOLLOW: Alarm = Alarm::new();
 
 const FIRST_MARGIN: f64 = 24.0;
 
@@ -70,11 +75,10 @@ impl Anchor {
         }
     }
 
-    fn holds(self, window: WindowId) -> bool {
+    fn carrier(self, highest: WindowId) -> WindowId {
         match self {
-            Self::Anywhere => true,
-            Self::OnlyOn(held) => held == window,
-            Self::TheNextOne => false,
+            Self::OnlyOn(window) => window,
+            Self::Anywhere | Self::TheNextOne => highest,
         }
     }
 }
@@ -173,22 +177,23 @@ impl RuneTable {
         self.generation.matches_latest(generation)
     }
 
-    fn hold_the_anchor(&self, window: WindowId) -> Option<Anchor> {
+    fn posted_anchor(&self) -> Option<Anchor> {
+        match self.mode() {
+            Mode::Posted { anchor } => Some(anchor),
+            Mode::Preview { .. } | Mode::Hidden => None,
+        }
+    }
+
+    fn settle_on(&self, highest: WindowId) -> Option<WindowId> {
         let mut held = self.held();
         let Some(Mode::Posted { anchor }) = *held else {
             return None;
         };
-        let taken = anchor.taken_on(window);
+        let taken = anchor.taken_on(highest);
 
         *held = Some(Mode::Posted { anchor: taken });
 
-        Some(taken)
-    }
-
-    fn sits_on(&self, foreground: WindowId) -> Option<WindowId> {
-        self.hold_the_anchor(foreground)
-            .filter(|anchor| anchor.holds(foreground))
-            .map(|_| foreground)
+        Some(taken.carrier(highest))
     }
 
     fn ratio(&self) -> Option<f64> {
@@ -293,9 +298,22 @@ fn post(app: &AppHandle, here: Option<WindowId>) {
 fn open_on(app: &AppHandle, mode: Mode) {
     let generation = app.state::<RuneTable>().lay(mode);
 
+    set_floating(app, mode.matches_previewing());
     tell_state(app);
     follow_foreground(app);
     follow_apart(app, generation);
+}
+
+fn set_floating(app: &AppHandle, should_float: bool) {
+    let Some(window) = OVERLAY.window(app) else {
+        return;
+    };
+
+    OVERLAY.said(app, window.set_always_on_top(should_float));
+}
+
+pub fn note_foreground() {
+    NEXT_FOLLOW.wake();
 }
 
 fn tell_state(app: &AppHandle) {
@@ -307,7 +325,7 @@ fn tell_state(app: &AppHandle) {
 fn follow_apart(app: &AppHandle, generation: u64) {
     OVERLAY.apart(app, move |app| {
         loop {
-            thread::sleep(FOLLOW);
+            NEXT_FOLLOW.wait(Duration::ZERO, FOLLOW);
 
             if !app.state::<RuneTable>().matches_latest(generation) || !is_open(app) {
                 return;
@@ -384,7 +402,7 @@ fn middle_offset(app: &AppHandle, frame: ScreenFrame, size: TableSize) -> RuneOf
 }
 
 fn follow_game(app: &AppHandle) {
-    let foreground = match windows(app).foreground_game_window() {
+    let window = match carrier(&app.state::<RuneTable>(), windows(app)) {
         Ok(Some(window)) => window,
         Ok(None) => {
             veil(app);
@@ -398,15 +416,9 @@ fn follow_game(app: &AppHandle) {
         }
     };
 
-    let Some(window) = app.state::<RuneTable>().sits_on(foreground.id()) else {
-        veil(app);
-
-        return;
-    };
-
     let frame = match windows(app).window_frame(window) {
         Ok(Some(frame)) => frame,
-        Ok(None) => {
+        Ok(None) | Err(PlatformError::WindowGone) => {
             veil(app);
 
             return;
@@ -430,6 +442,62 @@ fn follow_game(app: &AppHandle) {
     let size = table_size_of(app, area);
 
     lay_over(app, frame, size, kept_offset(app, frame, size));
+    stack_above(app, window);
+}
+
+fn carrier(table: &RuneTable, windows: &dyn WindowManager) -> platform::Result<Option<WindowId>> {
+    let Some(anchor) = table.posted_anchor() else {
+        return Ok(None);
+    };
+
+    if let Anchor::OnlyOn(window) = anchor {
+        return Ok(Some(window));
+    }
+
+    Ok(windows
+        .highest_game_window()?
+        .and_then(|highest| table.settle_on(highest)))
+}
+
+fn stack_above(app: &AppHandle, carrier: WindowId) {
+    let Some(table) = OVERLAY.window(app) else {
+        return;
+    };
+
+    let stacked = app.run_on_main_thread({
+        let app = app.clone();
+
+        move || {
+            if !app.state::<RuneTable>().mode().matches_posted() {
+                return;
+            }
+
+            if let Err(detail) = stacked_above(&table, carrier) {
+                OVERLAY.complain(&app, detail);
+            }
+        }
+    });
+
+    OVERLAY.said(app, stacked);
+}
+
+fn stacked_above(table: &WebviewWindow, carrier: WindowId) -> Result<(), String> {
+    let handle = native_handle(table).map_err(|error| error.to_string())?;
+
+    match platform::lay_above(handle, carrier) {
+        Ok(()) | Err(PlatformError::WindowGone) => Ok(()),
+        Err(error) => Err(error.to_string()),
+    }
+}
+
+#[cfg(target_os = "windows")]
+fn native_handle(window: &WebviewWindow) -> tauri::Result<*mut c_void> {
+    Ok(window.hwnd()?.0)
+}
+
+#[cfg(target_os = "macos")]
+fn native_handle(window: &WebviewWindow) -> tauri::Result<*mut c_void> {
+    window.ns_window()
 }
 
 fn complain(app: &AppHandle, detail: &str) {
@@ -809,8 +877,7 @@ fn build(app: &AppHandle) {
 
 #[cfg(target_os = "macos")]
 fn hold_back_activation(app: &AppHandle, window: &WebviewWindow) {
-    let held_back = window
-        .ns_window()
+    let held_back = native_handle(window)
         .map_err(|error| error.to_string())
         .and_then(|handle| {
             platform::hold_back_activation(handle).map_err(|error| error.to_string())
@@ -827,6 +894,7 @@ fn hold_back_activation(_app: &AppHandle, _window: &WebviewWindow) {}
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
+    use std::sync::Arc;
 
     use super::*;
     use crate::platform::PlatformError;
@@ -898,11 +966,10 @@ mod tests {
     }
 
     #[test]
-    fn the_table_opened_on_a_window_of_the_game_answers_to_that_one_alone() {
+    fn the_table_opened_on_a_window_of_the_game_stays_on_that_one_whatever_rises_above_it() {
         let anchor = Anchor::OnlyOn(here());
 
-        assert!(anchor.holds(here()));
-        assert!(!anchor.holds(there()));
+        assert_eq!(anchor.carrier(there()), here());
         assert_eq!(
             anchor.taken_on(there()),
             anchor,
@@ -911,27 +978,19 @@ mod tests {
     }
 
     #[test]
-    fn the_table_opened_outside_the_game_takes_the_first_window_that_comes_forward() {
+    fn the_table_opened_outside_the_game_takes_the_highest_window_of_the_game() {
         let waiting = Anchor::TheNextOne;
 
-        assert!(
-            !waiting.holds(here()),
-            "nothing of the game is in front yet, so there is nothing to sit on"
-        );
-
-        let taken = waiting.taken_on(there());
-
-        assert_eq!(taken, Anchor::OnlyOn(there()));
-        assert!(taken.holds(there()));
-        assert!(!taken.holds(here()));
+        assert_eq!(waiting.carrier(there()), there());
+        assert_eq!(waiting.taken_on(there()), Anchor::OnlyOn(there()));
     }
 
     #[test]
-    fn a_table_that_shows_itself_everywhere_never_takes_a_window_of_its_own() {
+    fn a_table_that_shows_itself_everywhere_follows_the_highest_window_of_the_game() {
         let anywhere = Anchor::Anywhere;
 
-        assert!(anywhere.holds(here()));
-        assert!(anywhere.holds(there()));
+        assert_eq!(anywhere.carrier(here()), here());
+        assert_eq!(anywhere.carrier(there()), there());
         assert_eq!(anywhere.taken_on(here()), Anchor::Anywhere);
     }
 
@@ -1015,57 +1074,89 @@ mod tests {
     fn the_anchor_is_only_taken_while_the_table_is_posed_on_the_game() {
         let table = RuneTable::default();
 
-        assert_eq!(table.hold_the_anchor(here()), None);
-
-        table.lay(Mode::Posted {
-            anchor: Anchor::TheNextOne,
-        });
-
         assert_eq!(
-            table.hold_the_anchor(there()),
-            Some(Anchor::OnlyOn(there()))
-        );
-        assert_eq!(
-            table.hold_the_anchor(here()),
-            Some(Anchor::OnlyOn(there())),
-            "the window taken first is the one it keeps"
-        );
-
-        table.lay(Mode::Preview { over: None });
-
-        assert_eq!(table.hold_the_anchor(here()), None);
-    }
-
-    #[test]
-    fn the_table_only_sits_on_the_window_its_anchor_answers_to() {
-        let table = RuneTable::default();
-
-        assert_eq!(
-            table.sits_on(here()),
+            table.settle_on(here()),
             None,
             "nothing is posed, so there is nothing to sit on"
         );
 
         table.lay(Mode::Posted {
+            anchor: Anchor::TheNextOne,
+        });
+
+        assert_eq!(table.settle_on(there()), Some(there()));
+        assert_eq!(table.posted_anchor(), Some(Anchor::OnlyOn(there())));
+
+        table.lay(Mode::Preview { over: None });
+
+        assert_eq!(table.settle_on(here()), None);
+        assert_eq!(table.posted_anchor(), None);
+    }
+
+    fn highest_showing(highest: Option<WindowId>) -> Arc<FakeWindowManager> {
+        FakeWindowManager::showing(Desktop {
+            highest,
+            ..Desktop::default()
+        })
+    }
+
+    #[test]
+    fn a_table_opened_on_a_window_stays_on_it_while_another_one_is_above() {
+        let table = RuneTable::default();
+
+        table.lay(Mode::Posted {
             anchor: Anchor::OnlyOn(here()),
         });
 
-        assert_eq!(table.sits_on(here()), Some(here()));
         assert_eq!(
-            table.sits_on(there()),
-            None,
-            "another window of the game came forward, and the table fades"
+            carrier(&table, &*highest_showing(Some(there()))),
+            Ok(Some(here())),
+            "the window above covers the table as it covers the window, the table does not fade"
         );
+    }
+
+    #[test]
+    fn a_table_opened_on_a_window_does_not_wait_on_a_scan_of_the_others() {
+        let table = RuneTable::default();
+        let windows = FakeWindowManager::showing(Desktop {
+            scan_refusal: Some(PlatformError::AuthorizationDenied),
+            ..Desktop::default()
+        });
+
+        table.lay(Mode::Posted {
+            anchor: Anchor::OnlyOn(here()),
+        });
+
+        assert_eq!(
+            carrier(&table, &*windows),
+            Ok(Some(here())),
+            "its window is known, and the other windows are none of its business"
+        );
+    }
+
+    #[test]
+    fn a_table_on_every_character_stays_on_the_last_one_played_while_another_application_has_the_focus()
+     {
+        let table = RuneTable::default();
+        let windows = FakeWindowManager::showing(Desktop {
+            foreground: None,
+            highest: Some(here()),
+            ..Desktop::default()
+        });
 
         table.lay(Mode::Posted {
             anchor: Anchor::Anywhere,
         });
 
-        assert_eq!(table.sits_on(there()), Some(there()));
+        assert_eq!(
+            carrier(&table, &*windows),
+            Ok(Some(here())),
+            "a browser beside the game, or the menu of the taskbar, takes the focus and leaves the table where it is"
+        );
     }
 
     #[test]
-    fn a_table_opened_outside_the_game_settles_on_the_first_window_that_comes_forward() {
+    fn a_table_opened_outside_the_game_settles_on_the_highest_window_of_the_game() {
         let table = RuneTable::default();
 
         table.lay(Mode::Posted {
@@ -1073,16 +1164,38 @@ mod tests {
         });
 
         assert_eq!(
-            table.sits_on(here()),
-            Some(here()),
-            "the window that comes forward is taken as the anchor, and carries the table at once"
+            carrier(&table, &*highest_showing(None)),
+            Ok(None),
+            "no window of the game shows, and the table waits for one"
         );
         assert_eq!(
-            table.sits_on(there()),
-            None,
-            "and it keeps that one, whatever comes forward next"
+            carrier(&table, &*highest_showing(Some(here()))),
+            Ok(Some(here())),
+            "the highest window of the game is taken as the anchor, and carries the table at once"
         );
-        assert_eq!(table.sits_on(here()), Some(here()));
+        assert_eq!(
+            carrier(&table, &*highest_showing(Some(there()))),
+            Ok(Some(here())),
+            "and it keeps that one, whatever rises above it next"
+        );
+    }
+
+    #[test]
+    fn a_table_that_is_not_posed_on_the_game_has_no_window_of_the_game_to_sit_on() {
+        let table = RuneTable::default();
+        let windows = highest_showing(Some(here()));
+
+        assert_eq!(carrier(&table, &*windows), Ok(None));
+
+        table.lay(Mode::Preview {
+            over: Some(Anchor::Anywhere),
+        });
+
+        assert_eq!(
+            carrier(&table, &*windows),
+            Ok(None),
+            "the preview sits on Multifus, not on the game"
+        );
     }
 
     #[test]

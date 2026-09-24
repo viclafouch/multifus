@@ -42,6 +42,8 @@ use windows::Win32::Foundation::POINT;
 use windows::Win32::Foundation::RECT;
 use windows::Win32::Foundation::STATUS_SUCCESS;
 use windows::Win32::Foundation::WPARAM;
+use windows::Win32::Graphics::Dwm::DWMWA_CLOAKED;
+use windows::Win32::Graphics::Dwm::DwmGetWindowAttribute;
 use windows::Win32::Graphics::Gdi::MONITOR_DEFAULTTONEAREST;
 use windows::Win32::Graphics::Gdi::MonitorFromWindow;
 use windows::Win32::Storage::EnhancedStorage::PKEY_AppUserModel_ID;
@@ -108,19 +110,23 @@ use windows::Win32::UI::WindowsAndMessaging::GA_ROOT;
 use windows::Win32::UI::WindowsAndMessaging::GCLP_HICON;
 use windows::Win32::UI::WindowsAndMessaging::GCLP_HICONSM;
 use windows::Win32::UI::WindowsAndMessaging::GET_CLASS_LONG_INDEX;
+use windows::Win32::UI::WindowsAndMessaging::GW_HWNDPREV;
 use windows::Win32::UI::WindowsAndMessaging::GW_OWNER;
+use windows::Win32::UI::WindowsAndMessaging::GWL_EXSTYLE;
 use windows::Win32::UI::WindowsAndMessaging::GetAncestor;
 use windows::Win32::UI::WindowsAndMessaging::GetClassLongPtrW;
 use windows::Win32::UI::WindowsAndMessaging::GetForegroundWindow;
 use windows::Win32::UI::WindowsAndMessaging::GetMessageW;
 use windows::Win32::UI::WindowsAndMessaging::GetSystemMetrics;
 use windows::Win32::UI::WindowsAndMessaging::GetWindow;
+use windows::Win32::UI::WindowsAndMessaging::GetWindowLongW;
 use windows::Win32::UI::WindowsAndMessaging::GetWindowRect;
 use windows::Win32::UI::WindowsAndMessaging::GetWindowTextLengthW;
 use windows::Win32::UI::WindowsAndMessaging::GetWindowTextW;
 use windows::Win32::UI::WindowsAndMessaging::GetWindowThreadProcessId;
 use windows::Win32::UI::WindowsAndMessaging::HHOOK;
 use windows::Win32::UI::WindowsAndMessaging::HICON;
+use windows::Win32::UI::WindowsAndMessaging::HWND_TOP;
 use windows::Win32::UI::WindowsAndMessaging::ICON_BIG;
 use windows::Win32::UI::WindowsAndMessaging::ICON_SMALL;
 use windows::Win32::UI::WindowsAndMessaging::IsIconic;
@@ -145,10 +151,14 @@ use windows::Win32::UI::WindowsAndMessaging::SPI_SETFOREGROUNDLOCKTIMEOUT;
 use windows::Win32::UI::WindowsAndMessaging::SPIF_SENDCHANGE;
 use windows::Win32::UI::WindowsAndMessaging::SW_MAXIMIZE;
 use windows::Win32::UI::WindowsAndMessaging::SW_RESTORE;
+use windows::Win32::UI::WindowsAndMessaging::SWP_NOACTIVATE;
+use windows::Win32::UI::WindowsAndMessaging::SWP_NOMOVE;
+use windows::Win32::UI::WindowsAndMessaging::SWP_NOSIZE;
 use windows::Win32::UI::WindowsAndMessaging::SYSTEM_PARAMETERS_INFO_ACTION;
 use windows::Win32::UI::WindowsAndMessaging::SYSTEM_PARAMETERS_INFO_UPDATE_FLAGS;
 use windows::Win32::UI::WindowsAndMessaging::SendMessageTimeoutW;
 use windows::Win32::UI::WindowsAndMessaging::SetForegroundWindow;
+use windows::Win32::UI::WindowsAndMessaging::SetWindowPos;
 use windows::Win32::UI::WindowsAndMessaging::SetWindowsHookExW;
 use windows::Win32::UI::WindowsAndMessaging::ShowWindow;
 use windows::Win32::UI::WindowsAndMessaging::ShowWindowAsync;
@@ -167,6 +177,7 @@ use windows::Win32::UI::WindowsAndMessaging::WM_RBUTTONUP;
 use windows::Win32::UI::WindowsAndMessaging::WM_SETICON;
 use windows::Win32::UI::WindowsAndMessaging::WM_SETTEXT;
 use windows::Win32::UI::WindowsAndMessaging::WNDENUMPROC;
+use windows::Win32::UI::WindowsAndMessaging::WS_EX_TOPMOST;
 use windows::Win32::UI::WindowsAndMessaging::WindowFromPoint;
 use windows::core::BOOL;
 use windows::core::HSTRING;
@@ -405,6 +416,11 @@ impl WindowManager for Win32WindowManager {
 
     fn window_frame(&self, window: WindowId) -> Result<Option<ScreenFrame>> {
         let handle = live_game_window(window)?;
+
+        if !is_on_screen(handle) {
+            return Ok(None);
+        }
+
         let mut rect = RECT::default();
 
         // SAFETY: `rect` is a live pointer for the duration of the call.
@@ -420,6 +436,14 @@ impl WindowManager for Win32WindowManager {
         };
 
         Ok(GameWindow::from_client_title(id, &title, self.shortens()))
+    }
+
+    fn highest_game_window(&self) -> Result<Option<WindowId>> {
+        Ok(self
+            .game_windows()?
+            .into_iter()
+            .map(|window| window.id())
+            .find(|window| is_on_screen(window_handle(*window))))
     }
 
     fn is_minimized(&self, window: WindowId) -> Result<bool> {
@@ -1048,6 +1072,62 @@ fn is_unowned(handle: HWND) -> bool {
     unsafe { GetWindow(handle, GW_OWNER) }.map_or(true, |owner| owner.is_invalid())
 }
 
+fn is_on_screen(handle: HWND) -> bool {
+    unsafe { IsWindowVisible(handle) }.as_bool()
+        && !unsafe { IsIconic(handle) }.as_bool()
+        && !is_cloaked(handle)
+}
+
+fn is_cloaked(handle: HWND) -> bool {
+    let mut cloaked = 0_u32;
+
+    // SAFETY: `cloaked` is a live u32, the size the attribute writes.
+    let read = unsafe {
+        DwmGetWindowAttribute(
+            handle,
+            DWMWA_CLOAKED,
+            (&raw mut cloaked).cast(),
+            size_of::<u32>() as u32,
+        )
+    };
+
+    read.is_ok() && cloaked != 0
+}
+
+fn is_topmost(handle: HWND) -> bool {
+    let styles = unsafe { GetWindowLongW(handle, GWL_EXSTYLE) }.cast_unsigned();
+
+    styles & WS_EX_TOPMOST.0 != 0
+}
+
+pub fn lay_above(ours: *mut c_void, window: WindowId) -> Result<()> {
+    let ours = HWND(ours);
+    let game = live_game_window(window)?;
+    let above = unsafe { GetWindow(game, GW_HWNDPREV) }.ok();
+
+    if above == Some(ours) {
+        return Ok(());
+    }
+
+    let after = above
+        .filter(|handle| !is_topmost(*handle))
+        .unwrap_or(HWND_TOP);
+
+    // SAFETY: the handle names the window Tauri built, alive on the thread that owns it.
+    unsafe {
+        SetWindowPos(
+            ours,
+            Some(after),
+            0,
+            0,
+            0,
+            0,
+            SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE,
+        )
+    }
+    .map_err(|error| PlatformError::system("laying a window over the game", error.to_string()))
+}
+
 fn is_live_window(window: WindowId) -> bool {
     unsafe { IsWindow(Some(window_handle(window))) }.as_bool()
 }
@@ -1083,6 +1163,10 @@ fn brought_to_front(handle: HWND) -> Result<()> {
 }
 
 fn raised(handle: HWND) -> bool {
+    if unsafe { GetForegroundWindow() } == handle {
+        return true;
+    }
+
     let _ = unsafe { BringWindowToTop(handle) };
 
     unsafe { SetForegroundWindow(handle) }.as_bool()

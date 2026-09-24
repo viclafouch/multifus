@@ -32,8 +32,12 @@ use objc2::runtime::AnyObject;
 use objc2::runtime::NSObjectProtocol;
 use objc2::runtime::ProtocolObject;
 use objc2_app_kit::NSApplicationActivationOptions;
+use objc2_app_kit::NSFloatingWindowLevel;
+use objc2_app_kit::NSNormalWindowLevel;
 use objc2_app_kit::NSRunningApplication;
 use objc2_app_kit::NSScreen;
+use objc2_app_kit::NSWindowLevel;
+use objc2_app_kit::NSWindowOrderingMode;
 use objc2_app_kit::NSWindowStyleMask;
 use objc2_app_kit::NSWorkspace;
 use objc2_app_kit::NSWorkspaceDidActivateApplicationNotification;
@@ -80,6 +84,13 @@ use objc2_core_graphics::CGEventTapPlacement;
 use objc2_core_graphics::CGEventTapProxy;
 use objc2_core_graphics::CGEventType;
 use objc2_core_graphics::CGKeyCode;
+use objc2_core_graphics::CGWindowID;
+use objc2_core_graphics::CGWindowListCopyWindowInfo;
+use objc2_core_graphics::CGWindowListOption;
+use objc2_core_graphics::kCGNullWindowID;
+use objc2_core_graphics::kCGWindowLayer;
+use objc2_core_graphics::kCGWindowNumber;
+use objc2_core_graphics::kCGWindowOwnerPID;
 use objc2_foundation::NSNotification;
 use objc2_foundation::NSNotificationCenter;
 use objc2_foundation::NSNotificationName;
@@ -359,10 +370,14 @@ fn set_frontmost(application: &AXUIElement) -> Result<()> {
     }
 }
 
+fn pid_of(window: WindowId) -> Result<pid_t> {
+    pid_t::try_from(window.raw()).map_err(|_| PlatformError::WindowGone)
+}
+
 fn live_application(
     window: WindowId,
 ) -> Result<(Retained<NSRunningApplication>, CFRetained<AXUIElement>)> {
-    let pid = pid_t::try_from(window.raw()).map_err(|_| PlatformError::WindowGone)?;
+    let pid = pid_of(window)?;
 
     let Some(application) = NSRunningApplication::runningApplicationWithProcessIdentifier(pid)
     else {
@@ -609,20 +624,20 @@ pub fn matches_frontmost() -> bool {
     NSRunningApplication::currentApplication().isActive()
 }
 
-pub fn hold_back_activation(ns_window: *mut c_void) -> Result<()> {
+fn our_window(ns_window: *mut c_void, operation: &'static str) -> Result<NonNull<AnyObject>> {
     if MainThreadMarker::new().is_none() {
         return Err(PlatformError::system(
-            POSING_A_PANEL,
+            operation,
             "AppKit answers on the main thread only",
         ));
     }
 
-    let Some(window) = NonNull::new(ns_window.cast::<AnyObject>()) else {
-        return Err(PlatformError::system(
-            POSING_A_PANEL,
-            "the window has no handle",
-        ));
-    };
+    NonNull::new(ns_window.cast::<AnyObject>())
+        .ok_or_else(|| PlatformError::system(operation, "the window has no handle"))
+}
+
+pub fn hold_back_activation(ns_window: *mut c_void) -> Result<()> {
+    let window = our_window(ns_window, POSING_A_PANEL)?;
 
     let Some(panel) = AnyClass::get(NS_PANEL) else {
         return Err(PlatformError::system(POSING_A_PANEL, "NSPanel is missing"));
@@ -664,6 +679,117 @@ pub fn hold_back_activation(ns_window: *mut c_void) -> Result<()> {
     }
 
     Ok(())
+}
+
+const LAYING_ABOVE: &str = "laying a window over the game";
+
+const NORMAL_LAYER: i64 = 0;
+
+#[derive(Debug, Clone, Copy)]
+struct ShownWindow {
+    number: CGWindowID,
+    owner: pid_t,
+}
+
+fn shown_windows() -> Vec<ShownWindow> {
+    let options =
+        CGWindowListOption::OptionOnScreenOnly | CGWindowListOption::ExcludeDesktopElements;
+
+    let Some(listed) = CGWindowListCopyWindowInfo(options, kCGNullWindowID) else {
+        return Vec::new();
+    };
+
+    // SAFETY: the list holds one description per window, as the function documents.
+    let listed = unsafe { listed.cast_unchecked::<CFDictionary>() };
+
+    listed
+        .iter()
+        .filter_map(|described| shown_window(&described))
+        .collect()
+}
+
+fn shown_window(described: &CFDictionary) -> Option<ShownWindow> {
+    // SAFETY: a window description is keyed by strings.
+    let described = unsafe { described.cast_unchecked::<CFString, CFType>() };
+    let number_of = |key: &CFString| described.get(key)?.downcast::<CFNumber>().ok()?.as_i64();
+
+    // SAFETY: constants of the framework, alive for the whole process.
+    let (layer, owner, number) = unsafe {
+        (
+            number_of(kCGWindowLayer)?,
+            number_of(kCGWindowOwnerPID)?,
+            number_of(kCGWindowNumber)?,
+        )
+    };
+
+    if layer != NORMAL_LAYER {
+        return None;
+    }
+
+    Some(ShownWindow {
+        number: CGWindowID::try_from(number).ok()?,
+        owner: pid_t::try_from(owner).ok()?,
+    })
+}
+
+fn matches_shown(owner: pid_t) -> bool {
+    shown_windows().iter().any(|shown| shown.owner == owner)
+}
+
+pub fn lay_above(ns_window: *mut c_void, window: WindowId) -> Result<()> {
+    let ours = our_window(ns_window, LAYING_ABOVE)?;
+    let (application, _) = live_application(window)?;
+
+    if application.isActive() {
+        set_level(ours, NSFloatingWindowLevel);
+
+        return Ok(());
+    }
+
+    set_level(ours, NSNormalWindowLevel);
+    order_above(ours, application.processIdentifier());
+
+    Ok(())
+}
+
+fn set_level(ours: NonNull<AnyObject>, level: NSWindowLevel) {
+    // SAFETY: the handle names the window Tauri built, and both selectors are NSWindow's own.
+    unsafe {
+        let worn: NSWindowLevel = msg_send![ours.as_ptr(), level];
+
+        if worn != level {
+            let _: () = msg_send![ours.as_ptr(), setLevel: level];
+        }
+    }
+}
+
+fn order_above(ours: NonNull<AnyObject>, owner: pid_t) {
+    let shown = shown_windows();
+
+    let Some(at) = shown.iter().position(|listed| listed.owner == owner) else {
+        return;
+    };
+
+    // SAFETY: the handle names the window Tauri built, alive for this call.
+    let our_number: isize = unsafe { msg_send![ours.as_ptr(), windowNumber] };
+    let game_number = shown[at].number as isize;
+
+    let is_right_above = at
+        .checked_sub(1)
+        .is_some_and(|above| shown[above].number as isize == our_number);
+
+    if is_right_above {
+        return;
+    }
+
+    // SAFETY: the handle names the window Tauri built, and the number a window on screen.
+    unsafe {
+        let _: () = msg_send![
+            ours.as_ptr(),
+            orderWindow: NSWindowOrderingMode::Above,
+            relativeTo: game_number
+        ];
+    }
 }
 
 #[derive(Debug, Default)]
@@ -748,7 +874,11 @@ impl WindowManager for AccessibilityWindowManager {
     }
 
     fn window_frame(&self, window: WindowId) -> Result<Option<ScreenFrame>> {
-        let (_, element) = live_application(window)?;
+        let (application, element) = live_application(window)?;
+
+        if !matches_shown(application.processIdentifier()) {
+            return Ok(None);
+        }
 
         let Some(game_window) = client_window_element(&element)? else {
             return Ok(None);
@@ -779,6 +909,29 @@ impl WindowManager for AccessibilityWindowManager {
         for application in dofus_applications() {
             if application.isActive() {
                 return game_window(&application);
+            }
+        }
+
+        Ok(None)
+    }
+
+    fn highest_game_window(&self) -> Result<Option<WindowId>> {
+        if !accessibility_authorization().is_granted() {
+            return Err(PlatformError::AuthorizationDenied);
+        }
+
+        let clients = dofus_applications();
+
+        for shown in shown_windows() {
+            let Some(client) = clients
+                .iter()
+                .find(|client| client.processIdentifier() == shown.owner)
+            else {
+                continue;
+            };
+
+            if let Some(window) = game_window(client)? {
+                return Ok(Some(window.id()));
             }
         }
 

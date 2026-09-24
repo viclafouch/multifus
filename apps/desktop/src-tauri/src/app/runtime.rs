@@ -1,6 +1,4 @@
 use std::sync::Arc;
-use std::sync::Condvar;
-use std::sync::Mutex;
 use std::sync::MutexGuard;
 use std::sync::PoisonError;
 use std::sync::TryLockError;
@@ -13,6 +11,7 @@ use tauri::Emitter;
 use tauri::Manager;
 use tauri::RunEvent;
 
+use crate::app::alarm::Alarm;
 use crate::app::journal::JournalEvent;
 use crate::app::journal::MaximizeAllOutcome;
 use crate::app::journal::Outcome;
@@ -22,6 +21,7 @@ use crate::app::main_window;
 use crate::app::panics;
 use crate::app::portraits;
 use crate::app::relay;
+use crate::app::rune_table;
 use crate::app::shortcuts;
 use crate::app::state::AppState;
 use crate::app::state::Decision;
@@ -59,44 +59,7 @@ const SCAN_INTERVAL: Duration = Duration::from_secs(1);
 
 const TURN_REST: Duration = Duration::from_millis(150);
 
-static NEXT_TURN: TurnAlarm = TurnAlarm::new();
-
-struct TurnAlarm {
-    asked: Mutex<bool>,
-    alarm: Condvar,
-}
-
-impl TurnAlarm {
-    const fn new() -> Self {
-        Self {
-            asked: Mutex::new(false),
-            alarm: Condvar::new(),
-        }
-    }
-
-    fn wake(&self) {
-        *self.asked.lock().unwrap_or_else(PoisonError::into_inner) = true;
-
-        self.alarm.notify_one();
-    }
-
-    fn wait(&self, rest: Duration, interval: Duration) {
-        thread::sleep(rest);
-
-        let mut guard = self.asked.lock().unwrap_or_else(PoisonError::into_inner);
-
-        if !*guard {
-            let (waited, _) = self
-                .alarm
-                .wait_timeout(guard, interval.saturating_sub(rest))
-                .unwrap_or_else(PoisonError::into_inner);
-
-            guard = waited;
-        }
-
-        *guard = false;
-    }
-}
+static NEXT_TURN: Alarm = Alarm::new();
 
 pub const SNAPSHOT_EVENT: &str = "multifus://snapshot";
 
@@ -144,7 +107,10 @@ pub fn wake() {
 fn on_wake(app: &AppHandle, waking: Wake) {
     match waking {
         Wake::GameWindows => wake(),
-        Wake::Foreground => shortcuts::note_foreground(app),
+        Wake::Foreground => {
+            shortcuts::note_foreground(app);
+            rune_table::note_foreground();
+        }
     }
 }
 
@@ -885,6 +851,7 @@ fn watcher(app: &AppHandle) -> MutexGuard<'_, PlatformNotificationWatcher> {
 #[cfg(test)]
 mod tests {
     use std::collections::HashSet;
+    use std::sync::Mutex;
     use std::time::Instant;
 
     use super::*;
@@ -905,92 +872,6 @@ mod tests {
 
     fn turn<'a>(windows: &'a FakeWindowManager, state: &'a AppState) -> Turn<'a> {
         Turn { windows, state }
-    }
-
-    const A_REST: Duration = Duration::from_millis(40);
-
-    const AN_INTERVAL: Duration = Duration::from_millis(400);
-
-    #[test]
-    fn a_turn_nobody_asked_for_waits_the_whole_interval() {
-        let alarm = TurnAlarm::new();
-        let start = Instant::now();
-
-        alarm.wait(A_REST, AN_INTERVAL);
-
-        assert!(
-            start.elapsed() >= AN_INTERVAL,
-            "the beat is the interval, rest included"
-        );
-    }
-
-    #[test]
-    fn a_wake_during_a_turn_is_kept_and_starts_the_next_one() {
-        let alarm = TurnAlarm::new();
-
-        alarm.wake();
-
-        let start = Instant::now();
-
-        alarm.wait(A_REST, AN_INTERVAL);
-
-        assert!(
-            start.elapsed() < AN_INTERVAL,
-            "a wake asked for before the wait is not lost"
-        );
-    }
-
-    #[test]
-    fn a_wake_never_starts_a_turn_before_the_rest_is_over() {
-        let alarm = TurnAlarm::new();
-
-        alarm.wake();
-
-        let start = Instant::now();
-
-        alarm.wait(A_REST, AN_INTERVAL);
-
-        assert!(
-            start.elapsed() >= A_REST,
-            "a burst of wakes may not run the turns back to back"
-        );
-    }
-
-    #[test]
-    fn a_wake_landing_during_the_rest_is_kept() {
-        let alarm = Arc::new(TurnAlarm::new());
-        let waking = Arc::clone(&alarm);
-        let woken = thread::spawn(move || {
-            thread::sleep(A_REST / 2);
-            waking.wake();
-        });
-        let start = Instant::now();
-
-        alarm.wait(A_REST, AN_INTERVAL);
-
-        assert!(
-            start.elapsed() < AN_INTERVAL,
-            "the rest holds a wake back, it never eats it"
-        );
-
-        drop(woken.join());
-    }
-
-    #[test]
-    fn a_turn_that_ran_on_a_wake_leaves_no_wake_behind_it() {
-        let alarm = TurnAlarm::new();
-
-        alarm.wake();
-        alarm.wait(A_REST, AN_INTERVAL);
-
-        let start = Instant::now();
-
-        alarm.wait(A_REST, AN_INTERVAL);
-
-        assert!(
-            start.elapsed() >= AN_INTERVAL,
-            "a wake serves one turn, not every turn after it"
-        );
     }
 
     #[test]

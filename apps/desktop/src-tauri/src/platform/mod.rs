@@ -28,6 +28,8 @@ pub use keyboard::key_labels;
 #[cfg(target_os = "macos")]
 pub use macos::hold_back_activation;
 #[cfg(target_os = "macos")]
+pub use macos::lay_above;
+#[cfg(target_os = "macos")]
 pub use macos::matches_frontmost;
 pub use notification::NotificationReport;
 pub use notification::NotificationSink;
@@ -46,6 +48,8 @@ pub use window::WindowIcon;
 pub use window::WindowId;
 pub use window::WindowManager;
 pub use window::matches_game_in_front;
+#[cfg(target_os = "windows")]
+pub use windows::lay_above;
 #[cfg(target_os = "windows")]
 pub use windows::matches_frontmost;
 #[cfg(target_os = "windows")]

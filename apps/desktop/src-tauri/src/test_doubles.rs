@@ -55,6 +55,7 @@ pub struct Desktop {
     pub game_windows: Vec<GameWindow>,
     pub client_windows: Vec<WindowId>,
     pub foreground: Option<GameWindow>,
+    pub highest: Option<WindowId>,
     pub minimized: Vec<WindowId>,
     pub maximized: Vec<WindowId>,
     pub under_click: Option<WindowId>,
@@ -77,6 +78,7 @@ impl Default for Desktop {
             game_windows: Vec::new(),
             client_windows: Vec::new(),
             foreground: None,
+            highest: None,
             minimized: Vec::new(),
             maximized: Vec::new(),
             under_click: None,
@@ -178,6 +180,12 @@ impl WindowManager for FakeWindowManager {
         let desktop = self.desktop();
 
         unless_refused(desktop.scan_refusal, desktop.foreground)
+    }
+
+    fn highest_game_window(&self) -> Result<Option<WindowId>> {
+        let desktop = self.desktop();
+
+        unless_refused(desktop.scan_refusal, desktop.highest)
     }
 
     fn window_at(&self, _at: ScreenPoint) -> Result<Option<WindowId>> {

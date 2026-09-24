@@ -395,6 +395,8 @@ pub trait WindowManager: Send + Sync {
 
     fn foreground_game_window(&self) -> Result<Option<GameWindow>>;
 
+    fn highest_game_window(&self) -> Result<Option<WindowId>>;
+
     fn window_at(&self, at: ScreenPoint) -> Result<Option<WindowId>>;
 
     fn window_frame(&self, window: WindowId) -> Result<Option<ScreenFrame>>;

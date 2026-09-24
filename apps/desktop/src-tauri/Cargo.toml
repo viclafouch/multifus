@@ -67,6 +67,7 @@ windows = { version = "0.62", features = [
   "Win32_UI_Input_KeyboardAndMouse",
   "Win32_UI_Accessibility",
   "Win32_UI_HiDpi",
+  "Win32_Graphics_Dwm",
   "Win32_Graphics_Gdi",
   "Win32_Storage_EnhancedStorage",
   "Win32_UI_Shell",
@@ -86,6 +87,7 @@ objc2-app-kit = { version = "0.3", default-features = false, features = [
   "std",
   "libc",
   "block2",
+  "NSGraphics",
   "NSRunningApplication",
   "NSScreen",
   "NSWorkspace",
@@ -108,6 +110,7 @@ objc2-core-graphics = { version = "0.3", default-features = false, features = [
   "CGEventSource",
   "CGEventTypes",
   "CGRemoteOperation",
+  "CGWindow",
 ] }
 objc2-core-foundation = { version = "0.3", default-features = false, features = [
   "std",

@@ -1,3 +1,4 @@
+pub mod alarm;
 pub mod autostart;
 pub mod banner;
 pub mod clicks;
