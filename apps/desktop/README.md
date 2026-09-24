@@ -68,12 +68,17 @@ private key, the `.p12` and its password are in `~/.apple-developer-id/`. The
 first notarization of the account took Apple about ten hours; the next ones take
 minutes.
 
-The Windows installer is not Authenticode signed, so SmartScreen warns on the
-first download of each version. Azure Artifact Signing needs a registered
-company in France, and SignPath shows "SignPath Foundation" as the publisher:
-the question comes back if Windows installs drop. Until then, send every
-published `.exe` to https://www.microsoft.com/wdsi/filesubmission as a software
-developer.
+The Windows installer is not Authenticode signed. SmartScreen warns on the first
+downloads of each version, an unsigned file carrying no reputation into the
+next one, and Smart App Control blocks it outright on the Windows 11 machines
+where it is on: the Windows page of the site tells those players to turn it off.
+Azure Artifact Signing needs a registered company in France, and SignPath shows
+"SignPath Foundation" as the publisher: the question comes back if Windows
+installs drop.
+
+https://www.microsoft.com/wdsi/filesubmission reviews a Microsoft Defender
+detection, and Microsoft offers no submission for SmartScreen reputation. Send
+a published `.exe` there, as a software developer, only when Defender flags it.
 
 0.1.0 could not prove the updater. 0.1.1 is its first run: it must install on
 both systems, and on Windows without SmartScreen.
