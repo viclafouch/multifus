@@ -7,6 +7,7 @@
 - Le tableau des runes suit la fenêtre de Dofus à 60 FPS quand vous la déplacez. C’est bien plus fluide.
 - Le menu de l’icône grise les boutons qui ne marchent pas sans personnage connecté.
 - Par défaut, la bannière du Déplacement rapide se pose maintenant en haut à gauche de l’écran.
+- « Est-ce que tout marche ? » n’est plus dans le menu de l’icône ni dans les raccourcis. Vous le trouvez dans les Paramètres.
 
 ### Corrections
 

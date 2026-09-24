@@ -1,8 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
-import { act, fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import type { Check } from '@/@types/onboarding'
 import { READING_FLOOR_MS } from '@/constants/health'
-import { ignore } from '@/lib/utils'
 import {
   WINDOWS_AGENT,
   onboardingOf,
@@ -21,18 +20,9 @@ const ALL_READY: readonly Check[] = [
   'ready'
 ]
 
-type HealthHandler = Parameters<
-  typeof import('@/lib/multifus').onHealthAsked
->[0]
-
-const tray = {
-  asked: null as HealthHandler | null
-}
-
 const bridge = {
   restartOnboarding: vi.fn(pending),
   openSystemPage: vi.fn(),
-  onHealthAsked: vi.fn(),
   checkHealth: vi.fn()
 }
 
@@ -69,12 +59,6 @@ const show = async ({
   } else {
     bridge.checkHealth.mockResolvedValue(snapshotOf())
   }
-
-  bridge.onHealthAsked.mockImplementation(async (handle: HealthHandler) => {
-    tray.asked = handle
-
-    return ignore
-  })
 
   await speakFrench()
 
@@ -227,18 +211,5 @@ describe('the check', () => {
 
     expect(screen.queryByText('Multifus ne peut pas tout lire ici')).toBeNull()
     expect(screen.getByText(ASKED[3])).not.toBeNull()
-  })
-
-  it('opens on the settings map when the tray calls it', async () => {
-    const { goToMap } = await show()
-
-    expect(screen.queryByText('Multifus ne peut pas tout lire ici')).toBeNull()
-
-    act(() => {
-      tray.asked?.(null)
-    })
-
-    expect(goToMap).toHaveBeenCalledWith('settings')
-    expect(await verdictOf('Multifus ne peut pas tout lire ici')).not.toBeNull()
   })
 })

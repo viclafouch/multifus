@@ -596,7 +596,6 @@ const CALLS = [
 const LISTENERS = [
   'onSnapshot',
   'onNavigate',
-  'onHealthAsked',
   'onBannerStep',
   'onClients',
   'onWheelStep',

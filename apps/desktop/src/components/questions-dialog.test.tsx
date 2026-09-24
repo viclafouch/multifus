@@ -1,7 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { QUESTIONS } from '@/constants/questions'
-import { ignore } from '@/lib/utils'
 import {
   APPLE_AGENT,
   WINDOWS_AGENT,
@@ -14,7 +13,6 @@ import {
 const bridge = {
   restartOnboarding: vi.fn(pending),
   openSystemPage: vi.fn(),
-  onHealthAsked: vi.fn(),
   checkHealth: vi.fn()
 }
 
@@ -40,9 +38,6 @@ const show = async ({ agent = WINDOWS_AGENT }: ShowParams = {}) => {
 
   bridge.openSystemPage.mockResolvedValue(null)
   bridge.checkHealth.mockResolvedValue(snapshotOf())
-  bridge.onHealthAsked.mockImplementation(async () => {
-    return ignore
-  })
 
   await speakFrench()
 

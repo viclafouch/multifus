@@ -3,10 +3,8 @@ import type { Snapshot } from '@/@types/snapshot'
 import { HealthDialog } from '@/components/health-dialog'
 import type { HelpDialog } from '@/components/help-context'
 import { HelpContext } from '@/components/help-context'
-import { useGoToMap } from '@/components/map-navigation-provider'
 import { QuestionsDialog } from '@/components/questions-dialog'
 import type { HealthSubject } from '@/helpers/health'
-import { useHealthCall } from '@/hooks/use-health-call'
 
 type HelpProviderProps = HealthSubject &
   Readonly<{
@@ -25,12 +23,6 @@ export const HelpProvider = ({
   children
 }: HelpProviderProps) => {
   const [shown, setShown] = React.useState<HelpDialog | null>(null)
-  const goToMap = useGoToMap()
-
-  useHealthCall(() => {
-    goToMap('settings')
-    setShown('health')
-  })
 
   return (
     <HelpContext value={setShown}>

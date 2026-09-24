@@ -1210,7 +1210,6 @@ msgstr "Send a test"
 msgid "Envoyez-vous un message maintenant, pour voir ce que ça donne dans Telegram."
 msgstr "Send yourself a message now, to see what it looks like in Telegram."
 
-#: src/constants/shortcuts.ts
 #: src/screens/settings/help-section.tsx
 msgid "Est-ce que tout marche ?"
 msgstr "Is everything working?"
@@ -2104,10 +2103,6 @@ msgstr "Osamodas"
 #: src/screens/rune-table/index.tsx
 msgid "Où il se montre"
 msgstr "Where it shows"
-
-#: src/constants/shortcuts.ts
-msgid "Ouvre Multifus sur le verdict des réglages."
-msgstr "Opens Multifus on the verdict of the settings."
 
 #: src/helpers/onboarding.ts
 msgid "Ouvrez les {options} de Dofus et cochez la case. Sans elle, le client se tait dès qu’il passe derrière, et Multifus n’a plus rien à écouter."

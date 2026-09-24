@@ -65,8 +65,6 @@ pub const SNAPSHOT_EVENT: &str = "multifus://snapshot";
 
 pub const NAVIGATE_EVENT: &str = "multifus://navigate";
 
-pub const HEALTH_EVENT: &str = "multifus://health";
-
 struct Wakes(PlatformWakeWatcher);
 
 pub fn start(app: AppHandle) {
@@ -801,12 +799,6 @@ pub fn request_authorization(app: &AppHandle) {
 
 pub fn navigate(app: &AppHandle, screen: Screen) {
     drop(app.emit(NAVIGATE_EVENT, screen));
-}
-
-pub fn ask_health(app: &AppHandle) {
-    drop(app.emit(HEALTH_EVENT, ()));
-
-    main_window::show(app);
 }
 
 pub fn change_language(app: &AppHandle, language: Language) {

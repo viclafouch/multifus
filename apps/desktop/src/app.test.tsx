@@ -17,7 +17,6 @@ const tray = {
 const bridge = {
   onSnapshot: vi.fn(),
   onNavigate: vi.fn(),
-  onHealthAsked: vi.fn(pending),
   snapshot: vi.fn(),
   bannerScreens: vi.fn(),
   wheelDisplay: vi.fn(),
