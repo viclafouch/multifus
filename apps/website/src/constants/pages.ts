@@ -150,8 +150,7 @@ export const SOFTWARE_PAGES = [
 
 export const HELP_PAGES = [
   'faq',
-  'windows',
-  'mac',
+  'journal',
   'ankama'
 ] as const satisfies readonly PageId[]
 

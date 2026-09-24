@@ -328,6 +328,10 @@ msgstr "Moving several characters at once"
 msgid "Déplacer sa team en multicompte sur Dofus Retro"
 msgstr "Move your whole team on Dofus Retro"
 
+#: src/components/release-entry.tsx
+msgid "Dernière version"
+msgstr "Latest version"
+
 #: src/constants/rivals.ts
 msgid "Deux équipes fixes, T1 et T2 : elles filtrent le cycle, elles n’enregistrent pas d’ordre."
 msgstr "Two fixed teams, T1 and T2: they filter the cycle, they save no order."
@@ -464,14 +468,6 @@ msgstr "Am I risking anything on my account?"
 #: src/constants/wording.ts
 msgid "Jouez en multicompte sur Dofus Retro sans jamais chercher une fenêtre."
 msgstr "Play multiple accounts on Dofus Retro without ever hunting for a window."
-
-#: src/constants/wording.ts
-msgid "Journal des versions"
-msgstr "Changelog"
-
-#: src/constants/wording.ts
-msgid "Journal des versions du multicompte Dofus Retro"
-msgstr "Changelog of the Dofus Retro multi-account app"
 
 #: src/constants/questions.ts
 msgid "L’accès aux notifications, et rien d’autre."
@@ -950,6 +946,10 @@ msgstr "No. Windows 10 or Windows 11 is needed."
 msgid "Non. Multifus ne connaît que <0>Dofus Retro</0>, toutes versions 1.x : la 1.29, la 1.40, et celles d’après."
 msgstr "No. Multifus only knows <0>Dofus Retro</0>, every 1.x version: 1.29, 1.40, and the ones after."
 
+#: src/constants/wording.ts
+msgid "Notes de mise à jour"
+msgstr "Patch notes"
+
 #: src/components/out-link.tsx
 msgid "nouvel onglet"
 msgstr "new tab"
@@ -1248,6 +1248,10 @@ msgstr "Quick texts from the keyboard on Dofus Retro"
 msgid "Tout est pareil sur Mac et sur Windows ?"
 msgstr "Is everything the same on Mac and on Windows?"
 
+#: src/components/release-rail.tsx
+msgid "Toutes les versions"
+msgstr "All versions"
+
 #: src/constants/bodies.ts
 msgid "Un bouton le replace au coin de la fenêtre du jeu si vous le perdez de vue."
 msgstr "A button puts it back in the corner of the game window if you lose sight of it."
@@ -1332,7 +1336,7 @@ msgstr "One key, one character"
 msgid "Vérifiez ce tableau vous-même"
 msgstr "Check this table yourself"
 
-#: src/screens/journal-screen.tsx
+#: src/components/release-entry.tsx
 msgid "Version"
 msgstr "Version"
 

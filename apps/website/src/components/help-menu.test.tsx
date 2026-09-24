@@ -11,7 +11,7 @@ import { pathOf } from '@/helpers/page'
 import { SPEAKERS } from '@/lib/i18n'
 import { showAt } from '@/test-router'
 
-const show = (language: Language, page: 'home' | 'mac' = 'home') => {
+const show = (language: Language, page: 'home' | 'journal' = 'home') => {
   return showAt({
     at: pathOf({ page, language }),
     children: (
@@ -83,7 +83,7 @@ describe('the help menu of the mast', () => {
   })
 
   it('marks the tab when the page being read is one of its own', () => {
-    show('fr', 'mac')
+    show('fr', 'journal')
 
     expect(tabOf('fr')?.getAttribute('aria-current')).toBe('location')
   })
@@ -100,7 +100,7 @@ describe('the help menu of the mast', () => {
     const hinge = hingeOf()
 
     hinge.open = true
-    fireEvent.click(linkNamed(SPEAKERS.fr._(PAGE_NAMES.mac)))
+    fireEvent.click(linkNamed(SPEAKERS.fr._(PAGE_NAMES.journal)))
 
     expect(hinge.open).toBe(false)
   })

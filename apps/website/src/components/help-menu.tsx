@@ -1,10 +1,9 @@
 import { useLingui } from '@lingui/react'
 import { cn } from '@multifus/retro'
 import type { Icon } from '@phosphor-icons/react'
-import { AppleLogoIcon } from '@phosphor-icons/react/dist/ssr/AppleLogo'
 import { QuestionIcon } from '@phosphor-icons/react/dist/ssr/Question'
 import { ScalesIcon } from '@phosphor-icons/react/dist/ssr/Scales'
-import { WindowsLogoIcon } from '@phosphor-icons/react/dist/ssr/WindowsLogo'
+import { ScrollIcon } from '@phosphor-icons/react/dist/ssr/Scroll'
 import type { PageId } from '@/@types/page'
 import {
   HINGE_ENTRY,
@@ -21,8 +20,7 @@ import { useHinge } from '@/hooks/use-hinge'
 
 const HELP_MARKS = {
   faq: QuestionIcon,
-  windows: WindowsLogoIcon,
-  mac: AppleLogoIcon,
+  journal: ScrollIcon,
   ankama: ScalesIcon
 } as const satisfies Record<(typeof HELP_PAGES)[number], Icon>
 

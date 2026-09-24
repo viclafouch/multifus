@@ -16,7 +16,7 @@ export const PAGE_NAMES = {
   comparison: msg`Comparatif`,
   download: msg`Télécharger`,
   faq: msg`Questions fréquentes`,
-  journal: msg`Journal des versions`,
+  journal: msg`Notes de mise à jour`,
   ankama: msg`Ankama tolère-t-il Multifus ?`,
   legal: msg`Mentions légales`
 } as const satisfies Record<PageId, MessageDescriptor>
@@ -34,7 +34,7 @@ export const PAGE_TITLES = {
   comparison: msg`Comparatif des logiciels multicompte Dofus Retro`,
   download: msg`Télécharger le logiciel multicompte Dofus Retro`,
   faq: msg`Le multicompte Dofus Retro en questions`,
-  journal: msg`Journal des versions du multicompte Dofus Retro`,
+  journal: msg`Notes de mise à jour`,
   ankama: msg`Le multicompte est-il autorisé sur Dofus Retro ?`,
   legal: msg`Mentions légales`
 } as const satisfies Record<PageId, MessageDescriptor>

@@ -112,3 +112,7 @@ export const releasesOf = (changelog: string): readonly ChangelogRelease[] => {
 
   return releases
 }
+
+export const anchorOf = (version: string) => {
+  return `v${version}`
+}
