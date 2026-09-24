@@ -15,6 +15,7 @@
 - Closing Dofus also closes its rune table.
 - Fixed the starting position of the rune table, in the top right corner. It now opens in the middle of the Dofus window.
 - On Windows, the notifications step asked you to tick Multifus in a list where it never shows. It now points at the right switch.
+- The Multifus window could go full screen, where it has no business being. The button that maximizes it is now disabled.
 
 ## 0.1.0 - 2026-09-23
 

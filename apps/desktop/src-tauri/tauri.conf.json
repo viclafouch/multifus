@@ -23,6 +23,7 @@
         "preventOverflow": true,
         "center": true,
         "resizable": true,
+        "maximizable": false,
         "visible": false,
         "theme": "Dark",
         "titleBarStyle": "Transparent",

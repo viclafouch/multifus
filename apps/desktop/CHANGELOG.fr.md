@@ -15,6 +15,7 @@
 - Fermer Dofus ferme aussi son tableau des runes.
 - Corrige la position de départ du tableau des runes, en haut à droite. Il s’ouvre désormais au milieu de la fenêtre de Dofus.
 - Sur Windows, l’étape des notifications vous demandait de cocher Multifus dans une liste où il n’apparaît jamais. Elle montre maintenant le bon interrupteur.
+- La fenêtre de Multifus pouvait passer en plein écran, où elle n’a rien à faire. Le bouton pour l’agrandir est maintenant désactivé.
 
 ## 0.1.0 - 2026-09-23
 

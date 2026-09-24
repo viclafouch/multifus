@@ -15,6 +15,7 @@
 - Cerrar Dofus también cierra su tabla de runas.
 - Corrige la posición inicial de la tabla de runas, arriba a la derecha. Ahora se abre en el centro de la ventana de Dofus.
 - En Windows, el paso de las notificaciones te pedía marcar Multifus en una lista donde nunca aparece. Ahora muestra el interruptor correcto.
+- La ventana de Multifus podía pasar a pantalla completa, donde no pinta nada. El botón para maximizarla ahora está desactivado.
 
 ## 0.1.0 - 2026-09-23
 
