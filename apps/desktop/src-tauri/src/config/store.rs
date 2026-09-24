@@ -315,7 +315,7 @@ mod tests {
                 send_body: true,
             },
             banner: Banner {
-                corner: BannerCorner::TopLeft,
+                corner: BannerCorner::BottomRight,
                 screen: Some("DISPLAY2".to_owned()),
             },
             wheel: Wheel { diameter: 300 },

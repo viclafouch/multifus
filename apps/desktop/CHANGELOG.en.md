@@ -6,6 +6,7 @@
 
 - The rune table follows the Dofus window at 60 FPS as you drag it. Much smoother.
 - The icon menu greys out the buttons that do not work with no character online.
+- By default, the Quick move banner now sits in the top left corner of the screen.
 
 ### Fixed
 

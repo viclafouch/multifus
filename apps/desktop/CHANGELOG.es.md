@@ -6,6 +6,7 @@
 
 - La tabla de runas sigue la ventana de Dofus a 60 FPS cuando la mueves. Mucho más fluido.
 - El menú del icono pone en gris los botones que no funcionan sin un personaje conectado.
+- Por defecto, el cartel del Movimiento rápido se coloca ahora arriba a la izquierda de la pantalla.
 
 ### Correcciones
 

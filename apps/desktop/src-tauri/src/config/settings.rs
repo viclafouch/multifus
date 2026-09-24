@@ -82,10 +82,10 @@ pub struct Banner {
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum BannerCorner {
+    #[default]
     TopLeft,
     TopRight,
     BottomLeft,
-    #[default]
     BottomRight,
 }
 

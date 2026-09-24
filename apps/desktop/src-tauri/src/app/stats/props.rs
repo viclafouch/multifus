@@ -261,7 +261,7 @@ mod tests {
         assert_eq!(props["start_at_login"], json!(false));
         assert_eq!(props["auto_focus"], json!(true));
         assert_eq!(props["auto_focus_kinds"], json!(7));
-        assert_eq!(props["banner_corner"], json!("bottom_right"));
+        assert_eq!(props["banner_corner"], json!("top_left"));
         assert_eq!(props["quick_texts"], json!(1));
         assert_eq!(props["quick_texts_bound"], json!(0));
         assert_eq!(props["shortcuts_changed"], json!(0));

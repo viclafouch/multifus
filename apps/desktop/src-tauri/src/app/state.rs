@@ -4873,7 +4873,7 @@ mod tests {
         state.set_class("Alpha", Some(Class::Iop));
         state.set_paired(42);
         state.set_short_titles(false);
-        state.set_banner_corner(BannerCorner::TopLeft);
+        state.set_banner_corner(BannerCorner::BottomRight);
 
         state.reset();
 
@@ -4882,7 +4882,7 @@ mod tests {
         assert_eq!(snapshot.characters, Vec::new());
         assert!(snapshot.short_titles);
         assert!(!snapshot.relay.paired);
-        assert_eq!(snapshot.walk.banner.corner, BannerCorner::BottomRight);
+        assert_eq!(snapshot.walk.banner.corner, BannerCorner::TopLeft);
         assert!(journalled(&state).contains(&JournalEvent::Reset));
         assert_eq!(
             multifus_reloaded(&directory).snapshot().characters,
