@@ -48,7 +48,7 @@ tick, granted once and stable. To see Multifus answer for itself, bundle it and
 let LaunchServices open it:
 
 ```
-pnpm run build:app -- --debug
+pnpm run build:app --debug
 open src-tauri/target/debug/bundle/macos/Multifus.app
 ```
 
