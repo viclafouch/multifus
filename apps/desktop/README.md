@@ -51,3 +51,29 @@ let LaunchServices open it:
 pnpm run build:app -- --debug
 open src-tauri/target/debug/bundle/macos/Multifus.app
 ```
+
+## Releasing
+
+A `v*` tag builds both systems into a draft release. Test the draft files, then
+publish it: the site rebuilds itself and points its buttons at them.
+
+The updater key pair lives in `~/.tauri/multifus.key` and its `.pub`, and the
+public half is `plugins.updater.pubkey` in `tauri.conf.json`. A new pair would
+leave every installed copy unable to trust an update. The key has an empty
+password, so `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` stays unset: a missing secret
+expands to the empty string the key expects.
+
+The Developer ID Application certificate expires on 17 September 2031. Its
+private key, the `.p12` and its password are in `~/.apple-developer-id/`. The
+first notarization of the account took Apple about ten hours; the next ones take
+minutes.
+
+The Windows installer is not Authenticode signed, so SmartScreen warns on the
+first download of each version. Azure Artifact Signing needs a registered
+company in France, and SignPath shows "SignPath Foundation" as the publisher:
+the question comes back if Windows installs drop. Until then, send every
+published `.exe` to https://www.microsoft.com/wdsi/filesubmission as a software
+developer.
+
+0.1.0 could not prove the updater. 0.1.1 is its first run: it must install on
+both systems, and on Windows without SmartScreen.
