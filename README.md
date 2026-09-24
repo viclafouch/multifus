@@ -12,20 +12,17 @@ account, no ads, and [within Ankama's rules](https://www.multifus.app/en/ankama)
 
 macOS 13.3 or later, on Intel and Apple Silicon. Signed and notarized by Apple.
 
-[Download for Mac](https://www.multifus.app/en/download) ·
-[Multifus on Mac](https://www.multifus.app/en/mac)
+[Download for Mac](https://www.multifus.app/en/download)
 
 ### Windows
 
 Windows 10 or 11. Windows may warn about a new app: click **More info**, then
 **Run anyway**.
 
-[Download for Windows](https://www.multifus.app/en/download) ·
-[Multifus on Windows](https://www.multifus.app/en/windows)
+[Download for Windows](https://www.multifus.app/en/download)
 
-Every version is on the [releases page](https://github.com/viclafouch/multifus/releases),
-and what each one changed is in the [changelog](https://www.multifus.app/en/changelog).
-Multifus updates itself from there.
+Multifus updates itself. What each version changed is in the
+[changelog](https://www.multifus.app/en/changelog).
 
 ## Features
 

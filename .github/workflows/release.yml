@@ -18,13 +18,17 @@ concurrency:
 
 env:
   RELEASE_BODY: |
-    **Français** · [Télécharger Multifus](https://www.multifus.app/telecharger) · [Ce que cette version change](https://www.multifus.app/journal)
+    ## Changelog
 
-    **English** · [Download Multifus](https://www.multifus.app/en/download) · [What this version changes](https://www.multifus.app/en/changelog)
+    [English](https://www.multifus.app/en/changelog) · [Français](https://www.multifus.app/journal) · [Español](https://www.multifus.app/es/novedades)
 
-    **Español** · [Descargar Multifus](https://www.multifus.app/es/descargar) · [Lo que cambia esta versión](https://www.multifus.app/es/novedades)
+    ## Assets
 
-    Mac `.dmg` · Windows `.exe`
+    - `Multifus_*_universal.dmg`: macOS 13.3 or later, Apple Silicon and Intel, signed and notarized by Apple
+    - `Multifus_*_x64-setup.exe`: Windows 10 or 11 installer, not code-signed yet
+    - `latest.json`, `*.sig`, `*.app.tar.gz`: read by the in-app updater
+
+    Every installer carries a build provenance attestation: `gh attestation verify <file> -R viclafouch/multifus`
 
 jobs:
   checks:
