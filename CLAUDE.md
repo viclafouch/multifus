@@ -4,8 +4,7 @@ A multi-account window manager for Dofus Retro, on macOS and Windows. A
 notification arrives in the game, Multifus brings the window of that character to
 the front. You start it, you forget it.
 
-Nothing is released yet and nobody has it installed, so a breaking change is
-cheap and the clean fix beats the compatible one.
+Players have Multifus installed, so a breaking change has to carry their copies.
 
 In this file, **you** is the agent reading it, **I** is Victor, the only
 developer.

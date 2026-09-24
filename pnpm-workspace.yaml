@@ -7,6 +7,10 @@ minimumReleaseAgeExclude:
   - vite@8.3.0
   - '@viclafouch/oxc-config@1.0.0-alpha.28'
 
+peerDependencyRules:
+  allowedVersions:
+    '@vitejs/plugin-react>oxc-transform-react': '0.151'
+
 onlyBuiltDependencies:
   - '@tailwindcss/oxide'
   - esbuild
