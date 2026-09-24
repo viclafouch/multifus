@@ -78,7 +78,7 @@ const show = async ({
 
   const { speak } = await import('@/lib/i18n')
 
-  speak(speaks)
+  await speak(speaks)
 
   const { OnboardingGuide } = await import('@/screens/onboarding/guide')
   const run = vi.fn()

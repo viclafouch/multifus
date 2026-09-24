@@ -1,6 +1,7 @@
 import React from 'react'
 import { windowPainted } from '@/lib/multifus'
 import { ignore } from '@/lib/utils'
+import { loadMaps } from '@/screens/deferred-map'
 
 const matchIsDrawn = (image: HTMLImageElement) => {
   return getComputedStyle(image).opacity !== '0'
@@ -25,6 +26,6 @@ export const useShowWhenPainted = (isReady: boolean) => {
       return
     }
 
-    showOnceSettled().catch(ignore)
+    showOnceSettled().then(loadMaps, loadMaps).catch(ignore)
   }, [isReady])
 }

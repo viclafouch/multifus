@@ -207,5 +207,5 @@ export const snapshotOf = (fields: Partial<Snapshot> = {}) => {
 export const speakFrench = async () => {
   const { SOURCE_LANGUAGE, speak } = await import('@/lib/i18n')
 
-  speak(SOURCE_LANGUAGE)
+  await speak(SOURCE_LANGUAGE)
 }

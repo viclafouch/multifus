@@ -13,6 +13,7 @@ import type { ConfigProblem } from '@/@types/system'
 import { ONBOARDING_ANCHOR } from '@/constants/onboarding'
 import { MAP_NAMES, MAPS } from '@/constants/world'
 import { ignore } from '@/lib/utils'
+import { loadMaps } from '@/screens/deferred-map'
 import { characterOf, onboardingOf, pending, snapshotOf } from '@/test-doubles'
 
 type TrayHandler = Parameters<typeof import('@/lib/multifus').onNavigate>[0]
@@ -59,6 +60,7 @@ const open = async (snapshot: Snapshot) => {
   render(<App />)
 
   await screen.findByRole('heading', { level: 1 })
+  await loadMaps()
 }
 
 const goBack = () => {

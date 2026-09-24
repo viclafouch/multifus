@@ -26,7 +26,7 @@ const speakThenShow = async (root: Root, screen: React.ReactNode) => {
     return SOURCE_LANGUAGE
   })
 
-  speak(spoken)
+  await speak(spoken)
 
   root.render(<React.StrictMode>{screen}</React.StrictMode>)
 }

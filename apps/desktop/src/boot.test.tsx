@@ -38,8 +38,8 @@ const press = (init: KeyboardEventInit) => {
 }
 
 describe('the boot of an entry point', () => {
-  afterEach(() => {
-    speak(SOURCE_LANGUAGE)
+  afterEach(async () => {
+    await speak(SOURCE_LANGUAGE)
     document.querySelector('#root')?.remove()
   })
 

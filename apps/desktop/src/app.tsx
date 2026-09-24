@@ -1,3 +1,4 @@
+import React from 'react'
 import { Shade } from '@multifus/retro'
 import type { ConfigProblem } from '@/@types/system'
 import { AuthorizationBanner } from '@/components/authorization-banner'
@@ -29,7 +30,7 @@ import {
 } from '@/lib/multifus'
 import { ignore } from '@/lib/utils'
 import { ClearingScreen } from '@/screens/clearing'
-import { CurrentMap } from '@/screens/current-map'
+import { DeferredMap } from '@/screens/deferred-map'
 import { OnboardingGuide } from '@/screens/onboarding/guide'
 
 export const App = () => {
@@ -130,7 +131,9 @@ export const App = () => {
                       setMap(CLEARING)
                     }}
                   >
-                    <CurrentMap map={map} snapshot={snapshot} run={run} />
+                    <React.Suspense fallback={null}>
+                      <DeferredMap map={map} snapshot={snapshot} run={run} />
+                    </React.Suspense>
                   </MapFrame>
                 )}
               </div>

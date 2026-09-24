@@ -25,7 +25,7 @@ const describeTheSystem = () => {
 
 describeTheSystem()
 
-speak(SOURCE_LANGUAGE)
+await speak(SOURCE_LANGUAGE)
 
 class SilentResizeObserver implements ResizeObserver {
   observe = ignore
