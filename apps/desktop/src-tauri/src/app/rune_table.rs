@@ -256,8 +256,6 @@ impl RuneTable {
 
 pub fn setup(app: &AppHandle) {
     app.manage(RuneTable::default());
-
-    build(app);
 }
 
 pub fn toggle(app: &AppHandle, here: Option<WindowId>) {
@@ -993,14 +991,22 @@ fn matches_same_edge(one: f64, other: f64) -> bool {
     (one - other).abs() <= EDGE_GRAIN
 }
 
-fn build(app: &AppHandle) {
+pub fn build(app: &AppHandle) {
     let width = f64::from(lock(app).rune_table_width());
 
     let Some(window) = OVERLAY.build(app, LogicalSize::new(width, width * GUESSED_RATIO)) else {
         return;
     };
 
-    hold_back_activation(app, &window);
+    set_floating(app, app.state::<RuneTable>().mode().matches_previewing());
+
+    let held_back = app.run_on_main_thread({
+        let app = app.clone();
+
+        move || hold_back_activation(&app, &window)
+    });
+
+    OVERLAY.said(app, held_back);
 }
 
 #[cfg(target_os = "macos")]

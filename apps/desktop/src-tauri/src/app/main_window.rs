@@ -10,6 +10,7 @@ use tauri::Window;
 use tauri::WindowEvent;
 use tauri::Wry;
 
+use crate::app::build_overlays;
 use crate::app::journal::JournalEvent;
 use crate::app::journal::Launch;
 use crate::app::runtime;
@@ -23,6 +24,8 @@ pub const LABEL: &str = "main";
 pub const FROM_SESSION_ARG: &str = "--from-session";
 
 const PAINT_GRACE: Duration = Duration::from_millis(1500);
+
+const OVERLAYS_AFTER_SHOW: Duration = Duration::from_millis(500);
 
 #[derive(Default)]
 struct Wait {
@@ -61,7 +64,11 @@ pub fn hold_until_ready(app: &AppHandle) {
     });
 
     if is_due {
-        show(app);
+        show_and_build_overlays(app);
+    }
+
+    if !is_awaited {
+        build_overlays_later(app);
     }
 
     later(app, PAINT_GRACE, |app| show_when_ready(app, LABEL));
@@ -77,8 +84,17 @@ pub fn show_when_ready(app: &AppHandle, label: &str) {
     });
 
     if is_due {
-        show(app);
+        show_and_build_overlays(app);
     }
+}
+
+fn show_and_build_overlays(app: &AppHandle) {
+    show(app);
+    build_overlays_later(app);
+}
+
+fn build_overlays_later(app: &AppHandle) {
+    later(app, OVERLAYS_AFTER_SHOW, build_overlays);
 }
 
 fn later(app: &AppHandle, delay: Duration, work: fn(&AppHandle)) {

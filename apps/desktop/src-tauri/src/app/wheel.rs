@@ -326,8 +326,6 @@ pub fn demo_crowd() -> usize {
 
 pub fn setup(app: &AppHandle) {
     app.manage(Wheel::default());
-
-    build(app);
 }
 
 pub fn open(app: &AppHandle, here: WindowId) {
@@ -752,7 +750,7 @@ fn framed(diameter: u32) -> f64 {
     f64::from(diameter) + HALO * 2.0
 }
 
-fn build(app: &AppHandle) {
+pub fn build(app: &AppHandle) {
     let widest = framed(WHEEL_WIDEST);
 
     let Some(window) = OVERLAY.build(app, LogicalSize::new(widest, widest)) else {

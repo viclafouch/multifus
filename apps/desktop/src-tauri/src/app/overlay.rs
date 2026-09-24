@@ -79,6 +79,10 @@ impl Overlay {
     }
 
     pub fn build(&self, app: &AppHandle, size: LogicalSize<f64>) -> Option<WebviewWindow> {
+        if let Some(window) = self.window(app) {
+            return Some(window);
+        }
+
         let built = WebviewWindowBuilder::new(app, self.label, WebviewUrl::App(self.page.into()))
             .title("Multifus")
             .inner_size(size.width, size.height)

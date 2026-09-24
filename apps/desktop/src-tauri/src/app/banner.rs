@@ -45,8 +45,6 @@ struct BannerGeneration(Generation);
 
 pub fn setup(app: &AppHandle) {
     app.manage(BannerGeneration::default());
-
-    build(app);
 }
 
 pub fn follow_walk(app: &AppHandle, enabled: bool, inside_game: bool) {
@@ -179,7 +177,7 @@ fn veil(app: &AppHandle) {
     OVERLAY.said(app, window.hide());
 }
 
-fn build(app: &AppHandle) -> Option<WebviewWindow> {
+pub fn build(app: &AppHandle) -> Option<WebviewWindow> {
     let window = OVERLAY.build(app, LogicalSize::new(WIDTH, HEIGHT))?;
 
     OVERLAY.said(app, window.set_ignore_cursor_events(true));

@@ -108,6 +108,12 @@ pub fn setup(app: &AppHandle) -> Result<(), ConfigError> {
     Ok(())
 }
 
+pub fn build_overlays(app: &AppHandle) {
+    banner::build(app);
+    wheel::build(app);
+    rune_table::build(app);
+}
+
 fn install_crypto_provider() {
     drop(rustls::crypto::ring::default_provider().install_default());
 }

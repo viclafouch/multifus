@@ -8,6 +8,7 @@
 - Le menu de l’icône grise les boutons qui ne marchent pas sans personnage connecté.
 - Par défaut, la bannière du Déplacement rapide se pose maintenant en haut à gauche de l’écran.
 - « Est-ce que tout marche ? » n’est plus dans le menu de l’icône ni dans les raccourcis. Vous le trouvez dans les Paramètres.
+- Multifus s’ouvre 1,5 fois plus vite quand vous le lancez.
 
 ### Corrections
 
