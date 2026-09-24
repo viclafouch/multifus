@@ -209,6 +209,23 @@ struct Contents {
     relay: RelayItem,
 }
 
+impl Contents {
+    fn matches_anyone_connected(&self) -> bool {
+        !self.entries.is_empty()
+    }
+
+    fn matches_switchable(&self, is_on: bool) -> bool {
+        is_on || self.matches_anyone_connected()
+    }
+
+    fn matches_relay_switchable(&self) -> bool {
+        match self.relay {
+            RelayItem::NotReady | RelayItem::On => true,
+            RelayItem::Off => self.matches_anyone_connected(),
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum RelayItem {
     NotReady,
@@ -393,7 +410,7 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
         app,
         MAXIMIZE_ALL_ID,
         words.maximize_all,
-        true,
+        contents.matches_anyone_connected(),
         None::<&str>,
     )?)?;
 
@@ -407,7 +424,7 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
             words.auto_focus_off,
             words.auto_focus_on,
         ),
-        true,
+        contents.matches_switchable(contents.auto_focus),
         None::<&str>,
     )?)?;
 
@@ -415,7 +432,7 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
         app,
         WALK_ID,
         switch_label(contents.walk, words.walk_off, words.walk_on),
-        true,
+        contents.matches_switchable(contents.walk),
         None::<&str>,
     )?)?;
 
@@ -427,7 +444,7 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
             words.rune_table_off,
             words.rune_table_on,
         ),
-        true,
+        contents.matches_switchable(contents.rune_table),
         None::<&str>,
     )?)?;
 
@@ -445,7 +462,7 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
         app,
         RELAY_ID,
         relay_label(contents.relay, contents.language),
-        true,
+        contents.matches_relay_switchable(),
         None::<&str>,
     )?)?;
 
@@ -772,6 +789,79 @@ mod tests {
         state.set_walk_enabled(true, WalkFrom::Shortcut);
 
         assert_ne!(contents(&state), shown);
+    }
+
+    #[test]
+    fn with_nobody_connected_the_menu_greys_what_acts_on_a_client() {
+        let directory = directory();
+        let mut state = test_doubles::multifus(
+            &directory,
+            test_doubles::intact(Settings {
+                roster: Roster::from_characters(vec![Character::new("Alpha")]),
+                ..Settings::default()
+            }),
+        );
+
+        state.apply_windows(&[]);
+
+        let empty = contents(&state);
+
+        assert!(!empty.matches_anyone_connected());
+        assert!(!empty.matches_switchable(empty.walk));
+
+        state.apply_windows(&[test_doubles::game_window(1, "Alpha")]);
+
+        let playing = contents(&state);
+
+        assert!(playing.matches_anyone_connected());
+        assert!(playing.matches_switchable(playing.walk));
+    }
+
+    #[test]
+    fn with_nobody_connected_the_relay_can_be_set_up_or_stopped_but_not_started() {
+        let directory = directory();
+        let state = test_doubles::multifus(&directory, test_doubles::intact(Settings::default()));
+        let nobody = contents(&state);
+
+        assert!(
+            !Contents {
+                relay: RelayItem::Off,
+                ..nobody.clone()
+            }
+            .matches_relay_switchable()
+        );
+        assert!(
+            Contents {
+                relay: RelayItem::On,
+                ..nobody.clone()
+            }
+            .matches_relay_switchable()
+        );
+        assert!(
+            Contents {
+                relay: RelayItem::NotReady,
+                ..nobody
+            }
+            .matches_relay_switchable(),
+            "setting the relay up only opens a screen, and is prepared before the game"
+        );
+    }
+
+    #[test]
+    fn a_switch_left_on_can_always_be_turned_off_from_the_menu() {
+        let directory = directory();
+        let mut state =
+            test_doubles::multifus(&directory, test_doubles::intact(Settings::default()));
+
+        state.set_rune_table_shown(true, false);
+
+        let shown = contents(&state);
+
+        assert!(!shown.matches_anyone_connected());
+        assert!(
+            shown.matches_switchable(shown.rune_table),
+            "a switch nobody could turn off from the menu would be a door with no way out"
+        );
     }
 
     #[test]

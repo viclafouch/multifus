@@ -22,6 +22,7 @@ use crate::app::overlay::Generation;
 use crate::app::overlay::Overlay;
 use crate::app::overlay::holds_point;
 use crate::app::panics;
+use crate::app::runtime;
 use crate::app::state::lock;
 use crate::app::state::windows;
 use crate::config::RUNE_TABLE_CLEAREST;
@@ -418,8 +419,13 @@ fn follow_game(app: &AppHandle) {
 
     let frame = match windows(app).window_frame(window) {
         Ok(Some(frame)) => frame,
-        Ok(None) | Err(PlatformError::WindowGone) => {
+        Ok(None) => {
             veil(app);
+
+            return;
+        }
+        Err(PlatformError::WindowGone) => {
+            close_with_its_client(app);
 
             return;
         }
@@ -443,6 +449,18 @@ fn follow_game(app: &AppHandle) {
 
     lay_over(app, frame, size, kept_offset(app, frame, size));
     stack_above(app, window);
+}
+
+fn close_with_its_client(app: &AppHandle) {
+    let table = app.state::<RuneTable>();
+
+    table.lay(Mode::Hidden);
+
+    *table.preview_offset() = None;
+
+    tell_state(app);
+    veil(app);
+    runtime::emit_snapshot(app);
 }
 
 fn carrier(table: &RuneTable, windows: &dyn WindowManager) -> platform::Result<Option<WindowId>> {
