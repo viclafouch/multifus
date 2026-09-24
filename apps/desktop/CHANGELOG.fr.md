@@ -1,5 +1,19 @@
 # Notes de mise à jour
 
+## Unreleased
+
+### Améliorations
+
+- Le tableau des runes suit la fenêtre de Dofus à 60 FPS quand vous la déplacez. C’est bien plus fluide.
+- Le menu de l’icône grise les boutons qui ne marchent pas sans personnage connecté.
+
+### Corrections
+
+- Le tableau des runes ne s’affichait que si la fenêtre de Dofus était au premier plan. Il reste maintenant visible.
+- Fermer Dofus ferme aussi son tableau des runes.
+- Corrige la position de départ du tableau des runes, en haut à droite. Il s’ouvre désormais au milieu de la fenêtre de Dofus.
+- Sur Windows, l’étape des notifications vous demandait de cocher Multifus dans une liste où il n’apparaît jamais. Elle montre maintenant le bon interrupteur.
+
 ## 0.1.0 - 2026-09-23
 
 ### La première version

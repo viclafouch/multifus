@@ -1,5 +1,19 @@
 # Patch notes
 
+## Unreleased
+
+### Improved
+
+- The rune table follows the Dofus window at 60 FPS as you drag it. Much smoother.
+- The icon menu greys out the buttons that do not work with no character online.
+
+### Fixed
+
+- The rune table only showed while the Dofus window was in front. It now stays visible.
+- Closing Dofus also closes its rune table.
+- Fixed the starting position of the rune table, in the top right corner. It now opens in the middle of the Dofus window.
+- On Windows, the notifications step asked you to tick Multifus in a list where it never shows. It now points at the right switch.
+
 ## 0.1.0 - 2026-09-23
 
 ### The first version

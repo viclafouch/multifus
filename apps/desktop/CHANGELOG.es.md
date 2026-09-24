@@ -1,5 +1,19 @@
 # Notas del parche
 
+## Unreleased
+
+### Mejoras
+
+- La tabla de runas sigue la ventana de Dofus a 60 FPS cuando la mueves. Mucho más fluido.
+- El menú del icono pone en gris los botones que no funcionan sin un personaje conectado.
+
+### Correcciones
+
+- La tabla de runas solo aparecía si la ventana de Dofus estaba delante. Ahora se queda visible.
+- Cerrar Dofus también cierra su tabla de runas.
+- Corrige la posición inicial de la tabla de runas, arriba a la derecha. Ahora se abre en el centro de la ventana de Dofus.
+- En Windows, el paso de las notificaciones te pedía marcar Multifus en una lista donde nunca aparece. Ahora muestra el interruptor correcto.
+
 ## 0.1.0 - 2026-09-23
 
 ### La primera versión

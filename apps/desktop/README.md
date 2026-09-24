@@ -54,6 +54,10 @@ open src-tauri/target/debug/bundle/macos/Multifus.app
 
 ## Releasing
 
+The commit that raises the version renames `## Unreleased` to
+`## <version> - <day>` in the three `CHANGELOG.<language>.md`, and the release
+refuses a tag whose notes are left unnamed.
+
 A `v*` tag builds both systems into a draft release. Test the draft files, then
 publish it: the site rebuilds itself and points its buttons at them.
 

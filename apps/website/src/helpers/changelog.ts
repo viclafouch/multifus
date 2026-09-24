@@ -9,6 +9,8 @@ export type ChangelogRelease = Readonly<{
   sections: readonly ChangelogSection[]
 }>
 
+const UNRELEASED = 'Unreleased'
+
 const RELEASE_HEADING =
   /^\[?(?<version>[^\]\s]+)\]?(?:\s+[-–—]\s+(?<day>\d{4}-\d{2}-\d{2}))?$/u
 
@@ -110,7 +112,9 @@ export const releasesOf = (changelog: string): readonly ChangelogRelease[] => {
     throw new Error(`changelog: version ${twice} is written twice`)
   }
 
-  return releases
+  return releases.filter(({ version }) => {
+    return version !== UNRELEASED
+  })
 }
 
 export const anchorOf = (version: string) => {

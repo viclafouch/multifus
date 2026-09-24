@@ -60,6 +60,24 @@ describe('releasesOf', () => {
     expect(only.day).toBe('2026-11-02')
   })
 
+  it('keeps the unreleased notes off the site', () => {
+    const releases = releasesOf(
+      `## Unreleased\n\n### Tableau des runes\n\n- Rien.\n\n${CHANGELOG}`
+    )
+
+    expect(
+      releases.map(({ version }) => {
+        return version
+      })
+    ).toStrictEqual(['0.2.0', '0.1.0'])
+  })
+
+  it('fails on unreleased notes that carry no section', () => {
+    expect(() => {
+      return releasesOf('## Unreleased\n\nRien à dire.')
+    }).toThrow('has no section')
+  })
+
   it('leaves out the title of the file, which is not a version', () => {
     expect(releasesOf('# Journal des versions\n')).toStrictEqual([])
   })

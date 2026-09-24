@@ -1,0 +1,21 @@
+head -n 1 "$1" | grep -Eq '^(feat|fix|perf)(\(.+\))?!?: ' || exit 0
+tr -d '\r' < "$1" | grep -qix 'Changelog: none' && exit 0
+git diff --cached --quiet -- apps/desktop ':!apps/desktop/*.md' && exit 0
+
+missing=""
+
+for language in fr en es; do
+  git diff --cached -U0 -- "apps/desktop/CHANGELOG.$language.md" | grep -q '^+- ' || missing="$missing CHANGELOG.$language.md"
+done
+
+[ -z "$missing" ] && exit 0
+
+cat >&2 <<EOF
+commit-msg: this commit changes apps/desktop, and the patch notes say nothing about it.
+Missing a line in:$missing
+
+A player can see it: add its line under "## Unreleased" of the three apps/desktop/CHANGELOG.<language>.md, as .claude/skills/changelog/SKILL.md says.
+A player cannot see it: end the message with the line "Changelog: none".
+EOF
+
+exit 1
