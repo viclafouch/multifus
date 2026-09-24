@@ -5,6 +5,7 @@ use std::sync::PoisonError;
 use std::sync::atomic::AtomicBool;
 use std::sync::atomic::Ordering;
 use std::time::Duration;
+use std::time::Instant;
 
 use tauri::AppHandle;
 use tauri::Emitter;
@@ -46,6 +47,10 @@ const OVERLAY: Overlay = Overlay {
 const LOOK_EVENT: &str = "multifus://rune-table-look";
 
 const FOLLOW: Duration = Duration::from_millis(100);
+
+const FOLLOW_IN_MOTION: Duration = Duration::from_millis(16);
+
+const MOTION_LINGERS: Duration = Duration::from_millis(500);
 
 static NEXT_FOLLOW: Alarm = Alarm::new();
 
@@ -135,6 +140,8 @@ struct RuneTable {
     preview_offset: Mutex<Option<RuneOffset>>,
     posed: Mutex<Option<Posed>>,
     posing: Mutex<()>,
+    highest: Mutex<Option<WindowId>>,
+    stirred_at: Mutex<Option<Instant>>,
     complained: AtomicBool,
     under_the_hand: AtomicBool,
     generation: Generation,
@@ -152,6 +159,7 @@ impl RuneTable {
     fn lay(&self, mode: Mode) -> u64 {
         *self.held() = Some(mode);
 
+        self.forget_highest();
         self.complained.store(false, Ordering::Release);
         self.under_the_hand.store(false, Ordering::Release);
 
@@ -219,6 +227,32 @@ impl RuneTable {
 
     fn posed(&self) -> MutexGuard<'_, Option<Posed>> {
         self.posed.lock().unwrap_or_else(PoisonError::into_inner)
+    }
+
+    fn remembered_highest(&self) -> Option<WindowId> {
+        *self.highest.lock().unwrap_or_else(PoisonError::into_inner)
+    }
+
+    fn remember_highest(&self, highest: Option<WindowId>) {
+        *self.highest.lock().unwrap_or_else(PoisonError::into_inner) = highest;
+    }
+
+    fn forget_highest(&self) {
+        self.remember_highest(None);
+    }
+
+    fn stir(&self) {
+        *self
+            .stirred_at
+            .lock()
+            .unwrap_or_else(PoisonError::into_inner) = Some(Instant::now());
+    }
+
+    fn since_stirred(&self) -> Duration {
+        self.stirred_at
+            .lock()
+            .unwrap_or_else(PoisonError::into_inner)
+            .map_or(Duration::MAX, |stirred_at| stirred_at.elapsed())
     }
 }
 
@@ -313,8 +347,21 @@ fn set_floating(app: &AppHandle, should_float: bool) {
     OVERLAY.said(app, window.set_always_on_top(should_float));
 }
 
-pub fn note_foreground() {
+pub fn note_windows(app: &AppHandle) {
+    app.state::<RuneTable>().forget_highest();
+
     NEXT_FOLLOW.wake();
+}
+
+pub fn note_drag(app: &AppHandle) {
+    let table = app.state::<RuneTable>();
+    let was_still = pace(table.since_stirred()) == FOLLOW;
+
+    table.stir();
+
+    if was_still {
+        NEXT_FOLLOW.wake();
+    }
 }
 
 fn tell_state(app: &AppHandle) {
@@ -325,16 +372,32 @@ fn tell_state(app: &AppHandle) {
 
 fn follow_apart(app: &AppHandle, generation: u64) {
     OVERLAY.apart(app, move |app| {
-        loop {
-            NEXT_FOLLOW.wait(Duration::ZERO, FOLLOW);
+        let table = app.state::<RuneTable>();
 
-            if !app.state::<RuneTable>().matches_latest(generation) || !is_open(app) {
+        loop {
+            NEXT_FOLLOW.wait(Duration::ZERO, pace(table.since_stirred()));
+
+            if !table.matches_latest(generation) || !is_open(app) {
                 return;
             }
 
+            let before = *table.posed();
+
             follow_foreground(app);
+
+            if *table.posed() != before {
+                table.stir();
+            }
         }
     });
+}
+
+fn pace(since_stirred: Duration) -> Duration {
+    if since_stirred < MOTION_LINGERS {
+        FOLLOW_IN_MOTION
+    } else {
+        FOLLOW
+    }
 }
 
 fn follow_foreground(app: &AppHandle) {
@@ -419,13 +482,14 @@ fn follow_game(app: &AppHandle) {
 
     let frame = match windows(app).window_frame(window) {
         Ok(Some(frame)) => frame,
-        Ok(None) => {
-            veil(app);
+        Err(PlatformError::WindowGone) if !matches_shown_everywhere(app) => {
+            close_with_its_client(app);
 
             return;
         }
-        Err(PlatformError::WindowGone) => {
-            close_with_its_client(app);
+        Ok(None) | Err(PlatformError::WindowGone) => {
+            app.state::<RuneTable>().forget_highest();
+            veil(app);
 
             return;
         }
@@ -451,6 +515,10 @@ fn follow_game(app: &AppHandle) {
     stack_above(app, window);
 }
 
+fn matches_shown_everywhere(app: &AppHandle) -> bool {
+    app.state::<RuneTable>().posted_anchor() == Some(Anchor::Anywhere)
+}
+
 fn close_with_its_client(app: &AppHandle) {
     let table = app.state::<RuneTable>();
 
@@ -472,9 +540,17 @@ fn carrier(table: &RuneTable, windows: &dyn WindowManager) -> platform::Result<O
         return Ok(Some(window));
     }
 
-    Ok(windows
+    if let Some(remembered) = table.remembered_highest() {
+        return Ok(Some(remembered));
+    }
+
+    let settled = windows
         .highest_game_window()?
-        .and_then(|highest| table.settle_on(highest)))
+        .and_then(|highest| table.settle_on(highest));
+
+    table.remember_highest(settled);
+
+    Ok(settled)
 }
 
 fn stack_above(app: &AppHandle, carrier: WindowId) {
@@ -601,20 +677,39 @@ fn pose(app: &AppHandle, wanted: Posed) {
     };
 
     let table = app.state::<RuneTable>();
-    let unchanged = *table.posed() == Some(wanted);
+    let last_posed = *table.posed();
+    let is_visible = window.is_visible().unwrap_or(false);
 
-    if unchanged && window.is_visible().unwrap_or(false) {
+    if is_visible && last_posed == Some(wanted) {
         return;
     }
 
-    let posed = window
-        .set_size(LogicalSize::new(wanted.size.width, wanted.size.height))
-        .and_then(|()| window.set_position(wanted.at))
-        .and_then(|()| window.show());
+    let posed = laid(&window, wanted, last_posed, is_visible);
 
     *table.posed() = posed.is_ok().then_some(wanted);
 
     OVERLAY.said(app, posed);
+}
+
+fn laid(
+    window: &WebviewWindow,
+    wanted: Posed,
+    last_posed: Option<Posed>,
+    is_visible: bool,
+) -> tauri::Result<()> {
+    let is_same_size = last_posed.is_some_and(|last| last.size == wanted.size);
+
+    if !is_same_size {
+        window.set_size(LogicalSize::new(wanted.size.width, wanted.size.height))?;
+    }
+
+    window.set_position(wanted.at)?;
+
+    if !is_visible {
+        window.show()?;
+    }
+
+    Ok(())
 }
 
 fn veil_in_turn(app: &AppHandle) {
@@ -810,6 +905,8 @@ pub fn spread(app: &AppHandle, everywhere: bool) {
     *held = Some(next);
 
     drop(held);
+
+    table.forget_highest();
 
     follow_foreground(app);
 }
@@ -1217,6 +1314,62 @@ mod tests {
     }
 
     #[test]
+    fn a_table_on_every_character_looks_for_the_highest_window_again_only_once_told_to() {
+        let table = RuneTable::default();
+
+        table.lay(Mode::Posted {
+            anchor: Anchor::Anywhere,
+        });
+
+        assert_eq!(
+            carrier(&table, &*highest_showing(Some(here()))),
+            Ok(Some(here()))
+        );
+        assert_eq!(
+            carrier(&table, &*highest_showing(Some(there()))),
+            Ok(Some(here())),
+            "a turn in the middle of a drag must not ask the game for its windows again"
+        );
+
+        table.forget_highest();
+
+        assert_eq!(
+            carrier(&table, &*highest_showing(Some(there()))),
+            Ok(Some(there())),
+            "a change of foreground sends the table to the window now on top"
+        );
+    }
+
+    #[test]
+    fn a_new_opening_forgets_the_window_the_last_one_sat_on() {
+        let table = RuneTable::default();
+
+        table.lay(Mode::Posted {
+            anchor: Anchor::Anywhere,
+        });
+        carrier(&table, &*highest_showing(Some(here()))).expect("a carrier");
+        table.lay(Mode::Posted {
+            anchor: Anchor::Anywhere,
+        });
+
+        assert_eq!(
+            carrier(&table, &*highest_showing(Some(there()))),
+            Ok(Some(there()))
+        );
+    }
+
+    #[test]
+    fn a_table_nobody_stirred_follows_at_the_resting_pace() {
+        let table = RuneTable::default();
+
+        assert_eq!(pace(table.since_stirred()), FOLLOW);
+
+        table.stir();
+
+        assert_eq!(pace(table.since_stirred()), FOLLOW_IN_MOTION);
+    }
+
+    #[test]
     fn a_frame_nobody_can_read_is_written_down_once_an_opening_and_not_every_turn() {
         let table = RuneTable::default();
 
@@ -1238,6 +1391,17 @@ mod tests {
             table.matches_first_complaint(),
             "the next opening is worth a line of its own"
         );
+    }
+
+    #[test]
+    fn the_table_follows_at_the_pace_of_the_screen_while_its_window_moves() {
+        assert_eq!(pace(Duration::ZERO), FOLLOW_IN_MOTION);
+        assert_eq!(
+            pace(MOTION_LINGERS / 2),
+            FOLLOW_IN_MOTION,
+            "a hand that pauses mid drag must not find the table ten beats behind when it moves on"
+        );
+        assert_eq!(pace(MOTION_LINGERS), FOLLOW);
     }
 
     #[test]

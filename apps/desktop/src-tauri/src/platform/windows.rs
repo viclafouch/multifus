@@ -105,6 +105,7 @@ use windows::Win32::UI::WindowsAndMessaging::EVENT_OBJECT_CREATE;
 use windows::Win32::UI::WindowsAndMessaging::EVENT_OBJECT_DESTROY;
 use windows::Win32::UI::WindowsAndMessaging::EVENT_OBJECT_NAMECHANGE;
 use windows::Win32::UI::WindowsAndMessaging::EVENT_SYSTEM_FOREGROUND;
+use windows::Win32::UI::WindowsAndMessaging::EVENT_SYSTEM_MOVESIZESTART;
 use windows::Win32::UI::WindowsAndMessaging::EnumWindows;
 use windows::Win32::UI::WindowsAndMessaging::GA_ROOT;
 use windows::Win32::UI::WindowsAndMessaging::GCLP_HICON;
@@ -1730,8 +1731,13 @@ fn watch_the_windows(sink: WakeSink, told: &mpsc::Sender<Result<u32>>) {
         EVENT_SYSTEM_FOREGROUND,
         Some(on_foreground_event),
     );
+    let dragging = hook_events(
+        EVENT_SYSTEM_MOVESIZESTART,
+        EVENT_SYSTEM_MOVESIZESTART,
+        Some(on_drag_event),
+    );
 
-    let hooks = [appearing, renaming, switching];
+    let hooks = [appearing, renaming, switching, dragging];
 
     if appearing.is_none() && renaming.is_none() {
         drop(told.send(Err(PlatformError::system(
@@ -1764,7 +1770,7 @@ fn watch_the_windows(sink: WakeSink, told: &mpsc::Sender<Result<u32>>) {
     });
 }
 
-fn unhook(hooks: [Option<HWINEVENTHOOK>; 3]) {
+fn unhook(hooks: [Option<HWINEVENTHOOK>; 4]) {
     for hook in hooks.into_iter().flatten() {
         let _ = unsafe { UnhookWinEvent(hook) };
     }
@@ -1817,6 +1823,30 @@ unsafe extern "system" fn on_foreground_event(
         };
 
         (waking.sink)(Wake::Foreground);
+    });
+}
+
+unsafe extern "system" fn on_drag_event(
+    _hook: HWINEVENTHOOK,
+    _event: u32,
+    handle: HWND,
+    object: i32,
+    child: i32,
+    _thread: u32,
+    _time: u32,
+) {
+    if !matches_a_whole_window(object, child) {
+        return;
+    }
+
+    WAKING.with_borrow(|waking| {
+        let Some(waking) = waking.as_ref() else {
+            return;
+        };
+
+        if waking.clients.contains(&window_id(handle)) {
+            (waking.sink)(Wake::Dragging);
+        }
     });
 }
 

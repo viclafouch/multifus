@@ -84,10 +84,12 @@ use objc2_core_graphics::CGEventTapPlacement;
 use objc2_core_graphics::CGEventTapProxy;
 use objc2_core_graphics::CGEventType;
 use objc2_core_graphics::CGKeyCode;
+use objc2_core_graphics::CGRectMakeWithDictionaryRepresentation;
 use objc2_core_graphics::CGWindowID;
 use objc2_core_graphics::CGWindowListCopyWindowInfo;
 use objc2_core_graphics::CGWindowListOption;
 use objc2_core_graphics::kCGNullWindowID;
+use objc2_core_graphics::kCGWindowBounds;
 use objc2_core_graphics::kCGWindowLayer;
 use objc2_core_graphics::kCGWindowNumber;
 use objc2_core_graphics::kCGWindowOwnerPID;
@@ -161,6 +163,8 @@ const MAX_BANNER_TEXTS: usize = 4;
 const BANNER_ECHO: Duration = Duration::from_secs(5);
 
 const STOP_CHECK_SECONDS: f64 = 0.25;
+
+const DRAG_MASK: CGEventMask = 1 << CGEventType::LeftMouseDragged.0;
 
 const CLICK_MASK: CGEventMask = (1 << CGEventType::LeftMouseDown.0)
     | (1 << CGEventType::LeftMouseUp.0)
@@ -689,6 +693,7 @@ const NORMAL_LAYER: i64 = 0;
 struct ShownWindow {
     number: CGWindowID,
     owner: pid_t,
+    bounds: CGRect,
 }
 
 fn shown_windows() -> Vec<ShownWindow> {
@@ -712,13 +717,15 @@ fn shown_window(described: &CFDictionary) -> Option<ShownWindow> {
     // SAFETY: a window description is keyed by strings.
     let described = unsafe { described.cast_unchecked::<CFString, CFType>() };
     let number_of = |key: &CFString| described.get(key)?.downcast::<CFNumber>().ok()?.as_i64();
+    let dictionary_of = |key: &CFString| described.get(key)?.downcast::<CFDictionary>().ok();
 
     // SAFETY: constants of the framework, alive for the whole process.
-    let (layer, owner, number) = unsafe {
+    let (layer, owner, number, bounds) = unsafe {
         (
             number_of(kCGWindowLayer)?,
             number_of(kCGWindowOwnerPID)?,
             number_of(kCGWindowNumber)?,
+            dictionary_of(kCGWindowBounds)?,
         )
     };
 
@@ -729,16 +736,62 @@ fn shown_window(described: &CFDictionary) -> Option<ShownWindow> {
     Some(ShownWindow {
         number: CGWindowID::try_from(number).ok()?,
         owner: pid_t::try_from(owner).ok()?,
+        bounds: bounds_of(&bounds)?,
     })
 }
 
-fn matches_shown(owner: pid_t) -> bool {
-    shown_windows().iter().any(|shown| shown.owner == owner)
+fn bounds_of(described: &CFDictionary) -> Option<CGRect> {
+    let mut bounds = CGRect::ZERO;
+
+    // SAFETY: the dictionary is the one the window list gives for a rectangle, and `bounds` is live.
+    let read = unsafe { CGRectMakeWithDictionaryRepresentation(Some(described), &raw mut bounds) };
+
+    read.then_some(bounds)
+}
+
+fn client_window_shown(
+    owner: pid_t,
+    element: &AXUIElement,
+    shown: &[ShownWindow],
+) -> Result<Option<usize>> {
+    let owned: Vec<usize> = (0..shown.len())
+        .filter(|&at| shown[at].owner == owner)
+        .collect();
+
+    let [first, _, ..] = owned.as_slice() else {
+        return Ok(owned.first().copied());
+    };
+
+    let Some(client) = client_window_element(element)? else {
+        return Ok(Some(*first));
+    };
+
+    let (Some(position), Some(size)) = (
+        point_attribute(&client, AX_POSITION)?,
+        size_attribute(&client, AX_SIZE)?,
+    ) else {
+        return Ok(Some(*first));
+    };
+
+    Ok(closest_to(CGRect::new(position, size), shown, owned))
+}
+
+fn closest_to(frame: CGRect, shown: &[ShownWindow], owned: Vec<usize>) -> Option<usize> {
+    owned.into_iter().min_by(|&one, &other| {
+        gap(shown[one].bounds, frame).total_cmp(&gap(shown[other].bounds, frame))
+    })
+}
+
+fn gap(one: CGRect, other: CGRect) -> CGFloat {
+    (one.origin.x - other.origin.x).abs()
+        + (one.origin.y - other.origin.y).abs()
+        + (one.size.width - other.size.width).abs()
+        + (one.size.height - other.size.height).abs()
 }
 
 pub fn lay_above(ns_window: *mut c_void, window: WindowId) -> Result<()> {
     let ours = our_window(ns_window, LAYING_ABOVE)?;
-    let (application, _) = live_application(window)?;
+    let (application, element) = live_application(window)?;
 
     if application.isActive() {
         set_level(ours, NSFloatingWindowLevel);
@@ -747,9 +800,7 @@ pub fn lay_above(ns_window: *mut c_void, window: WindowId) -> Result<()> {
     }
 
     set_level(ours, NSNormalWindowLevel);
-    order_above(ours, application.processIdentifier());
-
-    Ok(())
+    order_above(ours, application.processIdentifier(), &element)
 }
 
 fn set_level(ours: NonNull<AnyObject>, level: NSWindowLevel) {
@@ -763,11 +814,11 @@ fn set_level(ours: NonNull<AnyObject>, level: NSWindowLevel) {
     }
 }
 
-fn order_above(ours: NonNull<AnyObject>, owner: pid_t) {
+fn order_above(ours: NonNull<AnyObject>, owner: pid_t, element: &AXUIElement) -> Result<()> {
     let shown = shown_windows();
 
-    let Some(at) = shown.iter().position(|listed| listed.owner == owner) else {
-        return;
+    let Some(at) = client_window_shown(owner, element, &shown)? else {
+        return Ok(());
     };
 
     // SAFETY: the handle names the window Tauri built, alive for this call.
@@ -779,7 +830,7 @@ fn order_above(ours: NonNull<AnyObject>, owner: pid_t) {
         .is_some_and(|above| shown[above].number as isize == our_number);
 
     if is_right_above {
-        return;
+        return Ok(());
     }
 
     // SAFETY: the handle names the window Tauri built, and the number a window on screen.
@@ -790,6 +841,8 @@ fn order_above(ours: NonNull<AnyObject>, owner: pid_t) {
             relativeTo: game_number
         ];
     }
+
+    Ok(())
 }
 
 #[derive(Debug, Default)]
@@ -875,29 +928,22 @@ impl WindowManager for AccessibilityWindowManager {
 
     fn window_frame(&self, window: WindowId) -> Result<Option<ScreenFrame>> {
         let (application, element) = live_application(window)?;
+        let shown = shown_windows();
 
-        if !matches_shown(application.processIdentifier()) {
-            return Ok(None);
-        }
-
-        let Some(game_window) = client_window_element(&element)? else {
+        let Some(at) = client_window_shown(application.processIdentifier(), &element, &shown)?
+        else {
             return Ok(None);
         };
 
-        let (Some(position), Some(size)) = (
-            point_attribute(&game_window, AX_POSITION)?,
-            size_attribute(&game_window, AX_SIZE)?,
-        ) else {
-            return Ok(None);
-        };
+        let bounds = shown[at].bounds;
 
         Ok(Some(ScreenFrame {
             origin: ScreenPoint {
-                x: position.x,
-                y: position.y,
+                x: bounds.origin.x,
+                y: bounds.origin.y,
             },
-            width: size.width,
-            height: size.height,
+            width: bounds.size.width,
+            height: bounds.size.height,
         }))
     }
 
@@ -1772,6 +1818,7 @@ fn watch_the_clients(
     let mut watched: HashMap<pid_t, WatchedClient> = HashMap::new();
     let coming_and_going = watch_the_clients_coming_and_going(sink);
     let foreground = watch_the_foreground(sink);
+    let drags = watch_the_drags(&run_loop, mode, refcon);
 
     if told.send(Ok(LiveRunLoop(run_loop.clone()))).is_ok() {
         while running.load(Ordering::Relaxed) {
@@ -1785,8 +1832,59 @@ fn watch_the_clients(
         run_loop.remove_source(Some(&client.source), mode);
     }
 
+    if let Some(drags) = drags {
+        CGEvent::tap_enable(&drags.tap, false);
+        run_loop.remove_source(Some(&drags.source), mode);
+    }
+
     drop(coming_and_going);
     drop(foreground);
+}
+
+struct DragTap {
+    tap: CFRetained<CFMachPort>,
+    source: CFRetained<CFRunLoopSource>,
+}
+
+fn watch_the_drags(
+    run_loop: &CFRunLoop,
+    mode: Option<&CFRunLoopMode>,
+    refcon: *mut c_void,
+) -> Option<DragTap> {
+    // SAFETY: the callback has the signature the API documents, and `refcon` outlives the tap.
+    let tap = unsafe {
+        CGEvent::tap_create(
+            CGEventTapLocation::SessionEventTap,
+            CGEventTapPlacement::TailAppendEventTap,
+            CGEventTapOptions::ListenOnly,
+            DRAG_MASK,
+            Some(on_drag),
+            refcon,
+        )
+    }?;
+
+    let source = CFMachPort::new_run_loop_source(None, Some(&tap), 0)?;
+
+    run_loop.add_source(Some(&source), mode);
+    CGEvent::tap_enable(&tap, true);
+
+    Some(DragTap { tap, source })
+}
+
+unsafe extern "C-unwind" fn on_drag(
+    _proxy: CGEventTapProxy,
+    _kind: CGEventType,
+    event: NonNull<CGEvent>,
+    refcon: *mut c_void,
+) -> *mut CGEvent {
+    if !refcon.is_null() {
+        // SAFETY: `refcon` is the sink `watch_the_clients` holds, alive until the tap is torn down.
+        let sink: &WakeSink = unsafe { &*refcon.cast::<WakeSink>() };
+
+        drop(catch_unwind(AssertUnwindSafe(|| sink(Wake::Dragging))));
+    }
+
+    event.as_ptr()
 }
 
 fn wait_for_an_event(mode: Option<&CFRunLoopMode>) {
@@ -2456,6 +2554,39 @@ unsafe extern "C" {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    const DOFUS: pid_t = 501;
+
+    fn shown_at(bounds: CGRect) -> ShownWindow {
+        ShownWindow {
+            number: 7,
+            owner: DOFUS,
+            bounds,
+        }
+    }
+
+    #[test]
+    fn the_window_of_the_game_is_told_from_a_sheet_laid_over_it() {
+        let game = CGRect::new(CGPoint::new(0.0, 25.0), CGSize::new(1280.0, 800.0));
+        let sheet = CGRect::new(CGPoint::new(340.0, 50.0), CGSize::new(600.0, 200.0));
+        let shown = [shown_at(sheet), shown_at(game)];
+
+        assert_eq!(closest_to(game, &shown, vec![0, 1]), Some(1));
+    }
+
+    #[test]
+    fn the_window_of_the_game_is_still_told_apart_while_accessibility_lags_behind_a_drag() {
+        let read_late = CGRect::new(CGPoint::new(0.0, 25.0), CGSize::new(1280.0, 800.0));
+        let dragged = CGRect::new(CGPoint::new(60.0, 40.0), read_late.size);
+        let sheet = CGRect::new(CGPoint::new(400.0, 65.0), CGSize::new(600.0, 200.0));
+        let shown = [shown_at(sheet), shown_at(dragged)];
+
+        assert_eq!(
+            closest_to(read_late, &shown, vec![0, 1]),
+            Some(1),
+            "accessibility answers a tenth of a second late, and the size still tells the game apart"
+        );
+    }
 
     fn area() -> CGRect {
         CGRect::new(CGPoint::new(0.0, 25.0), CGSize::new(1440.0, 875.0))

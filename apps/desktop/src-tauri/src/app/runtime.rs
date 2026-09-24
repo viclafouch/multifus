@@ -106,11 +106,15 @@ pub fn wake() {
 
 fn on_wake(app: &AppHandle, waking: Wake) {
     match waking {
-        Wake::GameWindows => wake(),
+        Wake::GameWindows => {
+            wake();
+            rune_table::note_windows(app);
+        }
         Wake::Foreground => {
             shortcuts::note_foreground(app);
-            rune_table::note_foreground();
+            rune_table::note_windows(app);
         }
+        Wake::Dragging => rune_table::note_drag(app),
     }
 }
 

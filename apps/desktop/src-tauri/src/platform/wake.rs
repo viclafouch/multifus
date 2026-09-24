@@ -6,6 +6,7 @@ use crate::platform::error::Result;
 pub enum Wake {
     GameWindows,
     Foreground,
+    Dragging,
 }
 
 pub type WakeSink = Arc<dyn Fn(Wake) + Send + Sync>;
