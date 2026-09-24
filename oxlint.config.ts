@@ -57,6 +57,7 @@ export default defineConfig({
     },
     {
       files: [
+        'apps/desktop/src/boot.test.tsx',
         'apps/desktop/src/icon.test.ts',
         'apps/desktop/src/lib/character-marks.test.ts',
         'apps/desktop/src/lib/multifus.test.ts',

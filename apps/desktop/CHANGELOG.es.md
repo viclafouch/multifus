@@ -16,6 +16,7 @@
 - Corrige la posición inicial de la tabla de runas, arriba a la derecha. Ahora se abre en el centro de la ventana de Dofus.
 - En Windows, el paso de las notificaciones te pedía marcar Multifus en una lista donde nunca aparece. Ahora muestra el interruptor correcto.
 - La ventana de Multifus podía pasar a pantalla completa, donde no pinta nada. El botón para maximizarla ahora está desactivado.
+- Un clic derecho en Multifus abría el menú de un navegador web, y F5 recargaba la ventana. Ahora ninguno de los dos hace nada.
 
 ## 0.1.0 - 2026-09-23
 
