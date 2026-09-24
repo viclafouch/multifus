@@ -221,8 +221,23 @@ export const QUESTIONS = {
         said: msg`Windows prévient pour tout logiciel qu’il voit encore peu, et Multifus vient de sortir. L’avertissement partira quand assez de monde l’aura téléchargé.`
       },
       {
-        said: msg`Payer un certificat ne le ferait pas partir plus vite. Chaque version porte une <0>attestation GitHub</0> qui dit de quel code elle a été construite.`,
+        said: msg`Multifus n’a pas de certificat Windows, qui se paie chaque année. Chaque version porte à la place une <0>attestation GitHub</0> qui dit de quel code elle a été construite.`,
         marks: [{ kind: 'out', href: RELEASES }]
+      }
+    ]
+  },
+  blocked: {
+    ask: msg`Windows 11 bloque Multifus sans me laisser l’ouvrir ?`,
+    answer: [
+      {
+        said: msg`<0>C’est Smart App Control.</0> Sur certains Windows 11, il bloque tout logiciel qui n’a pas de certificat, et Multifus n’en a pas.`,
+        marks: [{ kind: 'stress' }]
+      },
+      {
+        said: msg`Pour jouer avec Multifus, coupez-le dans Sécurité Windows, rubrique Contrôle des applications et du navigateur. Allumé, il le bloquerait à chaque lancement.`
+      },
+      {
+        said: msg`Faites d’abord les mises à jour de Windows : avant celle de mars 2026, le couper était définitif.`
       }
     ]
   },
@@ -278,6 +293,7 @@ export const PAGE_QUESTIONS = {
   mac: ['macFloor', 'monterey', 'macAccess', 'macFullScreen'],
   windows: [
     'warning',
+    'blocked',
     'count',
     'eleven',
     'seven',

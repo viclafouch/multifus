@@ -36,6 +36,10 @@ msgid "<0>Autant que votre PC en ouvre.</0> 4, 6, 8 clients Dofus Retro : Multif
 msgstr "<0>As many as your PC opens.</0> 4, 6, 8 Dofus Retro clients: Multifus handles them all the same."
 
 #: src/constants/questions.ts
+msgid "<0>C’est Smart App Control.</0> Sur certains Windows 11, il bloque tout logiciel qui n’a pas de certificat, et Multifus n’en a pas."
+msgstr "<0>That is Smart App Control.</0> On some Windows 11 PCs, it blocks any software without a certificate, and Multifus has none."
+
+#: src/constants/questions.ts
 msgid "<0>Dofus 2 et Dofus 3 ne sont pas concernés.</0> Ils n’ont ni les mêmes fenêtres ni les mêmes notifications."
 msgstr "<0>Dofus 2 and Dofus 3 are not covered.</0> They have neither the same windows nor the same notifications."
 
@@ -399,6 +403,10 @@ msgstr "And running at Mac startup, if you tick the box."
 #: src/screens/windows-screen.tsx
 msgid "F1 sur votre premier Enutrof, F2 sur le second. Sur Windows, une touche de fonction se pose seule."
 msgstr "F1 on your first Enutrof, F2 on the second. On Windows a function key stands alone."
+
+#: src/constants/questions.ts
+msgid "Faites d’abord les mises à jour de Windows : avant celle de mars 2026, le couper était définitif."
+msgstr "Install the Windows updates first: before the March 2026 one, turning it off could not be undone."
 
 #: src/constants/rivals.ts
 msgid "Fenêtres rangées côte à côte"
@@ -881,6 +889,10 @@ msgstr "Multifus against the others"
 msgid "Multifus n’a aucun lien avec Ankama : ni partenariat, ni approbation, ni soutien d’aucune sorte."
 msgstr "Multifus has no link with Ankama: no partnership, no endorsement, no backing of any kind."
 
+#: src/constants/questions.ts
+msgid "Multifus n’a pas de certificat Windows, qui se paie chaque année. Chaque version porte à la place une <0>attestation GitHub</0> qui dit de quel code elle a été construite."
+msgstr "Multifus has no Windows certificate, which is paid for every year. Instead, every release carries a <0>GitHub attestation</0> that says which code it was built from."
+
 #: src/constants/ankama.ts
 msgid "Multifus n’en fait rien."
 msgstr "Multifus does none of it."
@@ -1022,10 +1034,6 @@ msgstr "Past four characters, one key per window becomes impossible to remember.
 msgid "Pause"
 msgstr "Pause"
 
-#: src/constants/questions.ts
-msgid "Payer un certificat ne le ferait pas partir plus vite. Chaque version porte une <0>attestation GitHub</0> qui dit de quel code elle a été construite."
-msgstr "Paying for a certificate would not make it go any faster. Every release carries a <0>GitHub attestation</0> that says which code it was built from."
-
 #: src/constants/bodies.ts
 msgid "Plus de touche à retenir"
 msgstr "No key to remember"
@@ -1037,6 +1045,10 @@ msgstr "Not one turn lost"
 #: src/constants/rivals.ts
 msgid "Plusieurs ordres de personnages enregistrés"
 msgstr "Several saved character orders"
+
+#: src/constants/questions.ts
+msgid "Pour jouer avec Multifus, coupez-le dans Sécurité Windows, rubrique Contrôle des applications et du navigateur. Allumé, il le bloquerait à chaque lancement."
+msgstr "To play with Multifus, turn it off in Windows Security, under App & browser control. Left on, it would block it at every launch."
 
 #: src/screens/mac-screen.tsx
 msgid "Pour lire votre version : menu <0/><1>Pomme</1>, puis À propos de ce Mac."
@@ -1456,6 +1468,10 @@ msgstr "You recognise the portrait and the nickname, and you go straight to it."
 #: src/constants/bodies.ts
 msgid "Vous savez qui s’est déconnecté"
 msgstr "You know who got disconnected"
+
+#: src/constants/questions.ts
+msgid "Windows 11 bloque Multifus sans me laisser l’ouvrir ?"
+msgstr "Windows 11 blocks Multifus and will not let me open it?"
 
 #: src/constants/questions.ts
 msgid "Windows affiche un avertissement, c’est normal ?"

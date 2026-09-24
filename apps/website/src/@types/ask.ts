@@ -3,6 +3,7 @@ import type { PageId } from '@/@types/page'
 
 export type AskId =
   | 'allowed'
+  | 'blocked'
   | 'count'
   | 'eleven'
   | 'free'

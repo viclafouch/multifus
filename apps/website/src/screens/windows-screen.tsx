@@ -5,6 +5,7 @@ import { DesktopIcon } from '@phosphor-icons/react/dist/ssr/Desktop'
 import { DesktopTowerIcon } from '@phosphor-icons/react/dist/ssr/DesktopTower'
 import { GameControllerIcon } from '@phosphor-icons/react/dist/ssr/GameController'
 import { ShieldCheckIcon } from '@phosphor-icons/react/dist/ssr/ShieldCheck'
+import { ShieldSlashIcon } from '@phosphor-icons/react/dist/ssr/ShieldSlash'
 import { ShieldWarningIcon } from '@phosphor-icons/react/dist/ssr/ShieldWarning'
 import { UsersThreeIcon } from '@phosphor-icons/react/dist/ssr/UsersThree'
 import type { PageScreenProps } from '@/@types/screen'
@@ -67,6 +68,11 @@ export const WindowsScreen = ({ page }: PageScreenProps) => {
           <li className="reveal">
             <Question ask={QUESTIONS.warning.ask} icon={ShieldWarningIcon}>
               <Answer lines={QUESTIONS.warning.answer} />
+            </Question>
+          </li>
+          <li className="reveal">
+            <Question ask={QUESTIONS.blocked.ask} icon={ShieldSlashIcon}>
+              <Answer lines={QUESTIONS.blocked.answer} />
             </Question>
           </li>
           <li className="reveal">
