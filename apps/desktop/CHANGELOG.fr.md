@@ -36,5 +36,5 @@
 
 ### Mac et Windows
 
-- Sur Mac, une application vérifiée par Apple qui s’ouvre au premier double-clic, sur Mac Intel comme Apple Silicon.
+- Sur Mac, une application vérifiée par Apple, sans clic droit ni réglage de sécurité à contourner, sur Mac Intel comme Apple Silicon.
 - Sur Windows 10 et 11, chaque personnage prend son bouton dans la barre des tâches, avec son pseudo et sa tête de classe.

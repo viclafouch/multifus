@@ -111,11 +111,15 @@ export const QUESTIONS = {
     ask: msg`Le fichier est sûr ?`,
     answer: [
       {
-        said: msg`Sur Mac, Apple vérifie le fichier avant qu’il s’ouvre, et aucun avertissement ne s’affiche. Sur Windows, votre ordinateur peut demander confirmation : Multifus est encore jeune, et Windows ne le connaît pas encore.`
+        said: msg`Sur Mac, Apple a vérifié le fichier : au premier lancement, macOS demande seulement de confirmer, et précise qu’aucun logiciel malveillant n’a été trouvé. Sur Windows, votre ordinateur peut demander confirmation : Multifus est encore jeune, et Windows ne le connaît pas encore.`
       },
       {
-        said: msg`Dans les deux cas, il ne crée aucun compte et <0>n’envoie rien de votre ordinateur</0>. La seule sortie est Telegram, si vous branchez vous-même les <1>Messages privés</1>.`,
-        marks: [{ kind: 'stress' }, { kind: 'page', page: 'relay' }]
+        said: msg`Dans les deux cas, il ne crée aucun compte et <0>n’envoie rien qui vous nomme</0> : ni pseudo, ni message, ni fichier du jeu. Il partage des statistiques d’usage, qu’une case des Réglages coupe, et les <1>Mentions légales</1> en donnent le détail. Telegram ne reçoit vos messages que si vous branchez vous-même les <2>Messages privés</2>.`,
+        marks: [
+          { kind: 'stress' },
+          { kind: 'page', page: 'legal' },
+          { kind: 'page', page: 'relay' }
+        ]
       }
     ]
   },

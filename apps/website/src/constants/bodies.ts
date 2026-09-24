@@ -186,8 +186,8 @@ export const PAGE_BODIES = {
     boons: [
       {
         icon: AppleLogoIcon,
-        title: msg`Multifus s’ouvre au premier double-clic`,
-        line: msg`Pas de clic droit, pas d’alerte, rien à aller autoriser dans les Réglages.`
+        title: msg`Un double-clic, puis « Ouvrir »`,
+        line: msg`macOS demande une confirmation et précise qu’aucun logiciel malveillant n’a été trouvé. Pas de clic droit, pas de réglage de sécurité à contourner.`
       },
       {
         icon: CertificateIcon,

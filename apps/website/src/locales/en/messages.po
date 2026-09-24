@@ -309,8 +309,8 @@ msgid "Crâ"
 msgstr "Cra"
 
 #: src/constants/questions.ts
-msgid "Dans les deux cas, il ne crée aucun compte et <0>n’envoie rien de votre ordinateur</0>. La seule sortie est Telegram, si vous branchez vous-même les <1>Messages privés</1>."
-msgstr "Either way, it creates no account and <0>sends nothing off your computer</0>. The only way out is Telegram, if you wire up <1>Private messages</1> yourself."
+msgid "Dans les deux cas, il ne crée aucun compte et <0>n’envoie rien qui vous nomme</0> : ni pseudo, ni message, ni fichier du jeu. Il partage des statistiques d’usage, qu’une case des Réglages coupe, et les <1>Mentions légales</1> en donnent le détail. Telegram ne reçoit vos messages que si vous branchez vous-même les <2>Messages privés</2>."
+msgstr "Either way, it creates no account and <0>sends nothing that names you</0>: no nickname, no message, no game file. It shares usage statistics, which a box in Settings turns off, and the <1>Legal notice</1> gives the detail. Telegram only receives your messages if you wire up <2>Private messages</2> yourself."
 
 #: src/constants/rivals.ts
 msgid "Dans sa fenêtre à lui, pas par-dessus le jeu."
@@ -634,8 +634,8 @@ msgid "Le multicompte Dofus Retro sur Mac, dans une application qu’Apple a vé
 msgstr "Dofus Retro multi-accounting on Mac, in an app Apple has checked."
 
 #: src/constants/wording.ts
-msgid "Le multicompte Dofus Retro sur Mac, dans une application vérifiée par Apple qui s’ouvre au premier double-clic. Les six fonctionnalités y sont, sans exception."
-msgstr "Dofus Retro multiboxing on Mac, in an app Apple has checked that opens on the first double-click. All six features are there, with no exception."
+msgid "Le multicompte Dofus Retro sur Mac, dans une application vérifiée par Apple, sans clic droit ni réglage à contourner. Les six fonctionnalités y sont."
+msgstr "Dofus Retro multiboxing on Mac, in an app Apple has checked, with no right-click and no setting to work around. All six features are there."
 
 #: src/constants/wording.ts
 msgid "Le multicompte Dofus Retro sur Windows 10 et 11 : chaque personnage prend son bouton dans la barre des tâches, avec son pseudo et sa tête de classe."
@@ -793,6 +793,10 @@ msgstr "Dofus Retro multi-account software on Windows"
 msgid "Logiciel multicompte gratuit pour Dofus Retro"
 msgstr "Free multi-account software for Dofus Retro"
 
+#: src/constants/bodies.ts
+msgid "macOS demande une confirmation et précise qu’aucun logiciel malveillant n’a été trouvé. Pas de clic droit, pas de réglage de sécurité à contourner."
+msgstr "macOS asks you to confirm and says no malicious software was found. No right-click, no security setting to work around."
+
 #: src/components/language-offer.tsx
 msgid "Masquer cette proposition"
 msgstr "Hide this suggestion"
@@ -905,10 +909,6 @@ msgstr "Does Multifus speak my language?"
 msgid "Multifus s’installe sur Mac et sur Windows"
 msgstr "Multifus installs on Mac and on Windows"
 
-#: src/constants/bodies.ts
-msgid "Multifus s’ouvre au premier double-clic"
-msgstr "Multifus opens on the first double-click"
-
 #: src/screens/download-screen.tsx
 msgid "Multifus s’ouvre et vous guide. Il vous montre les cases à cocher, dans votre ordinateur et dans Dofus. Deux minutes, une seule fois."
 msgstr "Multifus opens and guides you. It shows you the boxes to tick, in your computer and in Dofus. Two minutes, once."
@@ -1009,10 +1009,6 @@ msgstr "Signed package"
 #: src/constants/bodies.ts
 msgid "Par Telegram, sur votre téléphone"
 msgstr "Through Telegram, on your phone"
-
-#: src/constants/bodies.ts
-msgid "Pas de clic droit, pas d’alerte, rien à aller autoriser dans les Réglages."
-msgstr "No right-click, no warning, nothing to go and allow in Settings."
 
 #: src/constants/rivals.ts
 msgid "Pas signé, mais l’attestation GitHub y est."
@@ -1171,8 +1167,8 @@ msgid "Sur Mac"
 msgstr "On Mac"
 
 #: src/constants/questions.ts
-msgid "Sur Mac, Apple vérifie le fichier avant qu’il s’ouvre, et aucun avertissement ne s’affiche. Sur Windows, votre ordinateur peut demander confirmation : Multifus est encore jeune, et Windows ne le connaît pas encore."
-msgstr "On Mac, Apple checks the file before it opens, and no warning shows. On Windows, your computer may ask for confirmation: Multifus is still young, and Windows does not know it yet."
+msgid "Sur Mac, Apple a vérifié le fichier : au premier lancement, macOS demande seulement de confirmer, et précise qu’aucun logiciel malveillant n’a été trouvé. Sur Windows, votre ordinateur peut demander confirmation : Multifus est encore jeune, et Windows ne le connaît pas encore."
+msgstr "On Mac, Apple has checked the file: on the first launch, macOS only asks you to confirm, and says no malicious software was found. On Windows, your computer may ask for confirmation: Multifus is still young, and Windows does not know it yet."
 
 #. placeholder {0}: SYSTEM_VERSIONS.macos
 #: src/constants/questions.ts
@@ -1271,6 +1267,10 @@ msgstr "One click per character, and the team follows."
 #: src/constants/bodies.ts
 msgid "Un de vos personnages reçoit une invitation ou un message, et sa fenêtre passe devant vous toute seule."
 msgstr "One of your characters gets an invite or a message, and its window comes forward on its own."
+
+#: src/constants/bodies.ts
+msgid "Un double-clic, puis « Ouvrir »"
+msgstr "A double-click, then “Open”"
 
 #: src/constants/summons.ts
 msgid "Un fichier par système, trois gestes à l’installation, et vous jouez en multicompte le soir même."

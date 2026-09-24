@@ -1,8 +1,50 @@
+<img src="packages/ankama/images/multifus-mac.en.webp" alt="Multifus on macOS, with four Dofus Retro characters online" width="100%">
+
 # Multifus
 
-A multi-account window manager for Dofus Retro, on macOS and Windows.
+A multi-account window manager for Dofus Retro, on macOS and Windows. The window
+of the character whose turn it is comes to the front on its own. Free, no
+account, no ads, and [within Ankama's rules](https://www.multifus.app/en/ankama).
 
-Downloads, features and documentation: [multifus.app](https://www.multifus.app).
+## Download
+
+### macOS
+
+macOS 13.3 or later, on Intel and Apple Silicon. Signed and notarized by Apple.
+
+[Download for Mac](https://www.multifus.app/en/download) ·
+[Multifus on Mac](https://www.multifus.app/en/mac)
+
+### Windows
+
+Windows 10 or 11. Windows may warn about a new app: click **More info**, then
+**Run anyway**.
+
+[Download for Windows](https://www.multifus.app/en/download) ·
+[Multifus on Windows](https://www.multifus.app/en/windows)
+
+Every version is on the [releases page](https://github.com/viclafouch/multifus/releases),
+and what each one changed is in the [changelog](https://www.multifus.app/en/changelog).
+Multifus updates itself from there.
+
+## Features
+
+- [AutoFocus](https://www.multifus.app/en/autofocus): the window of the
+  character whose turn it is comes forward as the turn starts, and on a trade,
+  an invitation or a private message.
+- [Character wheel](https://www.multifus.app/en/character-wheel): hold a
+  shortcut, aim at a class head, let go.
+- [Quick move](https://www.multifus.app/en/quick-move): click where you want to
+  go, and the next character lands in front of you.
+- [Rune table](https://www.multifus.app/en/rune-table): the rune weight table
+  lies over the game window.
+- [Private messages](https://www.multifus.app/en/private-messages): your private
+  messages reach your phone through Telegram.
+- [Quick texts](https://www.multifus.app/en/quick-texts): a key combination
+  writes your sentence in the chat field.
+
+Found a bug? [Open an issue](https://github.com/viclafouch/multifus/issues), in
+French, English or Spanish.
 
 ## Architecture
 

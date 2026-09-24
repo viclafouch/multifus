@@ -47,7 +47,7 @@ export const PAGE_DESCRIPTIONS = {
   runeTable: msg`Le tableau du poids des runes de Dofus Retro se pose par-dessus le jeu, à la touche de votre choix. Vous forgemagez sans jamais ouvrir votre navigateur.`,
   relay: msg`Vos messages privés de Dofus Retro arrivent sur votre téléphone par Telegram, dans la seconde. Vous savez aussi quel personnage vient d’être déconnecté.`,
   quickTexts: msg`Rangez vos phrases les plus répétées sous une combinaison de touches. Dans Dofus Retro, vous appuyez, la phrase s’écrit, et c’est vous qui l’envoyez.`,
-  mac: msg`Le multicompte Dofus Retro sur Mac, dans une application vérifiée par Apple qui s’ouvre au premier double-clic. Les six fonctionnalités y sont, sans exception.`,
+  mac: msg`Le multicompte Dofus Retro sur Mac, dans une application vérifiée par Apple, sans clic droit ni réglage à contourner. Les six fonctionnalités y sont.`,
   windows: msg`Le multicompte Dofus Retro sur Windows 10 et 11 : chaque personnage prend son bouton dans la barre des tâches, avec son pseudo et sa tête de classe.`,
   comparison: msg`Multifus, Dracoon, Focus Retro, Dosoft, Retro Toolbox, ROrganizer : quatorze lignes comparées, chacune lue dans le code de l’outil et pas sur sa page d’accueil.`,
   download: msg`Téléchargez Multifus gratuitement, pour Mac et pour Windows. Trois gestes pour installer, aucun compte à créer, aucune publicité, et le code est public.`,

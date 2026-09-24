@@ -36,5 +36,5 @@
 
 ### Mac y Windows
 
-- En Mac, una aplicación verificada por Apple que se abre al primer doble clic, tanto en Mac Intel como en Apple Silicon.
+- En Mac, una aplicación verificada por Apple, sin clic derecho ni ajuste de seguridad que sortear, tanto en Mac Intel como en Apple Silicon.
 - En Windows 10 y 11, cada personaje tiene su botón en la barra de tareas, con su apodo y su cabeza de clase.

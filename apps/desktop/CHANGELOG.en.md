@@ -36,5 +36,5 @@
 
 ### Mac and Windows
 
-- On Mac, an application checked by Apple that opens on the first double-click, on Intel and Apple Silicon Macs alike.
+- On Mac, an application checked by Apple, with no right-click and no security setting to work around, on Intel and Apple Silicon Macs alike.
 - On Windows 10 and 11, every character takes its own taskbar button, with its nickname and its class head.
