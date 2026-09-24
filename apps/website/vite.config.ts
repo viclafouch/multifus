@@ -163,6 +163,10 @@ export default defineConfig(async ({ mode }) => {
       port: Number(new URL(originOf('development')).port),
       strictPort: true
     },
+    preview: {
+      // the prerender fetches from a busy event loop, and Windows answers localhost on ::1 alone
+      host: '127.0.0.1'
+    },
     test: {
       include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
       environment: 'jsdom',
