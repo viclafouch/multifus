@@ -54,8 +54,6 @@ const MOTION_LINGERS: Duration = Duration::from_millis(500);
 
 static NEXT_FOLLOW: Alarm = Alarm::new();
 
-const FIRST_MARGIN: f64 = 24.0;
-
 const GUESSED_RATIO: f64 = 2.1;
 
 const WILDEST_RATIO: f64 = 8.0;
@@ -441,7 +439,7 @@ fn follow_multifus(app: &AppHandle) {
     let area = screen_under(app, frame).map(|screen| screen.area);
     let size = table_size_of(app, area);
 
-    lay_over(app, frame, size, middle_offset(app, frame, size));
+    lay_over(app, frame, size, middle_offset(app, frame, size, area));
 }
 
 fn lay_over(app: &AppHandle, frame: ScreenFrame, size: TableSize, offset: RuneOffset) {
@@ -455,14 +453,36 @@ fn lay_over(app: &AppHandle, frame: ScreenFrame, size: TableSize, offset: RuneOf
     );
 }
 
-fn middle_offset(app: &AppHandle, frame: ScreenFrame, size: TableSize) -> RuneOffset {
+fn middle_offset(
+    app: &AppHandle,
+    frame: ScreenFrame,
+    size: TableSize,
+    area: Option<WorkArea>,
+) -> RuneOffset {
     let table = app.state::<RuneTable>();
     let mut held = table.preview_offset();
 
-    *held.get_or_insert(RuneOffset {
+    *held.get_or_insert(centred(frame, size, area))
+}
+
+fn centred(frame: ScreenFrame, size: TableSize, area: Option<WorkArea>) -> RuneOffset {
+    let middle = RuneOffset {
         x: (frame.width - size.width) / 2.0,
         y: (frame.height - size.height) / 2.0,
-    })
+    };
+
+    let Some(area) = area else {
+        return middle;
+    };
+
+    RuneOffset {
+        x: within(frame.origin.x + middle.x, area.x, area.width - size.width) - frame.origin.x,
+        y: within(frame.origin.y + middle.y, area.y, area.height - size.height) - frame.origin.y,
+    }
+}
+
+fn within(at: f64, start: f64, room: f64) -> f64 {
+    at.min(start + room).max(start)
 }
 
 fn follow_game(app: &AppHandle) {
@@ -511,7 +531,7 @@ fn follow_game(app: &AppHandle) {
     let area = screen.map(|screen| screen.area);
     let size = table_size_of(app, area);
 
-    lay_over(app, frame, size, kept_offset(app, frame, size));
+    lay_over(app, frame, size, kept_offset(app, frame, size, area));
     stack_above(app, window);
 }
 
@@ -604,22 +624,15 @@ fn complain(app: &AppHandle, detail: &str) {
     veil(app);
 }
 
-fn kept_offset(app: &AppHandle, frame: ScreenFrame, size: TableSize) -> RuneOffset {
-    if let Some(offset) = lock(app).rune_table_offset() {
-        return offset;
-    }
+fn kept_offset(
+    app: &AppHandle,
+    frame: ScreenFrame,
+    size: TableSize,
+    area: Option<WorkArea>,
+) -> RuneOffset {
+    let kept = lock(app).rune_table_offset();
 
-    let first = RuneOffset {
-        x: frame.width - size.width - FIRST_MARGIN,
-        y: FIRST_MARGIN,
-    };
-
-    let mut state = lock(app);
-
-    state.set_rune_table_offset(first);
-    state.save();
-
-    first
+    kept.unwrap_or_else(|| centred(frame, size, area))
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -1062,6 +1075,33 @@ mod tests {
         assert_eq!(
             placed(frame(), RuneOffset { x: 24.0, y: 40.0 }),
             LogicalPosition::new(124.0, 100.0)
+        );
+    }
+
+    #[test]
+    fn a_table_nobody_moved_sits_in_the_middle_of_the_window_of_the_game() {
+        assert_eq!(
+            centred(frame(), a_table_size(), Some(work_area())),
+            RuneOffset { x: 430.0, y: 80.0 }
+        );
+    }
+
+    #[test]
+    fn a_table_taller_than_a_small_client_keeps_its_top_on_the_screen() {
+        let small = ScreenFrame {
+            origin: ScreenPoint { x: 0.0, y: 0.0 },
+            width: 1024.0,
+            height: 600.0,
+        };
+        let too_tall = TableSize {
+            width: 420.0,
+            height: 1200.0,
+        };
+
+        assert_eq!(
+            centred(small, too_tall, Some(work_area())),
+            RuneOffset { x: 302.0, y: 0.0 },
+            "the close button sits at the top of the table"
         );
     }
 
