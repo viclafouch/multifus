@@ -144,6 +144,7 @@ export const wheelSizeOf = (fields: Partial<WheelSize> = {}) => {
 }
 
 const BLANK_SNAPSHOT: Snapshot = {
+  scanned: true,
   version: '0.0.0',
   system: 'test',
   language: 'fr',

@@ -1327,6 +1327,10 @@ msgstr "Il regarde d’abord s’il voit vos fenêtres, puis ce que le système 
 msgid "inactif"
 msgstr "inactif"
 
+#: src/helpers/journal.ts
+msgid "inconnue"
+msgstr "inconnue"
+
 #: src/constants/runes.ts
 msgid "Ine / Fo / Age / Cha"
 msgstr "Ine / Fo / Age / Cha"

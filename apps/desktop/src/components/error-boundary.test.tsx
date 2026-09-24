@@ -6,7 +6,8 @@ import { pending } from '@/test-doubles'
 
 const bridge = {
   revealJournal: vi.fn(pending),
-  screenStopped: vi.fn(pending)
+  screenStopped: vi.fn(pending),
+  windowPainted: vi.fn(pending)
 }
 
 vi.mock(import('@/lib/multifus'), () => {

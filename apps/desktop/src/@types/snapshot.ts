@@ -36,6 +36,7 @@ export type ScreenName =
   | 'walk'
 
 export type Snapshot = {
+  readonly scanned: boolean
   readonly version: string
   readonly system: string
   readonly language: Language

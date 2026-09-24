@@ -75,23 +75,40 @@ pub fn start(app: AppHandle) {
         .spawn({
             let app = app.clone();
 
-            move || loop {
-                if let Err(detail) = panics::guard(|| tick(&app)) {
-                    lock(&app).log_unless_repeated(JournalEvent::Panicked {
-                        work: Work::Scan,
-                        detail,
-                    });
-                }
+            move || {
+                take_turn(&app, tick);
+                take_turn(&app, announce_first_scan);
 
-                wait_for_next_turn();
+                loop {
+                    wait_for_next_turn();
+                    take_turn(&app, tick);
+                }
             }
         });
 
     if let Err(error) = spawned {
-        lock(&app).log(JournalEvent::ScanFailed {
+        let mut state = lock(&app);
+
+        state.log(JournalEvent::ScanFailed {
             detail: error.to_string(),
         });
+        state.mark_scanned();
     }
+}
+
+fn take_turn(app: &AppHandle, turn: fn(&AppHandle)) {
+    if let Err(detail) = panics::guard(|| turn(app)) {
+        lock(app).log_unless_repeated(JournalEvent::Panicked {
+            work: Work::Scan,
+            detail,
+        });
+    }
+}
+
+fn announce_first_scan(app: &AppHandle) {
+    lock(app).mark_scanned();
+
+    emit_snapshot(app);
 }
 
 fn wait_for_next_turn() {

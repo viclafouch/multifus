@@ -3,6 +3,7 @@ import { TriangleAlert } from 'lucide-react'
 import { t } from '@lingui/core/macro'
 import { Button } from '@multifus/retro'
 import { EmptyState, EmptyStateMark } from '@/components/layout/empty-state'
+import { useShowWhenPainted } from '@/hooks/use-show-when-painted'
 import { revealJournal, screenStopped } from '@/lib/multifus'
 import { reloadScreen } from '@/lib/reload'
 import { errorMessage, ignore } from '@/lib/utils'
@@ -46,6 +47,8 @@ type CrashScreenProps = Readonly<{
 }>
 
 const CrashScreen = ({ message }: CrashScreenProps) => {
+  useShowWhenPainted(true)
+
   return (
     <div role="alert" className="flex min-h-screen flex-col justify-center p-7">
       <EmptyState

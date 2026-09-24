@@ -53,6 +53,14 @@ window.matchMedia = (query: string) => {
 
 Element.prototype.scrollIntoView = ignore
 
+Object.defineProperty(document, 'fonts', {
+  value: { ready: Promise.resolve() }
+})
+
+HTMLImageElement.prototype.decode = function decode() {
+  return Promise.resolve()
+}
+
 const CAPTURED = new WeakMap<Element, Set<number>>()
 
 Element.prototype.setPointerCapture = function setPointerCapture(

@@ -1,5 +1,7 @@
 use std::sync::Mutex;
 use std::sync::PoisonError;
+use std::thread;
+use std::time::Duration;
 
 use tauri::AppHandle;
 use tauri::Manager;
@@ -19,6 +21,8 @@ use crate::app::tray;
 pub const LABEL: &str = "main";
 
 pub const FROM_SESSION_ARG: &str = "--from-session";
+
+const PAINT_GRACE: Duration = Duration::from_millis(1500);
 
 #[derive(Default)]
 struct Wait {
@@ -59,6 +63,8 @@ pub fn hold_until_ready(app: &AppHandle) {
     if is_due {
         show(app);
     }
+
+    later(app, PAINT_GRACE, |app| show_when_ready(app, LABEL));
 }
 
 pub fn show_when_ready(app: &AppHandle, label: &str) {
@@ -72,6 +78,25 @@ pub fn show_when_ready(app: &AppHandle, label: &str) {
 
     if is_due {
         show(app);
+    }
+}
+
+fn later(app: &AppHandle, delay: Duration, work: fn(&AppHandle)) {
+    let spawned = thread::Builder::new()
+        .name("multifus-later".to_owned())
+        .spawn({
+            let app = app.clone();
+
+            move || {
+                thread::sleep(delay);
+                work(&app);
+            }
+        });
+
+    if let Err(error) = spawned {
+        lock(app).log_unless_repeated(JournalEvent::WindowFailed {
+            detail: error.to_string(),
+        });
     }
 }
 

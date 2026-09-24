@@ -14,9 +14,11 @@ import { MapFrame } from '@/components/world/map-frame'
 import { WorldScene } from '@/components/world/world-scene'
 import { ONBOARDING_ANCHOR } from '@/constants/onboarding'
 import { CLEARING } from '@/constants/world'
+import { matchIsDenied } from '@/helpers/authorization'
 import { useCurrentMap } from '@/hooks/use-current-map'
 import { useEscape } from '@/hooks/use-escape'
 import { useMultifus } from '@/hooks/use-multifus'
+import { useShowWhenPainted } from '@/hooks/use-show-when-painted'
 import { useTrayNavigation } from '@/hooks/use-tray-navigation'
 import { showAnchor } from '@/lib/anchor'
 import {
@@ -35,6 +37,7 @@ export const App = () => {
   const [map, setMap] = useCurrentMap()
 
   useTrayNavigation(setMap)
+  useShowWhenPainted(snapshot?.scanned ?? false)
 
   const isPreviewing = snapshot?.runeTable.previewing ?? false
 
@@ -46,7 +49,7 @@ export const App = () => {
     setMap(CLEARING)
   })
 
-  if (snapshot === null) {
+  if (snapshot === null || !snapshot.scanned) {
     return <div aria-hidden className="grove fixed inset-0 -z-10" />
   }
 
@@ -64,7 +67,7 @@ export const App = () => {
   }
 
   const shouldWarnAboutAuthorization =
-    !snapshot.authorization.granted && map === CLEARING
+    matchIsDenied(snapshot.authorization) && map === CLEARING
 
   return (
     <KeyLabelsProvider labels={snapshot.keyboard}>

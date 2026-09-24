@@ -136,6 +136,12 @@ const CALLS = [
     }
   },
   {
+    name: 'windowPainted',
+    run: () => {
+      return multifus.windowPainted()
+    }
+  },
+  {
     name: 'language',
     run: () => {
       return multifus.language()

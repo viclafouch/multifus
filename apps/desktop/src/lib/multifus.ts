@@ -37,6 +37,10 @@ export const snapshot = async () => {
   return invoke<Snapshot>('snapshot')
 }
 
+export const windowPainted = async () => {
+  return invoke<null>('window_painted')
+}
+
 export const language = async () => {
   return invoke<Language>('language')
 }

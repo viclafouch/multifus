@@ -172,6 +172,7 @@ pub struct Multifus {
     watched_clients: Option<ClientsView>,
     painted_windows: HashMap<WindowId, WindowLook>,
     taskbar_combines: bool,
+    scanned: bool,
     granted: Option<bool>,
     checks: SystemChecks,
     notice_dismissed: bool,
@@ -268,6 +269,7 @@ impl Multifus {
             watched_clients: None,
             painted_windows: HashMap::new(),
             taskbar_combines,
+            scanned: false,
             granted: None,
             checks: SystemChecks::default(),
             notice_dismissed: false,
@@ -302,6 +304,7 @@ impl Multifus {
         let defaults = Shortcuts::default();
 
         Snapshot {
+            scanned: self.scanned,
             version: self.version.clone(),
             system: self.system.clone(),
             language: self.language(),
@@ -350,7 +353,7 @@ impl Multifus {
             auto_focus_enabled: self.settings.auto_focus.enabled,
             wakes_minimized: self.settings.auto_focus.wakes_minimized,
             authorization: AuthorizationView {
-                granted: self.is_granted(),
+                granted: self.granted,
                 listening: self.listening,
             },
             onboarding: self.onboarding(),
@@ -1591,6 +1594,10 @@ impl Multifus {
         }
     }
 
+    pub fn mark_scanned(&mut self) {
+        self.scanned = true;
+    }
+
     pub fn set_granted(&mut self, granted: bool) -> bool {
         if self.granted == Some(granted) {
             return false;
@@ -1605,6 +1612,11 @@ impl Multifus {
     #[must_use]
     pub fn is_granted(&self) -> bool {
         self.granted == Some(true)
+    }
+
+    #[must_use]
+    pub fn is_denied(&self) -> bool {
+        self.granted == Some(false)
     }
 
     pub fn set_listening(&mut self, listening: bool) -> bool {

@@ -1,5 +1,6 @@
 import React from 'react'
 import type { ScreenName, Snapshot } from '@/@types/snapshot'
+import { matchIsDenied } from '@/helpers/authorization'
 import { AboutScreen } from '@/screens/about'
 import { AuthorizationScreen } from '@/screens/authorization-screen'
 import { AutoFocusScreen } from '@/screens/auto-focus-screen'
@@ -20,7 +21,9 @@ type CurrentMapProps = Readonly<{
 export const CurrentMap = ({ map, snapshot, run }: CurrentMapProps) => {
   const maps = {
     characters: () => {
-      return snapshot.authorization.granted ? (
+      return matchIsDenied(snapshot.authorization) ? (
+        <AuthorizationScreen run={run} />
+      ) : (
         <CharactersScreen
           characters={snapshot.characters}
           paintPortraits={snapshot.paintPortraits}
@@ -28,8 +31,6 @@ export const CurrentMap = ({ map, snapshot, run }: CurrentMapProps) => {
           shortcuts={snapshot.shortcuts}
           run={run}
         />
-      ) : (
-        <AuthorizationScreen run={run} />
       )
     },
     shortcuts: () => {

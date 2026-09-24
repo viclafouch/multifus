@@ -37,10 +37,13 @@ use crate::domain::Gender;
 use crate::domain::NotificationKind;
 
 #[tauri::command]
-pub fn snapshot(app: AppHandle, window: WebviewWindow) -> Snapshot {
-    main_window::show_when_ready(&app, window.label());
-
+pub fn snapshot(app: AppHandle) -> Snapshot {
     lock(&app).snapshot()
+}
+
+#[tauri::command]
+pub fn window_painted(app: AppHandle, window: WebviewWindow) {
+    main_window::show_when_ready(&app, window.label());
 }
 
 #[tauri::command]

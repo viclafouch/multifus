@@ -1,6 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { i18n } from '@lingui/core'
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor
+} from '@testing-library/react'
 import type { ScreenName, Snapshot } from '@/@types/snapshot'
 import type { ConfigProblem } from '@/@types/system'
 import { ONBOARDING_ANCHOR } from '@/constants/onboarding'
@@ -28,7 +35,8 @@ const bridge = {
   revealJournal: vi.fn(pending),
   revealConfig: vi.fn(pending),
   revealQuarantinedConfig: vi.fn(pending),
-  closeRuneTable: vi.fn(pending)
+  closeRuneTable: vi.fn(pending),
+  windowPainted: vi.fn(pending)
 }
 
 vi.mock(import('@/lib/multifus'), () => {
@@ -98,6 +106,68 @@ const ARRIVALS = [
   { name: 'settings', mark: 'Les réglages de Multifus :' },
   { name: 'about', mark: 'Mentions légales' }
 ] as const satisfies readonly Arrival[]
+
+describe('the snapshot taken before the first scan', () => {
+  it('stays hidden on the reading taken before the first scan, and shows once the scan is painted', async () => {
+    const heard = { handle: ignore as (snapshot: Snapshot) => void }
+
+    bridge.onSnapshot.mockImplementation(
+      async (handle: (snapshot: Snapshot) => void) => {
+        heard.handle = handle
+
+        return ignore
+      }
+    )
+    bridge.onNavigate.mockResolvedValue(ignore)
+    bridge.snapshot.mockResolvedValue(
+      snapshotOf({
+        scanned: false,
+        authorization: { granted: false, listening: false }
+      })
+    )
+    bridge.bannerScreens.mockResolvedValue([])
+    bridge.wheelDisplay.mockResolvedValue(null)
+
+    render(<App />)
+
+    await waitFor(() => {
+      expect(bridge.snapshot).toHaveBeenCalledWith()
+    })
+
+    expect(screen.queryByRole('heading', { level: 1 })).toBeNull()
+    expect(screen.queryByText('Autorisation manquante')).toBeNull()
+    expect(bridge.windowPainted).not.toHaveBeenCalled()
+
+    act(() => {
+      heard.handle(snapshotOf())
+    })
+
+    await screen.findByRole('heading', { level: 1 })
+    await waitFor(() => {
+      expect(bridge.windowPainted).toHaveBeenCalledWith()
+    })
+  })
+})
+
+describe('the authorization no scan has read yet', () => {
+  const unread = snapshotOf({
+    authorization: { granted: null, listening: false }
+  })
+
+  it('raises no banner on the home screen', async () => {
+    await open(unread)
+
+    expect(screen.queryByText('Autorisation manquante')).toBeNull()
+  })
+
+  it('shows the characters rather than asking for the authorization', async () => {
+    await open(unread)
+
+    navigateTo('characters')
+
+    expect(screen.queryByText('Multifus attend votre autorisation')).toBeNull()
+  })
+})
 
 describe('the Multifus window', () => {
   beforeEach(() => {

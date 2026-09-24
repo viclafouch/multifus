@@ -198,7 +198,7 @@ struct Contents {
     auto_focus: bool,
     walk: bool,
     rune_table: bool,
-    granted: bool,
+    denied: bool,
     update: Option<String>,
     relay: RelayItem,
 }
@@ -254,7 +254,7 @@ fn contents(state: &Multifus) -> Contents {
         auto_focus: state.is_auto_focus_enabled(),
         walk: state.is_walk_enabled(),
         rune_table: state.is_rune_table_open(),
-        granted: state.is_granted(),
+        denied: state.is_denied(),
         update: state.available_update(),
         relay: relay_item(state),
     }
@@ -362,7 +362,7 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
     let menu = Menu::new(app)?;
     let words = words(contents.language);
 
-    if !contents.granted {
+    if contents.denied {
         menu.append(&MenuItem::with_id(
             app,
             DENIED_ID,
@@ -741,10 +741,26 @@ mod tests {
             }],
             "the character whose window the scan did not find is gone from the menu"
         );
-        assert!(shown.granted);
+        assert!(!shown.denied);
         assert!(!shown.walk);
         assert_eq!(shown.relay, RelayItem::NotReady);
         assert_eq!(shown.update, None);
+    }
+
+    #[test]
+    fn the_menu_names_a_refusal_only_once_a_scan_has_read_it() {
+        let directory = directory();
+        let mut state =
+            test_doubles::multifus(&directory, test_doubles::intact(Settings::default()));
+
+        assert!(
+            !contents(&state).denied,
+            "no scan has read the authorization yet"
+        );
+
+        state.apply_denied();
+
+        assert!(contents(&state).denied);
     }
 
     #[test]
@@ -953,7 +969,7 @@ mod tests {
             auto_focus: true,
             walk: false,
             rune_table: false,
-            granted: true,
+            denied: false,
             update: None,
             relay: RelayItem::NotReady,
         };
@@ -976,7 +992,7 @@ mod tests {
             auto_focus: true,
             walk: false,
             rune_table: false,
-            granted: true,
+            denied: false,
             update: None,
             relay: RelayItem::NotReady,
         };

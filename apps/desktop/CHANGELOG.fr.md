@@ -17,6 +17,7 @@
 - Sur Windows, l’étape des notifications vous demandait de cocher Multifus dans une liste où il n’apparaît jamais. Elle montre maintenant le bon interrupteur.
 - La fenêtre de Multifus pouvait passer en plein écran, où elle n’a rien à faire. Le bouton pour l’agrandir est maintenant désactivé.
 - Un clic droit dans Multifus ouvrait le menu d’un navigateur web, et F5 rechargeait la fenêtre. Les deux ne font plus rien.
+- À l’ouverture, Multifus affichait un instant « Autorisation manquante » sur un écran sans décor. Il s’ouvre maintenant directement sur le bon écran.
 
 ## 0.1.0 - 2026-09-23
 

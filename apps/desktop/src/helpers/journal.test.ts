@@ -1434,6 +1434,7 @@ const MORNING = Date.UTC(2026, 0, 15, 9, 5, 3)
 const NOON = Date.UTC(2026, 0, 15, 12, 30, 0)
 
 const SNAPSHOT = {
+  scanned: true,
   version: '0.1.0',
   system: 'macOS 26.0 (arm64)',
   language: 'fr',
@@ -1704,6 +1705,14 @@ describe('journalTranscript', () => {
     const transcript = journalTranscript({ ...SNAPSHOT, authorization })
 
     expect(transcript).toContain('Autorisation : refusée, écoute arrêtée')
+  })
+
+  it('says the authorization unknown while no scan has read it', () => {
+    const authorization = { granted: null, listening: false }
+
+    const transcript = journalTranscript({ ...SNAPSHOT, authorization })
+
+    expect(transcript).toContain('Autorisation : inconnue, écoute arrêtée')
   })
 
   it('says AutoFocus suspended and the wake of the minimized ones off', () => {

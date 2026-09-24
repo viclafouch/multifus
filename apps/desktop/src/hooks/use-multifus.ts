@@ -3,6 +3,16 @@ import type { Snapshot } from '@/@types/snapshot'
 import * as multifus from '@/lib/multifus'
 import { ignore } from '@/lib/utils'
 
+const replacedBy = (next: Snapshot) => {
+  return (current: Snapshot | null) => {
+    if ((current?.scanned ?? false) && !next.scanned) {
+      return current
+    }
+
+    return next
+  }
+}
+
 export const useMultifus = () => {
   const [snapshot, setSnapshot] = React.useState<Snapshot | null>(null)
 
@@ -13,7 +23,7 @@ export const useMultifus = () => {
     const subscribe = async () => {
       const stop = await multifus.onSnapshot((next) => {
         if (isLive) {
-          setSnapshot(next)
+          setSnapshot(replacedBy(next))
         }
       })
 
@@ -41,7 +51,9 @@ export const useMultifus = () => {
   }, [])
 
   const run = (action: Promise<Snapshot>) => {
-    action.then(setSnapshot, ignore)
+    action.then((next) => {
+      setSnapshot(replacedBy(next))
+    }, ignore)
   }
 
   return { snapshot, run }

@@ -114,6 +114,25 @@ describe('useMultifus', () => {
     )
   })
 
+  it('never goes back to a snapshot taken before the first scan', async () => {
+    const { result } = renderHook(() => {
+      return useMultifus()
+    })
+
+    await listening()
+
+    act(() => {
+      bridge.heard?.(snapshotOf({ version: '0.2.0' }))
+    })
+    act(() => {
+      bridge.heard?.(snapshotOf({ version: '0.1.0', scanned: false }))
+    })
+
+    expect(result.current.snapshot).toStrictEqual(
+      snapshotOf({ version: '0.2.0' })
+    )
+  })
+
   it('replaces the snapshot with what a command returns', async () => {
     const { result } = renderHook(() => {
       return useMultifus()

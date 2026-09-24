@@ -1327,6 +1327,10 @@ msgstr "It first looks at whether it can see your windows, then at what the syst
 msgid "inactif"
 msgstr "off"
 
+#: src/helpers/journal.ts
+msgid "inconnue"
+msgstr "unknown"
+
 #: src/constants/runes.ts
 msgid "Ine / Fo / Age / Cha"
 msgstr "Int / Str / Agi / Cha"

@@ -11,6 +11,7 @@ import { MapTitle } from '@/components/layout/map-title'
 import { StandingStone } from '@/components/world/standing-stone'
 import { WayList } from '@/components/world/way-list'
 import { CLEARING, MAP_NAMES } from '@/constants/world'
+import { matchIsGranted } from '@/helpers/authorization'
 import { colorHolders } from '@/helpers/colors'
 import { listeningLine, listeningState } from '@/helpers/wording'
 import { characterMarks } from '@/lib/character-marks'
@@ -41,7 +42,7 @@ export const ClearingScreen = ({
   return (
     <main className="relative flex min-h-0 flex-1 flex-col px-6 pt-3">
       <header className="relative z-30 flex h-crown w-fit shrink-0 items-center gap-3">
-        {authorization.granted ? (
+        {matchIsGranted(authorization) ? (
           <p className="limelight flex items-center gap-2 text-mark text-khaki">
             <Lamp state={listeningState(authorization.listening)} />
             {listeningLine(authorization.listening)}

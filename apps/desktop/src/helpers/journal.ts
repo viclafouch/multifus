@@ -21,7 +21,7 @@ import type {
   ShortcutAction
 } from '@/@types/shortcuts'
 import type { Snapshot } from '@/@types/snapshot'
-import type { Surface } from '@/@types/system'
+import type { Authorization, Surface } from '@/@types/system'
 import type { JournalTone } from '@/constants/journal'
 import {
   DEAD_SHORTCUT_STATUSES,
@@ -496,6 +496,14 @@ const journalPeriod = (entries: readonly JournalEntry[]) => {
   return `${journalMoment(entries[0].at)} → ${journalMoment(entries[lastIndex].at)}`
 }
 
+const authorizationWord = (granted: Authorization['granted']) => {
+  if (granted === null) {
+    return t`inconnue`
+  }
+
+  return granted ? t`accordée` : t`refusée`
+}
+
 export const journalTranscript = (snapshot: Snapshot) => {
   const { journal } = snapshot
 
@@ -504,7 +512,7 @@ export const journalTranscript = (snapshot: Snapshot) => {
   })
 
   const { version, system } = snapshot
-  const granted = snapshot.authorization.granted ? t`accordée` : t`refusée`
+  const granted = authorizationWord(snapshot.authorization.granted)
   const listening = snapshot.authorization.listening ? t`active` : t`arrêtée`
   const active = t`actif`
   const autoFocus = snapshot.autoFocusEnabled ? active : t`suspendu`

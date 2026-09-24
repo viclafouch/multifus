@@ -8,7 +8,7 @@ export type SystemInternals = Readonly<{
 }>
 
 export type Authorization = {
-  readonly granted: boolean
+  readonly granted: boolean | null
   readonly listening: boolean
 }
 

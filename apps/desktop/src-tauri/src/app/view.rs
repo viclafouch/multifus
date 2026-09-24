@@ -29,6 +29,7 @@ impl From<ScreenSaverDelay> for ScreenSaverView {
 #[derive(Debug, Clone, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Snapshot {
+    pub scanned: bool,
     pub version: String,
     pub system: String,
     pub language: Language,
@@ -409,7 +410,7 @@ pub struct AutoFocusView {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AuthorizationView {
-    pub granted: bool,
+    pub granted: Option<bool>,
     pub listening: bool,
 }
 
@@ -548,6 +549,7 @@ mod tests {
 
     fn snapshot() -> Snapshot {
         Snapshot {
+            scanned: true,
             version: "0.1.0".to_owned(),
             system: "macos 15.0 aarch64".to_owned(),
             language: Language::Fr,
@@ -579,7 +581,7 @@ mod tests {
             taskbar_combines: true,
             share_stats: true,
             authorization: AuthorizationView {
-                granted: true,
+                granted: Some(true),
                 listening: true,
             },
             onboarding: OnboardingView {
@@ -688,6 +690,7 @@ mod tests {
                 "quickTexts",
                 "relay",
                 "runeTable",
+                "scanned",
                 "shareStats",
                 "shortTitles",
                 "shortcuts",
@@ -1165,10 +1168,18 @@ mod tests {
     fn the_authorization_says_whether_it_was_granted_and_whether_multifus_listens() {
         assert_eq!(
             json_of(&AuthorizationView {
-                granted: false,
+                granted: Some(false),
                 listening: false,
             }),
             json!({ "granted": false, "listening": false })
+        );
+        assert_eq!(
+            json_of(&AuthorizationView {
+                granted: None,
+                listening: false,
+            }),
+            json!({ "granted": null, "listening": false }),
+            "an authorization no scan has read yet is neither granted nor refused"
         );
     }
 
