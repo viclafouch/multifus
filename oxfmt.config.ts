@@ -11,6 +11,6 @@ export default defineConfig({
     'apps/website/src/routeTree.gen.ts',
     'apps/desktop/src-tauri/**',
     'pnpm-lock.yaml',
-    '**/CHANGELOG*.md'
+    '**/*.md'
   ]
 })
