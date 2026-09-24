@@ -783,12 +783,12 @@ msgid "Cliquez sur Connecter"
 msgstr "Haz clic en Conectar"
 
 #: src/helpers/onboarding.ts
-msgid "Cliquez sur le bouton, puis cochez Multifus dans la liste. Sans cette autorisation, il n’entend pas Dofus et ne ramènera personne devant vous."
-msgstr "Pulse el botón y luego marque Multifus en la lista. Sin este permiso, no oye a Dofus y no traerá a nadie ante usted."
-
-#: src/helpers/onboarding.ts
 msgid "Cliquez sur le bouton, puis cochez Multifus dans la liste. Sans cette autorisation, il ne voit aucune fenêtre et ne ramènera personne devant vous."
 msgstr "Pulse el botón y luego marque Multifus en la lista. Sin este permiso, no ve ninguna ventana y no traerá a nadie ante usted."
+
+#: src/helpers/onboarding.ts
+msgid "Cliquez sur le bouton. Si Windows refuse, allumez l’accès des applications à vos notifications : Multifus n’a pas de ligne à lui dans la liste. Sans cet accès, il n’entend pas Dofus et ne ramènera personne devant vous."
+msgstr "Pulse el botón. Si Windows se niega, active el acceso de las aplicaciones a sus notificaciones: Multifus no tiene una línea propia en la lista. Sin este acceso, no oye a Dofus y no traerá a nadie ante usted."
 
 #: src/components/questions-dialog.tsx
 msgid "Cliquez une question pour voir la réponse."

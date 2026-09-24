@@ -92,7 +92,7 @@ const pageBody = (page: Page) => {
     case 'authorization': {
       return IS_APPLE
         ? t`Cliquez sur le bouton, puis cochez Multifus dans la liste. Sans cette autorisation, il ne voit aucune fenêtre et ne ramènera personne devant vous.`
-        : t`Cliquez sur le bouton, puis cochez Multifus dans la liste. Sans cette autorisation, il n’entend pas Dofus et ne ramènera personne devant vous.`
+        : t`Cliquez sur le bouton. Si Windows refuse, allumez l’accès des applications à vos notifications : Multifus n’a pas de ligne à lui dans la liste. Sans cet accès, il n’entend pas Dofus et ne ramènera personne devant vous.`
     }
     case 'notifications': {
       const game = quoted(systemWords().game)

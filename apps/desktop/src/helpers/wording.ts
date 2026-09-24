@@ -74,10 +74,9 @@ export const systemWords = () => {
           context:
             'l’application de réglages de Windows, et non un écran de Multifus'
         }),
-    privacy:
-      IS_APPLE || IS_WINDOWS_ELEVEN
-        ? t`Confidentialité et sécurité`
-        : t`Confidentialité`,
+    privacy: IS_WINDOWS_ELEVEN
+      ? t`Confidentialité et sécurité`
+      : t`Confidentialité`,
     accessibility: t`Accessibilité`,
     notifications: t`Notifications`,
     systemNotifications:

@@ -10,8 +10,7 @@ import {
   characterOf,
   onboardingOf,
   pending,
-  runOnWindowsTen,
-  speakFrench
+  runOnWindowsTen
 } from '@/test-doubles'
 
 const FEATURE_NAMES = [
@@ -56,6 +55,7 @@ type ShowParams = {
   readonly onboarding?: Onboarding
   readonly language?: Language
   readonly isWindowsTen?: boolean
+  readonly speaks?: Language
 }
 
 const show = async ({
@@ -66,7 +66,8 @@ const show = async ({
     steps: stepsWith({ authorization: 'blocked' })
   }),
   language = 'fr',
-  isWindowsTen = false
+  isWindowsTen = false,
+  speaks = 'fr'
 }: ShowParams = {}) => {
   vi.resetModules()
   vi.stubGlobal('navigator', { userAgent: agent })
@@ -75,7 +76,9 @@ const show = async ({
     runOnWindowsTen()
   }
 
-  await speakFrench()
+  const { speak } = await import('@/lib/i18n')
+
+  speak(speaks)
 
   const { OnboardingGuide } = await import('@/screens/onboarding/guide')
   const run = vi.fn()
@@ -477,6 +480,25 @@ describe('the words of Windows', () => {
     goTo('L’autorisation')
 
     expect(screen.getByText('Confidentialité et sécurité')).not.toBeNull()
+  })
+
+  it('writes the privacy screen in the case Windows 11 gives it in English', async () => {
+    await show({ agent: WINDOWS_AGENT, speaks: 'en' })
+
+    goTo('Permission')
+
+    expect(screen.getByText('Privacy & security')).not.toBeNull()
+  })
+
+  it('points at the switch of the page, since Windows lists no desktop app', async () => {
+    await show({ agent: WINDOWS_AGENT })
+
+    goTo('L’autorisation')
+
+    expect(
+      screen.getByText(/allumez l’accès des applications à vos notifications/u)
+    ).not.toBeNull()
+    expect(screen.queryByText(/cochez Multifus/u)).toBeNull()
   })
 
   it('names the game the way Windows lists it', async () => {
