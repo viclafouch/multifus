@@ -28,7 +28,7 @@ export const JournalScreen = ({ page }: PageScreenProps) => {
       <Band id={FOLD_ANCHOR} className="pt-rest-sm pb-8">
         <PageHead page={page} />
       </Band>
-      <Band className="reveal pb-rest-lg">
+      <Band className="pb-rest-lg">
         {releases.length === 0 ? (
           <Prose isWide>{i18n._(NOTHING_YET)}</Prose>
         ) : null}

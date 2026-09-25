@@ -1619,10 +1619,12 @@
 }
 
 @utility reveal {
-  @supports ((animation-timeline: view()) and (animation-range: entry)) {
-    animation: reveal 1ms linear both;
-    animation-timeline: view();
-    animation-range: entry 2% cover 24%;
+  @variant lg {
+    @supports ((animation-timeline: view()) and (animation-range: entry)) {
+      animation: reveal 1ms linear both;
+      animation-timeline: view();
+      animation-range: entry 2% cover 24%;
+    }
   }
 }
 

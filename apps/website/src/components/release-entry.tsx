@@ -22,7 +22,7 @@ export const ReleaseEntry = ({ release, isLatest }: ReleaseEntryProps) => {
   return (
     <article
       id={anchorOf(version)}
-      className="rule flex scroll-mt-fall flex-col gap-8 border-t pt-rest-xs"
+      className="flex scroll-mt-fall flex-col gap-8 max-lg:slab max-lg:p-6 lg:rule lg:border-t lg:pt-rest-xs"
     >
       <header className="flex flex-col gap-2">
         {isLatest ? (
