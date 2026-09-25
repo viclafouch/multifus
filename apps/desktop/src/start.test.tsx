@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { MapName } from '@/constants/world'
 import { CLEARING } from '@/constants/world'
+import { start } from './start'
 
 type Maps = Awaited<
   ReturnType<(typeof import('@/screens/deferred-map'))['loadMaps']>
@@ -47,10 +48,9 @@ vi.mock(import('@/screens/deferred-map'), () => {
   }
 })
 
-const start = async (map: MapName) => {
+const startOn = (map: MapName) => {
   lastSeenMap.mockReturnValue(map)
-  vi.resetModules()
-  await import('./main')
+  start()
 }
 
 describe('the entry of the Multifus window', () => {
@@ -60,15 +60,15 @@ describe('the entry of the Multifus window', () => {
     entry.failLoading = null
   })
 
-  it('mounts at once on the clearing', async () => {
-    await start(CLEARING)
+  it('mounts at once on the clearing', () => {
+    startOn(CLEARING)
 
     expect(entry.mounts).toBe(1)
     expect(entry.finishLoading).toBeNull()
   })
 
   it('waits for the other maps before mounting on a map seen before the reload', async () => {
-    await start('settings')
+    startOn('settings')
 
     expect(entry.mounts).toBe(0)
 
@@ -80,7 +80,7 @@ describe('the entry of the Multifus window', () => {
   })
 
   it('mounts anyway when the other maps fail to load', async () => {
-    await start('settings')
+    startOn('settings')
 
     entry.failLoading?.()
 
