@@ -1,7 +1,10 @@
 {
   "bumpFiles": [
     { "filename": "package.json", "type": "json" },
-    { "filename": "src-tauri/tauri.conf.json", "type": "json" },
+    {
+      "filename": "src-tauri/tauri.conf.json",
+      "updater": "scripts/tauri-version.cjs"
+    },
     {
       "filename": "src-tauri/Cargo.toml",
       "updater": "scripts/cargo-version.cjs"
