@@ -83,6 +83,3 @@ installs drop.
 https://www.microsoft.com/wdsi/filesubmission reviews a Microsoft Defender
 detection, and Microsoft offers no submission for SmartScreen reputation. Send
 a published `.exe` there, as a software developer, only when Defender flags it.
-
-0.1.0 could not prove the updater. 0.1.1 is its first run: it must install on
-both systems, and on Windows without SmartScreen.
