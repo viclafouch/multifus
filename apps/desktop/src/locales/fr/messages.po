@@ -1339,6 +1339,7 @@ msgstr "Ine / Fo / Age / Cha"
 msgid "Initiative"
 msgstr "Initiative"
 
+#: src/helpers/wording.ts
 #: src/screens/about/project-panel.tsx
 msgid "Installer"
 msgstr "Installer"
@@ -1540,6 +1541,10 @@ msgstr "La tête de classe est coupée dans les Paramètres : le client garde so
 #: src/helpers/journal.ts
 msgid "La version {version} est disponible."
 msgstr "La version {version} est disponible."
+
+#: src/helpers/wording.ts
+msgid "La version {version} est prête"
+msgstr "La version {version} est prête"
 
 #: src/helpers/wording.ts
 msgid "La version {version} est prête. Multifus se relancera tout seul, sans toucher à vos clients."
@@ -1956,6 +1961,10 @@ msgstr "Multifus entend le jeu."
 msgid "Multifus est déjà là quand vous ouvrez vos clients Dofus Retro."
 msgstr "Multifus est déjà là quand vous ouvrez vos clients Dofus Retro."
 
+#: src/helpers/wording.ts
+msgid "Multifus est passé en {version}"
+msgstr "Multifus est passé en {version}"
+
 #: src/screens/relay/screen-saver-warning.tsx
 msgid "Multifus garde l’écran allumé, mais votre écran de veille démarre après {delay} et verrouille l’ordinateur. Multifus n’entend plus le jeu, et vous ne recevez plus rien. Réglez-le sur Jamais."
 msgstr "Multifus garde l’écran allumé, mais votre écran de veille démarre après {delay} et verrouille l’ordinateur. Multifus n’entend plus le jeu, et vous ne recevez plus rien. Réglez-le sur Jamais."
@@ -2016,6 +2025,10 @@ msgstr "Multifus repart comme au premier lancement. Vos personnages Dofus Retro 
 msgid "Multifus se recharge d’un coup et vous laisse sur l’écran où vous êtes. Vos clients Dofus Retro ne bougent pas."
 msgstr "Multifus se recharge d’un coup et vous laisse sur l’écran où vous êtes. Vos clients Dofus Retro ne bougent pas."
 
+#: src/helpers/wording.ts
+msgid "Multifus se relancera tout seul, sans toucher à vos clients."
+msgstr "Multifus se relancera tout seul, sans toucher à vos clients."
+
 #: src/constants/journal.ts
 msgid "Multifus tournait déjà : le second lancement s’arrête là."
 msgstr "Multifus tournait déjà : le second lancement s’arrête là."
@@ -2067,6 +2080,10 @@ msgstr "Notifications"
 #: src/helpers/wording.ts
 msgid "Notifications en arrière-plan"
 msgstr "Notifications en arrière-plan"
+
+#: src/helpers/wording.ts
+msgid "Nouveautés, améliorations, corrections : allez jeter un œil au patch note."
+msgstr "Nouveautés, améliorations, corrections : allez jeter un œil au patch note."
 
 #: src/helpers/onboarding.ts
 msgid "On essaie pour de vrai"
@@ -2219,6 +2236,10 @@ msgstr "Personne de connecté"
 msgid "Plus qu’à vous faire appeler."
 msgstr "Plus qu’à vous faire appeler."
 
+#: src/components/release-notice-bar.tsx
+msgid "Plus tard"
+msgstr "Plus tard"
+
 #: src/constants/runes.ts
 msgid "PM"
 msgstr "PM"
@@ -2350,6 +2371,7 @@ msgid "Recharger l’écran"
 msgstr "Recharger l’écran"
 
 #: src/components/health-dialog.tsx
+#: src/helpers/wording.ts
 msgid "Réessayer"
 msgstr "Réessayer"
 
@@ -2956,6 +2978,10 @@ msgstr "Voir la vidéo"
 #: src/components/world/loop-porthole.tsx
 msgid "Voir la vidéo en grand"
 msgstr "Voir la vidéo en grand"
+
+#: src/components/release-notice-bar.tsx
+msgid "Voir le patch note"
+msgstr "Voir le patch note"
 
 #: src/components/move-button.tsx
 msgid "Voir le réglage"

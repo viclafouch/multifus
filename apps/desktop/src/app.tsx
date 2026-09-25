@@ -8,6 +8,7 @@ import { HelpProvider } from '@/components/help-provider'
 import { JournalPanel } from '@/components/journal-panel'
 import { KeyLabelsProvider } from '@/components/key-labels-provider'
 import { MapNavigationProvider } from '@/components/map-navigation-provider'
+import { ReleaseNoticeBar } from '@/components/release-notice-bar'
 import { SceneCredit } from '@/components/retro/scene-credit'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { LanguageBar } from '@/components/world/language-bar'
@@ -82,33 +83,42 @@ export const App = () => {
             <div className="relative flex h-screen flex-col overflow-hidden pb-ledger font-plain text-khaki">
               <WorldScene map={map} />
               <Shade edge="top" />
-              {snapshot.config.problem === null ? null : (
-                <ConfigNotice
-                  problem={snapshot.config.problem}
-                  quarantined={quarantinedPath(snapshot.config.problem)}
-                  onReveal={() => {
-                    revealQuarantinedConfig().catch(ignore)
-                  }}
-                  onDismiss={() => {
-                    run(dismissConfigProblem())
-                  }}
-                />
-              )}
-              {snapshot.onboarding.hasNotice ? (
-                <CheckNotice
-                  onOpen={() => {
-                    showAnchor(ONBOARDING_ANCHOR, () => {
-                      setMap('settings')
-                    })
-                  }}
-                  onDismiss={() => {
-                    run(dismissCheckNotice())
-                  }}
-                />
-              ) : null}
-              {shouldWarnAboutAuthorization ? (
-                <AuthorizationBanner run={run} />
-              ) : null}
+              <div className="absolute inset-x-0 top-12 z-45 flex flex-col">
+                {snapshot.config.problem === null ? null : (
+                  <ConfigNotice
+                    problem={snapshot.config.problem}
+                    quarantined={quarantinedPath(snapshot.config.problem)}
+                    onReveal={() => {
+                      revealQuarantinedConfig().catch(ignore)
+                    }}
+                    onDismiss={() => {
+                      run(dismissConfigProblem())
+                    }}
+                  />
+                )}
+                {snapshot.onboarding.hasNotice ? (
+                  <CheckNotice
+                    onOpen={() => {
+                      showAnchor(ONBOARDING_ANCHOR, () => {
+                        setMap('settings')
+                      })
+                    }}
+                    onDismiss={() => {
+                      run(dismissCheckNotice())
+                    }}
+                  />
+                ) : null}
+                {shouldWarnAboutAuthorization ? (
+                  <AuthorizationBanner run={run} />
+                ) : null}
+                {snapshot.releaseNotice === null ? null : (
+                  <ReleaseNoticeBar
+                    notice={snapshot.releaseNotice}
+                    update={snapshot.update}
+                    run={run}
+                  />
+                )}
+              </div>
               <div className="relative flex min-h-0 flex-1 flex-col">
                 <LanguageBar
                   version={snapshot.version}

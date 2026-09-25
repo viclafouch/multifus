@@ -1,5 +1,11 @@
 # Notas del parche
 
+## Unreleased
+
+### Novedades
+
+- Una actualización lista aparece en una franja arriba de Multifus, y la primera en el menú del icono con un punto naranja. Una vez instalada, Multifus te lleva a sus notas del parche.
+
 ## 0.2.0 - 2026-09-25
 
 ### Mejoras

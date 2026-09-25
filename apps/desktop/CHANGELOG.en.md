@@ -1,5 +1,11 @@
 # Patch notes
 
+## Unreleased
+
+### New
+
+- An update that is ready shows in a strip at the top of Multifus, and first in the icon menu with an orange dot. Once it is installed, Multifus leads you to its patch notes.
+
 ## 0.2.0 - 2026-09-25
 
 ### Improved

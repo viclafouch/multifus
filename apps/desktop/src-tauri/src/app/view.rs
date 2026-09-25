@@ -51,6 +51,7 @@ pub struct Snapshot {
     pub onboarding: OnboardingView,
     pub config: ConfigView,
     pub update: UpdateView,
+    pub release_notice: Option<ReleaseNotice>,
     pub relay: RelayView,
     pub walk: WalkView,
     pub wheel: WheelView,
@@ -268,6 +269,27 @@ pub enum UpdateView {
     Installing,
 
     Failed { detail: String },
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(
+    tag = "kind",
+    rename_all = "camelCase",
+    rename_all_fields = "camelCase"
+)]
+pub enum ReleaseNotice {
+    Ready { version: String },
+
+    Arrived { version: String },
+}
+
+impl ReleaseNotice {
+    #[must_use]
+    pub fn version(&self) -> &str {
+        match self {
+            Self::Ready { version } | Self::Arrived { version } => version,
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
@@ -598,6 +620,7 @@ mod tests {
                 problem: None,
             },
             update: UpdateView::UpToDate,
+            release_notice: None,
             relay: relay(),
             walk: WalkView {
                 enabled: false,
@@ -689,6 +712,7 @@ mod tests {
                 "paintPortraits",
                 "quickTexts",
                 "relay",
+                "releaseNotice",
                 "runeTable",
                 "scanned",
                 "shareStats",
@@ -1029,6 +1053,22 @@ mod tests {
             ["checking", "upToDate", "available", "installing", "failed"]
         );
         assert_eq!(json_of(&updates[2])["version"], json!("0.2.0"));
+    }
+
+    #[test]
+    fn every_release_notice_says_its_kind_and_its_version() {
+        let notices = [
+            ReleaseNotice::Ready {
+                version: "0.3.0".to_owned(),
+            },
+            ReleaseNotice::Arrived {
+                version: "0.2.0".to_owned(),
+            },
+        ];
+
+        assert_eq!(kinds_of(&notices), ["ready", "arrived"]);
+        assert_eq!(json_of(&notices[0])["version"], json!("0.3.0"));
+        assert_eq!(json_of(&notices[1])["version"], json!("0.2.0"));
     }
 
     #[test]

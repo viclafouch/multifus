@@ -132,6 +132,38 @@ export const updateLine = (update: UpdateStatus) => {
   }
 }
 
+export const readyNoticeLines = (version: string, update: UpdateStatus) => {
+  const title = t`La version ${version} est prête`
+
+  switch (update.kind) {
+    case 'available':
+    case 'upToDate': {
+      return {
+        title,
+        body: t`Multifus se relancera tout seul, sans toucher à vos clients.`,
+        installLabel: t`Installer`
+      }
+    }
+    case 'failed': {
+      return { title, body: updateLine(update), installLabel: t`Réessayer` }
+    }
+    case 'checking':
+    case 'installing': {
+      return { title, body: updateLine(update), installLabel: null }
+    }
+    default: {
+      return update satisfies never
+    }
+  }
+}
+
+export const arrivedNoticeLines = (version: string) => {
+  return {
+    title: t`Multifus est passé en ${version}`,
+    body: t`Nouveautés, améliorations, corrections : allez jeter un œil au patch note.`
+  }
+}
+
 const telegramSilentLine = (detail: string) => {
   return t`Telegram n’a pas répondu. Vérifiez votre connexion (${detail}).`
 }

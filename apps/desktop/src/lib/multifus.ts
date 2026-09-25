@@ -398,6 +398,14 @@ export const installUpdate = async () => {
   return invoke<Snapshot>('install_update')
 }
 
+export const dismissReleaseNotice = async () => {
+  return invoke<Snapshot>('dismiss_release_notice')
+}
+
+export const openReleaseNotes = async () => {
+  return invoke<null>('open_release_notes')
+}
+
 export const dismissCheckNotice = async () => {
   return invoke<Snapshot>('dismiss_check_notice')
 }

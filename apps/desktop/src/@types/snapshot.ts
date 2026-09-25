@@ -11,6 +11,7 @@ import type {
   Authorization,
   ConfigStatus,
   KeyLabels,
+  ReleaseNotice,
   UpdateStatus
 } from '@/@types/system'
 import type { WalkStatus } from '@/@types/walk'
@@ -58,6 +59,7 @@ export type Snapshot = {
   readonly onboarding: Onboarding
   readonly config: ConfigStatus
   readonly update: UpdateStatus
+  readonly releaseNotice: ReleaseNotice | null
   readonly relay: RelayStatus
   readonly walk: WalkStatus
   readonly wheel: WheelSize

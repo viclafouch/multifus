@@ -11,8 +11,7 @@ export const CheckNotice = ({ onOpen, onDismiss }: CheckNoticeProps) => {
     <NoticeBar
       title={t`L’AutoFocus ne peut pas marcher`}
       body={t`Un réglage du système empêche le jeu de vous appeler.`}
-      actionLabel={t`Régler`}
-      onAct={onOpen}
+      action={{ label: t`Régler`, onAct: onOpen }}
       onDismiss={onDismiss}
     />
   )

@@ -116,6 +116,23 @@ pub fn open_about(app: &AppHandle, link: AboutLink) {
     open_url(app, &link.url(language));
 }
 
+#[must_use]
+fn release_notes_url(version: &str, language: Language) -> String {
+    format!("{}#v{version}", AboutLink::Journal.url(language))
+}
+
+pub fn open_release_notes(app: &AppHandle) {
+    let (version, language) = {
+        let mut state = lock(app);
+
+        (state.mark_release_notes_opened(), state.language())
+    };
+
+    if let Some(version) = version {
+        open_url(app, &release_notes_url(&version, language));
+    }
+}
+
 pub fn open_url(app: &AppHandle, url: &str) {
     if let Err(error) = app.opener().open_url(url, None::<&str>) {
         failed(app, error.to_string());
@@ -193,6 +210,22 @@ mod tests {
                 "{link:?} is read in two languages at the same address"
             );
         }
+    }
+
+    #[test]
+    fn the_release_notes_land_on_the_version_in_the_patch_notes_of_the_site() {
+        assert_eq!(
+            release_notes_url("0.3.0", Language::Fr),
+            "https://www.multifus.app/journal#v0.3.0"
+        );
+        assert_eq!(
+            release_notes_url("0.3.0", Language::En),
+            "https://www.multifus.app/en/changelog#v0.3.0"
+        );
+        assert_eq!(
+            release_notes_url("0.3.0", Language::Es),
+            "https://www.multifus.app/es/novedades#v0.3.0"
+        );
     }
 
     #[test]

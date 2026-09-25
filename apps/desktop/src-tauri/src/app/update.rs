@@ -39,9 +39,7 @@ pub fn check(app: &AppHandle) {
 
                 let mut state = lock(&app);
 
-                state.set_update(UpdateView::Available {
-                    version: version.clone(),
-                });
+                state.offer_update(version.clone());
                 state.log_unless_repeated(JournalEvent::UpdateAvailable { version });
             }
             Ok(None) => up_to_date(&app),
@@ -81,6 +79,8 @@ pub fn install(app: &AppHandle) {
         let installed = update.download_and_install(|_, _| {}, || {}).await;
 
         if let Err(error) = installed {
+            *pending(&app) = Some(update);
+
             fail(&app, &error.to_string());
 
             runtime::emit_snapshot(&app);

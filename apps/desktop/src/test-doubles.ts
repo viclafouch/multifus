@@ -166,6 +166,7 @@ const BLANK_SNAPSHOT: Snapshot = {
   onboarding: BLANK_ONBOARDING,
   config: { path: '/tmp/multifus.json', problem: null },
   update: { kind: 'upToDate' },
+  releaseNotice: null,
   relay: {
     paired: false,
     sendBody: false,

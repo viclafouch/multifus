@@ -16,9 +16,11 @@ export const AuthorizationBanner = ({ run }: AuthorizationBannerProps) => {
       level="alarm"
       title={title}
       body={body}
-      actionLabel={t`Demander l’autorisation`}
-      onAct={() => {
-        run(requestAuthorization())
+      action={{
+        label: t`Demander l’autorisation`,
+        onAct: () => {
+          run(requestAuthorization())
+        }
       }}
     />
   )

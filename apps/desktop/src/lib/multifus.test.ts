@@ -562,6 +562,18 @@ const CALLS = [
     }
   },
   {
+    name: 'dismissReleaseNotice',
+    run: () => {
+      return multifus.dismissReleaseNotice()
+    }
+  },
+  {
+    name: 'openReleaseNotes',
+    run: () => {
+      return multifus.openReleaseNotes()
+    }
+  },
+  {
     name: 'dismissCheckNotice',
     run: () => {
       return multifus.dismissCheckNotice()

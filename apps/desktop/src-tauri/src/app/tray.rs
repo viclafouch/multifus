@@ -9,6 +9,7 @@ use tauri::AppHandle;
 use tauri::Manager;
 use tauri::Wry;
 use tauri::image::Image;
+use tauri::menu::IconMenuItem;
 use tauri::menu::Menu;
 use tauri::menu::MenuEvent;
 use tauri::menu::MenuItem;
@@ -142,6 +143,14 @@ fn words(language: Language) -> &'static MenuWords {
     }
 }
 
+fn notes_label(version: &str, language: Language) -> String {
+    match language {
+        Language::Fr => format!("Voir le patch note {version}"),
+        Language::En => format!("See the {version} patch notes"),
+        Language::Es => format!("Ver las notas del parche {version}"),
+    }
+}
+
 fn update_label(version: &str, language: Language) -> String {
     match language {
         Language::Fr => format!("Installer la mise à jour {version}"),
@@ -169,6 +178,8 @@ const RUNE_TABLE_ID: &str = "multifus://rune-table";
 const RUNE_TABLE_HOME_ID: &str = "multifus://rune-table-home";
 
 const UPDATE_ID: &str = "multifus://update";
+
+const NOTES_ID: &str = "multifus://notes";
 
 const JOURNAL_ID: &str = "multifus://journal";
 
@@ -200,6 +211,7 @@ struct Contents {
     rune_table: bool,
     denied: bool,
     update: Option<String>,
+    notes: Option<String>,
     relay: RelayItem,
 }
 
@@ -256,6 +268,7 @@ fn contents(state: &Multifus) -> Contents {
         rune_table: state.is_rune_table_open(),
         denied: state.is_denied(),
         update: state.available_update(),
+        notes: state.unread_notes(),
         relay: relay_item(state),
     }
 }
@@ -302,6 +315,28 @@ fn tray_image() -> Image<'static> {
 #[cfg(target_os = "windows")]
 fn tray_image() -> Image<'static> {
     tauri::include_image!("./icons/32x32.png")
+}
+
+const UPDATE_DOT_SIDE: u16 = 32;
+
+const UPDATE_DOT_RADIUS: f32 = 7.0;
+
+const UPDATE_DOT_AMBER: [u8; 3] = [245, 171, 72];
+
+fn update_dot() -> Image<'static> {
+    let middle = f32::from(UPDATE_DOT_SIDE) / 2.0;
+    let [red, green, blue] = UPDATE_DOT_AMBER;
+    let rgba = (0..UPDATE_DOT_SIDE)
+        .flat_map(|y| (0..UPDATE_DOT_SIDE).map(move |x| (x, y)))
+        .flat_map(|(x, y)| {
+            let distance = (f32::from(x) + 0.5 - middle).hypot(f32::from(y) + 0.5 - middle);
+            let coverage = (UPDATE_DOT_RADIUS + 0.5 - distance).clamp(0.0, 1.0);
+
+            [red, green, blue, (coverage * 255.0).round() as u8]
+        })
+        .collect();
+
+    Image::new_owned(rgba, u32::from(UPDATE_DOT_SIDE), u32::from(UPDATE_DOT_SIDE))
 }
 
 pub fn setup(app: &AppHandle) {
@@ -361,6 +396,31 @@ pub fn refresh(app: &AppHandle) {
 fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> {
     let menu = Menu::new(app)?;
     let words = words(contents.language);
+
+    if let Some(version) = &contents.update {
+        menu.append(&IconMenuItem::with_id(
+            app,
+            UPDATE_ID,
+            update_label(version, contents.language),
+            true,
+            Some(update_dot()),
+            None::<&str>,
+        )?)?;
+    }
+
+    if let Some(version) = &contents.notes {
+        menu.append(&MenuItem::with_id(
+            app,
+            NOTES_ID,
+            notes_label(version, contents.language),
+            true,
+            None::<&str>,
+        )?)?;
+    }
+
+    if contents.update.is_some() || contents.notes.is_some() {
+        menu.append(&PredefinedMenuItem::separator(app)?)?;
+    }
 
     if contents.denied {
         menu.append(&MenuItem::with_id(
@@ -480,16 +540,6 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
 
     menu.append(&PredefinedMenuItem::separator(app)?)?;
 
-    if let Some(version) = &contents.update {
-        menu.append(&MenuItem::with_id(
-            app,
-            UPDATE_ID,
-            update_label(version, contents.language),
-            true,
-            None::<&str>,
-        )?)?;
-    }
-
     menu.append(&MenuItem::with_id(
         app,
         QUIT_ID,
@@ -526,6 +576,13 @@ fn on_menu_event(app: &AppHandle, event: MenuEvent) {
 
     if id == UPDATE_ID {
         update::install(app);
+
+        return;
+    }
+
+    if id == NOTES_ID {
+        links::open_release_notes(app);
+        runtime::emit_snapshot(app);
 
         return;
     }
@@ -947,6 +1004,39 @@ mod tests {
     }
 
     #[test]
+    fn the_notes_line_names_the_version_just_installed() {
+        assert_eq!(
+            notes_label("0.3.0", Language::Fr),
+            "Voir le patch note 0.3.0"
+        );
+        assert_eq!(
+            notes_label("0.3.0", Language::En),
+            "See the 0.3.0 patch notes"
+        );
+        assert_eq!(
+            notes_label("0.3.0", Language::Es),
+            "Ver las notas del parche 0.3.0"
+        );
+    }
+
+    #[test]
+    fn the_update_dot_is_an_amber_disc_on_a_clear_square() {
+        let dot = update_dot();
+        let side = usize::from(UPDATE_DOT_SIDE);
+        let pixel = |x: usize, y: usize| {
+            let start = (y * side + x) * 4;
+
+            dot.rgba()[start..start + 4].to_vec()
+        };
+        let [red, green, blue] = UPDATE_DOT_AMBER;
+
+        assert_eq!(dot.rgba().len(), side * side * 4);
+        assert_eq!(pixel(side / 2, side / 2), [red, green, blue, 255]);
+        assert_eq!(pixel(0, 0)[3], 0, "a corner stays clear");
+        assert_eq!(pixel(side / 2, 0)[3], 0, "the disc does not touch the edge");
+    }
+
+    #[test]
     fn the_relay_item_says_a_different_thing_for_each_of_its_three_states() {
         let labels = [RelayItem::NotReady, RelayItem::Off, RelayItem::On]
             .map(|item| relay_label(item, Language::Fr));
@@ -971,6 +1061,7 @@ mod tests {
             rune_table: false,
             denied: false,
             update: None,
+            notes: None,
             relay: RelayItem::NotReady,
         };
 
@@ -994,6 +1085,7 @@ mod tests {
             rune_table: false,
             denied: false,
             update: None,
+            notes: None,
             relay: RelayItem::NotReady,
         };
 

@@ -28,6 +28,7 @@ pub struct Settings {
     pub client_title_suffix: Option<String>,
     pub start_at_login: bool,
     pub onboarding_done: bool,
+    pub notes_read: Option<String>,
     pub share_stats: bool,
     pub traces: Traces,
 }
@@ -66,6 +67,7 @@ impl Default for Settings {
             client_title_suffix: None,
             start_at_login: false,
             onboarding_done: false,
+            notes_read: None,
             share_stats: true,
             traces: Traces::default(),
         }

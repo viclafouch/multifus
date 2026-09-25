@@ -1456,6 +1456,7 @@ const SNAPSHOT = {
   onboarding: { done: true, steps: [], hasNotice: false },
   config: { path: '/tmp/multifus/config.json', problem: null },
   update: { kind: 'upToDate' },
+  releaseNotice: null,
   relay: {
     paired: false,
     sendBody: false,

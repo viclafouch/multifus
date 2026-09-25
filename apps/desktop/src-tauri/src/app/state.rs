@@ -41,6 +41,7 @@ use crate::app::view::OnboardingView;
 use crate::app::view::PairingView;
 use crate::app::view::QuickTextView;
 use crate::app::view::RelayView;
+use crate::app::view::ReleaseNotice;
 use crate::app::view::RuneTableView;
 use crate::app::view::ScreenSaverView;
 use crate::app::view::ShortcutAction;
@@ -155,6 +156,12 @@ impl ListeningRecovery {
 }
 
 #[derive(Debug)]
+struct FoundUpdate {
+    version: String,
+    is_put_aside: bool,
+}
+
+#[derive(Debug)]
 pub struct Multifus {
     store: ConfigStore,
     version: String,
@@ -184,6 +191,7 @@ pub struct Multifus {
     silence_told: bool,
     problem: Option<ConfigProblem>,
     update: UpdateView,
+    update_found: Option<FoundUpdate>,
     pairing: PairingView,
     test: TestView,
     last_test: Option<Instant>,
@@ -281,6 +289,7 @@ impl Multifus {
             silence_told: false,
             problem,
             update: UpdateView::Checking,
+            update_found: None,
             pairing: PairingView::Idle,
             test: TestView::Idle,
             last_test: None,
@@ -362,6 +371,7 @@ impl Multifus {
                 problem: self.problem.clone(),
             },
             update: self.update.clone(),
+            release_notice: self.release_notice(),
             walk: WalkView {
                 enabled: self.walk_enabled,
                 banner: BannerView {
@@ -1431,7 +1441,80 @@ impl Multifus {
     }
 
     pub fn set_update(&mut self, update: UpdateView) {
+        if update == UpdateView::UpToDate {
+            self.update_found = None;
+        }
+
         self.update = update;
+    }
+
+    pub fn offer_update(&mut self, version: String) {
+        let is_put_aside = self
+            .update_found
+            .as_ref()
+            .is_some_and(|found| found.version == version && found.is_put_aside);
+
+        self.update_found = Some(FoundUpdate {
+            version: version.clone(),
+            is_put_aside,
+        });
+        self.update = UpdateView::Available { version };
+    }
+
+    #[must_use]
+    pub fn release_notice(&self) -> Option<ReleaseNotice> {
+        match &self.update_found {
+            Some(found) if !found.is_put_aside => Some(ReleaseNotice::Ready {
+                version: found.version.clone(),
+            }),
+            _ => self.arrived_notice(),
+        }
+    }
+
+    #[must_use]
+    fn arrived_notice(&self) -> Option<ReleaseNotice> {
+        let is_read = self.settings.notes_read.as_ref() == Some(&self.version);
+
+        (self.settings.onboarding_done && !is_read).then(|| ReleaseNotice::Arrived {
+            version: self.version.clone(),
+        })
+    }
+
+    #[must_use]
+    pub fn unread_notes(&self) -> Option<String> {
+        match self.release_notice() {
+            Some(ReleaseNotice::Arrived { version }) => Some(version),
+            Some(ReleaseNotice::Ready { .. }) | None => None,
+        }
+    }
+
+    pub fn dismiss_release_notice(&mut self) {
+        match self.release_notice() {
+            Some(ReleaseNotice::Ready { .. }) => {
+                let is_installing = self.update == UpdateView::Installing;
+
+                if let Some(found) = self.update_found.as_mut().filter(|_| !is_installing) {
+                    found.is_put_aside = true;
+                }
+            }
+            Some(ReleaseNotice::Arrived { version }) => self.mark_notes_read(version),
+            None => {}
+        }
+    }
+
+    pub fn mark_release_notes_opened(&mut self) -> Option<String> {
+        let notice = self.release_notice()?;
+
+        if let ReleaseNotice::Arrived { version } = &notice {
+            self.mark_notes_read(version.clone());
+        }
+
+        Some(notice.version().to_owned())
+    }
+
+    fn mark_notes_read(&mut self, version: String) {
+        self.settings.notes_read = Some(version);
+        self.save();
     }
 
     #[must_use]
@@ -1694,6 +1777,7 @@ impl Multifus {
 
     pub fn finish_onboarding(&mut self) {
         self.settings.onboarding_done = true;
+        self.settings.notes_read = Some(self.version.clone());
         self.save();
     }
 
@@ -4230,6 +4314,184 @@ mod tests {
 
             assert_eq!(state.available_update(), None);
         }
+    }
+
+    fn ready(version: &str) -> Option<ReleaseNotice> {
+        Some(ReleaseNotice::Ready {
+            version: version.to_owned(),
+        })
+    }
+
+    fn arrived(version: &str) -> Option<ReleaseNotice> {
+        Some(ReleaseNotice::Arrived {
+            version: version.to_owned(),
+        })
+    }
+
+    fn multifus_played(directory: &TempDir, notes_read: Option<&str>) -> Multifus {
+        let settings = Settings {
+            onboarding_done: true,
+            notes_read: notes_read.map(str::to_owned),
+            ..Settings::default()
+        };
+
+        test_doubles::multifus(directory, test_doubles::intact(settings))
+    }
+
+    #[test]
+    fn a_version_found_is_announced_until_it_is_put_aside_and_a_newer_one_comes_back() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus_played(&directory, Some("0.0.0"));
+
+        assert_eq!(state.release_notice(), None, "nothing found yet");
+
+        state.offer_update("0.3.0".to_owned());
+
+        assert_eq!(state.release_notice(), ready("0.3.0"));
+
+        state.dismiss_release_notice();
+
+        assert_eq!(state.release_notice(), None);
+        assert_eq!(
+            state.available_update().as_deref(),
+            Some("0.3.0"),
+            "the menu of the icon still offers it"
+        );
+
+        state.offer_update("0.3.0".to_owned());
+
+        assert_eq!(state.release_notice(), None, "the same version stays aside");
+
+        state.offer_update("0.4.0".to_owned());
+
+        assert_eq!(state.release_notice(), ready("0.4.0"));
+    }
+
+    #[test]
+    fn a_version_being_installed_or_refused_keeps_its_notice_so_the_outcome_shows() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus_played(&directory, Some("0.0.0"));
+
+        state.offer_update("0.3.0".to_owned());
+
+        for update in [
+            UpdateView::Installing,
+            UpdateView::Failed {
+                detail: "coupure".to_owned(),
+            },
+            UpdateView::Checking,
+        ] {
+            state.set_update(update);
+
+            assert_eq!(state.release_notice(), ready("0.3.0"));
+        }
+
+        state.set_update(UpdateView::UpToDate);
+
+        assert_eq!(state.release_notice(), None);
+    }
+
+    #[test]
+    fn an_install_that_failed_can_be_put_aside_but_not_while_it_downloads() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus_played(&directory, Some("0.0.0"));
+
+        state.offer_update("0.3.0".to_owned());
+        state.set_update(UpdateView::Installing);
+        state.dismiss_release_notice();
+
+        assert_eq!(
+            state.release_notice(),
+            ready("0.3.0"),
+            "the download goes on"
+        );
+
+        state.set_update(UpdateView::Failed {
+            detail: "coupure".to_owned(),
+        });
+        state.dismiss_release_notice();
+
+        assert_eq!(state.release_notice(), None);
+    }
+
+    #[test]
+    fn reading_the_notes_of_a_version_found_leaves_it_to_install() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus_played(&directory, Some("0.0.0"));
+
+        state.offer_update("0.3.0".to_owned());
+
+        assert_eq!(state.mark_release_notes_opened().as_deref(), Some("0.3.0"));
+        assert_eq!(state.release_notice(), ready("0.3.0"));
+    }
+
+    #[test]
+    fn a_version_just_installed_is_told_until_its_notes_are_read_even_after_a_restart() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus_played(&directory, Some("0.0.0-alpha"));
+
+        assert_eq!(state.release_notice(), arrived("0.0.0"));
+
+        state.save();
+
+        assert_eq!(
+            multifus_reloaded(&directory).release_notice(),
+            arrived("0.0.0")
+        );
+
+        assert_eq!(state.mark_release_notes_opened().as_deref(), Some("0.0.0"));
+        assert_eq!(state.release_notice(), None);
+        assert_eq!(multifus_reloaded(&directory).release_notice(), None);
+    }
+
+    #[test]
+    fn a_player_from_before_the_notes_were_kept_is_told_of_the_version_installed() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus_played(&directory, None);
+
+        assert_eq!(state.release_notice(), arrived("0.0.0"));
+
+        state.dismiss_release_notice();
+
+        assert_eq!(state.release_notice(), None);
+        assert_eq!(multifus_reloaded(&directory).release_notice(), None);
+    }
+
+    #[test]
+    fn a_new_player_is_never_told_of_the_version_they_just_installed() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus(&directory);
+
+        assert_eq!(
+            state.release_notice(),
+            None,
+            "the prise en main comes first"
+        );
+
+        state.finish_onboarding();
+
+        assert_eq!(state.release_notice(), None);
+    }
+
+    #[test]
+    fn a_version_found_speaks_before_the_one_just_installed() {
+        let directory = TempDir::new().expect("a temporary directory");
+        let mut state = multifus_played(&directory, None);
+
+        state.offer_update("0.3.0".to_owned());
+
+        assert_eq!(state.release_notice(), ready("0.3.0"));
+
+        assert_eq!(
+            state.unread_notes(),
+            None,
+            "the menu offers the install first"
+        );
+
+        state.dismiss_release_notice();
+
+        assert_eq!(state.release_notice(), arrived("0.0.0"));
+        assert_eq!(state.unread_notes().as_deref(), Some("0.0.0"));
     }
 
     fn check_of_step(state: &Multifus, step: Step) -> Check {

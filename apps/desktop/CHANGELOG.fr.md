@@ -1,5 +1,11 @@
 # Notes de mise à jour
 
+## Unreleased
+
+### Nouveautés
+
+- Une mise à jour prête s’annonce dans un bandeau en haut de Multifus, et en tête du menu de l’icône avec une pastille orange. Une fois installée, Multifus vous mène à son patch note.
+
 ## 0.2.0 - 2026-09-25
 
 ### Améliorations

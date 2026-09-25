@@ -1,11 +1,12 @@
 import React from 'react'
-import { TriangleAlert } from 'lucide-react'
+import { type LucideIcon, TriangleAlert } from 'lucide-react'
 import { t } from '@lingui/core/macro'
 import { Button, type ButtonLook, cn } from '@multifus/retro'
 
-type NoticeLevel = 'alarm' | 'notice'
+type NoticeLevel = 'alarm' | 'news' | 'notice'
 
 type NoticeLook = {
+  readonly role: 'alert' | 'status'
   readonly bar: string
   readonly row: string
   readonly mark: string
@@ -17,6 +18,7 @@ type NoticeLook = {
 
 const NOTICE_LOOKS = {
   notice: {
+    role: 'alert',
     bar: 'border-flame/45 py-3',
     row: 'gap-3',
     mark: 'text-flame',
@@ -25,7 +27,18 @@ const NOTICE_LOOKS = {
     body: 'pl-7',
     action: { variant: 'slate', size: 'tight' }
   },
+  news: {
+    role: 'status',
+    bar: 'border-live/45 py-3',
+    row: 'gap-3',
+    mark: 'text-live',
+    icon: 'size-4',
+    title: 'text-tale font-medium text-cream',
+    body: 'pl-7',
+    action: { variant: 'leaf', size: 'tight' }
+  },
   alarm: {
+    role: 'alert',
     bar: 'alarm border-flame/55 py-3.5',
     row: 'gap-4',
     mark: 'grid size-10 place-items-center rounded-full border-2 border-flame/45 bg-flame/12 text-flame',
@@ -37,12 +50,18 @@ const NOTICE_LOOKS = {
   }
 } as const satisfies Record<NoticeLevel, NoticeLook>
 
+type NoticeAction = Readonly<{
+  label: string
+  onAct: () => void
+}>
+
 type NoticeBarProps = Readonly<{
   title: string
   body: string
   level?: NoticeLevel
-  actionLabel?: string
-  onAct?: () => void
+  icon?: LucideIcon
+  action?: NoticeAction
+  secondaryAction?: React.ReactNode
   onDismiss?: () => void
   children?: React.ReactNode
 }>
@@ -51,8 +70,9 @@ export const NoticeBar = ({
   title,
   body,
   level = 'notice',
-  actionLabel,
-  onAct,
+  icon: Icon = TriangleAlert,
+  action,
+  secondaryAction,
   onDismiss,
   children
 }: NoticeBarProps) => {
@@ -60,25 +80,31 @@ export const NoticeBar = ({
 
   return (
     <div
-      role="alert"
+      role={look.role}
       className={cn(
-        'relative z-30 shrink-0 border-b-2 bg-iron/95 px-6',
+        'relative border-y-2 bg-iron/95 px-6 shadow-lg shadow-black/40',
         look.bar
       )}
     >
       <div className={cn('flex items-center', look.row)}>
         <span aria-hidden className={cn('shrink-0', look.mark)}>
-          <TriangleAlert className={look.icon} strokeWidth={1.9} />
+          <Icon className={look.icon} strokeWidth={1.9} />
         </span>
         <p className={cn('min-w-0 flex-1', look.title)}>{title}</p>
         <div className="flex shrink-0 items-center gap-1.5">
-          {actionLabel === undefined ? null : (
-            <Button {...look.action} onClick={onAct}>
-              {actionLabel}
+          {secondaryAction}
+          {action === undefined ? null : (
+            <Button
+              {...look.action}
+              onClick={() => {
+                action.onAct()
+              }}
+            >
+              {action.label}
             </Button>
           )}
           {onDismiss === undefined ? null : (
-            <Button variant="slate" size="tight" onClick={onDismiss}>
+            <Button variant="leaf" size="tight" onClick={onDismiss}>
               {t`J’ai compris`}
             </Button>
           )}

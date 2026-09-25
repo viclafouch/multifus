@@ -1339,6 +1339,7 @@ msgstr "Ine / Fo / Age / Cha"
 msgid "Initiative"
 msgstr "Iniciativa"
 
+#: src/helpers/wording.ts
 #: src/screens/about/project-panel.tsx
 msgid "Installer"
 msgstr "Instalar"
@@ -1540,6 +1541,10 @@ msgstr "El icono de clase está apagado en Ajustes: el cliente conserva su logo 
 #: src/helpers/journal.ts
 msgid "La version {version} est disponible."
 msgstr "La versión {version} está disponible."
+
+#: src/helpers/wording.ts
+msgid "La version {version} est prête"
+msgstr "La versión {version} está lista"
 
 #: src/helpers/wording.ts
 msgid "La version {version} est prête. Multifus se relancera tout seul, sans toucher à vos clients."
@@ -1956,6 +1961,10 @@ msgstr "Multifus oye el juego."
 msgid "Multifus est déjà là quand vous ouvrez vos clients Dofus Retro."
 msgstr "Multifus ya está ahí cuando abres tus clientes de Dofus Retro."
 
+#: src/helpers/wording.ts
+msgid "Multifus est passé en {version}"
+msgstr "Multifus ya está en la {version}"
+
 #: src/screens/relay/screen-saver-warning.tsx
 msgid "Multifus garde l’écran allumé, mais votre écran de veille démarre après {delay} et verrouille l’ordinateur. Multifus n’entend plus le jeu, et vous ne recevez plus rien. Réglez-le sur Jamais."
 msgstr "Multifus mantiene la pantalla encendida, pero tu salvapantallas arranca después de {delay} y bloquea el ordenador. Multifus deja de oír el juego, y tú dejas de recibir nada. Ponlo en Nunca."
@@ -2016,6 +2025,10 @@ msgstr "Multifus vuelve a empezar como la primera vez. Tus personajes de Dofus R
 msgid "Multifus se recharge d’un coup et vous laisse sur l’écran où vous êtes. Vos clients Dofus Retro ne bougent pas."
 msgstr "Multifus se recarga de golpe y te deja en la pantalla donde estás. Tus clientes de Dofus Retro no se mueven."
 
+#: src/helpers/wording.ts
+msgid "Multifus se relancera tout seul, sans toucher à vos clients."
+msgstr "Multifus se reiniciará solo, sin tocar tus clientes."
+
 #: src/constants/journal.ts
 msgid "Multifus tournait déjà : le second lancement s’arrête là."
 msgstr "Multifus ya estaba en marcha: la segunda apertura se queda ahí."
@@ -2067,6 +2080,10 @@ msgstr "Notificaciones"
 #: src/helpers/wording.ts
 msgid "Notifications en arrière-plan"
 msgstr "Notificaciones en segundo plano"
+
+#: src/helpers/wording.ts
+msgid "Nouveautés, améliorations, corrections : allez jeter un œil au patch note."
+msgstr "Novedades, mejoras, correcciones: échales un ojo a las notas del parche."
 
 #: src/helpers/onboarding.ts
 msgid "On essaie pour de vrai"
@@ -2219,6 +2236,10 @@ msgstr "Nadie conectado"
 msgid "Plus qu’à vous faire appeler."
 msgstr "Ahora solo falta que le llamen."
 
+#: src/components/release-notice-bar.tsx
+msgid "Plus tard"
+msgstr "Más tarde"
+
 #: src/constants/runes.ts
 msgid "PM"
 msgstr "PM"
@@ -2350,6 +2371,7 @@ msgid "Recharger l’écran"
 msgstr "Recargar la pantalla"
 
 #: src/components/health-dialog.tsx
+#: src/helpers/wording.ts
 msgid "Réessayer"
 msgstr "Reintentar"
 
@@ -2956,6 +2978,10 @@ msgstr "Ver el vídeo"
 #: src/components/world/loop-porthole.tsx
 msgid "Voir la vidéo en grand"
 msgstr "Ver el vídeo en grande"
+
+#: src/components/release-notice-bar.tsx
+msgid "Voir le patch note"
+msgstr "Ver las notas del parche"
 
 #: src/components/move-button.tsx
 msgid "Voir le réglage"

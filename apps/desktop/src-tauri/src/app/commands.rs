@@ -574,6 +574,20 @@ pub fn dismiss_config_problem(app: AppHandle) -> Snapshot {
 }
 
 #[tauri::command]
+pub fn dismiss_release_notice(app: AppHandle) -> Snapshot {
+    lock(&app).dismiss_release_notice();
+
+    runtime::emit_snapshot(&app)
+}
+
+#[tauri::command]
+pub fn open_release_notes(app: AppHandle) {
+    links::open_release_notes(&app);
+
+    runtime::emit_snapshot(&app);
+}
+
+#[tauri::command]
 pub fn dismiss_check_notice(app: AppHandle) -> Snapshot {
     lock(&app).dismiss_check_notice();
 

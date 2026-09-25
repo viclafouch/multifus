@@ -34,6 +34,10 @@ export type UpdateStatus =
   | { readonly kind: 'installing' }
   | { readonly kind: 'upToDate' }
 
+export type ReleaseNotice =
+  | { readonly kind: 'arrived'; readonly version: string }
+  | { readonly kind: 'ready'; readonly version: string }
+
 export type ScreenSaver =
   | { readonly kind: 'after'; readonly seconds: number }
   | { readonly kind: 'never' }

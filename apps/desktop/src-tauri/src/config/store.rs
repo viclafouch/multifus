@@ -277,6 +277,7 @@ mod tests {
         Settings {
             language: Some(Language::En),
             onboarding_done: true,
+            notes_read: Some("0.2.0".to_owned()),
             roster: Roster::from_characters(vec![
                 Character::new("Alpha")
                     .with_gender(Gender::Male)

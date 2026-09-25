@@ -22,8 +22,11 @@ export const ConfigNotice = ({
     <NoticeBar
       title={title}
       body={body}
-      actionLabel={quarantined === null ? undefined : t`Montrer le fichier`}
-      onAct={onReveal}
+      action={
+        quarantined === null
+          ? undefined
+          : { label: t`Montrer le fichier`, onAct: onReveal }
+      }
       onDismiss={onDismiss}
     >
       {quarantined === null ? null : (
