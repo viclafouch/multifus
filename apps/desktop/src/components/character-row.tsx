@@ -26,8 +26,6 @@ import {
 } from '@/helpers/wording'
 import type { characterMarks } from '@/lib/character-marks'
 
-const STAGGER_MS = 38
-
 type RowActions = ReturnType<typeof characterMarks> &
   Readonly<{
     handleToggleExcluded: (nickname: string) => void
@@ -53,7 +51,6 @@ export const CharacterRow = ({
 }: CharacterRowProps) => {
   const { nickname, main, excluded, online } = character
   const { ref, handleRef, isDragging } = useSortable({ id: nickname, index })
-  const [isEntering, setIsEntering] = React.useState(true)
   const [isDialogOpen, setIsDialogOpen] = React.useState(false)
   const marksLabel = characterMarksLabel(character)
   const marksTooltip = characterMarksTooltip(character)
@@ -61,17 +58,10 @@ export const CharacterRow = ({
   return (
     <li
       ref={ref}
-      data-entering={isEntering ? '' : undefined}
       data-dragging={isDragging ? '' : undefined}
       data-offline={online ? undefined : ''}
       data-excluded={excluded ? '' : undefined}
-      style={{ animationDelay: `${index * STAGGER_MS}ms` }}
-      onAnimationEnd={(event) => {
-        if (event.target === event.currentTarget) {
-          setIsEntering(false)
-        }
-      }}
-      className="transition-row group relative flex h-row items-center gap-3 rounded-lg border border-transparent px-2 hover:border-border hover:bg-card/70 data-excluded:border-destructive/25 data-excluded:bg-destructive/8 data-excluded:hover:border-destructive/45 data-excluded:hover:bg-destructive/14 data-dragging:border-primary/35 data-dragging:bg-card data-dragging:shadow-lg data-entering:rise data-offline:dimmed"
+      className="transition-row group relative flex h-row items-center gap-3 rounded-lg border border-transparent px-2 hover:border-border hover:bg-card/70 data-excluded:border-destructive/25 data-excluded:bg-destructive/8 data-excluded:hover:border-destructive/45 data-excluded:hover:bg-destructive/14 data-dragging:border-primary/35 data-dragging:bg-card data-dragging:shadow-lg data-offline:dimmed"
     >
       {character.color === null ? null : (
         <ColorStripe

@@ -6,6 +6,16 @@
 
 - Una actualización lista aparece en una franja arriba de Multifus, y la primera en el menú del icono con un punto naranja. Una vez instalada, Multifus te lleva a sus notas del parche.
 
+### Mejoras
+
+- Las pantallas aparecen ahora de golpe al elegir un menú, sin animación de entrada.
+- En la pantalla de inicio, las cabezas de tus personajes ya no vuelven a colocarse en cada regreso, solo cuando llega un personaje nuevo.
+- La puesta en marcha hace aparecer sus textos con un fundido, sin deslizarlos.
+
+### Correcciones
+
+- Los textos de Multifus se movían un píxel solos en Windows, al cambiar de pantalla o al pasar el ratón por un botón. Ahora se quedan en su sitio.
+
 ## 0.2.0 - 2026-09-25
 
 ### Mejoras

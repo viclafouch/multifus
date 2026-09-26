@@ -6,6 +6,16 @@
 
 - Une mise à jour prête s’annonce dans un bandeau en haut de Multifus, et en tête du menu de l’icône avec une pastille orange. Une fois installée, Multifus vous mène à son patch note.
 
+### Améliorations
+
+- Les écrans s’affichent d’un coup quand vous choisissez un menu, sans animation d’arrivée.
+- Sur l’accueil, les têtes de vos personnages ne se posent plus à chaque retour, seulement quand un nouveau personnage arrive.
+- La mise en route fait apparaître ses textes en fondu, sans les faire glisser.
+
+### Corrections
+
+- Les textes de Multifus bougeaient d’un pixel tout seuls sur Windows, quand vous changiez d’écran ou passiez la souris sur un bouton. Ils restent maintenant bien en place.
+
 ## 0.2.0 - 2026-09-25
 
 ### Améliorations

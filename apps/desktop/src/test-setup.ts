@@ -57,6 +57,10 @@ Object.defineProperty(document, 'fonts', {
   value: { ready: Promise.resolve() }
 })
 
+document.getAnimations = () => {
+  return []
+}
+
 HTMLImageElement.prototype.decode = function decode() {
   return Promise.resolve()
 }

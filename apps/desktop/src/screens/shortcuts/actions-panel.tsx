@@ -85,7 +85,7 @@ export const ActionsPanel = ({
             variant="bare"
             size="tight"
             onClick={actions.handleDefaults}
-            className="rise text-aside font-normal text-khaki/75 hover:text-cream"
+            className="text-aside font-normal text-khaki/75 hover:text-cream"
           >
             {t`Remettre les touches d’origine`}
           </Button>

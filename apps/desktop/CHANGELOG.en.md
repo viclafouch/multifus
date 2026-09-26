@@ -6,6 +6,16 @@
 
 - An update that is ready shows in a strip at the top of Multifus, and first in the icon menu with an orange dot. Once it is installed, Multifus leads you to its patch notes.
 
+### Improved
+
+- Screens now show up at once when you pick a menu, with no entrance animation.
+- On the home screen, your characters’ heads no longer come and stand again every time you return, only when a new character arrives.
+- The setup fades its text in, without sliding it.
+
+### Fixed
+
+- Text in Multifus shifted by a pixel on its own on Windows, when you switched screens or hovered a button. It now stays put.
+
 ## 0.2.0 - 2026-09-25
 
 ### Improved

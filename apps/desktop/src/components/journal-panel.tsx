@@ -59,7 +59,7 @@ export const JournalPanel = ({ snapshot }: JournalPanelProps) => {
   }
 
   return (
-    <section className="fixed inset-x-0 bottom-0 z-50 border-t border-band/30 bg-iron/95 backdrop-blur-sm">
+    <section className="fixed inset-x-0 bottom-0 z-50 border-t border-band/30 bg-iron/95">
       <div className="flex items-center pr-2.5">
         <h2 className="min-w-0 flex-1">
           <Button

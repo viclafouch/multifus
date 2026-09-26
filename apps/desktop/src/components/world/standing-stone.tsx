@@ -2,6 +2,7 @@ import React from 'react'
 import { plural, t } from '@lingui/core/macro'
 import type { Character } from '@/@types/roster'
 import { Head } from '@/components/world/head'
+import { useAlreadyLanded } from '@/hooks/use-already-landed'
 import { useGlide } from '@/hooks/use-glide'
 import { useLingering } from '@/hooks/use-lingering'
 
@@ -51,6 +52,7 @@ export const StandingStone = ({
     .join('·')
 
   useGlide(seat, roll)
+  useAlreadyLanded(seat)
 
   const connected = characters.filter((character) => {
     return character.online

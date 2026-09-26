@@ -17,7 +17,7 @@ export const ShortcutUndoButton = ({ undo }: ShortcutUndoButtonProps) => {
       size="tight"
       aria-label={undo.label}
       onClick={undo.handleUndo}
-      className="rise text-aside font-normal text-muted-foreground hover:text-foreground"
+      className="text-aside font-normal text-muted-foreground hover:text-foreground"
     >
       {parts.length === 0 ? t`Remettre : aucune touche` : t`Remettre`}
       {parts.map((part) => {
