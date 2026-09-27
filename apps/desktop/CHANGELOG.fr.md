@@ -1,6 +1,6 @@
 # Notes de mise à jour
 
-## Unreleased
+## 0.3.0 - 2026-09-27
 
 ### Nouveautés
 
