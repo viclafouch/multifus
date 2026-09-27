@@ -58,8 +58,10 @@ The commit that raises the version renames `## Unreleased` to
 `## <version> - <day>` in the three `CHANGELOG.<language>.md`, and the release
 refuses a tag whose notes are left unnamed.
 
-A `v*` tag builds both systems into a draft release. Test the draft files, then
-publish it: the site rebuilds itself and points its buttons at them.
+A `v*` tag builds both systems into a draft release, and the `publish` workflow
+makes it public once both builds pass: the site rebuilds itself and points its
+buttons at them. The tag is the last look, since nothing waits for a test
+between it and the updater of every installed copy.
 
 The updater key pair lives in `~/.tauri/multifus.key` and its `.pub`, and the
 public half is `plugins.updater.pubkey` in `tauri.conf.json`. A new pair would
