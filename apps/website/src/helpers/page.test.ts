@@ -10,7 +10,7 @@ import { PAGES, PAGE_IDS } from '@/constants/pages'
 import {
   alternateRefsOf,
   everyPage,
-  matchHasLoop,
+  matchHasPlate,
   ogPathOf,
   pageOf,
   pathOf
@@ -116,43 +116,43 @@ const FEATURE_LOOP_PATHS = [
   '/textes-rapides'
 ]
 
-describe('matchHasLoop', () => {
+describe('matchHasPlate', () => {
   it('counts the six feature pages that carry a loop', () => {
     const carried = FEATURE_LOOP_PATHS.filter((path) => {
-      return matchHasLoop(path)
+      return matchHasPlate(path)
     })
 
     expect(carried).toStrictEqual(FEATURE_LOOP_PATHS)
   })
 
-  it('counts the three home pages, which carry the ambient loop', () => {
-    expect(matchHasLoop('/')).toBe(true)
-    expect(matchHasLoop('/en')).toBe(true)
-    expect(matchHasLoop('/es')).toBe(true)
+  it('counts the three home pages, which carry the trailer in the same plate', () => {
+    expect(matchHasPlate('/')).toBe(true)
+    expect(matchHasPlate('/en')).toBe(true)
+    expect(matchHasPlate('/es')).toBe(true)
   })
 
   it('sets aside mac, which is a feature without a loop', () => {
-    expect(matchHasLoop('/mac')).toBe(false)
-    expect(matchHasLoop('/en/mac')).toBe(false)
+    expect(matchHasPlate('/mac')).toBe(false)
+    expect(matchHasPlate('/en/mac')).toBe(false)
   })
 
   it('sets aside the pages that show no loop', () => {
-    expect(matchHasLoop('/comparatif')).toBe(false)
-    expect(matchHasLoop('/telecharger')).toBe(false)
-    expect(matchHasLoop('/journal')).toBe(false)
-    expect(matchHasLoop('/ankama')).toBe(false)
-    expect(matchHasLoop('/mentions-legales')).toBe(false)
+    expect(matchHasPlate('/comparatif')).toBe(false)
+    expect(matchHasPlate('/telecharger')).toBe(false)
+    expect(matchHasPlate('/journal')).toBe(false)
+    expect(matchHasPlate('/ankama')).toBe(false)
+    expect(matchHasPlate('/mentions-legales')).toBe(false)
   })
 
   it('answers the same in the three languages', () => {
-    expect(matchHasLoop('/en/character-wheel')).toBe(true)
-    expect(matchHasLoop('/es/rueda-de-personajes')).toBe(true)
-    expect(matchHasLoop('/en/comparison')).toBe(false)
-    expect(matchHasLoop('/es/aviso-legal')).toBe(false)
+    expect(matchHasPlate('/en/character-wheel')).toBe(true)
+    expect(matchHasPlate('/es/rueda-de-personajes')).toBe(true)
+    expect(matchHasPlate('/en/comparison')).toBe(false)
+    expect(matchHasPlate('/es/aviso-legal')).toBe(false)
   })
 
   it('refuses an address that is not a page', () => {
-    expect(matchHasLoop('/n-importe-quoi')).toBe(false)
+    expect(matchHasPlate('/n-importe-quoi')).toBe(false)
   })
 })
 

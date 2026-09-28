@@ -39,8 +39,6 @@ export type FeatureId =
   | 'walk'
   | 'wheel'
 
-export type LoopId = FeatureId | 'home'
-
 export type Loop = Readonly<{
   source: string
   size: Size
@@ -49,9 +47,17 @@ export type Loop = Readonly<{
   filmed: string
 }>
 
+export type Trailer = Pick<Loop, 'seconds'> &
+  Readonly<{
+    id: string
+    posters: Record<Language, Shot>
+    uploaded: string
+    spoken: Language
+  }>
+
 export type Page = Readonly<{
   kind: PageKind
   slugs: Readonly<Record<Language, string>>
-  loop: LoopId | null
+  loop: FeatureId | null
   kin: readonly FeatureId[]
 }>

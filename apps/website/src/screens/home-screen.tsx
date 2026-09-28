@@ -9,12 +9,12 @@ import { BandTitle } from '@/components/band-title'
 import { BotBan } from '@/components/bot-ban'
 import { DownloadCall } from '@/components/download-call'
 import { FeatureCard } from '@/components/feature-card'
-import { LoopPlate } from '@/components/loop-plate'
 import { OutLink } from '@/components/out-link'
 import { PageLink } from '@/components/page-link'
 import { PlateBlock } from '@/components/plate-block'
 import { Prose } from '@/components/prose'
 import { RivalPeek } from '@/components/rival-peek'
+import { TrailerPlate } from '@/components/trailer-plate'
 import { MENU_FEATURES } from '@/constants/pages'
 import { FOLD_ANCHOR, REPOSITORY } from '@/constants/site'
 import { BEFORE_INSTALL, LIMITS_TITLE, NO_HARM } from '@/constants/wording'
@@ -70,7 +70,7 @@ export const HomeScreen = (_props: PageScreenProps) => {
           <DownloadCall className="surface-3" />
         </div>
         <div className="surface-4" data-carried={isCarriedIn ? '' : undefined}>
-          <LoopPlate loop="home" isAuto />
+          <TrailerPlate />
         </div>
       </Band>
       <Band className="reveal py-rest-md">

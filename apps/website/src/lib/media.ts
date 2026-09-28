@@ -1,4 +1,4 @@
-import type { Shot } from '@/@types/media'
+import type { Shot, Size } from '@/@types/media'
 
 export const STILL = '(prefers-reduced-motion: reduce)'
 
@@ -38,6 +38,20 @@ export const PAIR_SIZES = [
   `(min-width: ${PAIR_FLOOR}) ${HALF_PAGE}`,
   FULL_PAGE
 ].join(', ')
+
+const POSTER_SIZE = { width: 1280, height: 720 } as const satisfies Size
+
+const SMALL_POSTER_SIZE = {
+  width: 760,
+  height: 428
+} as const satisfies Size
+
+export const posterOf = (full: string, small: string) => {
+  return {
+    full: { ...POSTER_SIZE, src: full },
+    small: { ...SMALL_POSTER_SIZE, src: small }
+  }
+}
 
 export const sourcesOf = ({ full, small }: Shot) => {
   return `${small.src} ${small.width}w, ${full.src} ${full.width}w`

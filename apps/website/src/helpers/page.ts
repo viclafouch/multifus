@@ -72,16 +72,16 @@ export const everyPage = (): readonly PageAddress[] => {
   })
 }
 
-const LOOP_PATHS = new Set(
+const PLATE_PATHS = new Set(
   everyPage()
     .filter(({ page }) => {
-      return PAGES[page].loop !== null
+      return page === 'home' || PAGES[page].loop !== null
     })
     .map(({ path }) => {
       return path
     })
 )
 
-export const matchHasLoop = (pathname: string) => {
-  return LOOP_PATHS.has(pathname)
+export const matchHasPlate = (pathname: string) => {
+  return PLATE_PATHS.has(pathname)
 }

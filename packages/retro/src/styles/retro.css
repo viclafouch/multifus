@@ -1348,10 +1348,6 @@
   .curtain[data-playing] &::after {
     content: none;
   }
-
-  .stage[data-auto] & {
-    --spacing-beacon: clamp(2.75rem, 6.25vw, 4.5rem);
-  }
 }
 
 @keyframes dawn {

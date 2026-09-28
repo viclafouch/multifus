@@ -1,31 +1,28 @@
 import { useLingui } from '@lingui/react'
 import { usePlayer } from '@multifus/retro'
-import type { LoopId } from '@/@types/page'
+import type { FeatureId } from '@/@types/page'
 import { LoopCurtain } from '@/components/loop-curtain'
-import { captionOf, LOOPS, posterSizesOf } from '@/constants/loops'
+import { LOOPS } from '@/constants/loops'
+import { PAGE_PROMISES } from '@/constants/wording'
 import { useMedia } from '@/hooks/use-media'
-import { sourcesOf, STILL } from '@/lib/media'
+import { sourcesOf, STAGE_SIZES, STILL } from '@/lib/media'
 
 type LoopPlateProps = Readonly<{
-  loop: LoopId
-  isAuto?: boolean
+  loop: FeatureId
 }>
 
-export const LoopPlate = ({ loop, isAuto = false }: LoopPlateProps) => {
+export const LoopPlate = ({ loop }: LoopPlateProps) => {
   const { i18n } = useLingui()
   const isStill = useMedia(STILL)
-  const { video, isPlaying, toggle } = usePlayer({ isStill, isAuto })
+  const { video, isPlaying, toggle } = usePlayer({ isStill, isAuto: false })
   const { source, size, poster } = LOOPS[loop]
 
   return (
-    <div
-      className="stage carried relative aspect-loop w-full"
-      data-auto={isAuto ? '' : undefined}
-    >
+    <div className="stage carried relative aspect-loop w-full">
       <img
         src={poster.full.src}
         srcSet={sourcesOf(poster)}
-        sizes={posterSizesOf(loop)}
+        sizes={STAGE_SIZES}
         alt=""
         width={poster.full.width}
         height={poster.full.height}
@@ -36,7 +33,7 @@ export const LoopPlate = ({ loop, isAuto = false }: LoopPlateProps) => {
         src={source}
         width={size.width}
         height={size.height}
-        aria-label={i18n._(captionOf(loop))}
+        aria-label={i18n._(PAGE_PROMISES[loop])}
         className="absolute inset-0 size-full object-cover"
         controls={isStill}
         loop

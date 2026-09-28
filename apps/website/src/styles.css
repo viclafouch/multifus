@@ -986,6 +986,39 @@
   view-transition-name: loop;
 }
 
+@utility youtube-slot {
+  --youtube-least: 200px;
+  container-type: inline-size;
+}
+
+@utility youtube-bleed {
+  --youtube-width: min(
+    100vw,
+    max(
+      100cqw,
+      var(--youtube-least) * var(--aspect-loop) + 2 * var(--stage-edge)
+    )
+  );
+  width: var(--youtube-width);
+  margin-inline: calc((100cqw - var(--youtube-width)) / 2);
+}
+
+@utility youtube-screen {
+  height: max(
+    var(--youtube-least),
+    (var(--youtube-width) - 2 * var(--stage-edge)) / (var(--aspect-loop))
+  );
+}
+
+@utility youtube-film {
+  opacity: 0;
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &[data-ready] {
+    opacity: 1;
+  }
+}
+
 @utility glint {
   background-image: linear-gradient(
     90deg,
@@ -1677,6 +1710,10 @@
 
   .drawer,
   .drawer::backdrop {
+    transition: none !important;
+  }
+
+  .youtube-film {
     transition: none !important;
   }
 

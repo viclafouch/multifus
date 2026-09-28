@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest'
-import type { PageId } from '@/@types/page'
 import { LANGUAGES } from '@/constants/languages'
 import { MENU_FEATURES, PAGES, PAGE_IDS } from '@/constants/pages'
 import { MENU_HINTS, PAGE_NAMES, PAGE_PROMISES } from '@/constants/wording'
@@ -12,8 +11,6 @@ const HINT_LENGTH = 38
 const WITHOUT_HOME = PAGE_IDS.filter((page) => {
   return page !== 'home'
 })
-
-const FILMED = ['home', ...MENU_FEATURES] as const satisfies readonly PageId[]
 
 describe('the table of the pages', () => {
   it('gives fifteen pages', () => {
@@ -102,17 +99,17 @@ describe('the table of the pages', () => {
     expect(new Set(kin).size).toBe(kin.length)
   })
 
-  it.each(FILMED)('gives its own loop to %s', (page) => {
+  it.each(MENU_FEATURES)('gives its own loop to %s', (page) => {
     expect(PAGES[page].loop).toBe(page)
   })
 
-  it('films only the home page and the features of the menu', () => {
+  it('loops only the features of the menu, the home page plays the trailer', () => {
     const filmed = PAGE_IDS.filter((page) => {
       return PAGES[page].loop !== null
     })
 
     expect(filmed.toSorted(alphabetical)).toStrictEqual(
-      [...FILMED].toSorted(alphabetical)
+      [...MENU_FEATURES].toSorted(alphabetical)
     )
   })
 })

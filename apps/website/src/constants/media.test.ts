@@ -14,6 +14,7 @@ import {
 } from '@/constants/shots'
 import { SUMMONS } from '@/constants/summons'
 import { SYSTEM_IDS } from '@/constants/systems'
+import { TRAILER } from '@/constants/trailer'
 
 const SERVED_FROM = '/@fs'
 
@@ -114,6 +115,12 @@ const everySizeDeclared = () => {
     declared.set(peek, PEEK_SIZE)
   }
 
+  for (const poster of Object.values(TRAILER.posters)) {
+    for (const { src, width, height } of [poster.full, poster.small]) {
+      declared.set(src, { width, height })
+    }
+  }
+
   return [...declared]
 }
 
@@ -121,7 +128,7 @@ const DECLARED = everySizeDeclared()
 
 describe('the sizes the pages reserve', () => {
   it('finds every decor, screenshot, poster, peek and loop', () => {
-    expect(DECLARED).toHaveLength(65)
+    expect(DECLARED).toHaveLength(68)
   })
 
   it.each(DECLARED)('matches the file behind %s', async (served, size) => {

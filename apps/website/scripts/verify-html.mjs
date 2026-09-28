@@ -82,12 +82,18 @@ const VIDEO_WANTED = [
   'description',
   'thumbnailUrl',
   'uploadDate',
-  'contentUrl',
-  'duration',
-  'encodingFormat',
-  'width',
-  'height'
+  'duration'
 ]
+
+const FILE_WANTED = ['contentUrl', 'encodingFormat', 'width', 'height']
+
+const PLAYER_WANTED = ['embedUrl']
+
+const videoWantedOf = (video) => {
+  const served = video.embedUrl === undefined ? FILE_WANTED : PLAYER_WANTED
+
+  return [...VIDEO_WANTED, ...served]
+}
 
 const OG_IMAGE = /<meta[^>]*property="og:image"[^>]*content="([^"]+)"/u
 
@@ -205,7 +211,7 @@ for (const pathname of addresses) {
     const video = nodeOf('VideoObject')
 
     if (video !== undefined) {
-      for (const wanted of VIDEO_WANTED) {
+      for (const wanted of videoWantedOf(video)) {
         if (video[wanted] === undefined) {
           complain(pathname, `a video written down without its ${wanted}`)
         }

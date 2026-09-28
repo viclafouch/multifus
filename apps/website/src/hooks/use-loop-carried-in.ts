@@ -1,6 +1,6 @@
 import React from 'react'
 import { useRouter } from '@tanstack/react-router'
-import { matchHasLoop } from '@/helpers/page'
+import { matchHasPlate } from '@/helpers/page'
 
 export const useLoopCarriedIn = () => {
   const router = useRouter()
@@ -13,7 +13,7 @@ export const useLoopCarriedIn = () => {
       return false
     }
 
-    return matchHasLoop(from)
+    return matchHasPlate(from)
   })
 
   return isCarriedIn

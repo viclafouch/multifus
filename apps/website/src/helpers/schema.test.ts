@@ -3,22 +3,25 @@ import type { Language } from '@/@types/language'
 import type { PageId } from '@/@types/page'
 import { HOST } from '@/constants/host'
 import { LANGUAGES } from '@/constants/languages'
-import { captionOf, LOOP_FORMAT, LOOPS } from '@/constants/loops'
+import { LOOP_FORMAT, LOOPS } from '@/constants/loops'
 import { PAGES, PAGE_IDS } from '@/constants/pages'
 import { PAGE_QUESTIONS, QUESTIONS } from '@/constants/questions'
 import { SYSTEM_SHOT_ALTS, SYSTEM_SHOTS } from '@/constants/shots'
 import { RELEASES } from '@/constants/site'
 import { SYSTEM_IDS } from '@/constants/systems'
+import { TRAILER, TRAILER_TITLE } from '@/constants/trailer'
 import type { PathParams } from '@/helpers/page'
 import type { SchemaNode } from '@/helpers/schema'
 import { graphOf, schemaOf, scriptOf } from '@/helpers/schema'
 import { SPEAKERS } from '@/lib/i18n'
+import { embedOf } from '@/lib/youtube'
 
 const ADDRESS_KEYS = new Set([
   '@id',
   'url',
   'item',
   'contentUrl',
+  'embedUrl',
   'thumbnailUrl',
   'downloadUrl',
   'installUrl',
@@ -69,11 +72,11 @@ const EVERY_FAQ_ANSWER = LANGUAGES.flatMap((language) => {
 })
 
 const FILMED = PAGE_IDS.filter((page) => {
-  return PAGES[page].loop !== null
+  return page === 'home' || PAGES[page].loop !== null
 })
 
 const UNFILMED = PAGE_IDS.filter((page) => {
-  return PAGES[page].loop === null
+  return !FILMED.includes(page)
 })
 
 const WITHOUT_HOME = PAGE_IDS.filter((page) => {
@@ -242,10 +245,37 @@ describe('the video record', () => {
     ).toMatch(DAY_AND_HOUR)
   })
 
-  it('names the loop of the home page after what it shows', () => {
-    expect(
-      nodeOf({ page: 'home', language: 'fr', type: 'VideoObject' })?.name
-    ).toBe(SPEAKERS.fr._(captionOf('home')))
+  it('points the video of the home page at the trailer on YouTube', () => {
+    const trailer = nodeOf({
+      page: 'home',
+      language: 'fr',
+      type: 'VideoObject'
+    })
+
+    expect(trailer).toMatchObject({
+      name: SPEAKERS.fr._(TRAILER_TITLE),
+      embedUrl: embedOf(TRAILER.id),
+      thumbnailUrl: `${HOST}${TRAILER.posters.fr.full.src}`,
+      duration: 'PT68S',
+      uploadDate: TRAILER.uploaded
+    })
+    expect(trailer).not.toHaveProperty('contentUrl')
+  })
+
+  it('gives every language the thumbnail written in its words', () => {
+    for (const language of LANGUAGES) {
+      expect(
+        nodeOf({ page: 'home', language, type: 'VideoObject' })?.thumbnailUrl
+      ).toBe(`${HOST}${TRAILER.posters[language].full.src}`)
+    }
+  })
+
+  it('tells every language that the trailer is filmed in French', () => {
+    for (const language of LANGUAGES) {
+      expect(
+        nodeOf({ page: 'home', language, type: 'VideoObject' })?.inLanguage
+      ).toBe('fr')
+    }
   })
 
   it('counts the duration of each loop in whole seconds', () => {

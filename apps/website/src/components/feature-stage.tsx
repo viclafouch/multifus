@@ -1,10 +1,10 @@
-import type { LoopId, PageId } from '@/@types/page'
+import type { FeatureId, PageId } from '@/@types/page'
 import { Blazon } from '@/components/blazon'
 import { LoopPlate } from '@/components/loop-plate'
 
 type FeatureStageProps = Readonly<{
   page: PageId
-  loop: LoopId
+  loop: FeatureId
 }>
 
 export const FeatureStage = ({ page, loop }: FeatureStageProps) => {

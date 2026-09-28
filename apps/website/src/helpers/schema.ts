@@ -13,10 +13,10 @@ import type {
 } from 'schema-dts'
 import type { AskId } from '@/@types/ask'
 import type { Language } from '@/@types/language'
-import type { LoopId, PageId } from '@/@types/page'
+import type { FeatureId, PageId } from '@/@types/page'
 import { HOST } from '@/constants/host'
 import { LANGUAGES } from '@/constants/languages'
-import { captionOf, LOOP_FORMAT, LOOPS } from '@/constants/loops'
+import { LOOP_FORMAT, LOOPS } from '@/constants/loops'
 import { OG_HEIGHT, OG_IMAGE, OG_WIDTH } from '@/constants/og'
 import { MENU_FEATURES, PAGES } from '@/constants/pages'
 import { PAGE_QUESTIONS, QUESTIONS } from '@/constants/questions'
@@ -29,14 +29,17 @@ import {
   REPOSITORY
 } from '@/constants/site'
 import { SYSTEM_IDS, SYSTEM_VERSIONS } from '@/constants/systems'
+import { TRAILER, TRAILER_TITLE } from '@/constants/trailer'
 import {
   PAGE_DESCRIPTIONS,
   PAGE_NAMES,
+  PAGE_PROMISES,
   SOFTWARE_CATEGORY
 } from '@/constants/wording'
 import { addressOf, ogAddressOf } from '@/helpers/address'
 import type { PathParams } from '@/helpers/page'
 import { SPEAKERS } from '@/lib/i18n'
+import { embedOf } from '@/lib/youtube'
 
 type Addressed<Node> = Node & Required<Pick<JsonLdObject, '@id'>>
 
@@ -46,7 +49,8 @@ export type SchemaNode =
   | ReturnType<typeof personOf>
   | ReturnType<typeof siteOf>
   | ReturnType<typeof softwareOf>
-  | ReturnType<typeof videoOf>
+  | ReturnType<typeof trailerOf>
+  | ReturnType<typeof loopVideoOf>
   | ReturnType<typeof webPageOf>
 
 const CONTEXT = 'https://schema.org'
@@ -149,9 +153,9 @@ const softwareOf = (language: Language) => {
   } satisfies Addressed<SoftwareApplication>
 }
 
-type VideoOfParams = PathParams & Readonly<{ loop: LoopId }>
+type LoopVideoOfParams = PathParams & Readonly<{ loop: FeatureId }>
 
-const videoOf = ({ page, language, loop }: VideoOfParams) => {
+const loopVideoOf = ({ page, language, loop }: LoopVideoOfParams) => {
   const speaker = SPEAKERS[language]
   const address = addressOf({ page, language })
   const { source, poster, size, seconds, filmed } = LOOPS[loop]
@@ -159,7 +163,7 @@ const videoOf = ({ page, language, loop }: VideoOfParams) => {
   return {
     '@type': 'VideoObject',
     '@id': `${address}#video`,
-    name: speaker._(captionOf(loop)),
+    name: speaker._(PAGE_PROMISES[loop]),
     description: speaker._(PAGE_DESCRIPTIONS[page]),
     contentUrl: `${HOST}${source}`,
     encodingFormat: LOOP_FORMAT,
@@ -171,6 +175,37 @@ const videoOf = ({ page, language, loop }: VideoOfParams) => {
     inLanguage: language,
     isFamilyFriendly: true
   } satisfies Addressed<VideoObject>
+}
+
+const trailerOf = ({ page, language }: PathParams) => {
+  const speaker = SPEAKERS[language]
+
+  return {
+    '@type': 'VideoObject',
+    '@id': `${addressOf({ page, language })}#video`,
+    name: speaker._(TRAILER_TITLE),
+    description: speaker._(PAGE_DESCRIPTIONS[page]),
+    embedUrl: embedOf(TRAILER.id),
+    thumbnailUrl: `${HOST}${TRAILER.posters[language].full.src}`,
+    uploadDate: TRAILER.uploaded,
+    duration: `PT${TRAILER.seconds}S`,
+    inLanguage: TRAILER.spoken,
+    isFamilyFriendly: true
+  } satisfies Addressed<VideoObject>
+}
+
+const filmOf = ({ page, language }: PathParams) => {
+  const { loop } = PAGES[page]
+
+  if (page === 'home') {
+    return trailerOf({ page, language })
+  }
+
+  if (loop === null) {
+    return null
+  }
+
+  return loopVideoOf({ page, language, loop })
 }
 
 const crumbsOf = ({ page, language }: PathParams) => {
@@ -278,10 +313,9 @@ export const schemaOf = ({
   page,
   language
 }: PathParams): readonly SchemaNode[] => {
-  const { loop } = PAGES[page]
   const asked = PAGE_QUESTIONS[page]
   const software = matchHasSoftware(page) ? softwareOf(language) : null
-  const video = loop === null ? null : videoOf({ page, language, loop })
+  const video = filmOf({ page, language })
   const crumbs = page === 'home' ? null : crumbsOf({ page, language })
   const sheet =
     asked === null

@@ -3,7 +3,7 @@ import { I18nProvider } from '@lingui/react'
 import { IDLE_AFTER } from '@multifus/retro'
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { LoopPlate } from '@/components/loop-plate'
-import { captionOf } from '@/constants/loops'
+import { PAGE_PROMISES } from '@/constants/wording'
 import { SPEAKERS } from '@/lib/i18n'
 
 const watchMotion = () => {
@@ -20,10 +20,10 @@ const spyOnPlayback = () => {
   return vi.spyOn(HTMLMediaElement.prototype, 'play').mockResolvedValue()
 }
 
-const show = (isAuto: boolean) => {
+const show = () => {
   return render(
     <I18nProvider i18n={SPEAKERS.fr}>
-      <LoopPlate loop="home" isAuto={isAuto} />
+      <LoopPlate loop="wheel" />
     </I18nProvider>
   )
 }
@@ -42,7 +42,7 @@ describe('the loop plate', () => {
   it('leaves the loop stopped while nobody starts it', () => {
     const play = spyOnPlayback()
 
-    show(false)
+    show()
 
     expect(play).not.toHaveBeenCalled()
   })
@@ -50,17 +50,17 @@ describe('the loop plate', () => {
   it('says out loud what the loop shows', () => {
     spyOnPlayback()
 
-    const { container } = show(false)
+    const { container } = show()
 
     expect(container.querySelector('video')?.getAttribute('aria-label')).toBe(
-      SPEAKERS.fr._(captionOf('home'))
+      SPEAKERS.fr._(PAGE_PROMISES.wheel)
     )
   })
 
   it('stays in the page on iOS rather than going full screen', () => {
     spyOnPlayback()
 
-    const { container } = show(false)
+    const { container } = show()
     const loop = container.querySelector('video')
 
     expect(loop?.hasAttribute('playsinline')).toBe(true)
@@ -70,7 +70,7 @@ describe('the loop plate', () => {
   it('offers the whole surface of the loop to the click, badge included', () => {
     const play = spyOnPlayback()
 
-    show(false)
+    show()
 
     const surface = screen.getByRole('button', { name: 'Lire' })
 
@@ -81,33 +81,15 @@ describe('the loop plate', () => {
     expect(play).toHaveBeenCalledWith()
   })
 
-  it('starts the loop of the entrance with its curtain already out', () => {
-    const play = spyOnPlayback()
-
-    show(true)
-
-    expect(play).toHaveBeenCalledWith()
-    expect(screen.getByRole('button', { name: 'Pause' })).toBeDefined()
-  })
-
-  it('holds the loop of the entrance until the page has loaded', () => {
-    const play = spyOnPlayback()
-    vi.spyOn(document, 'readyState', 'get').mockReturnValue('loading')
-
-    show(true)
-
-    expect(play).not.toHaveBeenCalled()
-
-    window.dispatchEvent(new Event('load'))
-
-    expect(play).toHaveBeenCalledWith()
-  })
-
   it('sends the curtain to sleep once the pointer stops moving', () => {
     vi.useFakeTimers()
     spyOnPlayback()
 
-    show(true)
+    show()
+
+    screen.getByRole('button', { name: 'Lire' }).click()
+    vi.spyOn(HTMLMediaElement.prototype, 'paused', 'get').mockReturnValue(false)
+    fireEvent.play(screen.getByLabelText(SPEAKERS.fr._(PAGE_PROMISES.wheel)))
 
     const surface = screen.getByRole('button', { name: 'Pause' })
 
@@ -128,7 +110,7 @@ describe('the loop plate', () => {
     vi.useFakeTimers()
     spyOnPlayback()
 
-    show(false)
+    show()
 
     const surface = screen.getByRole('button', { name: 'Lire' })
 

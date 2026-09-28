@@ -3,7 +3,7 @@ import type { FeatureId, Page, PageId } from '../@types/page.ts'
 export const PAGES = {
   home: {
     kind: 'home',
-    loop: 'home',
+    loop: null,
     kin: [],
     slugs: { fr: '', en: '', es: '' }
   },

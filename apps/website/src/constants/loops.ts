@@ -1,11 +1,7 @@
-import { msg } from '@lingui/core/macro'
 import autoFocusPeek from '@multifus/ankama/loops/auto-focus-loop-peek.webp'
 import autoFocusSmall from '@multifus/ankama/loops/auto-focus-loop-poster-760.webp'
 import autoFocusPoster from '@multifus/ankama/loops/auto-focus-loop-poster.webp'
 import autoFocusLoop from '@multifus/ankama/loops/auto-focus-loop.mp4'
-import homeSmall from '@multifus/ankama/loops/home-loop-poster-760.webp'
-import homePoster from '@multifus/ankama/loops/home-loop-poster.webp'
-import homeLoop from '@multifus/ankama/loops/home-loop.mp4'
 import quickTextsPeek from '@multifus/ankama/loops/quick-texts-loop-peek.webp'
 import quickTextsSmall from '@multifus/ankama/loops/quick-texts-loop-poster-760.webp'
 import quickTextsPoster from '@multifus/ankama/loops/quick-texts-loop-poster.webp'
@@ -27,9 +23,8 @@ import wheelSmall from '@multifus/ankama/loops/wheel-loop-poster-760.webp'
 import wheelPoster from '@multifus/ankama/loops/wheel-loop-poster.webp'
 import wheelLoop from '@multifus/ankama/loops/wheel-loop.mp4'
 import type { Size } from '@/@types/media'
-import type { FeatureId, Loop, LoopId } from '@/@types/page'
-import { PAGE_PROMISES } from '@/constants/wording'
-import { ENTRANCE_SIZES, STAGE_SIZES } from '@/lib/media'
+import type { FeatureId, Loop } from '@/@types/page'
+import { posterOf } from '@/lib/media'
 
 const FILMED_ON = '2026-09-08T12:00:00+02:00'
 
@@ -37,30 +32,9 @@ const REFILMED_ON = '2026-09-16T12:00:00+02:00'
 
 export const LOOP_FORMAT = 'video/mp4'
 
-export const POSTER_SIZE = { width: 1280, height: 720 } as const satisfies Size
-
-export const SMALL_POSTER_SIZE = {
-  width: 760,
-  height: 428
-} as const satisfies Size
-
 export const PEEK_SIZE = { width: 720, height: 406 } as const satisfies Size
 
-const posterOf = (full: string, small: string) => {
-  return {
-    full: { ...POSTER_SIZE, src: full },
-    small: { ...SMALL_POSTER_SIZE, src: small }
-  }
-}
-
 export const LOOPS = {
-  home: {
-    source: homeLoop,
-    size: { width: 1280, height: 720 },
-    poster: posterOf(homePoster, homeSmall),
-    seconds: 18,
-    filmed: FILMED_ON
-  },
   autoFocus: {
     source: autoFocusLoop,
     size: { width: 1384, height: 778 },
@@ -103,17 +77,7 @@ export const LOOPS = {
     seconds: 12,
     filmed: REFILMED_ON
   }
-} as const satisfies Record<LoopId, Loop>
-
-const HOME_CAPTION = msg`La roue des personnages, l’AutoFocus, le déplacement rapide et le tableau des runes, dans le jeu`
-
-export const captionOf = (loop: LoopId) => {
-  return loop === 'home' ? HOME_CAPTION : PAGE_PROMISES[loop]
-}
-
-export const posterSizesOf = (loop: LoopId) => {
-  return loop === 'home' ? ENTRANCE_SIZES : STAGE_SIZES
-}
+} as const satisfies Record<FeatureId, Loop>
 
 export const PEEKS = {
   autoFocus: autoFocusPeek,

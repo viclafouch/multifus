@@ -545,10 +545,6 @@ msgstr "the same icon for all your clients"
 msgid "La première version de Multifus n’est pas encore publiée."
 msgstr "The first version of Multifus is not published yet."
 
-#: src/constants/loops.ts
-msgid "La roue des personnages, l’AutoFocus, le déplacement rapide et le tableau des runes, dans le jeu"
-msgstr "The character wheel, AutoFocus, quick move and the rune table, inside the game"
-
 #: src/components/taskbar-proof.tsx
 msgid "la tête de classe du personnage, à sa couleur"
 msgstr "the class head of the character, in its colour"
@@ -840,6 +836,10 @@ msgstr "My PC runs Windows 7, does it work?"
 #: src/constants/wording.ts
 msgid "Multifus"
 msgstr "Multifus"
+
+#: src/constants/trailer.ts
+msgid "Multifus : l’outil gratuit pour Dofus Retro, mono ou multicompte"
+msgstr "Multifus: the free tool for Dofus Retro, single or multi-account"
 
 #: src/constants/rivals.ts
 msgid "Multifus agrandit les clients à leur ouverture, il ne les range jamais côte à côte."
