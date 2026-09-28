@@ -120,6 +120,6 @@ export const BEFORE_INSTALL = msg`Avant d’installer`
 
 export const PERKS = [
   msg`Gratuit`,
-  msg`Sans compte`,
-  msg`Sans publicité`
+  msg`Sans publicité`,
+  msg`Code source public`
 ] as const satisfies readonly MessageDescriptor[]

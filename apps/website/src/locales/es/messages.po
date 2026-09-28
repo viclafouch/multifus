@@ -280,6 +280,10 @@ msgstr "Código publicado"
 msgid "Code publié, sans licence libre."
 msgstr "Código publicado, sin licencia libre."
 
+#: src/constants/wording.ts
+msgid "Code source public"
+msgstr "Código fuente público"
+
 #: src/constants/bodies.ts
 msgid "Commande et Option s’affichent comme sur votre clavier, pas Ctrl et Alt."
 msgstr "Comando y Opción aparecen como en tu teclado, no Ctrl y Alt."
@@ -1133,10 +1137,6 @@ msgstr "Rueda de personajes"
 #: src/constants/questions.ts
 msgid "Sans cet accès, Multifus ne voit rien et ne peut rien faire."
 msgstr "Sin ese acceso, Multifus no ve nada y no puede hacer nada."
-
-#: src/constants/wording.ts
-msgid "Sans compte"
-msgstr "Sin cuenta"
 
 #: src/components/taskbar-proof.tsx
 msgid "Sans Multifus"
