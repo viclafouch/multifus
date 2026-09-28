@@ -5,6 +5,7 @@ import { BrandMark } from '@/components/brand-mark'
 import { LanguageNav } from '@/components/language-nav'
 import { PageNav } from '@/components/page-nav'
 import { PerkList } from '@/components/perk-list'
+import { PROJECT_LINKS } from '@/constants/elsewhere'
 import { MENU_FEATURES, PROJECT_PAGES, SOFTWARE_PAGES } from '@/constants/pages'
 import { AUTHOR_NAME } from '@/constants/site'
 import {
@@ -39,7 +40,11 @@ export const SiteFooter = ({ page }: SiteFooterProps) => {
           </div>
           <PageNav title={FEATURES_TITLE} pages={MENU_FEATURES} />
           <PageNav title={SOFTWARE_TITLE} pages={SOFTWARE_PAGES} />
-          <PageNav title={PROJECT_TITLE} pages={PROJECT_PAGES} />
+          <PageNav
+            title={PROJECT_TITLE}
+            pages={PROJECT_PAGES}
+            links={PROJECT_LINKS}
+          />
           <div className="lg:hidden">
             <LanguageNav page={page} />
           </div>

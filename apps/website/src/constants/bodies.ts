@@ -25,7 +25,7 @@ import { SquaresFourIcon } from '@phosphor-icons/react/dist/ssr/SquaresFour'
 import { TelegramLogoIcon } from '@phosphor-icons/react/dist/ssr/TelegramLogo'
 import { TranslateIcon } from '@phosphor-icons/react/dist/ssr/Translate'
 import { UserCheckIcon } from '@phosphor-icons/react/dist/ssr/UserCheck'
-import { UsersThreeIcon } from '@phosphor-icons/react/dist/ssr/UsersThree'
+import { UserFocusIcon } from '@phosphor-icons/react/dist/ssr/UserFocus'
 import type { Body } from '@/@types/body'
 import type { PageId } from '@/@types/page'
 
@@ -165,8 +165,8 @@ export const PAGE_BODIES = {
         line: msg`« Achète anneau 30 pp, MP moi », « Bon jeu à toi », « Je reviens dans deux minutes ».`
       },
       {
-        icon: UsersThreeIcon,
-        title: msg`Une phrase, tous vos personnages`,
+        icon: UserFocusIcon,
+        title: msg`Sur le personnage devant vous`,
         line: msg`Vous l’écrivez une fois, et la combinaison marche sur le personnage qui est devant vous.`
       },
       {

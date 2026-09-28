@@ -280,6 +280,10 @@ msgstr "Code publié"
 msgid "Code publié, sans licence libre."
 msgstr "Code publié, sans licence libre."
 
+#: src/constants/elsewhere.ts
+msgid "Code source GitHub"
+msgstr "Code source GitHub"
+
 #: src/constants/wording.ts
 msgid "Code source public"
 msgstr "Code source public"
@@ -333,8 +337,8 @@ msgid "Déplacer plusieurs personnages d’un coup"
 msgstr "Déplacer plusieurs personnages d’un coup"
 
 #: src/constants/wording.ts
-msgid "Déplacer sa team en multicompte sur Dofus Retro"
-msgstr "Déplacer sa team en multicompte sur Dofus Retro"
+msgid "Déplacer ses personnages un à un sur Dofus Retro"
+msgstr "Déplacer ses personnages un à un sur Dofus Retro"
 
 #: src/components/release-entry.tsx
 msgid "Dernière version"
@@ -712,6 +716,10 @@ msgstr "Le site de Dofus Retro"
 #: src/screens/legal-screen.tsx
 msgid "Le site est hébergé par <0>{VERCEL_NAME}</0>, {VERCEL_ADDRESS}, aux États-Unis."
 msgstr "Le site est hébergé par <0>{VERCEL_NAME}</0>, {VERCEL_ADDRESS}, aux États-Unis."
+
+#: src/constants/wording.ts
+msgid "Le suivant passe devant à chaque clic."
+msgstr "Le suivant passe devant à chaque clic."
 
 #: src/constants/bodies.ts
 msgid "Le tableau des poids de runes se pose par-dessus la fenêtre du jeu, à la touche que vous avez choisie."
@@ -1174,6 +1182,14 @@ msgstr "Six mécanismes, une seule installation"
 msgid "Suivez les trois lignes de votre ordinateur. Il n’y a rien d’autre à faire."
 msgstr "Suivez les trois lignes de votre ordinateur. Il n’y a rien d’autre à faire."
 
+#: src/constants/wording.ts
+msgid "Sur Dofus Retro, un clic déplace le personnage devant vous, puis la fenêtre du suivant arrive. Vous cliquez une fois par personnage."
+msgstr "Sur Dofus Retro, un clic déplace le personnage devant vous, puis la fenêtre du suivant arrive. Vous cliquez une fois par personnage."
+
+#: src/constants/bodies.ts
+msgid "Sur le personnage devant vous"
+msgstr "Sur le personnage devant vous"
+
 #: src/constants/rivals.ts
 msgid "Sur Mac"
 msgstr "Sur Mac"
@@ -1269,16 +1285,8 @@ msgid "Un bouton le replace au coin de la fenêtre du jeu si vous le perdez de v
 msgstr "Un bouton le replace au coin de la fenêtre du jeu si vous le perdez de vue."
 
 #: src/constants/wording.ts
-msgid "Un clic gauche, et la team suit."
-msgstr "Un clic gauche, et la team suit."
-
-#: src/constants/wording.ts
-msgid "Un clic par personnage et votre team suit sur Dofus Retro : vous cliquez là où vous allez, la fenêtre du personnage suivant arrive devant vous."
-msgstr "Un clic par personnage et votre team suit sur Dofus Retro : vous cliquez là où vous allez, la fenêtre du personnage suivant arrive devant vous."
-
-#: src/constants/wording.ts
-msgid "Un clic par personnage, et la team suit."
-msgstr "Un clic par personnage, et la team suit."
+msgid "Un clic par personnage, et le suivant passe devant."
+msgstr "Un clic par personnage, et le suivant passe devant."
 
 #: src/constants/bodies.ts
 msgid "Un de vos personnages reçoit une invitation ou un message, et sa fenêtre passe devant vous toute seule."
@@ -1327,10 +1335,6 @@ msgstr "Une combinaison écrit la phrase."
 #: src/constants/bodies.ts
 msgid "Une couleur par personnage"
 msgstr "Une couleur par personnage"
-
-#: src/constants/bodies.ts
-msgid "Une phrase, tous vos personnages"
-msgstr "Une phrase, tous vos personnages"
 
 #: src/constants/ankama.ts
 msgid "Une tolérance n’est pas une autorisation."

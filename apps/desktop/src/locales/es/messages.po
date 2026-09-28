@@ -794,6 +794,10 @@ msgstr "Pulse el botón. Si Windows se niega, active el acceso de las aplicacion
 msgid "Cliquez une question pour voir la réponse."
 msgstr "Haga clic en una pregunta para ver la respuesta."
 
+#: src/constants/features.ts
+msgid "Cliquez, le personnage se déplace, et le suivant passe devant."
+msgstr "Haga clic, el personaje se desplaza, y el siguiente pasa delante."
+
 #: src/screens/relay/index.tsx
 msgid "Coché, vous lisez son message dans Telegram. Décoché, vous savez seulement lequel de vos personnages a reçu un message privé."
 msgstr "Marcado, lees su mensaje en Telegram. Sin marcar, solo sabes cuál de tus personajes ha recibido un mensaje privado."
@@ -2821,20 +2825,16 @@ msgid "Un bug, une idée : c’est ici que ça se raconte."
 msgstr "Un fallo, una idea: es aquí donde se cuenta."
 
 #: src/constants/loops.ts
-msgid "Un clic dans le jeu : le personnage marche, le suivant passe devant."
-msgstr "Un clic en el juego: el personaje camina, el siguiente pasa al frente."
+msgid "Un clic dans le jeu : le personnage se déplace, le suivant passe devant."
+msgstr "Un clic en el juego: el personaje se desplaza, el siguiente pasa al frente."
 
 #: src/screens/walk-screen/index.tsx
 msgid "Un clic déplace le personnage devant vous, et le suivant prend sa place à l’écran."
 msgstr "Un clic mueve al personaje que tienes delante, y el siguiente ocupa su lugar en pantalla."
 
 #: src/constants/loops.ts
-msgid "Un clic gauche dans le jeu : le personnage marche, la fenêtre du suivant passe devant, et la bannière se pose dans le coin."
-msgstr "Un clic izquierdo en el juego: el personaje camina, la ventana del siguiente pasa delante, y el banner se coloca en la esquina."
-
-#: src/constants/features.ts
-msgid "Un clic gauche, et toute la team change de map."
-msgstr "Un clic izquierdo, y todo el equipo cambia de mapa."
+msgid "Un clic gauche dans le jeu : le personnage se déplace, la fenêtre du suivant passe devant, et la bannière se pose dans le coin."
+msgstr "Un clic izquierdo en el juego: el personaje se desplaza, la ventana del siguiente pasa delante, y el banner se coloca en la esquina."
 
 #: src/constants/journal.ts
 msgid "Un client Dofus vient d’ouvrir : sa fenêtre a été agrandie à l’écran."

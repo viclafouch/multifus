@@ -32,3 +32,8 @@ export const ELSEWHERE_LINKS = [
     Mark: SwordIcon
   }
 ] as const satisfies readonly Signpost[]
+
+export const PROJECT_LINKS = [
+  { href: REPOSITORY, name: msg`Code source GitHub` },
+  { href: AUTHOR, name: msg`Me contacter` }
+] as const satisfies readonly Pick<Signpost, 'href' | 'name'>[]

@@ -21,7 +21,7 @@ export const FEATURES = [
   },
   {
     name: msg`Le Déplacement rapide`,
-    line: msg`Un clic gauche, et toute la team change de map.`,
+    line: msg`Cliquez, le personnage se déplace, et le suivant passe devant.`,
     screen: 'walk'
   },
   {

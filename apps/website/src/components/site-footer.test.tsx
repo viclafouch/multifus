@@ -3,6 +3,7 @@ import { I18nProvider } from '@lingui/react'
 import { cleanup, screen } from '@testing-library/react'
 import type { Language } from '@/@types/language'
 import { SiteFooter } from '@/components/site-footer'
+import { PROJECT_LINKS } from '@/constants/elsewhere'
 import { LANGUAGE_NAMES, LANGUAGES } from '@/constants/languages'
 import { PAGE_IDS } from '@/constants/pages'
 import { PAGE_NAMES } from '@/constants/wording'
@@ -47,6 +48,21 @@ describe('the site footer', () => {
       expect(
         screen.getByRole('link', { name: speaker._(PAGE_NAMES[page]) })
       ).toBeDefined()
+    }
+  })
+
+  it.each(LANGUAGES)('leads to the code and to me in %s', (language) => {
+    show(language)
+
+    for (const { href, name } of PROJECT_LINKS) {
+      const said = SPEAKERS[language]._(name)
+      const link = screen.getByRole('link', {
+        name: (found) => {
+          return found.startsWith(said)
+        }
+      })
+
+      expect(link.getAttribute('href')).toBe(href)
     }
   })
 

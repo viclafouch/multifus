@@ -52,7 +52,7 @@ export const MAP_LOOPS = {
     name: 'walk',
     source: walkLoop,
     title: MAP_NAMES.walk,
-    description: msg`Un clic dans le jeu : le personnage marche, le suivant passe devant.`,
-    caption: msg`Un clic gauche dans le jeu : le personnage marche, la fenêtre du suivant passe devant, et la bannière se pose dans le coin.`
+    description: msg`Un clic dans le jeu : le personnage se déplace, le suivant passe devant.`,
+    caption: msg`Un clic gauche dans le jeu : le personnage se déplace, la fenêtre du suivant passe devant, et la bannière se pose dans le coin.`
   }
 } as const satisfies Record<ScreenName, Loop | null>
