@@ -1,5 +1,11 @@
 # Notes de mise à jour
 
+## Unreleased
+
+### Corrections
+
+- Les bandeaux d’information cachaient le titre de l’accueil. Ils se placent maintenant tout en haut de Multifus.
+
 ## 0.3.0 - 2026-09-27
 
 ### Nouveautés

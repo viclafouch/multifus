@@ -1,5 +1,11 @@
 # Patch notes
 
+## Unreleased
+
+### Fixed
+
+- Notice strips covered the title of the home screen. They now sit at the very top of Multifus.
+
 ## 0.3.0 - 2026-09-27
 
 ### New

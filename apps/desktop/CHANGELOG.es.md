@@ -1,5 +1,11 @@
 # Notas del parche
 
+## Unreleased
+
+### Correcciones
+
+- Las franjas de aviso tapaban el título de la pantalla de inicio. Ahora se colocan arriba del todo en Multifus.
+
 ## 0.3.0 - 2026-09-27
 
 ### Novedades

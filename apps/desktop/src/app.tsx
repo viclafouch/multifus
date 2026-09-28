@@ -83,7 +83,7 @@ export const App = () => {
             <div className="relative flex h-screen flex-col overflow-hidden pb-ledger font-plain text-khaki">
               <WorldScene map={map} />
               <Shade edge="top" />
-              <div className="absolute inset-x-0 top-12 z-45 flex flex-col">
+              <div className="absolute inset-x-0 top-0 z-45 flex flex-col">
                 {snapshot.config.problem === null ? null : (
                   <ConfigNotice
                     problem={snapshot.config.problem}
