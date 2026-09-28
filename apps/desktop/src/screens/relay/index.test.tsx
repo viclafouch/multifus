@@ -85,9 +85,7 @@ describe('the private messages screen, while the phone is not linked', () => {
   it('hides everything that only makes sense once linked', () => {
     show({ relay: notPaired })
 
-    expect(
-      screen.queryByText('Recevoir mes messages privés sur mon téléphone')
-    ).toBeNull()
+    expect(screen.queryByText('Messages privés sur le téléphone')).toBeNull()
     expect(screen.queryByText('Robot Telegram relié')).toBeNull()
     expect(screen.queryByText('Message d’essai')).toBeNull()
   })
@@ -177,9 +175,7 @@ describe('the private messages screen, once the phone is linked', () => {
     show({ relay: { paired: true } })
 
     expect(screen.queryByText('Relier votre téléphone')).toBeNull()
-    expect(
-      screen.getByText('Recevoir mes messages privés sur mon téléphone')
-    ).not.toBeNull()
+    expect(screen.getByText('Messages privés sur le téléphone')).not.toBeNull()
     expect(screen.getByText('Robot Telegram relié')).not.toBeNull()
     expect(screen.getByText('Message d’essai')).not.toBeNull()
   })
@@ -189,9 +185,9 @@ describe('the private messages screen, once the phone is linked', () => {
 
     expect(screen.getByText('À l’arrêt')).not.toBeNull()
     expect(
-      switchNamed(
-        'Recevoir mes messages privés sur mon téléphone'
-      ).getAttribute('aria-checked')
+      switchNamed('Messages privés sur le téléphone').getAttribute(
+        'aria-checked'
+      )
     ).toBe('false')
   })
 
@@ -200,9 +196,9 @@ describe('the private messages screen, once the phone is linked', () => {
 
     expect(screen.getByText('En marche')).not.toBeNull()
     expect(
-      switchNamed(
-        'Recevoir mes messages privés sur mon téléphone'
-      ).getAttribute('aria-checked')
+      switchNamed('Messages privés sur le téléphone').getAttribute(
+        'aria-checked'
+      )
     ).toBe('true')
   })
 
@@ -215,9 +211,7 @@ describe('the private messages screen, once the phone is linked', () => {
   it('starts the sending when the switch is moved', () => {
     show({ relay: { active: false } })
 
-    fireEvent.click(
-      switchNamed('Recevoir mes messages privés sur mon téléphone')
-    )
+    fireEvent.click(switchNamed('Messages privés sur le téléphone'))
 
     expect(bridge.setRelayActive).toHaveBeenCalledWith(true)
   })
@@ -225,9 +219,7 @@ describe('the private messages screen, once the phone is linked', () => {
   it('cuts the sending when the switch is moved again', () => {
     show({ relay: { active: true } })
 
-    fireEvent.click(
-      switchNamed('Recevoir mes messages privés sur mon téléphone')
-    )
+    fireEvent.click(switchNamed('Messages privés sur le téléphone'))
 
     expect(bridge.setRelayActive).toHaveBeenCalledWith(false)
   })
@@ -248,9 +240,9 @@ describe('the private messages screen, once the phone is linked', () => {
       'Telegram n’a pas répondu. Vérifiez votre connexion (timeout).'
     )
     expect(
-      switchNamed(
-        'Recevoir mes messages privés sur mon téléphone'
-      ).getAttribute('aria-describedby')
+      switchNamed('Messages privés sur le téléphone').getAttribute(
+        'aria-describedby'
+      )
     ).toBe(alert.id)
   })
 
@@ -258,9 +250,9 @@ describe('the private messages screen, once the phone is linked', () => {
     show({ relay: { switch: { kind: 'idle' } } })
 
     expect(
-      switchNamed(
-        'Recevoir mes messages privés sur mon téléphone'
-      ).getAttribute('aria-describedby')
+      switchNamed('Messages privés sur le téléphone').getAttribute(
+        'aria-describedby'
+      )
     ).toBeNull()
   })
 
@@ -268,9 +260,7 @@ describe('the private messages screen, once the phone is linked', () => {
     show({ relay: { switch: { kind: 'starting' } } })
 
     expect(
-      switchNamed(
-        'Recevoir mes messages privés sur mon téléphone'
-      ).getAttribute('aria-busy')
+      switchNamed('Messages privés sur le téléphone').getAttribute('aria-busy')
     ).toBe('true')
   })
 

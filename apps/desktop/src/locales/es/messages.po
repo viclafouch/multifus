@@ -1852,6 +1852,10 @@ msgstr "Mensajes privados: Telegram ha rechazado la petición ({detail})."
 msgid "Messages privés : Telegram n’a pas répondu ({detail})."
 msgstr "Mensajes privados: Telegram no ha respondido ({detail})."
 
+#: src/screens/relay/state-panel.tsx
+msgid "Messages privés sur le téléphone"
+msgstr "Mensajes privados en el teléfono"
+
 #: src/components/world/loop-curtain.tsx
 msgid "Mettre la vidéo en pause"
 msgstr "Pausar el vídeo"
@@ -2361,10 +2365,6 @@ msgstr "Trae tu personaje principal al frente, estés donde estés."
 #: src/screens/relay/index.tsx
 msgid "Recevoir ce que le joueur a écrit"
 msgstr "Recibir lo que ha escrito el jugador"
-
-#: src/screens/relay/state-panel.tsx
-msgid "Recevoir mes messages privés sur mon téléphone"
-msgstr "Recibir mis mensajes privados en mi teléfono"
 
 #: src/components/error-boundary.tsx
 msgid "Recharger l’écran"

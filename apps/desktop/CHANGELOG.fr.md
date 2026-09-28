@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Améliorations
+
+- Le menu de l’icône dit maintenant « Activer les messages privés sur le téléphone » et « Désactiver les messages privés sur le téléphone », au lieu d’un « Ne plus les recevoir » qu’on ne comprenait pas. L’interrupteur de l’écran Messages privés prend le même nom.
+
 ### Corrections
 
 - Les bandeaux d’information cachaient le titre de l’accueil. Ils se placent maintenant tout en haut de Multifus.

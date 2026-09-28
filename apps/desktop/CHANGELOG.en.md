@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Improved
+
+- The icon menu now says “Turn private messages to phone on” and “Turn private messages to phone off”, instead of a “Stop getting them” nobody understood. The switch on the Private messages screen takes the same name.
+
 ### Fixed
 
 - Notice strips covered the title of the home screen. They now sit at the very top of Multifus.

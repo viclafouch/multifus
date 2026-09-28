@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Mejoras
+
+- El menú del icono dice ahora «Activar los mensajes privados en el teléfono» y «Desactivar los mensajes privados en el teléfono», en lugar de un «Dejar de recibirlos» que no se entendía. El interruptor de la pantalla Mensajes privados lleva el mismo nombre.
+
 ### Correcciones
 
 - Las franjas de aviso tapaban el título de la pantalla de inicio. Ahora se colocan arriba del todo en Multifus.

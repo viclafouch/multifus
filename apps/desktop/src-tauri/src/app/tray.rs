@@ -74,8 +74,8 @@ const FRENCH_MENU: MenuWords = MenuWords {
     rune_table_off: "Cacher le tableau des runes",
     rune_table_home: "Remettre le tableau à sa position initiale",
     relay_setup: "Configurer les messages privés…",
-    relay_on: "Recevoir mes messages privés",
-    relay_off: "Ne plus les recevoir",
+    relay_on: "Activer les messages privés sur le téléphone",
+    relay_off: "Désactiver les messages privés sur le téléphone",
     denied: "Autorisation manquante",
     open_settings: if cfg!(target_os = "macos") {
         "Ouvrir Réglages Système"
@@ -99,8 +99,8 @@ const ENGLISH_MENU: MenuWords = MenuWords {
     rune_table_off: "Hide the rune table",
     rune_table_home: "Put the table back where it started",
     relay_setup: "Set up private messages…",
-    relay_on: "Get my private messages",
-    relay_off: "Stop getting them",
+    relay_on: "Turn private messages to phone on",
+    relay_off: "Turn private messages to phone off",
     denied: "Permission missing",
     open_settings: if cfg!(target_os = "macos") {
         "Open System Settings"
@@ -124,8 +124,8 @@ const SPANISH_MENU: MenuWords = MenuWords {
     rune_table_off: "Ocultar la tabla de runas",
     rune_table_home: "Devolver la tabla a su posición inicial",
     relay_setup: "Configurar los mensajes privados…",
-    relay_on: "Recibir mis mensajes privados",
-    relay_off: "Dejar de recibirlos",
+    relay_on: "Activar los mensajes privados en el teléfono",
+    relay_off: "Desactivar los mensajes privados en el teléfono",
     denied: "Falta la autorización",
     open_settings: if cfg!(target_os = "macos") {
         "Abrir Ajustes del Sistema"
@@ -1045,8 +1045,8 @@ mod tests {
             labels,
             [
                 "Configurer les messages privés…",
-                "Recevoir mes messages privés",
-                "Ne plus les recevoir"
+                "Activer les messages privés sur le téléphone",
+                "Désactiver les messages privés sur le téléphone"
             ]
         );
     }

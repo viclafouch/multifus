@@ -16,7 +16,7 @@ type StatePanelProps = Readonly<{
 }>
 
 export const StatePanel = ({ relay, run }: StatePanelProps) => {
-  const switchLabel = t`Recevoir mes messages privés sur mon téléphone`
+  const switchLabel = t`Messages privés sur le téléphone`
 
   const state = liveState(relay)
   const lines = stateLines(state)
