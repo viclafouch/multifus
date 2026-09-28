@@ -439,7 +439,7 @@ describe('the page record', () => {
         ?.primaryImageOfPage
     ).toMatchObject({
       '@type': 'ImageObject',
-      contentUrl: `${HOST}/og/en/mac.webp`
+      contentUrl: `${HOST}/og/en/mac.jpg`
     })
   })
 })
