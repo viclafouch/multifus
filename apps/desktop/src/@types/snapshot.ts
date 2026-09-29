@@ -1,3 +1,4 @@
+import type { CompanionSite } from '@/@types/companion'
 import type { JournalEntry } from '@/@types/journal'
 import type { Language } from '@/@types/language'
 import type { LoopsSeen } from '@/@types/loop'
@@ -64,6 +65,7 @@ export type Snapshot = {
   readonly walk: WalkStatus
   readonly wheel: WheelSize
   readonly runeTable: RuneTableStatus
+  readonly companionSite: CompanionSite
   readonly loopsSeen: LoopsSeen
   readonly journal: readonly JournalEntry[]
 }

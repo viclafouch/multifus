@@ -65,6 +65,7 @@ export const TONES = {
   bannerFailed: 'warning',
   wheelFailed: 'warning',
   runeTableFailed: 'warning',
+  companionFailed: 'warning',
   clientMaximized: 'good',
   clientMaximizeFailed: 'warning',
   clientsCountFailed: 'warning',
@@ -197,6 +198,7 @@ export const DETAILED_LINES = {
   bannerFailed: msg`La bannière du Déplacement rapide n’a pas suivi`,
   wheelFailed: msg`La roue n’a pas suivi`,
   runeTableFailed: msg`Le tableau des runes n’a pas suivi`,
+  companionFailed: msg`Le site compagnon n’a pas suivi`,
   saveFailed: msg`Configuration non enregistrée`,
   configNotSetAside: msg`Configuration illisible et impossible à déplacer, le prochain enregistrement l’écrasera`,
   openFailed: msg`Le système n’a pas pu ouvrir cet élément`,
@@ -246,5 +248,6 @@ export const WORK_LABELS = {
   walk: msg`La bascule du Déplacement rapide`,
   banner: msg`La bannière du Déplacement rapide`,
   wheel: msg`La roue`,
-  runeTable: msg`Le tableau des runes`
+  runeTable: msg`Le tableau des runes`,
+  companion: msg`Le site compagnon`
 } as const satisfies Record<Work, Phrase>

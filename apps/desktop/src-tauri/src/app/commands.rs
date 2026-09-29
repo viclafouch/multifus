@@ -3,6 +3,8 @@ use tauri::WebviewWindow;
 
 use crate::app::autostart;
 use crate::app::banner;
+use crate::app::companion;
+use crate::app::companion::Hole;
 use crate::app::journal::JournalEvent;
 use crate::app::journal::RelayStop;
 use crate::app::journal::Surface;
@@ -28,6 +30,7 @@ use crate::app::view::WheelStep;
 use crate::app::walk;
 use crate::app::wheel;
 use crate::config::BannerCorner;
+use crate::config::CompanionSite;
 use crate::config::Language;
 use crate::config::Loop;
 use crate::config::QuickTextId;
@@ -408,6 +411,48 @@ pub fn recall_rune_table(app: AppHandle) -> Snapshot {
 #[tauri::command(async)]
 pub fn rune_table_measured(app: AppHandle, ratio: f64) {
     rune_table::measured(&app, ratio);
+}
+
+#[tauri::command(async)]
+pub fn set_companion_site(app: AppHandle, site: CompanionSite) -> Snapshot {
+    companion::choose(&app, site);
+
+    runtime::emit_snapshot(&app)
+}
+
+#[tauri::command(async)]
+pub fn close_companion(app: AppHandle) {
+    companion::close(&app);
+}
+
+#[tauri::command]
+pub fn move_companion(app: AppHandle, by_x: f64, by_y: f64) {
+    companion::shift(&app, by_x, by_y);
+}
+
+#[tauri::command]
+pub fn stretch_companion(app: AppHandle, by_x: f64, by_y: f64) {
+    companion::stretch(&app, by_x, by_y);
+}
+
+#[tauri::command]
+pub fn companion_settled(app: AppHandle) {
+    companion::settled(&app);
+}
+
+#[tauri::command(async)]
+pub fn companion_measured(app: AppHandle, hole: Hole) {
+    companion::measured(&app, hole);
+}
+
+#[tauri::command(async)]
+pub fn companion_home(app: AppHandle) {
+    companion::go_home(&app);
+}
+
+#[tauri::command(async)]
+pub fn companion_back(app: AppHandle) {
+    companion::go_back(&app);
 }
 
 #[tauri::command]

@@ -212,6 +212,7 @@ impl Tally {
             | JournalEvent::BannerFailed { .. }
             | JournalEvent::WheelFailed { .. }
             | JournalEvent::RuneTableFailed { .. }
+            | JournalEvent::CompanionFailed { .. }
             | JournalEvent::DisplayAwakeFailed { .. } => self.count_failure(),
 
             JournalEvent::Started { .. }

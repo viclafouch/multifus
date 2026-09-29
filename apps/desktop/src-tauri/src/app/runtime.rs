@@ -12,6 +12,7 @@ use tauri::Manager;
 use tauri::RunEvent;
 
 use crate::app::alarm::Alarm;
+use crate::app::companion;
 use crate::app::journal::JournalEvent;
 use crate::app::journal::MaximizeAllOutcome;
 use crate::app::journal::Outcome;
@@ -124,12 +125,17 @@ fn on_wake(app: &AppHandle, waking: Wake) {
         Wake::GameWindows => {
             wake();
             rune_table::note_windows(app);
+            companion::note_windows();
         }
         Wake::Foreground => {
             shortcuts::note_foreground(app);
             rune_table::note_windows(app);
+            companion::note_windows();
         }
-        Wake::Dragging => rune_table::note_drag(app),
+        Wake::Dragging => {
+            rune_table::note_drag(app);
+            companion::note_drag(app);
+        }
     }
 }
 
@@ -826,6 +832,8 @@ pub fn change_language(app: &AppHandle, language: Language) {
     lock(app).set_language(language);
 
     tray::refresh(app);
+
+    companion::follow_language(app);
 
     for window in app.webview_windows().values() {
         if let Err(error) = window.reload() {

@@ -22,6 +22,7 @@ use crate::app::view::BannerStep;
 use crate::app::view::DisplayView;
 use crate::config::Banner;
 use crate::config::BannerCorner;
+use crate::platform::Keyboard;
 use crate::platform::matches_game_in_front;
 
 const STEP_EVENT: &str = "multifus://banner";
@@ -38,6 +39,7 @@ const OVERLAY: Overlay = Overlay {
     work: Work::Banner,
     failed: |detail| JournalEvent::BannerFailed { detail },
     accepts_first_mouse: false,
+    keyboard: Keyboard::KeptByTheGame,
 };
 
 #[derive(Debug, Default)]

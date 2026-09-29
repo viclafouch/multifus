@@ -1,0 +1,31 @@
+@layer base {
+  :root {
+    --sheet: oklch(0.14 0.007 66);
+    --sheet-edge: color-mix(in oklch, var(--foreground), transparent 88%);
+    --sheet-rule: color-mix(in oklch, var(--foreground), transparent 92%);
+  }
+
+  html,
+  body {
+    @apply overflow-hidden bg-transparent font-sans text-foreground antialiased;
+
+    user-select: none;
+    cursor: default;
+  }
+}
+
+@utility sheet {
+  border: 1px solid var(--sheet-edge);
+  border-radius: var(--radius-lg);
+  background-color: var(--sheet);
+  overflow: hidden;
+}
+
+@utility sheet-crown {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--spacing) * 2);
+  padding: calc(var(--spacing) * 1.5) calc(var(--spacing) * 2)
+    calc(var(--spacing) * 1.5) calc(var(--spacing) * 3);
+  border-bottom: 1px solid var(--sheet-rule);
+}

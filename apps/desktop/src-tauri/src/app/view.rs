@@ -4,6 +4,7 @@ use serde::Serialize;
 use crate::app::journal::JournalEntry;
 use crate::app::journal::RelayFailure;
 use crate::config::BannerCorner;
+use crate::config::CompanionSite;
 use crate::config::Language;
 use crate::config::LoopsSeen;
 use crate::config::QuickTextId;
@@ -56,6 +57,7 @@ pub struct Snapshot {
     pub walk: WalkView,
     pub wheel: WheelView,
     pub rune_table: RuneTableView,
+    pub companion_site: CompanionSite,
     pub loops_seen: LoopsSeen,
     pub journal: Vec<JournalEntry>,
 }
@@ -346,10 +348,11 @@ pub enum ShortcutAction {
     MaximizeAll,
     Wheel,
     RuneTable,
+    Companion,
 }
 
 impl ShortcutAction {
-    pub const ALL: [Self; 8] = [
+    pub const ALL: [Self; 9] = [
         Self::Next,
         Self::Previous,
         Self::Main,
@@ -358,6 +361,7 @@ impl ShortcutAction {
         Self::MaximizeAll,
         Self::Wheel,
         Self::RuneTable,
+        Self::Companion,
     ];
 
     #[must_use]
@@ -638,6 +642,7 @@ mod tests {
                 demo: vec![slice()],
             },
             rune_table: rune_table(),
+            companion_site: CompanionSite::DofusRetroTools,
             loops_seen: LoopsSeen::default(),
             journal: vec![JournalEntry {
                 id: 1,
@@ -702,6 +707,7 @@ mod tests {
                 "autoFocus",
                 "autoFocusEnabled",
                 "characters",
+                "companionSite",
                 "config",
                 "journal",
                 "keyboard",
@@ -901,7 +907,7 @@ mod tests {
     }
 
     #[test]
-    fn the_eight_actions_travel_under_the_names_the_shortcuts_screen_uses() {
+    fn the_nine_actions_travel_under_the_names_the_shortcuts_screen_uses() {
         let actions = ShortcutAction::ALL
             .into_iter()
             .map(|action| {
@@ -923,6 +929,7 @@ mod tests {
                 "maximizeAll",
                 "wheel",
                 "runeTable",
+                "companion",
             ]
         );
     }

@@ -31,6 +31,8 @@ pub use macos::hold_back_activation;
 pub use macos::lay_above;
 #[cfg(target_os = "macos")]
 pub use macos::matches_frontmost;
+#[cfg(target_os = "macos")]
+pub use macos::show_without_keyboard;
 pub use notification::NotificationReport;
 pub use notification::NotificationSink;
 pub use notification::NotificationWatcher;
@@ -59,6 +61,12 @@ pub use windows::matches_windows_eleven;
 #[must_use]
 pub fn matches_windows_eleven() -> bool {
     false
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Keyboard {
+    KeptByTheGame,
+    LentOnClick,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

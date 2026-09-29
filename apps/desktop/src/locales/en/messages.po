@@ -318,6 +318,10 @@ msgstr "Accessibility"
 msgid "accordée"
 msgstr "granted"
 
+#: src/screens/companion-window/index.tsx
+msgid "Accueil du site"
+msgstr "Site home"
+
 #: src/helpers/journal.ts
 msgid "actif"
 msgstr "on"
@@ -353,6 +357,10 @@ msgstr "Show notifications in notification center"
 #: src/screens/rune-table/index.tsx
 msgid "Afficher sur tous les personnages connectés"
 msgstr "Show it on every character online"
+
+#: src/screens/companion-window/index.tsx
+msgid "Agrandir le site"
+msgstr "Resize the site"
 
 #: src/helpers/questions.ts
 #: src/screens/settings/index.tsx
@@ -693,6 +701,10 @@ msgstr "What this system lets it read is in place. For the rest, only a call fro
 #: src/screens/about/project-panel.tsx
 msgid "Ce que chaque version a changé, sur le site."
 msgstr "What each version changed, on the site."
+
+#: src/screens/settings/index.tsx
+msgid "Ce que son raccourci ouvre par-dessus le jeu. Un site déjà ouvert passe sur le nouveau."
+msgstr "What its shortcut opens on top of the game. A site already open switches to the new one."
 
 #: src/helpers/wording.ts
 msgid "Ce que vous voyez à l’écran est bon, mais rien n’a été écrit sur le disque."
@@ -1279,6 +1291,10 @@ msgstr "Windows unreadable"
 msgid "Fermer"
 msgstr "Close"
 
+#: src/screens/companion-window/index.tsx
+msgid "Fermer le site"
+msgstr "Close the site"
+
 #: src/screens/rune-table-window/rune-sheet.tsx
 msgid "Fermer le tableau des runes"
 msgstr "Close the rune table"
@@ -1649,6 +1665,18 @@ msgstr "The project"
 #: src/helpers/wording.ts
 msgid "Le réintégrer au défilement, au Déplacement rapide et à l’AutoFocus"
 msgstr "Bring them back into cycling, Quick Move and AutoFocus"
+
+#: src/constants/journal.ts
+msgid "Le site compagnon"
+msgstr "The companion site"
+
+#: src/constants/journal.ts
+msgid "Le site compagnon n’a pas suivi"
+msgstr "The companion site did not keep up"
+
+#: src/screens/settings/companion-site-picker.tsx
+msgid "Le site du raccourci"
+msgstr "The site of the shortcut"
 
 #: src/constants/journal.ts
 msgid "Le système n’a pas pu ouvrir cet élément"
@@ -2133,6 +2161,10 @@ msgstr "Osamodas"
 msgid "Où il se montre"
 msgstr "Where it shows"
 
+#: src/constants/shortcuts.ts
+msgid "Ouvre Dofus Retro Tools ou Solomonk par-dessus le jeu."
+msgstr "Opens Dofus Retro Tools or Solomonk on top of the game."
+
 #: src/helpers/onboarding.ts
 msgid "Ouvrez les {options} de Dofus et cochez la case. Sans elle, le client se tait dès qu’il passe derrière, et Multifus n’a plus rien à écouter."
 msgstr "Open the Dofus {options} and tick the box. Without it, the client goes silent as soon as it drops behind, and Multifus has nothing left to hear."
@@ -2168,6 +2200,10 @@ msgstr "Pa"
 #: src/constants/runes.ts
 msgid "PA"
 msgstr "AP"
+
+#: src/screens/companion-window/index.tsx
+msgid "Page précédente"
+msgstr "Previous page"
 
 #: src/constants/roster.ts
 msgid "Pandawa"
@@ -2637,6 +2673,11 @@ msgstr "Report a problem"
 #: src/screens/rune-table-window/rune-sheet.tsx
 msgid "Simple"
 msgstr "Basic"
+
+#: src/constants/shortcuts.ts
+#: src/screens/settings/index.tsx
+msgid "Site compagnon"
+msgstr "Companion site"
 
 #: src/constants/runes.ts
 msgid "Soin"

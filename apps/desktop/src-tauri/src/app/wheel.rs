@@ -35,6 +35,7 @@ use crate::config::WHEEL_WIDEST;
 use crate::domain::Class;
 use crate::domain::Color;
 use crate::domain::Gender;
+use crate::platform::Keyboard;
 use crate::platform::PlatformError;
 use crate::platform::WindowId;
 use crate::platform::matches_game_in_front;
@@ -46,6 +47,7 @@ const OVERLAY: Overlay = Overlay {
     work: Work::Wheel,
     failed: |detail| JournalEvent::WheelFailed { detail },
     accepts_first_mouse: false,
+    keyboard: Keyboard::KeptByTheGame,
 };
 
 const STEP_EVENT: &str = "multifus://wheel";

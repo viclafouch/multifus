@@ -20,6 +20,7 @@ pub struct Settings {
     pub banner: Banner,
     pub wheel: Wheel,
     pub rune_table: RuneTable,
+    pub companion_site: CompanionSite,
     pub loops_seen: LoopsSeen,
     pub maximize_on_launch: bool,
     pub short_titles: bool,
@@ -59,6 +60,7 @@ impl Default for Settings {
             banner: Banner::default(),
             wheel: Wheel::default(),
             rune_table: RuneTable::default(),
+            companion_site: CompanionSite::default(),
             loops_seen: LoopsSeen::default(),
             maximize_on_launch: true,
             short_titles: true,
@@ -217,6 +219,14 @@ impl RuneTable {
     }
 }
 
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum CompanionSite {
+    #[default]
+    DofusRetroTools,
+    Solomonk,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Shortcuts {
@@ -228,6 +238,7 @@ pub struct Shortcuts {
     pub maximize_all: Option<Shortcut>,
     pub wheel: Option<Shortcut>,
     pub rune_table: Option<Shortcut>,
+    pub companion: Option<Shortcut>,
 }
 
 const DEFAULT_NEXT: &str = "Control+Shift+Right";
@@ -238,6 +249,7 @@ const DEFAULT_WALK: &str = "Control+Shift+KeyD";
 const DEFAULT_MAXIMIZE_ALL: &str = "Control+Shift+KeyA";
 const DEFAULT_WHEEL: &str = "Control+Shift+KeyW";
 const DEFAULT_RUNE_TABLE: &str = "Control+Shift+KeyR";
+const DEFAULT_COMPANION: &str = "Control+Shift+KeyS";
 
 impl Default for Shortcuts {
     fn default() -> Self {
@@ -250,6 +262,7 @@ impl Default for Shortcuts {
             maximize_all: Shortcut::new(DEFAULT_MAXIMIZE_ALL),
             wheel: Shortcut::new(DEFAULT_WHEEL),
             rune_table: Shortcut::new(DEFAULT_RUNE_TABLE),
+            companion: Shortcut::new(DEFAULT_COMPANION),
         }
     }
 }
@@ -498,7 +511,7 @@ mod tests {
     }
 
     #[test]
-    fn the_eight_shortcuts_are_bound_by_default_and_all_differ() {
+    fn the_nine_shortcuts_are_bound_by_default_and_all_differ() {
         let shortcuts = Shortcuts::default();
         let bound = [
             shortcuts.next.as_ref(),
@@ -509,20 +522,21 @@ mod tests {
             shortcuts.maximize_all.as_ref(),
             shortcuts.wheel.as_ref(),
             shortcuts.rune_table.as_ref(),
+            shortcuts.companion.as_ref(),
         ]
         .into_iter()
         .flatten()
         .map(Shortcut::as_str)
         .collect::<Vec<_>>();
 
-        assert_eq!(bound.len(), 8);
+        assert_eq!(bound.len(), 9);
 
         let mut unique = bound.clone();
         unique.sort_unstable();
         unique.dedup();
         assert_eq!(
             unique.len(),
-            8,
+            9,
             "two actions share a combination: {bound:?}"
         );
     }
@@ -632,6 +646,7 @@ mod tests {
             maximize_all: None,
             wheel: None,
             rune_table: None,
+            companion: None,
         };
 
         let json = serde_json::to_string(&shortcuts).expect("shortcuts serialise");

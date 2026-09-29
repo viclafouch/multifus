@@ -1376,6 +1376,12 @@ const JOURNAL_CASES = {
       line: `Le tableau des runes n’a pas suivi : ${DETAIL}`
     }
   ],
+  companionFailed: [
+    {
+      event: { kind: 'companionFailed', detail: DETAIL },
+      line: `Le site compagnon n’a pas suivi : ${DETAIL}`
+    }
+  ],
   wheelFailed: [
     {
       event: { kind: 'wheelFailed', detail: DETAIL },
@@ -1490,6 +1496,7 @@ const SNAPSHOT = {
     everywhere: false,
     previewing: false
   },
+  companionSite: 'dofusRetroTools',
   loopsSeen: {
     wheel: true,
     walk: true,

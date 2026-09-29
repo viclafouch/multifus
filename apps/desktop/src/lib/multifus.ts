@@ -1,6 +1,7 @@
 import { invoke } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event'
 import type { AboutLink } from '@/@types/about'
+import type { CompanionSite, Hole } from '@/@types/companion'
 import type { Display } from '@/@types/display'
 import type { Language } from '@/@types/language'
 import type { LoopName } from '@/@types/loop'
@@ -306,6 +307,38 @@ export const recallRuneTable = async () => {
 
 export const runeTableMeasured = async (ratio: number) => {
   return invoke<null>('rune_table_measured', { ratio })
+}
+
+export const setCompanionSite = async (site: CompanionSite) => {
+  return invoke<Snapshot>('set_companion_site', { site })
+}
+
+export const closeCompanion = async () => {
+  return invoke<null>('close_companion')
+}
+
+export const moveCompanion = async (byX: number, byY: number) => {
+  return invoke<null>('move_companion', { byX, byY })
+}
+
+export const stretchCompanion = async (byX: number, byY: number) => {
+  return invoke<null>('stretch_companion', { byX, byY })
+}
+
+export const companionSettled = async () => {
+  return invoke<null>('companion_settled')
+}
+
+export const companionMeasured = async (hole: Hole) => {
+  return invoke<null>('companion_measured', { hole })
+}
+
+export const companionHome = async () => {
+  return invoke<null>('companion_home')
+}
+
+export const companionBack = async () => {
+  return invoke<null>('companion_back')
 }
 
 export const setWakesMinimized = async (wakes: boolean) => {

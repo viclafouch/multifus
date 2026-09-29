@@ -1,6 +1,7 @@
 import { i18n } from '@lingui/core'
 import { t } from '@lingui/core/macro'
 import { Panel } from '@multifus/retro'
+import type { CompanionSite } from '@/@types/companion'
 import type { Snapshot } from '@/@types/snapshot'
 import { FieldRow } from '@/components/layout/field-row'
 import { Note } from '@/components/layout/note'
@@ -21,6 +22,7 @@ import {
   setUngroupTaskbar
 } from '@/lib/multifus'
 import { ClientsPanel } from '@/screens/settings/clients-panel'
+import { CompanionSitePicker } from '@/screens/settings/companion-site-picker'
 import { HelpSection } from '@/screens/settings/help-section'
 
 type SettingsScreenProps = Readonly<{
@@ -31,6 +33,7 @@ type SettingsScreenProps = Readonly<{
   ungroupTaskbar: boolean
   taskbarCombines: boolean
   shareStats: boolean
+  companionSite: CompanionSite
   run: (action: Promise<Snapshot>) => void
 }>
 
@@ -42,6 +45,7 @@ export const SettingsScreen = ({
   ungroupTaskbar,
   taskbarCombines,
   shareStats,
+  companionSite,
   run
 }: SettingsScreenProps) => {
   const startupLabel = t`Lancer Multifus au démarrage de l’ordinateur`
@@ -51,6 +55,7 @@ export const SettingsScreen = ({
   const ungroupLabel = t`Un bouton par personnage dans la barre des tâches`
   const backgroundLabel = t`Garder Multifus en arrière-plan`
   const statsLabel = t`Partager des statistiques d’usage`
+  const companionLabel = t`Site compagnon`
 
   const isAlreadyUngrouped = !IS_APPLE && !taskbarCombines
   const clients = useClients()
@@ -147,6 +152,14 @@ export const SettingsScreen = ({
             label={backgroundLabel}
             reason={t`Multifus doit rester en arrière-plan pour fonctionner.`}
           />
+        </FieldRow>
+      </Panel>
+      <Panel>
+        <FieldRow
+          label={companionLabel}
+          description={t`Ce que son raccourci ouvre par-dessus le jeu. Un site déjà ouvert passe sur le nouveau.`}
+        >
+          <CompanionSitePicker current={companionSite} run={run} />
         </FieldRow>
       </Panel>
       <Panel>

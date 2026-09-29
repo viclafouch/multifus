@@ -243,6 +243,7 @@ mod tests {
     use crate::config::settings::AutoFocus;
     use crate::config::settings::Banner;
     use crate::config::settings::BannerCorner;
+    use crate::config::settings::CompanionSite;
     use crate::config::settings::LoopsSeen;
     use crate::config::settings::QuickText;
     use crate::config::settings::QuickTextId;
@@ -297,6 +298,7 @@ mod tests {
                 maximize_all: Shortcut::new("Alt+KeyA"),
                 wheel: Shortcut::new("Alt+KeyW"),
                 rune_table: Shortcut::new("Alt+KeyR"),
+                companion: Shortcut::new("Alt+KeyS"),
             },
             maximize_on_launch: true,
             short_titles: true,
@@ -333,6 +335,7 @@ mod tests {
                 offset: Some(RuneOffset { x: 32.0, y: 24.0 }),
                 everywhere: true,
             },
+            companion_site: CompanionSite::Solomonk,
             start_at_login: true,
             traces: Traces {
                 portraits: HashSet::from(["Alpha".to_owned()]),

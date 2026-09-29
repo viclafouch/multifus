@@ -1106,7 +1106,7 @@ pub fn lay_above(ours: *mut c_void, window: WindowId) -> Result<()> {
     let game = live_game_window(window)?;
     let above = unsafe { GetWindow(game, GW_HWNDPREV) }.ok();
 
-    if above == Some(ours) {
+    if matches_among_ours_above(above, ours) {
         return Ok(());
     }
 
@@ -1236,10 +1236,26 @@ fn window_scale(handle: HWND) -> f64 {
     f64::from(across) / DOTS_PER_INCH
 }
 
+fn matches_among_ours_above(mut above: Option<HWND>, ours: HWND) -> bool {
+    while let Some(window) = above.filter(|window| matches_ours(*window)) {
+        if window == ours {
+            return true;
+        }
+
+        above = unsafe { GetWindow(window, GW_HWNDPREV) }.ok();
+    }
+
+    false
+}
+
 #[must_use]
 pub fn matches_frontmost() -> bool {
+    matches_ours(unsafe { GetForegroundWindow() })
+}
+
+fn matches_ours(handle: HWND) -> bool {
     let mut owner = 0_u32;
-    unsafe { GetWindowThreadProcessId(GetForegroundWindow(), Some(&mut owner)) };
+    unsafe { GetWindowThreadProcessId(handle, Some(&mut owner)) };
 
     owner != 0 && owner == process::id()
 }

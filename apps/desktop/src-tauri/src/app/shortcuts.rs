@@ -10,6 +10,7 @@ use tauri_plugin_global_shortcut::Shortcut;
 use tauri_plugin_global_shortcut::ShortcutState;
 
 use crate::app::Multifus;
+use crate::app::companion;
 use crate::app::journal::CharacterShortcutOutcome;
 use crate::app::journal::JournalEvent;
 use crate::app::journal::QuickTextFailure;
@@ -301,6 +302,8 @@ trait Mechanisms {
     fn release_wheel(&self);
 
     fn toggle_rune_table(&self, here: WindowId);
+
+    fn toggle_companion(&self, here: WindowId);
 }
 
 struct AppMechanisms<'a>(&'a AppHandle);
@@ -332,6 +335,10 @@ impl Mechanisms for AppMechanisms<'_> {
 
     fn toggle_rune_table(&self, here: WindowId) {
         rune_table::toggle(self.0, Some(here));
+    }
+
+    fn toggle_companion(&self, here: WindowId) {
+        companion::toggle(self.0, here);
     }
 }
 
@@ -404,6 +411,9 @@ fn act_on(press: &Press, binding: Binding, window: &GameWindow) {
         Binding::Action {
             action: ShortcutAction::RuneTable,
         } => press.mechanisms.toggle_rune_table(window.id()),
+        Binding::Action {
+            action: ShortcutAction::Companion,
+        } => press.mechanisms.toggle_companion(window.id()),
         Binding::Action { action } => {
             let Some(effect) = hold(press.state).decide_shortcut(action, window.nickname()) else {
                 return;
@@ -526,6 +536,7 @@ mod tests {
         WheelOpened(WindowId),
         WheelReleased,
         RuneTableToggled(WindowId),
+        CompanionToggled(WindowId),
     }
 
     #[derive(Debug, Default)]
@@ -576,6 +587,10 @@ mod tests {
 
         fn toggle_rune_table(&self, here: WindowId) {
             self.write_down(Mechanism::RuneTableToggled(here));
+        }
+
+        fn toggle_companion(&self, here: WindowId) {
+            self.write_down(Mechanism::CompanionToggled(here));
         }
     }
 
@@ -1209,6 +1224,41 @@ mod tests {
             windows.asked(),
             Vec::new(),
             "posing the rune table moves no window on its own"
+        );
+    }
+
+    #[test]
+    fn the_companion_site_is_posed_on_the_window_the_player_struck_the_keys_from() {
+        let directory = directory();
+        let state = three_in_the_cycle(&directory);
+        let windows = FakeWindowManager::showing(Desktop {
+            foreground: Some(game_window(2, "Bravo")),
+            ..Desktop::default()
+        });
+        let mechanisms = FakeMechanisms::default();
+
+        answering(
+            &Press {
+                windows: windows.as_ref(),
+                state: &state,
+                mechanisms: &mechanisms,
+            },
+            Binding::Action {
+                action: ShortcutAction::Companion,
+            },
+        );
+
+        assert_eq!(
+            mechanisms.set_going(),
+            vec![
+                Mechanism::RelayStopped,
+                Mechanism::CompanionToggled(WindowId::from_raw(2)),
+            ]
+        );
+        assert_eq!(
+            windows.asked(),
+            Vec::new(),
+            "opening the companion site moves no window of the game"
         );
     }
 

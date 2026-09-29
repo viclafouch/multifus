@@ -3,6 +3,7 @@ pub mod autostart;
 pub mod banner;
 pub mod clicks;
 pub mod commands;
+pub mod companion;
 pub mod journal;
 pub mod journal_file;
 pub mod links;
@@ -89,6 +90,8 @@ pub fn setup(app: &AppHandle) -> Result<(), ConfigError> {
     wheel::setup(app);
 
     rune_table::setup(app);
+
+    companion::setup(app);
 
     shortcuts::start(app);
     shortcuts::apply(app);

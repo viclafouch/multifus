@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Nouveautés
+
+- Un raccourci ouvre Dofus Retro Tools ou Solomonk par-dessus la fenêtre de Dofus, sans lui prendre le clavier. Choisissez le site dans les Paramètres, puis cliquez dedans pour vous connecter ou chercher.
+
 ### Améliorations
 
 - Le menu de l’icône dit maintenant « Activer les messages privés sur le téléphone » et « Désactiver les messages privés sur le téléphone », au lieu d’un « Ne plus les recevoir » qu’on ne comprenait pas. L’interrupteur de l’écran Messages privés prend le même nom.

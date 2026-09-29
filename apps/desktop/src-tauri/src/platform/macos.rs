@@ -29,8 +29,12 @@ use objc2::msg_send;
 use objc2::rc::Retained;
 use objc2::runtime::AnyClass;
 use objc2::runtime::AnyObject;
+use objc2::runtime::Bool;
+use objc2::runtime::ClassBuilder;
 use objc2::runtime::NSObjectProtocol;
 use objc2::runtime::ProtocolObject;
+use objc2::runtime::Sel;
+use objc2::sel;
 use objc2_app_kit::NSApplicationActivationOptions;
 use objc2_app_kit::NSFloatingWindowLevel;
 use objc2_app_kit::NSNormalWindowLevel;
@@ -101,6 +105,7 @@ use objc2_foundation::NSString;
 use crate::domain::GameNotification;
 use crate::domain::extract_nickname;
 use crate::platform::Authorization;
+use crate::platform::Keyboard;
 use crate::platform::click::ClickGate;
 use crate::platform::click::ClickJudge;
 use crate::platform::click::ClickReport;
@@ -609,6 +614,8 @@ const NS_PANEL: &CStr = c"NSPanel";
 
 const NS_WINDOW: &CStr = c"NSWindow";
 
+const KEY_PANEL: &CStr = c"MultifusKeyPanel";
+
 fn matches_a_kind_of(worn: &AnyClass, wanted: &AnyClass) -> bool {
     let mut climbed = Some(worn);
 
@@ -640,15 +647,20 @@ fn our_window(ns_window: *mut c_void, operation: &'static str) -> Result<NonNull
         .ok_or_else(|| PlatformError::system(operation, "the window has no handle"))
 }
 
-pub fn hold_back_activation(ns_window: *mut c_void) -> Result<()> {
+pub fn hold_back_activation(ns_window: *mut c_void, keyboard: Keyboard) -> Result<()> {
     let window = our_window(ns_window, POSING_A_PANEL)?;
 
-    let Some(panel) = AnyClass::get(NS_PANEL) else {
+    let Some(plain_panel) = AnyClass::get(NS_PANEL) else {
         return Err(PlatformError::system(POSING_A_PANEL, "NSPanel is missing"));
     };
 
     let Some(plain) = AnyClass::get(NS_WINDOW) else {
         return Err(PlatformError::system(POSING_A_PANEL, "NSWindow is missing"));
+    };
+
+    let panel = match keyboard {
+        Keyboard::KeptByTheGame => plain_panel,
+        Keyboard::LentOnClick => key_panel(plain_panel)?,
     };
 
     if panel.instance_size() > plain.instance_size() {
@@ -679,7 +691,50 @@ pub fn hold_back_activation(ns_window: *mut c_void) -> Result<()> {
             setStyleMask: worn | NSWindowStyleMask::NonactivatingPanel.0
         ];
         let _: () = msg_send![window.as_ptr(), setHidesOnDeactivate: false];
-        let _: () = msg_send![window.as_ptr(), setBecomesKeyOnlyIfNeeded: true];
+        let _: () = msg_send![
+            window.as_ptr(),
+            setBecomesKeyOnlyIfNeeded: keyboard == Keyboard::KeptByTheGame
+        ];
+    }
+
+    Ok(())
+}
+
+fn key_panel(plain_panel: &AnyClass) -> Result<&'static AnyClass> {
+    if let Some(declared) = AnyClass::get(KEY_PANEL) {
+        return Ok(declared);
+    }
+
+    let Some(mut declaring) = ClassBuilder::new(KEY_PANEL, plain_panel) else {
+        return Err(PlatformError::system(
+            POSING_A_PANEL,
+            "a panel that takes the keyboard cannot be declared",
+        ));
+    };
+
+    // SAFETY: canBecomeKeyWindow is NSWindow's own selector, and it answers a BOOL as the function does.
+    unsafe {
+        declaring.add_method(
+            sel!(canBecomeKeyWindow),
+            becomes_key as extern "C-unwind" fn(_, _) -> _,
+        );
+    }
+
+    Ok(declaring.register())
+}
+
+extern "C-unwind" fn becomes_key(_panel: &AnyObject, _selector: Sel) -> Bool {
+    Bool::YES
+}
+
+const SHOWING_UNFOCUSED: &str = "showing a window without the keyboard";
+
+pub fn show_without_keyboard(ns_window: *mut c_void) -> Result<()> {
+    let window = our_window(ns_window, SHOWING_UNFOCUSED)?;
+
+    // SAFETY: the handle names the window Tauri built, and the selector is NSWindow's own.
+    unsafe {
+        let _: () = msg_send![window.as_ptr(), orderFrontRegardless];
     }
 
     Ok(())
@@ -824,12 +879,15 @@ fn order_above(ours: NonNull<AnyObject>, owner: pid_t, element: &AXUIElement) ->
     // SAFETY: the handle names the window Tauri built, alive for this call.
     let our_number: isize = unsafe { msg_send![ours.as_ptr(), windowNumber] };
     let game_number = shown[at].number as isize;
+    let our_owner = NSRunningApplication::currentApplication().processIdentifier();
 
-    let is_right_above = at
-        .checked_sub(1)
-        .is_some_and(|above| shown[above].number as isize == our_number);
+    let is_among_ours_above = shown[..at]
+        .iter()
+        .rev()
+        .take_while(|above| above.owner == our_owner)
+        .any(|above| above.number as isize == our_number);
 
-    if is_right_above {
+    if is_among_ours_above {
         return Ok(());
     }
 

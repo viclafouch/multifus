@@ -436,6 +436,59 @@ const CALLS = [
     }
   },
   {
+    name: 'setCompanionSite',
+    run: () => {
+      return multifus.setCompanionSite('solomonk')
+    }
+  },
+  {
+    name: 'closeCompanion',
+    run: () => {
+      return multifus.closeCompanion()
+    }
+  },
+  {
+    name: 'moveCompanion',
+    run: () => {
+      return multifus.moveCompanion(12, -4)
+    }
+  },
+  {
+    name: 'stretchCompanion',
+    run: () => {
+      return multifus.stretchCompanion(40, 60)
+    }
+  },
+  {
+    name: 'companionSettled',
+    run: () => {
+      return multifus.companionSettled()
+    }
+  },
+  {
+    name: 'companionMeasured',
+    run: () => {
+      return multifus.companionMeasured({
+        top: 40,
+        right: 1,
+        bottom: 17,
+        left: 1
+      })
+    }
+  },
+  {
+    name: 'companionHome',
+    run: () => {
+      return multifus.companionHome()
+    }
+  },
+  {
+    name: 'companionBack',
+    run: () => {
+      return multifus.companionBack()
+    }
+  },
+  {
     name: 'setWakesMinimized',
     run: () => {
       return multifus.setWakesMinimized(false)

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Novedades
+
+- Un atajo abre Dofus Retro Tools o Solomonk encima de la ventana de Dofus, sin quitarle el teclado. Elige el sitio en los Ajustes y haz clic en él para conectarte o buscar.
+
 ### Mejoras
 
 - El menú del icono dice ahora «Activar los mensajes privados en el teléfono» y «Desactivar los mensajes privados en el teléfono», en lugar de un «Dejar de recibirlos» que no se entendía. El interruptor de la pantalla Mensajes privados lleva el mismo nombre.

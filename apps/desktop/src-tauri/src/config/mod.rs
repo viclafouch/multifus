@@ -9,6 +9,7 @@ pub use language::Language;
 pub use settings::AutoFocus;
 pub use settings::Banner;
 pub use settings::BannerCorner;
+pub use settings::CompanionSite;
 pub use settings::Loop;
 pub use settings::LoopsSeen;
 pub use settings::QuickText;

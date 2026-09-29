@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New
+
+- A shortcut opens Dofus Retro Tools or Solomonk on top of the Dofus window, without taking its keyboard. Pick the site in the Settings, then click in it to log in or search.
+
 ### Improved
 
 - The icon menu now says “Turn private messages to phone on” and “Turn private messages to phone off”, instead of a “Stop getting them” nobody understood. The switch on the Private messages screen takes the same name.

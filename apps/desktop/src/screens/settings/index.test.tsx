@@ -20,7 +20,8 @@ const bridge = {
   setShortTitles: vi.fn(),
   setPaintPortraits: vi.fn(),
   setUngroupTaskbar: vi.fn(),
-  setShareStats: vi.fn()
+  setShareStats: vi.fn(),
+  setCompanionSite: vi.fn()
 }
 
 vi.mock(import('@/lib/multifus'), () => {
@@ -65,6 +66,7 @@ const show = async ({
         ungroupTaskbar={false}
         taskbarCombines={taskbarCombines}
         shareStats
+        companionSite="dofusRetroTools"
         run={() => {}}
       />
     </TooltipProvider>

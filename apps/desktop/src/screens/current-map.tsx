@@ -93,6 +93,7 @@ export const CurrentMap = ({ map, snapshot, run }: CurrentMapProps) => {
           ungroupTaskbar={snapshot.ungroupTaskbar}
           taskbarCombines={snapshot.taskbarCombines}
           shareStats={snapshot.shareStats}
+          companionSite={snapshot.companionSite}
           run={run}
         />
       )

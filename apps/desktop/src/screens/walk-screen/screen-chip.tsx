@@ -1,6 +1,6 @@
 import { t } from '@lingui/core/macro'
-import { Button } from '@multifus/retro'
 import type { Display } from '@/@types/display'
+import { PickChip } from '@/components/pick-chip'
 
 type ScreenChipProps = Readonly<{
   screen: Display
@@ -16,23 +16,17 @@ export const ScreenChip = ({
   onPick
 }: ScreenChipProps) => {
   return (
-    <Button
-      variant="bare"
-      aria-pressed={isPicked}
-      onClick={onPick}
-      className="h-auto flex-col items-start gap-0.5 rounded-lg border border-border px-3 py-2 aria-pressed:border-primary/45 aria-pressed:bg-primary/8"
+    <PickChip
+      isPicked={isPicked}
+      detail={`${screen.width} × ${screen.height}`}
+      onPick={onPick}
     >
-      <span className="text-aside font-medium">
-        {t`Écran ${rank}`}
-        {screen.primary ? (
-          <span className="pl-1.5 text-mark text-muted-foreground">
-            {t`principal`}
-          </span>
-        ) : null}
-      </span>
-      <span className="font-mono text-mark text-muted-foreground">
-        {`${screen.width} × ${screen.height}`}
-      </span>
-    </Button>
+      {t`Écran ${rank}`}
+      {screen.primary ? (
+        <span className="pl-1.5 text-mark text-muted-foreground">
+          {t`principal`}
+        </span>
+      ) : null}
+    </PickChip>
   )
 }

@@ -1,4 +1,5 @@
 export type ShortcutAction =
+  | 'companion'
   | 'main'
   | 'maximizeAll'
   | 'next'

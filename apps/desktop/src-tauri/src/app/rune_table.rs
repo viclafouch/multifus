@@ -1,18 +1,15 @@
-use std::ffi::c_void;
 use std::sync::Mutex;
 use std::sync::MutexGuard;
 use std::sync::PoisonError;
 use std::sync::atomic::AtomicBool;
 use std::sync::atomic::Ordering;
 use std::time::Duration;
-use std::time::Instant;
 
 use tauri::AppHandle;
 use tauri::Emitter;
 use tauri::LogicalPosition;
 use tauri::LogicalSize;
 use tauri::Manager;
-use tauri::Monitor;
 use tauri::WebviewWindow;
 
 use crate::app::alarm::Alarm;
@@ -20,8 +17,13 @@ use crate::app::journal::JournalEvent;
 use crate::app::journal::Work;
 use crate::app::main_window;
 use crate::app::overlay::Generation;
+use crate::app::overlay::Hand;
+use crate::app::overlay::Motion;
 use crate::app::overlay::Overlay;
-use crate::app::overlay::holds_point;
+use crate::app::overlay::WorkArea;
+use crate::app::overlay::matches_full_screen;
+use crate::app::overlay::screen_under;
+use crate::app::overlay::stacked_above;
 use crate::app::panics;
 use crate::app::runtime;
 use crate::app::state::lock;
@@ -29,6 +31,7 @@ use crate::app::state::windows;
 use crate::config::RUNE_TABLE_CLEAREST;
 use crate::config::RuneOffset;
 use crate::platform;
+use crate::platform::Keyboard;
 use crate::platform::PlatformError;
 use crate::platform::ScreenFrame;
 use crate::platform::ScreenPoint;
@@ -42,15 +45,10 @@ const OVERLAY: Overlay = Overlay {
     work: Work::RuneTable,
     failed: |detail| JournalEvent::RuneTableFailed { detail },
     accepts_first_mouse: true,
+    keyboard: Keyboard::KeptByTheGame,
 };
 
 const LOOK_EVENT: &str = "multifus://rune-table-look";
-
-const FOLLOW: Duration = Duration::from_millis(100);
-
-const FOLLOW_IN_MOTION: Duration = Duration::from_millis(16);
-
-const MOTION_LINGERS: Duration = Duration::from_millis(500);
 
 static NEXT_FOLLOW: Alarm = Alarm::new();
 
@@ -61,8 +59,6 @@ const WILDEST_RATIO: f64 = 8.0;
 const FAINTEST_LOOK: f64 = 0.2;
 
 const RATIO_GRAIN: f64 = 1000.0;
-
-const EDGE_GRAIN: f64 = 1.0;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Anchor {
@@ -139,9 +135,9 @@ struct RuneTable {
     posed: Mutex<Option<Posed>>,
     posing: Mutex<()>,
     highest: Mutex<Option<WindowId>>,
-    stirred_at: Mutex<Option<Instant>>,
+    motion: Motion,
     complained: AtomicBool,
-    under_the_hand: AtomicBool,
+    hand: Hand,
     generation: Generation,
 }
 
@@ -159,21 +155,9 @@ impl RuneTable {
 
         self.forget_highest();
         self.complained.store(false, Ordering::Release);
-        self.under_the_hand.store(false, Ordering::Release);
+        self.hand.let_go();
 
         self.generation.next()
-    }
-
-    fn take_in_hand(&self) {
-        self.under_the_hand.store(true, Ordering::Release);
-    }
-
-    fn let_go(&self) {
-        self.under_the_hand.store(false, Ordering::Release);
-    }
-
-    fn matches_under_the_hand(&self) -> bool {
-        self.under_the_hand.load(Ordering::Acquire)
     }
 
     fn matches_first_complaint(&self) -> bool {
@@ -237,20 +221,6 @@ impl RuneTable {
 
     fn forget_highest(&self) {
         self.remember_highest(None);
-    }
-
-    fn stir(&self) {
-        *self
-            .stirred_at
-            .lock()
-            .unwrap_or_else(PoisonError::into_inner) = Some(Instant::now());
-    }
-
-    fn since_stirred(&self) -> Duration {
-        self.stirred_at
-            .lock()
-            .unwrap_or_else(PoisonError::into_inner)
-            .map_or(Duration::MAX, |stirred_at| stirred_at.elapsed())
     }
 }
 
@@ -350,14 +320,7 @@ pub fn note_windows(app: &AppHandle) {
 }
 
 pub fn note_drag(app: &AppHandle) {
-    let table = app.state::<RuneTable>();
-    let was_still = pace(table.since_stirred()) == FOLLOW;
-
-    table.stir();
-
-    if was_still {
-        NEXT_FOLLOW.wake();
-    }
+    app.state::<RuneTable>().motion.stir_waking(&NEXT_FOLLOW);
 }
 
 fn tell_state(app: &AppHandle) {
@@ -371,7 +334,7 @@ fn follow_apart(app: &AppHandle, generation: u64) {
         let table = app.state::<RuneTable>();
 
         loop {
-            NEXT_FOLLOW.wait(Duration::ZERO, pace(table.since_stirred()));
+            NEXT_FOLLOW.wait(Duration::ZERO, table.motion.pace());
 
             if !table.matches_latest(generation) || !is_open(app) {
                 return;
@@ -382,24 +345,16 @@ fn follow_apart(app: &AppHandle, generation: u64) {
             follow_foreground(app);
 
             if *table.posed() != before {
-                table.stir();
+                table.motion.stir();
             }
         }
     });
 }
 
-fn pace(since_stirred: Duration) -> Duration {
-    if since_stirred < MOTION_LINGERS {
-        FOLLOW_IN_MOTION
-    } else {
-        FOLLOW
-    }
-}
-
 fn follow_foreground(app: &AppHandle) {
     let table = app.state::<RuneTable>();
 
-    if table.matches_under_the_hand() {
+    if table.hand.matches_holding() {
         return;
     }
 
@@ -584,32 +539,13 @@ fn stack_above(app: &AppHandle, carrier: WindowId) {
                 return;
             }
 
-            if let Err(detail) = stacked_above(&table, carrier) {
+            if let Err(detail) = stacked_above(&table.as_ref().window(), carrier) {
                 OVERLAY.complain(&app, detail);
             }
         }
     });
 
     OVERLAY.said(app, stacked);
-}
-
-fn stacked_above(table: &WebviewWindow, carrier: WindowId) -> Result<(), String> {
-    let handle = native_handle(table).map_err(|error| error.to_string())?;
-
-    match platform::lay_above(handle, carrier) {
-        Ok(()) | Err(PlatformError::WindowGone) => Ok(()),
-        Err(error) => Err(error.to_string()),
-    }
-}
-
-#[cfg(target_os = "windows")]
-fn native_handle(window: &WebviewWindow) -> tauri::Result<*mut c_void> {
-    Ok(window.hwnd()?.0)
-}
-
-#[cfg(target_os = "macos")]
-fn native_handle(window: &WebviewWindow) -> tauri::Result<*mut c_void> {
-    window.ns_window()
 }
 
 fn complain(app: &AppHandle, detail: &str) {
@@ -635,23 +571,6 @@ fn kept_offset(
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 struct TableSize {
-    width: f64,
-    height: f64,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq)]
-struct Screen {
-    area: WorkArea,
-    x: f64,
-    y: f64,
-    width: f64,
-    height: f64,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq)]
-struct WorkArea {
-    x: f64,
-    y: f64,
     width: f64,
     height: f64,
 }
@@ -750,7 +669,7 @@ pub fn shift(app: &AppHandle, by_x: f64, by_y: f64) {
         return;
     }
 
-    table.take_in_hand();
+    table.hand.take();
 
     let Some(window) = OVERLAY.window(app) else {
         return;
@@ -803,7 +722,7 @@ fn keep(app: &AppHandle, mode: Mode, offset: RuneOffset) {
 pub fn settled(app: &AppHandle) {
     let table = app.state::<RuneTable>();
 
-    table.let_go();
+    table.hand.let_go();
 
     if table.mode().matches_posted() {
         lock(app).save();
@@ -934,63 +853,6 @@ fn own_frame(window: &WebviewWindow) -> Option<ScreenFrame> {
     })
 }
 
-fn screen_under(app: &AppHandle, frame: ScreenFrame) -> Option<Screen> {
-    let screens = app.available_monitors().ok()?;
-    let middle_x = frame.origin.x + frame.width / 2.0;
-    let middle_y = frame.origin.y + frame.height / 2.0;
-
-    let under = screens
-        .into_iter()
-        .filter_map(|screen| logical_screen(&screen))
-        .find(|screen| {
-            holds_point(screen.area.x, screen.area.width, middle_x)
-                && holds_point(screen.area.y, screen.area.height, middle_y)
-        });
-
-    under.or_else(|| {
-        app.primary_monitor()
-            .ok()
-            .flatten()
-            .and_then(|screen| logical_screen(&screen))
-    })
-}
-
-fn logical_screen(screen: &Monitor) -> Option<Screen> {
-    let scale = screen.scale_factor();
-
-    if !scale.is_finite() || scale <= 0.0 {
-        return None;
-    }
-
-    let area = screen.work_area();
-    let at = screen.position();
-    let whole = screen.size();
-
-    Some(Screen {
-        area: WorkArea {
-            x: f64::from(area.position.x) / scale,
-            y: f64::from(area.position.y) / scale,
-            width: f64::from(area.size.width) / scale,
-            height: f64::from(area.size.height) / scale,
-        },
-        x: f64::from(at.x) / scale,
-        y: f64::from(at.y) / scale,
-        width: f64::from(whole.width) / scale,
-        height: f64::from(whole.height) / scale,
-    })
-}
-
-fn matches_full_screen(frame: ScreenFrame, screen: Screen) -> bool {
-    matches_same_edge(frame.origin.x, screen.x)
-        && matches_same_edge(frame.origin.y, screen.y)
-        && matches_same_edge(frame.width, screen.width)
-        && matches_same_edge(frame.height, screen.height)
-}
-
-fn matches_same_edge(one: f64, other: f64) -> bool {
-    (one - other).abs() <= EDGE_GRAIN
-}
-
 pub fn build(app: &AppHandle) {
     let width = f64::from(lock(app).rune_table_width());
 
@@ -1000,30 +862,8 @@ pub fn build(app: &AppHandle) {
 
     set_floating(app, app.state::<RuneTable>().mode().matches_previewing());
 
-    let held_back = app.run_on_main_thread({
-        let app = app.clone();
-
-        move || hold_back_activation(&app, &window)
-    });
-
-    OVERLAY.said(app, held_back);
+    OVERLAY.hold_back_activation(app, window.as_ref().window());
 }
-
-#[cfg(target_os = "macos")]
-fn hold_back_activation(app: &AppHandle, window: &WebviewWindow) {
-    let held_back = native_handle(window)
-        .map_err(|error| error.to_string())
-        .and_then(|handle| {
-            platform::hold_back_activation(handle).map_err(|error| error.to_string())
-        });
-
-    if let Err(detail) = held_back {
-        OVERLAY.complain(app, detail);
-    }
-}
-
-#[cfg(not(target_os = "macos"))]
-fn hold_back_activation(_app: &AppHandle, _window: &WebviewWindow) {}
 
 #[cfg(test)]
 mod tests {
@@ -1405,17 +1245,6 @@ mod tests {
     }
 
     #[test]
-    fn a_table_nobody_stirred_follows_at_the_resting_pace() {
-        let table = RuneTable::default();
-
-        assert_eq!(pace(table.since_stirred()), FOLLOW);
-
-        table.stir();
-
-        assert_eq!(pace(table.since_stirred()), FOLLOW_IN_MOTION);
-    }
-
-    #[test]
     fn a_frame_nobody_can_read_is_written_down_once_an_opening_and_not_every_turn() {
         let table = RuneTable::default();
 
@@ -1437,17 +1266,6 @@ mod tests {
             table.matches_first_complaint(),
             "the next opening is worth a line of its own"
         );
-    }
-
-    #[test]
-    fn the_table_follows_at_the_pace_of_the_screen_while_its_window_moves() {
-        assert_eq!(pace(Duration::ZERO), FOLLOW_IN_MOTION);
-        assert_eq!(
-            pace(MOTION_LINGERS / 2),
-            FOLLOW_IN_MOTION,
-            "a hand that pauses mid drag must not find the table ten beats behind when it moves on"
-        );
-        assert_eq!(pace(MOTION_LINGERS), FOLLOW);
     }
 
     #[test]
@@ -1485,108 +1303,6 @@ mod tests {
         );
     }
 
-    fn screen() -> Screen {
-        Screen {
-            area: work_area(),
-            x: 0.0,
-            y: 0.0,
-            width: 1920.0,
-            height: 1080.0,
-        }
-    }
-
-    #[test]
-    fn a_client_that_fills_the_whole_screen_carries_no_table() {
-        let filling = ScreenFrame {
-            origin: ScreenPoint { x: 0.0, y: 0.0 },
-            width: 1920.0,
-            height: 1080.0,
-        };
-
-        assert!(matches_full_screen(filling, screen()));
-    }
-
-    #[test]
-    fn a_client_grown_to_the_work_area_still_carries_the_table() {
-        let grown_wide = ScreenFrame {
-            origin: ScreenPoint { x: 0.0, y: 0.0 },
-            width: 1920.0,
-            height: 1040.0,
-        };
-
-        assert!(
-            !matches_full_screen(grown_wide, screen()),
-            "a window grown to the work area is not a window in full screen"
-        );
-    }
-
-    #[test]
-    fn a_screen_that_reserves_nothing_still_reads_a_client_in_full_screen() {
-        let bare = Screen {
-            area: WorkArea {
-                x: 0.0,
-                y: 0.0,
-                width: 1920.0,
-                height: 1080.0,
-            },
-            ..screen()
-        };
-        let filling = ScreenFrame {
-            origin: ScreenPoint { x: 0.0, y: 0.0 },
-            width: 1920.0,
-            height: 1080.0,
-        };
-
-        assert!(
-            matches_full_screen(filling, bare),
-            "a taskbar that hides itself reserves nothing, and the client is in full screen all the same"
-        );
-    }
-
-    #[test]
-    fn a_client_grown_past_the_edges_of_the_screen_still_carries_the_table() {
-        let grown = ScreenFrame {
-            origin: ScreenPoint { x: -8.0, y: -8.0 },
-            width: 1936.0,
-            height: 1056.0,
-        };
-
-        assert!(
-            !matches_full_screen(grown, screen()),
-            "a window grown on Windows hangs over the screen by its invisible border"
-        );
-    }
-
-    #[test]
-    fn a_client_on_the_second_screen_reads_against_that_screen() {
-        let beside = Screen {
-            x: 1920.0,
-            y: 0.0,
-            area: WorkArea {
-                x: 1920.0,
-                ..work_area()
-            },
-            ..screen()
-        };
-        let filling = ScreenFrame {
-            origin: ScreenPoint { x: 1920.0, y: 0.0 },
-            width: 1920.0,
-            height: 1080.0,
-        };
-
-        assert!(matches_full_screen(filling, beside));
-        assert!(
-            !matches_full_screen(
-                ScreenFrame {
-                    origin: ScreenPoint { x: 0.0, y: 0.0 },
-                    ..filling
-                },
-                beside
-            ),
-            "a client filling the first screen is not in full screen on the second"
-        );
-    }
-
     #[test]
     fn the_gauge_pushed_to_the_end_leaves_a_table_one_can_still_read() {
         assert_eq!(faded(0), 1.0);
@@ -1611,31 +1327,16 @@ mod tests {
     }
 
     #[test]
-    fn the_hand_on_the_table_holds_the_thread_that_follows_the_game() {
-        let table = RuneTable::default();
-
-        assert!(!table.matches_under_the_hand());
-
-        table.take_in_hand();
-
-        assert!(table.matches_under_the_hand());
-
-        table.let_go();
-
-        assert!(!table.matches_under_the_hand());
-    }
-
-    #[test]
     fn a_new_opening_takes_the_table_out_of_a_hand_that_never_let_go() {
         let table = RuneTable::default();
 
-        table.take_in_hand();
+        table.hand.take();
         table.lay(Mode::Posted {
             anchor: Anchor::Anywhere,
         });
 
         assert!(
-            !table.matches_under_the_hand(),
+            !table.hand.matches_holding(),
             "a page that dies mid drag must not freeze the following for good"
         );
     }

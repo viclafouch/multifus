@@ -50,5 +50,10 @@ export const SHORTCUT_ACTIONS = {
     label: msg`Tableau des runes`,
     description: msg`Pose les poids des runes par-dessus le jeu.`,
     mention: null
+  },
+  companion: {
+    label: msg`Site compagnon`,
+    description: msg`Ouvre Dofus Retro Tools ou Solomonk par-dessus le jeu.`,
+    mention: null
   }
 } as const satisfies Record<ShortcutAction, ActionLabel>

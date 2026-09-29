@@ -190,6 +190,7 @@ const BLANK_SNAPSHOT: Snapshot = {
     everywhere: false,
     previewing: false
   },
+  companionSite: 'dofusRetroTools',
   loopsSeen: {
     wheel: true,
     walk: true,

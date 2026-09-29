@@ -61,6 +61,7 @@ use crate::app::wheel;
 use crate::app::wheel::WheelPlan;
 use crate::config::Banner;
 use crate::config::BannerCorner;
+use crate::config::CompanionSite;
 use crate::config::ConfigError;
 use crate::config::ConfigStore;
 use crate::config::Language;
@@ -398,6 +399,7 @@ impl Multifus {
                 everywhere: self.settings.rune_table.everywhere,
                 previewing: self.rune_table_previewing,
             },
+            companion_site: self.settings.companion_site,
             loops_seen: self.settings.loops_seen,
             relay: RelayView {
                 paired: self.settings.relay.chat_id.is_some(),
@@ -730,6 +732,7 @@ impl Multifus {
             ShortcutAction::MaximizeAll => &mut self.settings.shortcuts.maximize_all,
             ShortcutAction::Wheel => &mut self.settings.shortcuts.wheel,
             ShortcutAction::RuneTable => &mut self.settings.shortcuts.rune_table,
+            ShortcutAction::Companion => &mut self.settings.shortcuts.companion,
         };
 
         *slot = shortcut;
@@ -1212,6 +1215,15 @@ impl Multifus {
 
     pub fn set_rune_table_everywhere(&mut self, everywhere: bool) {
         self.settings.rune_table.everywhere = everywhere;
+    }
+
+    #[must_use]
+    pub fn companion_site(&self) -> CompanionSite {
+        self.settings.companion_site
+    }
+
+    pub fn set_companion_site(&mut self, site: CompanionSite) {
+        self.settings.companion_site = site;
     }
 
     #[must_use]
@@ -1947,7 +1959,8 @@ impl Multifus {
             ShortcutAction::Walk
             | ShortcutAction::MaximizeAll
             | ShortcutAction::Wheel
-            | ShortcutAction::RuneTable => None,
+            | ShortcutAction::RuneTable
+            | ShortcutAction::Companion => None,
         }
     }
 
@@ -2088,6 +2101,7 @@ fn shortcut_in(shortcuts: &Shortcuts, action: ShortcutAction) -> Option<&Shortcu
         ShortcutAction::MaximizeAll => shortcuts.maximize_all.as_ref(),
         ShortcutAction::Wheel => shortcuts.wheel.as_ref(),
         ShortcutAction::RuneTable => shortcuts.rune_table.as_ref(),
+        ShortcutAction::Companion => shortcuts.companion.as_ref(),
     }
 }
 
@@ -2878,8 +2892,9 @@ mod tests {
                 ShortcutAction::MaximizeAll,
                 ShortcutAction::Wheel,
                 ShortcutAction::RuneTable,
+                ShortcutAction::Companion,
             ],
-            "these four set a mechanism going, and no window moves for them"
+            "these five set a mechanism going, and no window moves for them"
         );
     }
 
@@ -3401,7 +3416,7 @@ mod tests {
     }
 
     #[test]
-    fn the_eight_actions_come_before_the_characters_and_the_quick_texts() {
+    fn the_nine_actions_come_before_the_characters_and_the_quick_texts() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
         state.apply_windows(&[window(1, "Alpha")]);
@@ -3412,7 +3427,7 @@ mod tests {
 
         let bindings = state.bindings();
 
-        assert_eq!(bindings.len(), 11);
+        assert_eq!(bindings.len(), 12);
         assert_eq!(
             bindings.first().map(|(binding, _)| binding.clone()),
             Some(Binding::Action {
