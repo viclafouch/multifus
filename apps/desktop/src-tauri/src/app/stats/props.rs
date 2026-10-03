@@ -138,7 +138,7 @@ fn counted(settings: &Settings, matches: impl Fn(&Character) -> bool) -> usize {
         .count()
 }
 
-fn all_shortcuts(shortcuts: &Shortcuts) -> [&Option<Shortcut>; 8] {
+fn all_shortcuts(shortcuts: &Shortcuts) -> [&Option<Shortcut>; 9] {
     [
         &shortcuts.next,
         &shortcuts.previous,
@@ -148,6 +148,7 @@ fn all_shortcuts(shortcuts: &Shortcuts) -> [&Option<Shortcut>; 8] {
         &shortcuts.maximize_all,
         &shortcuts.wheel,
         &shortcuts.rune_table,
+        &shortcuts.notes,
     ]
 }
 

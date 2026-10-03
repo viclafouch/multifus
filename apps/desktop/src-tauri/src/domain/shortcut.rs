@@ -2,6 +2,7 @@ use std::fmt;
 
 use serde::Deserialize;
 use serde::Serialize;
+use tauri_plugin_global_shortcut::Shortcut as Keys;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(try_from = "String", into = "String")]
@@ -22,6 +23,18 @@ impl Shortcut {
     #[must_use]
     pub fn as_str(&self) -> &str {
         &self.0
+    }
+
+    #[must_use]
+    pub fn matches_same_keys(&self, other: &Self) -> bool {
+        match (self.keys(), other.keys()) {
+            (Some(keys), Some(other_keys)) => keys == other_keys,
+            _ => self == other,
+        }
+    }
+
+    fn keys(&self) -> Option<u32> {
+        self.0.parse::<Keys>().ok().map(|keys| keys.id())
     }
 }
 
@@ -56,6 +69,16 @@ mod tests {
         assert_eq!(
             Shortcut::new("  Control+Shift+Right  ").map(String::from),
             Some("Control+Shift+Right".to_owned())
+        );
+    }
+
+    #[test]
+    fn two_spellings_of_one_combination_hold_the_same_keys() {
+        let written = Shortcut::new("Control+Shift+KeyN").expect("a shortcut");
+
+        assert!(written.matches_same_keys(&Shortcut::new("Shift+Control+N").expect("a shortcut")));
+        assert!(
+            !written.matches_same_keys(&Shortcut::new("Control+Shift+KeyM").expect("a shortcut"))
         );
     }
 }

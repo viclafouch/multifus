@@ -1,3 +1,4 @@
+use std::ffi::c_void;
 use std::sync::atomic::AtomicU64;
 use std::sync::atomic::Ordering;
 use std::thread;
@@ -6,6 +7,7 @@ use tauri::AppHandle;
 use tauri::EventTarget;
 use tauri::LogicalSize;
 use tauri::Manager;
+use tauri::Monitor;
 use tauri::WebviewUrl;
 use tauri::WebviewWindow;
 use tauri::WebviewWindowBuilder;
@@ -14,6 +16,8 @@ use crate::app::journal::JournalEvent;
 use crate::app::journal::Work;
 use crate::app::panics;
 use crate::app::state::lock;
+use crate::platform;
+use crate::platform::ScreenFrame;
 
 #[derive(Debug, Default)]
 pub struct Generation {
@@ -48,6 +52,88 @@ impl Acknowledged {
 #[must_use]
 pub fn holds_point(edge: f64, room: f64, at: f64) -> bool {
     at >= edge && at < edge + room
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Screen {
+    pub area: WorkArea,
+    pub x: f64,
+    pub y: f64,
+    pub width: f64,
+    pub height: f64,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct WorkArea {
+    pub x: f64,
+    pub y: f64,
+    pub width: f64,
+    pub height: f64,
+}
+
+impl WorkArea {
+    #[must_use]
+    pub fn holds(self, x: f64, y: f64) -> bool {
+        holds_point(self.x, self.width, x) && holds_point(self.y, self.height, y)
+    }
+}
+
+pub fn screen_under(app: &AppHandle, frame: ScreenFrame) -> Option<Screen> {
+    let middle_x = frame.origin.x + frame.width / 2.0;
+    let middle_y = frame.origin.y + frame.height / 2.0;
+
+    screens(app)?
+        .into_iter()
+        .find(|screen| screen.area.holds(middle_x, middle_y))
+        .or_else(|| primary_screen(app))
+}
+
+pub fn screens(app: &AppHandle) -> Option<Vec<Screen>> {
+    let screens = app.available_monitors().ok()?;
+
+    Some(screens.iter().filter_map(logical_screen).collect())
+}
+
+pub fn primary_screen(app: &AppHandle) -> Option<Screen> {
+    app.primary_monitor()
+        .ok()
+        .flatten()
+        .and_then(|screen| logical_screen(&screen))
+}
+
+fn logical_screen(screen: &Monitor) -> Option<Screen> {
+    let scale = screen.scale_factor();
+
+    if !scale.is_finite() || scale <= 0.0 {
+        return None;
+    }
+
+    let area = screen.work_area();
+    let at = screen.position();
+    let whole = screen.size();
+
+    Some(Screen {
+        area: WorkArea {
+            x: f64::from(area.position.x) / scale,
+            y: f64::from(area.position.y) / scale,
+            width: f64::from(area.size.width) / scale,
+            height: f64::from(area.size.height) / scale,
+        },
+        x: f64::from(at.x) / scale,
+        y: f64::from(at.y) / scale,
+        width: f64::from(whole.width) / scale,
+        height: f64::from(whole.height) / scale,
+    })
+}
+
+#[cfg(target_os = "windows")]
+pub fn native_handle(window: &WebviewWindow) -> tauri::Result<*mut c_void> {
+    Ok(window.hwnd()?.0)
+}
+
+#[cfg(target_os = "macos")]
+pub fn native_handle(window: &WebviewWindow) -> tauri::Result<*mut c_void> {
+    window.ns_window()
 }
 
 pub struct Overlay {
@@ -107,6 +193,30 @@ impl Overlay {
                 None
             }
         }
+    }
+
+    pub fn through_the_handle(
+        &'static self,
+        app: &AppHandle,
+        window: &WebviewWindow,
+        work: fn(*mut c_void) -> platform::Result<()>,
+    ) {
+        let done = app.run_on_main_thread({
+            let app = app.clone();
+            let window = window.clone();
+
+            move || {
+                let worked = native_handle(&window)
+                    .map_err(|error| error.to_string())
+                    .and_then(|handle| work(handle).map_err(|error| error.to_string()));
+
+                if let Err(detail) = worked {
+                    self.complain(&app, detail);
+                }
+            }
+        });
+
+        self.said(app, done);
     }
 
     pub fn apart(&self, app: &AppHandle, work: impl FnOnce(&AppHandle) + Send + 'static) -> bool {

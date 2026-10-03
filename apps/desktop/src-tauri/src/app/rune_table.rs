@@ -1,4 +1,3 @@
-use std::ffi::c_void;
 use std::sync::Mutex;
 use std::sync::MutexGuard;
 use std::sync::PoisonError;
@@ -12,7 +11,6 @@ use tauri::Emitter;
 use tauri::LogicalPosition;
 use tauri::LogicalSize;
 use tauri::Manager;
-use tauri::Monitor;
 use tauri::WebviewWindow;
 
 use crate::app::alarm::Alarm;
@@ -21,7 +19,10 @@ use crate::app::journal::Work;
 use crate::app::main_window;
 use crate::app::overlay::Generation;
 use crate::app::overlay::Overlay;
-use crate::app::overlay::holds_point;
+use crate::app::overlay::Screen;
+use crate::app::overlay::WorkArea;
+use crate::app::overlay::native_handle;
+use crate::app::overlay::screen_under;
 use crate::app::panics;
 use crate::app::runtime;
 use crate::app::state::lock;
@@ -602,16 +603,6 @@ fn stacked_above(table: &WebviewWindow, carrier: WindowId) -> Result<(), String>
     }
 }
 
-#[cfg(target_os = "windows")]
-fn native_handle(window: &WebviewWindow) -> tauri::Result<*mut c_void> {
-    Ok(window.hwnd()?.0)
-}
-
-#[cfg(target_os = "macos")]
-fn native_handle(window: &WebviewWindow) -> tauri::Result<*mut c_void> {
-    window.ns_window()
-}
-
 fn complain(app: &AppHandle, detail: &str) {
     if app.state::<RuneTable>().matches_first_complaint() {
         lock(app).log(JournalEvent::RuneTableFailed {
@@ -635,23 +626,6 @@ fn kept_offset(
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 struct TableSize {
-    width: f64,
-    height: f64,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq)]
-struct Screen {
-    area: WorkArea,
-    x: f64,
-    y: f64,
-    width: f64,
-    height: f64,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq)]
-struct WorkArea {
-    x: f64,
-    y: f64,
     width: f64,
     height: f64,
 }
@@ -934,52 +908,6 @@ fn own_frame(window: &WebviewWindow) -> Option<ScreenFrame> {
     })
 }
 
-fn screen_under(app: &AppHandle, frame: ScreenFrame) -> Option<Screen> {
-    let screens = app.available_monitors().ok()?;
-    let middle_x = frame.origin.x + frame.width / 2.0;
-    let middle_y = frame.origin.y + frame.height / 2.0;
-
-    let under = screens
-        .into_iter()
-        .filter_map(|screen| logical_screen(&screen))
-        .find(|screen| {
-            holds_point(screen.area.x, screen.area.width, middle_x)
-                && holds_point(screen.area.y, screen.area.height, middle_y)
-        });
-
-    under.or_else(|| {
-        app.primary_monitor()
-            .ok()
-            .flatten()
-            .and_then(|screen| logical_screen(&screen))
-    })
-}
-
-fn logical_screen(screen: &Monitor) -> Option<Screen> {
-    let scale = screen.scale_factor();
-
-    if !scale.is_finite() || scale <= 0.0 {
-        return None;
-    }
-
-    let area = screen.work_area();
-    let at = screen.position();
-    let whole = screen.size();
-
-    Some(Screen {
-        area: WorkArea {
-            x: f64::from(area.position.x) / scale,
-            y: f64::from(area.position.y) / scale,
-            width: f64::from(area.size.width) / scale,
-            height: f64::from(area.size.height) / scale,
-        },
-        x: f64::from(at.x) / scale,
-        y: f64::from(at.y) / scale,
-        width: f64::from(whole.width) / scale,
-        height: f64::from(whole.height) / scale,
-    })
-}
-
 fn matches_full_screen(frame: ScreenFrame, screen: Screen) -> bool {
     matches_same_edge(frame.origin.x, screen.x)
         && matches_same_edge(frame.origin.y, screen.y)
@@ -1000,26 +928,12 @@ pub fn build(app: &AppHandle) {
 
     set_floating(app, app.state::<RuneTable>().mode().matches_previewing());
 
-    let held_back = app.run_on_main_thread({
-        let app = app.clone();
-
-        move || hold_back_activation(&app, &window)
-    });
-
-    OVERLAY.said(app, held_back);
+    hold_back_activation(app, &window);
 }
 
 #[cfg(target_os = "macos")]
 fn hold_back_activation(app: &AppHandle, window: &WebviewWindow) {
-    let held_back = native_handle(window)
-        .map_err(|error| error.to_string())
-        .and_then(|handle| {
-            platform::hold_back_activation(handle).map_err(|error| error.to_string())
-        });
-
-    if let Err(detail) = held_back {
-        OVERLAY.complain(app, detail);
-    }
+    OVERLAY.through_the_handle(app, window, platform::hold_back_activation);
 }
 
 #[cfg(not(target_os = "macos"))]

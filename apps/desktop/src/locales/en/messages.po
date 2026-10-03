@@ -1270,6 +1270,11 @@ msgstr "Females in the cycle and in AutoFocus"
 msgid "Fenêtres illisibles"
 msgstr "Windows unreadable"
 
+#. Footer hint of the notes: Escape closes them
+#: src/screens/notes-window/notes-foot.tsx
+msgid "fermer"
+msgstr "close"
+
 #: src/components/health-dialog.tsx
 #: src/components/loop-dialog.tsx
 #: src/components/questions-dialog.tsx
@@ -1282,6 +1287,10 @@ msgstr "Close"
 #: src/screens/rune-table-window/rune-sheet.tsx
 msgid "Fermer le tableau des runes"
 msgstr "Close the rune table"
+
+#: src/screens/notes-window/index.tsx
+msgid "Fermer les notes"
+msgstr "Close notes"
 
 #: src/components/character-dialog.tsx
 msgid "Fermer sans rien changer"
@@ -1298,6 +1307,16 @@ msgstr "Keep it: on a Mac, it is what tells Multifus. Without it, nobody comes f
 #: src/helpers/wording.ts
 msgid "Général"
 msgstr "General"
+
+#. Button in the bar of the notes that makes the text bold
+#: src/screens/notes-window/format-buttons.tsx
+msgid "Gras"
+msgstr "Bold"
+
+#. Tooltip of the bold button, with the keys that do the same
+#: src/screens/notes-window/format-buttons.tsx
+msgid "Gras ({keys})"
+msgstr "Bold ({keys})"
 
 #: src/screens/about/project-panel.tsx
 msgid "Gratuit, sans compte et sans publicité."
@@ -1711,6 +1730,14 @@ msgstr "Multifus maps"
 msgid "Les messages privés"
 msgstr "Private messages"
 
+#: src/constants/journal.ts
+msgid "Les notes"
+msgstr "The notes"
+
+#: src/constants/journal.ts
+msgid "Les notes n’ont pas suivi"
+msgstr "The notes did not keep up"
+
 #: src/helpers/onboarding.ts
 msgid "Les notifications"
 msgstr "The notifications"
@@ -1774,6 +1801,15 @@ msgstr "Read the two posts"
 #: src/screens/about/project-panel.tsx
 msgid "Lire les mentions"
 msgstr "Read the notice"
+
+#. Button in the bar of the notes that makes a bulleted list
+#: src/screens/notes-window/format-buttons.tsx
+msgid "Liste"
+msgstr "List"
+
+#: src/screens/notes-window/format-buttons.tsx
+msgid "Liste (un tiret puis une espace)"
+msgstr "List (a dash, then a space)"
 
 #: src/screens/about/identity-panel.tsx
 #: src/screens/clearing/index.tsx
@@ -2069,9 +2105,31 @@ msgstr "Stop making them your main character"
 msgid "non attribué"
 msgstr "not bound"
 
-#: src/screens/about/project-panel.tsx
-msgid "Notes de version"
-msgstr "Release notes"
+#. Accessible name of the text area where the player writes
+#: src/hooks/use-note-editor.ts
+msgid "Note"
+msgstr "Note"
+
+#: src/helpers/journal.ts
+msgid "Note illisible et impossible à déplacer : elle ne sera pas écrasée, et rien de ce qui est écrit ne sera enregistré ({detail})."
+msgstr "Note unreadable and impossible to move: it will not be overwritten, and nothing written will be saved ({detail})."
+
+#: src/helpers/journal.ts
+msgid "Note illisible, les notes repartent vides ({detail}). Fichier mis de côté : {setAside}"
+msgstr "Note unreadable, the notes start again empty ({detail}). File set aside: {setAside}"
+
+#: src/constants/journal.ts
+msgid "Note non enregistrée"
+msgstr "Note not saved"
+
+#. Name of the notepad Multifus lays over the game: Notes in English, Notas in Spanish
+#: src/constants/notes.ts
+msgid "Notes"
+msgstr "Notes"
+
+#: src/hooks/use-note-editor.ts
+msgid "Notez ici ce que vous ne voulez pas oublier."
+msgstr "Write down here what you don’t want to forget."
 
 #: src/constants/journal.ts
 msgid "Notification impossible à lire"
@@ -2133,6 +2191,10 @@ msgstr "Osamodas"
 msgid "Où il se montre"
 msgstr "Where it shows"
 
+#: src/constants/shortcuts.ts
+msgid "Ouvre ou ferme vos notes, au-dessus du jeu."
+msgstr "Opens or closes your notes, on top of the game."
+
 #: src/helpers/onboarding.ts
 msgid "Ouvrez les {options} de Dofus et cochez la case. Sans elle, le client se tait dès qu’il passe derrière, et Multifus n’a plus rien à écouter."
 msgstr "Open the Dofus {options} and tick the box. Without it, the client goes silent as soon as it drops behind, and Multifus has nothing left to hear."
@@ -2160,6 +2222,10 @@ msgstr "Open BotFather"
 #: src/screens/relay/pairing-guide.tsx
 msgid "Ouvrir Telegram Web"
 msgstr "Open Telegram Web"
+
+#: src/screens/notes-window/notes-foot.tsx
+msgid "ouvrir, fermer"
+msgstr "open, close"
 
 #: src/screens/rune-table-window/rune-sheet.tsx
 msgid "Pa"
@@ -2209,6 +2275,10 @@ msgstr "Skip"
 #: src/components/language-picker.tsx
 msgid "Passer Multifus en {name} ?"
 msgstr "Switch Multifus to {name}?"
+
+#: src/screens/about/project-panel.tsx
+msgid "Patch notes"
+msgstr "Patch notes"
 
 #: src/constants/notification.ts
 msgid "Percepteur"
@@ -2732,6 +2802,10 @@ msgid "Texte rapide ignoré : impossible de savoir quelle fenêtre est au premie
 msgstr "Quick text ignored: no way to tell which window is at the front ({detail})."
 
 #: src/helpers/journal.ts
+msgid "Texte rapide ignoré : les notes ont le clavier, et ce texte va au chat du jeu."
+msgstr "Quick text ignored: the notes have the keyboard, and this text goes to the game chat."
+
+#: src/helpers/journal.ts
 msgid "Texte rapide introuvable : il a été retiré entre l’appui et le collage."
 msgstr "Quick text not found: it was removed between the press and the paste."
 
@@ -2952,6 +3026,11 @@ msgstr "Version"
 #: src/constants/roster.ts
 msgid "Vert"
 msgstr "Green"
+
+#. Button in the bar of the notes that erases the whole note
+#: src/screens/notes-window/index.tsx
+msgid "Vider"
+msgstr "Clear"
 
 #: src/constants/roster.ts
 msgid "Violet"

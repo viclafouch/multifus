@@ -1,5 +1,6 @@
 import { msg } from '@lingui/core/macro'
 import type { ShortcutAction } from '@/@types/shortcuts'
+import { NOTES_NAME } from '@/constants/notes'
 import type { Phrase } from '@/lib/i18n'
 
 export const HELD = msg`au maintien`
@@ -49,6 +50,11 @@ export const SHORTCUT_ACTIONS = {
   runeTable: {
     label: msg`Tableau des runes`,
     description: msg`Pose les poids des runes par-dessus le jeu.`,
+    mention: null
+  },
+  notes: {
+    label: NOTES_NAME,
+    description: msg`Ouvre ou ferme vos notes, au-dessus du jeu.`,
     mention: null
   }
 } as const satisfies Record<ShortcutAction, ActionLabel>

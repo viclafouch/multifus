@@ -436,6 +436,31 @@ const CALLS = [
     }
   },
   {
+    name: 'note',
+    run: () => {
+      return multifus.note()
+    }
+  },
+  {
+    name: 'writeNote',
+    run: () => {
+      return multifus.writeNote({ type: 'doc', content: [] })
+    }
+  },
+  {
+    name: 'closeNotes',
+    run: () => {
+      return multifus.closeNotes()
+    }
+  },
+  {
+    name: 'notesTakeKeyboard',
+    run: () => {
+      return multifus.notesTakeKeyboard()
+    }
+  },
+
+  {
     name: 'setWakesMinimized',
     run: () => {
       return multifus.setWakesMinimized(false)

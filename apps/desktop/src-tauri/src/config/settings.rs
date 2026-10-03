@@ -20,6 +20,7 @@ pub struct Settings {
     pub banner: Banner,
     pub wheel: Wheel,
     pub rune_table: RuneTable,
+    pub notes_place: Option<NotesPlace>,
     pub loops_seen: LoopsSeen,
     pub maximize_on_launch: bool,
     pub short_titles: bool,
@@ -28,7 +29,8 @@ pub struct Settings {
     pub client_title_suffix: Option<String>,
     pub start_at_login: bool,
     pub onboarding_done: bool,
-    pub notes_read: Option<String>,
+    #[serde(rename = "notes_read")]
+    pub patch_notes_read: Option<String>,
     pub share_stats: bool,
     pub traces: Traces,
 }
@@ -42,6 +44,55 @@ pub struct Traces {
 }
 
 const FIRST_QUICK_TEXT: &str = "Bon jeu à toi !";
+
+const NOTES_SHORTCUT_KEY: &str = "/shortcuts/notes";
+
+impl Settings {
+    pub fn from_stored(bytes: &[u8]) -> serde_json::Result<Self> {
+        let mut settings = serde_json::from_slice::<Self>(bytes)?;
+        let stored = serde_json::from_slice::<serde_json::Value>(bytes)?;
+
+        if stored.pointer(NOTES_SHORTCUT_KEY).is_none() {
+            settings.shortcuts.notes = settings
+                .shortcuts
+                .notes
+                .take()
+                .filter(|notes| !settings.holds_elsewhere(notes));
+        }
+
+        Ok(settings)
+    }
+
+    fn holds_elsewhere(&self, combination: &Shortcut) -> bool {
+        let shortcuts = &self.shortcuts;
+        let actions = [
+            &shortcuts.next,
+            &shortcuts.previous,
+            &shortcuts.main,
+            &shortcuts.toggle_excluded,
+            &shortcuts.walk,
+            &shortcuts.maximize_all,
+            &shortcuts.wheel,
+            &shortcuts.rune_table,
+        ];
+        let characters = self
+            .roster
+            .characters()
+            .iter()
+            .map(|character| &character.shortcut);
+        let quick_texts = self
+            .quick_texts
+            .iter()
+            .map(|quick_text| &quick_text.shortcut);
+
+        actions
+            .into_iter()
+            .chain(characters)
+            .chain(quick_texts)
+            .flatten()
+            .any(|held| held.matches_same_keys(combination))
+    }
+}
 
 impl Default for Settings {
     fn default() -> Self {
@@ -59,6 +110,7 @@ impl Default for Settings {
             banner: Banner::default(),
             wheel: Wheel::default(),
             rune_table: RuneTable::default(),
+            notes_place: None,
             loops_seen: LoopsSeen::default(),
             maximize_on_launch: true,
             short_titles: true,
@@ -67,7 +119,7 @@ impl Default for Settings {
             client_title_suffix: None,
             start_at_login: false,
             onboarding_done: false,
-            notes_read: None,
+            patch_notes_read: None,
             share_stats: true,
             traces: Traces::default(),
         }
@@ -217,6 +269,14 @@ impl RuneTable {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+pub struct NotesPlace {
+    pub x: f64,
+    pub y: f64,
+    pub width: f64,
+    pub height: f64,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Shortcuts {
@@ -228,6 +288,7 @@ pub struct Shortcuts {
     pub maximize_all: Option<Shortcut>,
     pub wheel: Option<Shortcut>,
     pub rune_table: Option<Shortcut>,
+    pub notes: Option<Shortcut>,
 }
 
 const DEFAULT_NEXT: &str = "Control+Shift+Right";
@@ -238,6 +299,7 @@ const DEFAULT_WALK: &str = "Control+Shift+KeyD";
 const DEFAULT_MAXIMIZE_ALL: &str = "Control+Shift+KeyA";
 const DEFAULT_WHEEL: &str = "Control+Shift+KeyW";
 const DEFAULT_RUNE_TABLE: &str = "Control+Shift+KeyR";
+const DEFAULT_NOTES: &str = "Control+Shift+KeyN";
 
 impl Default for Shortcuts {
     fn default() -> Self {
@@ -250,6 +312,7 @@ impl Default for Shortcuts {
             maximize_all: Shortcut::new(DEFAULT_MAXIMIZE_ALL),
             wheel: Shortcut::new(DEFAULT_WHEEL),
             rune_table: Shortcut::new(DEFAULT_RUNE_TABLE),
+            notes: Shortcut::new(DEFAULT_NOTES),
         }
     }
 }
@@ -498,7 +561,7 @@ mod tests {
     }
 
     #[test]
-    fn the_eight_shortcuts_are_bound_by_default_and_all_differ() {
+    fn the_nine_shortcuts_are_bound_by_default_and_all_differ() {
         let shortcuts = Shortcuts::default();
         let bound = [
             shortcuts.next.as_ref(),
@@ -509,20 +572,21 @@ mod tests {
             shortcuts.maximize_all.as_ref(),
             shortcuts.wheel.as_ref(),
             shortcuts.rune_table.as_ref(),
+            shortcuts.notes.as_ref(),
         ]
         .into_iter()
         .flatten()
         .map(Shortcut::as_str)
         .collect::<Vec<_>>();
 
-        assert_eq!(bound.len(), 8);
+        assert_eq!(bound.len(), 9);
 
         let mut unique = bound.clone();
         unique.sort_unstable();
         unique.dedup();
         assert_eq!(
             unique.len(),
-            8,
+            9,
             "two actions share a combination: {bound:?}"
         );
     }
@@ -632,6 +696,7 @@ mod tests {
             maximize_all: None,
             wheel: None,
             rune_table: None,
+            notes: None,
         };
 
         let json = serde_json::to_string(&shortcuts).expect("shortcuts serialise");
@@ -738,5 +803,73 @@ mod tests {
         assert_eq!(settings.relay, Relay::default());
         assert!(settings.roster.is_empty());
         assert_eq!(settings.quick_texts, Settings::default().quick_texts);
+    }
+
+    fn stored(json: &str) -> Settings {
+        Settings::from_stored(json.as_bytes()).expect("a stored configuration")
+    }
+
+    fn notes_shortcut(settings: &Settings) -> Option<&str> {
+        settings.shortcuts.notes.as_ref().map(Shortcut::as_str)
+    }
+
+    #[test]
+    fn a_file_written_before_the_notes_gives_them_their_combination() {
+        let settings = stored(r#"{ "shortcuts": { "next": "Alt+Right" } }"#);
+
+        assert_eq!(notes_shortcut(&settings), Some(DEFAULT_NOTES));
+    }
+
+    #[test]
+    fn a_combination_a_player_already_bound_stays_theirs_and_the_notes_start_without_one() {
+        let held_by_a_character = stored(
+            r#"{ "roster": { "characters": [
+                   { "nickname": "Alpha", "shortcut": "Shift+Control+N" } ] } }"#,
+        );
+        let held_by_a_quick_text = stored(
+            r#"{ "quick_texts": [ { "id": 0, "text": "prix", "shortcut": "Control+Shift+KeyN" } ] }"#,
+        );
+        let held_by_an_action = stored(r#"{ "shortcuts": { "walk": "Control+Shift+KeyN" } }"#);
+
+        assert_eq!(notes_shortcut(&held_by_a_character), None);
+        assert_eq!(
+            held_by_a_character
+                .roster
+                .get("Alpha")
+                .and_then(|character| character.shortcut.as_ref())
+                .map(Shortcut::as_str),
+            Some("Shift+Control+N"),
+            "actions claim first, so the default would have taken the combination of the character"
+        );
+        assert_eq!(notes_shortcut(&held_by_a_quick_text), None);
+        assert_eq!(notes_shortcut(&held_by_an_action), None);
+    }
+
+    #[test]
+    fn a_file_written_since_the_notes_keeps_what_the_player_chose_for_them() {
+        let cleared = stored(r#"{ "shortcuts": { "notes": null } }"#);
+        let shared = stored(
+            r#"{ "shortcuts": { "notes": "Control+Shift+KeyN" },
+                 "quick_texts": [ { "id": 0, "text": "prix", "shortcut": "Control+Shift+KeyN" } ] }"#,
+        );
+
+        assert_eq!(notes_shortcut(&cleared), None);
+        assert_eq!(
+            notes_shortcut(&shared),
+            Some(DEFAULT_NOTES),
+            "only an upgrade gives way, a combination the player picked is never taken back"
+        );
+    }
+
+    #[test]
+    fn the_patch_notes_read_keep_the_key_the_players_already_store() {
+        let settings = stored(r#"{ "notes_read": "0.2.0" }"#);
+
+        assert_eq!(settings.patch_notes_read.as_deref(), Some("0.2.0"));
+        assert!(
+            serde_json::to_string(&settings)
+                .expect("settings serialise")
+                .contains(r#""notes_read":"0.2.0""#)
+        );
     }
 }

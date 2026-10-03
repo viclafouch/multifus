@@ -12,6 +12,7 @@ import { ShortcutRecall } from '@/components/shortcut-recall'
 import { IS_APPLE } from '@/constants/keyboard'
 import { HELD, SHORTCUT_ACTIONS } from '@/constants/shortcuts'
 import { DEMO_FEWEST, DEMO_USUAL } from '@/constants/wheel'
+import { acceleratorOf } from '@/helpers/accelerator'
 import { useDraft } from '@/hooks/use-draft'
 import { useWheelDisplay } from '@/hooks/use-wheel-display'
 import { previewWheel, setWheelDiameter } from '@/lib/multifus'
@@ -28,10 +29,7 @@ export const WheelPanel = ({ wheel, shortcuts, run }: WheelPanelProps) => {
   const { draft, setDraft } = useDraft(wheel.diameter)
   const [crowd, setCrowd] = React.useState(DEMO_USUAL)
 
-  const accelerator =
-    shortcuts.find((shortcut) => {
-      return shortcut.action === 'wheel'
-    })?.accelerator ?? null
+  const accelerator = acceleratorOf(shortcuts, 'wheel')
 
   return (
     <Panel>

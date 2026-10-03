@@ -18,6 +18,10 @@ use crate::app::journal::ShortcutOutcome;
 use crate::app::journal::Surface;
 use crate::app::journal::WalkFrom;
 use crate::app::journal::Work;
+use crate::app::keyboard::Keyboard;
+use crate::app::keyboard::keyboard;
+use crate::app::keyboard::matches_in_the_game;
+use crate::app::notes;
 use crate::app::panics;
 use crate::app::quick_texts;
 use crate::app::relay;
@@ -40,7 +44,6 @@ use crate::platform::GameWindow;
 use crate::platform::PlatformError;
 use crate::platform::WindowId;
 use crate::platform::WindowManager;
-use crate::platform::matches_game_in_front;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Struck {
@@ -103,7 +106,7 @@ fn forget(app: &AppHandle, state: &mut Multifus) {
 }
 
 pub fn apply(app: &AppHandle) {
-    let game_in_front = matches_game_in_front(windows(app));
+    let game_in_front = matches_in_the_game(windows(app), keyboard(app));
     let mut state = lock(app);
 
     // The system only tells a refusal to whoever asks for the combination, and the screen is read from outside the game.
@@ -119,7 +122,7 @@ pub fn note_foreground(app: &AppHandle) {
 }
 
 fn follow_foreground(app: &AppHandle) {
-    let game_in_front = matches_game_in_front(windows(app));
+    let game_in_front = matches_in_the_game(windows(app), keyboard(app));
     let mut state = lock(app);
 
     match arming(state.shortcuts_armed(), game_in_front) {
@@ -301,6 +304,8 @@ trait Mechanisms {
     fn release_wheel(&self);
 
     fn toggle_rune_table(&self, here: WindowId);
+
+    fn toggle_notes(&self);
 }
 
 struct AppMechanisms<'a>(&'a AppHandle);
@@ -333,12 +338,17 @@ impl Mechanisms for AppMechanisms<'_> {
     fn toggle_rune_table(&self, here: WindowId) {
         rune_table::toggle(self.0, Some(here));
     }
+
+    fn toggle_notes(&self) {
+        notes::toggle(self.0);
+    }
 }
 
 struct Press<'a> {
     windows: &'a dyn WindowManager,
     state: &'a AppState,
     mechanisms: &'a dyn Mechanisms,
+    keyboard: &'a Keyboard,
 }
 
 fn on_told(app: &AppHandle, told: Told) {
@@ -354,6 +364,7 @@ fn on_struck(app: &AppHandle, struck: Struck) {
             windows: windows(app),
             state: app.state::<AppState>().inner(),
             mechanisms: &AppMechanisms(app),
+            keyboard: keyboard(app),
         },
         struck,
     );
@@ -379,6 +390,7 @@ fn answer(press: &Press, struck: Struck) {
 
             act_on(press, binding, &window);
         }
+        Ok(None) if press.keyboard.matches_notes_holding() => act_in_the_notes(press, binding),
         Ok(None) => refused(press, binding, Refusal::OutsideGame),
         Err(error) => refused(
             press,
@@ -404,6 +416,9 @@ fn act_on(press: &Press, binding: Binding, window: &GameWindow) {
         Binding::Action {
             action: ShortcutAction::RuneTable,
         } => press.mechanisms.toggle_rune_table(window.id()),
+        Binding::Action {
+            action: ShortcutAction::Notes,
+        } => press.mechanisms.toggle_notes(),
         Binding::Action { action } => {
             let Some(effect) = hold(press.state).decide_shortcut(action, window.nickname()) else {
                 return;
@@ -420,8 +435,27 @@ fn act_on(press: &Press, binding: Binding, window: &GameWindow) {
             hold(press.state)
                 .log_unless_repeated(JournalEvent::CharacterShortcut { nickname, outcome });
         }
+        Binding::QuickText { .. } if press.keyboard.matches_notes_holding() => {
+            refused_to_the_notes(press);
+        }
         Binding::QuickText { id } => press.mechanisms.paste_quick_text(id, window.id()),
     }
+}
+
+fn act_in_the_notes(press: &Press, binding: Binding) {
+    match binding {
+        Binding::Action {
+            action: ShortcutAction::Notes,
+        } => press.mechanisms.toggle_notes(),
+        Binding::QuickText { .. } => refused_to_the_notes(press),
+        other => refused(press, other, Refusal::OutsideGame),
+    }
+}
+
+fn refused_to_the_notes(press: &Press) {
+    hold(press.state).log_unless_repeated(JournalEvent::QuickTextFailed {
+        reason: QuickTextFailure::NotesHoldKeyboard,
+    });
 }
 
 fn refused(press: &Press, binding: Binding, refusal: Refusal) {
@@ -509,6 +543,7 @@ mod tests {
     use crate::domain::Character;
     use crate::domain::Roster;
     use crate::platform::WindowId;
+    use crate::platform::matches_game_in_front;
     use crate::test_doubles::Asked;
     use crate::test_doubles::Desktop;
     use crate::test_doubles::FakeWindowManager;
@@ -526,6 +561,7 @@ mod tests {
         WheelOpened(WindowId),
         WheelReleased,
         RuneTableToggled(WindowId),
+        NotesToggled,
     }
 
     #[derive(Debug, Default)]
@@ -576,6 +612,10 @@ mod tests {
 
         fn toggle_rune_table(&self, here: WindowId) {
             self.write_down(Mechanism::RuneTableToggled(here));
+        }
+
+        fn toggle_notes(&self) {
+            self.write_down(Mechanism::NotesToggled);
         }
     }
 
@@ -678,6 +718,7 @@ mod tests {
             windows: windows.as_ref(),
             state: &state,
             mechanisms: &mechanisms,
+            keyboard: &Keyboard::default(),
         };
 
         answering(
@@ -729,6 +770,7 @@ mod tests {
             windows: windows.as_ref(),
             state: &state,
             mechanisms: &mechanisms,
+            keyboard: &Keyboard::default(),
         };
         let detail = "reading the foreground failed: the system said no".to_owned();
 
@@ -777,6 +819,7 @@ mod tests {
                 windows: windows.as_ref(),
                 state: &state,
                 mechanisms: &mechanisms,
+                keyboard: &Keyboard::default(),
             },
             Binding::Action {
                 action: ShortcutAction::Walk,
@@ -809,6 +852,7 @@ mod tests {
                     windows: windows.as_ref(),
                     state: &state,
                     mechanisms: &mechanisms,
+                    keyboard: &Keyboard::default(),
                 },
                 Binding::Action { action },
             );
@@ -840,6 +884,7 @@ mod tests {
                     windows: windows.as_ref(),
                     state: &state,
                     mechanisms: &mechanisms,
+                    keyboard: &Keyboard::default(),
                 },
                 Binding::Action { action },
             );
@@ -866,6 +911,7 @@ mod tests {
                 windows: windows.as_ref(),
                 state: &state,
                 mechanisms: &mechanisms,
+                keyboard: &Keyboard::default(),
             },
             Binding::Action {
                 action: ShortcutAction::Next,
@@ -898,6 +944,7 @@ mod tests {
                 windows: windows.as_ref(),
                 state: &state,
                 mechanisms: &mechanisms,
+                keyboard: &Keyboard::default(),
             },
             Binding::QuickText { id },
         );
@@ -932,6 +979,7 @@ mod tests {
                 windows: windows.as_ref(),
                 state: &state,
                 mechanisms: &mechanisms,
+                keyboard: &Keyboard::default(),
             },
             Binding::Character {
                 nickname: "Charlie".to_owned(),
@@ -962,6 +1010,7 @@ mod tests {
                 windows: windows.as_ref(),
                 state: &state,
                 mechanisms: &mechanisms,
+                keyboard: &Keyboard::default(),
             },
             Binding::Character {
                 nickname: "Alpha".to_owned(),
@@ -989,6 +1038,7 @@ mod tests {
                 windows: windows.as_ref(),
                 state: &state,
                 mechanisms: &mechanisms,
+                keyboard: &Keyboard::default(),
             },
             Binding::Character {
                 nickname: "Bravo".to_owned(),
@@ -1157,6 +1207,7 @@ mod tests {
                 windows: windows.as_ref(),
                 state: &state,
                 mechanisms: &mechanisms,
+                keyboard: &Keyboard::default(),
             },
             Binding::Action {
                 action: ShortcutAction::Wheel,
@@ -1192,6 +1243,7 @@ mod tests {
                 windows: windows.as_ref(),
                 state: &state,
                 mechanisms: &mechanisms,
+                keyboard: &Keyboard::default(),
             },
             Binding::Action {
                 action: ShortcutAction::RuneTable,
@@ -1224,6 +1276,7 @@ mod tests {
                 windows: windows.as_ref(),
                 state: &state,
                 mechanisms: &mechanisms,
+                keyboard: &Keyboard::default(),
             },
             Binding::Action {
                 action: ShortcutAction::RuneTable,
@@ -1252,6 +1305,7 @@ mod tests {
                 windows: windows.as_ref(),
                 state: &state,
                 mechanisms: &mechanisms,
+                keyboard: &Keyboard::default(),
             },
             Binding::Action {
                 action: ShortcutAction::Wheel,
@@ -1281,6 +1335,7 @@ mod tests {
             windows: windows.as_ref(),
             state: &state,
             mechanisms: &mechanisms,
+            keyboard: &Keyboard::default(),
         };
 
         answer(
@@ -1343,5 +1398,86 @@ mod tests {
             "nobody is the main yet, so there is nowhere to go"
         );
         assert_eq!(windows.asked(), Vec::new());
+    }
+
+    fn the_notes_hold_the_keyboard() -> Keyboard {
+        let keyboard = Keyboard::default();
+
+        keyboard.notes_take();
+
+        keyboard
+    }
+
+    #[test]
+    fn a_quick_text_struck_while_the_notes_hold_the_keyboard_pastes_nothing_and_says_why() {
+        let directory = directory();
+        let state = three_in_the_cycle(&directory);
+        let windows = FakeWindowManager::showing(Desktop {
+            foreground: Some(game_window(1, "Alpha")),
+            ..Desktop::default()
+        });
+        let mechanisms = FakeMechanisms::default();
+        let keyboard = the_notes_hold_the_keyboard();
+
+        answering(
+            &Press {
+                windows: windows.as_ref(),
+                state: &state,
+                mechanisms: &mechanisms,
+                keyboard: &keyboard,
+            },
+            Binding::QuickText {
+                id: QuickTextId::default(),
+            },
+        );
+
+        assert!(
+            !mechanisms
+                .set_going()
+                .iter()
+                .any(|mechanism| matches!(mechanism, Mechanism::QuickTextPasted(..))),
+            "the paste would land in the notes, and the text belongs to the game chat"
+        );
+        assert!(journalled(&state).contains(&JournalEvent::QuickTextFailed {
+            reason: QuickTextFailure::NotesHoldKeyboard,
+        }));
+    }
+
+    #[test]
+    fn the_notes_shortcut_closes_the_notes_that_hold_the_keyboard_with_no_client_in_front() {
+        let directory = directory();
+        let state = app_state(&directory, Settings::default());
+        let windows = FakeWindowManager::showing(Desktop::default());
+        let mechanisms = FakeMechanisms::default();
+        let keyboard = the_notes_hold_the_keyboard();
+        let press = Press {
+            windows: windows.as_ref(),
+            state: &state,
+            mechanisms: &mechanisms,
+            keyboard: &keyboard,
+        };
+
+        answering(
+            &press,
+            Binding::Action {
+                action: ShortcutAction::Notes,
+            },
+        );
+        answering(
+            &press,
+            Binding::Action {
+                action: ShortcutAction::Next,
+            },
+        );
+
+        assert_eq!(mechanisms.set_going(), vec![Mechanism::NotesToggled]);
+        assert_eq!(
+            journalled(&state),
+            vec![JournalEvent::Shortcut {
+                action: ShortcutAction::Next,
+                outcome: ShortcutOutcome::OutsideGame,
+            }],
+            "with no client at all, the other actions have nowhere to go"
+        );
     }
 }

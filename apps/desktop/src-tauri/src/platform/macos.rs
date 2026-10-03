@@ -23,19 +23,29 @@ use std::time::Instant;
 use block2::RcBlock;
 use dispatch2::DispatchQueue;
 use libc::pid_t;
+use objc2::AnyThread;
 use objc2::MainThreadMarker;
 use objc2::ffi::object_setClass;
 use objc2::msg_send;
 use objc2::rc::Retained;
 use objc2::runtime::AnyClass;
 use objc2::runtime::AnyObject;
+use objc2::runtime::Bool;
+use objc2::runtime::ClassBuilder;
 use objc2::runtime::NSObjectProtocol;
 use objc2::runtime::ProtocolObject;
+use objc2::runtime::Sel;
+use objc2::sel;
 use objc2_app_kit::NSApplicationActivationOptions;
 use objc2_app_kit::NSFloatingWindowLevel;
 use objc2_app_kit::NSNormalWindowLevel;
 use objc2_app_kit::NSRunningApplication;
 use objc2_app_kit::NSScreen;
+use objc2_app_kit::NSTrackingArea;
+use objc2_app_kit::NSTrackingAreaOptions;
+use objc2_app_kit::NSView;
+use objc2_app_kit::NSWindow;
+use objc2_app_kit::NSWindowCollectionBehavior;
 use objc2_app_kit::NSWindowLevel;
 use objc2_app_kit::NSWindowOrderingMode;
 use objc2_app_kit::NSWindowStyleMask;
@@ -641,11 +651,33 @@ fn our_window(ns_window: *mut c_void, operation: &'static str) -> Result<NonNull
 }
 
 pub fn hold_back_activation(ns_window: *mut c_void) -> Result<()> {
-    let window = our_window(ns_window, POSING_A_PANEL)?;
-
     let Some(panel) = AnyClass::get(NS_PANEL) else {
         return Err(PlatformError::system(POSING_A_PANEL, "NSPanel is missing"));
     };
+
+    pose_as(ns_window, panel)
+}
+
+pub fn pose_as_notes_panel(ns_window: *mut c_void) -> Result<()> {
+    let panel = notes_panel()?;
+
+    pose_as(ns_window, panel)?;
+
+    let window = our_window(ns_window, POSING_A_PANEL)?;
+    let joined = NSWindowCollectionBehavior::CanJoinAllSpaces
+        | NSWindowCollectionBehavior::FullScreenAuxiliary;
+
+    // SAFETY: the handle names the window Tauri built, and both selectors are NSWindow's own.
+    unsafe {
+        let worn: NSWindowCollectionBehavior = msg_send![window.as_ptr(), collectionBehavior];
+        let _: () = msg_send![window.as_ptr(), setCollectionBehavior: worn | joined];
+    }
+
+    Ok(())
+}
+
+fn pose_as(ns_window: *mut c_void, panel: &AnyClass) -> Result<()> {
+    let window = our_window(ns_window, POSING_A_PANEL)?;
 
     let Some(plain) = AnyClass::get(NS_WINDOW) else {
         return Err(PlatformError::system(POSING_A_PANEL, "NSWindow is missing"));
@@ -683,6 +715,108 @@ pub fn hold_back_activation(ns_window: *mut c_void) -> Result<()> {
     }
 
     Ok(())
+}
+
+const NOTES_PANEL: &CStr = c"MultifusNotesPanel";
+
+static NOTES_MAY_TAKE_THE_KEYBOARD: AtomicBool = AtomicBool::new(false);
+
+fn notes_panel() -> Result<&'static AnyClass> {
+    if let Some(declared) = AnyClass::get(NOTES_PANEL) {
+        return Ok(declared);
+    }
+
+    let Some(plain_panel) = AnyClass::get(NS_PANEL) else {
+        return Err(PlatformError::system(POSING_A_PANEL, "NSPanel is missing"));
+    };
+
+    let Some(mut declaring) = ClassBuilder::new(NOTES_PANEL, plain_panel) else {
+        return Err(PlatformError::system(
+            POSING_A_PANEL,
+            "the panel of the notes cannot be declared",
+        ));
+    };
+
+    // SAFETY: canBecomeKeyWindow is NSWindow's own selector, and it answers a BOOL as the function does.
+    unsafe {
+        declaring.add_method(
+            sel!(canBecomeKeyWindow),
+            notes_may_take_the_keyboard as extern "C-unwind" fn(_, _) -> _,
+        );
+    }
+
+    Ok(declaring.register())
+}
+
+extern "C-unwind" fn notes_may_take_the_keyboard(_panel: &AnyObject, _selector: Sel) -> Bool {
+    Bool::new(NOTES_MAY_TAKE_THE_KEYBOARD.load(Ordering::Acquire))
+}
+
+const SHOWING_THE_NOTES: &str = "showing the notes";
+
+pub fn show_notes(ns_window: *mut c_void) -> Result<()> {
+    let window = our_window(ns_window, SHOWING_THE_NOTES)?;
+
+    // SAFETY: the handle names the window Tauri built, an NSWindow alive for this call.
+    let window = unsafe { window.cast::<NSWindow>().as_ref() };
+
+    if let Some(content) = window.contentView() {
+        track_the_mouse_always(&content);
+    }
+
+    window.orderFrontRegardless();
+
+    Ok(())
+}
+
+fn track_the_mouse_always(view: &NSView) {
+    for area in view.trackingAreas().to_vec() {
+        let options = area.options();
+
+        if !options.contains(NSTrackingAreaOptions::ActiveInKeyWindow) {
+            continue;
+        }
+
+        let always = options.difference(NSTrackingAreaOptions::ActiveInKeyWindow)
+            | NSTrackingAreaOptions::ActiveAlways;
+
+        // SAFETY: the area is rebuilt from the rect, owner and user info AppKit hands back for it.
+        let replacement = unsafe {
+            NSTrackingArea::initWithRect_options_owner_userInfo(
+                NSTrackingArea::alloc(),
+                area.rect(),
+                always,
+                area.owner().as_deref(),
+                area.userInfo().as_deref(),
+            )
+        };
+
+        view.removeTrackingArea(&area);
+        view.addTrackingArea(&replacement);
+    }
+
+    for subview in view.subviews().to_vec() {
+        track_the_mouse_always(&subview);
+    }
+}
+
+const GIVING_THE_NOTES_THE_KEYBOARD: &str = "giving the notes the keyboard";
+
+pub fn take_keyboard(ns_window: *mut c_void) -> Result<()> {
+    let window = our_window(ns_window, GIVING_THE_NOTES_THE_KEYBOARD)?;
+
+    NOTES_MAY_TAKE_THE_KEYBOARD.store(true, Ordering::Release);
+
+    // SAFETY: the handle names the window Tauri built, and the selector is NSWindow's own.
+    unsafe {
+        let _: () = msg_send![window.as_ptr(), makeKeyWindow];
+    }
+
+    Ok(())
+}
+
+pub fn let_keyboard_go() {
+    NOTES_MAY_TAKE_THE_KEYBOARD.store(false, Ordering::Release);
 }
 
 const LAYING_ABOVE: &str = "laying a window over the game";
@@ -1033,6 +1167,10 @@ impl WindowManager for AccessibilityWindowManager {
         }
 
         set_frontmost(&element)
+    }
+
+    fn raise(&self, window: WindowId) -> Result<()> {
+        self.focus(window)
     }
 
     fn client_windows(&self) -> Result<Vec<WindowId>> {

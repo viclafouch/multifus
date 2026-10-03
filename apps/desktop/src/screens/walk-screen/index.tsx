@@ -5,6 +5,7 @@ import type { Snapshot } from '@/@types/snapshot'
 import type { WalkStatus } from '@/@types/walk'
 import { Screen } from '@/components/layout/screen'
 import { MAP_NAMES } from '@/constants/world'
+import { acceleratorOf } from '@/helpers/accelerator'
 import { BannerPanel } from '@/screens/walk-screen/banner-panel'
 import { StatePanel } from '@/screens/walk-screen/state-panel'
 
@@ -15,10 +16,7 @@ type WalkScreenProps = Readonly<{
 }>
 
 export const WalkScreen = ({ walk, shortcuts, run }: WalkScreenProps) => {
-  const accelerator =
-    shortcuts.find((shortcut) => {
-      return shortcut.action === 'walk'
-    })?.accelerator ?? null
+  const accelerator = acceleratorOf(shortcuts, 'walk')
 
   return (
     <Screen

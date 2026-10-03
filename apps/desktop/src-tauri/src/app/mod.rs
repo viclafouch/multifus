@@ -5,8 +5,10 @@ pub mod clicks;
 pub mod commands;
 pub mod journal;
 pub mod journal_file;
+pub mod keyboard;
 pub mod links;
 pub mod main_window;
+pub mod notes;
 pub mod overlay;
 pub mod panics;
 pub mod portraits;
@@ -29,6 +31,8 @@ use std::sync::Mutex;
 use tauri::AppHandle;
 use tauri::Manager;
 
+use crate::app::keyboard::Keyboard;
+use crate::app::keyboard::KeyboardAware;
 use crate::app::view::ScreenSaverView;
 use crate::config::ConfigError;
 use crate::config::ConfigStore;
@@ -57,8 +61,12 @@ pub fn setup(app: &AppHandle) -> Result<(), ConfigError> {
     let store = ConfigStore::for_app(app)?;
     let loaded = store.load();
     let keeper = PlatformDisplayKeeper::new();
-    let windows: WindowState = Arc::new(PlatformWindowManager::new(
-        loaded.settings.traces.short_titles,
+    let keyboard = Arc::new(Keyboard::default());
+    let windows: WindowState = Arc::new(KeyboardAware::new(
+        Arc::new(PlatformWindowManager::new(
+            loaded.settings.traces.short_titles,
+        )),
+        Arc::clone(&keyboard),
     ));
 
     app.manage::<AppState>(Mutex::new(Multifus::new(MultifusParams {
@@ -75,6 +83,7 @@ pub fn setup(app: &AppHandle) -> Result<(), ConfigError> {
     let _ = windows.unlock_foreground();
 
     app.manage::<WindowState>(windows);
+    app.manage::<Arc<Keyboard>>(keyboard);
     app.manage::<PasteState>(Arc::new(PlatformPasteSender::new()));
     app.manage::<WatcherState>(Mutex::new(PlatformNotificationWatcher::new()));
 
@@ -89,6 +98,8 @@ pub fn setup(app: &AppHandle) -> Result<(), ConfigError> {
     wheel::setup(app);
 
     rune_table::setup(app);
+
+    notes::setup(app);
 
     shortcuts::start(app);
     shortcuts::apply(app);
@@ -112,6 +123,7 @@ pub fn build_overlays(app: &AppHandle) {
     banner::build(app);
     wheel::build(app);
     rune_table::build(app);
+    notes::build(app);
 }
 
 fn install_crypto_provider() {

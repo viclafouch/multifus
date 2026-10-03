@@ -1,13 +1,12 @@
 import React from 'react'
-import { X } from 'lucide-react'
 import { i18n } from '@lingui/core'
 import { t } from '@lingui/core/macro'
-import { Button } from '@multifus/retro'
 import {
   RUNE_FAMILY_IDS,
   RUNE_FAMILY_STATS,
   RUNE_WEIGHTS
 } from '@multifus/runes'
+import { CloseButton } from '@/components/close-button'
 import { RUNE_FAMILY_NAMES, RUNE_STAT_NAMES } from '@/constants/runes'
 import type { useWindowDrag } from '@/hooks/use-window-drag'
 import { RuneLine } from '@/screens/rune-table-window/rune-line'
@@ -31,22 +30,11 @@ export const RuneSheet = ({ drag, look, onClose, ref }: RuneSheetProps) => {
       className="rune-sheet"
       style={{ opacity: look }}
     >
-      <header className="rune-crown">
+      <header className="sheet-crown">
         <h1 className="min-w-0 flex-1 truncate text-tale leading-none font-medium">
           {title}
         </h1>
-        <Button
-          variant="bare"
-          size="icon-tight"
-          className="shrink-0 text-muted-foreground hover:bg-destructive/20 hover:text-foreground"
-          aria-label={t`Fermer le tableau des runes`}
-          onPointerDown={(event) => {
-            event.stopPropagation()
-          }}
-          onClick={onClose}
-        >
-          <X aria-hidden strokeWidth={2} />
-        </Button>
+        <CloseButton label={t`Fermer le tableau des runes`} onClick={onClose} />
       </header>
       <table className="rune-grid">
         <caption className="sr-only">{t`Le poids de chaque rune : la simple, la Pa, la Ra, et le poids d’un point de stat`}</caption>

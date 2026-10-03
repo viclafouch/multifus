@@ -11,6 +11,7 @@ import { Screen } from '@/components/layout/screen'
 import { Tick } from '@/components/retro/tick'
 import { ShortcutRecall } from '@/components/shortcut-recall'
 import { MAP_NAMES } from '@/constants/world'
+import { acceleratorOf } from '@/helpers/accelerator'
 import { recallRuneTable, setRuneTableEverywhere } from '@/lib/multifus'
 import { PreviewPanel } from '@/screens/rune-table/preview-panel'
 
@@ -27,10 +28,7 @@ export const RuneTableScreen = ({
 }: RuneTableScreenProps) => {
   const everywhereLabel = t`Afficher sur tous les personnages connectés`
 
-  const accelerator =
-    shortcuts.find((shortcut) => {
-      return shortcut.action === 'runeTable'
-    })?.accelerator ?? null
+  const accelerator = acceleratorOf(shortcuts, 'runeTable')
 
   return (
     <Screen

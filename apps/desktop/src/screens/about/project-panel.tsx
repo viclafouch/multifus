@@ -48,7 +48,7 @@ export const ProjectPanel = ({ update, run }: ProjectPanelProps) => {
         />
       </FieldRow>
       <FieldRow
-        label={t`Notes de version`}
+        label={t`Patch notes`}
         description={t`Ce que chaque version a changé, sur le site.`}
       >
         <LinkButton

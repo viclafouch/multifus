@@ -1,0 +1,195 @@
+@import 'tailwindcss';
+
+@import '@fontsource/roboto/400.css';
+@import '@fontsource/roboto/500.css';
+@import '@fontsource/roboto/700.css';
+
+@import '@multifus/retro/styles/theme.css';
+@import '@multifus/retro/styles/retro.css';
+
+@import './sheet.css';
+
+@layer base {
+  :root {
+    --notes-paper: oklch(0.17 0.009 66);
+    --notes-line: 1.5rem;
+    --notes-rule: color-mix(in oklch, var(--khaki), transparent 92%);
+    --notes-margin: color-mix(in oklch, var(--flame), transparent 58%);
+    --notes-margin-at: calc(var(--spacing) * 7);
+  }
+
+  html,
+  body {
+    background-color: var(--notes-paper);
+  }
+}
+
+@utility notes {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  height: 100vh;
+  background-color: var(--notes-paper);
+
+  &[data-pointer-away='true'] button:not([aria-pressed='true']):hover {
+    border-color: transparent;
+    background-color: transparent;
+    color: var(--muted-foreground);
+  }
+}
+
+@utility notes-crown {
+  @apply sheet-crown;
+
+  gap: calc(var(--spacing) * 1.5);
+  height: calc(var(--spacing) * 9);
+  padding-block: 0;
+  padding-right: calc(var(--spacing) * 1.5);
+  background-color: var(--sheet);
+}
+
+@utility notes-handle {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: calc(var(--spacing) * 2);
+  align-self: stretch;
+  min-width: 0;
+}
+
+@utility notes-mark {
+  width: calc(var(--spacing) * 4);
+  height: calc(var(--spacing) * 4);
+  flex-shrink: 0;
+}
+
+@utility notes-format {
+  color: var(--muted-foreground);
+  text-shadow: none;
+
+  &:hover {
+    background-color: color-mix(in oklch, var(--foreground), transparent 92%);
+    color: var(--foreground);
+  }
+
+  &[aria-pressed='true'] {
+    background-color: color-mix(in oklch, var(--amber), transparent 82%);
+    color: var(--amber);
+  }
+}
+
+@utility notes-title {
+  font-family: var(--font-carve);
+  font-size: 1rem;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  color: var(--cream);
+  transform: translateY(1px);
+}
+
+@utility notes-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--spacing) * 3);
+  height: calc(var(--spacing) * 8);
+  padding-inline: calc(var(--spacing) * 3);
+  border-top: 1px solid var(--sheet-rule);
+  background-color: var(--sheet);
+  white-space: nowrap;
+  overflow: hidden;
+  container-type: inline-size;
+}
+
+@utility notes-escape {
+  @container (max-width: 17rem) {
+    display: none;
+  }
+}
+
+@utility notes-paper {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklch, var(--khaki), transparent 70%)
+    transparent;
+  background-image:
+    linear-gradient(
+      to right,
+      transparent var(--notes-margin-at),
+      var(--notes-margin) var(--notes-margin-at),
+      var(--notes-margin) calc(var(--notes-margin-at) + 1px),
+      transparent calc(var(--notes-margin-at) + 1px)
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent calc(var(--notes-line) - 1px),
+      var(--notes-rule) calc(var(--notes-line) - 1px),
+      var(--notes-rule) var(--notes-line)
+    );
+  background-position:
+    0 0,
+    0 calc(var(--spacing) * 2);
+  background-attachment: local;
+  cursor: text;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border: 2px solid transparent;
+    border-radius: 9999px;
+    background-clip: padding-box;
+    background-color: color-mix(in oklch, var(--khaki), transparent 70%);
+  }
+
+  & .ProseMirror {
+    min-height: 100%;
+    padding: calc(var(--spacing) * 2) calc(var(--spacing) * 3)
+      calc(var(--spacing) * 6)
+      calc(var(--notes-margin-at) + calc(var(--spacing) * 3));
+    outline: none;
+    font-size: 0.875rem;
+    line-height: var(--notes-line);
+    font-variant-numeric: tabular-nums;
+    color: var(--cream);
+    caret-color: var(--amber);
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+    user-select: text;
+    cursor: text;
+  }
+
+  & .ProseMirror ::selection {
+    background-color: color-mix(in oklch, var(--amber), transparent 68%);
+  }
+
+  & .ProseMirror p {
+    margin: 0;
+  }
+
+  & .ProseMirror strong {
+    font-weight: 700;
+    color: oklch(0.97 0.02 85);
+  }
+
+  & .ProseMirror ul {
+    margin: 0;
+    padding-left: 1.125rem;
+    list-style-type: disc;
+  }
+
+  & .ProseMirror li::marker {
+    color: var(--amber);
+  }
+
+  & .ProseMirror p.is-editor-empty:first-child::before {
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    font-style: italic;
+    color: color-mix(in oklch, var(--khaki), transparent 45%);
+    pointer-events: none;
+  }
+}

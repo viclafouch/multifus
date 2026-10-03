@@ -11,35 +11,15 @@
 @import '@multifus/retro/styles/theme.css';
 @import '@multifus/retro/styles/retro.css';
 
-@layer base {
-  html,
-  body {
-    @apply overflow-hidden bg-transparent font-sans text-foreground antialiased;
-
-    user-select: none;
-    cursor: default;
-  }
-}
+@import './sheet.css';
 
 @utility rune-sheet {
+  @apply sheet;
+
   width: 100%;
-  border: 1px solid color-mix(in oklch, var(--foreground), transparent 88%);
-  border-radius: var(--radius-lg);
-  background-color: oklch(0.14 0.007 66);
   box-shadow: 0 10px 30px -8px oklch(0 0 0 / 0.7);
   padding-bottom: calc(var(--spacing) * 1.5);
   cursor: grab;
-  overflow: hidden;
-}
-
-@utility rune-crown {
-  display: flex;
-  align-items: center;
-  gap: calc(var(--spacing) * 2);
-  padding: calc(var(--spacing) * 1.5) calc(var(--spacing) * 2)
-    calc(var(--spacing) * 1.5) calc(var(--spacing) * 3);
-  border-bottom: 1px solid
-    color-mix(in oklch, var(--foreground), transparent 92%);
 }
 
 @utility rune-grid {

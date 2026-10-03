@@ -26,6 +26,7 @@ pub enum Work {
     Banner,
     Wheel,
     RuneTable,
+    Notes,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -290,6 +291,19 @@ pub enum JournalEvent {
         detail: String,
     },
 
+    NotesFailed {
+        detail: String,
+    },
+
+    NoteLoadFailed {
+        detail: String,
+        set_aside: Option<String>,
+    },
+
+    NoteSaveFailed {
+        detail: String,
+    },
+
     DisplayAwake {
         held: bool,
     },
@@ -437,6 +451,8 @@ pub enum RelayFailure {
 )]
 pub enum QuickTextFailure {
     OutsideGame,
+
+    NotesHoldKeyboard,
 
     ForegroundUnknown { detail: String },
 

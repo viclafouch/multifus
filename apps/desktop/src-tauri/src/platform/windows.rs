@@ -152,6 +152,7 @@ use windows::Win32::UI::WindowsAndMessaging::SPI_SETFOREGROUNDLOCKTIMEOUT;
 use windows::Win32::UI::WindowsAndMessaging::SPIF_SENDCHANGE;
 use windows::Win32::UI::WindowsAndMessaging::SW_MAXIMIZE;
 use windows::Win32::UI::WindowsAndMessaging::SW_RESTORE;
+use windows::Win32::UI::WindowsAndMessaging::SW_SHOWNOACTIVATE;
 use windows::Win32::UI::WindowsAndMessaging::SWP_NOACTIVATE;
 use windows::Win32::UI::WindowsAndMessaging::SWP_NOMOVE;
 use windows::Win32::UI::WindowsAndMessaging::SWP_NOSIZE;
@@ -503,6 +504,28 @@ impl WindowManager for Win32WindowManager {
         }
 
         brought_to_front(handle)
+    }
+
+    fn raise(&self, window: WindowId) -> Result<()> {
+        let handle = live_game_window(window)?;
+
+        if unsafe { IsIconic(handle) }.as_bool() {
+            let _ = unsafe { ShowWindow(handle, SW_SHOWNOACTIVATE) };
+        }
+
+        // SAFETY: the handle names a client the call above found alive, and no flag hands it the keyboard.
+        unsafe {
+            SetWindowPos(
+                handle,
+                Some(HWND_TOP),
+                0,
+                0,
+                0,
+                0,
+                SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE,
+            )
+        }
+        .map_err(|error| PlatformError::system("raising a client", error.to_string()))
     }
 
     fn client_windows(&self) -> Result<Vec<WindowId>> {
@@ -1234,6 +1257,10 @@ fn window_scale(handle: HWND) -> f64 {
     }
 
     f64::from(across) / DOTS_PER_INCH
+}
+
+pub fn take_keyboard(ours: *mut c_void) -> Result<()> {
+    brought_to_front(HWND(ours))
 }
 
 #[must_use]

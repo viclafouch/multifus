@@ -2,6 +2,7 @@ export type ShortcutAction =
   | 'main'
   | 'maximizeAll'
   | 'next'
+  | 'notes'
   | 'previous'
   | 'runeTable'
   | 'toggleExcluded'

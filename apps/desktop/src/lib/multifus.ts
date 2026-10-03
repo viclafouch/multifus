@@ -1,5 +1,6 @@
 import { invoke } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event'
+import type { JSONContent } from '@tiptap/core'
 import type { AboutLink } from '@/@types/about'
 import type { Display } from '@/@types/display'
 import type { Language } from '@/@types/language'
@@ -306,6 +307,23 @@ export const recallRuneTable = async () => {
 
 export const runeTableMeasured = async (ratio: number) => {
   return invoke<null>('rune_table_measured', { ratio })
+}
+
+export const note = async () => {
+  return invoke<JSONContent | null>('note')
+}
+
+// oxlint-disable-next-line typescript/prefer-readonly-parameter-types -- Tiptap declares JSONContent mutable all the way down, and the bridge only hands it on
+export const writeNote = async (written: JSONContent) => {
+  return invoke<null>('write_note', { note: written })
+}
+
+export const closeNotes = async () => {
+  return invoke<null>('close_notes')
+}
+
+export const notesTakeKeyboard = async () => {
+  return invoke<null>('notes_take_keyboard')
 }
 
 export const setWakesMinimized = async (wakes: boolean) => {

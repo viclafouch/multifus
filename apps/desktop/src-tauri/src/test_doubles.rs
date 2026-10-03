@@ -33,6 +33,7 @@ use crate::platform::WindowManager;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Asked {
     Focused(WindowId),
+    Raised(WindowId),
     Maximized(WindowId),
     ShortTitles {
         short: bool,
@@ -234,6 +235,12 @@ impl WindowManager for FakeWindowManager {
         }
 
         Ok(())
+    }
+
+    fn raise(&self, window: WindowId) -> Result<()> {
+        self.write_down(Asked::Raised(window));
+
+        unless_refused(self.desktop().focus_refusal, ())
     }
 
     fn client_windows(&self) -> Result<Vec<WindowId>> {

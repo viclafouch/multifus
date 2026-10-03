@@ -30,7 +30,15 @@ pub use macos::hold_back_activation;
 #[cfg(target_os = "macos")]
 pub use macos::lay_above;
 #[cfg(target_os = "macos")]
+pub use macos::let_keyboard_go;
+#[cfg(target_os = "macos")]
 pub use macos::matches_frontmost;
+#[cfg(target_os = "macos")]
+pub use macos::pose_as_notes_panel;
+#[cfg(target_os = "macos")]
+pub use macos::show_notes;
+#[cfg(target_os = "macos")]
+pub use macos::take_keyboard;
 pub use notification::NotificationReport;
 pub use notification::NotificationSink;
 pub use notification::NotificationWatcher;
@@ -54,6 +62,8 @@ pub use windows::lay_above;
 pub use windows::matches_frontmost;
 #[cfg(target_os = "windows")]
 pub use windows::matches_windows_eleven;
+#[cfg(target_os = "windows")]
+pub use windows::take_keyboard;
 
 #[cfg(not(target_os = "windows"))]
 #[must_use]

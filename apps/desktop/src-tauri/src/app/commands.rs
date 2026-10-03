@@ -12,6 +12,7 @@ use crate::app::links;
 use crate::app::links::AboutLink;
 use crate::app::links::SystemPage;
 use crate::app::main_window;
+use crate::app::notes;
 use crate::app::relay;
 use crate::app::rune_table;
 use crate::app::runtime;
@@ -623,4 +624,24 @@ pub fn reveal_quarantined_config(app: AppHandle) {
 #[tauri::command]
 pub fn open_about_link(app: AppHandle, link: AboutLink) {
     links::open_about(&app, link);
+}
+
+#[tauri::command]
+pub fn note(app: AppHandle) -> Option<serde_json::Value> {
+    notes::note(&app)
+}
+
+#[tauri::command]
+pub fn write_note(app: AppHandle, note: serde_json::Value) {
+    notes::write(&app, note);
+}
+
+#[tauri::command(async)]
+pub fn close_notes(app: AppHandle) {
+    notes::close(&app);
+}
+
+#[tauri::command]
+pub fn notes_take_keyboard(app: AppHandle) {
+    notes::take_keyboard(&app);
 }

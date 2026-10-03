@@ -672,6 +672,15 @@ const QUICK_TEXT_CASES = {
       line: 'Texte rapide ignoré : aucune fenêtre Dofus au premier plan.'
     }
   ],
+  notesHoldKeyboard: [
+    {
+      event: {
+        kind: 'quickTextFailed',
+        reason: { reason: 'notesHoldKeyboard' }
+      },
+      line: 'Texte rapide ignoré : les notes ont le clavier, et ce texte va au chat du jeu.'
+    }
+  ],
   foregroundUnknown: [
     {
       event: {
@@ -1374,6 +1383,32 @@ const JOURNAL_CASES = {
     {
       event: { kind: 'runeTableFailed', detail: DETAIL },
       line: `Le tableau des runes n’a pas suivi : ${DETAIL}`
+    }
+  ],
+  notesFailed: [
+    {
+      event: { kind: 'notesFailed', detail: DETAIL },
+      line: `Les notes n’ont pas suivi : ${DETAIL}`
+    }
+  ],
+  noteLoadFailed: [
+    {
+      event: {
+        kind: 'noteLoadFailed',
+        detail: DETAIL,
+        setAside: '/tmp/multifus/note.invalid-1.json'
+      },
+      line: `Note illisible, les notes repartent vides (${DETAIL}). Fichier mis de côté : /tmp/multifus/note.invalid-1.json`
+    },
+    {
+      event: { kind: 'noteLoadFailed', detail: DETAIL, setAside: null },
+      line: `Note illisible et impossible à déplacer : elle ne sera pas écrasée, et rien de ce qui est écrit ne sera enregistré (${DETAIL}).`
+    }
+  ],
+  noteSaveFailed: [
+    {
+      event: { kind: 'noteSaveFailed', detail: DETAIL },
+      line: `Note non enregistrée : ${DETAIL}`
     }
   ],
   wheelFailed: [

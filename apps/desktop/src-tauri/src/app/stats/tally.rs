@@ -27,6 +27,7 @@ pub struct Tally {
     walk_switches: u32,
     walk_turned_on: u32,
     rune_table_opens: u32,
+    notes_opens: u32,
     quick_texts_pasted: u32,
     maximize_all: u32,
     relay_sent: u32,
@@ -52,6 +53,7 @@ impl Default for Tally {
             walk_switches: 0,
             walk_turned_on: 0,
             rune_table_opens: 0,
+            notes_opens: 0,
             quick_texts_pasted: 0,
             maximize_all: 0,
             relay_sent: 0,
@@ -83,6 +85,7 @@ impl Tally {
             "walk_switches": self.walk_switches,
             "walk_turned_on": self.walk_turned_on,
             "rune_table_opens": self.rune_table_opens,
+            "notes_opens": self.notes_opens,
             "quick_texts_pasted": self.quick_texts_pasted,
             "maximize_all": self.maximize_all,
             "relay_sent": self.relay_sent,
@@ -118,6 +121,10 @@ impl Tally {
 
     pub fn count_rune_table_open(&mut self) {
         self.rune_table_opens = self.rune_table_opens.saturating_add(1);
+    }
+
+    pub fn count_notes_open(&mut self) {
+        self.notes_opens = self.notes_opens.saturating_add(1);
     }
 
     pub fn count_health_check(&mut self) {
@@ -212,6 +219,9 @@ impl Tally {
             | JournalEvent::BannerFailed { .. }
             | JournalEvent::WheelFailed { .. }
             | JournalEvent::RuneTableFailed { .. }
+            | JournalEvent::NotesFailed { .. }
+            | JournalEvent::NoteLoadFailed { .. }
+            | JournalEvent::NoteSaveFailed { .. }
             | JournalEvent::DisplayAwakeFailed { .. } => self.count_failure(),
 
             JournalEvent::Started { .. }

@@ -24,6 +24,7 @@ use crate::app::journal_file;
 use crate::app::links;
 use crate::app::links::SystemPage;
 use crate::app::main_window;
+use crate::app::notes;
 use crate::app::panics;
 use crate::app::relay;
 use crate::app::rune_table;
@@ -52,6 +53,8 @@ struct MenuWords {
     rune_table_on: &'static str,
     rune_table_off: &'static str,
     rune_table_home: &'static str,
+    notes_on: &'static str,
+    notes_off: &'static str,
     relay_setup: &'static str,
     relay_on: &'static str,
     relay_off: &'static str,
@@ -73,6 +76,8 @@ const FRENCH_MENU: MenuWords = MenuWords {
     rune_table_on: "Montrer le tableau des runes",
     rune_table_off: "Cacher le tableau des runes",
     rune_table_home: "Remettre le tableau à sa position initiale",
+    notes_on: "Ouvrir les notes",
+    notes_off: "Fermer les notes",
     relay_setup: "Configurer les messages privés…",
     relay_on: "Activer les messages privés sur le téléphone",
     relay_off: "Désactiver les messages privés sur le téléphone",
@@ -98,6 +103,8 @@ const ENGLISH_MENU: MenuWords = MenuWords {
     rune_table_on: "Show the rune table",
     rune_table_off: "Hide the rune table",
     rune_table_home: "Put the table back where it started",
+    notes_on: "Open notes",
+    notes_off: "Close notes",
     relay_setup: "Set up private messages…",
     relay_on: "Turn private messages to phone on",
     relay_off: "Turn private messages to phone off",
@@ -123,6 +130,8 @@ const SPANISH_MENU: MenuWords = MenuWords {
     rune_table_on: "Mostrar la tabla de runas",
     rune_table_off: "Ocultar la tabla de runas",
     rune_table_home: "Devolver la tabla a su posición inicial",
+    notes_on: "Abrir las notas",
+    notes_off: "Cerrar las notas",
     relay_setup: "Configurar los mensajes privados…",
     relay_on: "Activar los mensajes privados en el teléfono",
     relay_off: "Desactivar los mensajes privados en el teléfono",
@@ -143,7 +152,7 @@ fn words(language: Language) -> &'static MenuWords {
     }
 }
 
-fn notes_label(version: &str, language: Language) -> String {
+fn patch_notes_label(version: &str, language: Language) -> String {
     match language {
         Language::Fr => format!("Voir le patch note {version}"),
         Language::En => format!("See the {version} patch notes"),
@@ -177,9 +186,11 @@ const RUNE_TABLE_ID: &str = "multifus://rune-table";
 
 const RUNE_TABLE_HOME_ID: &str = "multifus://rune-table-home";
 
+const NOTES_ID: &str = "multifus://notes";
+
 const UPDATE_ID: &str = "multifus://update";
 
-const NOTES_ID: &str = "multifus://notes";
+const PATCH_NOTES_ID: &str = "multifus://patch-notes";
 
 const JOURNAL_ID: &str = "multifus://journal";
 
@@ -196,6 +207,7 @@ enum TrayWork {
     MaximizeAll,
     RuneTable,
     RecallRuneTable,
+    Notes,
 }
 
 type TrayQueue = Sender<TrayWork>;
@@ -209,9 +221,10 @@ struct Contents {
     auto_focus: bool,
     walk: bool,
     rune_table: bool,
+    notes: bool,
     denied: bool,
     update: Option<String>,
-    notes: Option<String>,
+    patch_notes: Option<String>,
     relay: RelayItem,
 }
 
@@ -266,9 +279,10 @@ fn contents(state: &Multifus) -> Contents {
         auto_focus: state.is_auto_focus_enabled(),
         walk: state.is_walk_enabled(),
         rune_table: state.is_rune_table_open(),
+        notes: state.are_notes_open(),
         denied: state.is_denied(),
         update: state.available_update(),
-        notes: state.unread_notes(),
+        patch_notes: state.unread_patch_notes(),
         relay: relay_item(state),
     }
 }
@@ -408,17 +422,17 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
         )?)?;
     }
 
-    if let Some(version) = &contents.notes {
+    if let Some(version) = &contents.patch_notes {
         menu.append(&MenuItem::with_id(
             app,
-            NOTES_ID,
-            notes_label(version, contents.language),
+            PATCH_NOTES_ID,
+            patch_notes_label(version, contents.language),
             true,
             None::<&str>,
         )?)?;
     }
 
-    if contents.update.is_some() || contents.notes.is_some() {
+    if contents.update.is_some() || contents.patch_notes.is_some() {
         menu.append(&PredefinedMenuItem::separator(app)?)?;
     }
 
@@ -514,6 +528,14 @@ fn build_menu(app: &AppHandle, contents: &Contents) -> tauri::Result<Menu<Wry>> 
 
     menu.append(&MenuItem::with_id(
         app,
+        NOTES_ID,
+        switch_label(contents.notes, words.notes_off, words.notes_on),
+        true,
+        None::<&str>,
+    )?)?;
+
+    menu.append(&MenuItem::with_id(
+        app,
         RELAY_ID,
         relay_label(contents.relay, contents.language),
         contents.matches_relay_switchable(),
@@ -580,7 +602,7 @@ fn on_menu_event(app: &AppHandle, event: MenuEvent) {
         return;
     }
 
-    if id == NOTES_ID {
+    if id == PATCH_NOTES_ID {
         links::open_release_notes(app);
         runtime::emit_snapshot(app);
 
@@ -617,6 +639,12 @@ fn on_menu_event(app: &AppHandle, event: MenuEvent) {
 
     if id == RUNE_TABLE_HOME_ID {
         hand_over(app, TrayWork::RecallRuneTable);
+
+        return;
+    }
+
+    if id == NOTES_ID {
+        hand_over(app, TrayWork::Notes);
 
         return;
     }
@@ -707,6 +735,7 @@ fn carry_out(app: &AppHandle, work: &TrayWork) {
             runtime::emit_snapshot(app);
         }
         TrayWork::RecallRuneTable => rune_table::recall(app),
+        TrayWork::Notes => notes::toggle(app),
     }
 }
 
@@ -1004,17 +1033,17 @@ mod tests {
     }
 
     #[test]
-    fn the_notes_line_names_the_version_just_installed() {
+    fn the_patch_notes_line_names_the_version_just_installed() {
         assert_eq!(
-            notes_label("0.3.0", Language::Fr),
+            patch_notes_label("0.3.0", Language::Fr),
             "Voir le patch note 0.3.0"
         );
         assert_eq!(
-            notes_label("0.3.0", Language::En),
+            patch_notes_label("0.3.0", Language::En),
             "See the 0.3.0 patch notes"
         );
         assert_eq!(
-            notes_label("0.3.0", Language::Es),
+            patch_notes_label("0.3.0", Language::Es),
             "Ver las notas del parche 0.3.0"
         );
     }
@@ -1059,9 +1088,10 @@ mod tests {
             auto_focus: true,
             walk: false,
             rune_table: false,
+            notes: false,
             denied: false,
             update: None,
-            notes: None,
+            patch_notes: None,
             relay: RelayItem::NotReady,
         };
 
@@ -1083,9 +1113,10 @@ mod tests {
             auto_focus: true,
             walk: false,
             rune_table: false,
+            notes: false,
             denied: false,
             update: None,
-            notes: None,
+            patch_notes: None,
             relay: RelayItem::NotReady,
         };
 
@@ -1103,6 +1134,34 @@ mod tests {
                 ..contents.clone()
             },
             "the relay has to move the comparison, or the menu sleeps through it"
+        );
+    }
+
+    #[test]
+    fn the_notes_open_and_close_from_the_menu_in_every_language_with_nobody_online() {
+        let directory = directory();
+        let mut state =
+            test_doubles::multifus(&directory, test_doubles::intact(Settings::default()));
+
+        assert!(!contents(&state).notes);
+
+        state.set_notes_shown(true);
+
+        assert!(
+            contents(&state).notes,
+            "the menu has to say « Fermer les notes » once they are open"
+        );
+        assert_eq!(
+            Language::ALL.map(|language| {
+                let words = words(language);
+
+                (words.notes_on, words.notes_off)
+            }),
+            [
+                ("Ouvrir les notes", "Fermer les notes"),
+                ("Open notes", "Close notes"),
+                ("Abrir las notas", "Cerrar las notas"),
+            ]
         );
     }
 }

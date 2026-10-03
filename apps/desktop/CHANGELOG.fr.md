@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Nouveautés
+
+- Les notes : une petite fenêtre au-dessus du jeu pour garder un prix de l’HDV, une recette ou le pseudo croisé tout à l’heure, partagée par tous vos personnages. Elle s’ouvre prête à écrire avec Ctrl+Maj+N ou depuis le menu de l’icône, garde le gras et les listes, et retrouve votre texte et sa place au prochain lancement. Pendant que vous écrivez, l’AutoFocus et vos raccourcis changent de personnage sans vous couper la phrase.
+
 ### Améliorations
 
 - Le menu de l’icône dit maintenant « Activer les messages privés sur le téléphone » et « Désactiver les messages privés sur le téléphone », au lieu d’un « Ne plus les recevoir » qu’on ne comprenait pas. L’interrupteur de l’écran Messages privés prend le même nom.

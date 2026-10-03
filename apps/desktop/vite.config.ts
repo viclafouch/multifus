@@ -33,7 +33,8 @@ export default defineConfig({
         main: path.resolve(import.meta.dirname, './index.html'),
         banner: path.resolve(import.meta.dirname, './banner.html'),
         wheel: path.resolve(import.meta.dirname, './wheel.html'),
-        runeTable: path.resolve(import.meta.dirname, './rune-table.html')
+        runeTable: path.resolve(import.meta.dirname, './rune-table.html'),
+        notes: path.resolve(import.meta.dirname, './notes.html')
       }
     }
   },

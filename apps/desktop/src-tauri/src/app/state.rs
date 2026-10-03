@@ -66,6 +66,7 @@ use crate::config::ConfigStore;
 use crate::config::Language;
 use crate::config::Loaded;
 use crate::config::Loop;
+use crate::config::NotesPlace;
 use crate::config::QuickText;
 use crate::config::QuickTextId;
 use crate::config::RUNE_TABLE_CLEAREST;
@@ -204,6 +205,7 @@ pub struct Multifus {
     banner_character: Option<BannerCharacter>,
     rune_table_open: bool,
     rune_table_previewing: bool,
+    notes_open: bool,
     first_launch: bool,
     journal: Journal,
     tally: Tally,
@@ -302,6 +304,7 @@ impl Multifus {
             banner_character: None,
             rune_table_open: false,
             rune_table_previewing: false,
+            notes_open: false,
             first_launch,
             journal,
             tally: Tally::new(),
@@ -730,6 +733,7 @@ impl Multifus {
             ShortcutAction::MaximizeAll => &mut self.settings.shortcuts.maximize_all,
             ShortcutAction::Wheel => &mut self.settings.shortcuts.wheel,
             ShortcutAction::RuneTable => &mut self.settings.shortcuts.rune_table,
+            ShortcutAction::Notes => &mut self.settings.shortcuts.notes,
         };
 
         *slot = shortcut;
@@ -1242,6 +1246,32 @@ impl Multifus {
     }
 
     #[must_use]
+    pub fn are_notes_open(&self) -> bool {
+        self.notes_open
+    }
+
+    pub fn set_notes_shown(&mut self, open: bool) {
+        if open && !self.notes_open {
+            self.tally.count_notes_open();
+        }
+
+        self.notes_open = open;
+    }
+
+    #[must_use]
+    pub fn notes_place(&self) -> Option<NotesPlace> {
+        self.settings.notes_place
+    }
+
+    pub fn set_notes_place(&mut self, place: NotesPlace) -> bool {
+        let moved = self.settings.notes_place != Some(place);
+
+        self.settings.notes_place = Some(place);
+
+        moved
+    }
+
+    #[must_use]
     pub fn walk_plan(&self) -> WalkPlan {
         let watched = self.windows.values().copied().collect();
 
@@ -1473,7 +1503,7 @@ impl Multifus {
 
     #[must_use]
     fn arrived_notice(&self) -> Option<ReleaseNotice> {
-        let is_read = self.settings.notes_read.as_ref() == Some(&self.version);
+        let is_read = self.settings.patch_notes_read.as_ref() == Some(&self.version);
 
         (self.settings.onboarding_done && !is_read).then(|| ReleaseNotice::Arrived {
             version: self.version.clone(),
@@ -1481,7 +1511,7 @@ impl Multifus {
     }
 
     #[must_use]
-    pub fn unread_notes(&self) -> Option<String> {
+    pub fn unread_patch_notes(&self) -> Option<String> {
         match self.release_notice() {
             Some(ReleaseNotice::Arrived { version }) => Some(version),
             Some(ReleaseNotice::Ready { .. }) | None => None,
@@ -1497,7 +1527,7 @@ impl Multifus {
                     found.is_put_aside = true;
                 }
             }
-            Some(ReleaseNotice::Arrived { version }) => self.mark_notes_read(version),
+            Some(ReleaseNotice::Arrived { version }) => self.mark_patch_notes_read(version),
             None => {}
         }
     }
@@ -1506,14 +1536,14 @@ impl Multifus {
         let notice = self.release_notice()?;
 
         if let ReleaseNotice::Arrived { version } = &notice {
-            self.mark_notes_read(version.clone());
+            self.mark_patch_notes_read(version.clone());
         }
 
         Some(notice.version().to_owned())
     }
 
-    fn mark_notes_read(&mut self, version: String) {
-        self.settings.notes_read = Some(version);
+    fn mark_patch_notes_read(&mut self, version: String) {
+        self.settings.patch_notes_read = Some(version);
         self.save();
     }
 
@@ -1777,7 +1807,7 @@ impl Multifus {
 
     pub fn finish_onboarding(&mut self) {
         self.settings.onboarding_done = true;
-        self.settings.notes_read = Some(self.version.clone());
+        self.settings.patch_notes_read = Some(self.version.clone());
         self.save();
     }
 
@@ -1947,7 +1977,8 @@ impl Multifus {
             ShortcutAction::Walk
             | ShortcutAction::MaximizeAll
             | ShortcutAction::Wheel
-            | ShortcutAction::RuneTable => None,
+            | ShortcutAction::RuneTable
+            | ShortcutAction::Notes => None,
         }
     }
 
@@ -2088,6 +2119,7 @@ fn shortcut_in(shortcuts: &Shortcuts, action: ShortcutAction) -> Option<&Shortcu
         ShortcutAction::MaximizeAll => shortcuts.maximize_all.as_ref(),
         ShortcutAction::Wheel => shortcuts.wheel.as_ref(),
         ShortcutAction::RuneTable => shortcuts.rune_table.as_ref(),
+        ShortcutAction::Notes => shortcuts.notes.as_ref(),
     }
 }
 
@@ -2211,6 +2243,8 @@ mod tests {
         state.count_walk_switch();
         state.count_health_check();
         state.set_rune_table_shown(true, false);
+        state.set_notes_shown(true);
+        state.set_notes_shown(true);
 
         let counted = counters(&state);
 
@@ -2220,6 +2254,7 @@ mod tests {
         assert_eq!(counted["walk_switches"], json!(1));
         assert_eq!(counted["health_checks"], json!(1));
         assert_eq!(counted["rune_table_opens"], json!(1));
+        assert_eq!(counted["notes_opens"], json!(1));
     }
 
     #[test]
@@ -2878,8 +2913,9 @@ mod tests {
                 ShortcutAction::MaximizeAll,
                 ShortcutAction::Wheel,
                 ShortcutAction::RuneTable,
+                ShortcutAction::Notes,
             ],
-            "these four set a mechanism going, and no window moves for them"
+            "these five set a mechanism going, and no window moves for them"
         );
     }
 
@@ -3401,7 +3437,7 @@ mod tests {
     }
 
     #[test]
-    fn the_eight_actions_come_before_the_characters_and_the_quick_texts() {
+    fn the_nine_actions_come_before_the_characters_and_the_quick_texts() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
         state.apply_windows(&[window(1, "Alpha")]);
@@ -3412,7 +3448,7 @@ mod tests {
 
         let bindings = state.bindings();
 
-        assert_eq!(bindings.len(), 11);
+        assert_eq!(bindings.len(), 12);
         assert_eq!(
             bindings.first().map(|(binding, _)| binding.clone()),
             Some(Binding::Action {
@@ -4328,10 +4364,10 @@ mod tests {
         })
     }
 
-    fn multifus_played(directory: &TempDir, notes_read: Option<&str>) -> Multifus {
+    fn multifus_played(directory: &TempDir, patch_notes_read: Option<&str>) -> Multifus {
         let settings = Settings {
             onboarding_done: true,
-            notes_read: notes_read.map(str::to_owned),
+            patch_notes_read: patch_notes_read.map(str::to_owned),
             ..Settings::default()
         };
 
@@ -4415,7 +4451,7 @@ mod tests {
     }
 
     #[test]
-    fn reading_the_notes_of_a_version_found_leaves_it_to_install() {
+    fn reading_the_patch_notes_of_a_version_found_leaves_it_to_install() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus_played(&directory, Some("0.0.0"));
 
@@ -4426,7 +4462,7 @@ mod tests {
     }
 
     #[test]
-    fn a_version_just_installed_is_told_until_its_notes_are_read_even_after_a_restart() {
+    fn a_version_just_installed_is_told_until_its_patch_notes_are_read_even_after_a_restart() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus_played(&directory, Some("0.0.0-alpha"));
 
@@ -4445,7 +4481,7 @@ mod tests {
     }
 
     #[test]
-    fn a_player_from_before_the_notes_were_kept_is_told_of_the_version_installed() {
+    fn a_player_from_before_the_patch_notes_were_kept_is_told_of_the_version_installed() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus_played(&directory, None);
 
@@ -4483,7 +4519,7 @@ mod tests {
         assert_eq!(state.release_notice(), ready("0.3.0"));
 
         assert_eq!(
-            state.unread_notes(),
+            state.unread_patch_notes(),
             None,
             "the menu offers the install first"
         );
@@ -4491,7 +4527,7 @@ mod tests {
         state.dismiss_release_notice();
 
         assert_eq!(state.release_notice(), arrived("0.0.0"));
-        assert_eq!(state.unread_notes().as_deref(), Some("0.0.0"));
+        assert_eq!(state.unread_patch_notes().as_deref(), Some("0.0.0"));
     }
 
     fn check_of_step(state: &Multifus, step: Step) -> Check {

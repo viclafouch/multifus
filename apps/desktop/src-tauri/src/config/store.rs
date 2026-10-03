@@ -1,23 +1,17 @@
 use std::fs;
 use std::io;
-use std::io::Write;
 use std::path::Path;
 use std::path::PathBuf;
-use std::time::SystemTime;
-use std::time::UNIX_EPOCH;
 
 use tauri::Manager;
 use tauri::Runtime;
 
 use crate::config::error::ConfigError;
 use crate::config::error::Result;
+use crate::config::file;
 use crate::config::settings::Settings;
 
 pub const FILE_NAME: &str = "config.json";
-
-const TEMPORARY_SUFFIX: &str = ".writing";
-
-const QUARANTINE_ATTEMPTS: u32 = 100;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ConfigStore {
@@ -65,7 +59,7 @@ impl ConfigStore {
             }
         };
 
-        match serde_json::from_slice::<Settings>(&bytes) {
+        match Settings::from_stored(&bytes) {
             Ok(settings) => Loaded::read(settings),
             Err(error) => {
                 let failure = ConfigError::malformed(&self.path, error.to_string());
@@ -86,98 +80,18 @@ impl ConfigStore {
     }
 
     pub fn save(&self, settings: &Settings) -> Result<()> {
-        if let Some(directory) = self.path.parent() {
-            fs::create_dir_all(directory).map_err(|error| {
-                ConfigError::io("creating the configuration directory", directory, &error)
-            })?;
-        }
-
         let mut json =
             serde_json::to_string_pretty(settings).map_err(|error| ConfigError::Encoding {
                 detail: error.to_string(),
             })?;
         json.push('\n');
 
-        let temporary = self.temporary_path();
-
-        if let Err(error) = write_whole_file(&temporary, json.as_bytes()) {
-            let _ = fs::remove_file(&temporary);
-
-            return Err(error);
-        }
-
-        if let Err(error) = fs::rename(&temporary, &self.path) {
-            let _ = fs::remove_file(&temporary);
-
-            return Err(ConfigError::io(
-                "replacing the configuration",
-                &self.path,
-                &error,
-            ));
-        }
-
-        Ok(())
+        file::write_whole(&self.path, json.as_bytes())
     }
 
     fn quarantine(&self) -> Result<PathBuf> {
-        let target = self.quarantine_path().ok_or_else(|| ConfigError::Encoding {
-            detail: format!(
-                "no free name for the configuration to be set aside to, after {QUARANTINE_ATTEMPTS} attempts"
-            ),
-        })?;
-
-        fs::rename(&self.path, &target)
-            .map_err(|error| ConfigError::io("setting the configuration aside", &target, &error))?;
-
-        Ok(target)
+        file::set_aside(&self.path)
     }
-
-    fn quarantine_path(&self) -> Option<PathBuf> {
-        let stem = self
-            .path
-            .file_stem()
-            .unwrap_or_else(|| "config".as_ref())
-            .to_string_lossy()
-            .into_owned();
-
-        let seconds = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .map(|elapsed| elapsed.as_secs())
-            .unwrap_or_default();
-
-        let first = self
-            .path
-            .with_file_name(format!("{stem}.invalid-{seconds}.json"));
-
-        if !first.exists() {
-            return Some(first);
-        }
-
-        (1..QUARANTINE_ATTEMPTS)
-            .map(|attempt| {
-                self.path
-                    .with_file_name(format!("{stem}.invalid-{seconds}-{attempt}.json"))
-            })
-            .find(|candidate| !candidate.exists())
-    }
-
-    fn temporary_path(&self) -> PathBuf {
-        let mut name = self.path.as_os_str().to_owned();
-        name.push(TEMPORARY_SUFFIX);
-
-        PathBuf::from(name)
-    }
-}
-
-fn write_whole_file(path: &Path, bytes: &[u8]) -> Result<()> {
-    let mut file =
-        fs::File::create(path).map_err(|error| ConfigError::io("opening", path, &error))?;
-
-    file.write_all(bytes)
-        .map_err(|error| ConfigError::io("writing", path, &error))?;
-
-    file.sync_all()
-        .map_err(|error| ConfigError::io("flushing", path, &error))
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -244,6 +158,7 @@ mod tests {
     use crate::config::settings::Banner;
     use crate::config::settings::BannerCorner;
     use crate::config::settings::LoopsSeen;
+    use crate::config::settings::NotesPlace;
     use crate::config::settings::QuickText;
     use crate::config::settings::QuickTextId;
     use crate::config::settings::RUNE_TABLE_CLEAREST;
@@ -277,7 +192,7 @@ mod tests {
         Settings {
             language: Some(Language::En),
             onboarding_done: true,
-            notes_read: Some("0.2.0".to_owned()),
+            patch_notes_read: Some("0.2.0".to_owned()),
             roster: Roster::from_characters(vec![
                 Character::new("Alpha")
                     .with_gender(Gender::Male)
@@ -297,6 +212,7 @@ mod tests {
                 maximize_all: Shortcut::new("Alt+KeyA"),
                 wheel: Shortcut::new("Alt+KeyW"),
                 rune_table: Shortcut::new("Alt+KeyR"),
+                notes: Shortcut::new("Alt+KeyN"),
             },
             maximize_on_launch: true,
             short_titles: true,
@@ -333,6 +249,12 @@ mod tests {
                 offset: Some(RuneOffset { x: 32.0, y: 24.0 }),
                 everywhere: true,
             },
+            notes_place: Some(NotesPlace {
+                x: 1480.0,
+                y: 120.0,
+                width: 360.0,
+                height: 440.0,
+            }),
             start_at_login: true,
             traces: Traces {
                 portraits: HashSet::from(["Alpha".to_owned()]),
@@ -672,7 +594,7 @@ mod tests {
         let settings = a_settled_configuration();
         store.save(&settings).expect("the configuration is written");
 
-        let temporary = store.temporary_path();
+        let temporary = file::temporary_path(store.path());
         fs::write(&temporary, "{ half a configu").expect("the leftover is written");
 
         assert_eq!(store.load().settings, as_stored(&settings));

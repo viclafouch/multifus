@@ -49,6 +49,7 @@ export type Surface = 'shortcut' | 'tray' | 'window'
 
 export type Work =
   | 'banner'
+  | 'notes'
   | 'runeTable'
   | 'scan'
   | 'shortcuts'

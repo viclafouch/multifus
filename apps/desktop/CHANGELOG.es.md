@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Novedades
+
+- Las notas: una pequeña ventana sobre el juego para guardar un precio del mercadillo, una receta o el nombre con el que te cruzaste antes, compartida por todos tus personajes. Se abre lista para escribir con Ctrl+Mayús+N o desde el menú del icono, conserva la negrita y las listas, y recupera tu texto y su sitio en el siguiente arranque. Mientras escribes, el AutoFocus y tus atajos cambian de personaje sin cortarte la frase.
+
 ### Mejoras
 
 - El menú del icono dice ahora «Activar los mensajes privados en el teléfono» y «Desactivar los mensajes privados en el teléfono», en lugar de un «Dejar de recibirlos» que no se entendía. El interruptor de la pantalla Mensajes privados lleva el mismo nombre.

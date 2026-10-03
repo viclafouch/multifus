@@ -1,16 +1,21 @@
 pub mod error;
+pub mod file;
 pub mod language;
+pub mod note;
 pub mod settings;
 pub mod store;
 
 pub use error::ConfigError;
 pub use error::Result;
 pub use language::Language;
+pub use note::NoteLoaded;
+pub use note::NoteStore;
 pub use settings::AutoFocus;
 pub use settings::Banner;
 pub use settings::BannerCorner;
 pub use settings::Loop;
 pub use settings::LoopsSeen;
+pub use settings::NotesPlace;
 pub use settings::QuickText;
 pub use settings::QuickTextId;
 pub use settings::RUNE_TABLE_CLEAREST;

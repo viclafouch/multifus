@@ -164,6 +164,17 @@ const configLoadFailedLine = ({
   return t`Configuration non chargée, Multifus est reparti sur ses réglages par défaut (${detail}). Fichier mis de côté : ${quarantined}`
 }
 
+const noteLoadFailedLine = ({
+  detail,
+  setAside
+}: Extract<JournalEvent, { kind: 'noteLoadFailed' }>) => {
+  if (setAside === null) {
+    return t`Note illisible et impossible à déplacer : elle ne sera pas écrasée, et rien de ce qui est écrit ne sera enregistré (${detail}).`
+  }
+
+  return t`Note illisible, les notes repartent vides (${detail}). Fichier mis de côté : ${setAside}`
+}
+
 const authorizationRequestedLine = ({
   failure,
   granted
@@ -198,6 +209,9 @@ const quickTextFailedLine = (failure: QuickTextFailure) => {
   switch (failure.reason) {
     case 'outsideGame': {
       return t`Texte rapide ignoré : aucune fenêtre Dofus au premier plan.`
+    }
+    case 'notesHoldKeyboard': {
+      return t`Texte rapide ignoré : les notes ont le clavier, et ce texte va au chat du jeu.`
     }
     case 'foregroundUnknown': {
       const { detail } = failure
@@ -768,6 +782,7 @@ type RunEventKind =
   | 'characterOnline'
   | 'configLoadFailed'
   | 'displayAwake'
+  | 'noteLoadFailed'
   | 'notification'
   | 'panicked'
   | 'relayFailed'
@@ -788,6 +803,7 @@ const RUN_KINDS = new Set<ComposedEventKind>([
   'characterOnline',
   'configLoadFailed',
   'displayAwake',
+  'noteLoadFailed',
   'notification',
   'panicked',
   'relayFailed',
@@ -827,6 +843,9 @@ const runLine = (
     }
     case 'configLoadFailed': {
       return configLoadFailedLine(event)
+    }
+    case 'noteLoadFailed': {
+      return noteLoadFailedLine(event)
     }
     case 'authorization': {
       return event.granted

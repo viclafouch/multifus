@@ -69,6 +69,7 @@ export type QuickTextFailure =
   | { readonly reason: 'clipboardRefused'; readonly detail: string }
   | { readonly reason: 'foregroundUnknown'; readonly detail: string }
   | { readonly reason: 'gone' }
+  | { readonly reason: 'notesHoldKeyboard' }
   | { readonly reason: 'outsideGame' }
   | { readonly reason: 'pasteRefused'; readonly detail: string }
 
@@ -187,6 +188,13 @@ export type JournalEvent =
   | { readonly kind: 'bannerFailed'; readonly detail: string }
   | { readonly kind: 'wheelFailed'; readonly detail: string }
   | { readonly kind: 'runeTableFailed'; readonly detail: string }
+  | { readonly kind: 'notesFailed'; readonly detail: string }
+  | {
+      readonly kind: 'noteLoadFailed'
+      readonly detail: string
+      readonly setAside: string | null
+    }
+  | { readonly kind: 'noteSaveFailed'; readonly detail: string }
   | { readonly kind: 'wheelPicked'; readonly outcome: WheelOutcome }
   | { readonly kind: 'walkSwitchFailed'; readonly detail: string }
   | { readonly kind: 'windowFailed'; readonly detail: string }

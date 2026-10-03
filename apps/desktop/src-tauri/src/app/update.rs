@@ -8,6 +8,7 @@ use tauri_plugin_updater::Update;
 use tauri_plugin_updater::UpdaterExt;
 
 use crate::app::journal::JournalEvent;
+use crate::app::notes;
 use crate::app::runtime;
 use crate::app::state::lock;
 use crate::app::stats;
@@ -56,6 +57,7 @@ async fn look(app: &AppHandle) -> tauri_plugin_updater::Result<Option<Update>> {
 
     app.updater_builder()
         .on_before_exit(move || {
+            notes::keep(&handle);
             runtime::give_traces_back(&handle);
         })
         .build()?
@@ -89,6 +91,8 @@ pub fn install(app: &AppHandle) {
         }
 
         stats::app_updated(&app, &version);
+
+        notes::keep(&app);
 
         app.restart();
     });

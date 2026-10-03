@@ -18,6 +18,7 @@ use crate::app::journal::Outcome;
 use crate::app::journal::Surface;
 use crate::app::journal::Work;
 use crate::app::main_window;
+use crate::app::notes;
 use crate::app::panics;
 use crate::app::portraits;
 use crate::app::relay;
@@ -126,6 +127,7 @@ fn on_wake(app: &AppHandle, waking: Wake) {
             rune_table::note_windows(app);
         }
         Wake::Foreground => {
+            notes::note_foreground(app);
             shortcuts::note_foreground(app);
             rune_table::note_windows(app);
         }
@@ -527,6 +529,7 @@ const GROUP_PREFIX: &str = "multifus.window.";
 
 pub fn on_run_event(app: &AppHandle, event: RunEvent) {
     if matches!(event, RunEvent::Exit) {
+        notes::keep(app);
         give_traces_back(app);
         stats::app_stopped(app);
 
@@ -826,6 +829,8 @@ pub fn change_language(app: &AppHandle, language: Language) {
     lock(app).set_language(language);
 
     tray::refresh(app);
+
+    notes::keep(app);
 
     for window in app.webview_windows().values() {
         if let Err(error) = window.reload() {

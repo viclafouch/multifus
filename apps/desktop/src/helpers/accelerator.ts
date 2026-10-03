@@ -1,3 +1,4 @@
+import type { ShortcutAction, ShortcutBinding } from '@/@types/shortcuts'
 import type { KeyLabels } from '@/@types/system'
 import type { CaptureRejection, Modifier } from '@/constants/keyboard'
 import {
@@ -122,5 +123,16 @@ const isModifierCode = (code: string) => {
     code.startsWith('Shift') ||
     code.startsWith('Alt') ||
     code.startsWith('Meta')
+  )
+}
+
+export const acceleratorOf = (
+  shortcuts: readonly ShortcutBinding[],
+  action: ShortcutAction
+) => {
+  return (
+    shortcuts.find((shortcut) => {
+      return shortcut.action === action
+    })?.accelerator ?? null
   )
 }

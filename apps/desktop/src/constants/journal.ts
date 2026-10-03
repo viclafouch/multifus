@@ -65,6 +65,9 @@ export const TONES = {
   bannerFailed: 'warning',
   wheelFailed: 'warning',
   runeTableFailed: 'warning',
+  notesFailed: 'warning',
+  noteLoadFailed: 'warning',
+  noteSaveFailed: 'warning',
   clientMaximized: 'good',
   clientMaximizeFailed: 'warning',
   clientsCountFailed: 'warning',
@@ -92,6 +95,7 @@ export const TONES = {
 
 export const QUICK_TEXT_FAILURE_TONES = {
   outsideGame: 'neutral',
+  notesHoldKeyboard: 'neutral',
   gone: 'neutral',
   foregroundUnknown: 'warning',
   clipboardRefused: 'warning',
@@ -172,7 +176,7 @@ export const TRAY_TONES = {
 
 type DetailedEventKind = Exclude<
   Extract<JournalEvent, { readonly detail: string }>['kind'],
-  'configLoadFailed' | 'panicked'
+  'configLoadFailed' | 'noteLoadFailed' | 'panicked'
 >
 
 export const DETAILED_LINES = {
@@ -197,6 +201,8 @@ export const DETAILED_LINES = {
   bannerFailed: msg`La bannière du Déplacement rapide n’a pas suivi`,
   wheelFailed: msg`La roue n’a pas suivi`,
   runeTableFailed: msg`Le tableau des runes n’a pas suivi`,
+  notesFailed: msg`Les notes n’ont pas suivi`,
+  noteSaveFailed: msg`Note non enregistrée`,
   saveFailed: msg`Configuration non enregistrée`,
   configNotSetAside: msg`Configuration illisible et impossible à déplacer, le prochain enregistrement l’écrasera`,
   openFailed: msg`Le système n’a pas pu ouvrir cet élément`,
@@ -246,5 +252,6 @@ export const WORK_LABELS = {
   walk: msg`La bascule du Déplacement rapide`,
   banner: msg`La bannière du Déplacement rapide`,
   wheel: msg`La roue`,
-  runeTable: msg`Le tableau des runes`
+  runeTable: msg`Le tableau des runes`,
+  notes: msg`Les notes`
 } as const satisfies Record<Work, Phrase>

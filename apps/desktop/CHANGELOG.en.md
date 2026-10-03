@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New
+
+- Notes: a small window over the game to keep a marketplace price, a recipe or the name you met earlier, shared by all your characters. It opens ready to type with Ctrl+Shift+N or from the icon menu, keeps bold and lists, and finds your text and its place again on the next launch. While you write, AutoFocus and your shortcuts switch characters without cutting your sentence.
+
 ### Improved
 
 - The icon menu now says “Turn private messages to phone on” and “Turn private messages to phone off”, instead of a “Stop getting them” nobody understood. The switch on the Private messages screen takes the same name.
