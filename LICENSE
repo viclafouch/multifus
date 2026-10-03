@@ -1,25 +1,29 @@
-MIT License
+Multifus
+Copyright (c) 2026 Victor de la Fouchardiere. All rights reserved.
 
-Copyright (c) 2026 Victor de la Fouchardiere
+This licence covers the Multifus software, the website published at
+https://multifus.app, and the source code of both, the texts, images and videos
+of the website included, save the Ankama artwork set out below.
 
-The MIT License does not cover packages/ankama. Everything in that directory,
+You may download Multifus from its releases at
+https://github.com/viclafouch/multifus/releases, install it, and use it free of
+charge. You may read the source code, and fork it on GitHub as the GitHub Terms
+of Service allow.
+
+No other right is granted. Without written permission from the copyright
+holder, you may not copy, modify, publish, distribute, sublicense or sell the
+software, the website or their source code, in whole or in part, and you may
+not present a copy of any of them as Multifus.
+
+This licence does not cover packages/ankama. Everything in that directory,
 images, videos and icons alike, belongs to Ankama Games, no right over it is
 granted here, and this project is not affiliated with Ankama.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+The third-party libraries Multifus is built on keep their own licences.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+THE SOFTWARE AND THE WEBSITE ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
+KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO
+EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+OUT OF OR IN CONNECTION WITH THE SOFTWARE, THE WEBSITE OR THEIR USE.

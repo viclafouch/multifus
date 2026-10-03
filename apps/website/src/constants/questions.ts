@@ -5,8 +5,10 @@ import {
   ANKAMA_FORUM,
   ANKAMA_POST,
   GAME,
+  OFFICIAL_DOMAIN,
   RELEASES,
-  REPOSITORY
+  REPOSITORY,
+  REPOSITORY_ADDRESS
 } from '@/constants/site'
 import { SYSTEM_VERSIONS } from '@/constants/systems'
 import { NO_HARM, PAGE_PROMISES } from '@/constants/wording'
@@ -120,6 +122,10 @@ export const QUESTIONS = {
           { kind: 'page', page: 'legal' },
           { kind: 'page', page: 'relay' }
         ]
+      },
+      {
+        said: msg`Le seul site de Multifus est ${OFFICIAL_DOMAIN}, et le seul téléchargement vient de <0>${REPOSITORY_ADDRESS}</0>. Un autre site qui propose Multifus est une copie, et le fichier qu’il donne peut voler votre compte.`,
+        marks: [{ kind: 'out', href: REPOSITORY }]
       }
     ]
   },

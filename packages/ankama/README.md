@@ -3,7 +3,7 @@
 Artwork owned by Ankama Games: images, loops, monsters, portraits and icons.
 Monsters are the dungeon illustrations.
 
-**Not covered by the MIT licence of this repository.** The
+**Not covered by the licence of this repository.** The
 [licence](../../LICENSE) excludes this directory, no right over its contents is
 granted, and this project is not affiliated with Ankama. A
 `git rm -r packages/ankama` removes all of it at once.

@@ -44,4 +44,4 @@ le recadrage 16:9 jette la ligne même qu'elle montre.
 
 **gifski, jamais `palettegen`.** La chaîne `palettegen`/`paletteuse` de ffmpeg, palette neuve à chaque image, rend un fichier dix fois plus lourd pour le même œil : 127 Mo là où gifski en fait 12. Le script n'appelle ffmpeg que pour sortir les images.
 
-**Une capture du jeu est une image d'Ankama.** Elle se pose dans `packages/ankama`, que la licence exclut du MIT, et nulle part ailleurs.
+**Une capture du jeu est une image d'Ankama.** Elle se pose dans `packages/ankama`, que la licence du dépôt exclut, et nulle part ailleurs.

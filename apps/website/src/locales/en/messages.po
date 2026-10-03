@@ -278,7 +278,7 @@ msgstr "Published code"
 
 #: src/constants/rivals.ts
 msgid "Code publié, sans licence libre."
-msgstr "Code published, with no free licence."
+msgstr "Code published, with no open-source licence."
 
 #: src/constants/elsewhere.ts
 msgid "Code source GitHub"
@@ -574,8 +574,8 @@ msgid "Lâchez au centre de la roue, et aucune fenêtre ne bouge."
 msgstr "Let go at the centre of the wheel, and no window moves."
 
 #: src/screens/legal-screen.tsx
-msgid "Le <0>code du site</0> est public."
-msgstr "The <0>site’s code</0> is public."
+msgid "Le <0>code du site</0> est public, mais pas libre : copier le site, ses textes ou son code est interdit sans l’accord écrit de viclafouch."
+msgstr "The <0>site’s code</0> is public, but not open source: copying the site, its texts or its code is forbidden without viclafouch’s written consent."
 
 #: src/constants/ankama.ts
 msgid "Le 10 mars 2026"
@@ -670,8 +670,8 @@ msgid "Le nom"
 msgstr "The name"
 
 #: src/screens/home-screen.tsx
-msgid "Le paquet est signé par Apple, le code est ouvert, et Ankama tolère ce genre d’outil tant qu’il ne touche pas au jeu. Les trois se vérifient."
-msgstr "The package is signed by Apple, the code is open, and Ankama tolerates this kind of tool as long as it does not touch the game. All three can be checked."
+msgid "Le paquet est signé par Apple, le code est public, et Ankama tolère ce genre d’outil tant qu’il ne touche pas au jeu. Les trois se vérifient."
+msgstr "The package is signed by Apple, the code is public, and Ankama tolerates this kind of tool as long as it does not touch the game. All three can be checked."
 
 #: src/constants/bodies.ts
 msgid "Le personnage laissé en banque ne prend aucun de vos clics."
@@ -705,6 +705,10 @@ msgstr "the nickname, and nothing else"
 msgid "le pseudo, puis « - Dofus Retro »"
 msgstr "the nickname, then “- Dofus Retro”"
 
+#: src/constants/questions.ts
+msgid "Le seul site de Multifus est {OFFICIAL_DOMAIN}, et le seul téléchargement vient de <0>{REPOSITORY_ADDRESS}</0>. Un autre site qui propose Multifus est une copie, et le fichier qu’il donne peut voler votre compte."
+msgstr "The only Multifus site is {OFFICIAL_DOMAIN}, and the only download comes from <0>{REPOSITORY_ADDRESS}</0>. Any other site offering Multifus is a copy, and the file it gives can steal your account."
+
 #: src/components/language-offer.tsx
 msgid "Le site dans votre langue"
 msgstr "The site in your language"
@@ -716,6 +720,10 @@ msgstr "The Dofus Retro website"
 #: src/screens/legal-screen.tsx
 msgid "Le site est hébergé par <0>{VERCEL_NAME}</0>, {VERCEL_ADDRESS}, aux États-Unis."
 msgstr "The site is hosted by <0>{VERCEL_NAME}</0>, {VERCEL_ADDRESS}, in the United States."
+
+#: src/screens/legal-screen.tsx
+msgid "Le site n’existe qu’à l’adresse {OFFICIAL_DOMAIN}, et Multifus ne se télécharge que sur <0>{REPOSITORY_ADDRESS}</0>. Une copie publiée à une autre adresse n’est pas de viclafouch, et son bouton de téléchargement peut mener à un faux Multifus."
+msgstr "The site exists only at {OFFICIAL_DOMAIN}, and Multifus downloads only from <0>{REPOSITORY_ADDRESS}</0>. A copy published at any other address is not viclafouch’s, and its download button can lead to a fake Multifus."
 
 #: src/constants/wording.ts
 msgid "Le suivant passe devant à chaque clic."

@@ -15,7 +15,9 @@ import {
   AUTHOR_CODE,
   FOLD_ANCHOR,
   GAME,
+  OFFICIAL_DOMAIN,
   REPOSITORY,
+  REPOSITORY_ADDRESS,
   VERCEL,
   VERCEL_ADDRESS,
   VERCEL_ANALYTICS,
@@ -70,7 +72,19 @@ export const LegalScreen = ({ page }: PageScreenProps) => {
               <OutLink isInline href={REPOSITORY}>
                 code du site
               </OutLink>{' '}
-              est public.
+              est public, mais pas libre : copier le site, ses textes ou son
+              code est interdit sans l’accord écrit de viclafouch.
+            </Trans>
+          </Prose>
+          <Prose isWide>
+            <Trans>
+              Le site n’existe qu’à l’adresse {OFFICIAL_DOMAIN}, et Multifus ne
+              se télécharge que sur{' '}
+              <OutLink isInline href={REPOSITORY}>
+                {REPOSITORY_ADDRESS}
+              </OutLink>
+              . Une copie publiée à une autre adresse n’est pas de viclafouch,
+              et son bouton de téléchargement peut mener à un faux Multifus.
             </Trans>
           </Prose>
         </ProseBlock>

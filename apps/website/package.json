@@ -2,7 +2,7 @@
   "name": "@multifus/website",
   "version": "0.0.0",
   "private": true,
-  "license": "MIT",
+  "license": "SEE LICENSE IN ../../LICENSE",
   "type": "module",
   "scripts": {
     "dev": "pnpm run draw:og && vite dev",

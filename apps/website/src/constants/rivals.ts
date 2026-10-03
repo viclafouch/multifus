@@ -13,6 +13,8 @@ import { PAGE_NAMES } from '@/constants/wording'
 
 export const SURVEYED_ON = '2026-09-21'
 
+const PUBLISHED_WITHOUT_FREE_LICENCE = msg`Code publié, sans licence libre.`
+
 export const RIVAL_IDS = [
   'dracoon',
   'focusRetro',
@@ -203,7 +205,7 @@ export const TRAITS = {
     }
   },
   source: {
-    mine: 'yes',
+    mine: 'half',
     theirs: {
       dracoon: 'yes',
       focusRetro: 'yes',
@@ -249,6 +251,10 @@ export const MINE_NOTES = [
   {
     trait: 'signed',
     line: msg`Signé et vérifié par Apple sur Mac. Sur Windows, seule l’attestation GitHub y est.`
+  },
+  {
+    trait: 'source',
+    line: PUBLISHED_WITHOUT_FREE_LICENCE
   }
 ] as const satisfies readonly MineNote[]
 
@@ -286,6 +292,6 @@ export const HALF_NOTES = [
   {
     trait: 'source',
     rival: 'retroToolbox',
-    line: msg`Code publié, sans licence libre.`
+    line: PUBLISHED_WITHOUT_FREE_LICENCE
   }
 ] as const satisfies readonly HalfNote[]

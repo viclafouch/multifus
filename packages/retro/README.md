@@ -39,4 +39,4 @@ dependencies. Tailwind flattens the `@import` before Vite resolves the `url()`,
 so the font files resolve from the consumer, never from here. It is a peer
 dependency for that reason.
 
-MIT.
+All rights reserved, see the [licence](../../LICENSE).

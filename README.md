@@ -52,7 +52,7 @@ apps/
   desktop/    Tauri application, React and TypeScript front end, Rust back end
   website/    TanStack Start website, prerendered and served by Vercel
 packages/
-  ankama/     Ankama artwork, excluded from the MIT licence
+  ankama/     Ankama artwork, outside the licence
   retro/      Shared styles and components
   runes/      Rune weights from the game
 ```
@@ -75,7 +75,10 @@ pnpm check      # formatting, lints and tests, both languages, every workspace
 
 ## Licence
 
-[MIT](./LICENSE), except `packages/ankama`, which holds artwork owned by Ankama.
+All rights reserved, see [LICENSE](./LICENSE). Multifus is free to download and
+use, and its code is public to read. Copying the software, its code or the
+website needs written permission. `packages/ankama` holds artwork owned by
+Ankama and stays outside that licence.
 
 Dofus and Dofus Retro are trademarks of Ankama. This project is not affiliated
 with them.

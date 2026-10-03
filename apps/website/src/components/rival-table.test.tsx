@@ -104,7 +104,15 @@ describe('the table of the comparison', () => {
   it('delivers the reason of a half cell without it being hovered', () => {
     show()
 
-    expect(screen.getByText('Code publié, sans licence libre.')).toBeDefined()
+    expect(screen.getByText(HALF_NOTE)).toBeDefined()
+  })
+
+  it('gives Multifus the reason it gives a rival on published code', () => {
+    show()
+
+    expect(
+      screen.getAllByText('Code publié, sans licence libre.')
+    ).toHaveLength(2)
   })
 
   it('raises the bubble when the cursor lands on a half cell', () => {

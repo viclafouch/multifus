@@ -31,7 +31,7 @@ const FEATURES_LEAD = msg`Six mécanismes, un seul but : ne plus chercher le per
 
 const TRUST_TITLE = msg`Multifus est sûr, et ça se vérifie`
 
-const TRUST_PROOF = msg`Le paquet est signé par Apple, le code est ouvert, et Ankama tolère ce genre d’outil tant qu’il ne touche pas au jeu. Les trois se vérifient.`
+const TRUST_PROOF = msg`Le paquet est signé par Apple, le code est public, et Ankama tolère ce genre d’outil tant qu’il ne touche pas au jeu. Les trois se vérifient.`
 
 const SOURCE = msg`Voir le code`
 
