@@ -78,6 +78,11 @@
     @apply font-sans;
 
     scroll-behavior: auto;
+    overscroll-behavior-y: none;
+
+    @media (any-pointer: coarse) {
+      overscroll-behavior-y: auto;
+    }
   }
 
   body {
