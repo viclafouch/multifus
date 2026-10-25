@@ -6,7 +6,6 @@ use crate::app::journal::RelayFailure;
 use crate::config::BannerCorner;
 use crate::config::Language;
 use crate::config::LoopsSeen;
-use crate::config::QuickTextId;
 use crate::domain::Class;
 use crate::domain::Color;
 use crate::domain::Gender;
@@ -36,7 +35,6 @@ pub struct Snapshot {
     pub keyboard: KeyLabels,
     pub characters: Vec<CharacterView>,
     pub shortcuts: Vec<ShortcutView>,
-    pub quick_texts: Vec<QuickTextView>,
     pub auto_focus: Vec<AutoFocusView>,
     pub auto_focus_enabled: bool,
     pub wakes_minimized: bool,
@@ -297,7 +295,6 @@ impl ReleaseNotice {
 pub enum Screen {
     Characters,
     Shortcuts,
-    QuickTexts,
     AutoFocus,
     Walk,
     RuneTable,
@@ -307,10 +304,9 @@ pub enum Screen {
 }
 
 impl Screen {
-    pub const ALL: [Self; 9] = [
+    pub const ALL: [Self; 8] = [
         Self::Characters,
         Self::Shortcuts,
-        Self::QuickTexts,
         Self::AutoFocus,
         Self::Walk,
         Self::RuneTable,
@@ -377,7 +373,6 @@ impl ShortcutAction {
 pub enum Binding {
     Action { action: ShortcutAction },
     Character { nickname: String },
-    QuickText { id: QuickTextId },
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -387,15 +382,6 @@ pub struct ShortcutView {
     pub accelerator: Option<String>,
     pub status: ShortcutStatus,
     pub is_default: bool,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct QuickTextView {
-    pub id: QuickTextId,
-    pub text: String,
-    pub accelerator: Option<String>,
-    pub status: ShortcutStatus,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -585,12 +571,6 @@ mod tests {
                 status: ShortcutStatus::Registered,
                 is_default: true,
             }],
-            quick_texts: vec![QuickTextView {
-                id: QuickTextId::default(),
-                text: "Bon jeu à toi !".to_owned(),
-                accelerator: None,
-                status: ShortcutStatus::Unbound,
-            }],
             auto_focus: vec![AutoFocusView {
                 kind: NotificationKind::Combat,
                 enabled: true,
@@ -712,7 +692,6 @@ mod tests {
                 "maximizeOnLaunch",
                 "onboarding",
                 "paintPortraits",
-                "quickTexts",
                 "relay",
                 "releaseNotice",
                 "runeTable",
@@ -945,7 +924,7 @@ mod tests {
     }
 
     #[test]
-    fn a_binding_is_an_action_a_character_or_a_quick_text_and_says_which() {
+    fn a_binding_is_an_action_or_a_character_and_says_which() {
         assert_eq!(
             json_of(&Binding::Action {
                 action: ShortcutAction::ToggleExcluded
@@ -957,12 +936,6 @@ mod tests {
                 nickname: "Alpha".to_owned()
             }),
             json!({ "kind": "character", "nickname": "Alpha" })
-        );
-        assert_eq!(
-            json_of(&Binding::QuickText {
-                id: QuickTextId::default()
-            }),
-            json!({ "kind": "quickText", "id": 0 })
         );
     }
 
@@ -1007,30 +980,10 @@ mod tests {
     }
 
     #[test]
-    fn a_quick_text_carries_its_identifier_its_line_and_its_combination() {
-        let view = QuickTextView {
-            id: QuickTextId::default().next(),
-            text: "Bon jeu à toi !".to_owned(),
-            accelerator: Some("Alt+KeyP".to_owned()),
-            status: ShortcutStatus::Registered,
-        };
-
-        assert_eq!(
-            json_of(&view),
-            json!({
-                "id": 1,
-                "text": "Bon jeu à toi !",
-                "accelerator": "Alt+KeyP",
-                "status": { "kind": "registered" },
-            })
-        );
-    }
-
-    #[test]
     fn a_bound_combination_carries_what_the_journal_line_shows() {
         let view = BindingView {
-            binding: Binding::QuickText {
-                id: QuickTextId::default(),
+            binding: Binding::Character {
+                nickname: "Alpha".to_owned(),
             },
             accelerator: Some("Alt+KeyP".to_owned()),
             status: ShortcutStatus::Registered,
@@ -1407,7 +1360,6 @@ mod tests {
             [
                 json!("characters"),
                 json!("shortcuts"),
-                json!("quickTexts"),
                 json!("autoFocus"),
                 json!("walk"),
                 json!("runeTable"),

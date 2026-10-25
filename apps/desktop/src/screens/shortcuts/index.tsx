@@ -1,7 +1,7 @@
 import { i18n } from '@lingui/core'
 import { t } from '@lingui/core/macro'
 import type { Character } from '@/@types/roster'
-import type { QuickText, ShortcutBinding } from '@/@types/shortcuts'
+import type { ShortcutBinding } from '@/@types/shortcuts'
 import type { Snapshot } from '@/@types/snapshot'
 import { Note } from '@/components/layout/note'
 import { Screen } from '@/components/layout/screen'
@@ -20,14 +20,12 @@ import { CharactersPanel } from '@/screens/shortcuts/characters-panel'
 type ShortcutsScreenProps = Readonly<{
   shortcuts: readonly ShortcutBinding[]
   characters: readonly Character[]
-  quickTexts: readonly QuickText[]
   run: (action: Promise<Snapshot>) => void
 }>
 
 export const ShortcutsScreen = ({
   shortcuts,
   characters,
-  quickTexts,
   run
 }: ShortcutsScreenProps) => {
   const editing = useShortcutEditing()
@@ -43,7 +41,6 @@ export const ShortcutsScreen = ({
     >
       <ActionsPanel
         shortcuts={shortcuts}
-        quickTexts={quickTexts}
         editing={editing.binding}
         undoFor={undo.undoFor}
         actions={{
@@ -64,7 +61,6 @@ export const ShortcutsScreen = ({
       />
       <CharactersPanel
         characters={characters}
-        quickTexts={quickTexts}
         editing={editing.binding}
         actions={{
           handleShortcut: (nickname, accelerator) => {

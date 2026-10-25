@@ -12,7 +12,6 @@ use tauri_plugin_global_shortcut::ShortcutState;
 use crate::app::Multifus;
 use crate::app::journal::CharacterShortcutOutcome;
 use crate::app::journal::JournalEvent;
-use crate::app::journal::QuickTextFailure;
 use crate::app::journal::RelayStop;
 use crate::app::journal::ShortcutOutcome;
 use crate::app::journal::Surface;
@@ -23,7 +22,6 @@ use crate::app::keyboard::keyboard;
 use crate::app::keyboard::matches_in_the_game;
 use crate::app::notes;
 use crate::app::panics;
-use crate::app::quick_texts;
 use crate::app::relay;
 use crate::app::rune_table;
 use crate::app::runtime;
@@ -39,7 +37,6 @@ use crate::app::view::ShortcutAction;
 use crate::app::view::ShortcutStatus;
 use crate::app::walk;
 use crate::app::wheel;
-use crate::config::QuickTextId;
 use crate::platform::GameWindow;
 use crate::platform::PlatformError;
 use crate::platform::WindowId;
@@ -297,8 +294,6 @@ trait Mechanisms {
 
     fn stop_relay(&self);
 
-    fn paste_quick_text(&self, id: QuickTextId, here: WindowId);
-
     fn open_wheel(&self, here: WindowId);
 
     fn release_wheel(&self);
@@ -321,10 +316,6 @@ impl Mechanisms for AppMechanisms<'_> {
 
     fn stop_relay(&self) {
         relay::run::stop(self.0, RelayStop::Shortcut);
-    }
-
-    fn paste_quick_text(&self, id: QuickTextId, here: WindowId) {
-        quick_texts::paste(self.0, id, here);
     }
 
     fn open_wheel(&self, here: WindowId) {
@@ -435,10 +426,6 @@ fn act_on(press: &Press, binding: Binding, window: &GameWindow) {
             hold(press.state)
                 .log_unless_repeated(JournalEvent::CharacterShortcut { nickname, outcome });
         }
-        Binding::QuickText { .. } if press.keyboard.matches_notes_holding() => {
-            refused_to_the_notes(press);
-        }
-        Binding::QuickText { id } => press.mechanisms.paste_quick_text(id, window.id()),
     }
 }
 
@@ -447,15 +434,8 @@ fn act_in_the_notes(press: &Press, binding: Binding) {
         Binding::Action {
             action: ShortcutAction::Notes,
         } => press.mechanisms.toggle_notes(),
-        Binding::QuickText { .. } => refused_to_the_notes(press),
         other => refused(press, other, Refusal::OutsideGame),
     }
-}
-
-fn refused_to_the_notes(press: &Press) {
-    hold(press.state).log_unless_repeated(JournalEvent::QuickTextFailed {
-        reason: QuickTextFailure::NotesHoldKeyboard,
-    });
 }
 
 fn refused(press: &Press, binding: Binding, refusal: Refusal) {
@@ -479,14 +459,6 @@ fn refusal_said(binding: Binding, refusal: Refusal) -> JournalEvent {
                 Refusal::OutsideGame => CharacterShortcutOutcome::OutsideGame,
                 Refusal::ForegroundUnknown { detail } => {
                     CharacterShortcutOutcome::ForegroundUnknown { detail }
-                }
-            },
-        },
-        Binding::QuickText { .. } => JournalEvent::QuickTextFailed {
-            reason: match refusal {
-                Refusal::OutsideGame => QuickTextFailure::OutsideGame,
-                Refusal::ForegroundUnknown { detail } => {
-                    QuickTextFailure::ForegroundUnknown { detail }
                 }
             },
         },
@@ -557,7 +529,6 @@ mod tests {
         WalkToggled,
         AllMaximized,
         RelayStopped,
-        QuickTextPasted(QuickTextId, WindowId),
         WheelOpened(WindowId),
         WheelReleased,
         RuneTableToggled(WindowId),
@@ -596,10 +567,6 @@ mod tests {
 
         fn stop_relay(&self) {
             self.write_down(Mechanism::RelayStopped);
-        }
-
-        fn paste_quick_text(&self, id: QuickTextId, here: WindowId) {
-            self.write_down(Mechanism::QuickTextPasted(id, here));
         }
 
         fn open_wheel(&self, here: WindowId) {
@@ -729,8 +696,8 @@ mod tests {
         );
         answering(
             &press,
-            Binding::QuickText {
-                id: QuickTextId::default(),
+            Binding::Character {
+                nickname: "Alpha".to_owned(),
             },
         );
 
@@ -741,8 +708,9 @@ mod tests {
                     action: ShortcutAction::Next,
                     outcome: ShortcutOutcome::OutsideGame,
                 },
-                JournalEvent::QuickTextFailed {
-                    reason: QuickTextFailure::OutsideGame,
+                JournalEvent::CharacterShortcut {
+                    nickname: "Alpha".to_owned(),
+                    outcome: CharacterShortcutOutcome::OutsideGame,
                 },
             ]
         );
@@ -782,8 +750,8 @@ mod tests {
         );
         answering(
             &press,
-            Binding::QuickText {
-                id: QuickTextId::default(),
+            Binding::Character {
+                nickname: "Alpha".to_owned(),
             },
         );
 
@@ -796,8 +764,9 @@ mod tests {
                         detail: detail.clone(),
                     },
                 },
-                JournalEvent::QuickTextFailed {
-                    reason: QuickTextFailure::ForegroundUnknown { detail },
+                JournalEvent::CharacterShortcut {
+                    nickname: "Alpha".to_owned(),
+                    outcome: CharacterShortcutOutcome::ForegroundUnknown { detail },
                 },
             ]
         );
@@ -926,42 +895,6 @@ mod tests {
                 nickname: "Bravo".to_owned(),
             },
         }));
-    }
-
-    #[test]
-    fn a_quick_text_is_pasted_where_the_player_is_writing_and_nowhere_else() {
-        let directory = directory();
-        let state = three_in_the_cycle(&directory);
-        let windows = FakeWindowManager::showing(Desktop {
-            foreground: Some(game_window(1, "Alpha")),
-            ..Desktop::default()
-        });
-        let mechanisms = FakeMechanisms::default();
-        let id = QuickTextId::default();
-
-        answering(
-            &Press {
-                windows: windows.as_ref(),
-                state: &state,
-                mechanisms: &mechanisms,
-                keyboard: &Keyboard::default(),
-            },
-            Binding::QuickText { id },
-        );
-
-        assert_eq!(
-            mechanisms.set_going(),
-            vec![
-                Mechanism::RelayStopped,
-                Mechanism::QuickTextPasted(id, WindowId::from_raw(1))
-            ],
-            "the paste aims at the game window the player is writing in"
-        );
-        assert_eq!(
-            windows.asked(),
-            Vec::new(),
-            "a quick text writes, it does not switch"
-        );
     }
 
     #[test]
@@ -1406,41 +1339,6 @@ mod tests {
         keyboard.notes_take();
 
         keyboard
-    }
-
-    #[test]
-    fn a_quick_text_struck_while_the_notes_hold_the_keyboard_pastes_nothing_and_says_why() {
-        let directory = directory();
-        let state = three_in_the_cycle(&directory);
-        let windows = FakeWindowManager::showing(Desktop {
-            foreground: Some(game_window(1, "Alpha")),
-            ..Desktop::default()
-        });
-        let mechanisms = FakeMechanisms::default();
-        let keyboard = the_notes_hold_the_keyboard();
-
-        answering(
-            &Press {
-                windows: windows.as_ref(),
-                state: &state,
-                mechanisms: &mechanisms,
-                keyboard: &keyboard,
-            },
-            Binding::QuickText {
-                id: QuickTextId::default(),
-            },
-        );
-
-        assert!(
-            !mechanisms
-                .set_going()
-                .iter()
-                .any(|mechanism| matches!(mechanism, Mechanism::QuickTextPasted(..))),
-            "the paste would land in the notes, and the text belongs to the game chat"
-        );
-        assert!(journalled(&state).contains(&JournalEvent::QuickTextFailed {
-            reason: QuickTextFailure::NotesHoldKeyboard,
-        }));
     }
 
     #[test]

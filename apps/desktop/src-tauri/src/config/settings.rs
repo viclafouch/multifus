@@ -14,7 +14,6 @@ pub struct Settings {
     pub language: Option<Language>,
     pub roster: Roster,
     pub shortcuts: Shortcuts,
-    pub quick_texts: Vec<QuickText>,
     pub auto_focus: AutoFocus,
     pub relay: Relay,
     pub banner: Banner,
@@ -42,8 +41,6 @@ pub struct Traces {
     pub ungrouped: HashSet<String>,
     pub short_titles: bool,
 }
-
-const FIRST_QUICK_TEXT: &str = "Bon jeu à toi !";
 
 const NOTES_SHORTCUT_KEY: &str = "/shortcuts/notes";
 
@@ -80,15 +77,9 @@ impl Settings {
             .characters()
             .iter()
             .map(|character| &character.shortcut);
-        let quick_texts = self
-            .quick_texts
-            .iter()
-            .map(|quick_text| &quick_text.shortcut);
-
         actions
             .into_iter()
             .chain(characters)
-            .chain(quick_texts)
             .flatten()
             .any(|held| held.matches_same_keys(combination))
     }
@@ -96,15 +87,10 @@ impl Settings {
 
 impl Default for Settings {
     fn default() -> Self {
-        let mut quick_text = QuickText::new(QuickTextId::default());
-
-        quick_text.set_text(FIRST_QUICK_TEXT);
-
         Self {
             language: None,
             roster: Roster::default(),
             shortcuts: Shortcuts::default(),
-            quick_texts: vec![quick_text],
             auto_focus: AutoFocus::default(),
             relay: Relay::default(),
             banner: Banner::default(),
@@ -183,7 +169,6 @@ pub struct LoopsSeen {
     pub rune_table: bool,
     pub auto_focus: bool,
     pub relay: bool,
-    pub quick_texts: bool,
 }
 
 impl LoopsSeen {
@@ -194,7 +179,6 @@ impl LoopsSeen {
             Loop::RuneTable => self.rune_table = true,
             Loop::AutoFocus => self.auto_focus = true,
             Loop::Relay => self.relay = true,
-            Loop::QuickTexts => self.quick_texts = true,
         }
     }
 }
@@ -207,7 +191,6 @@ pub enum Loop {
     RuneTable,
     AutoFocus,
     Relay,
-    QuickTexts,
 }
 
 impl Wheel {
@@ -314,49 +297,6 @@ impl Default for Shortcuts {
             rune_table: Shortcut::new(DEFAULT_RUNE_TABLE),
             notes: Shortcut::new(DEFAULT_NOTES),
         }
-    }
-}
-
-#[derive(
-    Debug, Clone, Copy, Default, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize,
-)]
-#[serde(transparent)]
-pub struct QuickTextId(u32);
-
-impl QuickTextId {
-    #[must_use]
-    pub const fn next(self) -> Self {
-        Self(self.0.saturating_add(1))
-    }
-}
-
-#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
-pub struct QuickText {
-    #[serde(default)]
-    pub id: QuickTextId,
-    #[serde(default)]
-    pub text: String,
-    #[serde(default)]
-    pub shortcut: Option<Shortcut>,
-}
-
-impl QuickText {
-    #[must_use]
-    pub fn new(id: QuickTextId) -> Self {
-        Self {
-            id,
-            text: String::new(),
-            shortcut: None,
-        }
-    }
-
-    pub fn set_text(&mut self, text: &str) {
-        self.text = text
-            .lines()
-            .map(str::trim)
-            .filter(|line| !line.is_empty())
-            .collect::<Vec<_>>()
-            .join(" ");
     }
 }
 
@@ -716,58 +656,6 @@ mod tests {
     }
 
     #[test]
-    fn a_first_launch_offers_one_quick_text_to_start_from() {
-        let quick_texts = Settings::default().quick_texts;
-
-        assert_eq!(quick_texts.len(), 1);
-        assert_eq!(quick_texts[0].text, FIRST_QUICK_TEXT);
-        assert!(quick_texts[0].shortcut.is_none());
-    }
-
-    #[test]
-    fn a_quick_text_holds_its_text_on_one_line() {
-        let mut quick_text = QuickText::new(QuickTextId::default());
-
-        quick_text.set_text("  prix libre\nde rien  ");
-
-        assert_eq!(quick_text.text, "prix libre de rien");
-
-        quick_text.set_text("prix libre\r\n\r\nde rien");
-
-        assert_eq!(quick_text.text, "prix libre de rien");
-    }
-
-    #[test]
-    fn a_quick_text_written_before_a_field_existed_still_loads() {
-        let quick_text = serde_json::from_str::<QuickText>(r#"{"text":"prix libre"}"#)
-            .expect("a partial quick_text");
-
-        assert_eq!(quick_text.text, "prix libre");
-        assert_eq!(quick_text.id, QuickTextId::default());
-        assert_eq!(quick_text.shortcut, None);
-    }
-
-    #[test]
-    fn a_quick_text_keeps_its_identifier_across_the_file() {
-        let quick_text = QuickText {
-            id: QuickTextId::default().next().next(),
-            text: "de rien".to_owned(),
-            shortcut: Shortcut::new("Control+Shift+K"),
-        };
-
-        let json = serde_json::to_string(&quick_text).expect("a quick_text serialises");
-
-        assert_eq!(
-            json,
-            r#"{"id":2,"text":"de rien","shortcut":"Control+Shift+K"}"#
-        );
-        assert_eq!(
-            serde_json::from_str::<QuickText>(&json).expect("a quick_text reads back"),
-            quick_text
-        );
-    }
-
-    #[test]
     fn the_body_of_a_private_message_stays_on_the_machine_until_it_is_asked_for() {
         let relay = Relay::default();
 
@@ -802,7 +690,6 @@ mod tests {
         assert_eq!(settings.auto_focus, AutoFocus::default());
         assert_eq!(settings.relay, Relay::default());
         assert!(settings.roster.is_empty());
-        assert_eq!(settings.quick_texts, Settings::default().quick_texts);
     }
 
     fn stored(json: &str) -> Settings {
@@ -826,9 +713,6 @@ mod tests {
             r#"{ "roster": { "characters": [
                    { "nickname": "Alpha", "shortcut": "Shift+Control+N" } ] } }"#,
         );
-        let held_by_a_quick_text = stored(
-            r#"{ "quick_texts": [ { "id": 0, "text": "prix", "shortcut": "Control+Shift+KeyN" } ] }"#,
-        );
         let held_by_an_action = stored(r#"{ "shortcuts": { "walk": "Control+Shift+KeyN" } }"#);
 
         assert_eq!(notes_shortcut(&held_by_a_character), None);
@@ -841,7 +725,6 @@ mod tests {
             Some("Shift+Control+N"),
             "actions claim first, so the default would have taken the combination of the character"
         );
-        assert_eq!(notes_shortcut(&held_by_a_quick_text), None);
         assert_eq!(notes_shortcut(&held_by_an_action), None);
     }
 
@@ -849,8 +732,7 @@ mod tests {
     fn a_file_written_since_the_notes_keeps_what_the_player_chose_for_them() {
         let cleared = stored(r#"{ "shortcuts": { "notes": null } }"#);
         let shared = stored(
-            r#"{ "shortcuts": { "notes": "Control+Shift+KeyN" },
-                 "quick_texts": [ { "id": 0, "text": "prix", "shortcut": "Control+Shift+KeyN" } ] }"#,
+            r#"{ "shortcuts": { "notes": "Control+Shift+KeyN", "walk": "Control+Shift+KeyN" } }"#,
         );
 
         assert_eq!(notes_shortcut(&cleared), None);

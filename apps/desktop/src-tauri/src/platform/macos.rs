@@ -84,7 +84,6 @@ use objc2_core_foundation::kCFPreferencesCurrentHost;
 use objc2_core_foundation::kCFPreferencesCurrentUser;
 use objc2_core_foundation::kCFRunLoopDefaultMode;
 use objc2_core_graphics::CGEvent;
-use objc2_core_graphics::CGEventFlags;
 use objc2_core_graphics::CGEventMask;
 use objc2_core_graphics::CGEventSource;
 use objc2_core_graphics::CGEventSourceStateID;
@@ -93,7 +92,6 @@ use objc2_core_graphics::CGEventTapOptions;
 use objc2_core_graphics::CGEventTapPlacement;
 use objc2_core_graphics::CGEventTapProxy;
 use objc2_core_graphics::CGEventType;
-use objc2_core_graphics::CGKeyCode;
 use objc2_core_graphics::CGRectMakeWithDictionaryRepresentation;
 use objc2_core_graphics::CGWindowID;
 use objc2_core_graphics::CGWindowListCopyWindowInfo;
@@ -127,7 +125,6 @@ use crate::platform::notification::NotificationReport;
 use crate::platform::notification::NotificationSink;
 use crate::platform::notification::NotificationWatcher;
 use crate::platform::notification::SystemChecks;
-use crate::platform::paste::PasteSender;
 use crate::platform::wake::Wake;
 use crate::platform::wake::WakeSink;
 use crate::platform::wake::WakeWatcher;
@@ -2433,54 +2430,6 @@ impl Drop for PowerAssertionDisplayKeeper {
     fn drop(&mut self) {
         drop(self.release());
     }
-}
-
-const PASTE_KEY: CGKeyCode = 9;
-
-const PRESS_TO_RELEASE: Duration = Duration::from_millis(10);
-
-#[derive(Debug, Default)]
-pub struct CoreGraphicsPasteSender;
-
-impl CoreGraphicsPasteSender {
-    #[must_use]
-    pub fn new() -> Self {
-        Self
-    }
-}
-
-impl PasteSender for CoreGraphicsPasteSender {
-    fn send_paste_combination(&self, here: WindowId) -> Result<()> {
-        if !accessibility_authorization().is_granted() {
-            return Err(PlatformError::AuthorizationDenied);
-        }
-
-        let pid = pid_t::try_from(here.raw()).map_err(|_| PlatformError::WindowGone)?;
-
-        let source = CGEventSource::new(CGEventSourceStateID::Private);
-        let source = source.as_deref();
-
-        let press = keyboard_event(source, true)?;
-        let release = keyboard_event(source, false)?;
-
-        CGEvent::set_flags(Some(&press), CGEventFlags::MaskCommand);
-        CGEvent::set_flags(Some(&release), CGEventFlags::MaskCommand);
-
-        CGEvent::post_to_pid(pid, Some(&press));
-        thread::sleep(PRESS_TO_RELEASE);
-        CGEvent::post_to_pid(pid, Some(&release));
-
-        Ok(())
-    }
-}
-
-fn keyboard_event(source: Option<&CGEventSource>, key_down: bool) -> Result<CFRetained<CGEvent>> {
-    CGEvent::new_keyboard_event(source, PASTE_KEY, key_down).ok_or_else(|| {
-        PlatformError::system(
-            "posting the paste combination",
-            "CGEventCreateKeyboardEvent returned nothing",
-        )
-    })
 }
 
 fn screen_saver_delay() -> ScreenSaverDelay {

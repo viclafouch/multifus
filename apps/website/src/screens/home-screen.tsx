@@ -27,7 +27,7 @@ const HERO_TURN = msg`enfin jouable`
 
 const FEATURES_TITLE = msg`Ce que Multifus fait`
 
-const FEATURES_LEAD = msg`Six mécanismes, un seul but : ne plus chercher le personnage qui vous attend.`
+const FEATURES_LEAD = msg`Cinq mécanismes, un seul but : ne plus chercher le personnage qui vous attend.`
 
 const TRUST_TITLE = msg`Multifus est sûr, et ça se vérifie`
 

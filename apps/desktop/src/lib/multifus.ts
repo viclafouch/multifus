@@ -9,7 +9,7 @@ import type { NotificationKind } from '@/@types/notification'
 import type { SystemPage } from '@/@types/onboarding'
 import type { RelayLink } from '@/@types/relay'
 import type { Class, Color, Gender } from '@/@types/roster'
-import type { QuickTextId, ShortcutAction } from '@/@types/shortcuts'
+import type { ShortcutAction } from '@/@types/shortcuts'
 import type { Clients, ScreenName, Snapshot } from '@/@types/snapshot'
 import type { BannerCorner, BannerStep } from '@/@types/walk'
 import type { WheelStep } from '@/@types/wheel'
@@ -129,25 +129,6 @@ export const setCharacterShortcut = async (
 
 export const resetShortcuts = async () => {
   return invoke<Snapshot>('reset_shortcuts')
-}
-
-export const addQuickText = async () => {
-  return invoke<Snapshot>('add_quick_text')
-}
-
-export const setQuickTextText = async (id: QuickTextId, text: string) => {
-  return invoke<Snapshot>('set_quick_text_text', { id, text })
-}
-
-export const setQuickTextShortcut = async (
-  id: QuickTextId,
-  accelerator: string | null
-) => {
-  return invoke<Snapshot>('set_quick_text_shortcut', { id, accelerator })
-}
-
-export const removeQuickText = async (id: QuickTextId) => {
-  return invoke<Snapshot>('remove_quick_text', { id })
 }
 
 export const setAutoFocus = async (

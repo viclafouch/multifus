@@ -5,7 +5,6 @@ import type { PairingProblem, RelayFailure } from '@/@types/relay'
 import type { Character, Color, Gender } from '@/@types/roster'
 import type {
   Binding,
-  QuickText,
   ShortcutAction,
   ShortcutStatus
 } from '@/@types/shortcuts'
@@ -214,51 +213,12 @@ export const relayFailureLine = ({ reason, detail }: RelayFailure) => {
   }
 }
 
-const QUICK_TEXT_LABEL_LENGTH = 30
-
-export const bindingLabel = (
-  binding: Binding,
-  quickTexts: readonly QuickText[]
-): string => {
+export const bindingLabel = (binding: Binding): string => {
   if (binding.kind === 'action') {
     return quoted(i18n._(SHORTCUT_ACTIONS[binding.action].label))
   }
 
-  if (binding.kind === 'character') {
-    return quoted(binding.nickname)
-  }
-
-  const quickText = quickTexts.find((candidate) => {
-    return candidate.id === binding.id
-  })
-
-  if (quickText === undefined || quickText.text.length === 0) {
-    return t`un texte rapide vide`
-  }
-
-  const text = shorten(quickText.text)
-
-  return t`le texte rapide « ${text} »`
-}
-
-export const quickTextEditLabel = (quickText: QuickText, rank: number) => {
-  if (quickText.text.length === 0) {
-    return t`Modifier les touches du texte ${rank}`
-  }
-
-  const text = shorten(quickText.text)
-
-  return t`Modifier les touches du texte ${rank}, « ${text} »`
-}
-
-const shorten = (text: string) => {
-  const letters = Array.from(text)
-
-  if (letters.length <= QUICK_TEXT_LABEL_LENGTH) {
-    return text
-  }
-
-  return `${letters.slice(0, QUICK_TEXT_LABEL_LENGTH).join('')}…`
+  return quoted(binding.nickname)
 }
 
 export const shortcutActionLabel = (action: ShortcutAction) => {
@@ -272,8 +232,7 @@ export const shortcutUndoLabel = (action: ShortcutAction) => {
 }
 
 export const shortcutStatusLine = (
-  status: ShortcutStatus,
-  quickTexts: readonly QuickText[]
+  status: ShortcutStatus
 ): TonedLine | null => {
   switch (status.kind) {
     case 'registered': {
@@ -295,7 +254,7 @@ export const shortcutStatusLine = (
       }
     }
     case 'duplicate': {
-      const label = bindingLabel(status.binding, quickTexts)
+      const label = bindingLabel(status.binding)
 
       return { tone: 'bad', text: t`Déjà pris par ${label}.` }
     }
@@ -306,12 +265,9 @@ export const shortcutStatusLine = (
 }
 
 export const characterShortcutStatusLine = (
-  status: ShortcutStatus,
-  quickTexts: readonly QuickText[]
+  status: ShortcutStatus
 ): TonedLine | null => {
-  return status.kind === 'unbound'
-    ? null
-    : shortcutStatusLine(status, quickTexts)
+  return status.kind === 'unbound' ? null : shortcutStatusLine(status)
 }
 
 export const authorizationNoticeLines = () => {

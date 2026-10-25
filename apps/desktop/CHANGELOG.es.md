@@ -8,6 +8,7 @@
 
 ### Mejoras
 
+- Los Textos rápidos desaparecen: Ankama considera la escritura automática en el chat de Dofus como una macro. Tus frases y sus atajos se borran.
 - El menú del icono dice ahora «Activar los mensajes privados en el teléfono» y «Desactivar los mensajes privados en el teléfono», en lugar de un «Dejar de recibirlos» que no se entendía. El interruptor de la pantalla Mensajes privados lleva el mismo nombre.
 - La puesta en marcha describe ahora el Movimiento rápido tal como funciona: un clic por personaje, y luego la ventana de Dofus del personaje siguiente pasa delante.
 

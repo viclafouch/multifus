@@ -11,7 +11,6 @@ export type PageId =
   | 'journal'
   | 'legal'
   | 'mac'
-  | 'quickTexts'
   | 'relay'
   | 'runeTable'
   | 'walk'
@@ -31,13 +30,7 @@ export type PageKind =
   | 'plain'
   | 'windows'
 
-export type FeatureId =
-  | 'autoFocus'
-  | 'quickTexts'
-  | 'relay'
-  | 'runeTable'
-  | 'walk'
-  | 'wheel'
+export type FeatureId = 'autoFocus' | 'relay' | 'runeTable' | 'walk' | 'wheel'
 
 export type Loop = Readonly<{
   source: string

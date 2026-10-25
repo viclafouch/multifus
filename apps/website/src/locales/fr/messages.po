@@ -13,10 +13,6 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/constants/bodies.ts
-msgid "« Achète anneau 30 pp, MP moi », « Bon jeu à toi », « Je reviens dans deux minutes »."
-msgstr "« Achète anneau 30 pp, MP moi », « Bon jeu à toi », « Je reviens dans deux minutes »."
-
 #: src/components/author-word.tsx
 msgid "« Je fais du web depuis 10 ans, et je sais que les joueurs ont peur d’installer un logiciel qui vole nos identifiants. Multifus ne voit jamais votre mot de passe, parce qu’il ne fait que ranger vos fenêtres de Dofus Retro. Son code est public, libre à vous d’aller le vérifier. Et non, ce n’est pas un projet vibe codé en 3 jours <0/> »"
 msgstr "« Je fais du web depuis 10 ans, et je sais que les joueurs ont peur d’installer un logiciel qui vole nos identifiants. Multifus ne voit jamais votre mot de passe, parce qu’il ne fait que ranger vos fenêtres de Dofus Retro. Son code est public, libre à vous d’aller le vérifier. Et non, ce n’est pas un projet vibe codé en 3 jours <0/> »"
@@ -164,10 +160,6 @@ msgstr "C’est gratuit, alors qui paie ?"
 msgid "C’est là que ses cases ont été lues, et vous pouvez lire le même code que nous."
 msgstr "C’est là que ses cases ont été lues, et vous pouvez lire le même code que nous."
 
-#: src/constants/bodies.ts
-msgid "C’est vous qui envoyez"
-msgstr "C’est vous qui envoyez"
-
 #: src/constants/questions.ts
 msgid "Ça marche sur Dofus 2 ou Dofus 3 ?"
 msgstr "Ça marche sur Dofus 2 ou Dofus 3 ?"
@@ -267,6 +259,14 @@ msgstr "Chaque colonne mène à son dépôt."
 #: src/constants/bodies.ts
 msgid "Chaque message arrive dans la seconde, et leur nombre n’est pas limité."
 msgstr "Chaque message arrive dans la seconde, et leur nombre n’est pas limité."
+
+#: src/screens/home-screen.tsx
+msgid "Cinq mécanismes, un seul but : ne plus chercher le personnage qui vous attend."
+msgstr "Cinq mécanismes, un seul but : ne plus chercher le personnage qui vous attend."
+
+#: src/constants/summons.ts
+msgid "Cinq mécanismes, une seule installation"
+msgstr "Cinq mécanismes, une seule installation"
 
 #: src/constants/systems.ts
 msgid "Cliquez sur le bouton vert. Le fichier arrive dans vos téléchargements."
@@ -450,8 +450,8 @@ msgid "Il faut <0>{0} ou plus récent</0>. Les Mac Intel et les Mac Apple Silico
 msgstr "Il faut <0>{0} ou plus récent</0>. Les Mac Intel et les Mac Apple Silicon reçoivent le même fichier."
 
 #: src/constants/questions.ts
-msgid "Il lit le <0>titre de vos fenêtres</0> Dofus Retro, où le jeu écrit le pseudo du personnage. La <1>Roue des personnages</1> et le <2>Déplacement rapide</2> voient votre clic, et les <3>Textes rapides</3> collent la phrase dans la fenêtre devant vous."
-msgstr "Il lit le <0>titre de vos fenêtres</0> Dofus Retro, où le jeu écrit le pseudo du personnage. La <1>Roue des personnages</1> et le <2>Déplacement rapide</2> voient votre clic, et les <3>Textes rapides</3> collent la phrase dans la fenêtre devant vous."
+msgid "Il lit le <0>titre de vos fenêtres</0> Dofus Retro, où le jeu écrit le pseudo du personnage. La <1>Roue des personnages</1> et le <2>Déplacement rapide</2> voient votre clic."
+msgstr "Il lit le <0>titre de vos fenêtres</0> Dofus Retro, où le jeu écrit le pseudo du personnage. La <1>Roue des personnages</1> et le <2>Déplacement rapide</2> voient votre clic."
 
 #: src/constants/questions.ts
 msgid "Il n’ouvre aucun fichier de Dofus Retro, et ne lit pas sa mémoire. Le <0>code est public</0>, vous pouvez le lire."
@@ -506,8 +506,8 @@ msgid "L’AutoFocus amène le bon personnage tout seul : l’ordre ne sert qu�
 msgstr "L’AutoFocus amène le bon personnage tout seul : l’ordre ne sert qu’au défilement."
 
 #: src/constants/summons.ts
-msgid "L’AutoFocus, la roue, le déplacement rapide, le tableau des runes, les messages privés et les textes rapides arrivent ensemble."
-msgstr "L’AutoFocus, la roue, le déplacement rapide, le tableau des runes, les messages privés et les textes rapides arrivent ensemble."
+msgid "L’AutoFocus, la roue, le déplacement rapide, le tableau des runes et les messages privés arrivent ensemble."
+msgstr "L’AutoFocus, la roue, le déplacement rapide, le tableau des runes et les messages privés arrivent ensemble."
 
 #: src/components/taskbar-proof.tsx
 msgid "L’icône"
@@ -642,8 +642,8 @@ msgid "Le multicompte Dofus Retro sur Mac, dans une application qu’Apple a vé
 msgstr "Le multicompte Dofus Retro sur Mac, dans une application qu’Apple a vérifiée."
 
 #: src/constants/wording.ts
-msgid "Le multicompte Dofus Retro sur Mac, dans une application vérifiée par Apple, sans clic droit ni réglage à contourner. Les six fonctionnalités y sont."
-msgstr "Le multicompte Dofus Retro sur Mac, dans une application vérifiée par Apple, sans clic droit ni réglage à contourner. Les six fonctionnalités y sont."
+msgid "Le multicompte Dofus Retro sur Mac, dans une application vérifiée par Apple, sans clic droit ni réglage à contourner. Les cinq fonctionnalités y sont."
+msgstr "Le multicompte Dofus Retro sur Mac, dans une application vérifiée par Apple, sans clic droit ni réglage à contourner. Les cinq fonctionnalités y sont."
 
 #: src/constants/wording.ts
 msgid "Le multicompte Dofus Retro sur Windows 10 et 11 : chaque personnage prend son bouton dans la barre des tâches, avec son pseudo et sa tête de classe."
@@ -746,8 +746,12 @@ msgid "Le tableau part et revient"
 msgstr "Le tableau part et revient"
 
 #: src/constants/bodies.ts
-msgid "Le texte se pose dans le champ, et vous le relisez avant d’appuyer sur Entrée."
-msgstr "Le texte se pose dans le champ, et vous le relisez avant d’appuyer sur Entrée."
+msgid "Les cinq fonctionnalités du menu sont là, sans exception."
+msgstr "Les cinq fonctionnalités du menu sont là, sans exception."
+
+#: src/constants/questions.ts
+msgid "Les cinq mécanismes sont sur les deux. <0>Trois choses manquent au Mac.</0>"
+msgstr "Les cinq mécanismes sont sur les deux. <0>Trois choses manquent au Mac.</0>"
 
 #: src/constants/wording.ts
 msgid "Les fonctionnalités"
@@ -773,21 +777,9 @@ msgstr "Les pages de Multifus"
 msgid "Les pages sont construites à l’avance et servies telles quelles, sans base de données et sans compte."
 msgstr "Les pages sont construites à l’avance et servies telles quelles, sans base de données et sans compte."
 
-#: src/constants/bodies.ts
-msgid "Les phrases livrées au premier lancement sont en français, même si vous lisez Multifus en anglais."
-msgstr "Les phrases livrées au premier lancement sont en français, même si vous lisez Multifus en anglais."
-
 #: src/constants/wording.ts
 msgid "Les questions qu’on se pose"
 msgstr "Les questions qu’on se pose"
-
-#: src/constants/bodies.ts
-msgid "Les six fonctionnalités du menu sont là, sans exception."
-msgstr "Les six fonctionnalités du menu sont là, sans exception."
-
-#: src/constants/questions.ts
-msgid "Les six mécanismes sont sur les deux. <0>Trois choses manquent au Mac.</0>"
-msgstr "Les six mécanismes sont sur les deux. <0>Trois choses manquent au Mac.</0>"
 
 #: src/screens/ankama-screen.tsx
 msgid "Les sources"
@@ -954,8 +946,8 @@ msgid "Multifus sur Windows"
 msgstr "Multifus sur Windows"
 
 #: src/constants/wording.ts
-msgid "Multifus, Dracoon, Focus Retro, Dosoft, Retro Toolbox, ROrganizer : quatorze lignes comparées, chacune lue dans le code de l’outil et pas sur sa page d’accueil."
-msgstr "Multifus, Dracoon, Focus Retro, Dosoft, Retro Toolbox, ROrganizer : quatorze lignes comparées, chacune lue dans le code de l’outil et pas sur sa page d’accueil."
+msgid "Multifus, Dracoon, Focus Retro, Dosoft, Retro Toolbox, ROrganizer : treize lignes comparées, chacune lue dans le code de l’outil et pas sur sa page d’accueil."
+msgstr "Multifus, Dracoon, Focus Retro, Dosoft, Retro Toolbox, ROrganizer : treize lignes comparées, chacune lue dans le code de l’outil et pas sur sa page d’accueil."
 
 #: src/constants/ankama.ts
 msgid "Ne rien lire et ne rien changer dans le jeu"
@@ -1126,10 +1118,6 @@ msgstr "Quittez le plein écran. En fenêtre agrandie, tout revient."
 msgid "Ranger et changer les fenêtres du jeu"
 msgstr "Ranger et changer les fenêtres du jeu"
 
-#: src/constants/wording.ts
-msgid "Rangez vos phrases les plus répétées sous une combinaison de touches. Dans Dofus Retro, vous appuyez, la phrase s’écrit, et c’est vous qui l’envoyez."
-msgstr "Rangez vos phrases les plus répétées sous une combinaison de touches. Dans Dofus Retro, vous appuyez, la phrase s’écrit, et c’est vous qui l’envoyez."
-
 #: src/components/rival-table.tsx
 msgid "Relevé le {surveyed}, dans le code de chaque outil."
 msgstr "Relevé le {surveyed}, dans le code de chaque outil."
@@ -1178,14 +1166,6 @@ msgstr "Signaler un problème"
 msgid "Signé et vérifié par Apple sur Mac. Sur Windows, seule l’attestation GitHub y est."
 msgstr "Signé et vérifié par Apple sur Mac. Sur Windows, seule l’attestation GitHub y est."
 
-#: src/screens/home-screen.tsx
-msgid "Six mécanismes, un seul but : ne plus chercher le personnage qui vous attend."
-msgstr "Six mécanismes, un seul but : ne plus chercher le personnage qui vous attend."
-
-#: src/constants/summons.ts
-msgid "Six mécanismes, une seule installation"
-msgstr "Six mécanismes, une seule installation"
-
 #: src/screens/download-screen.tsx
 msgid "Suivez les trois lignes de votre ordinateur. Il n’y a rien d’autre à faire."
 msgstr "Suivez les trois lignes de votre ordinateur. Il n’y a rien d’autre à faire."
@@ -1193,10 +1173,6 @@ msgstr "Suivez les trois lignes de votre ordinateur. Il n’y a rien d’autre �
 #: src/constants/wording.ts
 msgid "Sur Dofus Retro, un clic déplace le personnage devant vous, puis la fenêtre du suivant arrive. Vous cliquez une fois par personnage."
 msgstr "Sur Dofus Retro, un clic déplace le personnage devant vous, puis la fenêtre du suivant arrive. Vous cliquez une fois par personnage."
-
-#: src/constants/bodies.ts
-msgid "Sur le personnage devant vous"
-msgstr "Sur le personnage devant vous"
 
 #: src/constants/rivals.ts
 msgid "Sur Mac"
@@ -1272,14 +1248,6 @@ msgstr "Télécharger une version antérieure"
 msgid "Téléchargez Multifus gratuitement, pour Mac et pour Windows. Trois gestes pour installer, aucun compte à créer, aucune publicité, et le code est public."
 msgstr "Téléchargez Multifus gratuitement, pour Mac et pour Windows. Trois gestes pour installer, aucun compte à créer, aucune publicité, et le code est public."
 
-#: src/constants/wording.ts
-msgid "Textes rapides"
-msgstr "Textes rapides"
-
-#: src/constants/wording.ts
-msgid "Textes rapides au clavier sur Dofus Retro"
-msgstr "Textes rapides au clavier sur Dofus Retro"
-
 #: src/constants/questions.ts
 msgid "Tout est pareil sur Mac et sur Windows ?"
 msgstr "Tout est pareil sur Mac et sur Windows ?"
@@ -1332,14 +1300,6 @@ msgstr "Une bannière nomme le personnage"
 msgid "Une case qui vous paraît fausse se corrige ici :"
 msgstr "Une case qui vous paraît fausse se corrige ici :"
 
-#: src/constants/wording.ts
-msgid "Une combinaison écrit la phrase à votre place."
-msgstr "Une combinaison écrit la phrase à votre place."
-
-#: src/constants/wording.ts
-msgid "Une combinaison écrit la phrase."
-msgstr "Une combinaison écrit la phrase."
-
 #: src/constants/bodies.ts
 msgid "Une couleur par personnage"
 msgstr "Une couleur par personnage"
@@ -1388,14 +1348,6 @@ msgstr "Vos messages privés de Dofus Retro arrivent sur votre téléphone par T
 #: src/constants/bodies.ts
 msgid "Vos métiers montent plus vite"
 msgstr "Vos métiers montent plus vite"
-
-#: src/constants/bodies.ts
-msgid "Vos phrases les plus répétées"
-msgstr "Vos phrases les plus répétées"
-
-#: src/constants/bodies.ts
-msgid "Vos phrases parlent français"
-msgstr "Vos phrases parlent français"
 
 #: src/constants/bodies.ts
 msgid "Vos raccourcis parlent Mac"
@@ -1453,10 +1405,6 @@ msgstr "Vous cliquez quatre fois, sans chercher de fenêtre entre deux clics."
 msgid "Vous êtes parti manger, vos personnages sont restés connectés, et quelqu’un vous écrit en privé."
 msgstr "Vous êtes parti manger, vos personnages sont restés connectés, et quelqu’un vous écrit en privé."
 
-#: src/constants/bodies.ts
-msgid "Vous l’écrivez une fois, et la combinaison marche sur le personnage qui est devant vous."
-msgstr "Vous l’écrivez une fois, et la combinaison marche sur le personnage qui est devant vous."
-
 #: src/components/taskbar-proof.tsx
 msgid "Vous le voyez."
 msgstr "Vous le voyez."
@@ -1468,10 +1416,6 @@ msgstr "Vous maintenez une combinaison, la roue s’ouvre au milieu de l’écra
 #: src/constants/bodies.ts
 msgid "Vous ne quittez plus le jeu pour chercher le poids d’une rune."
 msgstr "Vous ne quittez plus le jeu pour chercher le poids d’une rune."
-
-#: src/constants/bodies.ts
-msgid "Vous rangez une phrase sous une combinaison de touches. Dans le jeu, vous appuyez, et elle s’écrit dans votre champ de discussion."
-msgstr "Vous rangez une phrase sous une combinaison de touches. Dans le jeu, vous appuyez, et elle s’écrit dans votre champ de discussion."
 
 #: src/constants/bodies.ts
 msgid "Vous reconnaissez le portrait et le pseudo, et vous partez dessus."

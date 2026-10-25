@@ -16,8 +16,6 @@ pub use settings::BannerCorner;
 pub use settings::Loop;
 pub use settings::LoopsSeen;
 pub use settings::NotesPlace;
-pub use settings::QuickText;
-pub use settings::QuickTextId;
 pub use settings::RUNE_TABLE_CLEAREST;
 pub use settings::RUNE_TABLE_NARROWEST;
 pub use settings::RUNE_TABLE_STEP;

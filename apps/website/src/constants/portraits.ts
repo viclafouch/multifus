@@ -1,6 +1,5 @@
 import craFemale from '@multifus/ankama/portraits/cra_f.webp'
 import ecaflipMale from '@multifus/ankama/portraits/ecaflip_m.webp'
-import eniripsaFemale from '@multifus/ankama/portraits/eniripsa_f.webp'
 import enutrofMale from '@multifus/ankama/portraits/enutrof_m.webp'
 import pandawaFemale from '@multifus/ankama/portraits/pandawa_f.webp'
 import sramMale from '@multifus/ankama/portraits/sram_m.webp'
@@ -15,7 +14,6 @@ export const PAGE_PORTRAITS = {
   walk: pandawaFemale,
   runeTable: enutrofMale,
   relay: sramMale,
-  quickTexts: eniripsaFemale,
   mac: null,
   windows: null,
   comparison: null,

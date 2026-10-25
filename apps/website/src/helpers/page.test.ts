@@ -112,12 +112,11 @@ const FEATURE_LOOP_PATHS = [
   '/roue-des-personnages',
   '/deplacement-rapide',
   '/tableau-des-runes',
-  '/messages-prives',
-  '/textes-rapides'
+  '/messages-prives'
 ]
 
 describe('matchHasPlate', () => {
-  it('counts the six feature pages that carry a loop', () => {
+  it('counts the five feature pages that carry a loop', () => {
     const carried = FEATURE_LOOP_PATHS.filter((path) => {
       return matchHasPlate(path)
     })

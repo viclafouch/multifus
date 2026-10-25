@@ -2,7 +2,6 @@ import React from 'react'
 import { plural, t } from '@lingui/core/macro'
 import { Button } from '@multifus/retro'
 import type { JournalEntry } from '@/@types/journal'
-import type { QuickText } from '@/@types/shortcuts'
 import type { Snapshot } from '@/@types/snapshot'
 import { CopyButton } from '@/components/copy-button'
 import { RevealButton } from '@/components/reveal-button'
@@ -105,13 +104,7 @@ export const JournalPanel = ({ snapshot }: JournalPanelProps) => {
             </li>
           ) : (
             entries.map((entry) => {
-              return (
-                <JournalLine
-                  key={entry.id}
-                  entry={entry}
-                  quickTexts={snapshot.quickTexts}
-                />
-              )
+              return <JournalLine key={entry.id} entry={entry} />
             })
           )}
         </ol>
@@ -122,10 +115,9 @@ export const JournalPanel = ({ snapshot }: JournalPanelProps) => {
 
 type JournalLineProps = Readonly<{
   entry: JournalEntry
-  quickTexts: readonly QuickText[]
 }>
 
-const JournalLine = ({ entry, quickTexts }: JournalLineProps) => {
+const JournalLine = ({ entry }: JournalLineProps) => {
   return (
     <li
       data-tone={journalTone(entry.event)}
@@ -142,7 +134,7 @@ const JournalLine = ({ entry, quickTexts }: JournalLineProps) => {
         {journalTime(entry.at)}
       </time>
       <span className="selectable min-w-0 break-words text-muted-foreground group-data-[tone=warning]/line:text-foreground/90">
-        {journalLine(entry.event, quickTexts)}
+        {journalLine(entry.event)}
       </span>
     </li>
   )

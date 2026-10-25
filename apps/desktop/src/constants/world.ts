@@ -2,7 +2,6 @@ import { msg } from '@lingui/core/macro'
 import battle from '@multifus/ankama/images/battle.webp'
 import camp from '@multifus/ankama/images/camp.webp'
 import forest from '@multifus/ankama/images/forest.webp'
-import harbour from '@multifus/ankama/images/harbour.webp'
 import pen from '@multifus/ankama/images/pen.webp'
 import standingStone from '@multifus/ankama/images/standing-stone.webp'
 import village from '@multifus/ankama/images/village.webp'
@@ -19,7 +18,6 @@ export type MapName = ScreenName | typeof CLEARING
 export const MAPS = [
   'characters',
   'shortcuts',
-  'quickTexts',
   'autoFocus',
   'walk',
   'runeTable',
@@ -32,7 +30,6 @@ export const MAP_SCENES = {
   clearing: standingStone,
   characters: camp,
   shortcuts: village,
-  quickTexts: harbour,
   autoFocus: battle,
   walk: forest,
   runeTable: workshop,
@@ -45,7 +42,6 @@ export const MAP_NAMES = {
   clearing: msg`Multifus`,
   characters: msg`Personnages`,
   shortcuts: msg`Raccourcis`,
-  quickTexts: msg`Textes rapides`,
   autoFocus: msg`AutoFocus`,
   walk: msg`Déplacement rapide`,
   runeTable: msg`Tableau des runes`,

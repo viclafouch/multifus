@@ -80,16 +80,6 @@ use windows::Win32::UI::Accessibility::UnhookWinEvent;
 use windows::Win32::UI::Accessibility::WINEVENTPROC;
 use windows::Win32::UI::HiDpi::GetDpiForMonitor;
 use windows::Win32::UI::HiDpi::MDT_EFFECTIVE_DPI;
-use windows::Win32::UI::Input::KeyboardAndMouse::INPUT;
-use windows::Win32::UI::Input::KeyboardAndMouse::INPUT_0;
-use windows::Win32::UI::Input::KeyboardAndMouse::INPUT_KEYBOARD;
-use windows::Win32::UI::Input::KeyboardAndMouse::KEYBD_EVENT_FLAGS;
-use windows::Win32::UI::Input::KeyboardAndMouse::KEYBDINPUT;
-use windows::Win32::UI::Input::KeyboardAndMouse::KEYEVENTF_KEYUP;
-use windows::Win32::UI::Input::KeyboardAndMouse::SendInput;
-use windows::Win32::UI::Input::KeyboardAndMouse::VIRTUAL_KEY;
-use windows::Win32::UI::Input::KeyboardAndMouse::VK_CONTROL;
-use windows::Win32::UI::Input::KeyboardAndMouse::VK_V;
 use windows::Win32::UI::Shell::PropertiesSystem::IPropertyStore;
 use windows::Win32::UI::Shell::PropertiesSystem::SHGetPropertyStoreForWindow;
 use windows::Win32::UI::Shell::QUNS_ACCEPTS_NOTIFICATIONS;
@@ -205,7 +195,6 @@ use crate::platform::notification::NotificationReport;
 use crate::platform::notification::NotificationSink;
 use crate::platform::notification::NotificationWatcher;
 use crate::platform::notification::SystemChecks;
-use crate::platform::paste::PasteSender;
 use crate::platform::wake::Wake;
 use crate::platform::wake::WakeSink;
 use crate::platform::wake::WakeWatcher;
@@ -2254,63 +2243,6 @@ impl DisplayKeeper for PowerRequestDisplayKeeper {
 impl Drop for PowerRequestDisplayKeeper {
     fn drop(&mut self) {
         drop(self.release());
-    }
-}
-
-const PASTE_EVENTS: usize = 4;
-
-#[derive(Debug, Default)]
-pub struct SendInputPasteSender;
-
-impl SendInputPasteSender {
-    #[must_use]
-    pub fn new() -> Self {
-        Self
-    }
-}
-
-impl PasteSender for SendInputPasteSender {
-    fn send_paste_combination(&self, _here: WindowId) -> Result<()> {
-        let events: [INPUT; PASTE_EVENTS] = [
-            key_event(VK_CONTROL, true),
-            key_event(VK_V, true),
-            key_event(VK_V, false),
-            key_event(VK_CONTROL, false),
-        ];
-
-        // SAFETY: the slice is alive for the call, and sized as the structure expects.
-        let sent = unsafe {
-            SendInput(
-                &events,
-                i32::try_from(size_of::<INPUT>()).unwrap_or(i32::MAX),
-            )
-        };
-
-        if sent as usize != PASTE_EVENTS {
-            return Err(PlatformError::system(
-                "posting the paste combination",
-                format!("SendInput took {sent} of {PASTE_EVENTS} events"),
-            ));
-        }
-
-        Ok(())
-    }
-}
-
-fn key_event(key: VIRTUAL_KEY, key_down: bool) -> INPUT {
-    INPUT {
-        r#type: INPUT_KEYBOARD,
-        Anonymous: INPUT_0 {
-            ki: KEYBDINPUT {
-                wVk: key,
-                dwFlags: if key_down {
-                    KEYBD_EVENT_FLAGS(0)
-                } else {
-                    KEYEVENTF_KEYUP
-                },
-                ..KEYBDINPUT::default()
-            },
-        },
     }
 }
 

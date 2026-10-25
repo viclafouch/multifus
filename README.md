@@ -37,8 +37,6 @@ Multifus updates itself. What each version changed is in the
   lies over the game window.
 - [Private messages](https://www.multifus.app/en/private-messages): your private
   messages reach your phone through Telegram.
-- [Quick texts](https://www.multifus.app/en/quick-texts): a key combination
-  writes your sentence in the chat field.
 
 Found a bug? [Open an issue](https://github.com/viclafouch/multifus/issues), in
 French, English or Spanish.

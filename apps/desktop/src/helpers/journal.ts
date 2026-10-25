@@ -6,7 +6,6 @@ import type {
   JournalEvent,
   MaximizeAllOutcome,
   NotificationOutcome,
-  QuickTextFailure,
   RosterChange,
   SettingChange,
   ShortcutOutcome,
@@ -15,11 +14,7 @@ import type {
 } from '@/@types/journal'
 import type { NotificationKind } from '@/@types/notification'
 import type { RelayFailure } from '@/@types/relay'
-import type {
-  BoundCombination,
-  QuickText,
-  ShortcutAction
-} from '@/@types/shortcuts'
+import type { BoundCombination, ShortcutAction } from '@/@types/shortcuts'
 import type { Snapshot } from '@/@types/snapshot'
 import type { Authorization, Surface } from '@/@types/system'
 import type { JournalTone } from '@/constants/journal'
@@ -29,7 +24,6 @@ import {
   GENDER_GROUP_LINES,
   MAXIMIZE_ALL_TONES,
   NOTICE_LINES,
-  QUICK_TEXT_FAILURE_TONES,
   PLAIN_LINES,
   SURFACE_LABELS,
   WALK_FROM_LABELS,
@@ -95,10 +89,6 @@ export const journalTone = (event: JournalEvent): JournalTone => {
 
   if (event.kind === 'shortcut' || event.kind === 'characterShortcut') {
     return SHORTCUT_TONES[event.outcome.outcome]
-  }
-
-  if (event.kind === 'quickTextFailed') {
-    return QUICK_TEXT_FAILURE_TONES[event.reason.reason]
   }
 
   if (event.kind === 'maximizeAll') {
@@ -201,43 +191,6 @@ const relayFailedLine = ({ reason, detail }: RelayFailure) => {
     }
     default: {
       return reason satisfies never
-    }
-  }
-}
-
-const quickTextFailedLine = (failure: QuickTextFailure) => {
-  switch (failure.reason) {
-    case 'outsideGame': {
-      return t`Texte rapide ignoré : aucune fenêtre Dofus au premier plan.`
-    }
-    case 'notesHoldKeyboard': {
-      return t`Texte rapide ignoré : les notes ont le clavier, et ce texte va au chat du jeu.`
-    }
-    case 'foregroundUnknown': {
-      const { detail } = failure
-
-      return t`Texte rapide ignoré : impossible de savoir quelle fenêtre est au premier plan (${detail}).`
-    }
-    case 'gone': {
-      return t`Texte rapide introuvable : il a été retiré entre l’appui et le collage.`
-    }
-    case 'clipboardRefused': {
-      const { detail } = failure
-
-      return t`Texte rapide non collé : le presse-papiers a refusé le texte (${detail}).`
-    }
-    case 'pasteRefused': {
-      const { detail } = failure
-
-      return t`Texte rapide non collé : le système a refusé la combinaison de collage (${detail}).`
-    }
-    case 'clipboardNotGivenBack': {
-      const { detail } = failure
-
-      return t`Texte rapide collé, mais le presse-papiers d’avant n’a pas pu être rendu (${detail}).`
-    }
-    default: {
-      return failure satisfies never
     }
   }
 }
@@ -425,23 +378,17 @@ const settingLine = (change: SettingChange) => {
   }
 }
 
-const shortcutsBoundLine = (
-  bindings: readonly BoundCombination[],
-  quickTexts: readonly QuickText[]
-) => {
+const shortcutsBoundLine = (bindings: readonly BoundCombination[]) => {
   const bound = bindings
     .map((binding) => {
-      return `${bindingLabel(binding.binding, quickTexts)} ${boundCombinationLabel(binding, quickTexts)}`
+      return `${bindingLabel(binding.binding)} ${boundCombinationLabel(binding)}`
     })
     .join(' · ')
 
   return t`Raccourcis : ${bound}.`
 }
 
-const boundCombinationLabel = (
-  { accelerator, status }: BoundCombination,
-  quickTexts: readonly QuickText[]
-) => {
+const boundCombinationLabel = ({ accelerator, status }: BoundCombination) => {
   const combination = accelerator ?? t`aucune combinaison`
 
   switch (status.kind) {
@@ -457,7 +404,7 @@ const boundCombinationLabel = (
       return t`${combination} illisible (${detail})`
     }
     case 'duplicate': {
-      const label = bindingLabel(status.binding, quickTexts)
+      const label = bindingLabel(status.binding)
 
       return t`${combination} en doublon avec ${label}, donc inerte`
     }
@@ -489,15 +436,7 @@ const boundCombinations = (snapshot: Snapshot): readonly BoundCombination[] => {
       } as const
     })
 
-  const quickTexts = snapshot.quickTexts.map(({ id, accelerator, status }) => {
-    return {
-      binding: { kind: 'quickText', id },
-      accelerator,
-      status
-    } as const
-  })
-
-  return [...actions, ...characters, ...quickTexts]
+  return [...actions, ...characters]
 }
 
 const journalPeriod = (entries: readonly JournalEntry[]) => {
@@ -522,7 +461,7 @@ export const journalTranscript = (snapshot: Snapshot) => {
   const { journal } = snapshot
 
   const lines = journal.map((entry) => {
-    return `${journalTime(entry.at)}  ${journalLine(entry.event, snapshot.quickTexts)}`
+    return `${journalTime(entry.at)}  ${journalLine(entry.event)}`
   })
 
   const { version, system } = snapshot
@@ -542,7 +481,7 @@ export const journalTranscript = (snapshot: Snapshot) => {
     t`Autorisation : ${granted}, écoute ${listening}`,
     t`AutoFocus : ${autoFocus}, réveil des réduites ${minimized}`,
     t`Déplacement rapide : ${walk}`,
-    shortcutsBoundLine(boundCombinations(snapshot), snapshot.quickTexts),
+    shortcutsBoundLine(boundCombinations(snapshot)),
     t`Configuration : ${path}`,
     t`Mise à jour : ${update}`,
     t`Entrées en mémoire : ${kept}, ${period}`,
@@ -833,10 +772,7 @@ const checkEventLine = ({
     : t`${subject} : ce n’est plus en place, le jeu ne vous appellera pas.`
 }
 
-const runLine = (
-  event: EventOf<RunEventKind>,
-  quickTexts: readonly QuickText[]
-) => {
+const runLine = (event: EventOf<RunEventKind>) => {
   switch (event.kind) {
     case 'started': {
       return startedLine(event)
@@ -877,7 +813,7 @@ const runLine = (
       return notificationLine(event)
     }
     case 'shortcutsBound': {
-      return shortcutsBoundLine(event.bindings, quickTexts)
+      return shortcutsBoundLine(event.bindings)
     }
     case 'startAtLoginReconciled': {
       return event.enabled
@@ -941,14 +877,6 @@ const actionLine = (event: EventOf<ActionEventKind>) => {
     case 'maximizeAll': {
       return maximizeAllLine(event)
     }
-    case 'quickTextPasted': {
-      const { excerpt } = event
-
-      return t`Texte rapide collé dans le jeu : « ${excerpt} »`
-    }
-    case 'quickTextFailed': {
-      return quickTextFailedLine(event.reason)
-    }
     case 'trayFocus': {
       return trayLine(event)
     }
@@ -979,10 +907,7 @@ const actionLine = (event: EventOf<ActionEventKind>) => {
   }
 }
 
-export const journalLine = (
-  event: JournalEvent,
-  quickTexts: readonly QuickText[]
-) => {
+export const journalLine = (event: JournalEvent) => {
   if (isDetailed(event)) {
     const subject = i18n._(DETAILED_LINES[event.kind])
     const { detail } = event
@@ -994,5 +919,5 @@ export const journalLine = (
     return i18n._(PLAIN_LINES[event.kind])
   }
 
-  return isRunEvent(event) ? runLine(event, quickTexts) : actionLine(event)
+  return isRunEvent(event) ? runLine(event) : actionLine(event)
 }

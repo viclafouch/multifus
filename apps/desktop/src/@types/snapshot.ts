@@ -6,7 +6,7 @@ import type { Onboarding } from '@/@types/onboarding'
 import type { RelayStatus } from '@/@types/relay'
 import type { Character } from '@/@types/roster'
 import type { RuneTableStatus } from '@/@types/rune'
-import type { QuickText, ShortcutBinding } from '@/@types/shortcuts'
+import type { ShortcutBinding } from '@/@types/shortcuts'
 import type {
   Authorization,
   ConfigStatus,
@@ -29,7 +29,6 @@ export type ScreenName =
   | 'about'
   | 'autoFocus'
   | 'characters'
-  | 'quickTexts'
   | 'relay'
   | 'runeTable'
   | 'settings'
@@ -44,7 +43,6 @@ export type Snapshot = {
   readonly keyboard: KeyLabels
   readonly characters: readonly Character[]
   readonly shortcuts: readonly ShortcutBinding[]
-  readonly quickTexts: readonly QuickText[]
   readonly autoFocus: readonly AutoFocusSwitch[]
   readonly autoFocusEnabled: boolean
   readonly wakesMinimized: boolean

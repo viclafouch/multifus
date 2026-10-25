@@ -8,6 +8,7 @@
 
 ### Improved
 
+- Quick texts are gone: Ankama sees automatic writing in the Dofus chat as a macro. Your sentences and their shortcuts are erased.
 - The icon menu now says “Turn private messages to phone on” and “Turn private messages to phone off”, instead of a “Stop getting them” nobody understood. The switch on the Private messages screen takes the same name.
 - The setup now describes Quick move as it works: one click per character, then the Dofus window of the next character comes forward.
 

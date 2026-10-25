@@ -28,7 +28,6 @@ pub struct Tally {
     walk_turned_on: u32,
     rune_table_opens: u32,
     notes_opens: u32,
-    quick_texts_pasted: u32,
     maximize_all: u32,
     relay_sent: u32,
     relay_turned_on: u32,
@@ -54,7 +53,6 @@ impl Default for Tally {
             walk_turned_on: 0,
             rune_table_opens: 0,
             notes_opens: 0,
-            quick_texts_pasted: 0,
             maximize_all: 0,
             relay_sent: 0,
             relay_turned_on: 0,
@@ -86,7 +84,6 @@ impl Tally {
             "walk_turned_on": self.walk_turned_on,
             "rune_table_opens": self.rune_table_opens,
             "notes_opens": self.notes_opens,
-            "quick_texts_pasted": self.quick_texts_pasted,
             "maximize_all": self.maximize_all,
             "relay_sent": self.relay_sent,
             "relay_turned_on": self.relay_turned_on,
@@ -151,10 +148,6 @@ impl Tally {
 
             JournalEvent::MaximizeAll { outcome, .. } => self.count_maximize_all(outcome),
 
-            JournalEvent::QuickTextPasted { .. } => {
-                self.quick_texts_pasted = self.quick_texts_pasted.saturating_add(1);
-            }
-
             JournalEvent::RelaySent { .. } => {
                 self.relay_sent = self.relay_sent.saturating_add(1);
             }
@@ -196,7 +189,6 @@ impl Tally {
             | JournalEvent::ListeningFailed { .. }
             | JournalEvent::NotificationUnreadable { .. }
             | JournalEvent::ShortcutsFailed { .. }
-            | JournalEvent::QuickTextFailed { .. }
             | JournalEvent::ClientMaximizeFailed { .. }
             | JournalEvent::ClientsCountFailed { .. }
             | JournalEvent::ShortTitlesFailed { .. }

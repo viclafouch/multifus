@@ -3,19 +3,12 @@ import { i18n } from '@lingui/core'
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import type { Character } from '@/@types/roster'
 import type {
-  QuickText,
   ShortcutAction,
   ShortcutBinding,
   ShortcutStatus
 } from '@/@types/shortcuts'
 import { SHORTCUT_ACTIONS } from '@/constants/shortcuts'
-import {
-  characterOf,
-  keyCapsOf,
-  pending,
-  quickTextOf,
-  strike
-} from '@/test-doubles'
+import { characterOf, keyCapsOf, pending, strike } from '@/test-doubles'
 
 const bridge = {
   setShortcut: vi.fn(),
@@ -64,19 +57,13 @@ const shortcut = (
 type ShowParams = {
   readonly shortcuts?: readonly ShortcutBinding[]
   readonly characters?: readonly Character[]
-  readonly quickTexts?: readonly QuickText[]
 }
 
-const show = ({
-  shortcuts = [],
-  characters = [],
-  quickTexts = []
-}: ShowParams = {}) => {
+const show = ({ shortcuts = [], characters = [] }: ShowParams = {}) => {
   const { rerender } = render(
     <ShortcutsScreen
       shortcuts={shortcuts}
       characters={characters}
-      quickTexts={quickTexts}
       run={() => {}}
     />
   )
@@ -86,7 +73,6 @@ const show = ({
       <ShortcutsScreen
         shortcuts={next.shortcuts ?? shortcuts}
         characters={next.characters ?? characters}
-        quickTexts={next.quickTexts ?? quickTexts}
         run={() => {}}
       />
     )
@@ -361,25 +347,6 @@ describe('the shortcuts screen, what Rust answers about a combination', () => {
 
     expect(screen.getByRole('alert').textContent).toBe(
       'Déjà pris par « Personnage suivant ».'
-    )
-  })
-
-  it('names the quick text that already holds the same keys', () => {
-    show({
-      shortcuts: [
-        shortcut('walk', {
-          accelerator: 'Control+KeyR',
-          status: {
-            kind: 'duplicate',
-            binding: { kind: 'quickText', id: 7 }
-          }
-        })
-      ],
-      quickTexts: [quickTextOf({ id: 7, text: 'Bonjour' })]
-    })
-
-    expect(screen.getByRole('alert').textContent).toBe(
-      'Déjà pris par le texte rapide « Bonjour ».'
     )
   })
 

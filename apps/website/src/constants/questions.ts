@@ -22,12 +22,11 @@ export const QUESTIONS = {
         marks: [{ kind: 'stress' }]
       },
       {
-        said: msg`Il lit le <0>titre de vos fenêtres</0> Dofus Retro, où le jeu écrit le pseudo du personnage. La <1>Roue des personnages</1> et le <2>Déplacement rapide</2> voient votre clic, et les <3>Textes rapides</3> collent la phrase dans la fenêtre devant vous.`,
+        said: msg`Il lit le <0>titre de vos fenêtres</0> Dofus Retro, où le jeu écrit le pseudo du personnage. La <1>Roue des personnages</1> et le <2>Déplacement rapide</2> voient votre clic.`,
         marks: [
           { kind: 'stress' },
           { kind: 'page', page: 'wheel' },
-          { kind: 'page', page: 'walk' },
-          { kind: 'page', page: 'quickTexts' }
+          { kind: 'page', page: 'walk' }
         ]
       },
       {
@@ -40,7 +39,7 @@ export const QUESTIONS = {
     ask: msg`Tout est pareil sur Mac et sur Windows ?`,
     answer: [
       {
-        said: msg`Les six mécanismes sont sur les deux. <0>Trois choses manquent au Mac.</0>`,
+        said: msg`Les cinq mécanismes sont sur les deux. <0>Trois choses manquent au Mac.</0>`,
         marks: [{ kind: 'stress' }]
       },
       {
@@ -295,7 +294,6 @@ export const PAGE_QUESTIONS = {
   walk: null,
   runeTable: null,
   relay: null,
-  quickTexts: null,
   mac: ['macFloor', 'monterey', 'macAccess', 'macFullScreen'],
   windows: [
     'warning',

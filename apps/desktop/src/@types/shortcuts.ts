@@ -9,12 +9,9 @@ export type ShortcutAction =
   | 'walk'
   | 'wheel'
 
-export type QuickTextId = number
-
 export type Binding =
   | { readonly kind: 'action'; readonly action: ShortcutAction }
   | { readonly kind: 'character'; readonly nickname: string }
-  | { readonly kind: 'quickText'; readonly id: QuickTextId }
 
 export type ShortcutStatus =
   | { readonly kind: 'duplicate'; readonly binding: Binding }
@@ -28,13 +25,6 @@ export type ShortcutBinding = {
   readonly accelerator: string | null
   readonly status: ShortcutStatus
   readonly isDefault: boolean
-}
-
-export type QuickText = {
-  readonly id: QuickTextId
-  readonly text: string
-  readonly accelerator: string | null
-  readonly status: ShortcutStatus
 }
 
 export type BoundCombination = {

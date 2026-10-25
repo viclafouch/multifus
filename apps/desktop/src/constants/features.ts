@@ -30,11 +30,6 @@ export const FEATURES = [
     screen: 'runeTable'
   },
   {
-    name: msg`Les textes rapides`,
-    line: msg`Un texte tout prêt, collé dans le chat.`,
-    screen: 'quickTexts'
-  },
-  {
     name: msg`Les messages privés`,
     line: msg`Vos MP suivis sur votre téléphone, par Telegram.`,
     screen: 'relay'

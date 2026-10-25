@@ -2,7 +2,6 @@ import { fireEvent, screen } from '@testing-library/react'
 import type { Display } from '@/@types/display'
 import type { Onboarding } from '@/@types/onboarding'
 import type { Character } from '@/@types/roster'
-import type { QuickText } from '@/@types/shortcuts'
 import type { Snapshot } from '@/@types/snapshot'
 import type { SystemInternals } from '@/@types/system'
 import type { WheelSize, WheelSlice } from '@/@types/wheel'
@@ -55,17 +54,6 @@ const BLANK_CHARACTER: Character = {
 
 export const characterOf = (fields: Partial<Character> = {}) => {
   return { ...BLANK_CHARACTER, ...fields }
-}
-
-const BLANK_QUICK_TEXT: QuickText = {
-  id: 1,
-  text: '',
-  accelerator: null,
-  status: { kind: 'unbound' }
-}
-
-export const quickTextOf = (fields: Partial<QuickText> = {}) => {
-  return { ...BLANK_QUICK_TEXT, ...fields }
 }
 
 export type Combination = {
@@ -151,7 +139,6 @@ const BLANK_SNAPSHOT: Snapshot = {
   keyboard: {},
   characters: [],
   shortcuts: [],
-  quickTexts: [],
   autoFocus: [],
   autoFocusEnabled: true,
   wakesMinimized: true,
@@ -195,8 +182,7 @@ const BLANK_SNAPSHOT: Snapshot = {
     walk: true,
     runeTable: true,
     autoFocus: true,
-    relay: true,
-    quickTexts: true
+    relay: true
   },
   journal: []
 }

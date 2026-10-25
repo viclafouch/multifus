@@ -83,7 +83,7 @@ describe('the video button', () => {
       return loop !== null
     })
 
-    expect(named).toHaveLength(6)
+    expect(named).toHaveLength(5)
 
     for (const loop of named) {
       const view = show({ loop })

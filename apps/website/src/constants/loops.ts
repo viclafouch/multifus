@@ -2,10 +2,6 @@ import autoFocusPeek from '@multifus/ankama/loops/auto-focus-loop-peek.webp'
 import autoFocusSmall from '@multifus/ankama/loops/auto-focus-loop-poster-760.webp'
 import autoFocusPoster from '@multifus/ankama/loops/auto-focus-loop-poster.webp'
 import autoFocusLoop from '@multifus/ankama/loops/auto-focus-loop.mp4'
-import quickTextsPeek from '@multifus/ankama/loops/quick-texts-loop-peek.webp'
-import quickTextsSmall from '@multifus/ankama/loops/quick-texts-loop-poster-760.webp'
-import quickTextsPoster from '@multifus/ankama/loops/quick-texts-loop-poster.webp'
-import quickTextsLoop from '@multifus/ankama/loops/quick-texts-loop.mp4'
 import relayPeek from '@multifus/ankama/loops/relay-loop-peek.webp'
 import relaySmall from '@multifus/ankama/loops/relay-loop-poster-760.webp'
 import relayPoster from '@multifus/ankama/loops/relay-loop-poster.webp'
@@ -69,13 +65,6 @@ export const LOOPS = {
     poster: posterOf(relayPoster, relaySmall),
     seconds: 5,
     filmed: REFILMED_ON
-  },
-  quickTexts: {
-    source: quickTextsLoop,
-    size: { width: 800, height: 450 },
-    poster: posterOf(quickTextsPoster, quickTextsSmall),
-    seconds: 12,
-    filmed: REFILMED_ON
   }
 } as const satisfies Record<FeatureId, Loop>
 
@@ -84,6 +73,5 @@ export const PEEKS = {
   wheel: wheelPeek,
   walk: walkPeek,
   runeTable: runeTablePeek,
-  relay: relayPeek,
-  quickTexts: quickTextsPeek
+  relay: relayPeek
 } as const satisfies Record<FeatureId, string>

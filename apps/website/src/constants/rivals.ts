@@ -55,7 +55,6 @@ export const TRAIT_IDS = [
   'autoFocus',
   'runeTable',
   'relay',
-  'quickTexts',
   'split',
   'savedOrders',
   'tongues',
@@ -69,8 +68,7 @@ export const PEEK_TRAITS = [
   'wheel',
   'walk',
   'autoFocus',
-  'relay',
-  'quickTexts'
+  'relay'
 ] as const satisfies readonly TraitId[]
 
 export const TRAITS = {
@@ -154,16 +152,6 @@ export const TRAITS = {
       rorganizer: 'no'
     }
   },
-  quickTexts: {
-    mine: 'yes',
-    theirs: {
-      dracoon: 'no',
-      focusRetro: 'no',
-      dosoft: 'no',
-      retroToolbox: 'no',
-      rorganizer: 'no'
-    }
-  },
   split: {
     mine: 'no',
     theirs: {
@@ -225,7 +213,6 @@ export const TRAIT_NAMES = {
   autoFocus: msg`AutoFocus`,
   runeTable: PAGE_NAMES.runeTable,
   relay: PAGE_NAMES.relay,
-  quickTexts: PAGE_NAMES.quickTexts,
   split: msg`Fenêtres rangées côte à côte`,
   savedOrders: msg`Plusieurs ordres de personnages enregistrés`,
   tongues: msg`Français, anglais, espagnol`,

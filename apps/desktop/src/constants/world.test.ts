@@ -40,7 +40,6 @@ describe('the world', () => {
       'Multifus',
       'Personnages',
       'Raccourcis',
-      'Textes rapides',
       'AutoFocus',
       'Déplacement rapide',
       'Tableau des runes',

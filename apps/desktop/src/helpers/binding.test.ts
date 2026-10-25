@@ -20,30 +20,30 @@ describe('matchIsSameBinding', () => {
     expect(isSame).toBe(false)
   })
 
-  it('recognizes twice the same quick text', () => {
+  it('recognizes twice the same character', () => {
     const isSame = matchIsSameBinding(
-      { kind: 'quickText', id: 3 },
-      { kind: 'quickText', id: 3 }
+      { kind: 'character', nickname: 'Ilyzaelle' },
+      { kind: 'character', nickname: 'Ilyzaelle' }
     )
 
     expect(isSame).toBe(true)
   })
 
-  it('separates two different quick texts', () => {
+  it('separates two different characters', () => {
     const isSame = matchIsSameBinding(
-      { kind: 'quickText', id: 3 },
-      { kind: 'quickText', id: 4 }
+      { kind: 'character', nickname: 'Ilyzaelle' },
+      { kind: 'character', nickname: 'Goultard' }
     )
 
     expect(isSame).toBe(false)
   })
 
   it('never mixes up the two families', () => {
-    const quickText = { kind: 'quickText', id: 0 } as const
+    const character = { kind: 'character', nickname: 'next' } as const
 
     const isSame = matchIsSameBinding(
       { kind: 'action', action: 'next' },
-      quickText
+      character
     )
 
     expect(isSame).toBe(false)

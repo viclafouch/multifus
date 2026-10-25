@@ -5,7 +5,6 @@ import { ArrowUUpLeftIcon } from '@phosphor-icons/react/dist/ssr/ArrowUUpLeft'
 import { BellRingingIcon } from '@phosphor-icons/react/dist/ssr/BellRinging'
 import { BrowsersIcon } from '@phosphor-icons/react/dist/ssr/Browsers'
 import { CertificateIcon } from '@phosphor-icons/react/dist/ssr/Certificate'
-import { ChatTextIcon } from '@phosphor-icons/react/dist/ssr/ChatText'
 import { CrosshairSimpleIcon } from '@phosphor-icons/react/dist/ssr/CrosshairSimple'
 import { CursorClickIcon } from '@phosphor-icons/react/dist/ssr/CursorClick'
 import { DropIcon } from '@phosphor-icons/react/dist/ssr/Drop'
@@ -14,7 +13,6 @@ import { FlagIcon } from '@phosphor-icons/react/dist/ssr/Flag'
 import { HammerIcon } from '@phosphor-icons/react/dist/ssr/Hammer'
 import { HourglassHighIcon } from '@phosphor-icons/react/dist/ssr/HourglassHigh'
 import { KeyboardIcon } from '@phosphor-icons/react/dist/ssr/Keyboard'
-import { KeyReturnIcon } from '@phosphor-icons/react/dist/ssr/KeyReturn'
 import { ListNumbersIcon } from '@phosphor-icons/react/dist/ssr/ListNumbers'
 import { LockKeyIcon } from '@phosphor-icons/react/dist/ssr/LockKey'
 import { PaletteIcon } from '@phosphor-icons/react/dist/ssr/Palette'
@@ -23,9 +21,7 @@ import { PowerIcon } from '@phosphor-icons/react/dist/ssr/Power'
 import { PushPinIcon } from '@phosphor-icons/react/dist/ssr/PushPin'
 import { SquaresFourIcon } from '@phosphor-icons/react/dist/ssr/SquaresFour'
 import { TelegramLogoIcon } from '@phosphor-icons/react/dist/ssr/TelegramLogo'
-import { TranslateIcon } from '@phosphor-icons/react/dist/ssr/Translate'
 import { UserCheckIcon } from '@phosphor-icons/react/dist/ssr/UserCheck'
-import { UserFocusIcon } from '@phosphor-icons/react/dist/ssr/UserFocus'
 import type { Body } from '@/@types/body'
 import type { PageId } from '@/@types/page'
 
@@ -156,31 +152,6 @@ export const PAGE_BODIES = {
       }
     ]
   },
-  quickTexts: {
-    lead: msg`Vous rangez une phrase sous une combinaison de touches. Dans le jeu, vous appuyez, et elle s’écrit dans votre champ de discussion.`,
-    boons: [
-      {
-        icon: ChatTextIcon,
-        title: msg`Vos phrases les plus répétées`,
-        line: msg`« Achète anneau 30 pp, MP moi », « Bon jeu à toi », « Je reviens dans deux minutes ».`
-      },
-      {
-        icon: UserFocusIcon,
-        title: msg`Sur le personnage devant vous`,
-        line: msg`Vous l’écrivez une fois, et la combinaison marche sur le personnage qui est devant vous.`
-      },
-      {
-        icon: KeyReturnIcon,
-        title: msg`C’est vous qui envoyez`,
-        line: msg`Le texte se pose dans le champ, et vous le relisez avant d’appuyer sur Entrée.`
-      },
-      {
-        icon: TranslateIcon,
-        title: msg`Vos phrases parlent français`,
-        line: msg`Les phrases livrées au premier lancement sont en français, même si vous lisez Multifus en anglais.`
-      }
-    ]
-  },
   mac: {
     lead: msg`Presque tous les gestionnaires pour Dofus Retro s’arrêtent à Windows. Multifus est né sur Mac, et c’est de là que part la version Windows.`,
     boons: [
@@ -197,7 +168,7 @@ export const PAGE_BODIES = {
       {
         icon: SquaresFourIcon,
         title: msg`Rien ne manque sur Mac`,
-        line: msg`Les six fonctionnalités du menu sont là, sans exception.`
+        line: msg`Les cinq fonctionnalités du menu sont là, sans exception.`
       },
       {
         icon: KeyboardIcon,

@@ -396,11 +396,6 @@ msgstr "Agrandissement des fenêtres au lancement désactivé."
 msgid "Agrandit tous vos clients Dofus d’un seul coup."
 msgstr "Agrandit tous vos clients Dofus d’un seul coup."
 
-#: src/screens/quick-texts/empty-texts.tsx
-#: src/screens/quick-texts/index.tsx
-msgid "Ajouter un texte"
-msgstr "Ajouter un texte"
-
 #: src/components/shortcut-field.tsx
 msgid "Ajoutez Ctrl, Alt ou Maj, ou prenez une touche de fonction : F1, F2, F5… Seule, cette touche partirait dès que vous écrivez dans le jeu."
 msgstr "Ajoutez Ctrl, Alt ou Maj, ou prenez une touche de fonction : F1, F2, F5… Seule, cette touche partirait dès que vous écrivez dans le jeu."
@@ -490,10 +485,6 @@ msgstr "Aucun homme connecté"
 #: src/screens/relay/state-panel.tsx
 msgid "Aucun personnage connecté"
 msgstr "Aucun personnage connecté"
-
-#: src/screens/quick-texts/empty-texts.tsx
-msgid "Aucun texte rangé"
-msgstr "Aucun texte rangé"
 
 #: src/components/character-dialog.tsx
 #: src/components/shortcut-field.tsx
@@ -624,11 +615,6 @@ msgstr "Barre système : le système a refusé de ramener {nickname} au premier 
 #: src/constants/roster.ts
 msgid "Bleu"
 msgstr "Bleu"
-
-#: src/screens/quick-texts/empty-texts.tsx
-#: src/screens/quick-texts/text-row.tsx
-msgid "Bon jeu à toi !"
-msgstr "Bon jeu à toi !"
 
 #: src/screens/relay/pairing-guide.tsx
 msgid "BotFather finit par une longue suite de chiffres et de lettres. Un clic dessus la copie."
@@ -1650,8 +1636,8 @@ msgid "Le jeu vous appelle, sa fenêtre passe devant."
 msgstr "Le jeu vous appelle, sa fenêtre passe devant."
 
 #: src/screens/about/identity-panel.tsx
-msgid "Le multicompte sur Dofus Retro, sans quitter le jeu des yeux. Vos fenêtres passent devant au clavier, à la roue des personnages ou au clic, et celle qui vous appelle arrive toute seule. Un raccourci colle un texte rapide, un autre pose le tableau des runes, et vos messages privés vous rejoignent sur votre téléphone si vous reliez Telegram."
-msgstr "Le multicompte sur Dofus Retro, sans quitter le jeu des yeux. Vos fenêtres passent devant au clavier, à la roue des personnages ou au clic, et celle qui vous appelle arrive toute seule. Un raccourci colle un texte rapide, un autre pose le tableau des runes, et vos messages privés vous rejoignent sur votre téléphone si vous reliez Telegram."
+msgid "Le multicompte sur Dofus Retro, sans quitter le jeu des yeux. Vos fenêtres passent devant au clavier, à la roue des personnages ou au clic, et celle qui vous appelle arrive toute seule. Un raccourci pose le tableau des runes, et vos messages privés vous rejoignent sur votre téléphone si vous reliez Telegram."
+msgstr "Le multicompte sur Dofus Retro, sans quitter le jeu des yeux. Vos fenêtres passent devant au clavier, à la roue des personnages ou au clic, et celle qui vous appelle arrive toute seule. Un raccourci pose le tableau des runes, et vos messages privés vous rejoignent sur votre téléphone si vous reliez Telegram."
 
 #: src/screens/rune-table-window/rune-sheet.tsx
 msgid "Le poids de chaque rune : la simple, la Pa, la Ra, et le poids d’un point de stat"
@@ -1689,14 +1675,6 @@ msgstr "Le tableau ne s’affiche pas sur un client en plein écran. Forgez dans
 #: src/screens/rune-table/index.tsx
 msgid "Le tableau ne s’affiche que sur le personnage où vous l’avez ouvert."
 msgstr "Le tableau ne s’affiche que sur le personnage où vous l’avez ouvert."
-
-#: src/screens/quick-texts/text-row.tsx
-msgid "Le texte à coller"
-msgstr "Le texte à coller"
-
-#: src/helpers/wording.ts
-msgid "le texte rapide « {text} »"
-msgstr "le texte rapide « {text} »"
 
 #: src/constants/journal.ts
 msgid "Le tour ne sera pas prévenu par le système, il passera une fois par seconde"
@@ -1746,10 +1724,6 @@ msgstr "Les notifications"
 msgid "Les options de Dofus, avec la case Notifications en arrière-plan cochée"
 msgstr "Les options de Dofus, avec la case Notifications en arrière-plan cochée"
 
-#: src/screens/quick-texts/index.tsx
-msgid "Les phrases que vous retapez tous les soirs, rangées sous une touche. Multifus les colle dans le jeu."
-msgstr "Les phrases que vous retapez tous les soirs, rangées sous une touche. Multifus les colle dans le jeu."
-
 #: src/screens/rune-table/index.tsx
 msgid "Les poids des runes par-dessus le jeu. Plus besoin d’aller les chercher ailleurs pendant un brisage."
 msgstr "Les poids des runes par-dessus le jeu. Plus besoin d’aller les chercher ailleurs pendant un brisage."
@@ -1773,14 +1747,6 @@ msgstr "Les réglages de Multifus : son démarrage, et ce qu’il change sur vos
 #: src/helpers/health.ts
 msgid "Les réglages dont l’AutoFocus dépend sont ouverts. Une notification de Dofus ramènera la bonne fenêtre devant vous."
 msgstr "Les réglages dont l’AutoFocus dépend sont ouverts. Une notification de Dofus ramènera la bonne fenêtre devant vous."
-
-#: src/constants/features.ts
-msgid "Les textes rapides"
-msgstr "Les textes rapides"
-
-#: src/constants/loops.ts
-msgid "Les touches frappées dans le jeu : le texte tout prêt s’écrit dans la fenêtre du personnage et part, sans quitter le combat."
-msgstr "Les touches frappées dans le jeu : le texte tout prêt s’écrit dans la fenêtre du personnage et part, sans quitter le combat."
 
 #: src/constants/loops.ts
 msgid "Les touches frappées pendant une casse : le tableau s’ouvre sur le jeu, les poids sous les yeux, et la souris ne quitte pas l’atelier."
@@ -1928,14 +1894,6 @@ msgstr "Modifier le raccourci {label}"
 msgid "Modifier le raccourci de {nickname}"
 msgstr "Modifier le raccourci de {nickname}"
 
-#: src/helpers/wording.ts
-msgid "Modifier les touches du texte {rank}"
-msgstr "Modifier les touches du texte {rank}"
-
-#: src/helpers/wording.ts
-msgid "Modifier les touches du texte {rank}, « {text} »"
-msgstr "Modifier les touches du texte {rank}, « {text} »"
-
 #: src/components/config-notice.tsx
 msgid "Montrer le fichier"
 msgstr "Montrer le fichier"
@@ -1980,10 +1938,6 @@ msgstr "Multifus a été quitté depuis la barre système."
 #: src/screens/authorization-screen.tsx
 msgid "Multifus attend votre autorisation"
 msgstr "Multifus attend votre autorisation"
-
-#: src/screens/quick-texts/index.tsx
-msgid "Multifus colle, c’est vous qui appuyez sur Entrée. Le temps du collage, il emprunte votre presse-papiers, puis vous le rend."
-msgstr "Multifus colle, c’est vous qui appuyez sur Entrée. Le temps du collage, il emprunte votre presse-papiers, puis vous le rend."
 
 #: src/screens/settings/index.tsx
 msgid "Multifus doit rester en arrière-plan pour fonctionner."
@@ -2546,10 +2500,6 @@ msgstr "Retirer {nickname} du roster"
 msgid "Retirer ce robot"
 msgstr "Retirer ce robot"
 
-#: src/screens/quick-texts/text-row.tsx
-msgid "Retirer ce texte"
-msgstr "Retirer ce texte"
-
 #: src/components/character-dialog.tsx
 msgid "Retirer la classe de {nickname}"
 msgstr "Retirer la classe de {nickname}"
@@ -2651,10 +2601,6 @@ msgstr "Sans l’autorisation {accessibility}, Multifus ne peut pas lire le pseu
 #: src/helpers/wording.ts
 msgid "Sans l’autorisation {accessibility}, Multifus ne voit aucune fenêtre Dofus Retro et ne ramènera personne devant vous."
 msgstr "Sans l’autorisation {accessibility}, Multifus ne voit aucune fenêtre Dofus Retro et ne ramènera personne devant vous."
-
-#: src/screens/quick-texts/text-row.tsx
-msgid "Sans texte, il n’y aura rien à coller."
-msgstr "Sans texte, il n’y aura rien à coller."
 
 #: src/helpers/wording.ts
 msgid "Sans touches, il ne se passera rien."
@@ -2784,42 +2730,6 @@ msgstr "Tête de classe dans la barre des tâches activée."
 #: src/helpers/journal.ts
 msgid "Tête de classe dans la barre des tâches désactivée."
 msgstr "Tête de classe dans la barre des tâches désactivée."
-
-#: src/helpers/journal.ts
-msgid "Texte rapide collé dans le jeu : « {excerpt} »"
-msgstr "Texte rapide collé dans le jeu : « {excerpt} »"
-
-#: src/helpers/journal.ts
-msgid "Texte rapide collé, mais le presse-papiers d’avant n’a pas pu être rendu ({detail})."
-msgstr "Texte rapide collé, mais le presse-papiers d’avant n’a pas pu être rendu ({detail})."
-
-#: src/helpers/journal.ts
-msgid "Texte rapide ignoré : aucune fenêtre Dofus au premier plan."
-msgstr "Texte rapide ignoré : aucune fenêtre Dofus au premier plan."
-
-#: src/helpers/journal.ts
-msgid "Texte rapide ignoré : impossible de savoir quelle fenêtre est au premier plan ({detail})."
-msgstr "Texte rapide ignoré : impossible de savoir quelle fenêtre est au premier plan ({detail})."
-
-#: src/helpers/journal.ts
-msgid "Texte rapide ignoré : les notes ont le clavier, et ce texte va au chat du jeu."
-msgstr "Texte rapide ignoré : les notes ont le clavier, et ce texte va au chat du jeu."
-
-#: src/helpers/journal.ts
-msgid "Texte rapide introuvable : il a été retiré entre l’appui et le collage."
-msgstr "Texte rapide introuvable : il a été retiré entre l’appui et le collage."
-
-#: src/helpers/journal.ts
-msgid "Texte rapide non collé : le presse-papiers a refusé le texte ({detail})."
-msgstr "Texte rapide non collé : le presse-papiers a refusé le texte ({detail})."
-
-#: src/helpers/journal.ts
-msgid "Texte rapide non collé : le système a refusé la combinaison de collage ({detail})."
-msgstr "Texte rapide non collé : le système a refusé la combinaison de collage ({detail})."
-
-#: src/constants/world.ts
-msgid "Textes rapides"
-msgstr "Textes rapides"
 
 #: src/constants/journal.ts
 msgid "Titre d’une fenêtre impossible à changer"
@@ -2970,18 +2880,6 @@ msgstr "Un réglage du système empêche le jeu de vous appeler."
 msgid "Un robot ne parle jamais le premier. Sans ce message, il n’a pas le droit de vous écrire."
 msgstr "Un robot ne parle jamais le premier. Sans ce message, il n’a pas le droit de vous écrire."
 
-#: src/helpers/wording.ts
-msgid "un texte rapide vide"
-msgstr "un texte rapide vide"
-
-#: src/constants/features.ts
-msgid "Un texte tout prêt, collé dans le chat."
-msgstr "Un texte tout prêt, collé dans le chat."
-
-#: src/screens/quick-texts/empty-texts.tsx
-msgid "Un texte, des touches, et vous ne le retapez plus de la soirée."
-msgstr "Un texte, des touches, et vous ne le retapez plus de la soirée."
-
 #: src/screens/settings/help-section.tsx
 msgid "Une bannière de trop, un raccourci muet, une fenêtre qui ne s’agrandit pas : ce qu’il faut cocher, et où."
 msgstr "Une bannière de trop, un raccourci muet, une fenêtre qui ne s’agrandit pas : ce qu’il faut cocher, et où."
@@ -2989,10 +2887,6 @@ msgstr "Une bannière de trop, un raccourci muet, une fenêtre qui ne s’agrand
 #: src/helpers/questions.ts
 msgid "Une bannière me cache le jeu à chaque message"
 msgstr "Une bannière me cache le jeu à chaque message"
-
-#: src/constants/loops.ts
-msgid "Une combinaison de touches, et le texte part dans la fenêtre du personnage."
-msgstr "Une combinaison de touches, et le texte part dans la fenêtre du personnage."
 
 #: src/constants/journal.ts
 msgid "Une partie de Multifus a échoué brutalement"

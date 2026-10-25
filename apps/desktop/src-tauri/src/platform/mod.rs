@@ -3,7 +3,6 @@ pub mod display;
 pub mod error;
 pub mod keyboard;
 pub mod notification;
-pub mod paste;
 pub mod wake;
 pub mod window;
 
@@ -43,8 +42,6 @@ pub use notification::NotificationReport;
 pub use notification::NotificationSink;
 pub use notification::NotificationWatcher;
 pub use notification::SystemChecks;
-pub use paste::Clipboard;
-pub use paste::PasteSender;
 pub use wake::Wake;
 pub use wake::WakeSink;
 pub use wake::WakeWatcher;
@@ -98,11 +95,6 @@ pub type PlatformNotificationWatcher = windows::UserNotificationWatcher;
 pub type PlatformDisplayKeeper = macos::PowerAssertionDisplayKeeper;
 #[cfg(target_os = "windows")]
 pub type PlatformDisplayKeeper = windows::PowerRequestDisplayKeeper;
-
-#[cfg(target_os = "macos")]
-pub type PlatformPasteSender = macos::CoreGraphicsPasteSender;
-#[cfg(target_os = "windows")]
-pub type PlatformPasteSender = windows::SendInputPasteSender;
 
 #[cfg(target_os = "macos")]
 pub type PlatformClickWatcher = macos::MouseTapClickWatcher;

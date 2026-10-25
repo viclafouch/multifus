@@ -13,8 +13,8 @@ const WITHOUT_HOME = PAGE_IDS.filter((page) => {
 })
 
 describe('the table of the pages', () => {
-  it('gives fifteen pages', () => {
-    expect(PAGE_IDS).toHaveLength(15)
+  it('gives fourteen pages', () => {
+    expect(PAGE_IDS).toHaveLength(14)
   })
 
   it('lists exactly what the table carries', () => {

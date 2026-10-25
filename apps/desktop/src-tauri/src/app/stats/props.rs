@@ -51,7 +51,6 @@ pub fn started_props(params: StartedParams<'_>) -> Value {
         loops.rune_table,
         loops.auto_focus,
         loops.relay,
-        loops.quick_texts,
     ]
     .into_iter()
     .filter(|seen| *seen)
@@ -99,12 +98,6 @@ pub fn started_props(params: StartedParams<'_>) -> Value {
         "rune_table_width": rune_table.width,
         "rune_table_transparency": rune_table.transparency,
         "rune_table_moved": rune_table.offset.is_some(),
-        "quick_texts": settings.quick_texts.len(),
-        "quick_texts_bound": settings
-            .quick_texts
-            .iter()
-            .filter(|quick_text| quick_text.shortcut.is_some())
-            .count(),
         "shortcuts_changed": shortcuts_changed(&settings.shortcuts),
         "shortcuts_off": shortcuts_off(&settings.shortcuts),
         "loops_seen": loops_seen,
@@ -262,8 +255,6 @@ mod tests {
         assert_eq!(props["auto_focus"], json!(true));
         assert_eq!(props["auto_focus_kinds"], json!(7));
         assert_eq!(props["banner_corner"], json!("top_left"));
-        assert_eq!(props["quick_texts"], json!(1));
-        assert_eq!(props["quick_texts_bound"], json!(0));
         assert_eq!(props["shortcuts_changed"], json!(0));
         assert_eq!(props["shortcuts_off"], json!(0));
         assert_eq!(props["loops_seen"], json!(0));

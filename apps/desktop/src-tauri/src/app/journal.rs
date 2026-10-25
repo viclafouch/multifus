@@ -133,14 +133,6 @@ pub enum JournalEvent {
         outcome: CharacterShortcutOutcome,
     },
 
-    QuickTextPasted {
-        excerpt: String,
-    },
-
-    QuickTextFailed {
-        reason: QuickTextFailure,
-    },
-
     ClientMaximized,
 
     ClientMaximizeFailed {
@@ -441,28 +433,6 @@ pub enum RelayFailure {
     Telegram { detail: String },
 
     Network { detail: String },
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
-#[serde(
-    tag = "reason",
-    rename_all = "camelCase",
-    rename_all_fields = "camelCase"
-)]
-pub enum QuickTextFailure {
-    OutsideGame,
-
-    NotesHoldKeyboard,
-
-    ForegroundUnknown { detail: String },
-
-    Gone,
-
-    ClipboardRefused { detail: String },
-
-    PasteRefused { detail: String },
-
-    ClipboardNotGivenBack { detail: String },
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
@@ -864,69 +834,6 @@ mod tests {
             .collect::<Vec<_>>();
 
         assert_eq!(named, ["keychain", "telegram", "network"]);
-    }
-
-    #[test]
-    fn a_paste_carries_an_excerpt_of_the_user_s_own_line_and_nothing_more() {
-        let pasted = JournalEvent::QuickTextPasted {
-            excerpt: "prix libre".to_owned(),
-        };
-
-        assert_eq!(fields_of(&pasted), ["excerpt", "kind"]);
-
-        let failed = JournalEvent::QuickTextFailed {
-            reason: QuickTextFailure::PasteRefused {
-                detail: "refusé".to_owned(),
-            },
-        };
-
-        assert_eq!(fields_of(&failed), ["kind", "reason"]);
-        assert_eq!(
-            serde_json::to_string(&failed).expect("the event serialises"),
-            r#"{"kind":"quickTextFailed","reason":{"reason":"pasteRefused","detail":"refusé"}}"#
-        );
-    }
-
-    #[test]
-    fn a_quick_text_that_failed_says_which_of_the_six_places_it_is_repaired_in() {
-        let reasons = [
-            QuickTextFailure::OutsideGame,
-            QuickTextFailure::ForegroundUnknown {
-                detail: "denied".to_owned(),
-            },
-            QuickTextFailure::Gone,
-            QuickTextFailure::ClipboardRefused {
-                detail: "denied".to_owned(),
-            },
-            QuickTextFailure::PasteRefused {
-                detail: "denied".to_owned(),
-            },
-            QuickTextFailure::ClipboardNotGivenBack {
-                detail: "denied".to_owned(),
-            },
-        ];
-
-        let named = reasons
-            .iter()
-            .map(|reason| {
-                serde_json::to_value(reason).expect("a reason serialises")["reason"]
-                    .as_str()
-                    .expect("a reason is tagged")
-                    .to_owned()
-            })
-            .collect::<Vec<_>>();
-
-        assert_eq!(
-            named,
-            [
-                "outsideGame",
-                "foregroundUnknown",
-                "gone",
-                "clipboardRefused",
-                "pasteRefused",
-                "clipboardNotGivenBack"
-            ]
-        );
     }
 
     #[test]

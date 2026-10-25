@@ -18,7 +18,6 @@ export type TraitId =
   | 'autoFocus'
   | 'charShortcut'
   | 'macos'
-  | 'quickTexts'
   | 'relay'
   | 'runeTable'
   | 'signed'

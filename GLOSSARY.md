@@ -45,7 +45,7 @@ _Avoid_: bloc-notes, notepad, memo
 **Note**:
 What the player wrote in the Notes, kept across restarts. The Notes hold one
 note.
-_Avoid_: text, which belongs to the quick text, page
+_Avoid_: page
 
 ### Releases
 

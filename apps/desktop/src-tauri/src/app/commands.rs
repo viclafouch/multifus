@@ -31,7 +31,6 @@ use crate::app::wheel;
 use crate::config::BannerCorner;
 use crate::config::Language;
 use crate::config::Loop;
-use crate::config::QuickTextId;
 use crate::domain::Class;
 use crate::domain::Color;
 use crate::domain::Gender;
@@ -201,42 +200,6 @@ pub fn set_character_shortcut(
 #[tauri::command]
 pub fn reset_shortcuts(app: AppHandle) -> Snapshot {
     lock(&app).reset_shortcuts();
-
-    shortcuts::apply(&app);
-
-    runtime::emit_snapshot(&app)
-}
-
-#[tauri::command]
-pub fn add_quick_text(app: AppHandle) -> Snapshot {
-    lock(&app).add_quick_text();
-
-    runtime::emit_snapshot(&app)
-}
-
-#[tauri::command]
-pub fn set_quick_text_text(app: AppHandle, id: QuickTextId, text: String) -> Snapshot {
-    lock(&app).set_quick_text_text(id, &text);
-
-    runtime::emit_snapshot(&app)
-}
-
-#[tauri::command]
-pub fn set_quick_text_shortcut(
-    app: AppHandle,
-    id: QuickTextId,
-    accelerator: Option<String>,
-) -> Snapshot {
-    lock(&app).set_quick_text_shortcut(id, accelerator);
-
-    shortcuts::apply(&app);
-
-    runtime::emit_snapshot(&app)
-}
-
-#[tauri::command]
-pub fn remove_quick_text(app: AppHandle, id: QuickTextId) -> Snapshot {
-    lock(&app).remove_quick_text(id);
 
     shortcuts::apply(&app);
 

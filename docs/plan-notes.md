@@ -50,8 +50,6 @@ of scope: it gets its own session once the Notes ship.
   stay live. Every switch brings its client in front and leaves the keyboard in
   the Notes. The client in front stays known, so « Personnage suivant » starts
   from it.
-- Quick texts belong to the game chat. While the Notes hold the keyboard, a
-  quick text shortcut does nothing, and the journal says why.
 
 ### The note
 
@@ -261,8 +259,8 @@ Tiptap:
 - `pnpm run check` passes at the root.
 - Tests prove what can regress in silence: the shortcut collision on an
   upgrade, the note file round trip and the set-aside of a broken one, in the
-  game while the Notes hold the keyboard, a switch that leaves the keyboard in
-  the Notes, and the quick text refused.
+  game while the Notes hold the keyboard, and a switch that leaves the keyboard
+  in the Notes.
 - The patch notes line is in the three changelogs.
 - What only Victor can run is handed over, in this order:
   1. `pnpm --filter @multifus/desktop dev:app` on the Mac, through the
@@ -283,12 +281,11 @@ The scenarios:
    keyboard.
 7. While typing: an AutoFocus notification, « Personnage suivant », the wheel.
    The client comes in front and the typing goes on in the note.
-8. A quick text shortcut while typing does nothing.
-9. Escape closes the Notes over any window, Chrome in fullscreen included, and
+8. Escape closes the Notes over any window, Chrome in fullscreen included, and
    nothing moves.
-10. « Vider », then Cmd/Ctrl+Z.
-11. Quit and relaunch: the note comes back, and the Notes open where they were.
-12. A change of language with the Notes open loses nothing.
-13. On macOS, the Notes show over a client in fullscreen.
-14. With the screen holding the Notes unplugged, they reopen on a screen that
+9. « Vider », then Cmd/Ctrl+Z.
+10. Quit and relaunch: the note comes back, and the Notes open where they were.
+11. A change of language with the Notes open loses nothing.
+12. On macOS, the Notes show over a client in fullscreen.
+13. With the screen holding the Notes unplugged, they reopen on a screen that
     exists.

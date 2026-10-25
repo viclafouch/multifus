@@ -262,30 +262,6 @@ const CALLS = [
     }
   },
   {
-    name: 'addQuickText',
-    run: () => {
-      return multifus.addQuickText()
-    }
-  },
-  {
-    name: 'setQuickTextText',
-    run: () => {
-      return multifus.setQuickTextText(0, 'Bon jeu à toi !')
-    }
-  },
-  {
-    name: 'setQuickTextShortcut',
-    run: () => {
-      return multifus.setQuickTextShortcut(0, 'Alt+KeyP')
-    }
-  },
-  {
-    name: 'removeQuickText',
-    run: () => {
-      return multifus.removeQuickText(0)
-    }
-  },
-  {
     name: 'setAutoFocus',
     run: () => {
       return multifus.setAutoFocus('combat', true)

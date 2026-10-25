@@ -10,7 +10,6 @@ export const PAGE_NAMES = {
   walk: msg`Déplacement rapide`,
   runeTable: msg`Tableau des runes`,
   relay: msg`Messages privés`,
-  quickTexts: msg`Textes rapides`,
   mac: msg`Multifus sur Mac`,
   windows: msg`Multifus sur Windows`,
   comparison: msg`Comparatif`,
@@ -28,7 +27,6 @@ export const PAGE_TITLES = {
   walk: msg`Déplacer ses personnages un à un sur Dofus Retro`,
   runeTable: msg`Tableau du poids des runes Dofus Retro`,
   relay: msg`Messages privés Dofus Retro sur Telegram`,
-  quickTexts: msg`Textes rapides au clavier sur Dofus Retro`,
   mac: msg`Logiciel multicompte Dofus Retro sur Mac`,
   windows: msg`Logiciel multicompte Dofus Retro sur Windows`,
   comparison: msg`Comparatif des logiciels multicompte Dofus Retro`,
@@ -46,10 +44,9 @@ export const PAGE_DESCRIPTIONS = {
   walk: msg`Sur Dofus Retro, un clic déplace le personnage devant vous, puis la fenêtre du suivant arrive. Vous cliquez une fois par personnage.`,
   runeTable: msg`Le tableau du poids des runes de Dofus Retro se pose par-dessus le jeu, à la touche de votre choix. Vous forgemagez sans jamais ouvrir votre navigateur.`,
   relay: msg`Vos messages privés de Dofus Retro arrivent sur votre téléphone par Telegram, dans la seconde. Vous savez aussi quel personnage vient d’être déconnecté.`,
-  quickTexts: msg`Rangez vos phrases les plus répétées sous une combinaison de touches. Dans Dofus Retro, vous appuyez, la phrase s’écrit, et c’est vous qui l’envoyez.`,
-  mac: msg`Le multicompte Dofus Retro sur Mac, dans une application vérifiée par Apple, sans clic droit ni réglage à contourner. Les six fonctionnalités y sont.`,
+  mac: msg`Le multicompte Dofus Retro sur Mac, dans une application vérifiée par Apple, sans clic droit ni réglage à contourner. Les cinq fonctionnalités y sont.`,
   windows: msg`Le multicompte Dofus Retro sur Windows 10 et 11 : chaque personnage prend son bouton dans la barre des tâches, avec son pseudo et sa tête de classe.`,
-  comparison: msg`Multifus, Dracoon, Focus Retro, Dosoft, Retro Toolbox, ROrganizer : quatorze lignes comparées, chacune lue dans le code de l’outil et pas sur sa page d’accueil.`,
+  comparison: msg`Multifus, Dracoon, Focus Retro, Dosoft, Retro Toolbox, ROrganizer : treize lignes comparées, chacune lue dans le code de l’outil et pas sur sa page d’accueil.`,
   download: msg`Téléchargez Multifus gratuitement, pour Mac et pour Windows. Trois gestes pour installer, aucun compte à créer, aucune publicité, et le code est public.`,
   faq: msg`Ankama, votre compte, votre ordinateur, votre langue, le prix : les questions qu’on me pose avant d’installer un logiciel multicompte sur Dofus Retro.`,
   journal: msg`Ce que chaque version de Multifus a changé pour le multicompte sur Dofus Retro : les fonctionnalités ajoutées, les réglages déplacés, les défauts corrigés.`,
@@ -64,7 +61,6 @@ export const PAGE_PROMISES = {
   walk: msg`Un clic par personnage, et le suivant passe devant.`,
   runeTable: msg`Le poids des runes sans quitter le jeu.`,
   relay: msg`Votre téléphone reçoit vos messages privés du jeu.`,
-  quickTexts: msg`Une combinaison écrit la phrase à votre place.`,
   mac: msg`Le multicompte Dofus Retro sur Mac, dans une application qu’Apple a vérifiée.`,
   windows: msg`Le multicompte Dofus Retro sur Windows, un bouton par personnage.`,
   comparison: msg`Multifus et les autres gestionnaires, ligne par ligne.`,
@@ -80,8 +76,7 @@ export const MENU_HINTS = {
   wheel: msg`Le personnage visé passe devant.`,
   walk: msg`Le suivant passe devant à chaque clic.`,
   runeTable: msg`Le poids des runes posé sur le jeu.`,
-  relay: msg`Votre téléphone les reçoit.`,
-  quickTexts: msg`Une combinaison écrit la phrase.`
+  relay: msg`Votre téléphone les reçoit.`
 } as const satisfies Record<(typeof MENU_FEATURES)[number], MessageDescriptor>
 
 export const SOFTWARE_CATEGORY = msg`Gestionnaire de fenêtres`

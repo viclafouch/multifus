@@ -5,7 +5,6 @@ import { AboutScreen } from '@/screens/about'
 import { AuthorizationScreen } from '@/screens/authorization-screen'
 import { AutoFocusScreen } from '@/screens/auto-focus-screen'
 import { CharactersScreen } from '@/screens/characters'
-import { QuickTextsScreen } from '@/screens/quick-texts'
 import { RelayScreen } from '@/screens/relay'
 import { RuneTableScreen } from '@/screens/rune-table'
 import { SettingsScreen } from '@/screens/settings'
@@ -38,13 +37,9 @@ export const CurrentMap = ({ map, snapshot, run }: CurrentMapProps) => {
         <ShortcutsScreen
           shortcuts={snapshot.shortcuts}
           characters={snapshot.characters}
-          quickTexts={snapshot.quickTexts}
           run={run}
         />
       )
-    },
-    quickTexts: () => {
-      return <QuickTextsScreen quickTexts={snapshot.quickTexts} run={run} />
     },
     autoFocus: () => {
       return (

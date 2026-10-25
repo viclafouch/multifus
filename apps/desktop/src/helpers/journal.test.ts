@@ -4,7 +4,6 @@ import type {
   JournalEvent,
   MaximizeAllOutcome,
   NotificationOutcome,
-  QuickTextFailure,
   RosterChange,
   SettingChange,
   ShortcutOutcome,
@@ -13,7 +12,6 @@ import type {
 import type { NoticeCase, RelayFailure } from '@/@types/relay'
 import type {
   BoundCombination,
-  QuickText,
   ShortcutBinding,
   ShortcutStatus
 } from '@/@types/shortcuts'
@@ -71,15 +69,6 @@ const SHORTCUTS = [
   }
 ] as const satisfies readonly ShortcutBinding[]
 
-const QUICK_TEXTS = [
-  {
-    id: 1,
-    text: 'prix libre',
-    accelerator: 'Control+Shift+KeyP',
-    status: { kind: 'registered' }
-  }
-] as const satisfies readonly QuickText[]
-
 const BINDINGS = [
   {
     binding: { kind: 'action', action: 'next' },
@@ -102,7 +91,7 @@ const BINDINGS = [
     status: { kind: 'invalid', detail: 'touche inconnue' }
   },
   {
-    binding: { kind: 'quickText', id: 1 },
+    binding: { kind: 'character', nickname: NICKNAME },
     accelerator: 'Control+Shift+KeyP',
     status: { kind: 'registered' }
   }
@@ -114,7 +103,7 @@ const QUIET_STATUSES = new Set<ShortcutStatus['kind']>([
 ])
 
 const BINDINGS_LINE =
-  'Raccourcis : « Personnage suivant » Control+Shift+ArrowRight · « Personnage précédent » non attribué · « Exclure ou réintégrer » Control+Shift+KeyS refusé (déjà prise) · « Déplacement rapide » Control+Shift+KeyX illisible (touche inconnue) · le texte rapide « prix libre » Control+Shift+KeyP.'
+  'Raccourcis : « Personnage suivant » Control+Shift+ArrowRight · « Personnage précédent » non attribué · « Exclure ou réintégrer » Control+Shift+KeyS refusé (déjà prise) · « Déplacement rapide » Control+Shift+KeyX illisible (touche inconnue) · « Alpha » Control+Shift+KeyP.'
 
 const ROSTER_CASES = {
   excluded: [
@@ -665,69 +654,6 @@ const MAXIMIZE_ALL_CASES = {
   readonly Case<'maximizeAll'>[]
 >
 
-const QUICK_TEXT_CASES = {
-  outsideGame: [
-    {
-      event: { kind: 'quickTextFailed', reason: { reason: 'outsideGame' } },
-      line: 'Texte rapide ignoré : aucune fenêtre Dofus au premier plan.'
-    }
-  ],
-  notesHoldKeyboard: [
-    {
-      event: {
-        kind: 'quickTextFailed',
-        reason: { reason: 'notesHoldKeyboard' }
-      },
-      line: 'Texte rapide ignoré : les notes ont le clavier, et ce texte va au chat du jeu.'
-    }
-  ],
-  foregroundUnknown: [
-    {
-      event: {
-        kind: 'quickTextFailed',
-        reason: { reason: 'foregroundUnknown', detail: DETAIL }
-      },
-      line: `Texte rapide ignoré : impossible de savoir quelle fenêtre est au premier plan (${DETAIL}).`
-    }
-  ],
-  gone: [
-    {
-      event: { kind: 'quickTextFailed', reason: { reason: 'gone' } },
-      line: 'Texte rapide introuvable : il a été retiré entre l’appui et le collage.'
-    }
-  ],
-  clipboardRefused: [
-    {
-      event: {
-        kind: 'quickTextFailed',
-        reason: { reason: 'clipboardRefused', detail: DETAIL }
-      },
-      line: `Texte rapide non collé : le presse-papiers a refusé le texte (${DETAIL}).`
-    }
-  ],
-  pasteRefused: [
-    {
-      event: {
-        kind: 'quickTextFailed',
-        reason: { reason: 'pasteRefused', detail: DETAIL }
-      },
-      line: `Texte rapide non collé : le système a refusé la combinaison de collage (${DETAIL}).`
-    }
-  ],
-  clipboardNotGivenBack: [
-    {
-      event: {
-        kind: 'quickTextFailed',
-        reason: { reason: 'clipboardNotGivenBack', detail: DETAIL }
-      },
-      line: `Texte rapide collé, mais le presse-papiers d’avant n’a pas pu être rendu (${DETAIL}).`
-    }
-  ]
-} as const satisfies Record<
-  QuickTextFailure['reason'],
-  readonly Case<'quickTextFailed'>[]
->
-
 const TRAY_CASES = {
   focused: [
     {
@@ -1041,13 +967,6 @@ const JOURNAL_CASES = {
   shortcut: Object.values(SHORTCUT_CASES).flat(),
   maximizeAll: Object.values(MAXIMIZE_ALL_CASES).flat(),
   characterShortcut: Object.values(CHARACTER_SHORTCUT_CASES).flat(),
-  quickTextFailed: Object.values(QUICK_TEXT_CASES).flat(),
-  quickTextPasted: [
-    {
-      event: { kind: 'quickTextPasted', excerpt: 'prix libre' },
-      line: 'Texte rapide collé dans le jeu : « prix libre »'
-    }
-  ],
   trayFocus: Object.values(TRAY_CASES).flat(),
   shortcutsBound: [
     {
@@ -1080,7 +999,7 @@ const JOURNAL_CASES = {
         kind: 'shortcutsBound',
         bindings: [
           {
-            binding: { kind: 'quickText', id: 2 },
+            binding: { kind: 'character', nickname: NICKNAME },
             accelerator: 'Control+Shift+KeyP',
             status: {
               kind: 'duplicate',
@@ -1089,7 +1008,7 @@ const JOURNAL_CASES = {
           }
         ]
       },
-      line: 'Raccourcis : un texte rapide vide Control+Shift+KeyP en doublon avec « Personnage suivant », donc inerte.'
+      line: 'Raccourcis : « Alpha » Control+Shift+KeyP en doublon avec « Personnage suivant », donc inerte.'
     }
   ],
   shortcutsFailed: [
@@ -1474,9 +1393,21 @@ const SNAPSHOT = {
   system: 'macOS 26.0 (arm64)',
   language: 'fr',
   keyboard: {},
-  characters: [],
+  characters: [
+    {
+      nickname: NICKNAME,
+      gender: 'male',
+      class: null,
+      color: null,
+      main: false,
+      excluded: false,
+      online: true,
+      relayed: false,
+      shortcut: 'Control+Shift+KeyP',
+      shortcutStatus: { kind: 'registered' }
+    }
+  ],
   shortcuts: SHORTCUTS,
-  quickTexts: QUICK_TEXTS,
   autoFocus: [],
   autoFocusEnabled: true,
   wakesMinimized: true,
@@ -1530,8 +1461,7 @@ const SNAPSHOT = {
     walk: true,
     runeTable: true,
     autoFocus: true,
-    relay: true,
-    quickTexts: true
+    relay: true
   },
   journal: [
     { id: 1, at: MORNING, event: { kind: 'listening' } },
@@ -1543,7 +1473,7 @@ describe('journalLine', () => {
   it.each(Object.values(JOURNAL_CASES).flat())(
     '$event.kind reads as « $line »',
     ({ event, line }) => {
-      const written = journalLine(event, QUICK_TEXTS)
+      const written = journalLine(event)
 
       expect(written).toBe(line)
     }

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { PairingProblem, RelayFailure } from '@/@types/relay'
 import type { Character } from '@/@types/roster'
-import type { QuickText, ShortcutStatus } from '@/@types/shortcuts'
+import type { ShortcutStatus } from '@/@types/shortcuts'
 import type { UpdateStatus } from '@/@types/system'
 import { IS_APPLE } from '@/constants/keyboard'
 import type { TonedLine } from '@/helpers/wording'
@@ -136,16 +136,6 @@ const STATUS_CASES = {
   }
 } as const satisfies Record<ShortcutStatus['kind'], StatusCase>
 
-const QUICK_TEXTS = [
-  {
-    id: 1,
-    text: 'prix libre',
-    accelerator: 'Control+Shift+KeyP',
-    status: { kind: 'registered' }
-  },
-  { id: 2, text: '', accelerator: null, status: { kind: 'unbound' } }
-] as const satisfies readonly QuickText[]
-
 const ONLINE_CHARACTER = {
   nickname: 'Alpha',
   gender: 'male',
@@ -196,7 +186,7 @@ describe('shortcutStatusLine', () => {
   it.each(Object.values(STATUS_CASES))(
     'puts into words the status $status.kind, with the tone that goes with it',
     ({ status, answer }) => {
-      const written = shortcutStatusLine(status, QUICK_TEXTS)
+      const written = shortcutStatusLine(status)
 
       expect(written).toStrictEqual(answer)
     }
@@ -208,49 +198,17 @@ describe('shortcutStatusLine', () => {
       binding: { kind: 'action', action: 'walk' }
     } as const
 
-    const written = shortcutStatusLine(status, QUICK_TEXTS)
+    const written = shortcutStatusLine(status)
 
     expect(written?.text).toContain('Déplacement rapide')
-  })
-
-  it('names by its text the quickText that already holds the combination', () => {
-    const status = {
-      kind: 'duplicate',
-      binding: { kind: 'quickText', id: 1 }
-    } as const
-
-    const written = shortcutStatusLine(status, QUICK_TEXTS)
-
-    expect(written?.text).toContain('le texte rapide « prix libre »')
-  })
-
-  it('names a quickText without text without pretending to quote it', () => {
-    const status = {
-      kind: 'duplicate',
-      binding: { kind: 'quickText', id: 2 }
-    } as const
-
-    const written = shortcutStatusLine(status, QUICK_TEXTS)
-
-    expect(written?.text).toContain('un texte rapide vide')
   })
 })
 
 describe('bindingLabel', () => {
-  it('cuts a text that is too long on a character and not in the middle of one', () => {
-    const quickTexts = [
-      { ...QUICK_TEXTS[0], text: 'é'.repeat(60) }
-    ] as const satisfies readonly QuickText[]
+  it('names a character by its nickname, in quotes', () => {
+    const label = bindingLabel({ kind: 'character', nickname: 'Alpha' })
 
-    const label = bindingLabel({ kind: 'quickText', id: 1 }, quickTexts)
-
-    expect(label).toBe(`le texte rapide « ${'é'.repeat(30)}… »`)
-  })
-
-  it('names a quickText the table no longer carries', () => {
-    const label = bindingLabel({ kind: 'quickText', id: 404 }, QUICK_TEXTS)
-
-    expect(label).toBe('un texte rapide vide')
+    expect(label).toBe('« Alpha »')
   })
 })
 

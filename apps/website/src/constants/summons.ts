@@ -21,8 +21,8 @@ export const SUMMONS = {
   whole: {
     decor: BAND_DECORS.zaap,
     shape: 'split',
-    title: msg`Six mécanismes, une seule installation`,
-    line: msg`L’AutoFocus, la roue, le déplacement rapide, le tableau des runes, les messages privés et les textes rapides arrivent ensemble.`
+    title: msg`Cinq mécanismes, une seule installation`,
+    line: msg`L’AutoFocus, la roue, le déplacement rapide, le tableau des runes et les messages privés arrivent ensemble.`
   }
 } as const satisfies Record<SummonsId, Summons>
 
@@ -33,7 +33,6 @@ export const PAGE_SUMMONS = {
   walk: SUMMONS.trust,
   runeTable: SUMMONS.whole,
   relay: SUMMONS.start,
-  quickTexts: SUMMONS.trust,
   mac: SUMMONS.trust,
   windows: SUMMONS.whole,
   comparison: SUMMONS.trust,

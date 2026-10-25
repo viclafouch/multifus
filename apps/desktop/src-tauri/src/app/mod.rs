@@ -12,7 +12,6 @@ pub mod notes;
 pub mod overlay;
 pub mod panics;
 pub mod portraits;
-pub mod quick_texts;
 pub mod relay;
 pub mod rune_table;
 pub mod runtime;
@@ -40,7 +39,6 @@ use crate::config::Language;
 use crate::platform::DisplayKeeper;
 use crate::platform::PlatformDisplayKeeper;
 use crate::platform::PlatformNotificationWatcher;
-use crate::platform::PlatformPasteSender;
 use crate::platform::PlatformWindowManager;
 use crate::platform::key_labels;
 use crate::platform::matches_windows_eleven;
@@ -48,7 +46,6 @@ use crate::platform::matches_windows_eleven;
 pub use state::AppState;
 pub use state::Multifus;
 pub use state::MultifusParams;
-pub use state::PasteState;
 pub use state::WatcherState;
 pub use state::WindowState;
 pub use view::Snapshot;
@@ -84,7 +81,6 @@ pub fn setup(app: &AppHandle) -> Result<(), ConfigError> {
 
     app.manage::<WindowState>(windows);
     app.manage::<Arc<Keyboard>>(keyboard);
-    app.manage::<PasteState>(Arc::new(PlatformPasteSender::new()));
     app.manage::<WatcherState>(Mutex::new(PlatformNotificationWatcher::new()));
 
     stats::setup(app);

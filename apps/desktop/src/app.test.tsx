@@ -91,10 +91,6 @@ type Arrival = {
 
 const ARRIVALS = [
   { name: 'shortcuts', mark: 'Changez de personnage sans lâcher la souris.' },
-  {
-    name: 'quickTexts',
-    mark: 'Les phrases que vous retapez tous les soirs'
-  },
   { name: 'autoFocus', mark: 'Un combat, un échange, un message privé :' },
   { name: 'walk', mark: 'Un clic déplace le personnage devant vous' },
   {
