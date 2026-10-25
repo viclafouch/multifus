@@ -128,7 +128,7 @@ const DECLARED = everySizeDeclared()
 
 describe('the sizes the pages reserve', () => {
   it('finds every decor, screenshot, poster, peek and loop', () => {
-    expect(DECLARED).toHaveLength(62)
+    expect(DECLARED).toHaveLength(68)
   })
 
   it.each(DECLARED)('matches the file behind %s', async (served, size) => {

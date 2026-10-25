@@ -15,13 +15,16 @@ import { HourglassHighIcon } from '@phosphor-icons/react/dist/ssr/HourglassHigh'
 import { KeyboardIcon } from '@phosphor-icons/react/dist/ssr/Keyboard'
 import { ListNumbersIcon } from '@phosphor-icons/react/dist/ssr/ListNumbers'
 import { LockKeyIcon } from '@phosphor-icons/react/dist/ssr/LockKey'
+import { NotePencilIcon } from '@phosphor-icons/react/dist/ssr/NotePencil'
 import { PaletteIcon } from '@phosphor-icons/react/dist/ssr/Palette'
 import { PlugsConnectedIcon } from '@phosphor-icons/react/dist/ssr/PlugsConnected'
 import { PowerIcon } from '@phosphor-icons/react/dist/ssr/Power'
 import { PushPinIcon } from '@phosphor-icons/react/dist/ssr/PushPin'
+import { ShieldCheckIcon } from '@phosphor-icons/react/dist/ssr/ShieldCheck'
 import { SquaresFourIcon } from '@phosphor-icons/react/dist/ssr/SquaresFour'
 import { TelegramLogoIcon } from '@phosphor-icons/react/dist/ssr/TelegramLogo'
 import { UserCheckIcon } from '@phosphor-icons/react/dist/ssr/UserCheck'
+import { UserSwitchIcon } from '@phosphor-icons/react/dist/ssr/UserSwitch'
 import type { Body } from '@/@types/body'
 import type { PageId } from '@/@types/page'
 
@@ -152,6 +155,31 @@ export const PAGE_BODIES = {
       }
     ]
   },
+  notes: {
+    lead: msg`Vous appuyez sur une touche, Ctrl+Maj+N par défaut, et les Notes s’ouvrent au-dessus du jeu, prêtes à écrire.`,
+    boons: [
+      {
+        icon: PushPinIcon,
+        title: msg`Plus de fenêtre à chercher`,
+        line: msg`Les Notes restent au-dessus du jeu, et retrouvent leur place et votre texte à chaque ouverture.`
+      },
+      {
+        icon: UserSwitchIcon,
+        title: msg`Votre phrase n’est pas coupée`,
+        line: msg`Pendant que vous écrivez, l’AutoFocus et vos raccourcis changent de personnage, et le texte continue dans la note.`
+      },
+      {
+        icon: NotePencilIcon,
+        title: msg`La même note partout`,
+        line: msg`Un prix de l’HDV, les ressources d’un craft, le pseudo croisé tout à l’heure : tous vos personnages lisent la même note.`
+      },
+      {
+        icon: ShieldCheckIcon,
+        title: msg`Rien n’arrive au jeu`,
+        line: msg`Votre note reste dans Multifus. Aucune touche n’est envoyée à Dofus Retro.`
+      }
+    ]
+  },
   mac: {
     lead: msg`Presque tous les gestionnaires pour Dofus Retro s’arrêtent à Windows. Multifus est né sur Mac, et c’est de là que part la version Windows.`,
     boons: [
@@ -168,7 +196,7 @@ export const PAGE_BODIES = {
       {
         icon: SquaresFourIcon,
         title: msg`Rien ne manque sur Mac`,
-        line: msg`Les cinq fonctionnalités du menu sont là, sans exception.`
+        line: msg`Les six fonctionnalités du menu sont là, sans exception.`
       },
       {
         icon: KeyboardIcon,

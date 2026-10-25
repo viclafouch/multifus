@@ -260,14 +260,6 @@ msgstr "Cada columna lleva a su repositorio."
 msgid "Chaque message arrive dans la seconde, et leur nombre n’est pas limité."
 msgstr "Cada mensaje llega en el segundo, y su número no tiene límite."
 
-#: src/screens/home-screen.tsx
-msgid "Cinq mécanismes, un seul but : ne plus chercher le personnage qui vous attend."
-msgstr "Cinco mecanismos, un solo objetivo: dejar de buscar al personaje que te espera."
-
-#: src/constants/summons.ts
-msgid "Cinq mécanismes, une seule installation"
-msgstr "Cinco mecanismos, una sola instalación"
-
 #: src/constants/systems.ts
 msgid "Cliquez sur le bouton vert. Le fichier arrive dans vos téléchargements."
 msgstr "Haz clic en el botón verde. El archivo llega a tus descargas."
@@ -506,8 +498,8 @@ msgid "L’AutoFocus amène le bon personnage tout seul : l’ordre ne sert qu�
 msgstr "El AutoFocus trae al personaje correcto solo: el orden solo sirve para el ciclo."
 
 #: src/constants/summons.ts
-msgid "L’AutoFocus, la roue, le déplacement rapide, le tableau des runes et les messages privés arrivent ensemble."
-msgstr "El AutoFocus, la rueda, el movimiento rápido, la tabla de runas y los mensajes privados llegan juntos."
+msgid "L’AutoFocus, la roue, le déplacement rapide, le tableau des runes, les messages privés et les notes arrivent ensemble."
+msgstr "El AutoFocus, la rueda, el movimiento rápido, la tabla de runas, los mensajes privados y las notas llegan juntos."
 
 #: src/components/taskbar-proof.tsx
 msgid "L’icône"
@@ -548,6 +540,10 @@ msgstr "El idioma del sitio"
 #: src/components/taskbar-proof.tsx
 msgid "la même icône pour tous vos clients"
 msgstr "el mismo icono para todos tus clientes"
+
+#: src/constants/bodies.ts
+msgid "La même note partout"
+msgstr "La misma nota en todas partes"
 
 #: src/screens/journal-screen.tsx
 msgid "La première version de Multifus n’est pas encore publiée."
@@ -642,8 +638,8 @@ msgid "Le multicompte Dofus Retro sur Mac, dans une application qu’Apple a vé
 msgstr "La multicuenta de Dofus Retro en Mac, en una aplicación que Apple ha revisado."
 
 #: src/constants/wording.ts
-msgid "Le multicompte Dofus Retro sur Mac, dans une application vérifiée par Apple, sans clic droit ni réglage à contourner. Les cinq fonctionnalités y sont."
-msgstr "La multicuenta de Dofus Retro en Mac, en una aplicación revisada por Apple, sin clic derecho ni ajuste que sortear. Las cinco funciones están ahí."
+msgid "Le multicompte Dofus Retro sur Mac, dans une application vérifiée par Apple, sans clic droit ni réglage à contourner. Les six fonctionnalités y sont."
+msgstr "La multicuenta de Dofus Retro en Mac, en una aplicación revisada por Apple, sin clic derecho ni ajuste que sortear. Las seis funciones están ahí."
 
 #: src/constants/wording.ts
 msgid "Le multicompte Dofus Retro sur Windows 10 et 11 : chaque personnage prend son bouton dans la barre des tâches, avec son pseudo et sa tête de classe."
@@ -745,14 +741,6 @@ msgstr "La tabla se queda en su sitio"
 msgid "Le tableau part et revient"
 msgstr "La tabla se va y vuelve"
 
-#: src/constants/bodies.ts
-msgid "Les cinq fonctionnalités du menu sont là, sans exception."
-msgstr "Las cinco funcionalidades del menú están ahí, sin que falte ninguna."
-
-#: src/constants/questions.ts
-msgid "Les cinq mécanismes sont sur les deux. <0>Trois choses manquent au Mac.</0>"
-msgstr "Los cinco mecanismos están en ambos. <0>Al Mac le faltan tres cosas.</0>"
-
 #: src/constants/wording.ts
 msgid "Les fonctionnalités"
 msgstr "Las funcionalidades"
@@ -769,6 +757,10 @@ msgstr "Las marcas que no son nuestras"
 msgid "Les mêmes quatre boutons avec Multifus : chacun porte la tête de classe de son personnage, cerclée de sa couleur, et son pseudo sans le nom du jeu."
 msgstr "Los mismos cuatro botones con Multifus: cada uno lleva la cabeza de clase de su personaje, rodeada de su color, y su apodo sin el nombre del juego."
 
+#: src/constants/bodies.ts
+msgid "Les Notes restent au-dessus du jeu, et retrouvent leur place et votre texte à chaque ouverture."
+msgstr "Las Notas se quedan encima del juego, y recuperan su sitio y tu texto cada vez que se abren."
+
 #: src/components/site-header.tsx
 msgid "Les pages de Multifus"
 msgstr "Las páginas de Multifus"
@@ -780,6 +772,14 @@ msgstr "Las páginas se construyen por adelantado y se sirven tal cual, sin base
 #: src/constants/wording.ts
 msgid "Les questions qu’on se pose"
 msgstr "Las preguntas que surgen"
+
+#: src/constants/bodies.ts
+msgid "Les six fonctionnalités du menu sont là, sans exception."
+msgstr "Las seis funcionalidades del menú están ahí, sin que falte ninguna."
+
+#: src/constants/questions.ts
+msgid "Les six mécanismes sont sur les deux. <0>Trois choses manquent au Mac.</0>"
+msgstr "Los seis mecanismos están en ambos. <0>Al Mac le faltan tres cosas.</0>"
 
 #: src/screens/ankama-screen.tsx
 msgid "Les sources"
@@ -971,6 +971,10 @@ msgid "Non. Multifus ne connaît que <0>Dofus Retro</0>, toutes versions 1.x : l
 msgstr "No. Multifus solo conoce <0>Dofus Retro</0>, todas las versiones 1.x: la 1.29, la 1.40 y las siguientes."
 
 #: src/constants/wording.ts
+msgid "Notes"
+msgstr "Notas"
+
+#: src/constants/wording.ts
 msgid "Notes de mise à jour"
 msgstr "Notas del parche"
 
@@ -1045,6 +1049,14 @@ msgstr "Pasados cuatro personajes, una tecla por ventana es imposible de recorda
 #: src/constants/wording.ts
 msgid "Pause"
 msgstr "Pausa"
+
+#: src/constants/bodies.ts
+msgid "Pendant que vous écrivez, l’AutoFocus et vos raccourcis changent de personnage, et le texte continue dans la note."
+msgstr "Mientras escribes, el AutoFocus y tus atajos cambian de personaje, y el texto sigue en la nota."
+
+#: src/constants/bodies.ts
+msgid "Plus de fenêtre à chercher"
+msgstr "Ninguna ventana que buscar"
 
 #: src/constants/bodies.ts
 msgid "Plus de touche à retenir"
@@ -1127,6 +1139,10 @@ msgid "Retour à l’accueil"
 msgstr "Volver al inicio"
 
 #: src/constants/bodies.ts
+msgid "Rien n’arrive au jeu"
+msgstr "Nada llega al juego"
+
+#: src/constants/bodies.ts
 msgid "Rien ne manque sur Mac"
 msgstr "No falta nada en Mac"
 
@@ -1165,6 +1181,14 @@ msgstr "Informar de un problema"
 #: src/constants/rivals.ts
 msgid "Signé et vérifié par Apple sur Mac. Sur Windows, seule l’attestation GitHub y est."
 msgstr "Firmado y revisado por Apple en Mac. En Windows, solo está la atestación de GitHub."
+
+#: src/screens/home-screen.tsx
+msgid "Six mécanismes, un seul but : ne plus chercher le personnage qui vous attend."
+msgstr "Seis mecanismos, un solo objetivo: dejar de buscar al personaje que te espera."
+
+#: src/constants/summons.ts
+msgid "Six mécanismes, une seule installation"
+msgstr "Seis mecanismos, una sola instalación"
 
 #: src/screens/download-screen.tsx
 msgid "Suivez les trois lignes de votre ordinateur. Il n’y a rien d’autre à faire."
@@ -1256,6 +1280,14 @@ msgstr "¿Todo es igual en Mac y en Windows?"
 msgid "Toutes les versions"
 msgstr "Todas las versiones"
 
+#: src/constants/wording.ts
+msgid "Un bloc-notes par-dessus Dofus Retro"
+msgstr "Un bloc de notas encima de Dofus Retro"
+
+#: src/constants/wording.ts
+msgid "Un bloc-notes reste au-dessus de Dofus Retro : un prix de l’HDV, une recette, un pseudo croisé. Vous notez sans quitter le jeu, et sans fenêtre à chercher."
+msgstr "Un bloc de notas sobre Dofus Retro: un precio del mercadillo, una receta, un apodo con el que te cruzaste. Apuntas sin salir del juego ni buscar ventanas."
+
 #: src/constants/bodies.ts
 msgid "Un bouton le replace au coin de la fenêtre du jeu si vous le perdez de vue."
 msgstr "Un botón la devuelve a la esquina de la ventana del juego si la pierdes de vista."
@@ -1287,6 +1319,10 @@ msgstr "Un personaje excluido deja su ventana en segundo plano hasta que lo vuel
 #: src/constants/bodies.ts
 msgid "Un personnage rangé dans le Dock ou dans la barre des tâches repasse devant vous."
 msgstr "Un personaje guardado en el Dock o en la barra de tareas vuelve delante de ti."
+
+#: src/constants/bodies.ts
+msgid "Un prix de l’HDV, les ressources d’un craft, le pseudo croisé tout à l’heure : tous vos personnages lisent la même note."
+msgstr "Un precio del mercadillo, los recursos de una fabricación, el apodo con el que te cruzaste antes: todos tus personajes leen la misma nota."
 
 #: src/constants/ankama.ts
 msgid "Une action, un seul personnage"
@@ -1361,9 +1397,25 @@ msgstr "Tu barra de tareas se convierte en tu equipo"
 msgid "Votre navigateur ne garde qu’une chose : que la proposition de lire le site dans votre langue vous a déjà été montrée. Elle ne quitte pas votre machine, et vider les données du site l’efface."
 msgstr "Tu navegador solo guarda una cosa: que ya te hemos enseñado la propuesta de leer el sitio en tu idioma. No sale de tu máquina, y vaciar los datos del sitio la borra."
 
+#: src/constants/wording.ts
+msgid "Votre note posée sur le jeu."
+msgstr "Tu nota sobre el juego."
+
+#: src/constants/wording.ts
+msgid "Votre note reste au-dessus du jeu."
+msgstr "Tu nota se queda encima del juego."
+
+#: src/constants/bodies.ts
+msgid "Votre note reste dans Multifus. Aucune touche n’est envoyée à Dofus Retro."
+msgstr "Tu nota se queda en Multifus. No se envía ninguna tecla a Dofus Retro."
+
 #: src/components/system-pick.tsx
 msgid "Votre ordinateur"
 msgstr "Tu ordenador"
+
+#: src/constants/bodies.ts
+msgid "Votre phrase n’est pas coupée"
+msgstr "Tu frase no se corta"
 
 #: src/constants/wording.ts
 msgid "Votre question n’est pas là ?"
@@ -1380,6 +1432,10 @@ msgstr "Tu teléfono recibe tus mensajes privados del juego."
 #: src/constants/bodies.ts
 msgid "Vous allumez le Déplacement rapide, vous cliquez là où vous voulez aller, et c’est le personnage suivant qui arrive devant vous."
 msgstr "Enciendes el Movimiento rápido, haces clic donde quieres ir, y el siguiente personaje aparece delante de ti."
+
+#: src/constants/bodies.ts
+msgid "Vous appuyez sur une touche, Ctrl+Maj+N par défaut, et les Notes s’ouvrent au-dessus du jeu, prêtes à écrire."
+msgstr "Pulsas una tecla, Ctrl+Mayús+N por defecto, y las Notas se abren encima del juego, listas para escribir."
 
 #: src/components/taskbar-proof.tsx
 msgid "Vous cherchez votre Enutrof."

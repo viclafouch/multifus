@@ -36,18 +36,24 @@ export const PAGES = {
   runeTable: {
     kind: 'feature',
     loop: 'runeTable',
-    kin: ['relay', 'wheel'],
+    kin: ['notes', 'wheel'],
     slugs: { fr: 'tableau-des-runes', en: 'rune-table', es: 'tabla-de-runas' }
   },
   relay: {
     kind: 'feature',
     loop: 'relay',
-    kin: ['autoFocus', 'runeTable'],
+    kin: ['autoFocus', 'notes'],
     slugs: {
       fr: 'messages-prives',
       en: 'private-messages',
       es: 'mensajes-privados'
     }
+  },
+  notes: {
+    kind: 'feature',
+    loop: 'notes',
+    kin: ['relay', 'runeTable'],
+    slugs: { fr: 'notes', en: 'notes', es: 'notas' }
   },
   mac: {
     kind: 'mac',
@@ -82,7 +88,7 @@ export const PAGES = {
   journal: {
     kind: 'journal',
     loop: null,
-    kin: ['runeTable', 'relay'],
+    kin: ['runeTable', 'notes'],
     slugs: { fr: 'journal', en: 'changelog', es: 'novedades' }
   },
   ankama: {
@@ -110,6 +116,7 @@ export const PAGE_IDS = [
   'walk',
   'runeTable',
   'relay',
+  'notes',
   'mac',
   'windows',
   'comparison',
@@ -125,7 +132,8 @@ export const MENU_FEATURES = [
   'wheel',
   'walk',
   'runeTable',
-  'relay'
+  'relay',
+  'notes'
 ] as const satisfies readonly FeatureId[]
 
 export const SOFTWARE_PAGES = [

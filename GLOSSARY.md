@@ -40,7 +40,9 @@ The overlay where the player writes, shared by every character. It stays where
 the player put it on the screen, above every application, where the rune table
 is posted on one client. On screen: « Notes » in French and English, « Notas »
 in Spanish.
-_Avoid_: bloc-notes, notepad, memo
+_Avoid_: bloc-notes, notepad, memo. The site's search title and description of
+the Notes page are the exception: they use the word players search for, « bloc-notes »,
+« notepad », « bloc de notas ».
 
 **Note**:
 What the player wrote in the Notes, kept across restarts. The Notes hold one

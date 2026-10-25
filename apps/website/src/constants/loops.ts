@@ -2,6 +2,10 @@ import autoFocusPeek from '@multifus/ankama/loops/auto-focus-loop-peek.webp'
 import autoFocusSmall from '@multifus/ankama/loops/auto-focus-loop-poster-760.webp'
 import autoFocusPoster from '@multifus/ankama/loops/auto-focus-loop-poster.webp'
 import autoFocusLoop from '@multifus/ankama/loops/auto-focus-loop.mp4'
+import notesPeek from '@multifus/ankama/loops/notes-loop-peek.webp'
+import notesSmall from '@multifus/ankama/loops/notes-loop-poster-760.webp'
+import notesPoster from '@multifus/ankama/loops/notes-loop-poster.webp'
+import notesLoop from '@multifus/ankama/loops/notes-loop.mp4'
 import relayPeek from '@multifus/ankama/loops/relay-loop-peek.webp'
 import relaySmall from '@multifus/ankama/loops/relay-loop-poster-760.webp'
 import relayPoster from '@multifus/ankama/loops/relay-loop-poster.webp'
@@ -25,6 +29,8 @@ import { posterOf } from '@/lib/media'
 const FILMED_ON = '2026-09-08T12:00:00+02:00'
 
 const REFILMED_ON = '2026-09-16T12:00:00+02:00'
+
+const NOTES_FILMED_ON = '2026-10-25T17:39:00+01:00'
 
 export const LOOP_FORMAT = 'video/mp4'
 
@@ -65,6 +71,13 @@ export const LOOPS = {
     poster: posterOf(relayPoster, relaySmall),
     seconds: 5,
     filmed: REFILMED_ON
+  },
+  notes: {
+    source: notesLoop,
+    size: { width: 1384, height: 778 },
+    poster: posterOf(notesPoster, notesSmall),
+    seconds: 11,
+    filmed: NOTES_FILMED_ON
   }
 } as const satisfies Record<FeatureId, Loop>
 
@@ -73,5 +86,6 @@ export const PEEKS = {
   wheel: wheelPeek,
   walk: walkPeek,
   runeTable: runeTablePeek,
-  relay: relayPeek
+  relay: relayPeek,
+  notes: notesPeek
 } as const satisfies Record<FeatureId, string>

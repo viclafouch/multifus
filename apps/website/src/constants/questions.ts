@@ -39,7 +39,7 @@ export const QUESTIONS = {
     ask: msg`Tout est pareil sur Mac et sur Windows ?`,
     answer: [
       {
-        said: msg`Les cinq mécanismes sont sur les deux. <0>Trois choses manquent au Mac.</0>`,
+        said: msg`Les six mécanismes sont sur les deux. <0>Trois choses manquent au Mac.</0>`,
         marks: [{ kind: 'stress' }]
       },
       {
@@ -294,6 +294,7 @@ export const PAGE_QUESTIONS = {
   walk: null,
   runeTable: null,
   relay: null,
+  notes: null,
   mac: ['macFloor', 'monterey', 'macAccess', 'macFullScreen'],
   windows: [
     'warning',

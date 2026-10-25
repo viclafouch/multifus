@@ -8,6 +8,7 @@ export const PAGE_TINTS = {
   walk: 'tint-green',
   runeTable: 'tint-yellow',
   relay: 'tint-sky',
+  notes: 'tint-pink',
   mac: 'tint-turquoise',
   windows: 'tint-blue',
   comparison: 'tint-green',

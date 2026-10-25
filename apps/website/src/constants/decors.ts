@@ -8,6 +8,8 @@ import campUpright from '@multifus/ankama/images/camp-upright.webp'
 import camp from '@multifus/ankama/images/camp.webp'
 import forestUpright from '@multifus/ankama/images/forest-upright.webp'
 import forest from '@multifus/ankama/images/forest.webp'
+import harbourUpright from '@multifus/ankama/images/harbour-upright.webp'
+import harbour from '@multifus/ankama/images/harbour.webp'
 import marsh from '@multifus/ankama/images/marsh.webp'
 import penUpright from '@multifus/ankama/images/pen-upright.webp'
 import pen from '@multifus/ankama/images/pen.webp'
@@ -28,6 +30,7 @@ type DecorId =
   | 'battle'
   | 'camp'
   | 'forest'
+  | 'harbour'
   | 'pen'
   | 'standingStone'
   | 'village'
@@ -51,6 +54,10 @@ const DECORS = {
   forest: {
     wide: { src: forest, width: 1100, height: 825 },
     upright: { src: forestUpright, width: 620, height: 825 }
+  },
+  harbour: {
+    wide: { src: harbour, width: 1100, height: 825 },
+    upright: { src: harbourUpright, width: 620, height: 825 }
   },
   pen: {
     wide: { src: pen, width: 1100, height: 825 },
@@ -88,6 +95,7 @@ export const PAGE_DECORS = {
   walk: DECORS.forest,
   runeTable: DECORS.workshop,
   relay: DECORS.pen,
+  notes: DECORS.harbour,
   mac: DECORS.village,
   windows: DECORS.camp,
   comparison: DECORS.arena,
@@ -105,6 +113,7 @@ export const OG_DECOR_FILES = {
   walk: `${DECOR_DIR}/forest.webp`,
   runeTable: `${DECOR_DIR}/workshop.webp`,
   relay: `${DECOR_DIR}/pen.webp`,
+  notes: `${DECOR_DIR}/harbour.webp`,
   mac: `${DECOR_DIR}/village.webp`,
   windows: `${DECOR_DIR}/camp.webp`,
   comparison: `${DECOR_DIR}/arena.webp`,
