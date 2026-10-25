@@ -18,6 +18,7 @@ export type TraitId =
   | 'autoFocus'
   | 'charShortcut'
   | 'macos'
+  | 'notes'
   | 'relay'
   | 'runeTable'
   | 'signed'

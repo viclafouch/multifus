@@ -49,7 +49,7 @@ export const PAGE_DESCRIPTIONS = {
   notes: msg`Un bloc-notes reste au-dessus de Dofus Retro : un prix de l’HDV, une recette, un pseudo croisé. Vous notez sans quitter le jeu, et sans fenêtre à chercher.`,
   mac: msg`Le multicompte Dofus Retro sur Mac, dans une application vérifiée par Apple, sans clic droit ni réglage à contourner. Les six fonctionnalités y sont.`,
   windows: msg`Le multicompte Dofus Retro sur Windows 10 et 11 : chaque personnage prend son bouton dans la barre des tâches, avec son pseudo et sa tête de classe.`,
-  comparison: msg`Multifus, Dracoon, Focus Retro, Dosoft, Retro Toolbox, ROrganizer : treize lignes comparées, chacune lue dans le code de l’outil et pas sur sa page d’accueil.`,
+  comparison: msg`Multifus, Dracoon, Focus Retro, Dosoft, Retro Toolbox, ROrganizer : quatorze lignes comparées, chacune lue dans le code de l’outil et pas sur sa page d’accueil.`,
   download: msg`Téléchargez Multifus gratuitement, pour Mac et pour Windows. Trois gestes pour installer, aucun compte à créer, aucune publicité, et le code est public.`,
   faq: msg`Ankama, votre compte, votre ordinateur, votre langue, le prix : les questions qu’on me pose avant d’installer un logiciel multicompte sur Dofus Retro.`,
   journal: msg`Ce que chaque version de Multifus a changé pour le multicompte sur Dofus Retro : les fonctionnalités ajoutées, les réglages déplacés, les défauts corrigés.`,

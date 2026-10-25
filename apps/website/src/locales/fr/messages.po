@@ -40,6 +40,10 @@ msgid "<0>Dofus 2 et Dofus 3 ne sont pas concernés.</0> Ils n’ont ni les mêm
 msgstr "<0>Dofus 2 et Dofus 3 ne sont pas concernés.</0> Ils n’ont ni les mêmes fenêtres ni les mêmes notifications."
 
 #: src/constants/questions.ts
+msgid "<0>En partie.</0> Le plein écran du Mac donne au client un bureau à lui seul, et seules les <1>Notes</1> s’y affichent par-dessus."
+msgstr "<0>En partie.</0> Le plein écran du Mac donne au client un bureau à lui seul, et seules les <1>Notes</1> s’y affichent par-dessus."
+
+#: src/constants/questions.ts
 msgid "<0>Français, anglais, espagnol.</0> Il prend celle de votre ordinateur, et vous en changez dans les réglages."
 msgstr "<0>Français, anglais, espagnol.</0> Il prend celle de votre ordinateur, et vous en changez dans les réglages."
 
@@ -50,10 +54,6 @@ msgstr "<0>L’accès à l’Accessibilité, et rien d’autre.</0> C’est ce q
 #: src/constants/questions.ts
 msgid "<0>Moi.</0> Pas de publicité, pas de compte, pas de version payante. Je paie l’hébergement et le certificat d’Apple."
 msgstr "<0>Moi.</0> Pas de publicité, pas de compte, pas de version payante. Je paie l’hébergement et le certificat d’Apple."
-
-#: src/constants/questions.ts
-msgid "<0>Non.</0> Le plein écran du Mac donne au client un bureau à lui seul, et macOS n’y laisse rien s’afficher par-dessus."
-msgstr "<0>Non.</0> Le plein écran du Mac donne au client un bureau à lui seul, et macOS n’y laisse rien s’afficher par-dessus."
 
 #: src/constants/questions.ts
 msgid "<0>Oui, et sur Windows 10 aussi.</0> L’installation prend 3 gestes."
@@ -313,8 +313,8 @@ msgid "Crâ"
 msgstr "Crâ"
 
 #: src/constants/questions.ts
-msgid "Dans les deux cas, il ne crée aucun compte et <0>n’envoie rien qui vous nomme</0> : ni pseudo, ni message, ni fichier du jeu. Il partage des statistiques d’usage, qu’une case des Réglages coupe, et les <1>Mentions légales</1> en donnent le détail. Telegram ne reçoit vos messages que si vous branchez vous-même les <2>Messages privés</2>."
-msgstr "Dans les deux cas, il ne crée aucun compte et <0>n’envoie rien qui vous nomme</0> : ni pseudo, ni message, ni fichier du jeu. Il partage des statistiques d’usage, qu’une case des Réglages coupe, et les <1>Mentions légales</1> en donnent le détail. Telegram ne reçoit vos messages que si vous branchez vous-même les <2>Messages privés</2>."
+msgid "Dans les deux cas, il ne crée aucun compte et <0>n’envoie rien qui vous nomme</0> : ni pseudo, ni message, ni note, ni fichier du jeu. Il partage des statistiques d’usage, qu’une case des Réglages coupe, et les <1>Mentions légales</1> en donnent le détail. Telegram ne reçoit vos messages que si vous branchez vous-même les <2>Messages privés</2>."
+msgstr "Dans les deux cas, il ne crée aucun compte et <0>n’envoie rien qui vous nomme</0> : ni pseudo, ni message, ni note, ni fichier du jeu. Il partage des statistiques d’usage, qu’une case des Réglages coupe, et les <1>Mentions légales</1> en donnent le détail. Telegram ne reçoit vos messages que si vous branchez vous-même les <2>Messages privés</2>."
 
 #: src/constants/rivals.ts
 msgid "Dans sa fenêtre à lui, pas par-dessus le jeu."
@@ -946,8 +946,8 @@ msgid "Multifus sur Windows"
 msgstr "Multifus sur Windows"
 
 #: src/constants/wording.ts
-msgid "Multifus, Dracoon, Focus Retro, Dosoft, Retro Toolbox, ROrganizer : treize lignes comparées, chacune lue dans le code de l’outil et pas sur sa page d’accueil."
-msgstr "Multifus, Dracoon, Focus Retro, Dosoft, Retro Toolbox, ROrganizer : treize lignes comparées, chacune lue dans le code de l’outil et pas sur sa page d’accueil."
+msgid "Multifus, Dracoon, Focus Retro, Dosoft, Retro Toolbox, ROrganizer : quatorze lignes comparées, chacune lue dans le code de l’outil et pas sur sa page d’accueil."
+msgstr "Multifus, Dracoon, Focus Retro, Dosoft, Retro Toolbox, ROrganizer : quatorze lignes comparées, chacune lue dans le code de l’outil et pas sur sa page d’accueil."
 
 #: src/constants/ankama.ts
 msgid "Ne rien lire et ne rien changer dans le jeu"

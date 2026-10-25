@@ -115,7 +115,7 @@ export const QUESTIONS = {
         said: msg`Sur Mac, Apple a vérifié le fichier : au premier lancement, macOS demande seulement de confirmer, et précise qu’aucun logiciel malveillant n’a été trouvé. Sur Windows, votre ordinateur peut demander confirmation : Multifus est encore jeune, et Windows ne le connaît pas encore.`
       },
       {
-        said: msg`Dans les deux cas, il ne crée aucun compte et <0>n’envoie rien qui vous nomme</0> : ni pseudo, ni message, ni fichier du jeu. Il partage des statistiques d’usage, qu’une case des Réglages coupe, et les <1>Mentions légales</1> en donnent le détail. Telegram ne reçoit vos messages que si vous branchez vous-même les <2>Messages privés</2>.`,
+        said: msg`Dans les deux cas, il ne crée aucun compte et <0>n’envoie rien qui vous nomme</0> : ni pseudo, ni message, ni note, ni fichier du jeu. Il partage des statistiques d’usage, qu’une case des Réglages coupe, et les <1>Mentions légales</1> en donnent le détail. Telegram ne reçoit vos messages que si vous branchez vous-même les <2>Messages privés</2>.`,
         marks: [
           { kind: 'stress' },
           { kind: 'page', page: 'legal' },
@@ -173,8 +173,8 @@ export const QUESTIONS = {
     ask: msg`Le plein écran du Mac, ça marche ?`,
     answer: [
       {
-        said: msg`<0>Non.</0> Le plein écran du Mac donne au client un bureau à lui seul, et macOS n’y laisse rien s’afficher par-dessus.`,
-        marks: [{ kind: 'stress' }]
+        said: msg`<0>En partie.</0> Le plein écran du Mac donne au client un bureau à lui seul, et seules les <1>Notes</1> s’y affichent par-dessus.`,
+        marks: [{ kind: 'stress' }, { kind: 'page', page: 'notes' }]
       },
       {
         said: msg`Tant que le client reste en plein écran, la <0>Roue des personnages</0>, le <1>Tableau des runes</1> et la bannière du <2>Déplacement rapide</2> ne s’affichent pas.`,

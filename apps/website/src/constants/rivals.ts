@@ -15,6 +15,8 @@ export const SURVEYED_ON = '2026-09-21'
 
 const PUBLISHED_WITHOUT_FREE_LICENCE = msg`Code publié, sans licence libre.`
 
+const IN_ITS_OWN_WINDOW = msg`Dans sa fenêtre à lui, pas par-dessus le jeu.`
+
 export const RIVAL_IDS = [
   'dracoon',
   'focusRetro',
@@ -55,6 +57,7 @@ export const TRAIT_IDS = [
   'autoFocus',
   'runeTable',
   'relay',
+  'notes',
   'split',
   'savedOrders',
   'tongues',
@@ -68,7 +71,8 @@ export const PEEK_TRAITS = [
   'wheel',
   'walk',
   'autoFocus',
-  'relay'
+  'relay',
+  'notes'
 ] as const satisfies readonly TraitId[]
 
 export const TRAITS = {
@@ -152,6 +156,16 @@ export const TRAITS = {
       rorganizer: 'no'
     }
   },
+  notes: {
+    mine: 'yes',
+    theirs: {
+      dracoon: 'no',
+      focusRetro: 'no',
+      dosoft: 'no',
+      retroToolbox: 'half',
+      rorganizer: 'no'
+    }
+  },
   split: {
     mine: 'no',
     theirs: {
@@ -213,6 +227,7 @@ export const TRAIT_NAMES = {
   autoFocus: msg`AutoFocus`,
   runeTable: PAGE_NAMES.runeTable,
   relay: PAGE_NAMES.relay,
+  notes: PAGE_NAMES.notes,
   split: msg`Fenêtres rangées côte à côte`,
   savedOrders: msg`Plusieurs ordres de personnages enregistrés`,
   tongues: msg`Français, anglais, espagnol`,
@@ -259,7 +274,12 @@ export const HALF_NOTES = [
   {
     trait: 'runeTable',
     rival: 'retroToolbox',
-    line: msg`Dans sa fenêtre à lui, pas par-dessus le jeu.`
+    line: IN_ITS_OWN_WINDOW
+  },
+  {
+    trait: 'notes',
+    rival: 'retroToolbox',
+    line: IN_ITS_OWN_WINDOW
   },
   {
     trait: 'savedOrders',
