@@ -3,7 +3,7 @@
 Players asked for a small notepad they can keep over Dofus Retro. The Notes are
 that: one note for every character, above every application, kept across
 restarts, and never costing the game a keystroke it was owed. The words are in
-`CONTEXT.md`. The two decisions that are hard to reverse are
+`GLOSSARY.md`. The two decisions that are hard to reverse are
 `docs/adr/0001-the-notes-keep-the-keyboard-through-a-switch.md` and
 `docs/adr/0002-tiptap-writes-the-note-kept-as-its-json.md`.
 
