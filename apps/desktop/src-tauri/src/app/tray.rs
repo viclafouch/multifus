@@ -22,6 +22,7 @@ use crate::app::journal::WalkFrom;
 use crate::app::journal::Work;
 use crate::app::journal_file;
 use crate::app::links;
+use crate::app::links::AboutLink;
 use crate::app::links::SystemPage;
 use crate::app::main_window;
 use crate::app::notes;
@@ -32,7 +33,6 @@ use crate::app::runtime;
 use crate::app::state::Multifus;
 use crate::app::state::lock;
 use crate::app::state::windows;
-use crate::app::update;
 use crate::app::view::CharacterView;
 use crate::app::view::Screen;
 use crate::app::walk;
@@ -162,9 +162,9 @@ fn patch_notes_label(version: &str, language: Language) -> String {
 
 fn update_label(version: &str, language: Language) -> String {
     match language {
-        Language::Fr => format!("Installer la mise à jour {version}"),
-        Language::En => format!("Install update {version}"),
-        Language::Es => format!("Instalar la actualización {version}"),
+        Language::Fr => format!("Télécharger la version {version}"),
+        Language::En => format!("Download version {version}"),
+        Language::Es => format!("Descargar la versión {version}"),
     }
 }
 
@@ -597,7 +597,7 @@ fn on_menu_event(app: &AppHandle, event: MenuEvent) {
     }
 
     if id == UPDATE_ID {
-        update::install(app);
+        links::open_about(app, AboutLink::Download);
 
         return;
     }
@@ -1020,15 +1020,18 @@ mod tests {
     }
 
     #[test]
-    fn the_update_line_names_the_version_it_is_about_to_install() {
+    fn the_update_line_names_the_version_it_leads_to() {
         assert_eq!(
             update_label("0.2.0", Language::Fr),
-            "Installer la mise à jour 0.2.0"
+            "Télécharger la version 0.2.0"
         );
-        assert_eq!(update_label("0.2.0", Language::En), "Install update 0.2.0");
+        assert_eq!(
+            update_label("0.2.0", Language::En),
+            "Download version 0.2.0"
+        );
         assert_eq!(
             update_label("0.2.0", Language::Es),
-            "Instalar la actualización 0.2.0"
+            "Descargar la versión 0.2.0"
         );
     }
 

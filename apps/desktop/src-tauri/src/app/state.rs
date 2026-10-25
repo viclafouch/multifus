@@ -1438,9 +1438,7 @@ impl Multifus {
     pub fn dismiss_release_notice(&mut self) {
         match self.release_notice() {
             Some(ReleaseNotice::Ready { .. }) => {
-                let is_installing = self.update == UpdateView::Installing;
-
-                if let Some(found) = self.update_found.as_mut().filter(|_| !is_installing) {
+                if let Some(found) = self.update_found.as_mut() {
                     found.is_put_aside = true;
                 }
             }
@@ -1468,10 +1466,7 @@ impl Multifus {
     pub fn available_update(&self) -> Option<String> {
         match &self.update {
             UpdateView::Available { version } => Some(version.clone()),
-            UpdateView::Checking
-            | UpdateView::UpToDate
-            | UpdateView::Installing
-            | UpdateView::Failed { .. } => None,
+            UpdateView::Checking | UpdateView::UpToDate | UpdateView::Failed { .. } => None,
         }
     }
 
@@ -4165,7 +4160,7 @@ mod tests {
     }
 
     #[test]
-    fn an_update_is_only_offered_while_there_is_one_to_install() {
+    fn an_update_is_only_offered_while_there_is_one_to_download() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus(&directory);
 
@@ -4179,7 +4174,6 @@ mod tests {
 
         for update in [
             UpdateView::UpToDate,
-            UpdateView::Installing,
             UpdateView::Failed {
                 detail: "coupure".to_owned(),
             },
@@ -4242,14 +4236,13 @@ mod tests {
     }
 
     #[test]
-    fn a_version_being_installed_or_refused_keeps_its_notice_so_the_outcome_shows() {
+    fn a_version_found_keeps_its_notice_while_the_check_runs_again_or_fails() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus_played(&directory, Some("0.0.0"));
 
         state.offer_update("0.3.0".to_owned());
 
         for update in [
-            UpdateView::Installing,
             UpdateView::Failed {
                 detail: "coupure".to_owned(),
             },
@@ -4266,30 +4259,7 @@ mod tests {
     }
 
     #[test]
-    fn an_install_that_failed_can_be_put_aside_but_not_while_it_downloads() {
-        let directory = TempDir::new().expect("a temporary directory");
-        let mut state = multifus_played(&directory, Some("0.0.0"));
-
-        state.offer_update("0.3.0".to_owned());
-        state.set_update(UpdateView::Installing);
-        state.dismiss_release_notice();
-
-        assert_eq!(
-            state.release_notice(),
-            ready("0.3.0"),
-            "the download goes on"
-        );
-
-        state.set_update(UpdateView::Failed {
-            detail: "coupure".to_owned(),
-        });
-        state.dismiss_release_notice();
-
-        assert_eq!(state.release_notice(), None);
-    }
-
-    #[test]
-    fn reading_the_patch_notes_of_a_version_found_leaves_it_to_install() {
+    fn reading_the_patch_notes_of_a_version_found_leaves_it_to_download() {
         let directory = TempDir::new().expect("a temporary directory");
         let mut state = multifus_played(&directory, Some("0.0.0"));
 
@@ -4359,7 +4329,7 @@ mod tests {
         assert_eq!(
             state.unread_patch_notes(),
             None,
-            "the menu offers the install first"
+            "the menu offers the download first"
         );
 
         state.dismiss_release_notice();

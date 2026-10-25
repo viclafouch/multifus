@@ -32,8 +32,6 @@ const ENDED: &str = "session_ended";
 
 const ONBOARDING_FINISHED: &str = "onboarding_finished";
 
-const UPDATED: &str = "app_updated";
-
 const CRASHED: &str = "app_crashed";
 
 const ELSEWHERE: &str = "elsewhere";
@@ -128,15 +126,6 @@ pub fn onboarding_finished(app: &AppHandle) {
 
     stats.track(ONBOARDING_FINISHED, json!({}));
     stats.send_apart();
-}
-
-pub fn app_updated(app: &AppHandle, version: &str) {
-    let Some(stats) = stats_if_measuring(app) else {
-        return;
-    };
-
-    stats.track(UPDATED, json!({ "to": shortened(version) }));
-    stats.send_and_wait();
 }
 
 pub fn app_crashed(app: &AppHandle, location: Option<&Location<'_>>) {

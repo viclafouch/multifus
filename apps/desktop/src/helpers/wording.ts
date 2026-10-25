@@ -115,15 +115,12 @@ export const updateLine = (update: UpdateStatus) => {
     case 'available': {
       const { version } = update
 
-      return t`La version ${version} est prête. Multifus se relancera tout seul, sans toucher à vos clients.`
-    }
-    case 'installing': {
-      return t`Téléchargement en cours…`
+      return t`La version ${version} est sortie. Elle se télécharge sur le site, et vos réglages restent.`
     }
     case 'failed': {
       const { detail } = update
 
-      return t`La mise à jour a échoué : ${detail}`
+      return t`La vérification a échoué : ${detail}`
     }
     default: {
       return update satisfies never
@@ -131,28 +128,10 @@ export const updateLine = (update: UpdateStatus) => {
   }
 }
 
-export const readyNoticeLines = (version: string, update: UpdateStatus) => {
-  const title = t`La version ${version} est prête`
-
-  switch (update.kind) {
-    case 'available':
-    case 'upToDate': {
-      return {
-        title,
-        body: t`Multifus se relancera tout seul, sans toucher à vos clients.`,
-        installLabel: t`Installer`
-      }
-    }
-    case 'failed': {
-      return { title, body: updateLine(update), installLabel: t`Réessayer` }
-    }
-    case 'checking':
-    case 'installing': {
-      return { title, body: updateLine(update), installLabel: null }
-    }
-    default: {
-      return update satisfies never
-    }
+export const readyNoticeLines = (version: string) => {
+  return {
+    title: t`La version ${version} est sortie`,
+    body: t`Téléchargez-la sur le site et installez-la par-dessus : vos réglages restent.`
   }
 }
 

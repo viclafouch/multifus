@@ -1,24 +1,25 @@
-use std::sync::Mutex;
-use std::sync::MutexGuard;
-use std::sync::PoisonError;
+use std::time::Duration;
 
+use reqwest::Client;
+use semver::Version;
+use serde::Deserialize;
 use tauri::AppHandle;
-use tauri::Manager;
-use tauri_plugin_updater::Update;
-use tauri_plugin_updater::UpdaterExt;
 
 use crate::app::journal::JournalEvent;
-use crate::app::notes;
 use crate::app::runtime;
 use crate::app::state::lock;
-use crate::app::stats;
 use crate::app::view::UpdateView;
 
-type PendingUpdate = Mutex<Option<Update>>;
+const LATEST_RELEASE_URL: &str = "https://api.github.com/repos/viclafouch/multifus/releases/latest";
+
+const TIMEOUT: Duration = Duration::from_secs(15);
+
+#[derive(Debug, Deserialize)]
+struct LatestRelease {
+    tag_name: String,
+}
 
 pub fn setup(app: &AppHandle) {
-    app.manage::<PendingUpdate>(Mutex::new(None));
-
     check(app);
 }
 
@@ -30,72 +31,44 @@ pub fn check(app: &AppHandle) {
     let app = app.clone();
 
     tauri::async_runtime::spawn(async move {
-        let found = look(&app).await;
+        let running = &app.package_info().version;
 
-        match found {
-            Ok(Some(update)) => {
-                let version = update.version.clone();
+        match latest_tag(running).await {
+            Ok(tag) => match newer_version(&tag, running) {
+                Some(version) => {
+                    let mut state = lock(&app);
 
-                *pending(&app) = Some(update);
-
-                let mut state = lock(&app);
-
-                state.offer_update(version.clone());
-                state.log_unless_repeated(JournalEvent::UpdateAvailable { version });
-            }
-            Ok(None) => up_to_date(&app),
-            Err(tauri_plugin_updater::Error::ReleaseNotFound) => up_to_date(&app),
-            Err(error) => fail(&app, &error.to_string()),
+                    state.offer_update(version.clone());
+                    state.log_unless_repeated(JournalEvent::UpdateAvailable { version });
+                }
+                None => up_to_date(&app),
+            },
+            Err(error) => fail(&app, &error.without_url().to_string()),
         }
 
         runtime::emit_snapshot(&app);
     });
 }
 
-async fn look(app: &AppHandle) -> tauri_plugin_updater::Result<Option<Update>> {
-    let handle = app.clone();
-
-    app.updater_builder()
-        .on_before_exit(move || {
-            notes::keep(&handle);
-            runtime::give_traces_back(&handle);
-        })
+async fn latest_tag(running: &Version) -> reqwest::Result<String> {
+    let release = Client::builder()
+        .timeout(TIMEOUT)
+        .user_agent(format!("Multifus/{running}"))
         .build()?
-        .check()
-        .await
+        .get(LATEST_RELEASE_URL)
+        .send()
+        .await?
+        .error_for_status()?
+        .json::<LatestRelease>()
+        .await?;
+
+    Ok(release.tag_name)
 }
 
-pub fn install(app: &AppHandle) {
-    let Some(update) = pending(app).take() else {
-        return;
-    };
+fn newer_version(tag: &str, running: &Version) -> Option<String> {
+    let published = Version::parse(tag.trim_start_matches('v')).ok()?;
 
-    lock(app).set_update(UpdateView::Installing);
-
-    runtime::emit_snapshot(app);
-
-    let app = app.clone();
-
-    tauri::async_runtime::spawn(async move {
-        let version = update.version.clone();
-        let installed = update.download_and_install(|_, _| {}, || {}).await;
-
-        if let Err(error) = installed {
-            *pending(&app) = Some(update);
-
-            fail(&app, &error.to_string());
-
-            runtime::emit_snapshot(&app);
-
-            return;
-        }
-
-        stats::app_updated(&app, &version);
-
-        notes::keep(&app);
-
-        app.restart();
-    });
+    (published > *running).then(|| published.to_string())
 }
 
 fn up_to_date(app: &AppHandle) {
@@ -116,9 +89,34 @@ fn fail(app: &AppHandle, detail: &str) {
     });
 }
 
-fn pending(app: &AppHandle) -> MutexGuard<'_, Option<Update>> {
-    app.state::<PendingUpdate>()
-        .inner()
-        .lock()
-        .unwrap_or_else(PoisonError::into_inner)
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn running() -> Version {
+        Version::new(0, 4, 0)
+    }
+
+    #[test]
+    fn a_later_release_is_offered_under_its_bare_version() {
+        assert_eq!(
+            newer_version("v0.5.0", &running()),
+            Some("0.5.0".to_owned())
+        );
+        assert_eq!(
+            newer_version("v0.10.0", &running()),
+            Some("0.10.0".to_owned())
+        );
+    }
+
+    #[test]
+    fn the_running_version_or_an_older_one_offers_nothing() {
+        assert_eq!(newer_version("v0.4.0", &running()), None);
+        assert_eq!(newer_version("v0.3.0", &running()), None);
+    }
+
+    #[test]
+    fn a_tag_that_is_not_a_version_offers_nothing() {
+        assert_eq!(newer_version("nightly", &running()), None);
+    }
 }

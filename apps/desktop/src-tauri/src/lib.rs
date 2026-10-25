@@ -26,7 +26,6 @@ pub fn run() {
             MacosLauncher::LaunchAgent,
             Some(vec![main_window::FROM_SESSION_ARG]),
         ))
-        .plugin(tauri_plugin_updater::Builder::new().build())
         .setup(|tauri_app| {
             app::setup(tauri_app.handle())?;
 
@@ -104,7 +103,6 @@ pub fn run() {
             app::commands::open_relay_link,
             app::commands::reset,
             app::commands::check_update,
-            app::commands::install_update,
             app::commands::dismiss_config_problem,
             app::commands::dismiss_check_notice,
             app::commands::dismiss_release_notice,

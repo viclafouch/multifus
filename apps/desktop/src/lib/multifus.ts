@@ -393,10 +393,6 @@ export const checkUpdate = async () => {
   return invoke<Snapshot>('check_update')
 }
 
-export const installUpdate = async () => {
-  return invoke<Snapshot>('install_update')
-}
-
 export const dismissReleaseNotice = async () => {
   return invoke<Snapshot>('dismiss_release_notice')
 }

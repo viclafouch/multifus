@@ -21,8 +21,8 @@ Windows 10 or 11. Windows may warn about a new app: click **More info**, then
 
 [Download for Windows](https://www.multifus.app/en/download)
 
-Multifus updates itself. What each version changed is in the
-[changelog](https://www.multifus.app/en/changelog).
+Multifus tells you when a new version is out. What each version changed is in
+the [changelog](https://www.multifus.app/en/changelog).
 
 ## Features
 

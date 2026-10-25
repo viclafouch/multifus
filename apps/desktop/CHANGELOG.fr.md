@@ -8,6 +8,7 @@
 
 ### Améliorations
 
+- Multifus n’installe plus ses mises à jour lui-même. Quand une version sort, un bandeau vous mène à la page de téléchargement du site, et vos réglages restent.
 - Les Textes rapides disparaissent : Ankama assimile l’écriture automatique dans le tchat de Dofus à une macro. Vos phrases et leurs raccourcis sont effacés.
 - Le menu de l’icône dit maintenant « Activer les messages privés sur le téléphone » et « Désactiver les messages privés sur le téléphone », au lieu d’un « Ne plus les recevoir » qu’on ne comprenait pas. L’interrupteur de l’écran Messages privés prend le même nom.
 - La mise en route décrit maintenant le Déplacement rapide tel qu’il marche : un clic par personnage, puis la fenêtre Dofus du personnage suivant passe devant.

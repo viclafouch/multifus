@@ -1348,11 +1348,6 @@ msgstr "Ine / Fo / Age / Cha"
 msgid "Initiative"
 msgstr "Iniciativa"
 
-#: src/helpers/wording.ts
-#: src/screens/about/project-panel.tsx
-msgid "Installer"
-msgstr "Instalar"
-
 #: src/screens/relay/pairing-guide.tsx
 msgid "Installez Telegram sur votre téléphone, puis suivez ces cinq étapes ici. Après, on n’y revient plus."
 msgstr "Instala Telegram en tu teléfono y sigue estos cinco pasos aquí. Después no se vuelve más."
@@ -1486,10 +1481,6 @@ msgstr "El idioma de Multifus"
 msgid "La lecture des fenêtres"
 msgstr "La lectura de las ventanas"
 
-#: src/helpers/wording.ts
-msgid "La mise à jour a échoué : {detail}"
-msgstr "La actualización ha fallado: {detail}"
-
 #: src/constants/journal.ts
 msgid "La réponse à un clic dans la barre système"
 msgstr "La respuesta a un clic en la bandeja del sistema"
@@ -1547,17 +1538,21 @@ msgstr "El icono de clase en la barra de tareas"
 msgid "La tête de classe est coupée dans les Paramètres : le client garde son logo Dofus."
 msgstr "El icono de clase está apagado en Ajustes: el cliente conserva su logo de Dofus."
 
+#: src/helpers/wording.ts
+msgid "La vérification a échoué : {detail}"
+msgstr "La comprobación ha fallado: {detail}"
+
 #: src/helpers/journal.ts
 msgid "La version {version} est disponible."
 msgstr "La versión {version} está disponible."
 
 #: src/helpers/wording.ts
-msgid "La version {version} est prête"
-msgstr "La versión {version} está lista"
+msgid "La version {version} est sortie"
+msgstr "La versión {version} ya está aquí"
 
 #: src/helpers/wording.ts
-msgid "La version {version} est prête. Multifus se relancera tout seul, sans toucher à vos clients."
-msgstr "La versión {version} está lista. Multifus se reiniciará solo, sin tocar tus clientes."
+msgid "La version {version} est sortie. Elle se télécharge sur le site, et vos réglages restent."
+msgstr "La versión {version} ya está aquí. Se descarga en el sitio, y tus ajustes se quedan."
 
 #: src/helpers/onboarding.ts
 msgid "Laissez Dofus vous prévenir"
@@ -2023,10 +2018,6 @@ msgstr "Multifus vuelve a empezar como la primera vez. Tus personajes de Dofus R
 msgid "Multifus se recharge d’un coup et vous laisse sur l’écran où vous êtes. Vos clients Dofus Retro ne bougent pas."
 msgstr "Multifus se recarga de golpe y te deja en la pantalla donde estás. Tus clientes de Dofus Retro no se mueven."
 
-#: src/helpers/wording.ts
-msgid "Multifus se relancera tout seul, sans toucher à vos clients."
-msgstr "Multifus se reiniciará solo, sin tocar tus clientes."
-
 #: src/constants/journal.ts
 msgid "Multifus tournait déjà : le second lancement s’arrête là."
 msgstr "Multifus ya estaba en marcha: la segunda apertura se queda ahí."
@@ -2399,7 +2390,6 @@ msgid "Recharger l’écran"
 msgstr "Recargar la pantalla"
 
 #: src/components/health-dialog.tsx
-#: src/helpers/wording.ts
 msgid "Réessayer"
 msgstr "Reintentar"
 
@@ -2699,9 +2689,14 @@ msgstr "Tabla de runas"
 msgid "Taille"
 msgstr "Tamaño"
 
+#: src/components/release-notice-bar.tsx
+#: src/screens/about/project-panel.tsx
+msgid "Télécharger"
+msgstr "Descargar"
+
 #: src/helpers/wording.ts
-msgid "Téléchargement en cours…"
-msgstr "Descargando…"
+msgid "Téléchargez-la sur le site et installez-la par-dessus : vos réglages restent."
+msgstr "Descárgala en el sitio e instálala encima de esta: tus ajustes se quedan."
 
 #: src/helpers/wording.ts
 msgid "Telegram a refusé la demande ({detail})."

@@ -29,6 +29,7 @@ pub enum AboutLink {
     Journal,
     Ankama,
     Legal,
+    Download,
 }
 
 impl AboutLink {
@@ -51,6 +52,11 @@ impl AboutLink {
                 Language::Fr => "mentions-legales",
                 Language::En => "en/legal-notice",
                 Language::Es => "es/aviso-legal",
+            }),
+            Self::Download => site_page(match language {
+                Language::Fr => "telecharger",
+                Language::En => "en/download",
+                Language::Es => "es/descargar",
             }),
         }
     }

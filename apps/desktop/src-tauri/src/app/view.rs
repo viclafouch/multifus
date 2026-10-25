@@ -264,8 +264,6 @@ pub enum UpdateView {
 
     Available { version: String },
 
-    Installing,
-
     Failed { detail: String },
 }
 
@@ -1000,13 +998,12 @@ mod tests {
             UpdateView::Available {
                 version: "0.2.0".to_owned(),
             },
-            UpdateView::Installing,
             UpdateView::Failed { detail: detail() },
         ];
 
         assert_eq!(
             kinds_of(&updates),
-            ["checking", "upToDate", "available", "installing", "failed"]
+            ["checking", "upToDate", "available", "failed"]
         );
         assert_eq!(json_of(&updates[2])["version"], json!("0.2.0"));
     }

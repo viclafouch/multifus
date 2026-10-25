@@ -551,12 +551,6 @@ const CALLS = [
     }
   },
   {
-    name: 'installUpdate',
-    run: () => {
-      return multifus.installUpdate()
-    }
-  },
-  {
     name: 'dismissConfigProblem',
     run: () => {
       return multifus.dismissConfigProblem()

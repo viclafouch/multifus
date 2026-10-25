@@ -2,15 +2,16 @@ import { Download, Sparkles } from 'lucide-react'
 import { t } from '@lingui/core/macro'
 import { Button } from '@multifus/retro'
 import type { Snapshot } from '@/@types/snapshot'
-import type { ReleaseNotice, UpdateStatus } from '@/@types/system'
+import type { ReleaseNotice } from '@/@types/system'
 import { LinkButton } from '@/components/link-button'
 import { NoticeBar } from '@/components/notice-bar'
 import { arrivedNoticeLines, readyNoticeLines } from '@/helpers/wording'
 import {
   dismissReleaseNotice,
-  installUpdate,
+  openAboutLink,
   openReleaseNotes
 } from '@/lib/multifus'
+import { ignore } from '@/lib/utils'
 
 type Run = (action: Promise<Snapshot>) => void
 
@@ -26,13 +27,11 @@ const PatchNoteButton = () => {
 
 type ReadyNoticeProps = Readonly<{
   version: string
-  update: UpdateStatus
   run: Run
 }>
 
-const ReadyNotice = ({ version, update, run }: ReadyNoticeProps) => {
-  const { title, body, installLabel } = readyNoticeLines(version, update)
-  const canWait = update.kind !== 'installing'
+const ReadyNotice = ({ version, run }: ReadyNoticeProps) => {
+  const { title, body } = readyNoticeLines(version)
 
   return (
     <NoticeBar
@@ -40,30 +39,24 @@ const ReadyNotice = ({ version, update, run }: ReadyNoticeProps) => {
       icon={Download}
       title={title}
       body={body}
-      action={
-        installLabel === null
-          ? undefined
-          : {
-              label: installLabel,
-              onAct: () => {
-                run(installUpdate())
-              }
-            }
-      }
+      action={{
+        label: t`Télécharger`,
+        onAct: () => {
+          openAboutLink('download').catch(ignore)
+        }
+      }}
       secondaryAction={
         <>
           <PatchNoteButton />
-          {canWait ? (
-            <Button
-              variant="slate"
-              size="tight"
-              onClick={() => {
-                run(dismissReleaseNotice())
-              }}
-            >
-              {t`Plus tard`}
-            </Button>
-          ) : null}
+          <Button
+            variant="slate"
+            size="tight"
+            onClick={() => {
+              run(dismissReleaseNotice())
+            }}
+          >
+            {t`Plus tard`}
+          </Button>
         </>
       }
     />
@@ -94,18 +87,13 @@ const ArrivedNotice = ({ version, run }: ArrivedNoticeProps) => {
 
 type ReleaseNoticeBarProps = Readonly<{
   notice: ReleaseNotice
-  update: UpdateStatus
   run: Run
 }>
 
-export const ReleaseNoticeBar = ({
-  notice,
-  update,
-  run
-}: ReleaseNoticeBarProps) => {
+export const ReleaseNoticeBar = ({ notice, run }: ReleaseNoticeBarProps) => {
   switch (notice.kind) {
     case 'ready': {
-      return <ReadyNotice version={notice.version} update={update} run={run} />
+      return <ReadyNotice version={notice.version} run={run} />
     }
     case 'arrived': {
       return <ArrivedNotice version={notice.version} run={run} />

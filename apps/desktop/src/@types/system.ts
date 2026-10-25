@@ -31,7 +31,6 @@ export type UpdateStatus =
   | { readonly kind: 'available'; readonly version: string }
   | { readonly kind: 'checking' }
   | { readonly kind: 'failed'; readonly detail: string }
-  | { readonly kind: 'installing' }
   | { readonly kind: 'upToDate' }
 
 export type ReleaseNotice =

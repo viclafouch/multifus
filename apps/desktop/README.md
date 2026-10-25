@@ -58,16 +58,20 @@ The commit that raises the version renames `## Unreleased` to
 `## <version> - <day>` in the three `CHANGELOG.<language>.md`, and the release
 refuses a tag whose notes are left unnamed.
 
-A `v*` tag builds both systems into a draft release, and the `publish` workflow
-makes it public once both builds pass: the site rebuilds itself and points its
-buttons at them. The tag is the last look, since nothing waits for a test
-between it and the updater of every installed copy.
+A `v*` tag builds both systems into a draft release. Victor publishes the draft
+by hand on GitHub, after a look at its files and their attestations. Publishing
+rebuilds the site, which points its buttons at the new files.
 
-The updater key pair lives in `~/.tauri/multifus.key` and its `.pub`, and the
-public half is `plugins.updater.pubkey` in `tauri.conf.json`. A new pair would
-leave every installed copy unable to trust an update. The key has an empty
-password, so `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` stays unset: a missing secret
-expands to the empty string the key expects.
+Multifus installs no update itself: Ankama sees an updater as a way to push a
+compromised version to every player. At launch it reads the latest published
+tag from the GitHub API, and a newer one opens the download page of the site.
+
+Copies up to 0.3.0 still carry the Tauri updater, which reads `latest.json`
+from the latest release. So the release keeps `createUpdaterArtifacts` and
+`plugins.updater.pubkey` until 0.4.0 is published, the version that carries
+those copies over. The key pair lives in `~/.tauri/multifus.key` and its
+`.pub`, with an empty password, so `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` stays
+unset.
 
 The Developer ID Application certificate expires on 17 September 2031. Its
 private key, the `.p12` and its password are in `~/.apple-developer-id/`. The

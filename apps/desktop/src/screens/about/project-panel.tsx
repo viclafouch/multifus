@@ -6,7 +6,7 @@ import { FieldRow } from '@/components/layout/field-row'
 import { PanelHeader } from '@/components/layout/panel-header'
 import { LinkButton } from '@/components/link-button'
 import { updateLine } from '@/helpers/wording'
-import { checkUpdate, installUpdate, openAboutLink } from '@/lib/multifus'
+import { checkUpdate, openAboutLink } from '@/lib/multifus'
 
 type ProjectPanelProps = Readonly<{
   update: UpdateStatus
@@ -15,8 +15,7 @@ type ProjectPanelProps = Readonly<{
 
 export const ProjectPanel = ({ update, run }: ProjectPanelProps) => {
   const isChecking = update.kind === 'checking'
-  const hasUpdate = update.kind === 'available' || update.kind === 'installing'
-  const isBusy = isChecking || update.kind === 'installing'
+  const hasUpdate = update.kind === 'available'
 
   return (
     <Panel>
@@ -25,16 +24,25 @@ export const ProjectPanel = ({ update, run }: ProjectPanelProps) => {
         description={t`Gratuit, sans compte et sans publicité.`}
       />
       <FieldRow label={t`Mise à jour`} description={updateLine(update)}>
-        <Button
-          variant="slate"
-          size="sm"
-          aria-busy={isBusy}
-          onClick={() => {
-            run(hasUpdate ? installUpdate() : checkUpdate())
-          }}
-        >
-          {hasUpdate ? t`Installer` : t`Vérifier`}
-        </Button>
+        {hasUpdate ? (
+          <LinkButton
+            label={t`Télécharger`}
+            onOpen={() => {
+              return openAboutLink('download')
+            }}
+          />
+        ) : (
+          <Button
+            variant="slate"
+            size="sm"
+            aria-busy={isChecking}
+            onClick={() => {
+              run(checkUpdate())
+            }}
+          >
+            {t`Vérifier`}
+          </Button>
+        )}
       </FieldRow>
       <FieldRow
         label={t`Comment Multifus est développé`}

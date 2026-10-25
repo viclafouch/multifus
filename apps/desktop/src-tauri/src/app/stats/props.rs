@@ -226,11 +226,10 @@ mod tests {
 
     const WORD_CEILING: usize = 180;
 
-    const EVENT_NAMES: [&str; 5] = [
+    const EVENT_NAMES: [&str; 4] = [
         "app_started",
         "session_ended",
         "onboarding_finished",
-        "app_updated",
         "app_crashed",
     ];
 

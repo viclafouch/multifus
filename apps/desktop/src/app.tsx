@@ -112,11 +112,7 @@ export const App = () => {
                   <AuthorizationBanner run={run} />
                 ) : null}
                 {snapshot.releaseNotice === null ? null : (
-                  <ReleaseNoticeBar
-                    notice={snapshot.releaseNotice}
-                    update={snapshot.update}
-                    run={run}
-                  />
+                  <ReleaseNoticeBar notice={snapshot.releaseNotice} run={run} />
                 )}
               </div>
               <div className="relative flex min-h-0 flex-1 flex-col">

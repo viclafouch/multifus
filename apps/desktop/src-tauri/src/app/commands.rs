@@ -524,13 +524,6 @@ pub fn check_update(app: AppHandle) -> Snapshot {
 }
 
 #[tauri::command]
-pub fn install_update(app: AppHandle) -> Snapshot {
-    update::install(&app);
-
-    runtime::emit_snapshot(&app)
-}
-
-#[tauri::command]
 pub fn dismiss_config_problem(app: AppHandle) -> Snapshot {
     lock(&app).dismiss_problem();
 

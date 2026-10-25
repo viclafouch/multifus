@@ -39,15 +39,11 @@ const UPDATE_CASES = {
   },
   available: {
     update: { kind: 'available', version: '1.4.0' },
-    line: 'La version 1.4.0 est prête. Multifus se relancera tout seul, sans toucher à vos clients.'
-  },
-  installing: {
-    update: { kind: 'installing' },
-    line: 'Téléchargement en cours…'
+    line: 'La version 1.4.0 est sortie. Elle se télécharge sur le site, et vos réglages restent.'
   },
   failed: {
     update: { kind: 'failed', detail: 'réseau injoignable' },
-    line: 'La mise à jour a échoué : réseau injoignable'
+    line: 'La vérification a échoué : réseau injoignable'
   }
 } as const satisfies Record<UpdateStatus['kind'], UpdateCase>
 

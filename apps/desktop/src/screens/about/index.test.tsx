@@ -4,7 +4,6 @@ import type { UpdateStatus } from '@/@types/system'
 
 const bridge = {
   checkUpdate: vi.fn(),
-  installUpdate: vi.fn(),
   openAboutLink: vi.fn(),
   reset: vi.fn(),
   revealConfig: vi.fn()
@@ -117,7 +116,7 @@ describe('the About screen', () => {
       fireEvent.click(buttonNamed('Vérifier'))
 
       expect(bridge.checkUpdate).toHaveBeenCalledWith()
-      expect(bridge.installUpdate).not.toHaveBeenCalled()
+      expect(bridge.openAboutLink).not.toHaveBeenCalledWith('download')
     })
 
     it('says the version is the latest', () => {
@@ -133,33 +132,27 @@ describe('the About screen', () => {
       expect(buttonNamed('Vérifier').getAttribute('aria-busy')).toBe('true')
     })
 
-    it('offers to install the version it found', () => {
+    it('leads to the download page of the version it found', () => {
+      bridge.openAboutLink.mockResolvedValue(null)
       show({ update: { kind: 'available', version: '1.5.0' } })
 
       expect(
         screen.getByText(
-          'La version 1.5.0 est prête. Multifus se relancera tout seul, sans toucher à vos clients.'
+          'La version 1.5.0 est sortie. Elle se télécharge sur le site, et vos réglages restent.'
         )
       ).not.toBeNull()
 
-      fireEvent.click(buttonNamed('Installer'))
+      fireEvent.click(buttonNamed('Télécharger'))
 
-      expect(bridge.installUpdate).toHaveBeenCalledWith()
+      expect(bridge.openAboutLink).toHaveBeenCalledWith('download')
       expect(bridge.checkUpdate).not.toHaveBeenCalled()
     })
 
-    it('says the download is going on', () => {
-      show({ update: { kind: 'installing' } })
-
-      expect(screen.getByText('Téléchargement en cours…')).not.toBeNull()
-      expect(buttonNamed('Installer').getAttribute('aria-busy')).toBe('true')
-    })
-
-    it('says why the update did not go through, and lets it be tried again', () => {
-      show({ update: { kind: 'failed', detail: 'signature invalide' } })
+    it('says why the check did not go through, and lets it be tried again', () => {
+      show({ update: { kind: 'failed', detail: 'réseau injoignable' } })
 
       expect(
-        screen.getByText('La mise à jour a échoué : signature invalide')
+        screen.getByText('La vérification a échoué : réseau injoignable')
       ).not.toBeNull()
 
       fireEvent.click(buttonNamed('Vérifier'))

@@ -1,1 +1,7 @@
-export type AboutLink = 'ankama' | 'issues' | 'journal' | 'legal' | 'source'
+export type AboutLink =
+  | 'ankama'
+  | 'download'
+  | 'issues'
+  | 'journal'
+  | 'legal'
+  | 'source'
