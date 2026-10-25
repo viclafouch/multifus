@@ -1,6 +1,6 @@
 # Notas del parche
 
-## Unreleased
+## 0.4.0 - 2026-10-25
 
 ### Novedades
 
