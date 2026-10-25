@@ -1166,7 +1166,7 @@ const JOURNAL_CASES = {
   updateFailed: [
     {
       event: { kind: 'updateFailed', detail: DETAIL },
-      line: `Mise à jour impossible : ${DETAIL}`
+      line: `Vérification de version impossible : ${DETAIL}`
     }
   ],
   relayPaired: [

@@ -1411,7 +1411,7 @@ impl Multifus {
     #[must_use]
     pub fn release_notice(&self) -> Option<ReleaseNotice> {
         match &self.update_found {
-            Some(found) if !found.is_put_aside => Some(ReleaseNotice::Ready {
+            Some(found) if !found.is_put_aside => Some(ReleaseNotice::Published {
                 version: found.version.clone(),
             }),
             _ => self.arrived_notice(),
@@ -1431,13 +1431,13 @@ impl Multifus {
     pub fn unread_patch_notes(&self) -> Option<String> {
         match self.release_notice() {
             Some(ReleaseNotice::Arrived { version }) => Some(version),
-            Some(ReleaseNotice::Ready { .. }) | None => None,
+            Some(ReleaseNotice::Published { .. }) | None => None,
         }
     }
 
     pub fn dismiss_release_notice(&mut self) {
         match self.release_notice() {
-            Some(ReleaseNotice::Ready { .. }) => {
+            Some(ReleaseNotice::Published { .. }) => {
                 if let Some(found) = self.update_found.as_mut() {
                     found.is_put_aside = true;
                 }
@@ -4184,8 +4184,8 @@ mod tests {
         }
     }
 
-    fn ready(version: &str) -> Option<ReleaseNotice> {
-        Some(ReleaseNotice::Ready {
+    fn published(version: &str) -> Option<ReleaseNotice> {
+        Some(ReleaseNotice::Published {
             version: version.to_owned(),
         })
     }
@@ -4215,7 +4215,7 @@ mod tests {
 
         state.offer_update("0.3.0".to_owned());
 
-        assert_eq!(state.release_notice(), ready("0.3.0"));
+        assert_eq!(state.release_notice(), published("0.3.0"));
 
         state.dismiss_release_notice();
 
@@ -4232,7 +4232,7 @@ mod tests {
 
         state.offer_update("0.4.0".to_owned());
 
-        assert_eq!(state.release_notice(), ready("0.4.0"));
+        assert_eq!(state.release_notice(), published("0.4.0"));
     }
 
     #[test]
@@ -4250,7 +4250,7 @@ mod tests {
         ] {
             state.set_update(update);
 
-            assert_eq!(state.release_notice(), ready("0.3.0"));
+            assert_eq!(state.release_notice(), published("0.3.0"));
         }
 
         state.set_update(UpdateView::UpToDate);
@@ -4266,7 +4266,7 @@ mod tests {
         state.offer_update("0.3.0".to_owned());
 
         assert_eq!(state.mark_release_notes_opened().as_deref(), Some("0.3.0"));
-        assert_eq!(state.release_notice(), ready("0.3.0"));
+        assert_eq!(state.release_notice(), published("0.3.0"));
     }
 
     #[test]
@@ -4324,7 +4324,7 @@ mod tests {
 
         state.offer_update("0.3.0".to_owned());
 
-        assert_eq!(state.release_notice(), ready("0.3.0"));
+        assert_eq!(state.release_notice(), published("0.3.0"));
 
         assert_eq!(
             state.unread_patch_notes(),

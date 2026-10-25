@@ -1,6 +1,7 @@
 use std::time::Duration;
 
 use reqwest::Client;
+use reqwest::StatusCode;
 use semver::Version;
 use serde::Deserialize;
 use tauri::AppHandle;
@@ -31,44 +32,51 @@ pub fn check(app: &AppHandle) {
     let app = app.clone();
 
     tauri::async_runtime::spawn(async move {
-        let running = &app.package_info().version;
+        let looked = newer_release(&app.package_info().version).await;
 
-        match latest_tag(running).await {
-            Ok(tag) => match newer_version(&tag, running) {
-                Some(version) => {
-                    let mut state = lock(&app);
-
-                    state.offer_update(version.clone());
-                    state.log_unless_repeated(JournalEvent::UpdateAvailable { version });
-                }
-                None => up_to_date(&app),
-            },
-            Err(error) => fail(&app, &error.without_url().to_string()),
-        }
+        settle(&app, looked);
 
         runtime::emit_snapshot(&app);
     });
 }
 
-async fn latest_tag(running: &Version) -> reqwest::Result<String> {
-    let release = Client::builder()
+async fn newer_release(running: &Version) -> reqwest::Result<Option<String>> {
+    let response = Client::builder()
         .timeout(TIMEOUT)
         .user_agent(format!("Multifus/{running}"))
         .build()?
         .get(LATEST_RELEASE_URL)
         .send()
-        .await?
-        .error_for_status()?
-        .json::<LatestRelease>()
         .await?;
 
-    Ok(release.tag_name)
+    if response.status() == StatusCode::NOT_FOUND {
+        return Ok(None);
+    }
+
+    let release = response.error_for_status()?.json::<LatestRelease>().await?;
+
+    Ok(newer_version(&release.tag_name, running))
 }
 
 fn newer_version(tag: &str, running: &Version) -> Option<String> {
     let published = Version::parse(tag.trim_start_matches('v')).ok()?;
 
     (published > *running).then(|| published.to_string())
+}
+
+fn settle(app: &AppHandle, looked: reqwest::Result<Option<String>>) {
+    match looked {
+        Ok(Some(version)) => offer(app, version),
+        Ok(None) => up_to_date(app),
+        Err(error) => fail(app, &error.without_url().to_string()),
+    }
+}
+
+fn offer(app: &AppHandle, version: String) {
+    let mut state = lock(app);
+
+    state.offer_update(version.clone());
+    state.log_unless_repeated(JournalEvent::UpdateAvailable { version });
 }
 
 fn up_to_date(app: &AppHandle) {

@@ -1869,10 +1869,6 @@ msgstr "Mise à jour"
 msgid "Mise à jour : {update}"
 msgstr "Mise à jour : {update}"
 
-#: src/constants/journal.ts
-msgid "Mise à jour impossible"
-msgstr "Mise à jour impossible"
-
 #: src/helpers/onboarding.ts
 msgid "Mise en route"
 msgstr "Mise en route"
@@ -2689,8 +2685,7 @@ msgstr "Tableau des runes"
 msgid "Taille"
 msgstr "Taille"
 
-#: src/components/release-notice-bar.tsx
-#: src/screens/about/project-panel.tsx
+#: src/components/download-button.tsx
 msgid "Télécharger"
 msgstr "Télécharger"
 
@@ -2898,6 +2893,10 @@ msgstr "Uniquement sur Windows"
 #: src/components/health-dialog.tsx
 msgid "Vérification"
 msgstr "Vérification"
+
+#: src/constants/journal.ts
+msgid "Vérification de version impossible"
+msgstr "Vérification de version impossible"
 
 #: src/helpers/wording.ts
 msgid "Vérification en cours…"

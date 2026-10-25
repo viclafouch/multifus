@@ -3,15 +3,11 @@ import { t } from '@lingui/core/macro'
 import { Button } from '@multifus/retro'
 import type { Snapshot } from '@/@types/snapshot'
 import type { ReleaseNotice } from '@/@types/system'
+import { DownloadButton } from '@/components/download-button'
 import { LinkButton } from '@/components/link-button'
 import { NoticeBar } from '@/components/notice-bar'
-import { arrivedNoticeLines, readyNoticeLines } from '@/helpers/wording'
-import {
-  dismissReleaseNotice,
-  openAboutLink,
-  openReleaseNotes
-} from '@/lib/multifus'
-import { ignore } from '@/lib/utils'
+import { arrivedNoticeLines, publishedNoticeLines } from '@/helpers/wording'
+import { dismissReleaseNotice, openReleaseNotes } from '@/lib/multifus'
 
 type Run = (action: Promise<Snapshot>) => void
 
@@ -25,13 +21,13 @@ const PatchNoteButton = () => {
   )
 }
 
-type ReadyNoticeProps = Readonly<{
+type PublishedNoticeProps = Readonly<{
   version: string
   run: Run
 }>
 
-const ReadyNotice = ({ version, run }: ReadyNoticeProps) => {
-  const { title, body } = readyNoticeLines(version)
+const PublishedNotice = ({ version, run }: PublishedNoticeProps) => {
+  const { title, body } = publishedNoticeLines(version)
 
   return (
     <NoticeBar
@@ -39,12 +35,6 @@ const ReadyNotice = ({ version, run }: ReadyNoticeProps) => {
       icon={Download}
       title={title}
       body={body}
-      action={{
-        label: t`Télécharger`,
-        onAct: () => {
-          openAboutLink('download').catch(ignore)
-        }
-      }}
       secondaryAction={
         <>
           <PatchNoteButton />
@@ -57,6 +47,7 @@ const ReadyNotice = ({ version, run }: ReadyNoticeProps) => {
           >
             {t`Plus tard`}
           </Button>
+          <DownloadButton variant="leaf" size="tight" />
         </>
       }
     />
@@ -92,8 +83,8 @@ type ReleaseNoticeBarProps = Readonly<{
 
 export const ReleaseNoticeBar = ({ notice, run }: ReleaseNoticeBarProps) => {
   switch (notice.kind) {
-    case 'ready': {
-      return <ReadyNotice version={notice.version} run={run} />
+    case 'published': {
+      return <PublishedNotice version={notice.version} run={run} />
     }
     case 'arrived': {
       return <ArrivedNotice version={notice.version} run={run} />

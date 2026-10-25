@@ -2,6 +2,7 @@ import { t } from '@lingui/core/macro'
 import { Button, Panel } from '@multifus/retro'
 import type { Snapshot } from '@/@types/snapshot'
 import type { UpdateStatus } from '@/@types/system'
+import { DownloadButton } from '@/components/download-button'
 import { FieldRow } from '@/components/layout/field-row'
 import { PanelHeader } from '@/components/layout/panel-header'
 import { LinkButton } from '@/components/link-button'
@@ -25,12 +26,7 @@ export const ProjectPanel = ({ update, run }: ProjectPanelProps) => {
       />
       <FieldRow label={t`Mise à jour`} description={updateLine(update)}>
         {hasUpdate ? (
-          <LinkButton
-            label={t`Télécharger`}
-            onOpen={() => {
-              return openAboutLink('download')
-            }}
-          />
+          <DownloadButton />
         ) : (
           <Button
             variant="slate"

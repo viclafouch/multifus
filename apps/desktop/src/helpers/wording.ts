@@ -128,7 +128,7 @@ export const updateLine = (update: UpdateStatus) => {
   }
 }
 
-export const readyNoticeLines = (version: string) => {
+export const publishedNoticeLines = (version: string) => {
   return {
     title: t`La version ${version} est sortie`,
     body: t`Téléchargez-la sur le site et installez-la par-dessus : vos réglages restent.`

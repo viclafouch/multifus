@@ -22,8 +22,8 @@ const buttonNamed = (label: string) => {
   return screen.getByRole('button', { name: label })
 }
 
-const READY = {
-  kind: 'ready',
+const PUBLISHED = {
+  kind: 'published',
   version: '0.3.0'
 } as const satisfies ReleaseNotice
 
@@ -35,7 +35,7 @@ const ARRIVED = {
 describe('the release notice', () => {
   it('leads to the download page of the version found, its notes, and to wait', () => {
     bridge.openAboutLink.mockResolvedValue(null)
-    show(READY)
+    show(PUBLISHED)
 
     expect(screen.getByText('La version 0.3.0 est sortie')).not.toBeNull()
 

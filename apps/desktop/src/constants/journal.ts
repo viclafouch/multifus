@@ -193,7 +193,7 @@ export const DETAILED_LINES = {
   saveFailed: msg`Configuration non enregistrée`,
   configNotSetAside: msg`Configuration illisible et impossible à déplacer, le prochain enregistrement l’écrasera`,
   openFailed: msg`Le système n’a pas pu ouvrir cet élément`,
-  updateFailed: msg`Mise à jour impossible`,
+  updateFailed: msg`Vérification de version impossible`,
   displayAwakeFailed: msg`Écran impossible à tenir éveillé, la session peut se verrouiller`
 } as const satisfies Record<DetailedEventKind, Phrase>
 

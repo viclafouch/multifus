@@ -539,7 +539,7 @@ pub fn on_run_event(app: &AppHandle, event: RunEvent) {
     main_window::show_on_dock_click(app, event);
 }
 
-pub fn give_traces_back(app: &AppHandle) {
+fn give_traces_back(app: &AppHandle) {
     let turn = Turn::of(app);
 
     give_titles_back(&turn);

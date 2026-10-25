@@ -274,7 +274,7 @@ pub enum UpdateView {
     rename_all_fields = "camelCase"
 )]
 pub enum ReleaseNotice {
-    Ready { version: String },
+    Published { version: String },
 
     Arrived { version: String },
 }
@@ -283,7 +283,7 @@ impl ReleaseNotice {
     #[must_use]
     pub fn version(&self) -> &str {
         match self {
-            Self::Ready { version } | Self::Arrived { version } => version,
+            Self::Published { version } | Self::Arrived { version } => version,
         }
     }
 }
@@ -1011,7 +1011,7 @@ mod tests {
     #[test]
     fn every_release_notice_says_its_kind_and_its_version() {
         let notices = [
-            ReleaseNotice::Ready {
+            ReleaseNotice::Published {
                 version: "0.3.0".to_owned(),
             },
             ReleaseNotice::Arrived {
@@ -1019,7 +1019,7 @@ mod tests {
             },
         ];
 
-        assert_eq!(kinds_of(&notices), ["ready", "arrived"]);
+        assert_eq!(kinds_of(&notices), ["published", "arrived"]);
         assert_eq!(json_of(&notices[0])["version"], json!("0.3.0"));
         assert_eq!(json_of(&notices[1])["version"], json!("0.2.0"));
     }

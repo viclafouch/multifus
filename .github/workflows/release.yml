@@ -26,7 +26,7 @@ env:
 
     - `Multifus_*_universal.dmg`: macOS 13.3 or later, Apple Silicon and Intel, signed and notarized by Apple
     - `Multifus_*_x64-setup.exe`: Windows 10 or 11 installer, not code-signed yet
-    - `latest.json`, `*.sig`, `*.app.tar.gz`: read by the in-app updater
+    - `latest.json`, `*.sig`, `*.app.tar.gz`: read by the updater of the copies up to 0.3.0
 
     Every installer carries a build provenance attestation: `gh attestation verify <file> -R viclafouch/multifus`
 

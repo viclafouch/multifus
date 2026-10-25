@@ -116,7 +116,7 @@ describe('the About screen', () => {
       fireEvent.click(buttonNamed('Vérifier'))
 
       expect(bridge.checkUpdate).toHaveBeenCalledWith()
-      expect(bridge.openAboutLink).not.toHaveBeenCalledWith('download')
+      expect(bridge.openAboutLink).not.toHaveBeenCalled()
     })
 
     it('says the version is the latest', () => {
